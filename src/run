@@ -1,0 +1,2 @@
+set -x
+scala -classpath ../lib/smack.jar:../lib/smackx.jar:. scalabot.ScalaBot
