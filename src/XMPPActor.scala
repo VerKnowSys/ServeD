@@ -2,7 +2,6 @@ package scalabot
 
 import scala.actors._
 import org.jivesoftware.smack._
-// import org.jivesoftware.smack.XMPPConnection
 
 object XMPPActor extends Actor {
 
@@ -11,16 +10,15 @@ object XMPPActor extends Actor {
 	
 	def initConnection = {
 		config.setCompressionEnabled(true)
-		//config.setSASLAuthenticationEnabled(true)
+		config.setSASLAuthenticationEnabled(false)
 		connection.connect
-		connection.login("git-bot@drakor.eu", "git-bot-666", "scalaBot")
+		connection.login("git-bot", "git-bot-666", "scalaBot")
 	}
-	
+
 	def closeConnection = {
-		// Disconnect from the server
 		connection.disconnect
 	}
-	
+
 	override def act = {
 		while(true) {
 			receive {
@@ -28,13 +26,22 @@ object XMPPActor extends Actor {
 					println("received message: "+ x)
 				case y: Symbol =>
 					println("received command symbol: "+ y)
-					if (y.equals(Symbol("Quit"))) {
-						println("received quit command.")
-						exit
-					}
-					if (y.equals(Symbol("InitConnection"))) {
-						println("received init connection command")
-						initConnection
+					y match {
+						case 'Quit => {
+							println("received Quit command.")
+							exit
+						}
+						case 'InitConnection => {
+							println("received InitConnection command.")
+							initConnection
+						}
+						case 'CloseConnection => {
+							println("received CloseConnection command.")
+							closeConnection
+						}
+						case _ => {
+							println("received Unknown command.")
+						}
 					}
 			}
 		}

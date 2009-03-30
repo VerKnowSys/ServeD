@@ -8,6 +8,8 @@ object ScalaBot extends Application {
 	
 	XMPPActor.start
 	XMPPActor ! 'InitConnection
+	XMPPActor ! 'CloseConnection
+	XMPPActor ! 'Quit
 	
 	CommandActor.start	
 	CommandActor ! 'Quit
