@@ -1,3 +1,5 @@
+// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
+
 package scalabot
 
 class Commit(commitMsg: String, branchName: String) {

@@ -1,3 +1,5 @@
+// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
+
 package scalabot
 
 import scala.actors._
@@ -17,7 +19,7 @@ object ScalaBot extends Application with Actor {
 		
 		Thread sleep 2000
 		Actor.loop {
-			Thread sleep 1000
+			Thread sleep 5000
 			CommandActor ! 'CheckForNewMessages
 		}
 	}

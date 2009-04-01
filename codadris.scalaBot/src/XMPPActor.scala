@@ -1,3 +1,5 @@
+// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved. 
+
 package scalabot
 
 import scala.actors._
@@ -36,7 +38,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		println("num: " + chat.length)
 		for ( x <- getUsers) {
 			try {
-				chat = chat ::: List( chatmanager.createChat(x("user"), this) )		
+				chat = chat ::: List( chatmanager.createChat(x("user"), this) )
 			} catch {
 				case x: Throwable => {
 					if (debug) {
