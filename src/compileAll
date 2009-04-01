@@ -1,2 +1,0 @@
-set -x
-fsc -classpath ../lib/smack.jar:../lib/smackx.jar:. XMPPActor.scala CommandActor.scala ScalaBot.scala
