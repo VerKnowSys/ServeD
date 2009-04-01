@@ -1,6 +1,0 @@
-#!/bin/bash
-
-set -x
-cd src/
-scala -classpath ../lib/smack.jar:../lib/smackx.jar:. scalabot.ScalaBot
-#cd ../
