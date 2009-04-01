@@ -14,12 +14,21 @@ object CommandActor extends Actor {
 	}
 	
 	def checkForNewMessages = {
-		// TODO: really do checking data to be sent to users
+		var commitData: Commit = null
 		if (debug) {
 			println("*** checkForNewMessages: Trying to send message")
 		}
-		val commitData = new Commit(
+		try {
+			// TODO: really do checking data to be sent to users
+			commitData = new Commit(
 			"Something was changed \nhere and\nin file \"somefile\"", "master256-" + new Date) // FIXME: hardcoded message
+		} catch {
+			case x: Throwable => {
+				if (debug) {
+					println("### Error: " + x)
+				}
+			}
+		}
 		XMPPActor ! commitData
 	}
 	
