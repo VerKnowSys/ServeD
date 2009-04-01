@@ -1,7 +1,11 @@
 #!/bin/bash
 
-set -x
 cd src/
-fsc -classpath ../lib/smack.jar:../lib/smackx.jar:. Commit.scala XMPPActor.scala CommandActor.scala ScalaBot.scala
-#z=$?
-#cd ../
+
+jars=`for i in ../lib/*.jar; do echo -n "$i:"; done`
+files=`for i in *.scala; do echo "$i"; done`
+
+echo $jars
+echo $files
+
+fsc -classpath $jars. $files

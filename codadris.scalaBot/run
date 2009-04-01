@@ -1,6 +1,19 @@
 #!/bin/bash
 
-set -x
 cd src/
-scala -classpath ../lib/smack.jar:../lib/smackx.jar:. scalabot.ScalaBot
-#cd ../
+
+jars=`for i in ../lib/*.jar; do echo -n "$i:"; done`
+packageDir="scalabot"
+main="$packageDir.ScalaBot"
+tests=`for i in *Test.scala; do echo -n "$i:"; done`
+echo $jars
+echo $main
+echo $tests
+
+echo "Running tests.."
+for i in $tests; do
+	scala -classpath $jars. $packageDir.tests.${i%%.*}
+done	
+
+echo "Running $packageDir"
+scala -classpath $jars. $main
