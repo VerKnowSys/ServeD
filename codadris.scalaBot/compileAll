@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -x
+cd src/
+fsc -classpath ../lib/smack.jar:../lib/smackx.jar:. Commit.scala XMPPActor.scala CommandActor.scala ScalaBot.scala
+#z=$?
+#cd ../
