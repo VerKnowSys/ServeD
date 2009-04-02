@@ -106,21 +106,23 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		    val query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))
 			val commit = odb.getObjects(query)
 				while (commit.hasNext) {
-					val el = commit.next
-					var comm = el.asInstanceOf[Commit]
-					comm.toRead = false
-					odb.store(comm)
-					odb.commit
-					if (debug)
-						println("*** Found in database: " + comm.commitSha1)
-					list = list ::: List(comm.commitSha1)	
+					commit.next match {
+						case comm: Commit => {
+							comm.toRead = false
+							odb.store(comm)
+							odb.commit
+							if (debug)
+								println("*** Found in database: " + comm.commitSha1)
+							list = list ::: List(comm.commitSha1)
+						}
+					}
 				}
+			odb.close
 		} catch {
 			case x: Throwable => {
 				println("### Error: " + x)
 			}
 		}
-		odb.close
 		return list
 	}
 	
@@ -128,13 +130,21 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		if (debug) print(".")
 			chat.foreach { element =>
 				try {
-					for ( message <- getMessages ) {
-						if (message.length > 0) {
+					for ( commitSha <- getMessages ) {
+						if (commitSha.length > 0) {
 							if (debug) {
 								println("*** Trying to send messages, to User: " + element.getParticipant)
 							}
-							// val showCommand = Array("git","show", , comm.commitSha1)
-							element.sendMessage(message + " ->" + element.getParticipant)
+							var currentUserSettings: String = ""
+							getUsers.foreach{ 
+								e => if (e("user") == element.getParticipant) currentUserSettings = e("settings")
+							}
+							val a = currentUserSettings.split(' ')
+							// XXX: only 5 arguments max:
+							val showCommand = Array("git","show", a(0), a(1), a(2), a(3), a(4), commitSha) 
+							val output = CommandExec.cmdExec(showCommand)
+							println("*** " + output)
+							element.sendMessage(output)
 						}
 					}
 				} catch {
@@ -146,8 +156,6 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 					}
 				}
 		}
-		//val chatmanager = connection.getChatManager
-		//val newChat = chatmanager.createChat( targetXMPP, this )
 	}
 			
 		
@@ -170,6 +178,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 							closeConnection
 						}
 						case 'ProcessMessages => {
+							initConnection
 							tryToSendMessages
 							act
 						}
