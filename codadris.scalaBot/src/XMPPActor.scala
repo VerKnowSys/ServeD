@@ -128,24 +128,23 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	
 	def tryToSendMessages = {
 		if (debug) print(".")
+		for ( commitSha <- getMessages ) {
 			chat.foreach { element =>
 				try {
-					for ( commitSha <- getMessages ) {
-						if (commitSha.length > 0) {
-							if (debug) {
-								println("*** Trying to send messages, to User: " + element.getParticipant)
-							}
-							var currentUserSettings: String = ""
-							getUsers.foreach{ 
-								e => if (e("user") == element.getParticipant) currentUserSettings = e("settings")
-							}
-							val a = currentUserSettings.split(' ')
-							// XXX: only 5 arguments max:
-							val showCommand = Array("git","show", a(0), a(1), a(2), a(3), a(4), commitSha) 
-							val output = CommandExec.cmdExec(showCommand)
-							println("*** " + output)
-							element.sendMessage(output)
+					if (commitSha.length > 0) {
+						if (debug) {
+							println("*** Trying to send messages, to User: " + element.getParticipant)
 						}
+						var currentUserSettings: String = ""
+						getUsers.foreach{ 
+							e => if (e("user") == element.getParticipant) currentUserSettings = e("settings")
+						}
+						val a = currentUserSettings.split(' ')
+						// XXX: only 2 arguments max:
+						val showCommand = Array("git","show", a(0), a(1), a(2), commitSha)
+						val output = CommandExec.cmdExec(showCommand)
+						println("*** sent message length: " + output.length)
+						element.sendMessage(output)
 					}
 				} catch {
 					case e: XMPPException => {
@@ -155,9 +154,9 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 						throw new Exception("### Error in sendMessage")
 					}
 				}
+			}
 		}
 	}
-			
 		
 	override def act = {
 		Actor.loop {
