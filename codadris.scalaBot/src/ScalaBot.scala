@@ -17,9 +17,9 @@ object ScalaBot extends Application with Actor {
 		XMPPActor.start
 		XMPPActor ! 'InitConnection
 		
-		Thread sleep 2000
+		Thread sleep 2500
 		Actor.loop {
-			Thread sleep 3000
+			Thread sleep 500
 			XMPPActor ! 'ProcessMessages
 		}
 	}
