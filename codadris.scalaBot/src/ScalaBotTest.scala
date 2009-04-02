@@ -17,23 +17,12 @@ class Test1 extends TestCase {
 	
 	def testCommitCreation = {
 		try {
-			commit = new Commit("","")
+			commit = new Commit("")
 			fail
 		} catch {
 			case a: Throwable => {
 			}
 		}
-	}
-	
-	def testCommitCreation1 = {
-		try {
-			commit = new Commit("") 
-			fail
-		} catch {
-			case a: Throwable => {
-			}
-		}
-		assert( commit == null )
 	}
 	
 	def testCommitCreation2 = {
@@ -41,11 +30,6 @@ class Test1 extends TestCase {
 		assert( commit != null )	
 	}
 	
-	def testCommitCreation3 = {
-		commit = new Commit("Something", "notMaster")
-		assert( commit != null )
-	}	
-		
 		// try {
 		// 	fail()
 		// } catch {

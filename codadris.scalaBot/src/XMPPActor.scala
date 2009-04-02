@@ -5,6 +5,10 @@ package scalabot
 import scala.actors._
 import scala.collection.immutable.HashMap
 
+import org.neodatis.odb._
+import org.neodatis.odb.impl.core.query.criteria._
+import org.neodatis.odb.core.query.criteria._
+
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.Chat
@@ -12,6 +16,7 @@ import org.jivesoftware.smack.filter._
 import org.jivesoftware.smack.PacketCollector
 import org.jivesoftware.smack.PacketListener
 import org.jivesoftware.smackx._
+
 
 object XMPPActor extends Actor with MessageListener { // with PacketListener 
 	
@@ -22,7 +27,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	private val presence = new Presence(Presence.Type.unavailable)
 	private val login = "git-bot"
 	private val password = "git-bot-666"
-	private val resource = "scalaBot_0.2"
+	private val resource = "scalaBot_0.3"
 	
 	var filter: AndFilter = null
 	var chatmanager: ChatManager = null
@@ -83,8 +88,8 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	
 	def getUsers = {
 		List(
-			HashMap( "user" -> "dmilith@drakor.eu", "settings" -> "-p -v" ),
-			HashMap( "user" -> "szymon@jez.net.pl", "settings" -> "-p" )
+			HashMap( "user" -> "dmilith@drakor.eu", "settings" -> "--numstat --no-merges" ),
+			HashMap( "user" -> "szymon@jez.net.pl", "settings" -> "--full-diff --numstat --no-merges" )
 		)
 	}
 	
@@ -92,14 +97,45 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		connection.disconnect
 	}
 	
-	def sendMessages( msg: String ) = {
-		chat.foreach { element =>
-			if (debug) {
+	def getMessages: List[String] = {
+		var odb: ODB = null
+		var list: List[String] = List()
+		try {
+		    odb = ODBFactory.open(ScalaBot.databaseName)
+		    val query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))
+			val commit = odb.getObjects(query)
+				while (commit.hasNext) {
+					val el = commit.next
+					var comm = el.asInstanceOf[Commit]
+					comm.toRead = false
+					odb.store(comm)
+					odb.commit
+					if (debug)
+						println("*** Found in database: " + comm.commitSha1)
+					list = list ::: List(comm.commitSha1)	
+				}
+		} catch {
+			case x: Throwable => {
+				println("### Error: " + x)
+			}
+		}
+		odb.close
+		return list
+	}
+	
+	def tryToSendMessages = {
+		if (debug) print(".")
+			chat.foreach { element =>
 				try {
-					if (debug) {
-						println("*** Sending message: " + msg + ", to User: " + element.getParticipant)
+					for ( message <- getMessages ) {
+						if (message.length > 0) {
+							if (debug) {
+								println("*** Trying to send messages, to User: " + element.getParticipant)
+							}
+							// val showCommand = Array("git","show", , comm.commitSha1)
+							element.sendMessage(message + " ->" + element.getParticipant)
+						}
 					}
-					element.sendMessage(msg + " -> " + element.getParticipant)
 				} catch {
 					case e: XMPPException => {
 						if (debug) {
@@ -108,7 +144,6 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 						throw new Exception("### Error in sendMessage")
 					}
 				}
-			}
 		}
 		//val chatmanager = connection.getChatManager
 		//val newChat = chatmanager.createChat( targetXMPP, this )
@@ -133,15 +168,15 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 							if (debug) println("received CloseConnection command.")
 							closeConnection
 						}
+						case 'ProcessMessages => {
+							tryToSendMessages
+							act
+						}
 						case _ => {
 							if (debug) println("received Unknown command.")
 							act
 						}
 					}
-				case z: Commit => {
-					sendMessages(z.commitMessage + " @" + z.branch)
-					act
-				}
 				case _ => {
 					if (debug) 
 						println(" ")

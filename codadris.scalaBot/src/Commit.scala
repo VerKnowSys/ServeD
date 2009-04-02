@@ -2,16 +2,13 @@
 
 package scalabot
 
-class Commit(commitMsg: String, branchName: String) {
+class Commit(commitSha: String, unRead: Boolean) {
 	
-	require(commitMsg.length != 0)
-	require(branchName.length != 0)
+	require(commitSha.length != 0)
 	
-	val commitMessage = commitMsg
-	val branch = branchName
+	val commitSha1 = commitSha
+	var toRead = unRead
 	
-	var sent = false
-	
-	def this(commitMsg: String) = this(commitMsg, "master")
+	def this(commitSha: String) = this(commitSha, true)
 	
 }

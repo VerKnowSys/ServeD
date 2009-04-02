@@ -7,6 +7,7 @@ import scala.actors._
 object ScalaBot extends Application with Actor {
 	
 	val debug = true
+	val databaseName = "../ScalaBotCommitDataBase.neodatis"
 	
 	println("ScalaBot initializing..")
 	this.start
@@ -14,13 +15,11 @@ object ScalaBot extends Application with Actor {
 	override def act = {
 		XMPPActor.start
 		XMPPActor ! 'InitConnection
-		CommandActor.start
-		CommandActor ! 'InitAndCheckVCS
 		
 		Thread sleep 2000
 		Actor.loop {
-			Thread sleep 5000
-			CommandActor ! 'CheckForNewMessages
+			Thread sleep 3000
+			XMPPActor ! 'ProcessMessages
 		}
 	}
 	
