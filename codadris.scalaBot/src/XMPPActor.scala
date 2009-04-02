@@ -42,7 +42,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		connection.login(login, password, resource)
 		chatmanager = connection.getChatManager
 		println("num: " + chat.length)
-		for ( x <- getUsers) {
+		getUsers.foreach { x =>
 			try {
 				chat = chat ::: List( chatmanager.createChat(x("user"), this) )
 			} catch {
@@ -54,15 +54,8 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 			}
 		}
 		println("num: " + chat.length)
-		
-// 		chat = chatmanager.createChat("dmilith@drakor.eu", this)
-		// assert user("user") != Nothing
-		// if (debug) println("myMap(\"user\": " + user("user"))	
-		
 		presence.setStatus("I'm still in development so stay away")
 		connection.sendPacket(presence)
-		//filter = new AndFilter( new PacketTypeFilter( classOf[Message] ), new FromContainsFilter("dmilith@drakor.eu") )
-		//connection.addPacketListener(this, filter)
 		println("Connected as: " + login)
 	}
 
@@ -89,8 +82,10 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	
 	def getUsers = {
 		List(
-			HashMap( "user" -> "dmilith@drakor.eu", "settings" -> "--numstat --no-merges" ),
-			HashMap( "user" -> "szymon@jez.net.pl", "settings" -> "--full-diff --numstat --no-merges" )
+			// XXX: only three arguments in settings:
+			HashMap( "user" -> "dmilith@drakor.eu", "settings" -> "--numstat --no-merges --no-merges" ),
+			HashMap( "user" -> "szymon@jez.net.pl", "settings" -> "--full-diff --numstat --no-merges" ),
+			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "settings" -> "--numstat --no-merges --no-merges" )
 		)
 	}
 	
@@ -177,7 +172,6 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 							closeConnection
 						}
 						case 'ProcessMessages => {
-							initConnection
 							tryToSendMessages
 							act
 						}
