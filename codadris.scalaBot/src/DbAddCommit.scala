@@ -1,7 +1,9 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
+// This Software is a close code project. You may not redistribute this code without permission of author.
 
-package scalabot
+package commiter
 
+import scalabot._
 import scala.actors._
 import java.io._
 import org.neodatis.odb._
