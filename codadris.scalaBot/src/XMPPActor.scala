@@ -28,7 +28,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	private val presence = new Presence(Presence.Type.unavailable)
 	private val login = "git-bot"
 	private val password = "git-bot-666"
-	private val resource = "scalaBot_0.3"
+	private val resource = "scalaBot_0.4"
 	
 	var filter: AndFilter = null
 	var chatmanager: ChatManager = null
@@ -54,7 +54,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 			}
 		}
 		println("num: " + chat.length)
-		presence.setStatus("I'm still in development so stay away")
+		presence.setStatus("I'm quite ready to serve!")
 		connection.sendPacket(presence)
 		println("Connected as: " + login)
 	}
