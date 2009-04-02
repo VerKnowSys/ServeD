@@ -10,6 +10,8 @@ class Commit(commitMsg: String, branchName: String) {
 	val commitMessage = commitMsg
 	val branch = branchName
 	
+	var sent = false
+	
 	def this(commitMsg: String) = this(commitMsg, "master")
 	
 }
