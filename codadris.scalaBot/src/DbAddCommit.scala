@@ -25,13 +25,14 @@ object DbAddCommit {
 			println("*** Reqested adding new commit list to objDb: " + args(0) + " to " + args(1))
 		val command = Array("git", "rev-list", args(0) + "..." + args(1))
 		var listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
-		listOfSha1.foreach{ oneOf => 
+		listOfSha1.foreach { oneOf => 
 			val commit = new Commit(oneOf)
 			writeCommitToDataBase( commit )	// sha1, show?
 			if (debug)
 				println("*** writeCommitToDatabase: " + commit )
 		}
 		println("Done. All ok")
+		exit(0)
 	}
 
 }
