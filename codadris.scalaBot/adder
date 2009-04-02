@@ -1,0 +1,9 @@
+#!/bin/bash
+# This Software is a close code project. You may not redistribute this code without permission of author.
+cd src/
+
+jars=`for i in ../lib/*.jar; do echo -n "$i:"; done`
+echo $jars
+
+echo "Running DbAddCommit"
+scala -classpath $jars. commiter.DbAddCommit 88a71334823b2182be6603a2609cb5defefc1a17 7abacecf8c9449fd73a5d5af0ae5ef46ff9f6b6f
