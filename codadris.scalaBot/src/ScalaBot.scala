@@ -7,7 +7,7 @@ import scala.actors._
 
 object ScalaBot extends Application with Actor {
 	
-	val debug = true
+	val debug = false
 	val databaseName = "../ScalaBotCommitDataBase.neodatis"
 	
 	println("ScalaBot initializing..")
