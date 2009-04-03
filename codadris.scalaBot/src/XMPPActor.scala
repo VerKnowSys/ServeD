@@ -21,7 +21,7 @@ import org.jivesoftware.smackx._
 
 object XMPPActor extends Actor with MessageListener { // with PacketListener 
 	
-	val debug = ScalaBot.debug
+	val debug = true
 	
 	private val config = new ConnectionConfiguration("drakor.eu", 5222)
 	private val connection = new XMPPConnection(config)	

@@ -11,7 +11,7 @@ import org.neodatis.odb._
 
 object DbAddCommit {
 	
-	val debug = ScalaBot.debug
+	val debug = true
 	
 	def writeCommitToDataBase(arg: Commit) = {
 		val odb = ODBFactory.open(ScalaBot.databaseName)
@@ -35,6 +35,7 @@ object DbAddCommit {
 		} catch {
 			case x: Throwable => {
 				println("### Error: bad arguments.\nUsage: scriptname sha1-start sha1-end")
+				exit(1)
 			}
 		}
 	}
