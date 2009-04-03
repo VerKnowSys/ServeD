@@ -31,10 +31,10 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	private val resource = Settings.resource
 	private val repositoryDir = Settings.repositoryDir
 	private val databaseName = Settings.databaseName
-	
-	var filter: AndFilter = null
-	var chatmanager: ChatManager = null
-	var chat: List[Chat] = List()
+
+	private var filter: AndFilter = null
+	private var chatmanager: ChatManager = null
+	private var chat: List[Chat] = List()
 	
 	def initConnection = {
 		XMPPConnection.DEBUG_ENABLED = true
