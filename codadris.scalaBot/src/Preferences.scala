@@ -35,7 +35,7 @@ object Preferences {
 			settings = Yaml.loadType(new File(botConfigFile), classOf[Settings])
 		} catch {
 			case x: Throwable => {
-				if (debug) println("*** file "+botConfigFile+" doesn't exists! creating new one")
+				println("*** config file "+botConfigFile+" doesn't exists! creating new one")
 				savePreferences(new Settings)
 				settings = new Settings
 			}
