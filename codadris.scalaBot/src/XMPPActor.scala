@@ -95,7 +95,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 				if (debug) println("*** Indexes were added")
 			} catch {
 				case y: Throwable => {
-					if (debug) println("*** Indexes already exist")
+					// XXX: NOOP
 				}
 			}
 		    val query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))

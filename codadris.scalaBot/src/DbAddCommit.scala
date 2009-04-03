@@ -18,7 +18,6 @@ object DbAddCommit {
 	def writeCommitToDataBase(arg: Commit) = {
 		val odb = ODBFactory.open(databaseName)
 		odb.store( arg )
-		// query.addExtension("datanucleus.query.flushBeforeExecution","true");
 		odb.close
 	}
 	
