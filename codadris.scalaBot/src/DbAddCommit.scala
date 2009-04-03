@@ -13,9 +13,10 @@ object DbAddCommit {
 	
 	val debug = true
 	val repository_dir = "/git/codadris.git"
+	val databaseName = "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/ScalaBotCommitDataBase.neodatis"
 	
 	def writeCommitToDataBase(arg: Commit) = {
-		val odb = ODBFactory.open(ScalaBot.databaseName)
+		val odb = ODBFactory.open(databaseName)
 		odb.store( arg )
 		// query.addExtension("datanucleus.query.flushBeforeExecution","true");
 		odb.close

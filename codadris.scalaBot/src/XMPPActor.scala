@@ -30,6 +30,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	private val password = "git-bot-666"
 	private val resource = "scalaBot_0.4"
 	val repository_dir = "/git/codadris.git"
+	val databaseName = "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/ScalaBotCommitDataBase.neodatis"
 	
 	var filter: AndFilter = null
 	var chatmanager: ChatManager = null
@@ -98,7 +99,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		var odb: ODB = null
 		var list: List[String] = List()
 		try {
-		    odb = ODBFactory.open(ScalaBot.databaseName)
+		    odb = ODBFactory.open(databaseName)
 		    val query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))
 			val commit = odb.getObjects(query)
 				while (commit.hasNext) {
@@ -150,8 +151,8 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 						}
 						throw new Exception("### Error in sendMessage")
 					}
-					case _ => {
-						XMPPActor ! 'InitConnection
+					case f: Throwable => {
+						println("### Error " + f )
 					}
 				}
 			}
