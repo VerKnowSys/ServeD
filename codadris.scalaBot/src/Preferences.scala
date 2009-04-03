@@ -28,7 +28,7 @@ class Settings { // Preferences with default parametters
 
 object Preferences {
 
-	val botConfigFile = "/home/verknowsys/Java/ScalaBot/codadris.scalaBot/ScalaBot.config"
+	val botConfigFile = "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/ScalaBot.config"
 	
 	def loadPreferences = {
 		var sett = new Settings
