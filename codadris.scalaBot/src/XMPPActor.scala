@@ -89,6 +89,15 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		var list: List[String] = List()
 		try {
 		    odb = ODBFactory.open(databaseName)
+			try { //adding indexes before queries
+				odb.getClassRepresentation(classOf[Commit]).addUniqueIndexOn("commitSha1", Array("commitSha1"), true)
+				odb.getClassRepresentation(classOf[Commit]).addUniqueIndexOn("toRead", Array("toRead"), true)
+				if (debug) println("*** Indexes were added")
+			} catch {
+				case y: Throwable => {
+					if (debug) println("*** Indexes already exist")
+				}
+			}
 		    val query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))
 			val commit = odb.getObjects(query)
 				while (commit.hasNext) {
