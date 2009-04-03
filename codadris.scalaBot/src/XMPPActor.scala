@@ -29,7 +29,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	private val login = "git-bot"
 	private val password = "git-bot-666"
 	private val resource = "scalaBot_0.4"
-	val repository_dir = "/git/codadris.git/.git"
+	val repository_dir = "/git/codadris.git"
 	
 	var filter: AndFilter = null
 	var chatmanager: ChatManager = null
