@@ -31,12 +31,12 @@ object Preferences {
 	val botConfigFile = "/home/verknowsys/Java/ScalaBot/codadris.scalaBot/ScalaBot.config"
 	
 	def loadPreferences = {
+		var sett = new Settings
 		try {
 			sett = Yaml.loadType(new File(botConfigFile), classOf[Settings])
 		} catch {
 			case x: Throwable => {
 				println("*** config file "+botConfigFile+" doesn't exists! creating new one")
-				sett = new Settings
 				savePreferences(sett)
 			}
 		}
