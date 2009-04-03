@@ -32,15 +32,15 @@ object Preferences {
 	
 	def loadPreferences = {
 		try {
-			settings = Yaml.loadType(new File(botConfigFile), classOf[Settings])
+			sett = Yaml.loadType(new File(botConfigFile), classOf[Settings])
 		} catch {
 			case x: Throwable => {
 				println("*** config file "+botConfigFile+" doesn't exists! creating new one")
-				savePreferences(new Settings)
-				settings = new Settings
+				sett = new Settings
+				savePreferences(sett)
 			}
 		}
-		settings
+		sett
 	}
 	
 	def savePreferences(set: Settings) = Yaml.dump(set, new File(botConfigFile))
