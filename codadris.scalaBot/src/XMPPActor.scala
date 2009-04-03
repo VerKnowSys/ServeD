@@ -28,7 +28,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	private val presence = new Presence(Presence.Type.unavailable)
 	private val login = "git-bot"
 	private val password = "git-bot-666"
-	private val resource = "scalaBot_0.4"
+	private val resource = "scalaBot_0.5"
 	val repository_dir = "/git/codadris.git"
 	val databaseName = "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/ScalaBotCommitDataBase.neodatis"
 	
@@ -145,14 +145,9 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 						element.sendMessage(output)
 					}
 				} catch {
-					case e: XMPPException => {
-						if (debug) {
-							println("Error Delivering block")
-						}
-						throw new Exception("### Error in sendMessage")
-					}
-					case f: Throwable => {
-						println("### Error " + f )
+					case e: Throwable => {
+						println("### Error " + e + "\nTrying to put commit onto list cause errors.")
+						DbAddCommit.writeCommitToDataBase(new Commit(commitSha))
 					}
 				}
 			}
