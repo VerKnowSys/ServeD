@@ -8,7 +8,7 @@ import scala.actors._
 object ScalaBot extends Application with Actor {
 	
 	val debug = true
-	val databaseName = "../ScalaBotCommitDataBase.neodatis"
+	val databaseName = "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/ScalaBotCommitDataBase.neodatis"
 	
 	Runtime.getRuntime.addShutdownHook( new Thread {
 		override def run = {
