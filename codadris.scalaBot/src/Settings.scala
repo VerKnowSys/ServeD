@@ -9,16 +9,13 @@ object Settings {
 	
 	val debug = true
 	
-	def getUsers = {
-		List(
+	val getUsers = List(
 			// XXX: only three arguments in settings:
 			HashMap( "user" -> "dmilith@drakor.eu", "settings" -> "--numstat --no-merges --no-merges" ),
 			HashMap( "user" -> "szymon@jez.net.pl", "settings" -> "--full-diff --numstat --no-merges" ),
 			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "settings" -> "--numstat --no-merges --no-merges" ),
 			HashMap( "user" -> "vara@jabber.verknowsys.info", "settings" -> "--numstat --no-merges --no-merges" )
 		)
-	}
-	
 	val databaseName = "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/ScalaBotCommitDataBase.neodatis"
 	val repositoryDir = "/git/codadris.git"
 	val resource = "scalaBot_0.5"
