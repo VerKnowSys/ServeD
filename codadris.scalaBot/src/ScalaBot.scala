@@ -10,6 +10,13 @@ object ScalaBot extends Application with Actor {
 	val debug = false
 	val databaseName = "../ScalaBotCommitDataBase.neodatis"
 	
+	Runtime.getRuntime.addShutdownHook( new Thread {
+		override def run = {
+			println ("Called at shutdown.")
+			XMPPActor ! 'Quit
+		}
+	})
+	
 	println("ScalaBot initializing..")
 	this.start
 	
@@ -18,6 +25,7 @@ object ScalaBot extends Application with Actor {
 		XMPPActor ! 'InitConnection
 		
 		Thread sleep 2500
+		println("Ready to serve. Waiting for orders.")
 		Actor.loop {
 			Thread sleep 500
 			XMPPActor ! 'ProcessMessages
