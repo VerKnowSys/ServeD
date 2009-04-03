@@ -136,7 +136,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 						}
 						val a = currentUserSettings.split(' ')
 						// XXX: only 2 arguments max:
-						val showCommand = Array("/usr/bin/git","show", a(0), a(1), a(2), commitSha)
+						val showCommand = Array("git","show", a(0), a(1), a(2), commitSha)
 						val output = CommandExec.cmdExec(showCommand)
 						if (debug)
 							println("*** sent message length: " + output.length)

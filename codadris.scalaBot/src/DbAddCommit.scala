@@ -12,7 +12,7 @@ import org.neodatis.odb._
 object DbAddCommit {
 	
 	val debug = true
-	val git_dir_of_repository = "/home/verknowsys/JAVA/codadris-public/"
+	val repository_dir = "/home/verknowsys/JAVA/codadris-public/.git"
 	
 	def writeCommitToDataBase(arg: Commit) = {
 		val odb = ODBFactory.open(ScalaBot.databaseName)
@@ -23,8 +23,8 @@ object DbAddCommit {
 	
 	def main(args: Array[String]) = {
 		try{
-			System.setProperty("user.dir", git_dir_of_repository)
-			val command = Array("/usr/bin/git", "rev-list", args(0) + "..." + args(1))
+			val command = Array("git", "--git-dir=\""+ repository_dir +"\"", "rev-list", args(0) + "..." + args(1))
+			println("Performing "+command.map{ a => a })
 			var listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
 			listOfSha1.foreach { oneOf => 
 				val commit = new Commit(oneOf)

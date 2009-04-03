@@ -11,14 +11,16 @@ object CommandExec {
 	def cmdExec(cmdLine: Array[String]): String = {
      	var output = ""
     	try {
+			println("cmdLine: " + cmdLine)
 	        val p = Runtime.getRuntime.exec(cmdLine)
 	        val input = new BufferedReader(new InputStreamReader(p.getInputStream))
-			p.waitFor
+
 			var line = ""
 	        	while (line != null) {
 					output += (line + '\n')
 					line = input.readLine
-		        }
+				}
+			p.waitFor
 	        input.close
 	        } catch {
 				case ex: Throwable => {
