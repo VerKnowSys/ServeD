@@ -7,17 +7,17 @@ import scala.actors._
 
 object ScalaBot extends Application with Actor {
 	
-	val debug = true
+	private val debug = Settings.debug
 	
 	Runtime.getRuntime.addShutdownHook( new Thread {
 		override def run = {
-			println ("Called at shutdown.")
+			println ("bot shutdown requested.")
 			XMPPActor ! 'CloseConnection
 			XMPPActor ! 'Quit
 		}
 	})
 	
-	println("ScalaBot initializing..")
+	println("initializing..")
 	this.start
 	
 	override def act = {
@@ -25,7 +25,7 @@ object ScalaBot extends Application with Actor {
 		XMPPActor ! 'InitConnection
 		
 		Thread sleep 2500
-		println("Ready to serve. Waiting for orders.")
+		println("ready to serve. waiting for orders.")
 		Actor.loop {
 			Thread sleep 500
 			XMPPActor ! 'ProcessMessages

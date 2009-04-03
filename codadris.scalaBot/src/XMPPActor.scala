@@ -6,7 +6,6 @@ package scalabot
 import commiter._
 
 import scala.actors._
-import scala.collection.immutable.HashMap
 
 import org.neodatis.odb._
 import org.neodatis.odb.impl.core.query.criteria._
@@ -23,16 +22,15 @@ import org.jivesoftware.smackx._
 
 object XMPPActor extends Actor with MessageListener { // with PacketListener 
 	
-	val debug = true
-	
-	private val config = new ConnectionConfiguration("drakor.eu", 5222)
+	private val debug = Settings.debug
+	private val config = new ConnectionConfiguration(Settings.server, Settings.port)
 	private val connection = new XMPPConnection(config)	
 	private val presence = new Presence(Presence.Type.unavailable)
-	private val login = "git-bot"
-	private val password = "git-bot-666"
-	private val resource = "scalaBot_0.5"
-	val repository_dir = "/git/codadris.git"
-	val databaseName = "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/ScalaBotCommitDataBase.neodatis"
+	private val login = Settings.login
+	private val password = Settings.password
+	private val resource = Settings.resource
+	private val repositoryDir = Settings.repositoryDir
+	private val databaseName = Settings.databaseName
 	
 	var filter: AndFilter = null
 	var chatmanager: ChatManager = null
@@ -45,8 +43,8 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		connection.connect
 		connection.login(login, password, resource)
 		chatmanager = connection.getChatManager
-		println("num: " + chat.length)
-		getUsers.foreach { x =>
+		if (debug) println("*** num of users: " + chat.length)
+		Settings.getUsers.foreach { x =>
 			try {
 				chat = chat ::: List( chatmanager.createChat(x("user"), this) )
 			} catch {
@@ -57,10 +55,10 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 				}
 			}
 		}
-		println("num: " + chat.length)
+		if (debug) println("*** num of users: " + chat.length)
 		presence.setStatus("I'm quite ready to serve!")
 		connection.sendPacket(presence)
-		println("Connected as: " + login)
+		if (debug) println("*** Connected as: " + login)
 	}
 
 	// def processPacket(packet: Packet) {
@@ -79,19 +77,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	// }
 
 	def processMessage(chat: Chat, message: Message) {
-		if (debug) {
-			println("*** Received message: " + message + " (\"" + message.getBody + "\")")
-		}
-	}
-	
-	def getUsers = {
-		List(
-			// XXX: only three arguments in settings:
-			HashMap( "user" -> "dmilith@drakor.eu", "settings" -> "--numstat --no-merges --no-merges" ),
-			HashMap( "user" -> "szymon@jez.net.pl", "settings" -> "--full-diff --numstat --no-merges" ),
-			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "settings" -> "--numstat --no-merges --no-merges" ),
-			HashMap( "user" -> "vara@jabber.verknowsys.info", "settings" -> "--numstat --no-merges --no-merges" )
-		)
+		if (debug) println("*** Received message: " + message + " (\"" + message.getBody + "\")")
 	}
 	
 	def closeConnection = {
@@ -136,12 +122,12 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 							println("*** Trying to send messages, to User: " + element.getParticipant)
 						}
 						var currentUserSettings: String = ""
-						getUsers.foreach{ 
+						Settings.getUsers.foreach{ 
 							e => if (e("user") == element.getParticipant) currentUserSettings = e("settings")
 						}
 						val a = currentUserSettings.split(' ')
 						// XXX: only 2 arguments max:
-						val showCommand = Array("git",  "--git-dir="+ repository_dir +"","show", a(0), a(1), a(2), commitSha)
+						val showCommand = Array("git",  "--git-dir="+ repositoryDir +"","show", a(0), a(1), a(2), commitSha)
 						val output = CommandExec.cmdExec(showCommand)
 						if (debug)
 							println("*** sent message length: " + output.length)
@@ -163,16 +149,16 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 				case y: Symbol =>
 					y match {
 						case 'Quit => {
-							if (debug) println("received Quit command.")
+							if (debug) println("*** received Quit command.")
 							exit
 						}
 						case 'InitConnection => {
-							if (debug) println("received InitConnection command.")
+							if (debug) println("*** received InitConnection command.")
 							initConnection
 							act
 						}
 						case 'CloseConnection => {
-							if (debug) println("received CloseConnection command.")
+							if (debug) println("*** received CloseConnection command.")
 							closeConnection
 						}
 						case 'ProcessMessages => {
@@ -180,13 +166,11 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 							act
 						}
 						case _ => {
-							if (debug) println("received Unknown command.")
+							if (debug) println("*** received Unknown command.")
 							act
 						}
 					}
 				case _ => {
-					if (debug) 
-						println(" ")
 					act
 				}
 			}
