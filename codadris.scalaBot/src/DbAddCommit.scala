@@ -11,9 +11,9 @@ import org.neodatis.odb._
 
 object DbAddCommit {
 	
-	private val debug = Settings.debug
-	private val repositoryDir = Settings.repositoryDir
-	private val databaseName = Settings.databaseName
+	private val debug = Preferences.settings.debug
+	private val repositoryDir = Preferences.settings.repositoryDir
+	private val databaseName = Preferences.settings.databaseName
 	
 	def writeCommitToDataBase(arg: Commit) = {
 		val odb = ODBFactory.open(databaseName)

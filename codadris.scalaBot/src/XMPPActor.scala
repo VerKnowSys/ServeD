@@ -22,15 +22,15 @@ import org.jivesoftware.smackx._
 
 object XMPPActor extends Actor with MessageListener { // with PacketListener 
 	
-	private val debug = Settings.debug
-	private val config = new ConnectionConfiguration(Settings.server, Settings.port)
+	private val debug = Preferences.settings.debug
+	private val config = new ConnectionConfiguration(Preferences.settings.server, Preferences.settings.port)
 	private val connection = new XMPPConnection(config)	
 	private val presence = new Presence(Presence.Type.unavailable)
-	private val login = Settings.login
-	private val password = Settings.password
-	private val resource = Settings.resource
-	private val repositoryDir = Settings.repositoryDir
-	private val databaseName = Settings.databaseName
+	private val login = Preferences.settings.login
+	private val password = Preferences.settings.password
+	private val resource = Preferences.settings.resource
+	private val repositoryDir = Preferences.settings.repositoryDir
+	private val databaseName = Preferences.settings.databaseName
 
 	private var filter: AndFilter = null
 	private var chatmanager: ChatManager = null
@@ -44,7 +44,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		connection.login(login, password, resource)
 		chatmanager = connection.getChatManager
 		if (debug) println("*** num of users: " + chat.length)
-		Settings.getUsers.foreach { x =>
+		Preferences.settings.users.foreach { x =>
 			try {
 				chat = chat ::: List( chatmanager.createChat(x("user"), this) )
 			} catch {
@@ -130,12 +130,12 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 						if (debug) {
 							println("*** Trying to send messages, to User: " + element.getParticipant)
 						}
-						var currentUserSettings: String = ""
-						Settings.getUsers.foreach{ 
-							e => if (e("user") == element.getParticipant) currentUserSettings = e("settings")
+						var currentUserPreferences: String = ""
+						Preferences.settings.users.foreach{ 
+							e => if (e("user") == element.getParticipant) currentUserPreferences = e("Preferences")
 						}
-						val a = currentUserSettings.split(' ')
-						// XXX: only 2 arguments max:
+						val a = currentUserPreferences.split(' ')
+						// XXX: only and max 3 arguments max:
 						val showCommand = Array("git",  "--git-dir="+ repositoryDir +"","show", a(0), a(1), a(2), commitSha)
 						val output = CommandExec.cmdExec(showCommand)
 						if (debug)
