@@ -87,7 +87,8 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 			// XXX: only three arguments in settings:
 			HashMap( "user" -> "dmilith@drakor.eu", "settings" -> "--numstat --no-merges --no-merges" ),
 			HashMap( "user" -> "szymon@jez.net.pl", "settings" -> "--full-diff --numstat --no-merges" ),
-			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "settings" -> "--numstat --no-merges --no-merges" )
+			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "settings" -> "--numstat --no-merges --no-merges" ),
+			HashMap( "user" -> "vara@jabber.verknowsys.info", "settings" -> "--numstat --no-merges --no-merges" )
 		)
 	}
 	
