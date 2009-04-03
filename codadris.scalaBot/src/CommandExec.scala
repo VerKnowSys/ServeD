@@ -13,6 +13,7 @@ object CommandExec {
     	try {
 	        val p = Runtime.getRuntime.exec(cmdLine)
 	        val input = new BufferedReader(new InputStreamReader(p.getInputStream))
+			p.waitFor
 			var line = ""
 	        	while (line != null) {
 					output += (line + '\n')
