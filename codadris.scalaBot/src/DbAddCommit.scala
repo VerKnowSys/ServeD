@@ -27,8 +27,7 @@ object DbAddCommit {
 			listOfSha1.foreach { oneOf => 
 				val commit = new Commit(oneOf)
 				writeCommitToDataBase( commit )	// sha1, show?
-				if (debug)
-					println("*** writeCommitToDatabase: " + commit )
+				if (debug) println("*** writeCommitToDatabase: " + commit )
 			}
 			println("Done. All ok")
 			exit(0)
