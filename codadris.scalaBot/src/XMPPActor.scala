@@ -29,7 +29,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	private val login = "git-bot"
 	private val password = "git-bot-666"
 	private val resource = "scalaBot_0.4"
-	val repository_dir = "/git/codadris.git"
+	val repository_dir = "/git/codadris.git/.git"
 	
 	var filter: AndFilter = null
 	var chatmanager: ChatManager = null
@@ -137,7 +137,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 						}
 						val a = currentUserSettings.split(' ')
 						// XXX: only 2 arguments max:
-						val showCommand = Array("git",  "--git-dir=\""+ repository_dir +"\"","show", a(0), a(1), a(2), commitSha)
+						val showCommand = Array("git",  "--git-dir="+ repository_dir +"","show", a(0), a(1), a(2), commitSha)
 						val output = CommandExec.cmdExec(showCommand)
 						if (debug)
 							println("*** sent message length: " + output.length)
