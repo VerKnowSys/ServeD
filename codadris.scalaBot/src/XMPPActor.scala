@@ -150,6 +150,9 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 						}
 						throw new Exception("### Error in sendMessage")
 					}
+					case _ => {
+						XMPPActor ! 'InitConnection
+					}
 				}
 			}
 		}
