@@ -3,7 +3,5 @@
 cd src/
 
 jars=`for i in ../lib/*.jar; do echo -n "$i:"; done`
-echo $jars
-
 echo "Running DbAddCommit"
 scala -classpath $jars. commiter.DbAddCommit $1 $2

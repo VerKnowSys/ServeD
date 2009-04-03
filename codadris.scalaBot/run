@@ -6,9 +6,6 @@ jars=`for i in ../lib/*.jar; do echo -n "$i:"; done`
 packageDir="scalabot"
 main="$packageDir.ScalaBot"
 tests=`for i in *Test.scala; do echo -n "$i:"; done`
-echo $jars
-echo $main
-echo $tests
 
 echo "Running tests.."
 for i in $tests; do
