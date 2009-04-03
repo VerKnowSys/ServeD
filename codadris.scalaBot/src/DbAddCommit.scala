@@ -22,7 +22,7 @@ object DbAddCommit {
 	
 	def main(args: Array[String]) = {
 		try{
-			val command = Array("git", "rev-list", args(0) + "..." + args(1))
+			val command = Array("/usr/bin/git", "rev-list", args(0) + "..." + args(1))
 			var listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
 			listOfSha1.foreach { oneOf => 
 				val commit = new Commit(oneOf)

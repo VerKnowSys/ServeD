@@ -13,6 +13,7 @@ object ScalaBot extends Application with Actor {
 	Runtime.getRuntime.addShutdownHook( new Thread {
 		override def run = {
 			println ("Called at shutdown.")
+			XMPPActor ! 'CloseConnection
 			XMPPActor ! 'Quit
 		}
 	})
