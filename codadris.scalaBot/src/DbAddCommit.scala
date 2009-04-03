@@ -12,7 +12,7 @@ import org.neodatis.odb._
 object DbAddCommit {
 	
 	val debug = true
-	val repository_dir = "/home/verknowsys/JAVA/codadris-public/.git"
+	val repository_dir = "/git/codadris.git"
 	
 	def writeCommitToDataBase(arg: Commit) = {
 		val odb = ODBFactory.open(ScalaBot.databaseName)
