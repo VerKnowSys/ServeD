@@ -3,6 +3,8 @@
 
 package scalabot
 
+import commiter._
+
 import scala.actors._
 import scala.collection.immutable.HashMap
 
