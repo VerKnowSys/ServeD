@@ -22,15 +22,16 @@ import org.jivesoftware.smackx._
 
 object XMPPActor extends Actor with MessageListener { // with PacketListener 
 	
-	private val debug = Preferences.settings.debug
-	private val config = new ConnectionConfiguration(Preferences.settings.server, Preferences.settings.port)
+	private val prefs = new Preferences
+	private val debug = prefs.getb("debug")
+	private val config = new ConnectionConfiguration(prefs.get("server"), prefs.geti("port"))
 	private val connection = new XMPPConnection(config)	
 	private val presence = new Presence(Presence.Type.unavailable)
-	private val login = Preferences.settings.login
-	private val password = Preferences.settings.password
-	private val resource = Preferences.settings.resource
-	private val repositoryDir = Preferences.settings.repositoryDir
-	private val databaseName = Preferences.settings.databaseName
+	private val login = prefs.get("login")
+	private val password = prefs.get("password")
+	private val resource = prefs.get("resource")
+	private val repositoryDir = prefs.get("repositoryDir")
+	private val databaseName = prefs.get("databaseName")
 
 	private var filter: AndFilter = null
 	private var chatmanager: ChatManager = null
@@ -44,7 +45,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		connection.login(login, password, resource)
 		chatmanager = connection.getChatManager
 		if (debug) println("*** num of users: " + chat.length)
-		Preferences.settings.users.foreach { x =>
+		prefs.getl("users").foreach { x =>
 			try {
 				chat = chat ::: List( chatmanager.createChat(x("user"), this) )
 			} catch {
@@ -131,8 +132,8 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 							println("*** Trying to send messages, to User: " + element.getParticipant)
 						}
 						var currentUserPreferences: String = ""
-						Preferences.settings.users.foreach{ 
-							e => if (e("user") == element.getParticipant) currentUserPreferences = e("Preferences")
+						prefs.getl("users").foreach{ 
+							e => if (e("user") == element.getParticipant) currentUserPreferences = e("params")
 						}
 						val a = currentUserPreferences.split(' ')
 						// XXX: only and max 3 arguments max:

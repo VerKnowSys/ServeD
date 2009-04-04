@@ -7,7 +7,8 @@ import scala.actors._
 
 object ScalaBot extends Application with Actor {
 	
-	private val debug = Preferences.settings.debug
+	private val prefs = new Preferences
+	private val debug = prefs.getb("debug")
 	
 	Runtime.getRuntime.addShutdownHook( new Thread {
 		override def run = {
