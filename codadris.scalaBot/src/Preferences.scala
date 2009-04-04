@@ -83,7 +83,8 @@ sealed class Preferences {
 	def loadPreferences: Preferences = {
 		var sett = new Preferences
 		try {
-			// sett.value = Yaml.load(new File(sett.get("configFile").asInstanceOf[String])).asInstanceOf[HashMap[String,Any]]
+			val loadnode = xml.XML.loadFile(sett.get("configFile")) 
+			fromXML(loadnode)
 		} catch {
 			case x: Throwable => {
 				println("*** config file "+sett.get("configFile")+" doesn't exists! creating new one")
@@ -96,7 +97,8 @@ sealed class Preferences {
 	def loadPreferences( configFileName: String ): Preferences = {
 		var sett = new Preferences
 		try {
-			// sett.value = Yaml.load(configFileName).asInstanceOf[HashMap[String,Any]]
+			val loadnode = xml.XML.loadFile(sett.get("configFile")) 
+			fromXML(loadnode)
 		} catch {
 			case x: Throwable => {
 				println("*** config file "+configFileName+" doesn't exists! creating new one")
@@ -107,6 +109,7 @@ sealed class Preferences {
 	}
 	
 	def savePreferences = {
+		scala.xml.XML.saveFull(get("configFile"), this.toXML, "UTF-8", true, null)
 		// var matrix = Array[Array[String]]()
 		// 	for(o <- value.keys) {
 		// 		o match {

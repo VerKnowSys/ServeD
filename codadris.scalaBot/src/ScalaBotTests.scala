@@ -51,6 +51,14 @@ class ConfigTest1 extends TestCase {
 
 	def testXML = {
 		println( settings.toXML )
+		val node = settings.toXML
+		println( settings.fromXML(node) )
+	}
+	
+	def testXML2 = {
+		val a = settings.toXML
+		settings.savePreferences
+		assert( a.equals(settings.loadPreferences.toXML))
 	}
 	
 	def testConfigReadWrite = {
