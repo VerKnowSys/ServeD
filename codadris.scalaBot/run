@@ -5,9 +5,9 @@ cd src/
 jars=`for i in ../lib/*.jar; do echo -n "$i:"; done`
 packageDir="scalabot"
 main="$packageDir.ScalaBot"
-tests=`for i in *Test.scala; do echo -n "$i:"; done`
+tests=`for i in *Tests.scala; do echo -n "$i:"; done`
 
-echo "Running tests.."
+echo "Running test suites.."
 for i in $tests; do
 	scala -classpath $jars. $packageDir.tests.${i%%.*}
 done	
