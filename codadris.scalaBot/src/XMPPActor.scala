@@ -100,7 +100,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		var odb: ODB = null
 		var list: List[String] = List()
 		try {
-		    odb = ODBFactory.openClient(prefs.get("ODBListenAddress"), prefs.geti("ODBport"), prefs.get("ODBName"))
+		    odb = ODBFactory.openClient(prefs.get("ODBListenAddress"), prefs.geti("ODBPort"), prefs.get("ODBName"))
 			// try { //adding indexes before queries
 			// 				odb.getClassRepresentation(classOf[Commit]).addUniqueIndexOn("commitSha1", Array("commitSha1"), true)
 			// 				odb.getClassRepresentation(classOf[Commit]).addUniqueIndexOn("toRead", Array("toRead"), true)

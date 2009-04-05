@@ -21,7 +21,7 @@ object ODBServerActor extends Actor {
 	
 	def initServer = {
 		try { 
-			server = ODBFactory.openServer(prefs.geti("ODBport"))
+			server = ODBFactory.openServer(prefs.geti("ODBPort"))
 			server.addBase(prefs.get("ODBName"), prefs.get("absoultePathToBotODB") + prefs.get("databaseName"))
 			server.startServer(false) //start server in current thread
 		} catch {

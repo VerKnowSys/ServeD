@@ -20,7 +20,7 @@ object DbAddCommit {
 	def writeCommitToDataBase(arg: Commit) = {
 		var odb: ODB = null
 		try {
-			odb = ODBFactory.openClient(prefs.get("ODBListenAddress"), prefs.geti("ODBport"), prefs.get("ODBName"))
+			odb = ODBFactory.openClient(prefs.get("ODBListenAddress"), prefs.geti("ODBPort"), prefs.get("ODBName"))
 			odb.store( arg )
 			odb.commit
 		} catch {
