@@ -3,12 +3,15 @@
 
 package scalabot
 
+import java.util.Date
+
 class Commit(commitSha: String, unRead: Boolean) {
 	
 	require(commitSha.length != 0)
 	
 	val commitSha1 = commitSha
 	var toRead = unRead
+	val date = new Date
 	
 	def this(commitSha: String) = this(commitSha, true)
 	
