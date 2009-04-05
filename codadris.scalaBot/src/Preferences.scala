@@ -27,7 +27,7 @@ sealed class Preferences {
 		),
 		"configFile" -> "scalaBot.config",
 		"statusDescription" -> "I should work fine like a death spell!",
-		"absoultePathToBotODB" -> "/home/verknowsys/JAVA/ScalaBot/",
+		"absoultePathToBotODB" -> "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/",
 		"databaseName" -> "ScalaBotCommitDataBase.neodatis",
 		"ODBPort" -> 50603,
 		"ODBName" -> "scalaBotCommitDatabase",
@@ -108,11 +108,11 @@ sealed class Preferences {
 	def loadPreferences: Preferences = {
 		var sett = new Preferences
 		try {
-			val loadnode = xml.XML.loadFile(sett.get("configFile")) 
+			val loadnode = xml.XML.loadFile(sett.get("absoultePathToBotODB") + sett.get("configFile")) 
 			sett.value = fromXML(loadnode)
 		} catch {
 			case x: Throwable => {
-				println("*** config file "+sett.get("configFile")+" doesn't exists! creating new one")
+				println("*** config file " + sett.get("absoultePathToBotODB") + sett.get("configFile")+" doesn't exists! creating new one")
 				sett.savePreferences
 			}
 		}
@@ -122,18 +122,18 @@ sealed class Preferences {
 	def loadPreferences( configFileName: String ): Preferences = {
 		var sett = new Preferences
 		try {
-			val loadnode = xml.XML.loadFile(sett.get("configFile")) 
+			val loadnode = xml.XML.loadFile(sett.get("absoultePathToBotODB") + sett.get("configFile")) 
  			sett.value = fromXML(loadnode)
 		} catch {
 			case x: Throwable => {
-				println("*** config file "+configFileName+" doesn't exists! creating new one")
+				println("*** config file " + sett.get("absoultePathToBotODB") + configFileName + " doesn't exists! creating new one")
 				sett.savePreferences
 			}
 		}
 		sett
 	}
 	
-	def savePreferences = scala.xml.XML.saveFull(get("configFile"), this.toXML, "UTF-8", true, null)
+	def savePreferences = scala.xml.XML.saveFull(get("absoultePathToBotODB") + get("configFile"), this.toXML, "UTF-8", true, null)
 	
 	def savePreferences(fileName: String) = scala.xml.XML.saveFull(fileName, this.toXML, "UTF-8", true, null)
 	

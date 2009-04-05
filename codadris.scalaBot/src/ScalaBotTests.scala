@@ -64,14 +64,14 @@ class ConfigTest1 extends TestCase {
 	def testConfigReadWrite = {
 		assert(settings.get("configFile").equals("testing.config"))
 		try {
-			settings.savePreferences(settings.get("configFile"))
+			settings.savePreferences(sett.get("absoultePathToBotODB") + settings.get("configFile"))
 		} catch {
 			case _ => {
 				fail("Cannot save preferences file!")
 			}
 		}
 		try {
-			settings.loadPreferences(settings.get("configFile"))
+			settings.loadPreferences(sett.get("absoultePathToBotODB") + settings.get("configFile"))
 		} catch {
 			case _ => {
 				fail("Cannot load preferences file!")
@@ -81,8 +81,8 @@ class ConfigTest1 extends TestCase {
 	
 	def testConfigSettings = {
 		assert(settings.get("configFile").equals("testing.config"))
-		settings.value("repositoryDir") = "/gówno"
-		assert(settings.get("repositoryDir").equals("/gówno"))
+		settings.value("repositoryDir") = "/something"
+		assert(settings.get("repositoryDir").equals("/something"))
 	}
 	
 }
