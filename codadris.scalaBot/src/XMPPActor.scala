@@ -110,7 +110,8 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 			// 					// XXX: NOOP
 			// 				}
 			// 			}
-		    val query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))
+		    var query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))
+			query.orderByDesc("date") 
 			val commit = odb.getObjects(query)
 				while (commit.hasNext) {
 					val comm = (commit.next).asInstanceOf[Commit] //match {
