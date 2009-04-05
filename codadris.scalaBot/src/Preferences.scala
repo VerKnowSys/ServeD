@@ -25,7 +25,7 @@ sealed class Preferences {
 			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" ),
 			HashMap( "user" -> "vara@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" )
 		),
-		"configFile" -> "scalaBot.config",
+		"configFile" -> "scalaBotConfig.xml",
 		"statusDescription" -> "I should work fine like a death spell!",
 		"absoultePathToBotODB" -> "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/",
 		"databaseName" -> "ScalaBotCommitDataBase.neodatis",
@@ -133,7 +133,7 @@ sealed class Preferences {
 		sett
 	}
 	
-	def savePreferences = scala.xml.XML.saveFull(get("absoultePathToBotODB") + get("configFile"), this.toXML, "UTF-8", true, null)
+	def savePreferences = scala.xml.XML.saveFull( get("absoultePathToBotODB") + get("configFile"), this.toXML, "UTF-8", true, null)
 	
 	def savePreferences(fileName: String) = scala.xml.XML.saveFull(fileName, this.toXML, "UTF-8", true, null)
 	
