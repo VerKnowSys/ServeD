@@ -7,22 +7,36 @@ import scalabot._
 import scala.actors._
 import java.io._
 import org.neodatis.odb._
+// import org.neodatis.odb.Configuration
 
 
 object DbAddCommit {
 	
-	private val prefs = new Preferences
+	private val prefs = (new Preferences).loadPreferences
 	private val debug = prefs.getb("debug")
 	private val repositoryDir = prefs.get("repositoryDir")
-	private val databaseName = prefs.get("databaseName")
 	
 	def writeCommitToDataBase(arg: Commit) = {
-		val odb = ODBFactory.open(databaseName)
-		odb.store( arg )
-		odb.close
+		var odb: ODB = null
+		try {
+			odb = ODBFactory.openClient("127.0.0.1",50603,"commitDatabase") // TODO: add preferences params instead of hardcoded vals
+			odb.store( arg )
+			odb.commit
+		} catch {
+			case x: Throwable => {
+				println("### Error: There were problems while storing data in database")
+				if (debug) println(x.printStackTrace)
+			}
+		} finally {
+			if (odb != null) { 
+				odb.close
+			} 
+		}
 	}
 	
 	def main(args: Array[String]) = {
+		// Configuration.useMultiThread(true, 5)
+		// Configuration.setDatabaseCharacterEncoding("UTF-8")
 		try{
 			val command = Array("git", "--git-dir=" + repositoryDir, "rev-list", args(0) + "..." + args(1))
 			if (debug) println("*** performing "+command.map{ a => a })
@@ -40,6 +54,6 @@ object DbAddCommit {
 				if (debug) x.printStackTrace
 				exit(1)
 			}
-		}
+		} 
 	}
 }

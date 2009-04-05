@@ -10,6 +10,7 @@ import scala.actors._
 import org.neodatis.odb._
 import org.neodatis.odb.impl.core.query.criteria._
 import org.neodatis.odb.core.query.criteria._
+// import org.neodatis.odb.Configuration
 
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
@@ -20,9 +21,10 @@ import org.jivesoftware.smack.PacketListener
 import org.jivesoftware.smackx._
 
 
+
 object XMPPActor extends Actor with MessageListener { // with PacketListener 
 	
-	private val prefs = new Preferences
+	private val prefs = (new Preferences).loadPreferences
 	private val debug = prefs.getb("debug")
 	private val config = new ConnectionConfiguration(prefs.get("server"), prefs.geti("port"))
 	private val connection = new XMPPConnection(config)	
@@ -31,13 +33,14 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	private val password = prefs.get("password")
 	private val resource = prefs.get("resource")
 	private val repositoryDir = prefs.get("repositoryDir")
-	private val databaseName = prefs.get("databaseName")
 
 	private var filter: AndFilter = null
 	private var chatmanager: ChatManager = null
 	private var chat: List[Chat] = List()
 	
 	def initConnection = {
+		// Configuration.useMultiThread(true, 5)
+		// Configuration.setDatabaseCharacterEncoding("UTF-8")
 		XMPPConnection.DEBUG_ENABLED = true
 		config.setCompressionEnabled(true)
 		config.setSASLAuthenticationEnabled(false)
@@ -97,7 +100,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		var odb: ODB = null
 		var list: List[String] = List()
 		try {
-		    odb = ODBFactory.open(databaseName)
+		    odb = ODBFactory.openClient("127.0.0.1",50603,"commitDatabase")
 			try { //adding indexes before queries
 				odb.getClassRepresentation(classOf[Commit]).addUniqueIndexOn("commitSha1", Array("commitSha1"), true)
 				odb.getClassRepresentation(classOf[Commit]).addUniqueIndexOn("toRead", Array("toRead"), true)
@@ -110,22 +113,26 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		    val query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))
 			val commit = odb.getObjects(query)
 				while (commit.hasNext) {
-					commit.next match {
-						case comm: Commit => {
+					val comm = (commit.next).asInstanceOf[Commit] //match {
+						//case comm: Commit => {
 							comm.toRead = false
 							odb.store(comm)
 							odb.commit
 							if (debug)
 								println("*** Found in database: " + comm.commitSha1)
 							list = list ::: List(comm.commitSha1)
-						}
-					}
+						//}
+					//}
 				}
 			odb.close
 		} catch {
 			case x: Throwable => {
 				println("### Error: " + x)
 			}
+		} finally {
+			if (odb != null) { 
+				odb.close
+			} 
 		}
 		return list
 	}
