@@ -101,33 +101,31 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		var list: List[String] = List()
 		try {
 		    odb = ODBFactory.openClient("127.0.0.1",50603,"commitDatabase")
-			try { //adding indexes before queries
-				odb.getClassRepresentation(classOf[Commit]).addUniqueIndexOn("commitSha1", Array("commitSha1"), true)
-				odb.getClassRepresentation(classOf[Commit]).addUniqueIndexOn("toRead", Array("toRead"), true)
-				if (debug) println("*** Indexes were added")
-			} catch {
-				case y: Throwable => {
-					// XXX: NOOP
-				}
-			}
+			// try { //adding indexes before queries
+			// 				odb.getClassRepresentation(classOf[Commit]).addUniqueIndexOn("commitSha1", Array("commitSha1"), true)
+			// 				odb.getClassRepresentation(classOf[Commit]).addUniqueIndexOn("toRead", Array("toRead"), true)
+			// 				if (debug) println("*** Indexes were added")
+			// 			} catch {
+			// 				case y: Throwable => {
+			// 					// XXX: NOOP
+			// 				}
+			// 			}
 		    val query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))
 			val commit = odb.getObjects(query)
 				while (commit.hasNext) {
 					val comm = (commit.next).asInstanceOf[Commit] //match {
 						//case comm: Commit => {
-							comm.toRead = false
-							odb.store(comm)
-							odb.commit
-							if (debug)
-								println("*** Found in database: " + comm.commitSha1)
-							list = list ::: List(comm.commitSha1)
+						comm.toRead = false
+						odb.store(comm)
+						if (debug)
+							println("*** Found in database: " + comm.commitSha1)
+						list = list ::: List(comm.commitSha1)
 						//}
 					//}
 				}
-			odb.close
 		} catch {
 			case x: Throwable => {
-				println("### Error: " + x)
+				println("### Error in XMPPActor: " + x)
 				if (debug) println(x.printStackTrace)
 			}
 		} finally {
