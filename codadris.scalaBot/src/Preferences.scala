@@ -74,7 +74,7 @@ sealed class Preferences {
 			hashMap.update( "absoultePathToBotODB", (node \ "absoultePathToBotODB").text)
 			hashMap.update( "repositoryDir", (node \ "repositoryDir").text)
 			hashMap.update( "statusDescription", (node \ "statusDescription").text)
-			hashMap.update( "ODBPort", (node \ "ODBPort").text)
+			hashMap.update( "ODBPort", (node \ "ODBPort").text.toInt)
 			hashMap.update( "ODBName", (node \ "ODBName").text)
 			hashMap.update( "ODBListenAddress", (node \ "ODBListenAddress").text)
 			var list = List[HashMap[String,String]]()
