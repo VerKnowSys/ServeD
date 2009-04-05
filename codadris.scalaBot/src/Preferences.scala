@@ -52,17 +52,27 @@ sealed class Preferences {
 			</users>
 		</preferences> 
 	
-	// def fromXML(node: Node): Preferences = 
-	// 	new Preferences {
-	// 		val debug = (node \ "description").text 
-	// 		val yearMade = (node \ "yearMade").text.toInt 
-	// 		val dateObtained = (node \ "dateObtained").text 
-	// 		val bookPrice = (node \ "bookPrice").text.toInt 
-	// 		val purchasePrice = (node \ "purchasePrice").text.toInt 
-	// 		val condition = (node \ "condition").text.toInt 
-	// 	
-	// 	} 
-	// 
+	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
+		var hashMap = HashMap[String,Any]()
+			hashMap.update( "debug", (node \ "debug").text.toBoolean)
+			hashMap.update( "resource", (node \ "resource").text)
+			hashMap.update( "login", (node \ "login").text)
+			hashMap.update( "password", (node \ "password").text)
+			hashMap.update( "server", (node \ "server").text)
+			hashMap.update( "port", (node \ "port").text.toInt)
+			hashMap.update( "databaseName", (node \ "databaseName").text)
+			hashMap.update( "repositoryDir", (node \ "repositoryDir").text)
+			var list = List[HashMap[String,String]]()
+			(node \\ "user").foreach { user =>
+				user.foreach { nod =>
+					val name = (nod \ "name").text
+					val params = (nod \ "params").text
+					list = list ::: List( HashMap( "name" -> name, "params" -> params ) ).asInstanceOf[List[HashMap[String,String]]]
+				}
+			}
+			hashMap.update( "users", list )
+		hashMap.asInstanceOf[HashMap[String,Any]]
+	} 
 	
 	def get(param: String): String = {
 		return value(param).asInstanceOf[String]
@@ -98,7 +108,7 @@ sealed class Preferences {
 		var sett = new Preferences
 		try {
 			val loadnode = xml.XML.loadFile(sett.get("configFile")) 
-			fromXML(loadnode)
+ 			fromXML(loadnode)
 		} catch {
 			case x: Throwable => {
 				println("*** config file "+configFileName+" doesn't exists! creating new one")
@@ -108,21 +118,8 @@ sealed class Preferences {
 		sett
 	}
 	
-	def savePreferences = {
-		scala.xml.XML.saveFull(get("configFile"), this.toXML, "UTF-8", true, null)
-		// var matrix = Array[Array[String]]()
-		// 	for(o <- value.keys) {
-		// 		o match {
-		// 			case x: String => {
-		// 				matrix += Array[String](o, value.get(o))
-		// 			}
-		// 		}
-		// 	}
-		// 	// Yaml.dump(matrix, new File(value("configFile").asInstanceOf[String]))
-	}
+	def savePreferences = scala.xml.XML.saveFull(get("configFile"), this.toXML, "UTF-8", true, null)
 	
-	def savePreferences(fileName: String) = ""// Yaml.dump(value, new File(fileName))
-
-	// var settings: Settings = loadPreferences
+	def savePreferences(fileName: String) = scala.xml.XML.saveFull(fileName), this.toXML, "UTF-8", true, null)
 	
 }
