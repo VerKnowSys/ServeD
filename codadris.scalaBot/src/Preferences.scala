@@ -14,7 +14,7 @@ sealed class Preferences {
 		"debug" -> true,
 		"resource" -> "scalaBot_0.6",
 		"login" -> "git-bot",
-		"password" -> "git-bot-666,",
+		"password" -> "git-bot-666",
 		"server" -> "drakor.eu",
 		"port" -> 5222,
 		"databaseName" -> "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/ScalaBotCommitDataBase.neodatis",
