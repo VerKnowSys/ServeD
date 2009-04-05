@@ -29,9 +29,8 @@ object DbAddCommit {
 				odb.store( arg )
 				odb.commit
 			}
-			case x: Throwable => {
+			case _ => {
 				println("### Error: There were problems while storing data in database")
-				if (debug) println(x.printStackTrace)
 			}
 		} finally {
 			if (odb != null) { 
