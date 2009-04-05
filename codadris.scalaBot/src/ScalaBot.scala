@@ -7,7 +7,7 @@ import scala.actors._
 
 object ScalaBot extends Application with Actor {
 	
-	private val prefs = new Preferences
+	private val prefs = (new Preferences).loadPreferences
 	private val debug = prefs.getb("debug")
 	
 	Runtime.getRuntime.addShutdownHook( new Thread {
@@ -15,6 +15,7 @@ object ScalaBot extends Application with Actor {
 			println ("bot shutdown requested.")
 			XMPPActor ! 'CloseConnection
 			XMPPActor ! 'Quit
+			ODBServerActor ! 'Quit
 		}
 	})
 	
@@ -24,6 +25,9 @@ object ScalaBot extends Application with Actor {
 	override def act = {
 		XMPPActor.start
 		XMPPActor ! 'InitConnection
+		
+		ODBServerActor.start
+		ODBServerActor ! 'InitServer
 		
 		Thread sleep 2500
 		println("ready to serve. waiting for orders.")
