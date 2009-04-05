@@ -15,6 +15,7 @@ object DbAddCommit {
 	private val prefs = (new Preferences).loadPreferences
 	private val debug = prefs.getb("debug")
 	private val repositoryDir = prefs.get("repositoryDir")
+	private val databaseName = prefs.get("databaseName")
 	
 	def writeCommitToDataBase(arg: Commit) = {
 		var odb: ODB = null
@@ -23,6 +24,11 @@ object DbAddCommit {
 			odb.store( arg )
 			odb.commit
 		} catch {
+			case z: java.net.ConnectException => {
+				odb = ODBFactory.open(databaseName)
+				odb.store( arg )
+				odb.commit
+			}
 			case x: Throwable => {
 				println("### Error: There were problems while storing data in database")
 				if (debug) println(x.printStackTrace)
