@@ -46,7 +46,7 @@ sealed class Preferences {
 			<absoultePathToBotODB>{value("absoultePathToBotODB")}</absoultePathToBotODB>
 			<repositoryDir>{value("repositoryDir")}</repositoryDir>
 			<statusDescription>{value("statusDescription")}</statusDescription>
-			<ODBport>{value("ODBPort")}</ODBport>
+			<ODBPort>{value("ODBPort")}</ODBPort>
 			<ODBName>{value("ODBName")}</ODBName>
 			<ODBListenAddress>{value("ODBListenAddress")}</ODBListenAddress>
 			<users>
