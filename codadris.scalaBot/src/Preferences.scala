@@ -97,7 +97,7 @@ sealed class Preferences {
 		var sett = new Preferences
 		try {
 			val loadnode = xml.XML.loadFile(sett.get("configFile")) 
-			fromXML(loadnode)
+			sett.value = fromXML(loadnode)
 		} catch {
 			case x: Throwable => {
 				println("*** config file "+sett.get("configFile")+" doesn't exists! creating new one")
@@ -111,7 +111,7 @@ sealed class Preferences {
 		var sett = new Preferences
 		try {
 			val loadnode = xml.XML.loadFile(sett.get("configFile")) 
- 			fromXML(loadnode)
+ 			sett.value = fromXML(loadnode)
 		} catch {
 			case x: Throwable => {
 				println("*** config file "+configFileName+" doesn't exists! creating new one")
