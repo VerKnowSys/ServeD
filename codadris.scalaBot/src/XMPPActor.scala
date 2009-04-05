@@ -128,6 +128,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		} catch {
 			case x: Throwable => {
 				println("### Error: " + x)
+				if (debug) println(x.printStackTrace)
 			}
 		} finally {
 			if (odb != null) { 

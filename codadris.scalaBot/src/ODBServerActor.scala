@@ -25,6 +25,11 @@ object ODBServerActor extends Actor {
 			server = ODBFactory.openServer(50603)
 			server.addBase("commitDatabase", databaseName)
 			server.startServer(false) //start server in current thread
+		} catch {
+			case x: Throwable => {
+				println("### Error: exception occured in ODBServerActor!")
+				if (debug) println( x.printStackTrace )
+			}
 		} finally {
 			if (server != null) {
 				server.close
@@ -42,7 +47,7 @@ object ODBServerActor extends Actor {
 							if (server != null) server.close
 							exit
 						}
-						case 'InitConnection => {
+						case 'InitServer => {
 							if (debug) println("*** ODBServer received InitServer command.")
 							initServer
 							act
