@@ -43,7 +43,14 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		config.setSASLAuthenticationEnabled(false)
 		connection.connect
 		if (debug) println("*** l:"+login + " p:" + password + " r:" + resource)
-		connection.login(login, password, resource)
+		try {
+			connection.login(login, password, resource)
+		} catch {
+			case x: Throwable => {
+				println("### Error while connecting to XMPP server. Please check login / password.")
+				if (debug) println( x.printStackTrace )
+			}
+		}
 		chatmanager = connection.getChatManager
 		if (debug) println("*** num of users: " + chat.length)
 		prefs.getl("users").foreach { x =>
