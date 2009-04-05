@@ -24,13 +24,11 @@ object DbAddCommit {
 			odb.store( arg )
 			odb.commit
 		} catch {
-			case z: java.net.ConnectException => {
+			case x: Throwable => {
+				println("### Error: There were problems while connecting to remote ODB server. Will try to write directly to ODB file")
 				odb = ODBFactory.open(databaseName)
 				odb.store( arg )
 				odb.commit
-			}
-			case _ => {
-				println("### Error: There were problems while storing data in database")
 			}
 		} finally {
 			if (odb != null) { 
