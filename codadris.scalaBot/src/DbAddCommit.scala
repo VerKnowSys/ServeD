@@ -15,12 +15,12 @@ object DbAddCommit {
 	private val prefs = (new Preferences).loadPreferences
 	private val debug = prefs.getb("debug")
 	private val repositoryDir = prefs.get("repositoryDir")
-	private val databaseName = prefs.get("databaseName")
+	private val databaseName = prefs.get("absoultePathToBotODB") + prefs.get("databaseName")
 	
 	def writeCommitToDataBase(arg: Commit) = {
 		var odb: ODB = null
 		try {
-			odb = ODBFactory.openClient("127.0.0.1",50603,"commitDatabase") // TODO: add preferences params instead of hardcoded vals
+			odb = ODBFactory.openClient(prefs.get("ODBListenAddress"), prefs.geti("ODBport"), prefs.get("ODBName"))
 			odb.store( arg )
 			odb.commit
 		} catch {

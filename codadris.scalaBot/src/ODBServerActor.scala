@@ -18,12 +18,11 @@ object ODBServerActor extends Actor {
 	
 	private val prefs = (new Preferences).loadPreferences
 	private val debug = prefs.getb("debug")	
-	private val databaseName = prefs.get("databaseName")
 	
 	def initServer = {
 		try { 
-			server = ODBFactory.openServer(50603)
-			server.addBase("commitDatabase", databaseName)
+			server = ODBFactory.openServer(prefs.geti("ODBport"))
+			server.addBase(prefs.get("ODBName"), prefs.get("absoultePathToBotODB") + prefs.get("databaseName"))
 			server.startServer(false) //start server in current thread
 		} catch {
 			case x: Throwable => {

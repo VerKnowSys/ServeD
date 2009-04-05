@@ -12,12 +12,11 @@ sealed class Preferences {
 
 	var value = HashMap[String,Any] (
 		"debug" -> true,
-		"resource" -> "scalaBot_0.6",
+		"resource" -> "scalaBot_0.7",
 		"login" -> "git-bot",
 		"password" -> "git-bot-666",
 		"server" -> "drakor.eu",
 		"port" -> 5222,
-		"databaseName" -> "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/ScalaBotCommitDataBase.neodatis",
 		"repositoryDir" -> "/git/codadris.git",
 		"users" -> List(
 			// XXX: only three arguments in Preferences:
@@ -27,7 +26,12 @@ sealed class Preferences {
 			HashMap( "user" -> "vara@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" )
 		),
 		"configFile" -> "scalaBot.config",
-		"statusDescription" -> "I should work fine like a death spell!"
+		"statusDescription" -> "I should work fine like a death spell!",
+		"absoultePathToBotODB" -> "/home/verknowsys/JAVA/ScalaBot/",
+		"databaseName" -> "ScalaBotCommitDataBase.neodatis",
+		"ODBPort" -> 50603,
+		"ODBName" -> "scalaBotCommitDatabase",
+		"ODBListenAddress" -> "127.0.0.1"
 	)
 	
 	def toXML = 
@@ -39,8 +43,12 @@ sealed class Preferences {
 			<server>{value("server")}</server> 
 			<port>{value("port")}</port> 
 			<databaseName>{value("databaseName")}</databaseName>
+			<absoultePathToBotODB>{value("absoultePathToBotODB")}</absoultePathToBotODB>
 			<repositoryDir>{value("repositoryDir")}</repositoryDir>
 			<statusDescription>{value("statusDescription")}</statusDescription>
+			<ODBport>{value("ODBPort")}</ODBport>
+			<ODBName>{value("ODBName")}</ODBName>
+			<ODBListenAddress>{value("ODBListenAddress")}</ODBListenAddress>
 			<users>
 			{
 				val list = value("users").asInstanceOf[List[HashMap[String,String]]]
@@ -63,8 +71,12 @@ sealed class Preferences {
 			hashMap.update( "server", (node \ "server").text)
 			hashMap.update( "port", (node \ "port").text.toInt)
 			hashMap.update( "databaseName", (node \ "databaseName").text)
+			hashMap.update( "absoultePathToBotODB", (node \ "absoultePathToBotODB").text)
 			hashMap.update( "repositoryDir", (node \ "repositoryDir").text)
 			hashMap.update( "statusDescription", (node \ "statusDescription").text)
+			hashMap.update( "ODBPort", (node \ "ODBPort").text)
+			hashMap.update( "ODBName", (node \ "ODBName").text)
+			hashMap.update( "ODBListenAddress", (node \ "ODBListenAddress").text)
 			var list = List[HashMap[String,String]]()
 			(node \\ "user").foreach { user =>
 				user.foreach { nod =>
