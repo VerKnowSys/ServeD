@@ -26,7 +26,8 @@ sealed class Preferences {
 			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" ),
 			HashMap( "user" -> "vara@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" )
 		),
-		"configFile" -> "scalaBot.config"
+		"configFile" -> "scalaBot.config",
+		"statusDescription" -> "I should work fine like a death spell!"
 	)
 	
 	def toXML = 
@@ -39,6 +40,7 @@ sealed class Preferences {
 			<port>{value("port")}</port> 
 			<databaseName>{value("databaseName")}</databaseName>
 			<repositoryDir>{value("repositoryDir")}</repositoryDir>
+			<statusDescription>{value("statusDescription")}</statusDescription>
 			<users>
 			{
 				val list = value("users").asInstanceOf[List[HashMap[String,String]]]
@@ -62,6 +64,7 @@ sealed class Preferences {
 			hashMap.update( "port", (node \ "port").text.toInt)
 			hashMap.update( "databaseName", (node \ "databaseName").text)
 			hashMap.update( "repositoryDir", (node \ "repositoryDir").text)
+			hashMap.update( "statusDescription", (node \ "statusDescription").text)
 			var list = List[HashMap[String,String]]()
 			(node \\ "user").foreach { user =>
 				user.foreach { nod =>
@@ -120,6 +123,6 @@ sealed class Preferences {
 	
 	def savePreferences = scala.xml.XML.saveFull(get("configFile"), this.toXML, "UTF-8", true, null)
 	
-	def savePreferences(fileName: String) = scala.xml.XML.saveFull(fileName), this.toXML, "UTF-8", true, null)
+	def savePreferences(fileName: String) = scala.xml.XML.saveFull(fileName, this.toXML, "UTF-8", true, null)
 	
 }

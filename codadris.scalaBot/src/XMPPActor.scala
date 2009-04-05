@@ -57,7 +57,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 			}
 		}
 		if (debug) println("*** num of users: " + chat.length)
-		presence.setStatus("I'm quite ready to serve!")
+		presence.setStatus(prefs.get("statusDescription"))
 		connection.sendPacket(presence)
 		if (debug) println("*** Connected as: " + login)
 	}
