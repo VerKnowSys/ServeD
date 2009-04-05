@@ -23,11 +23,11 @@ object ScalaBot extends Application with Actor {
 	this.start
 	
 	override def act = {
-		XMPPActor.start
-		XMPPActor ! 'InitConnection
-		
 		ODBServerActor.start
 		ODBServerActor ! 'InitServer
+		
+		XMPPActor.start
+		XMPPActor ! 'InitConnection
 		
 		Thread sleep 2500
 		println("ready to serve. waiting for orders.")
