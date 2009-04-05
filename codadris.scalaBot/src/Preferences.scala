@@ -70,7 +70,7 @@ sealed class Preferences {
 				user.foreach { nod =>
 					val name = (nod \ "name").text
 					val params = (nod \ "params").text
-					list = list ::: List( HashMap( "name" -> name, "params" -> params ) ).asInstanceOf[List[HashMap[String,String]]]
+					list = list ::: List( HashMap( "user" -> name, "params" -> params ) ).asInstanceOf[List[HashMap[String,String]]]
 				}
 			}
 			hashMap.update( "users", list )
