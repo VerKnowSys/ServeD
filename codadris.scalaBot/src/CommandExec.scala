@@ -11,7 +11,6 @@ object CommandExec {
 	def cmdExec(cmdLine: Array[String]): String = {
      	var output = ""
     	try {
-			println("cmdLine: " + cmdLine)
 	        val p = Runtime.getRuntime.exec(cmdLine)
 	        val input = new BufferedReader(new InputStreamReader(p.getInputStream))
 
