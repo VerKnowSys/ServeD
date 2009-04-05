@@ -37,6 +37,7 @@ object DbAddCommit {
 		} catch {
 			case x: Throwable => {
 				println("### Error: bad arguments.\nUsage: scriptname sha1-start sha1-end")
+				if (debug) x.printStackTrace
 				exit(1)
 			}
 		}
