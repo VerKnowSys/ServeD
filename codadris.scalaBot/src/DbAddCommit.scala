@@ -44,7 +44,7 @@ object DbAddCommit {
 			val command = Array("git", "--git-dir=" + repositoryDir, "rev-list", args(0) + "..." + args(1))
 			if (debug) println("*** performing "+command.map{ a => a })
 			var listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
-			listOfSha1.reverse.foreach { oneOf => 
+			listOfSha1.foreach { oneOf => 
 				val commit = new Commit(oneOf)
 				writeCommitToDataBase( commit )	// sha1, show?
 				if (debug) println("*** writeCommitToDatabase: " + commit )

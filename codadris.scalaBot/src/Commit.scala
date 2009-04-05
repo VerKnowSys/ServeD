@@ -11,7 +11,7 @@ class Commit(commitSha: String, unRead: Boolean) {
 	
 	val commitSha1 = commitSha
 	var toRead = unRead
-	val date = new Date
+	var date = new Date
 	
 	def this(commitSha: String) = this(commitSha, true)
 	
