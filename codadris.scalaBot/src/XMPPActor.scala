@@ -42,6 +42,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		config.setCompressionEnabled(true)
 		config.setSASLAuthenticationEnabled(false)
 		connection.connect
+		if (debug) println("*** l:"+login + " p:" + password + " r:" + resource)
 		connection.login(login, password, resource)
 		chatmanager = connection.getChatManager
 		if (debug) println("*** num of users: " + chat.length)
