@@ -56,9 +56,9 @@ class ConfigTest1 extends TestCase {
 	}
 	
 	def testXML2 = {
-		val a = settings.toXML
-		settings.savePreferences
-		assert( a.equals(settings.loadPreferences.toXML))
+		settings = settings.loadPreferences
+		settings.value("port") = 666
+		assert( ! settings.geti("port").equals( settings.loadPreferences.geti("port") ) )
 	}
 	
 	def testConfigReadWrite = {
