@@ -4,4 +4,4 @@ cd src/
 
 jars=`for i in ../lib/*.jar; do echo -n "$i:"; done`
 echo "Running DbAddCommit"
-scala -classpath $jars. commiter.DbAddCommit $1 $2
+scala -classpath $jars. commiter.DbAddCommit $1 $2 "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/"
