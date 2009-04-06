@@ -10,7 +10,6 @@ import scala.actors._
 import org.neodatis.odb._
 import org.neodatis.odb.impl.core.query.criteria._
 import org.neodatis.odb.core.query.criteria._
-// import org.neodatis.odb.Configuration
 
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
@@ -39,8 +38,6 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	private var chat: List[Chat] = List()
 	
 	def initConnection = {
-		// Configuration.useMultiThread(true, 5)
-		// Configuration.setDatabaseCharacterEncoding("UTF-8")
 		XMPPConnection.DEBUG_ENABLED = true
 		config.setCompressionEnabled(true)
 		config.setSASLAuthenticationEnabled(false)
@@ -69,6 +66,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		}
 		if (debug) println("*** num of users: " + chat.length)
 		presence.setStatus(prefs.get("statusDescription"))
+		presence.setMode(Presence.Mode.dnd)
 		connection.sendPacket(presence)
 		if (debug) println("*** Connected as: " + login + "\nReady to enter main loop")
 		ScalaBot ! 'MainLoop
@@ -177,12 +175,12 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 					debug = prefs.getb("debug")
 					config = new ConnectionConfiguration(prefs.get("server"), prefs.geti("port"))
 					connection = new XMPPConnection(config)	
-					presence = new Presence(Presence.Type.unavailable)
+					presence = new Presence(Presence.Type.available)
 					login = prefs.get("login")
 					password = prefs.get("password")
 					resource = prefs.get("resource")
 					repositoryDir = prefs.get("repositoryDir")
-					XMPPActor ! 'InitConnection
+					initConnection // init connection after getting preferences
 					act
 				}
 				case y: Symbol =>
@@ -190,11 +188,6 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 						case 'Quit => {
 							if (debug) println("*** received Quit command.")
 							exit
-						}
-						case 'InitConnection => {
-							if (debug) println("*** received InitConnection command.")
-							initConnection
-							act
 						}
 						case 'CloseConnection => {
 							if (debug) println("*** received CloseConnection command.")
