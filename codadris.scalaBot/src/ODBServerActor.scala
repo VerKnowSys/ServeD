@@ -45,19 +45,16 @@ object ODBServerActor extends Actor {
 					ODBServerActor ! 'InitServer
 					act
 				}
-				case y: Symbol =>
-					y match {
-						case 'Quit => {
-							if (debug) println("*** ODBServer received Quit command.")
-							if (server != null) server.close
-							exit
-						}
-						case 'InitServer => {
-							if (debug) println("*** ODBServer received InitServer command.")
-							initServer
-							act
-						}
-					}
+				case 'Quit => {
+					if (debug) println("*** ODBServer received Quit command.")
+					if (server != null) server.close
+					exit
+				}
+				case 'InitServer => {
+					if (debug) println("*** ODBServer received InitServer command.")
+					initServer
+					act
+				}
 				case args: Array[String] => {
 					if (debug) println("*** ODBServerActor recived arguments: " + args)
 					absolutePathToBotODB = args(0)
