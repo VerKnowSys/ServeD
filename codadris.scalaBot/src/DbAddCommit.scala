@@ -12,10 +12,10 @@ import org.neodatis.odb._
 
 object DbAddCommit {
 	
-	private val prefs = (new Preferences).loadPreferences
-	private val debug = prefs.getb("debug")
-	private val repositoryDir = prefs.get("repositoryDir")
-	private val databaseName = prefs.get("absoultePathToBotODB") + prefs.get("databaseName")
+	private var prefs: Preferences = null
+	private var debug = true
+	private var repositoryDir: String = null
+	private var databaseName = ""
 	
 	def writeCommitToDataBase(arg: Commit) = {
 		var odb: ODB = null
@@ -25,7 +25,8 @@ object DbAddCommit {
 			odb.commit
 		} catch {
 			case x: Throwable => {
-				println("### Error: There were problems while connecting to remote ODB server. Will try to write directly to ODB file")
+				println("### Error: There were problems while connecting to remote ODB server."+
+						" Will try to write directly to ODB file")
 				odb = ODBFactory.open(databaseName)
 				odb.store( arg )
 				odb.commit
@@ -36,11 +37,21 @@ object DbAddCommit {
 			} 
 		}
 	}
-	
+
+	/**
+	 * args(0) -> commit sha (beginning of range)
+	 * args(1) -> commit sha (end of range)
+	 * args(2) -> absolute path to git repository
+	 */
 	def main(args: Array[String]) = {
 		// Configuration.useMultiThread(true, 5)
 		// Configuration.setDatabaseCharacterEncoding("UTF-8")
 		try{
+			prefs = new Preferences(args(2))
+			debug = prefs.getb("debug")
+			repositoryDir = prefs.get("repositoryDir")
+			databaseName = args(2) + prefs.get("databaseName")
+			
 			val command = Array("git", "--git-dir=" + repositoryDir, "rev-list", args(0) + "..." + args(1))
 			if (debug) println("*** performing "+command.map{ a => a })
 			var listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
@@ -53,7 +64,7 @@ object DbAddCommit {
 			exit(0)
 		} catch {
 			case x: Throwable => {
-				println("### Error: bad arguments.\nUsage: scriptname sha1-start sha1-end")
+				println("### Error: bad arguments.\nUsage: scriptname sha1-start sha1-end absolutePathToGitRepo")
 				if (debug) x.printStackTrace
 				exit(1)
 			}

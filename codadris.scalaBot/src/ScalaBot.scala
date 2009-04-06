@@ -5,32 +5,43 @@ package scalabot
 
 import scala.actors._
 
-object ScalaBot extends Application with Actor {
+object ScalaBot extends Actor {
 	
-	private val prefs = (new Preferences).loadPreferences
-	private val debug = prefs.getb("debug")
+	private var arguments: Array[String] = Array()
 	
 	Runtime.getRuntime.addShutdownHook( new Thread {
 		override def run = {
-			println ("bot shutdown requested.")
+			println ("Bot shutdown requested.")
 			XMPPActor ! 'CloseConnection
 			XMPPActor ! 'Quit
 			ODBServerActor ! 'Quit
+			PreferencesActor ! 'Quit
 		}
 	})
 	
-	println("initializing..")
-	this.start
+	def main(args: Array[String]) {
+		arguments = args
+		println("Initializing..")
+		this.start
+	}
 	
 	override def act = {
+		PreferencesActor.start
+		PreferencesActor ! arguments
+		
 		ODBServerActor.start
+		ODBServerActor ! arguments
+		PreferencesActor ! 'ODBServerActorNeedPreferences
+		Thread sleep 100 // XXX: These sleeps might be rewriten smarter i suppose. But actually I don't know how ;}
 		ODBServerActor ! 'InitServer
 		
 		XMPPActor.start
+		PreferencesActor ! 'XMPPActorNeedPreferences
+		Thread sleep 100
 		XMPPActor ! 'InitConnection
 		
 		Thread sleep 2500
-		println("ready to serve. waiting for orders.")
+		println("Ready to serve. waiting for orders.")
 		Actor.loop {
 			Thread sleep 500
 			XMPPActor ! 'ProcessMessages

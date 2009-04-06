@@ -43,35 +43,31 @@ class CommitTest1 extends TestCase {
 
 
 class ConfigTest1 extends TestCase {
-	var settings = new Preferences
+	var settings = new Preferences("")
 	
 	override def setUp {
 		settings.value("configFile") = "testing.config"
 	}
 
-	def testXML = {
-		println( settings.toXML )
-		val node = settings.toXML
-		println( settings.fromXML(node) )
-	}
-	
 	def testXML2 = {
-		// settings = settings.loadPreferences
-		// settings.value("port") = 666
-		// assert( ! settings.geti("port").equals( settings.loadPreferences.geti("port") ) )
+		settings.value("port") = 666
+		assert( settings.loadPreferences != null )
+		println( settings.geti("port") )
+		// println( settings.loadPreferences.geti("port") )
+	//	settings = settings.loadPreferences
 	}
 	
 	def testConfigReadWrite = {
 		assert(settings.get("configFile").equals("testing.config"))
 		try {
-			settings.savePreferences(settings.get("absoultePathToBotODB") + settings.get("configFile"))
+			settings.savePreferences(settings.get("configFile"))
 		} catch {
 			case _ => {
 				fail("Cannot save preferences file!")
 			}
 		}
 		try {
-			settings.loadPreferences(settings.get("absoultePathToBotODB") + settings.get("configFile"))
+			settings.loadPreferences
 		} catch {
 			case _ => {
 				fail("Cannot load preferences file!")

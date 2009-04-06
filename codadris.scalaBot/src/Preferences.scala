@@ -8,11 +8,12 @@ import java.io._
 import scala.xml.XML
 
 
-sealed class Preferences {
+sealed class Preferences(absolutePathToBot: String) {
 
+	val absolutePathToBotODB = absolutePathToBot
 	var value = HashMap[String,Any] (
 		"debug" -> true,
-		"resource" -> "scalaBot_0.7",
+		"resource" -> "scalaBot_0.9",
 		"login" -> "git-bot",
 		"password" -> "git-bot-666",
 		"server" -> "drakor.eu",
@@ -27,7 +28,6 @@ sealed class Preferences {
 		),
 		"configFile" -> "scalaBotConfig.xml",
 		"statusDescription" -> "I should work fine like a death spell!",
-		"absoultePathToBotODB" -> "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/",
 		"databaseName" -> "ScalaBotCommitDataBase.neodatis",
 		"ODBPort" -> 50603,
 		"ODBName" -> "scalaBotCommitDatabase",
@@ -43,7 +43,6 @@ sealed class Preferences {
 			<server>{value("server")}</server> 
 			<port>{value("port")}</port> 
 			<databaseName>{value("databaseName")}</databaseName>
-			<absoultePathToBotODB>{value("absoultePathToBotODB")}</absoultePathToBotODB>
 			<repositoryDir>{value("repositoryDir")}</repositoryDir>
 			<statusDescription>{value("statusDescription")}</statusDescription>
 			<ODBPort>{value("ODBPort")}</ODBPort>
@@ -71,7 +70,6 @@ sealed class Preferences {
 			hashMap.update( "server", (node \ "server").text)
 			hashMap.update( "port", (node \ "port").text.toInt)
 			hashMap.update( "databaseName", (node \ "databaseName").text)
-			hashMap.update( "absoultePathToBotODB", (node \ "absoultePathToBotODB").text)
 			hashMap.update( "repositoryDir", (node \ "repositoryDir").text)
 			hashMap.update( "statusDescription", (node \ "statusDescription").text)
 			hashMap.update( "ODBPort", (node \ "ODBPort").text.toInt)
@@ -87,54 +85,43 @@ sealed class Preferences {
 			}
 			hashMap.update( "users", list )
 		hashMap.asInstanceOf[HashMap[String,Any]]
-	} 
+	}	
 	
 	def get(param: String): String = {
-		return value(param).asInstanceOf[String]
+		value(param).asInstanceOf[String]
 	}
 	
 	def geti(param: String): Int = {
-		return value(param).asInstanceOf[Int]
+		value(param).asInstanceOf[Int]
 	}
 	
 	def getb(param: String): Boolean = {
-		return value(param).asInstanceOf[Boolean]
+		value(param).asInstanceOf[Boolean]
 	}
 	
 	def getl(param: String): List[HashMap[String,String]] = {
-		return value(param).asInstanceOf[List[HashMap[String,String]]]
+		value(param).asInstanceOf[List[HashMap[String,String]]]
 	}
 	
 	def loadPreferences: Preferences = {
-		var sett = new Preferences
+		var sett = new Preferences(absolutePathToBotODB)
+		var oldCfgFile = sett.get("configFile") // XXX: cause we don't write it's value to config. It's hardcoded
 		try {
-			val loadnode = xml.XML.loadFile(sett.get("absoultePathToBotODB") + sett.get("configFile")) 
+			val loadnode = XML.loadFile(absolutePathToBotODB + sett.get("configFile")) 
 			sett.value = fromXML(loadnode)
+			sett.value("configFile") = oldCfgFile
 		} catch {
 			case x: Throwable => {
-				println("*** config file " + sett.get("absoultePathToBotODB") + sett.get("configFile")+" doesn't exists! creating new one")
+				println("*** config file " +
+						absolutePathToBotODB + sett.get("configFile") + " doesn't exists! creating new one")
 				sett.savePreferences
 			}
 		}
 		sett
 	}
 
-	def loadPreferences( configFileName: String ): Preferences = {
-		var sett = new Preferences
-		try {
-			val loadnode = xml.XML.loadFile(sett.get("absoultePathToBotODB") + sett.get("configFile")) 
- 			sett.value = fromXML(loadnode)
-		} catch {
-			case x: Throwable => {
-				println("*** config file " + sett.get("absoultePathToBotODB") + configFileName + " doesn't exists! creating new one")
-				sett.savePreferences
-			}
-		}
-		sett
-	}
+	def savePreferences = XML.saveFull( absolutePathToBotODB + get("configFile"), toXML, "UTF-8", true, null)
 	
-	def savePreferences = scala.xml.XML.saveFull( get("absoultePathToBotODB") + get("configFile"), this.toXML, "UTF-8", true, null)
-	
-	def savePreferences(fileName: String) = scala.xml.XML.saveFull(fileName, this.toXML, "UTF-8", true, null)
+	def savePreferences(fileName: String) = XML.saveFull(fileName, toXML, "UTF-8", true, null)
 	
 }

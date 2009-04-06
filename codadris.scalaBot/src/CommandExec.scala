@@ -9,11 +9,10 @@ import java.io._
 object CommandExec {
 	
 	def cmdExec(cmdLine: Array[String]): String = {
-     	var output = ""
+    	var output = ""
     	try {
-	        val p = Runtime.getRuntime.exec(cmdLine)
+			val p = Runtime.getRuntime.exec(cmdLine)
 	        val input = new BufferedReader(new InputStreamReader(p.getInputStream))
-
 			var line = ""
 	        	while (line != null) {
 					output += (line + '\n')

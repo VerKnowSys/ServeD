@@ -24,15 +24,15 @@ import org.jivesoftware.smackx._
 
 object XMPPActor extends Actor with MessageListener { // with PacketListener 
 	
-	private val prefs = (new Preferences).loadPreferences
-	private val debug = prefs.getb("debug")
-	private val config = new ConnectionConfiguration(prefs.get("server"), prefs.geti("port"))
-	private val connection = new XMPPConnection(config)	
-	private val presence = new Presence(Presence.Type.unavailable)
-	private val login = prefs.get("login")
-	private val password = prefs.get("password")
-	private val resource = prefs.get("resource")
-	private val repositoryDir = prefs.get("repositoryDir")
+	private var prefs: Preferences = null
+	private var debug = true
+	private var config: ConnectionConfiguration = null
+	private var connection: XMPPConnection = null
+	private var presence: Presence = null
+	private var login = ""
+	private var password = ""
+	private var resource = ""
+	private var repositoryDir = ""
 
 	private var filter: AndFilter = null
 	private var chatmanager: ChatManager = null
@@ -171,6 +171,17 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 	override def act = {
 		Actor.loop {
 			react {
+				case s: Preferences => {
+					prefs = s
+					debug = prefs.getb("debug")
+					config = new ConnectionConfiguration(prefs.get("server"), prefs.geti("port"))
+					connection = new XMPPConnection(config)	
+					presence = new Presence(Presence.Type.unavailable)
+					login = prefs.get("login")
+					password = prefs.get("password")
+					resource = prefs.get("resource")
+					repositoryDir = prefs.get("repositoryDir")
+				}
 				case y: Symbol =>
 					y match {
 						case 'Quit => {
@@ -195,9 +206,6 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 							act
 						}
 					}
-				case _ => {
-					act
-				}
 			}
 		}
 	}

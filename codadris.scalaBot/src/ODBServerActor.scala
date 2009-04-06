@@ -15,14 +15,14 @@ import org.neodatis.odb.core.query.criteria._
 object ODBServerActor extends Actor {
 	
 	private var server: ODBServer = null
-	
-	private val prefs = (new Preferences).loadPreferences
-	private val debug = prefs.getb("debug")	
+	private var absolutePathToBotODB = ""
+	private var prefs: Preferences = null
+	private var debug = true
 	
 	def initServer = {
 		try { 
 			server = ODBFactory.openServer(prefs.geti("ODBPort"))
-			server.addBase(prefs.get("ODBName"), prefs.get("absoultePathToBotODB") + prefs.get("databaseName"))
+			server.addBase(prefs.get("ODBName"), absolutePathToBotODB + prefs.get("databaseName"))
 			server.startServer(false) //start server in current thread
 		} catch {
 			case x: Throwable => {
@@ -39,6 +39,10 @@ object ODBServerActor extends Actor {
 	override def act = {
 		Actor.loop {
 			react {
+				case (a: Preferences) => {
+					prefs = a
+					debug = prefs.getb("debug")
+				}
 				case y: Symbol =>
 					y match {
 						case 'Quit => {
@@ -52,6 +56,11 @@ object ODBServerActor extends Actor {
 							act
 						}
 					}
+				case args: Array[String] => {
+					if (debug) println("*** ODBServerActor recived arguments: " + args)
+					absolutePathToBotODB = args(0)
+					act
+				}
 			}
 		}
 	}	
