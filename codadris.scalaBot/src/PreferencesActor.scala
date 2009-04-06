@@ -16,12 +16,10 @@ object PreferencesActor extends Actor {
 					case z: Symbol => {
 						z match {
 							case 'ODBServerActorNeedPreferences => {
-								println("ODBServerActor wants preferences")
 								ODBServerActor ! prefs
 								act
 							}
 							case 'XMPPActorNeedPreferences => {
-								println("XMPPActor wants preferences")
 								XMPPActor ! prefs
 								act
 							}

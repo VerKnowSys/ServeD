@@ -16,6 +16,8 @@ object ScalaBot extends Actor {
 			XMPPActor ! 'Quit
 			ODBServerActor ! 'Quit
 			PreferencesActor ! 'Quit
+			ScalaBot ! 'Quit
+			println("Done\n")
 		}
 	})
 	
@@ -32,20 +34,22 @@ object ScalaBot extends Actor {
 		ODBServerActor.start
 		ODBServerActor ! arguments
 		PreferencesActor ! 'ODBServerActorNeedPreferences
-		Thread sleep 100 // XXX: These sleeps might be rewriten smarter i suppose. But actually I don't know how ;}
-		ODBServerActor ! 'InitServer
 		
 		XMPPActor.start
 		PreferencesActor ! 'XMPPActorNeedPreferences
-		Thread sleep 100
-		XMPPActor ! 'InitConnection
 		
-		Thread sleep 2500
-		println("Ready to serve. waiting for orders.")
-		Actor.loop {
-			Thread sleep 500
-			XMPPActor ! 'ProcessMessages
+		react {
+			case 'MainLoop => {
+				Actor.loop {
+					Thread sleep 500 // 500 ms for each check. That's enough even for very often updated repository
+					XMPPActor ! 'ProcessMessages
+				}
+			}
+			case 'Quit => {
+				exit
+			}
 		}
+		println("Ready to serve. waiting for orders.")
 	}
 	
 }

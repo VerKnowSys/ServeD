@@ -70,7 +70,8 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		if (debug) println("*** num of users: " + chat.length)
 		presence.setStatus(prefs.get("statusDescription"))
 		connection.sendPacket(presence)
-		if (debug) println("*** Connected as: " + login)
+		if (debug) println("*** Connected as: " + login + "\nReady to enter main loop")
+		ScalaBot ! 'MainLoop
 	}
 
 	// def processPacket(packet: Packet) {
@@ -181,6 +182,8 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 					password = prefs.get("password")
 					resource = prefs.get("resource")
 					repositoryDir = prefs.get("repositoryDir")
+					XMPPActor ! 'InitConnection
+					act
 				}
 				case y: Symbol =>
 					y match {
@@ -196,6 +199,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 						case 'CloseConnection => {
 							if (debug) println("*** received CloseConnection command.")
 							closeConnection
+							act
 						}
 						case 'ProcessMessages => {
 							tryToSendMessages

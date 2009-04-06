@@ -42,6 +42,8 @@ object ODBServerActor extends Actor {
 				case (a: Preferences) => {
 					prefs = a
 					debug = prefs.getb("debug")
+					ODBServerActor ! 'InitServer
+					act
 				}
 				case y: Symbol =>
 					y match {
