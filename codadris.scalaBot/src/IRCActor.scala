@@ -103,6 +103,7 @@ object IRCActor extends PircBot with Actor {
 				sendMessage( sender, msg )
 			}
 		}
+		try {
 		if (message.split(' ')(0).equalsIgnoreCase("!links") && message.split(' ')(1).length > 2) {
 			sendMessage( sender, "You requested, to find links which contain: \"" + message.split(' ')(1) + "\"…" )
 			var msg = ""
@@ -113,7 +114,10 @@ object IRCActor extends PircBot with Actor {
 					sendMessage( sender, msg )
 				}
 			}
-
+		} catch {
+			case x: Throwable => {
+				x.printStackTrace
+			}
 		}
 	}
 	
