@@ -1,0 +1,103 @@
+// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
+// This Software is a close code project. You may not redistribute this code without permission of author.
+
+package scalabot
+
+import scala.actors._
+import scala.actors.Actor._
+import scala.collection.mutable.HashMap
+
+import java.util.Date
+import org.jibble.pircbot._
+
+import org.neodatis.odb._
+import org.neodatis.odb.impl.core.query.criteria._
+import org.neodatis.odb.core.query.criteria._
+
+
+object IRCActor extends PircBot with Actor {
+
+	override def act = {
+		this.setName("ScalaBot")
+		this.setVerbose(true)
+		this.setEncoding("UTF-8")
+		this.connect("irc.freenode.net")
+		this.joinChannel("#scala.pl")
+		this.joinChannel("#ruby.pl")
+		react {
+			case 'Quit => {
+				this.disconnect
+			}
+		}
+	}
+	
+	def getLinks(howMany: Int): List[LinkInfo] = {
+		var odb: ODB = null
+		var list: List[LinkInfo] = List()
+		try {
+		    odb = ODBFactory.openClient("127.0.0.1", 50603, "scalaBotCommitDatabase")
+		    var query = new CriteriaQuery(classOf[LinkInfo]) //, Where.equal("date.getDay", (new Date).getDay))
+			query.orderByAsc("date") 
+			val link = odb.getObjects(query)
+				while (link.hasNext && (list.size <= howMany)) {
+					val comm = (link.next).asInstanceOf[LinkInfo]
+					list = list ::: List(comm)
+				}
+		} catch {
+			case x: Throwable => {
+				println("### Error in getLinks: " + x)
+				println(x.printStackTrace)
+			}
+		} finally {
+			if (odb != null) { 
+				odb.close
+			} 
+		}
+		return list
+	}
+	
+	def putLinkToDatabase(arg: LinkInfo) {
+		var odb: ODB = null
+		try {
+			odb = ODBFactory.openClient("127.0.0.1", 50603, "scalaBotCommitDatabase")
+			odb.store( arg )
+			odb.commit
+		} catch {
+			case x: Throwable => {
+				println("### Error: There were problems while connecting to ODB server.")
+			}
+		} finally {
+			if (odb != null) { 
+				odb.close
+			} 
+		}
+	}
+	
+	override def onMessage(channel: String, sender: String, login: String, hostname: String, message: String) {
+		if (message.equalsIgnoreCase("!herbata")) {
+			actor {
+				Thread.sleep(240000)
+				sendMessage(channel, sender + ": Minęły 4minuty. Herbata gotowa")
+			}
+		}
+		if (message.equalsIgnoreCase("!zróbFlame")) {
+			actor {
+				Thread.sleep(2000)
+				sendMessage("#ruby.pl", "Ruby to język dla cieniasów ;} (flame mode on)")
+			}
+		}
+		if (message.contains("http://") || message.contains("www.")) {
+			val link = new LinkInfo(sender, channel, "\"" + message + "\"")
+			putLinkToDatabase(link)
+		}
+		if (message.equalsIgnoreCase("!links")) {
+			sendMessage( channel, "Taking 10 last links with their context:" )
+			var msg = ""
+			for (link <- getLinks(10)) {
+				msg += "On: " + link.channel + ", by " + link.author + ": " + link.message + " --=#=-- "
+			}
+			sendMessage( channel, msg )
+		}
+	}
+	
+}
