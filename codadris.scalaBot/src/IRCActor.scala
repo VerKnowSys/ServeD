@@ -99,7 +99,7 @@ object IRCActor extends PircBot with Actor {
 			sendMessage( sender, "Taking 10 last links with their context:" )
 			var msg = ""
 			for (link <- getLinks(10)) {
-				msg = "On: " + link.channel + ", by " + link.author + ": " + link.message
+				msg = "On: " + link.channel + " @(" + link.date.toString + ", by " + link.author + ": " + link.message
 				sendMessage( sender, msg )
 			}
 		}
