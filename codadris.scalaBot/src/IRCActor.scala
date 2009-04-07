@@ -20,6 +20,7 @@ object IRCActor extends PircBot with Actor {
 	override def act = {
 		this.setName("ScalaBot")
 		this.setVerbose(false)
+		this.setVersion("ScalaBot based on pircbot")
 		this.setEncoding("UTF-8")
 		this.connect("irc.freenode.net")
 		this.joinChannel("#scala.pl")
@@ -103,7 +104,7 @@ object IRCActor extends PircBot with Actor {
 			var msg = ""
 			for (link <- getLinks(100000)) { // XXX hardcoded max of 100.000 links to search in
 				if (link.message.toUpperCase.contains(message.split(' ')(1).toUpperCase)) {
-					msg += "On: " + link.channel + ", by " + link.author + ": " + link.message + " --=#=-- "
+					msg += "On: " + link.channel + ", by " + link.author + ": \"" + link.message + "\" --=#=-- "
 				}
 			}
 			sendMessage( channel, msg )
