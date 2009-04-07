@@ -95,22 +95,24 @@ object IRCActor extends PircBot with Actor {
 			putLinkToDatabase(link)
 		}
 		if (message.equalsIgnoreCase("!links")) {
-			sendMessage( channel, "Taking 10 last links with their context:" )
+			sendMessage( sender, "Taking 10 last links with their context:" )
 			var msg = ""
 			for (link <- getLinks(10)) {
-				msg += "On: " + link.channel + ", by " + link.author + ": " + link.message + " --=#=-- "
+				msg = "On: " + link.channel + ", by " + link.author + ": " + link.message
+				sendMessage( sender, msg )
 			}
-			sendMessage( channel, msg )
 		}
 		if (message.split(' ')(0).equalsIgnoreCase("!links") && message.split(' ')(1).length > 2) {
-			sendMessage( channel, "I'm trying to find links which contains: \"" + message.split(' ')(1) + "\"…" )
+			sendMessage( sender, "I'm trying to find links which contains: \"" + message.split(' ')(1) + "\"…" )
 			var msg = ""
 			for (link <- getLinks(100000)) { // XXX hardcoded max of 100.000 links to search in
 				if (link.message.toUpperCase.contains(message.split(' ')(1).toUpperCase)) {
-					msg += "On: " + link.channel + ", by " + link.author + ": \"" + link.message + "\" --=#=-- "
+					msg = "On: " + link.channel + " @(" + link.date.toString + "), by " + link.author + 
+					": \"" + link.message + "\""
+					sendMessage( sender, msg )
 				}
 			}
-			sendMessage( channel, msg )
+
 		}
 	}
 	
