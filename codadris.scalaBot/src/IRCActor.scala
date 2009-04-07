@@ -114,6 +114,7 @@ object IRCActor extends PircBot with Actor {
 					sendMessage( sender, msg )
 				}
 			}
+		}
 		} catch {
 			case x: Throwable => {
 				x.printStackTrace
