@@ -25,6 +25,7 @@ object IRCActor extends PircBot with Actor {
 		this.connect("irc.freenode.net")
 		this.joinChannel("#scala.pl")
 		this.joinChannel("#ruby.pl")
+		this.joinChannel("#scala")
 		react {
 			case 'Quit => {
 				this.disconnect
@@ -103,12 +104,12 @@ object IRCActor extends PircBot with Actor {
 			}
 		}
 		if (message.split(' ')(0).equalsIgnoreCase("!links") && message.split(' ')(1).length > 2) {
-			sendMessage( sender, "I'm trying to find links which contains: \"" + message.split(' ')(1) + "\"…" )
+			sendMessage( sender, "You requested, to find links which contains: \"" + message.split(' ')(1) + "\"…" )
 			var msg = ""
 			for (link <- getLinks(100000)) { // XXX hardcoded max of 100.000 links to search in
 				if (link.message.toUpperCase.contains(message.split(' ')(1).toUpperCase)) {
 					msg = "On: " + link.channel + " @(" + link.date.toString + "), by " + link.author + 
-					": \"" + link.message + "\""
+					": " + link.message
 					sendMessage( sender, msg )
 				}
 			}
