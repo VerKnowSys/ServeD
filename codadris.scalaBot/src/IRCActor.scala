@@ -19,7 +19,7 @@ object IRCActor extends PircBot with Actor {
 
 	override def act = {
 		this.setName("ScalaBot")
-		this.setVerbose(true)
+		this.setVerbose(false)
 		this.setEncoding("UTF-8")
 		this.connect("irc.freenode.net")
 		this.joinChannel("#scala.pl")
@@ -95,6 +95,16 @@ object IRCActor extends PircBot with Actor {
 			var msg = ""
 			for (link <- getLinks(10)) {
 				msg += "On: " + link.channel + ", by " + link.author + ": " + link.message + " --=#=-- "
+			}
+			sendMessage( channel, msg )
+		}
+		if (message.split(' ')(0).equalsIgnoreCase("!links") && message.split(' ')(1).length > 2) {
+			sendMessage( channel, "I'm trying to find links which contains: \"" + message.split(' ')(1) + "\"…" )
+			var msg = ""
+			for (link <- getLinks(100000)) { // XXX hardcoded max of 100.000 links to search in
+				if (link.message.toUpperCase.contains(message.split(' ')(1).toUpperCase)) {
+					msg += "On: " + link.channel + ", by " + link.author + ": " + link.message + " --=#=-- "
+				}
 			}
 			sendMessage( channel, msg )
 		}
