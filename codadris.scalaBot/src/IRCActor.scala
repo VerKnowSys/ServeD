@@ -19,7 +19,7 @@ object IRCActor extends PircBot with Actor {
 
 	override def act = {
 		this.setName("ScalaBot")
-		this.setVerbose(false)
+		this.setVerbose(true)
 		this.setVersion("ScalaBot based on pircbot")
 		this.setEncoding("UTF-8")
 		this.connect("irc.freenode.net")
@@ -39,7 +39,7 @@ object IRCActor extends PircBot with Actor {
 		try {
 		    odb = ODBFactory.openClient("127.0.0.1", 50603, "scalaBotCommitDatabase")
 		    var query = new CriteriaQuery(classOf[LinkInfo]) //, Where.equal("date.getDay", (new Date).getDay))
-			query.orderByAsc("date")
+			query.orderByDesc("date")
 			val link = odb.getObjects(query)
 				while (link.hasNext && (list.size <= howMany)) {
 					val comm = (link.next).asInstanceOf[LinkInfo]
