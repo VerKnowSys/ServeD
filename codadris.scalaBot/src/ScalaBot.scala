@@ -16,6 +16,7 @@ object ScalaBot extends Actor {
 			XMPPActor ! 'Quit
 			ODBServerActor ! 'Quit
 			PreferencesActor ! 'Quit
+			IRCActor ! 'Quit
 			ScalaBot ! 'Quit
 			println("Done\n")
 		}
@@ -37,6 +38,8 @@ object ScalaBot extends Actor {
 		
 		XMPPActor.start
 		PreferencesActor ! 'XMPPActorNeedPreferences
+		
+		IRCActor.start
 		
 		react {
 			case 'MainLoop => {
