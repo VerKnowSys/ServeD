@@ -128,6 +128,7 @@ object IRCActor extends PircBot with Actor {
 		} catch {
 			case x: Throwable => {
 				println("### Disconnected and cannot connect again! " + x.getMessage)
+				act
 			}
 		}
 	}
