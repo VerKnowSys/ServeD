@@ -38,7 +38,7 @@ object IRCActor extends PircBot with Actor {
 		try {
 		    odb = ODBFactory.openClient("127.0.0.1", 50603, "scalaBotCommitDatabase")
 		    var query = new CriteriaQuery(classOf[LinkInfo]) //, Where.equal("date.getDay", (new Date).getDay))
-			query.orderByAsc("date") 
+			query.orderByAsc("date")
 			val link = odb.getObjects(query)
 				while (link.hasNext && (list.size <= howMany)) {
 					val comm = (link.next).asInstanceOf[LinkInfo]
@@ -75,6 +75,9 @@ object IRCActor extends PircBot with Actor {
 	}
 	
 	override def onMessage(channel: String, sender: String, login: String, hostname: String, message: String) {
+		if (message.equalsIgnoreCase("!kawa")) {
+			sendMessage(channel,sender + ": Taki problem ruszyć dupsko po kawę do automatu? ;P")
+		}
 		if (message.equalsIgnoreCase("!herbata")) {
 			actor {
 				Thread.sleep(240000)
