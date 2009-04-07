@@ -124,7 +124,7 @@ object IRCActor extends PircBot with Actor {
 	
 	override def onDisconnect = {
 		try {
-			this.reconnect
+			act
 		} catch {
 			case x: Throwable => {
 				println("### Disconnected and cannot connect again! " + x.getMessage)
