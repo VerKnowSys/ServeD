@@ -49,6 +49,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 			case x: Throwable => {
 				println("### Error while connecting to XMPP server. Please check login / password.")
 				if (debug) println( x.printStackTrace )
+                exit
 			}
 		}
 		chatmanager = connection.getChatManager
