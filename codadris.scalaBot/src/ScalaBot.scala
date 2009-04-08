@@ -23,7 +23,10 @@ object ScalaBot extends Actor {
 	})
 	
 	def main(args: Array[String]) {
-		arguments = args
+		if (args.size < 1)
+            arguments = Array("./") // set current dir if there's no given path to bot dir
+        else
+            arguments = args
 		println("Initializing..")
 		this.start
 	}
