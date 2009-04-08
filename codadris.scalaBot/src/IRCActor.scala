@@ -17,15 +17,26 @@ import org.neodatis.odb.core.query.criteria._
 
 object IRCActor extends PircBot with Actor {
 
-	override def act = {
-		this.setName("ScalaBot")
-		this.setVerbose(true)
+	def settings = {
+		this.setVerbose(false)
 		this.setVersion("ScalaBot based on pircbot")
 		this.setEncoding("UTF-8")
 		this.connect("irc.freenode.net")
 		this.joinChannel("#scala.pl")
 		this.joinChannel("#ruby.pl")
 		this.joinChannel("#scala")
+	}
+
+	override def act = {
+		try {
+			this.setName("ScalaBot")
+			settings
+		} catch {
+			case v: Throwable => {
+				this.setName("ScalaBot-")
+				settings
+			}
+		}
 		react {
 			case 'Quit => {
 				this.disconnect
@@ -85,39 +96,30 @@ object IRCActor extends PircBot with Actor {
 				sendMessage(channel, sender + ": Minęły 4minuty. Herbata gotowa")
 			}
 		}
-		if (message.equalsIgnoreCase("!zróbFlame")) {
-			actor {
-				Thread.sleep(2000)
-				sendMessage("#ruby.pl", "Ruby to język dla cieniasów ;} (flame mode on)")
-			}
-		}
 		if (message.contains("http://") || message.contains("www.")) {
 			val link = new LinkInfo(sender, channel, "\"" + message + "\"")
 			putLinkToDatabase(link)
 		}
-		if (message.equalsIgnoreCase("!links")) {
-			sendMessage( sender, "Taking 10 last links with their context:" )
-			var msg = ""
-			for (link <- getLinks(10)) {
-				msg = "On: " + link.channel + " @(" + link.date.toString + ", by " + link.author + ": " + link.message
-				sendMessage( sender, msg )
-			}
-		}
 		try {
-		if (message.split(' ')(0).equalsIgnoreCase("!links") && message.split(' ')(1).length > 2) {
-			sendMessage( sender, "You requested, to find links which contain: \"" + message.split(' ')(1) + "\"…" )
-			var msg = ""
-			for (link <- getLinks(100000)) { // XXX hardcoded max of 100.000 links to search in
-				if (link.message.toUpperCase.contains(message.split(' ')(1).toUpperCase)) {
-					msg = "On: " + link.channel + " @(" + link.date.toString + "), by " + link.author + 
-					": " + link.message
-					sendMessage( sender, msg )
+			if (message.split(' ')(0).equalsIgnoreCase("!links") && message.split(' ')(1).length > 2) {
+				sendMessage( sender, "You requested, to find links which contain: \"" + message.split(' ')(1) + "\"…" )
+				var msg = ""
+				for (link <- getLinks(100000)) { // XXX hardcoded max of 100.000 links to search in
+					if (link.message.toUpperCase.contains(message.split(' ')(1).toUpperCase)) {
+						msg = "On: " + link.channel + " @(" + link.date.toString + "), by " + link.author +
+						": " + link.message
+						sendMessage( sender, msg )
+					}
 				}
 			}
-		}
 		} catch {
 			case x: Throwable => {
-				x.printStackTrace
+				sendMessage( sender, "Taking 10 last links with their context:" )
+				var msg = ""
+				for (link <- getLinks(10)) {
+					msg = "On: " + link.channel + " @(" + link.date.toString + ", by " + link.author + ": " + link.message
+					sendMessage( sender, msg )
+				}
 			}
 		}
 	}
