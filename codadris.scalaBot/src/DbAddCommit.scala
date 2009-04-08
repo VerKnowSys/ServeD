@@ -7,7 +7,6 @@ import scalabot._
 import scala.actors._
 import java.io._
 import org.neodatis.odb._
-// import org.neodatis.odb.Configuration
 
 
 object DbAddCommit {
@@ -44,8 +43,6 @@ object DbAddCommit {
 	 * args(2) -> absolute path to git repository
 	 */
 	def main(args: Array[String]) = {
-		// Configuration.useMultiThread(true, 5)
-		// Configuration.setDatabaseCharacterEncoding("UTF-8")
 		try{
 			prefs = new Preferences(args(2))
 			debug = prefs.getb("debug")
@@ -55,7 +52,7 @@ object DbAddCommit {
 			val command = Array("git", "--git-dir=" + repositoryDir, "rev-list", args(0) + "..." + args(1))
 			if (debug) println("*** performing "+command.map{ a => a })
 			var listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
-			listOfSha1.foreach { oneOf => 
+			listOfSha1.foreach { oneOf =>
 				val commit = new Commit(oneOf)
 				writeCommitToDataBase( commit )	// sha1, show?
 				if (debug) println("*** writeCommitToDatabase: " + commit )

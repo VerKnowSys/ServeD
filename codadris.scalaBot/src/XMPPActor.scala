@@ -113,15 +113,12 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 			query.orderByDesc("date") 
 			val commit = odb.getObjects(query)
 				while (commit.hasNext) {
-					val comm = (commit.next).asInstanceOf[Commit] //match {
-						//case comm: Commit => {
+					val comm = (commit.next).asInstanceOf[Commit]
 						comm.toRead = false
 						odb.store(comm)
 						if (debug)
 							println("*** Found in database: " + comm.commitSha1)
 						list = list ::: List(comm.commitSha1)
-						//}
-					//}
 				}
 		} catch {
 			case x: Throwable => {
