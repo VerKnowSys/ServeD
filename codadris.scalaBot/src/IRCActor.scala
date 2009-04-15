@@ -19,6 +19,8 @@ object IRCActor extends PircBot with Actor {
 
 	def settings = {
 		this.setVerbose(false)
+		this.setName("ScalaBot")
+		this.setAutoNickChange(true)
 		this.setVersion("ScalaBot based on pircbot")
 		this.setEncoding("UTF-8")
 		this.connect("irc.freenode.net")
@@ -28,15 +30,7 @@ object IRCActor extends PircBot with Actor {
 	}
 
 	override def act = {
-		try {
-			this.setName("ScalaBot")
-			settings
-		} catch {
-			case v: Throwable => {
-				this.setName("ScalaBot-")
-				settings
-			}
-		}
+		settings
 		react {
 			case 'Quit => {
 				this.disconnect
@@ -87,8 +81,8 @@ object IRCActor extends PircBot with Actor {
 	}
 	
 	override def onMessage(channel: String, sender: String, login: String, hostname: String, message: String) {
-		if (message.equalsIgnoreCase("!kawa")) {
-			sendMessage(channel,sender + ": Taki problem ruszyć dupsko po kawę do automatu? ;P")
+		if (message.equalsIgnoreCase("!dupa")) {
+			sendMessage(channel, sender + ": lopex?")
 		}
 		if (message.equalsIgnoreCase("!herbata")) {
 			actor {
@@ -126,11 +120,11 @@ object IRCActor extends PircBot with Actor {
 	
 	override def onDisconnect = {
 		try {
-			act
+			settings
 		} catch {
 			case x: Throwable => {
-				println("### Disconnected and cannot connect again! " + x.getMessage)
-				act
+				println("### Disconnected and cannot connect again! I'll keep trying.. " + x.getMessage)
+				settings
 			}
 		}
 	}
