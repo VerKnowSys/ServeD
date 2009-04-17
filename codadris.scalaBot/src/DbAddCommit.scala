@@ -7,6 +7,7 @@ import org.neodatis.odb.{ODBFactory, ODB}
 import scalabot._
 import scala.actors._
 import java.io._
+
 object DbAddCommit {
 	
 	private var prefs: Preferences = null
