@@ -53,18 +53,13 @@ object ODBServerActor extends Actor {
 				case (a: Preferences) => {
 					prefs = a
 					debug = prefs.getb("debug")
-					ODBServerActor ! 'InitServer
+					initServer
 					act
 				}
 				case 'Quit => {
 					if (debug) println("*** ODBServer received Quit command.")
 					if (server != null) server.close
 					exit
-				}
-				case 'InitServer => {
-					if (debug) println("*** ODBServer received InitServer command.")
-					initServer
-					act
 				}
 				case args: Array[String] => {
 					if (debug) println("*** ODBServerActor recived arguments: " + args)

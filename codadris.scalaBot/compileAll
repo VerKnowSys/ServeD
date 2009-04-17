@@ -9,10 +9,10 @@ files=`for i in *.scala; do echo "$i"; done`
 echo $jars
 echo $files
 
-out=`fsc -classpath $jars. $files`
+fsc -classpath $jars. $files
 ex="$?"
 if [ "$ex" != "0" ]; then
-  echo $out | most -w
+  echo $out #| most -v
 fi
 
 exit $ex

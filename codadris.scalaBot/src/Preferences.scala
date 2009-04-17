@@ -59,7 +59,7 @@ sealed class Preferences(absolutePathToBot: String) {
 				</user>
 			}
 			</users>
-		</preferences> 
+		</preferences>
 	
 	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
 		var hashMap = HashMap[String,Any]()

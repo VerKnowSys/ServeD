@@ -13,5 +13,6 @@ for i in $tests; do
 done	
 
 echo "Running $packageDir"
-scala -classpath $jars. $main "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/"
+scala -classpath $jars. $main "../"
+# remotely: "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/"
 # locally: "../" 
