@@ -13,7 +13,7 @@ sealed class Preferences(absolutePathToBot: String) {
 	val absolutePathToBotODB = absolutePathToBot
 	var value = HashMap[String,Any] (
 		"debug" -> true,
-		"resource" -> "scalaBot_0.9",
+		"resource" -> "scalaBot_1.0",
 		"login" -> "git-bot",
 		"password" -> "git-bot-666",
 		"server" -> "drakor.eu",
