@@ -3,7 +3,7 @@
 
 cd src/
 
-jars=`for i in ../lib/*.jar; do echo -n "$i:"; done`
+jars=`for i in ../../lib/*.jar; do echo -n "$i:"; done`
 files=`for i in *.scala; do echo "$i"; done`
 
 echo $jars
