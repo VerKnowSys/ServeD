@@ -6,17 +6,16 @@ package scalabot
 import commiter._
 
 import scala.actors._
+import scala.actors.Actor._
 
 import org.neodatis.odb._
 import org.neodatis.odb.impl.core.query.criteria._
 import org.neodatis.odb.core.query.criteria._
-// import org.neodatis.odb.Configuration
 
 
 object ODBServerActor extends Actor {
 	
 	private var server: ODBServer = null
-	// private var serverForIRC: ODBServer = null
 	private var absolutePathToBotODB = ""
 	private var prefs: Preferences = null
 	private var debug = true
@@ -28,10 +27,6 @@ object ODBServerActor extends Actor {
 			server.addBase(prefs.get("ODBName"), absolutePathToBotODB + prefs.get("databaseName"))
 			server.startServer(false) //start server in current thread
 			
-			// serverForIRC = ODBFactory.openServer(50604) // XXX hardcoded values
-			// 		serverForIRC.addBase("ircLinksODB", absolutePathToBotODB + "ircLinksODB")
-			// 		serverForIRC.startServer(true) //start server in new thread
-			// 		
 		} catch {
 			case x: Throwable => {
 				println("### Error: exception occured in ODBServerActor!")
@@ -41,14 +36,11 @@ object ODBServerActor extends Actor {
 			if (server != null) {
 				server.close
 			}
-			// if (serverForIRC != null) {
-				// serverForIRC.close
-			// }
 		}
 	}
 	
-	override def act = {
-		Actor.loop {
+ 	override def act = {
+		loop {
 			react {
 				case (a: Preferences) => {
 					prefs = a
