@@ -18,7 +18,8 @@ sealed class Preferences(absolutePathToBot: String) {
 		"password" -> "varrajabber",
 		"server" -> "drakor.eu",
 		"port" -> 5222,
-		"repositoryDir" -> "/git/scala.project.tools.git",
+		"gitExecutable" -> "/opt/local/bin/git",
+		"repositoryDir" -> "/git/scala.project.tools.git/.git",
 		"users" -> List(
 			// XXX: only three arguments in Preferences:
 			HashMap( "user" -> "dmilith@drakor.eu", "params" -> "--numstat --no-merges --no-merges" )

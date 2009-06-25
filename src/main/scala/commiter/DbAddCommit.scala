@@ -7,7 +7,6 @@ import command.exec.CommandExec
 import org.neodatis.odb.{ODBFactory, ODB}
 import scalabot._
 import scala.actors._
-import java.io._
 
 object DbAddCommit {
 	
@@ -15,6 +14,7 @@ object DbAddCommit {
 	private var debug = true
 	private var repositoryDir: String = null
 	private var databaseName = ""
+	private var git = ""
 	
 	def writeCommitToDataBase(arg: Commit) = {
 		var odb: ODB = null
@@ -24,7 +24,7 @@ object DbAddCommit {
 			odb.commit
 		} catch {
 			case x: Throwable => {
-				println("### Error: There were problems while connecting to remote ODB server."+
+				println("### Warning: There were problems while connecting to remote ODB server."+
 						" Will try to write directly to ODB file")
 				odb = ODBFactory.open(databaseName)
 				odb.store( arg )
@@ -42,22 +42,24 @@ object DbAddCommit {
 	 * args(1) -> commit sha (end of range)
 	 * args(2) -> absolute path to git repository
 	 */
-	def main(args: Array[String]) = {
+	def main(args: Array[String]) {
 		try{
 			prefs = new Preferences(args(2))
 			debug = prefs.getb("debug")
 			repositoryDir = prefs.get("repositoryDir")
 			databaseName = args(2) + prefs.get("databaseName")
-			
-			val command = Array("git", "--git-dir=" + repositoryDir, "rev-list", args(0) + "..." + args(1))
+			git = prefs.get("gitExecutable")
+
+			val command = Array(git, "--git-dir=" + repositoryDir, "rev-list", args(0) + "..." + args(1))
 			if (debug) println("*** performing "+command.map{ a => a })
 			var listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
 			listOfSha1.foreach { oneOf =>
 				val commit = new Commit(oneOf)
 				writeCommitToDataBase( commit )	// sha1, show?
 				if (debug) println("*** writeCommitToDatabase: " + commit )
+				println("commit added")
 			}
-			println("done. commit added")
+			println("done")
 			exit(0)
 		} catch {
 			case x: Throwable => {
