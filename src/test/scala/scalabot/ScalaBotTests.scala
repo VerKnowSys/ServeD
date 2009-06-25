@@ -8,17 +8,23 @@ import scalabot._
 import scala.collection.mutable.HashMap
 import scala._
 
-import junit.framework._
-import junit.framework.Assert.assertEquals 
-import junit.framework.Assert.fail 
-import junit.textui._
+import junit.framework._;
+import Assert._;
 
-import java.util.Date
-import java.util.ArrayList
-import java.io.File
+object ScalaBotTests {
 
+	def suite: Test = {
+        val suite = new TestSuite(classOf[CommitTest])
+		suite.addTestSuite(classOf[ConfigTest])
+        suite
+    }
 
-class CommitTest1 extends TestCase {
+    def main(args : Array[String]) {
+        junit.textui.TestRunner.run(suite);
+    }
+}
+
+class CommitTest extends TestCase("commit") {
 	var commit: Commit = null
 
 	override def setUp {
@@ -37,12 +43,12 @@ class CommitTest1 extends TestCase {
 	
 	def testCommitCreation2 = {
 		commit = new Commit("Something")
-		assert( commit != null )	
+		assertTrue( commit != null )
 	}
 }
 
 
-class ConfigTest1 extends TestCase {
+class ConfigTest extends TestCase("config") {
 	var settings = new Preferences("")
 	
 	override def setUp {
@@ -51,14 +57,14 @@ class ConfigTest1 extends TestCase {
 
 	def testXML2 = {
 		settings.value("port") = 666
-		assert( settings.loadPreferences != null )
+		assertTrue( settings.loadPreferences != null )
 		println( settings.geti("port") )
 		// println( settings.loadPreferences.geti("port") )
 	//	settings = settings.loadPreferences
 	}
 	
 	def testConfigReadWrite = {
-		assert(settings.get("configFile").equals("testing.config"))
+		assertTrue(settings.get("configFile").equals("testing.config"))
 		try {
 			settings.savePreferences(settings.get("configFile"))
 		} catch {
@@ -76,25 +82,9 @@ class ConfigTest1 extends TestCase {
 	}
 	
 	def testConfigSettings = {
-		assert(settings.get("configFile").equals("testing.config"))
+		assertTrue(settings.get("configFile").equals("testing.config"))
 		settings.value("repositoryDir") = "/something"
-		assert(settings.get("repositoryDir").equals("/something"))
+		assertTrue(settings.get("repositoryDir").equals("/something"))
 	}
 	
 }
-
-
-object ScalaBotTests {
-	
-	def main (args: Array[String]) = {
-		junit.textui.TestRunner.run(suite)
-	}
-
-	def suite: Test = {
-		val suite = new TestSuite
-		suite.addTestSuite(classOf[CommitTest1])
-		suite.addTestSuite(classOf[ConfigTest1])
-		suite
-	}
-	
-} 
