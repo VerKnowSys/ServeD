@@ -1,18 +1,21 @@
 #!/bin/bash
 # This Software is a close code project. You may not redistribute this code without permission of author.
-cd src/
+# cd src/
 
-jars=`for i in ../../lib/*.jar; do echo -n "$i:"; done`
-packageDir="scalabot"
-main="$packageDir.ScalaBot"
-tests=`for i in *Tests.scala; do echo -n "$i:"; done`
+# jars=`for i in ../../lib/*.jar; do echo -n "$i:"; done`
+main="scalabot.ScalaBot"
+# tests=`for i in *Tests.scala; do echo -n "$i:"; done`
 
-echo "Running test suites.."
-for i in $tests; do
-	scala -classpath $jars. $packageDir.tests.${i%%.*}
-done	
+echo "Running $main"
+scala -classpath \
+$HOME/.m2/repository/junit/junit/4.5/junit-4.5.jar:\
+$HOME/.m2/repository/log4j/log4j/1.2.14/log4j-1.2.14.jar:\
+$HOME/.m2/repository/org/scala-lang/scala-library/2.7.5/scala-library-2.7.5.jar:\
+$HOME/.m2/repository/org/neodatis/odb/neodatis-odb/1.9-SNAPSHOT/neodatis-odb-1.9-SNAPSHOT.jar:\
+$HOME/.m2/repository/pircbot/pircbot/1.4.2/pircbot-1.4.2.jar:\
+$HOME/.m2/repository/jivesoftware/smack/3.0.4/smack-3.0.4.jar:\
+$HOME/.m2/repository/jivesoftware/smackx/3.0.4/smackx-3.0.4.jar:\
+target/scala.project.tools-1.0-SNAPSHOT.jar $main "./"
 
-echo "Running $packageDir"
-scala -classpath $jars. $main "../../"
 # remotely: "/home/verknowsys/JAVA/ScalaBot/codadris.scalaBot/"
 # locally: "../" 
