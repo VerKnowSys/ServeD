@@ -13,23 +13,23 @@ sealed class Preferences(absolutePathToBot: String) {
 	val absolutePathToBotODB = absolutePathToBot
 	var value = HashMap[String,Any] (
 		"debug" -> true,
-		"resource" -> "scalaBot_1.0",
-		"login" -> "git-bot",
-		"password" -> "git-bot-666",
+		"resource" -> "scalaBot-2",
+		"login" -> "varra",
+		"password" -> "varrajabber",
 		"server" -> "drakor.eu",
 		"port" -> 5222,
-		"repositoryDir" -> "/git/codadris.git",
+		"repositoryDir" -> "/git/scala.project.tools.git",
 		"users" -> List(
 			// XXX: only three arguments in Preferences:
-			HashMap( "user" -> "dmilith@drakor.eu", "params" -> "--numstat --no-merges --no-merges" ),
-			HashMap( "user" -> "szymon@jez.net.pl", "params" -> "--full-diff --numstat --no-merges" ),
-			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" ),
-			HashMap( "user" -> "vara@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" )
+			HashMap( "user" -> "dmilith@drakor.eu", "params" -> "--numstat --no-merges --no-merges" )
+//			HashMap( "user" -> "szymon@jez.net.pl", "params" -> "--full-diff --numstat --no-merges" ),
+//			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" ),
+//			HashMap( "user" -> "vara@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" )
 		),
 		"configFile" -> "scalaBotConfig.xml",
-		"statusDescription" -> "I should work fine like a death spell!",
+		"statusDescription" -> "I should work fine.",
 		"databaseName" -> "ScalaBotCommitDataBase.neodatis",
-		"ODBPort" -> 50603,
+		"ODBPort" -> 50604,
 		"ODBName" -> "scalaBotCommitDatabase",
 		"ODBListenAddress" -> "127.0.0.1"
 	)
