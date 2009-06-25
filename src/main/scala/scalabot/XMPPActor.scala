@@ -86,6 +86,10 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 
 	def processMessage(chat: Chat, message: Message) {
 		if (debug) println("*** Received message: " + message + " (\"" + message.getBody + "\")")
+		if (message.getBody.equals("help")) {
+			println("help requested from !" + message.getFrom)
+			chat.sendMessage("Ok")
+		}
 	}
 	
 	def closeConnection = {
