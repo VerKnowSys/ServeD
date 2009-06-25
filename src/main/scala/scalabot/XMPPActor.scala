@@ -3,6 +3,7 @@
 
 package scalabot
 
+import command.exec.CommandExec
 import commiter.DbAddCommit
 import scala.actors._
 
@@ -86,9 +87,21 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 
 	def processMessage(chat: Chat, message: Message) {
 		if (debug) println("*** Received message: " + message + " (\"" + message.getBody + "\")")
-		if (message.getBody.equals("help")) {
-			println("help requested from !" + message.getFrom)
-			chat.sendMessage("Ok")
+		if (message.getFrom.contains("dmilith")) {   // XXX: hardcoded value
+			message.getBody match {
+				case "last" => {
+					chat.sendMessage("Requested last commit.\nNYI")
+				}
+				case "last5" => {
+					chat.sendMessage("Requested last 5 commits.\nNYI")
+				}
+				case "last10" => {
+					chat.sendMessage("Requested last 10 commits.\nNYI")
+				}
+				case "help" => {
+					chat.sendMessage("No help for noobs ;}")
+				}
+			}
 		}
 	}
 	

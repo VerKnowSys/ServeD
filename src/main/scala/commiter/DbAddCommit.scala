@@ -3,6 +3,7 @@
 
 package commiter
 
+import command.exec.CommandExec
 import org.neodatis.odb.{ODBFactory, ODB}
 import scalabot._
 import scala.actors._
