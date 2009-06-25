@@ -1,5 +1,4 @@
-*.class
 .DS_Store
-dist/
-build/
-out/
+*.jar
+*.class
+target/
