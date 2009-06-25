@@ -1,7 +1,7 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package scalabot.tests
+package scalabot
 
 import scalabot._
 
@@ -84,10 +84,10 @@ class ConfigTest1 extends TestCase {
 }
 
 
-object ScalaBotTests extends TestCase {
+object ScalaBotTests {
 	
 	def main (args: Array[String]) = {
-		TestRunner.run(suite)
+		junit.textui.TestRunner.run(suite)
 	}
 
 	def suite: Test = {
