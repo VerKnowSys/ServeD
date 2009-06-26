@@ -5,6 +5,7 @@ package deployer
 
 
 import actors._
+import command.exec.CommandExec
 import java.io._
 import java.util.{UUID, Date, ArrayList}
 import org.apache.commons.io.{FileUtils, CopyUtils}
@@ -133,9 +134,14 @@ object Deployer extends Actor {
 		new File(deployDir).mkdir // make temporary place for jars before signinig
 		FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployDir)) // copy files to temporary dir
 		logger.info("Deploy tmp dir: " + deployDir)
-		val signCommand = Array("echo", prefs.get("jarSignerPassword") + "|",
-			prefs.get("jarSignerExecutable"), deployDir + fileToBeSigned.split("/").last, prefs.get("jarSignerKeyName"))
+		val signCommand = Array(
+			prefs.get("jarSignerExecutable"), "-storepass", 
+			prefs.get("jarSignerPassword"),
+			deployDir + fileToBeSigned.split("/").last,
+			prefs.get("jarSignerKeyName")
+			)
 		logger.info("Will sign file with command: " + signCommand.map{ a => a })
+		println(CommandExec.cmdExec(signCommand))
 
 	}
 
