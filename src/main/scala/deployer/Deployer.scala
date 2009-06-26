@@ -6,6 +6,7 @@ package deployer
 
 import actors._
 import command.exec.CommandExec
+import jar.comparator.JarEntryComparator
 import java.io._
 import java.util.{UUID, Date, ArrayList}
 import org.apache.commons.io.{FileUtils, CopyUtils}
@@ -100,14 +101,11 @@ object Deployer extends Actor {
 		}
 	}
 
-	def getFilesFromMavenRepository = {
-		logger.info("User home: " + System.getProperty("user.home"))
-		logger.info("Path to repo: " + pathToMaven2Repo)
-
+	def getFilesFromMavenRepositoryAndSignThem = {
 		var jar_names = Array[String]()
 		if (basicOnly_?) jar_names = BASIC_JAR_NAMES else jar_names = BASIC_JAR_NAMES ++ DEPENDENCY_JAR_NAMES
 
-		logger.info("Searching for jars in Maven repository.")
+		logger.info("Searching for jars in Maven repository and signing them..")
 		jar_names foreach { file =>
 				findFile(new File(pathToMaven2Repo), new P {
 					override
@@ -116,17 +114,16 @@ object Deployer extends Actor {
 						val pattern = Pattern.compile(fileRegex)
 						val mat = pattern.matcher(t)
 						if ( mat.find ) {
-							Deployer ! ('DoSign, t)
-							print(".")
+							signJar(t)
 							return true
 						}
 						return false
 					}
 				}, filesToBeDeployed)
 		}
-		println
-		logger.info("Done.\nFiles to be deployed:\n" + filesToBeDeployed.toArray.map{ a => "\n" + a.toString })
-		Deployer ! 'End
+//		println
+//		logger.info("Done searching. Signed files:\n" + filesToBeDeployed.toArray.map{ a => "\n" + a.toString })
+		doDeployOnServer
 	}
 
 	def signJar(fileToBeSigned: String) = {
@@ -140,6 +137,14 @@ object Deployer extends Actor {
 		println(CommandExec.cmdExec(signCommand).trim)
 	}
 
+	def doDeployOnServer = {
+		logger.info("Preparing for deploying files to server")
+		var element = new JarEntryComparator
+//		element.load("s","a")
+		
+		Deployer ! 'End
+	}
+
 	override
 	def act = {
 		Actor.loop {
@@ -147,11 +152,7 @@ object Deployer extends Actor {
 				case s: Preferences => {
 					prefs = s
 					debug = prefs.getb("debug")
-					getFilesFromMavenRepository
-					act
-				}
-				case ('DoSign, whichOne: String) => {
-					signJar(whichOne)
+					getFilesFromMavenRepositoryAndSignThem
 					act
 				}
 				case 'End => {
@@ -166,6 +167,8 @@ object Deployer extends Actor {
 		val arguments = Array[String]("./") // XXX: should be based on given arguments
 		initLogger
 		addShutdownHook
+		logger.info("User home: " + System.getProperty("user.home"))
+		logger.info("Path to repo: " + pathToMaven2Repo)
 		logger.info("Deploy tmp dir: " + deployDir)
 		logger.info("Starting Deployer..")
 		this.start
