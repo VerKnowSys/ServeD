@@ -4,6 +4,7 @@
 package jar.comparator
 
 import _root_.java.util.jar.{JarEntry, JarFile}
+import java.util.zip.ZipException
 
 /**
  * User: dmilith
@@ -17,6 +18,7 @@ class JarEntryComparator {
 	
 	private var p_elements = List[JarFileFields]()
 	private var p_elements2 = List[JarFileFields]()
+	private var broken = false
 
 	val ignoreList = List( "pom.properties", "MANIFEST.MF", "VERKNOWS.SF" )
 
@@ -30,48 +32,54 @@ class JarEntryComparator {
 
 	def diff = p_elements2 -- p_elements
 
-	def diff_? = if (diff == List() && size == size2) false else true
+	def diff_? = if (!broken && diff == List() && size == size2) false else true
 	           
 	def size = p_elements size
 
 	def size2 = p_elements2 size
 
 	def load(file: String, file2: String) = {
-		val jarFile = new JarFile(file)
-		val jarFile2 = new JarFile(file2)
-		val entries = jarFile entries
-		val entries2 = jarFile2 entries
-		
-		while (entries.hasMoreElements) {
-			entries.nextElement match {
-				case ne: JarEntry => {
-					if (!ne.isDirectory) {
-						ignoreList.foreach( element =>
-								if (ne.getName.contains(element)) {
-									println("Ignoring " + element)
-								} else {
-									add(new JarFileFields(ne.getName, ne.getCrc))
-								}
-							)
+		try {
+			val jarFile = new JarFile(file)
+			val jarFile2 = new JarFile(file2)
+			val entries = jarFile entries
+			val entries2 = jarFile2 entries
+
+			while (entries.hasMoreElements) {
+				entries.nextElement match {
+					case ne: JarEntry => {
+						if (!ne.isDirectory) {
+							ignoreList.foreach( element =>
+									if (ne.getName.contains(element)) {
+										println("Ignoring " + element)
+									} else {
+										add(new JarFileFields(ne.getName, ne.getCrc))
+									}
+								)
+						}
 					}
 				}
 			}
-        }
-		while (entries2.hasMoreElements) {
-			entries2.nextElement match {
-				case ne: JarEntry => {
-					if (!ne.isDirectory) {
-						ignoreList.foreach( element =>
-								if (ne.getName.contains(element)) {
-									println("Ignoring " + element)
-								} else {
-									add2(new JarFileFields(ne.getName, ne.getCrc))
-								}
-							)
+			while (entries2.hasMoreElements) {
+				entries2.nextElement match {
+					case ne: JarEntry => {
+						if (!ne.isDirectory) {
+							ignoreList.foreach( element =>
+									if (ne.getName.contains(element)) {
+										println("Ignoring " + element)
+									} else {
+										add2(new JarFileFields(ne.getName, ne.getCrc))
+									}
+								)
+						}
 					}
 				}
 			}
-        }
+		} catch {
+			case x: ZipException => {
+				broken = true
+			}
+		}
 	}
 	
 

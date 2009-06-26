@@ -36,8 +36,8 @@ class JarEntryComparatorTest extends TestCase("app") {
 	    assertTrue(z.diff != null)
 	    if (z.diff == List() && z.size == z.size2) assertFalse(z.diff_?)
 	    if (z.diff_?) assertTrue(z.diff != List() || z.size != z.size2)
-	    assertTrue(z.size > 0)
-	    println("First: " + z.size + "\t" + z.elements)
+		assertTrue(z.size > 0)
+		println("First: " + z.size + "\t" + z.elements)
 		println("Second: " + z.size2 + "\t" + z.elements2)
 		println("Differs: " + z.diff_?)
 	}
@@ -138,19 +138,24 @@ class JarEntryComparatorTest extends TestCase("app") {
 	    checkAllAdditionalStandardAssertions
     }
 
-//	def testJarsWithBrokenZip = {
-//	    prepare
-//	    try {
-//	        z.load(currentDir + "broken.zip",
-//		        currentDir + "reference_test_file.zip")
-//	    } catch {
-//		    case x: Exception => {
-//			    println("Error while loading test jars. Test skipped!")
-//			    x.printStackTrace
-//			    exit
-//		    }
-//	    }
-//	    assertTrue(z.diff_?)
-//	    checkAllAdditionalStandardAssertions
-//    }
+	def testJarsWithBrokenZip = {
+	    prepare
+		println("Trying with broken zip")
+	    try {
+	        z.load(currentDir + "broken.zip",
+		        currentDir + "reference_test_file.zip")
+	    } catch {
+		    case x: Exception => {
+			    println("Error while loading test jars. Test skipped!")
+			    x.printStackTrace
+			    exit
+		    }
+	    }
+	    assertTrue(z.diff_?)
+		assertTrue(z.diff == List())
+		assertTrue(z.size == 0)
+		assertTrue(z.size2 == 0)
+		assertTrue(z.elements == Nil || z.elements2 == Nil) // one should be broken so empty List is Nil
+		println("Differs: " + z.diff_?)
+    }
 }
