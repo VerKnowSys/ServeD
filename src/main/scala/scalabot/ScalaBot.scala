@@ -3,6 +3,7 @@
 
 package scalabot
 
+import prefs.PreferencesActor
 import scala.actors._
 
 object ScalaBot extends Actor {

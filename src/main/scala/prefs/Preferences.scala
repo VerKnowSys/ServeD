@@ -1,7 +1,7 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved. 
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package scalabot
+package prefs
 
 import scala.collection.mutable.HashMap
 import java.io._
@@ -20,6 +20,9 @@ sealed class Preferences(absolutePathToBot: String) {
 		"port" -> 5222,
 		"gitExecutable" -> "/opt/local/bin/git",
 		"repositoryDir" -> "/git/scala.project.tools.git/.git",
+		"jarSignerPassword" -> "gru5zka.",
+		"jarSignerExecutable" -> "/usr/bin/jarsigner",
+		"jarSignerKeyName" -> "VerKnowSys",	
 		"users" -> List(
 			// XXX: only three arguments in Preferences:
 			HashMap( "user" -> "dmilith@drakor.eu", "params" -> "--numstat --no-merges --no-merges" )
@@ -44,6 +47,10 @@ sealed class Preferences(absolutePathToBot: String) {
 			<server>{value("server")}</server> 
 			<port>{value("port")}</port> 
 			<databaseName>{value("databaseName")}</databaseName>
+			<gitExecutable>{value("gitExecutable")}</gitExecutable>
+			<jarSignerPassword>{value("jarSignerPassword")}</jarSignerPassword>
+			<jarSignerExecutable>{value("jarSignerExecutable")}</jarSignerExecutable>
+			<jarSignerKeyName>{value("jarSignerKeyName")}</jarSignerKeyName>
 			<repositoryDir>{value("repositoryDir")}</repositoryDir>
 			<statusDescription>{value("statusDescription")}</statusDescription>
 			<ODBPort>{value("ODBPort")}</ODBPort>
@@ -71,6 +78,10 @@ sealed class Preferences(absolutePathToBot: String) {
 			hashMap.update( "server", (node \ "server").text)
 			hashMap.update( "port", (node \ "port").text.toInt)
 			hashMap.update( "databaseName", (node \ "databaseName").text)
+			hashMap.update( "gitExecutable", (node \ "gitExecutable").text)
+			hashMap.update( "jarSignerPassword", (node \ "jarSignerPassword").text)
+			hashMap.update( "jarSignerExecutable", (node \ "jarSignerExecutable").text)
+			hashMap.update( "jarSignerKeyName", (node \ "jarSignerKeyName").text)
 			hashMap.update( "repositoryDir", (node \ "repositoryDir").text)
 			hashMap.update( "statusDescription", (node \ "statusDescription").text)
 			hashMap.update( "ODBPort", (node \ "ODBPort").text.toInt)

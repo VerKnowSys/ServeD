@@ -1,10 +1,11 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package scalabot
+package prefs
 
+import deployer.Deployer
 import scala.actors._
-
+import scalabot.{ODBServerActor, XMPPActor}
 
 object PreferencesActor extends Actor {
 	
@@ -21,6 +22,10 @@ object PreferencesActor extends Actor {
 							}
 							case 'XMPPActorNeedPreferences => {
 								XMPPActor ! prefs
+								act
+							}
+							case 'DeployerNeedPreferences => {
+								Deployer ! prefs
 								act
 							}
 							case 'Quit => {

@@ -5,6 +5,7 @@ package scalabot
 
 import command.exec.CommandExec
 import commiter.DbAddCommit
+import prefs.Preferences
 import scala.actors._
 
 import org.neodatis.odb._

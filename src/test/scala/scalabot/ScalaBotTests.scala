@@ -3,6 +3,7 @@
 
 package scalabot
 
+import prefs.Preferences
 import scalabot._
 
 import scala.collection.mutable.HashMap

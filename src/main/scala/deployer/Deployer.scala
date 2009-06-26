@@ -4,11 +4,12 @@
 package deployer
 
 
-import actors.Actor
+import actors._
 import java.io.{OutputStreamWriter, File}
+import java.util.{UUID, Date, ArrayList}
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
-import java.util.ArrayList
 import java.util.regex.{Matcher, Pattern}
+import prefs.{PreferencesActor, Preferences}
 
 /**
  * User: dmilith
@@ -20,9 +21,15 @@ trait P {
 	def accept(t: String): Boolean
 }
 
-object Deployer {
+object Deployer extends Actor {
 
-	val logger = Logger.getLogger(Deployer.getClass)
+	private val basicOnly_? = true
+	private val uuid = UUID.randomUUID.toString
+	private val filesToBeDeployed = new ArrayList[File]()
+	private val pathToMaven2Repo = System.getProperty("user.home") + "/.m2/repository/"
+	private val logger = Logger.getLogger(Deployer.getClass)
+	private var prefs: Preferences = null
+	private var debug: Boolean = false
 
 	val BASIC_JAR_NAMES = Array[String](
 		"codadris.utils-0.0.1-SNAPSHOT.jar",
@@ -63,7 +70,8 @@ object Deployer {
 	def addShutdownHook =
 		Runtime.getRuntime.addShutdownHook( new Thread {
 			override def run = {
-				println ("Deploy abort requested.")
+				PreferencesActor ! 'Quit
+				Deployer ! 'End
 				println("Done\n")
 			}
 		})
@@ -89,37 +97,75 @@ object Deployer {
 		}
 	}
 
-	def main(args: Array[String]) {
-		initLogger
-		addShutdownHook
-		val basicOnly_? = false
-		val filesToBeDeployed = new ArrayList[File]()
-		val pathToRepo = System.getProperty("user.home") + "/.m2/repository/"
-
+	def doDeploy = {
 		logger.info("User home: " + System.getProperty("user.home"))
-		logger.info("Path to repo: " + pathToRepo)
+		logger.info("Path to repo: " + pathToMaven2Repo)
 
 		var jar_names = Array[String]()
 		if (basicOnly_?) jar_names = BASIC_JAR_NAMES else jar_names = BASIC_JAR_NAMES ++ DEPENDENCY_JAR_NAMES
 
 		logger.info("Searching for jars in Maven repository.")
 		jar_names foreach { file =>
-			findFile(new File(pathToRepo), new P {
-				override def accept(t: String): Boolean = {
-					val fileRegex = ".*" + file + "$"
-					val pattern = Pattern.compile(fileRegex)
+				findFile(new File(pathToMaven2Repo), new P {
+					override
+					def accept(t: String): Boolean = {
+						val fileRegex = ".*" + file + "$"
+						val pattern = Pattern.compile(fileRegex)
 						val mat = pattern.matcher(t)
 						if ( mat.find ) {
 							print(".")
+							Deployer ! ('DoSign, t)
 							return true
 						}
-					return false
-				}
-			}, filesToBeDeployed)
+						return false
+					}
+				}, filesToBeDeployed)
 		}
 		println
 		logger.info("Done.\nFiles to be deployed:\n" + filesToBeDeployed.toArray.map{ a => "\n" + a.toString })
-		
+		Deployer ! 'End
 	}
-	
+
+	def signJar(fileToBeSigned: String) = {
+		logger.info("Preparing for signing jar: " + fileToBeSigned)
+		val deployDir = "/tmp/deployer-" + uuid
+		new File(deployDir).mkdir
+		logger.info("Deploy tmp dir: " + deployDir)
+		val command = Array("echo", prefs.get("jarSignerPassword") + "|", prefs.get("jarSignerExecutable"), fileToBeSigned, prefs.get("jarSignerKeyName"))
+		logger.info("Will sign with command: " + command.map{ a => a })
+	}
+
+	override
+	def act = {
+		Actor.loop {
+			react {
+				case s: Preferences => {
+					prefs = s
+					debug = prefs.getb("debug")
+					doDeploy
+					act
+				}
+				case ('DoSign, whichOne: String) => {
+					signJar(whichOne)
+					act
+				}
+				case 'End => {
+					PreferencesActor ! 'Quit
+					exit
+				}
+			}
+		}
+	}
+
+	def main(args: Array[String]) {
+		val arguments = Array[String]("./") // XXX: should be based on given arguments
+		initLogger
+		addShutdownHook
+		logger.info("Starting Deployer")
+		this.start
+		PreferencesActor.start
+		PreferencesActor ! arguments
+		PreferencesActor ! 'DeployerNeedPreferences // tell PreferencesActor that DeployerActor wants his settings
+	}
+
 }

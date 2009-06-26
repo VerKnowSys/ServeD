@@ -5,6 +5,7 @@ package scalabot
 
 import commiter._
 
+import prefs.Preferences
 import scala.actors._
 import scala.actors.Actor._
 
