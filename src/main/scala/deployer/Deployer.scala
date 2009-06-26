@@ -27,6 +27,7 @@ object Deployer extends Actor {
 
 	private val basicOnly_? = true
 	private val uuid = UUID.randomUUID.toString
+	private val deployDir = "/tmp/deployer-" + uuid + "/"
 	private val filesToBeDeployed = new ArrayList[File]()
 	private val pathToMaven2Repo = System.getProperty("user.home") + "/.m2/repository/"
 	private val logger = Logger.getLogger(Deployer.getClass)
@@ -130,19 +131,13 @@ object Deployer extends Actor {
 
 	def signJar(fileToBeSigned: String) = {
 		logger.info("Preparing for signing jar: " + fileToBeSigned)
-		val deployDir = "/tmp/deployer-" + uuid + "/"
 		new File(deployDir).mkdir // make temporary place for jars before signinig
 		FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployDir)) // copy files to temporary dir
-		logger.info("Deploy tmp dir: " + deployDir)
 		val signCommand = Array(
-			prefs.get("jarSignerExecutable"), "-storepass", 
-			prefs.get("jarSignerPassword"),
-			deployDir + fileToBeSigned.split("/").last,
-			prefs.get("jarSignerKeyName")
+			prefs.get("jarSignerExecutable"), "-storepass", prefs.get("jarSignerPassword"),
+			deployDir + fileToBeSigned.split("/").last,	prefs.get("jarSignerKeyName")
 			)
-		logger.info("Will sign file with command: " + signCommand.map{ a => a })
-		println(CommandExec.cmdExec(signCommand))
-
+		println(CommandExec.cmdExec(signCommand).trim)
 	}
 
 	override
@@ -171,7 +166,8 @@ object Deployer extends Actor {
 		val arguments = Array[String]("./") // XXX: should be based on given arguments
 		initLogger
 		addShutdownHook
-		logger.info("Starting Deployer")
+		logger.info("Deploy tmp dir: " + deployDir)
+		logger.info("Starting Deployer..")
 		this.start
 		PreferencesActor.start
 		PreferencesActor ! arguments
