@@ -98,7 +98,7 @@ object Deployer extends Actor {
 		}
 	}
 
-	def doDeploy = {
+	def getFilesFromMavenRepository = {
 		logger.info("User home: " + System.getProperty("user.home"))
 		logger.info("Path to repo: " + pathToMaven2Repo)
 
@@ -114,8 +114,8 @@ object Deployer extends Actor {
 						val pattern = Pattern.compile(fileRegex)
 						val mat = pattern.matcher(t)
 						if ( mat.find ) {
-							print(".")
 							Deployer ! ('DoSign, t)
+							print(".")
 							return true
 						}
 						return false
@@ -129,12 +129,13 @@ object Deployer extends Actor {
 
 	def signJar(fileToBeSigned: String) = {
 		logger.info("Preparing for signing jar: " + fileToBeSigned)
-		val deployDir = "/tmp/deployer-" + uuid
-		new File(deployDir).mkdir
-		FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployDir + "/"))
+		val deployDir = "/tmp/deployer-" + uuid + "/"
+		new File(deployDir).mkdir // make temporary place for jars before signinig
+		FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployDir)) // copy files to temporary dir
 		logger.info("Deploy tmp dir: " + deployDir)
-		val command = Array("echo", prefs.get("jarSignerPassword") + "|", prefs.get("jarSignerExecutable"), fileToBeSigned, prefs.get("jarSignerKeyName"))
-		logger.info("Will sign file with command: " + command.map{ a => a })
+		val signCommand = Array("echo", prefs.get("jarSignerPassword") + "|",
+			prefs.get("jarSignerExecutable"), deployDir + fileToBeSigned.split("/").last, prefs.get("jarSignerKeyName"))
+		logger.info("Will sign file with command: " + signCommand.map{ a => a })
 
 	}
 
@@ -145,7 +146,7 @@ object Deployer extends Actor {
 				case s: Preferences => {
 					prefs = s
 					debug = prefs.getb("debug")
-					doDeploy
+					getFilesFromMavenRepository
 					act
 				}
 				case ('DoSign, whichOne: String) => {
