@@ -9,6 +9,7 @@ main="scalabot.ScalaBot"
 echo "Running $main"
 scala -classpath \
 $HOME/.m2/repository/junit/junit/4.5/junit-4.5.jar:\
+$HOME/.m2/repository/commons-io/commons-io/1.4/commons-io-1.4.jar:\
 $HOME/.m2/repository/log4j/log4j/1.2.14/log4j-1.2.14.jar:\
 $HOME/.m2/repository/org/scala-lang/scala-library/2.7.5/scala-library-2.7.5.jar:\
 $HOME/.m2/repository/org/neodatis/odb/neodatis-odb/1.9-SNAPSHOT/neodatis-odb-1.9-SNAPSHOT.jar:\

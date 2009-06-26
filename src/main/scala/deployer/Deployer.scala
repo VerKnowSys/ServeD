@@ -5,8 +5,9 @@ package deployer
 
 
 import actors._
-import java.io.{OutputStreamWriter, File}
+import java.io._
 import java.util.{UUID, Date, ArrayList}
+import org.apache.commons.io.{FileUtils, CopyUtils}
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import java.util.regex.{Matcher, Pattern}
 import prefs.{PreferencesActor, Preferences}
@@ -130,9 +131,11 @@ object Deployer extends Actor {
 		logger.info("Preparing for signing jar: " + fileToBeSigned)
 		val deployDir = "/tmp/deployer-" + uuid
 		new File(deployDir).mkdir
+		FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployDir + "/"))
 		logger.info("Deploy tmp dir: " + deployDir)
 		val command = Array("echo", prefs.get("jarSignerPassword") + "|", prefs.get("jarSignerExecutable"), fileToBeSigned, prefs.get("jarSignerKeyName"))
-		logger.info("Will sign with command: " + command.map{ a => a })
+		logger.info("Will sign file with command: " + command.map{ a => a })
+
 	}
 
 	override
