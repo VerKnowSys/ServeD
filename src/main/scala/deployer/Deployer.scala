@@ -118,7 +118,7 @@ object Deployer {
 			}, filesToBeDeployed)
 		}
 		println
-		logger.info("Found files:\n" + filesToBeDeployed.toArray.map{ a => a.toString + "\n"})
+		logger.info("Done.\nFiles to be deployed:\n" + filesToBeDeployed.toArray.map{ a => "\n" + a.toString })
 		
 	}
 	
