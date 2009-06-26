@@ -30,7 +30,7 @@ object IRCActor extends PircBot with Actor {
 	}
 
 	override def act = {
-		settings
+//		settings
 		react {
 			case 'Quit => {
 				this.disconnect
