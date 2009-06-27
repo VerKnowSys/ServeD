@@ -76,7 +76,8 @@ sealed class Preferences(absolutePathToBot: String) {
 		"ODBListenAddress" -> "127.0.0.1",
 		"remoteWebStartDeployDir" -> "/home/verknowsys/public_html/javaws/coviob2/dist/",
 		"deployOnlyBasicFiles" -> true,
-		"remoteProjectToolsDir" -> "/home/verknowsys/JAVA/project.tools/"
+		"remoteProjectToolsDir" -> "/home/verknowsys/JAVA/project.tools/",
+		"remoteScalaBin" -> "/home/verknowsys/JAVA/scala/bin/scala"
 	)
 	
 	def toXML = 
@@ -127,14 +128,15 @@ sealed class Preferences(absolutePathToBot: String) {
 				val list = value("deployFilesAdditionalDependencies").asInstanceOf[List[String]]
 				for( i <- list)
 				yield
-				<file>
+				<fileDep>
 				{i}
-				</file>
+				</fileDep>
 			}
 			</deployFilesAdditionalDependencies>
 			<remoteWebStartDeployDir>{value("remoteWebStartDeployDir")}</remoteWebStartDeployDir>
 			<deployOnlyBasicFiles>{value("deployOnlyBasicFiles")}</deployOnlyBasicFiles>
 			<remoteProjectToolsDir>{value("remoteProjectToolsDir")}</remoteProjectToolsDir>
+			<remoteScalaBin>{value("remoteScalaBin")}</remoteScalaBin>
 		</preferences>
 	
 	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
@@ -177,7 +179,7 @@ sealed class Preferences(absolutePathToBot: String) {
 			hashMap.update( "deployFilesBasic", list2 )
 
 			list2 = List[String]()
-			(node \\ "file").foreach { file =>
+			(node \\ "fileDep").foreach { file =>
 				list2 = list2 ::: List( file.text ).asInstanceOf[List[String]]
 			}
 			hashMap.update( "deployFilesAdditionalDependencies", list2 )
@@ -185,6 +187,7 @@ sealed class Preferences(absolutePathToBot: String) {
 			hashMap.update( "remoteWebStartDeployDir", (node \ "remoteWebStartDeployDir").text)
 		    hashMap.update( "deployOnlyBasicFiles", (node \ "deployOnlyBasicFiles").text.toBoolean)
 			hashMap.update( "remoteProjectToolsDir", (node \ "remoteProjectToolsDir").text)
+			hashMap.update( "remoteScalaBin", (node \ "remoteScalaBin").text)
 			hashMap.asInstanceOf[HashMap[String,Any]]
 	}	
 	

@@ -8,6 +8,7 @@ import actors.Actor
 import com.sshtools.j2ssh.authentication.{PasswordAuthenticationClient, AuthenticationProtocolState}
 import com.sshtools.j2ssh.SshClient
 import deployer.Deployer
+import jar.comparator.JarEntryComparator
 import java.io.{BufferedReader, InputStreamReader, File}
 
 import java.util.ArrayList
@@ -56,35 +57,54 @@ object SSHActor extends Actor {
 					logger.info("Performing tasks with given list of files: " + x.toArray.map{ a => deployDir + a.toString.split("/").last })
 					logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
 					uuid = deployUuid
-					performTasksAndQuit
+					performRemoteTasksAndQuit(x, deployUuid, deployDir)
 					act
 				}
 			}
 		}
 	}
 
-	def performTasksAndQuit = {
-		//Open the SFTP channel
-		val client = ssh.openSftpClient
-		val client2 = ssh.openSessionChannel
+	def performRemoteTasksAndQuit(list: ArrayList[File], deployUuid: String, deployDir: String) = {
+
 		val remoteDeployDir = prefs.get("remoteWebStartDeployDir") + "lib/"
-		val remoteProjectToolsDir = prefs.get("remoteProjectToolsDir")
-		client2.executeCommand("cd " + remoteProjectToolsDir + "; ./getcrcs " + remoteDeployDir + "codadris.dbgui-0.0.1-SNAPSHOT.jar")
-		val input = new BufferedReader(new InputStreamReader(client2.getInputStream))
-		var output = ""
-		var line = ""
+		val listOfSignedFiles = list.toArray.map{ a => deployDir + a.toString.split("/").last }
+
+		logger.warn(listOfSignedFiles.toArray)
+		listOfSignedFiles foreach { localFile =>
+			val clientForRemoteCommand = ssh.openSessionChannel
+			val comparator = new JarEntryComparator
+			var listOfCRCLocalFile = comparator.loadAndThrowListOfCrcs(localFile)	
+
+			clientForRemoteCommand.executeCommand(
+				prefs.get("remoteProjectToolsDir") + "getcrcs" + " " +
+				remoteDeployDir + localFile.split("/").last + " " +
+				prefs.get("remoteProjectToolsDir") + " " +
+				prefs.get("remoteScalaBin"))
+			val input = new BufferedReader(new InputStreamReader(clientForRemoteCommand.getInputStream))
+			var output = ""
+			var line = ""
 			while (line != null) {
-				output += line + ","
+				output += line
 				line = input.readLine
 			}
-		input.close
-		println(output)
+			input.close
+			if ((List(output) -- listOfCRCLocalFile) == List()) {
+				logger.warn("FILE IDENTICALLY: " + localFile.split("/").last)
+			} else {
+				logger.warn("FILE DIFFERENT: " + localFile.split("/").last)
+			}
+			clientForRemoteCommand.close
+		}
 
-		client2.close
+
+
+
+		//Open the SFTP channel
+		//		val client = ssh.openSftpClient
 		//Send the file
-		client.put("/tmp/FileCache/http:__www_google_pl_images_nav_logo4_png","/tmp/dupa" + uuid + ".png")
+		//		client.put("/tmp/FileCache/http:__www_google_pl_images_nav_logo4_png","/tmp/dupa" + uuid + ".png")
 		//disconnect
-		client.quit
+		//		client.quit
 		this ! 'Quit
 	}
 

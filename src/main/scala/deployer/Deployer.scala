@@ -38,10 +38,8 @@ object Deployer extends Actor {
 	private var prefs: Preferences = null
 	private var debug: Boolean = false
 	private var basicOnly_? = true
-
-	var BASIC_JAR_NAMES: List[String] = _
-
-	var DEPENDENCY_JAR_NAMES: List[String] = _
+	private var basic_jar_names = List[String]()
+	private var dependency_jar_names = List[String]()
 
 	def addShutdownHook =
 		Runtime.getRuntime.addShutdownHook( new Thread {
@@ -57,7 +55,7 @@ object Deployer extends Actor {
 		val appender = new ConsoleAppender
 		appender.setName(ConsoleAppender.SYSTEM_OUT);
 		appender.setWriter(new OutputStreamWriter(System.out))
-		val level = Level.INFO
+		val level = Level.TRACE
 		appender.setThreshold(level)
 		appender.setLayout(new PatternLayout("{ %-5p %d : %m }%n"));
 		Logger.getRootLogger.addAppender(appender)
@@ -75,10 +73,16 @@ object Deployer extends Actor {
 	}
 
 	def getFilesFromMavenRepositoryAndSignThem = {
-		var jar_names = List[String]()
-		if (basicOnly_?) jar_names = BASIC_JAR_NAMES else jar_names = BASIC_JAR_NAMES ++ DEPENDENCY_JAR_NAMES
-
 		logger.info("Searching for jars in Maven repository and signing them..")
+
+		var jar_names = List[String]()
+		if (basicOnly_?) {
+			jar_names ++= basic_jar_names
+			logger.info("Selected only basic jars to deploy")
+		} else {
+			jar_names ++= basic_jar_names ++ dependency_jar_names
+			logger.info("Selected basic and dependendant jars to deploy")
+		}
 		jar_names.foreach { file =>
 			logger.info("*" + file.trim + "*")
 			findFile(new File(pathToMaven2Repo), new P {
@@ -118,8 +122,8 @@ object Deployer extends Actor {
 					prefs = s
 					debug = prefs.getb("debug")
 					basicOnly_? = prefs.getb("deployOnlyBasicFiles")
-					BASIC_JAR_NAMES = prefs.getl("deployFilesBasic")
-					DEPENDENCY_JAR_NAMES = prefs.getl("deployFilesAdditionalDependencies")
+					basic_jar_names = prefs.getl("deployFilesBasic")
+					dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
 					getFilesFromMavenRepositoryAndSignThem
 					act
 				}
