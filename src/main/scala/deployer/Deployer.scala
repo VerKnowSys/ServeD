@@ -5,6 +5,7 @@ package deployer
 
 
 import actors._
+import collection.mutable.HashMap
 import com.sshtools.j2ssh.{SshClient, SftpClient}
 import com.sshtools.j2ssh.authentication.{PasswordAuthenticationClient, AuthenticationProtocolState}
 import command.exec.CommandExec
@@ -38,41 +39,9 @@ object Deployer extends Actor {
 	private var prefs: Preferences = null
 	private var debug: Boolean = false
 
-	val BASIC_JAR_NAMES = Array[String](
-		"codadris.utils-0.0.1-SNAPSHOT.jar",
-		"codadris.gui-0.0.1-SNAPSHOT.jar",
-//		"codadris.gui.utils-0.0.1-SNAPSHOT.jar",
-//		"codadris.gui.screenspace-0.0.1-SNAPSHOT.jar",
-//		"codadris.gui.suite-0.0.1-SNAPSHOT.jar",
-//		"codadris.gui.textedit-0.0.1-SNAPSHOT.jar",
-//		"codadris.gui.treetable-0.0.1-SNAPSHOT.jar",
-//		"codadris.gui.scala-0.0.1-SNAPSHOT.jar",
-//		"codadris.dbgui-0.0.1-SNAPSHOT.jar",
-//		"codadris.dbapp-0.0.1-SNAPSHOT.jar",
-//		"flexdock_codadris-0.0.1-SNAPSHOT.jar",
-//		"codadris.binblocklang-0.0.1-SNAPSHOT.jar"
-	)
+	var BASIC_JAR_NAMES: List[String] = _
 
-	val DEPENDENCY_JAR_NAMES = Array[String] (
-		"commons-io-1.4.jar",
-		"commons-lang-2.4.jar",
-		"commons-logging-1.1.1.jar",
-		"log4j-1.2.14.jar",
-		"junit-4.4.jar",
-		"jcommon-1.0.12.jar",
-		"jargs-0.0.1-SNAPSHOT.jar",
-		"jfreechart-1.0.9.jar",
-		"looks-2.1.2.jar",
-		"net.jcip.annotations-0.0.1-SNAPSHOT.jar",
-		"skinlf-1.2.3.jar",
-		"swing-layout-1.0.jar",
-		"swingx-0.9.5-2.jar",
-		"filters-2.0.235.jar",
-		"timingframework-1.0.jar",
-		"scala-swing-2.7.5.jar",
-		"scala-compiler-2.7.5.jar",
-		"scala-library-2.7.5.jar"
-    )
+	var DEPENDENCY_JAR_NAMES: List[String] = _
 
 	def addShutdownHook =
 		Runtime.getRuntime.addShutdownHook( new Thread {
@@ -106,15 +75,16 @@ object Deployer extends Actor {
 	}
 
 	def getFilesFromMavenRepositoryAndSignThem = {
-		var jar_names = Array[String]()
+		var jar_names = List[String]()
 		if (basicOnly_?) jar_names = BASIC_JAR_NAMES else jar_names = BASIC_JAR_NAMES ++ DEPENDENCY_JAR_NAMES
 
 		logger.info("Searching for jars in Maven repository and signing them..")
-		jar_names foreach { file =>
+		jar_names.foreach { file =>
+			logger.info("*" + file.trim + "*")
 			findFile(new File(pathToMaven2Repo), new P {
 				override
 				def accept(t: String): Boolean = {
-					val fileRegex = ".*" + file + "$"
+					val fileRegex = ".*" + file.trim + "$"
 					val pattern = Pattern.compile(fileRegex)
 					val mat = pattern.matcher(t)
 					if ( mat.find ) {
@@ -125,6 +95,7 @@ object Deployer extends Actor {
 				}
 			}, filesToBeDeployed)
 		}
+
 //		println
 //		logger.info("Done searching. Signed files:\n" + filesToBeDeployed.toArray.map{ a => "\n" + a.toString })
 		
@@ -150,6 +121,8 @@ object Deployer extends Actor {
 				case s: Preferences => {
 					prefs = s
 					debug = prefs.getb("debug")
+					BASIC_JAR_NAMES = prefs.getl("deployFilesBasic")
+					DEPENDENCY_JAR_NAMES = prefs.getl("deployFilesAdditionalDependencies")
 					getFilesFromMavenRepositoryAndSignThem
 					act
 				}

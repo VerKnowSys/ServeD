@@ -52,7 +52,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 		}
 		chatmanager = connection.getChatManager
 		if (debug) println("*** num of users: " + chat.length)
-		prefs.getl("users").foreach { x =>
+		prefs.getlh("users").foreach { x =>
 			try {
 				chat = chat ::: List( chatmanager.createChat(x("user"), this) )
 			} catch {
@@ -158,7 +158,7 @@ object XMPPActor extends Actor with MessageListener { // with PacketListener
 							println("*** Trying to send messages, to User: " + element.getParticipant)
 						}
 						var currentUserPreferences: String = ""
-						prefs.getl("users").foreach{ 
+						prefs.getlh("users").foreach{
 							e => if (e("user") == element.getParticipant) currentUserPreferences = e("params")
 						}
 						val a = currentUserPreferences.split(' ')

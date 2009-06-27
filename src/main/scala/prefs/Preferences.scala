@@ -34,6 +34,40 @@ sealed class Preferences(absolutePathToBot: String) {
 //			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" ),
 //			HashMap( "user" -> "vara@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" )
 		),
+		"deployFilesBasic" -> List(
+			"codadris.utils-0.0.1-SNAPSHOT.jar",
+			"codadris.gui-0.0.1-SNAPSHOT.jar",
+			"codadris.gui.utils-0.0.1-SNAPSHOT.jar",
+			"codadris.gui.screenspace-0.0.1-SNAPSHOT.jar",
+			"codadris.gui.suite-0.0.1-SNAPSHOT.jar",
+			"codadris.gui.textedit-0.0.1-SNAPSHOT.jar",
+			"codadris.gui.treetable-0.0.1-SNAPSHOT.jar",
+			"codadris.gui.scala-0.0.1-SNAPSHOT.jar",
+			"codadris.dbgui-0.0.1-SNAPSHOT.jar",
+			"codadris.dbapp-0.0.1-SNAPSHOT.jar",
+			"flexdock_codadris-0.0.1-SNAPSHOT.jar",
+			"codadris.binblocklang-0.0.1-SNAPSHOT.jar"
+		),
+		"deployFilesAdditionalDependencies" -> List(
+			"commons-io-1.4.jar",
+			"commons-lang-2.4.jar",
+			"commons-logging-1.1.1.jar",
+			"log4j-1.2.14.jar",
+			"junit-4.4.jar",
+			"jcommon-1.0.12.jar",
+			"jargs-0.0.1-SNAPSHOT.jar",
+			"jfreechart-1.0.9.jar",
+			"looks-2.1.2.jar",
+			"net.jcip.annotations-0.0.1-SNAPSHOT.jar",
+			"skinlf-1.2.3.jar",
+			"swing-layout-1.0.jar",
+			"swingx-0.9.5-2.jar",
+			"filters-2.0.235.jar",
+			"timingframework-1.0.jar",
+			"scala-swing-2.7.5.jar",
+			"scala-compiler-2.7.5.jar",
+			"scala-library-2.7.5.jar"
+		),
 		"configFile" -> "project.tools.xml",
 		"statusDescription" -> "I should work fine.",
 		"databaseName" -> "ScalaBotCommitDataBase.neodatis",
@@ -75,6 +109,26 @@ sealed class Preferences(absolutePathToBot: String) {
 				</user>
 			}
 			</users>
+			<deployFilesBasic>
+			{
+				val list = value("deployFilesBasic").asInstanceOf[List[String]]
+				for( i <- list)
+				yield
+				<file>
+				{i}
+				</file>
+			}
+			</deployFilesBasic>
+			<deployFilesAdditionalDependencies>
+			{
+				val list = value("deployFilesAdditionalDependencies").asInstanceOf[List[String]]
+				for( i <- list)
+				yield
+				<file>
+				{i}
+				</file>
+			}
+			</deployFilesAdditionalDependencies>
 		</preferences>
 	
 	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
@@ -99,6 +153,7 @@ sealed class Preferences(absolutePathToBot: String) {
 			hashMap.update( "ODBPort", (node \ "ODBPort").text.toInt)
 			hashMap.update( "ODBName", (node \ "ODBName").text)
 			hashMap.update( "ODBListenAddress", (node \ "ODBListenAddress").text)
+
 			var list = List[HashMap[String,String]]()
 			(node \\ "user").foreach { user =>
 				user.foreach { nod =>
@@ -108,7 +163,20 @@ sealed class Preferences(absolutePathToBot: String) {
 				}
 			}
 			hashMap.update( "users", list )
-		hashMap.asInstanceOf[HashMap[String,Any]]
+
+			var list2 = List[String]()
+			(node \\ "file").foreach { file =>
+				list2 = list2 ::: List( file.text ).asInstanceOf[List[String]]
+			}
+			hashMap.update( "deployFilesBasic", list2 )
+
+			list2 = List[String]()
+			(node \\ "file").foreach { file =>
+				list2 = list2 ::: List( file.text ).asInstanceOf[List[String]]
+			}
+			hashMap.update( "deployFilesAdditionalDependencies", list2 )
+
+			hashMap.asInstanceOf[HashMap[String,Any]]
 	}	
 	
 	def get(param: String): String = {
@@ -123,8 +191,12 @@ sealed class Preferences(absolutePathToBot: String) {
 		value(param).asInstanceOf[Boolean]
 	}
 	
-	def getl(param: String): List[HashMap[String,String]] = {
+	def getlh(param: String): List[HashMap[String,String]] = {
 		value(param).asInstanceOf[List[HashMap[String,String]]]
+	}
+
+	def getl(param: String): List[String] = {
+		value(param).asInstanceOf[List[String]]
 	}
 	
 	def loadPreferences: Preferences = {
