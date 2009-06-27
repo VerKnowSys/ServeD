@@ -39,12 +39,12 @@ object PreferencesActor extends Actor {
 						}
 					}
 					case x: Array[String] => {
-						println ("Setting absolute git path to: " + x(0))
+//						println ("Setting absolute git path to: " + x(0))
 						prefs = new Preferences(x(0)).loadPreferences
 						act
 					}
 					case (a: String, b: String) => {
-						println ("*** setting key: " + a + " with value: " + b)
+//						println ("*** setting key: " + a + " with value: " + b)
 						prefs.value(a) = b
 						act
 					}

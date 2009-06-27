@@ -74,7 +74,7 @@ sealed class Preferences(absolutePathToBot: String) {
 		"ODBPort" -> 50604,
 		"ODBName" -> "scalaBotCommitDatabase",
 		"ODBListenAddress" -> "127.0.0.1",
-		"remoteWebStartDeployDir" -> "/home/verknowsys/public_html/javaws/coviob2/dist/",
+		"remoteWebStartDeployDir" -> "/home/verknowsys/public_html/javaws/coviob2/dist/trunk/",
 		"deployOnlyBasicFiles" -> true,
 		"remoteProjectToolsDir" -> "/home/verknowsys/JAVA/project.tools/",
 		"remoteScalaBin" -> "/home/verknowsys/JAVA/scala/bin/scala"

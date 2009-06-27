@@ -69,7 +69,6 @@ object SSHActor extends Actor {
 		val remoteDeployDir = prefs.get("remoteWebStartDeployDir") + "lib/"
 		val listOfSignedFiles = list.toArray.map{ a => deployDir + a.toString.split("/").last }
 
-		logger.warn(listOfSignedFiles.toArray)
 		listOfSignedFiles foreach { localFile =>
 			val clientForRemoteCommand = ssh.openSessionChannel
 			val comparator = new JarEntryComparator
@@ -88,23 +87,25 @@ object SSHActor extends Actor {
 				line = input.readLine
 			}
 			input.close
-			if ((List(output) -- listOfCRCLocalFile) == List()) {
+			
+			var out = List[String]()
+			output.split(",").foreach{ a => out ++= List[String](a) }
+			logger.warn("1: " + out)
+			logger.warn("2: " + listOfCRCLocalFile)
+			logger.warn("result: " + (listOfCRCLocalFile -- out))
+			if ((out -- listOfCRCLocalFile) == List()) {
 				logger.warn("FILE IDENTICALLY: " + localFile.split("/").last)
 			} else {
 				logger.warn("FILE DIFFERENT: " + localFile.split("/").last)
+				//Open the SFTP channel
+				val client = ssh.openSftpClient
+				//Send the file
+				client.put(localFile, remoteDeployDir + localFile.split("/").last)
+				client.quit
 			}
 			clientForRemoteCommand.close
 		}
 
-
-
-
-		//Open the SFTP channel
-		//		val client = ssh.openSftpClient
-		//Send the file
-		//		client.put("/tmp/FileCache/http:__www_google_pl_images_nav_logo4_png","/tmp/dupa" + uuid + ".png")
-		//disconnect
-		//		client.quit
 		this ! 'Quit
 	}
 

@@ -47,7 +47,7 @@ class JarEntryComparator {
 				entries.nextElement match {
 					case ne: JarEntry => {
 						if (!ne.isDirectory) {
-							outList ::= ne.getCrc.toString
+							outList ::= ne.getCrc.toString.trim
 						}
 					}
 				}

@@ -55,7 +55,7 @@ object Deployer extends Actor {
 		val appender = new ConsoleAppender
 		appender.setName(ConsoleAppender.SYSTEM_OUT);
 		appender.setWriter(new OutputStreamWriter(System.out))
-		val level = Level.TRACE
+		val level = if (debug) Level.TRACE else Level.WARN
 		appender.setThreshold(level)
 		appender.setLayout(new PatternLayout("{ %-5p %d : %m }%n"));
 		Logger.getRootLogger.addAppender(appender)
@@ -138,18 +138,18 @@ object Deployer extends Actor {
 
 	def main(args: Array[String]) {
 		val arguments = Array[String]("./") // XXX: should be based on given arguments
-		initLogger
 		addShutdownHook
-		logger.info("User home: " + System.getProperty("user.home"))
-		logger.info("Path to repo: " + pathToMaven2Repo)
-		logger.info("Deploy tmp dir: " + deployDir)
-		logger.info("Starting Deployer..")
 		this.start
 		SSHActor.start
 		PreferencesActor.start
 		PreferencesActor ! arguments
 		PreferencesActor ! 'DeployerNeedPreferences // tell PreferencesActor that DeployerActor wants his settings
 		PreferencesActor ! 'SSHActorNeedPreferences
+		initLogger
+		logger.info("User home: " + System.getProperty("user.home"))
+		logger.info("Path to repo: " + pathToMaven2Repo)
+		logger.info("Deploy tmp dir: " + deployDir)
+		logger.info("Starting Deployer..")
 	}
 
 }
