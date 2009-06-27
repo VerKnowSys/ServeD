@@ -96,16 +96,12 @@ object Deployer extends Actor {
 			}, filesToBeDeployed)
 		}
 
-//		println
-//		logger.info("Done searching. Signed files:\n" + filesToBeDeployed.toArray.map{ a => "\n" + a.toString })
-		
-		logger.info("Preparing for deploying files to server  " + filesToBeDeployed.toArray )
-		SSHActor ! ('PerformTasks, filesToBeDeployed, uuid)
+		SSHActor ! ('PerformTasks, filesToBeDeployed, uuid, deployDir)
 	}
 
 	def signJar(fileToBeSigned: String) = {
-		logger.info("Preparing for signing jar: " + fileToBeSigned)
 		new File(deployDir).mkdir // make temporary place for jars before signinig
+		logger.info("Preparing for signing jar: " + deployDir + fileToBeSigned.split("/").last)
 		FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployDir)) // copy files to temporary dir
 		val signCommand = Array(
 			prefs.get("jarSignerExecutable"), "-storepass", prefs.get("jarSignerPassword"),

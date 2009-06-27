@@ -48,8 +48,9 @@ object SSHActor extends Actor {
 					Deployer ! 'Quit
 					exit
 				}
-				case ('PerformTasks, x: ArrayList[File], deployUuid: String) => {
-					logger.info("Performing tasks with given list of files: " + x.toArray.map{ a => a })
+				case ('PerformTasks, x: ArrayList[File], deployUuid: String, deployDir: String) => {
+					logger.info("Performing tasks with given list of files: " + x.toArray.map{ a => deployDir + a.toString.split("/").last })
+					logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
 					uuid = deployUuid
 					performTasksAndQuit
 					act

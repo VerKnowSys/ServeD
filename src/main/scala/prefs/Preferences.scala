@@ -73,7 +73,8 @@ sealed class Preferences(absolutePathToBot: String) {
 		"databaseName" -> "ScalaBotCommitDataBase.neodatis",
 		"ODBPort" -> 50604,
 		"ODBName" -> "scalaBotCommitDatabase",
-		"ODBListenAddress" -> "127.0.0.1"
+		"ODBListenAddress" -> "127.0.0.1",
+		"remoteWebStartDeployDir" -> "/home/verknowsys/public_html/javaws/coviob2/dist/"
 	)
 	
 	def toXML = 
@@ -129,6 +130,7 @@ sealed class Preferences(absolutePathToBot: String) {
 				</file>
 			}
 			</deployFilesAdditionalDependencies>
+			<remoteWebStartDeployDir>{value("remoteWebStartDeployDir")}</remoteWebStartDeployDir>	
 		</preferences>
 	
 	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
@@ -175,6 +177,8 @@ sealed class Preferences(absolutePathToBot: String) {
 				list2 = list2 ::: List( file.text ).asInstanceOf[List[String]]
 			}
 			hashMap.update( "deployFilesAdditionalDependencies", list2 )
+
+			hashMap.update( "remoteWebStartDeployDir", (node \ "remoteWebStartDeployDir").text)
 
 			hashMap.asInstanceOf[HashMap[String,Any]]
 	}	
