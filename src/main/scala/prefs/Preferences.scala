@@ -22,7 +22,11 @@ sealed class Preferences(absolutePathToBot: String) {
 		"repositoryDir" -> "/git/scala.project.tools.git/.git",
 		"jarSignerPassword" -> "gru5zka.",
 		"jarSignerExecutable" -> "/usr/bin/jarsigner",
-		"jarSignerKeyName" -> "VerKnowSys",	
+		"jarSignerKeyName" -> "VerKnowSys",
+		"sshUserName" -> "verknowsys",
+		"sshPassword" -> "gru5zka.",
+		"sshHost" -> "verknowsys.info",
+		"sshPort" -> 22,
 		"users" -> List(
 			// XXX: only three arguments in Preferences:
 			HashMap( "user" -> "dmilith@drakor.eu", "params" -> "--numstat --no-merges --no-merges" )
@@ -51,6 +55,10 @@ sealed class Preferences(absolutePathToBot: String) {
 			<jarSignerPassword>{value("jarSignerPassword")}</jarSignerPassword>
 			<jarSignerExecutable>{value("jarSignerExecutable")}</jarSignerExecutable>
 			<jarSignerKeyName>{value("jarSignerKeyName")}</jarSignerKeyName>
+			<sshPassword>{value("sshPassword")}</sshPassword>
+			<sshUserName>{value("sshUserName")}</sshUserName>
+			<sshHost>{value("sshHost")}</sshHost>
+			<sshPort>{value("sshPort")}</sshPort>
 			<repositoryDir>{value("repositoryDir")}</repositoryDir>
 			<statusDescription>{value("statusDescription")}</statusDescription>
 			<ODBPort>{value("ODBPort")}</ODBPort>
@@ -82,6 +90,10 @@ sealed class Preferences(absolutePathToBot: String) {
 			hashMap.update( "jarSignerPassword", (node \ "jarSignerPassword").text)
 			hashMap.update( "jarSignerExecutable", (node \ "jarSignerExecutable").text)
 			hashMap.update( "jarSignerKeyName", (node \ "jarSignerKeyName").text)
+			hashMap.update( "sshPassword", (node \ "sshPassword").text)
+			hashMap.update( "sshUserName", (node \ "sshUserName").text)
+			hashMap.update( "sshHost", (node \ "sshHost").text)
+			hashMap.update( "sshPort", (node \ "sshPort").text)
 			hashMap.update( "repositoryDir", (node \ "repositoryDir").text)
 			hashMap.update( "statusDescription", (node \ "statusDescription").text)
 			hashMap.update( "ODBPort", (node \ "ODBPort").text.toInt)
