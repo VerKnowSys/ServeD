@@ -34,7 +34,7 @@ sealed class Preferences(absolutePathToBot: String) {
 //			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" ),
 //			HashMap( "user" -> "vara@jabber.verknowsys.info", "params" -> "--numstat --no-merges --no-merges" )
 		),
-		"configFile" -> "scalaBotConfig.xml",
+		"configFile" -> "project.tools.xml",
 		"statusDescription" -> "I should work fine.",
 		"databaseName" -> "ScalaBotCommitDataBase.neodatis",
 		"ODBPort" -> 50604,

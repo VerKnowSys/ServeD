@@ -15,6 +15,7 @@ import org.apache.commons.io.{FileUtils, CopyUtils}
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import java.util.regex.{Matcher, Pattern}
 import prefs.{PreferencesActor, Preferences}
+import ssh.tools.SSHActor
 
 /**
  * User: dmilith
@@ -40,16 +41,16 @@ object Deployer extends Actor {
 	val BASIC_JAR_NAMES = Array[String](
 		"codadris.utils-0.0.1-SNAPSHOT.jar",
 		"codadris.gui-0.0.1-SNAPSHOT.jar",
-		"codadris.gui.utils-0.0.1-SNAPSHOT.jar",
-		"codadris.gui.screenspace-0.0.1-SNAPSHOT.jar",
-		"codadris.gui.suite-0.0.1-SNAPSHOT.jar",
-		"codadris.gui.textedit-0.0.1-SNAPSHOT.jar",
-		"codadris.gui.treetable-0.0.1-SNAPSHOT.jar",
-		"codadris.gui.scala-0.0.1-SNAPSHOT.jar",
-		"codadris.dbgui-0.0.1-SNAPSHOT.jar",
-		"codadris.dbapp-0.0.1-SNAPSHOT.jar",
-		"flexdock_codadris-0.0.1-SNAPSHOT.jar",
-		"codadris.binblocklang-0.0.1-SNAPSHOT.jar"
+//		"codadris.gui.utils-0.0.1-SNAPSHOT.jar",
+//		"codadris.gui.screenspace-0.0.1-SNAPSHOT.jar",
+//		"codadris.gui.suite-0.0.1-SNAPSHOT.jar",
+//		"codadris.gui.textedit-0.0.1-SNAPSHOT.jar",
+//		"codadris.gui.treetable-0.0.1-SNAPSHOT.jar",
+//		"codadris.gui.scala-0.0.1-SNAPSHOT.jar",
+//		"codadris.dbgui-0.0.1-SNAPSHOT.jar",
+//		"codadris.dbapp-0.0.1-SNAPSHOT.jar",
+//		"flexdock_codadris-0.0.1-SNAPSHOT.jar",
+//		"codadris.binblocklang-0.0.1-SNAPSHOT.jar"
 	)
 
 	val DEPENDENCY_JAR_NAMES = Array[String] (
@@ -77,7 +78,8 @@ object Deployer extends Actor {
 		Runtime.getRuntime.addShutdownHook( new Thread {
 			override def run = {
 				PreferencesActor ! 'Quit
-				Deployer ! 'End
+				SSHActor ! 'Quit
+				Deployer ! 'Quit
 				println("Done\n")
 			}
 		})
@@ -125,7 +127,9 @@ object Deployer extends Actor {
 		}
 //		println
 //		logger.info("Done searching. Signed files:\n" + filesToBeDeployed.toArray.map{ a => "\n" + a.toString })
-		doDeployOnServer
+		
+		logger.info("Preparing for deploying files to server  " + filesToBeDeployed.toArray )
+		SSHActor ! ('PerformTasks, filesToBeDeployed, uuid)
 	}
 
 	def signJar(fileToBeSigned: String) = {
@@ -139,43 +143,6 @@ object Deployer extends Actor {
 		println(CommandExec.cmdExec(signCommand).trim)
 	}
 
-	def doSSHConnection = {
-		val host = "verknowsys.info"
-		val port = 22
-		val userName = "verknowsys"
-		val password = "gru5zka."
-
-		val ssh = new SshClient
-		ssh.connect(host, port)
-		//Authenticate
-		val passwordAuthenticationClient = new PasswordAuthenticationClient
-		passwordAuthenticationClient.setUsername(userName)
-		passwordAuthenticationClient.setPassword(password)
-		val result = ssh.authenticate(passwordAuthenticationClient)
-		if (result != AuthenticationProtocolState.COMPLETE) {
-			 logger.error("Login to " + host + ":" + port + " " + userName + "/" + password + " failed");
-		}
-		//Open the SFTP channel
-		val client = ssh.openSftpClient
-		val client2 = ssh.openSessionChannel
-		println("XXXX" + client2.executeCommand("mkdir /tmp/DUPA"))
-		client2.close
-		//Send the file
-		client.put("/tmp/FileCache/http:__www_google_pl_images_nav_logo4_png","/tmp/dupa" + uuid + ".png")
-		//disconnect
-		client.quit
-		ssh.disconnect
-	}
-
-	def doDeployOnServer = {
-		logger.info("Preparing for deploying files to server")
-		var comparator = new JarEntryComparator
-		doSSHConnection
-//		element.load("s","a")
-		
-		Deployer ! 'End
-	}
-
 	override
 	def act = {
 		Actor.loop {
@@ -186,8 +153,9 @@ object Deployer extends Actor {
 					getFilesFromMavenRepositoryAndSignThem
 					act
 				}
-				case 'End => {
+				case 'Quit => {
 					PreferencesActor ! 'Quit
+					SSHActor ! 'Quit
 					exit
 				}
 			}
@@ -203,9 +171,11 @@ object Deployer extends Actor {
 		logger.info("Deploy tmp dir: " + deployDir)
 		logger.info("Starting Deployer..")
 		this.start
+		SSHActor.start
 		PreferencesActor.start
 		PreferencesActor ! arguments
 		PreferencesActor ! 'DeployerNeedPreferences // tell PreferencesActor that DeployerActor wants his settings
+		PreferencesActor ! 'SSHActorNeedPreferences
 	}
 
 }
