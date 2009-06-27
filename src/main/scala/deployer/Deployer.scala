@@ -5,6 +5,8 @@ package deployer
 
 
 import actors._
+import com.sshtools.j2ssh.{SshClient, SftpClient}
+import com.sshtools.j2ssh.authentication.{PasswordAuthenticationClient, AuthenticationProtocolState}
 import command.exec.CommandExec
 import jar.comparator.JarEntryComparator
 import java.io._
@@ -107,19 +109,19 @@ object Deployer extends Actor {
 
 		logger.info("Searching for jars in Maven repository and signing them..")
 		jar_names foreach { file =>
-				findFile(new File(pathToMaven2Repo), new P {
-					override
-					def accept(t: String): Boolean = {
-						val fileRegex = ".*" + file + "$"
-						val pattern = Pattern.compile(fileRegex)
-						val mat = pattern.matcher(t)
-						if ( mat.find ) {
-							signJar(t)
-							return true
-						}
-						return false
+			findFile(new File(pathToMaven2Repo), new P {
+				override
+				def accept(t: String): Boolean = {
+					val fileRegex = ".*" + file + "$"
+					val pattern = Pattern.compile(fileRegex)
+					val mat = pattern.matcher(t)
+					if ( mat.find ) {
+						signJar(t)
+						return true
 					}
-				}, filesToBeDeployed)
+					return false
+				}
+			}, filesToBeDeployed)
 		}
 //		println
 //		logger.info("Done searching. Signed files:\n" + filesToBeDeployed.toArray.map{ a => "\n" + a.toString })
@@ -137,9 +139,38 @@ object Deployer extends Actor {
 		println(CommandExec.cmdExec(signCommand).trim)
 	}
 
+	def doSSHConnection = {
+		val host = "verknowsys.info"
+		val port = 22
+		val userName = "verknowsys"
+		val password = "gru5zka."
+
+		val ssh = new SshClient
+		ssh.connect(host, port)
+		//Authenticate
+		val passwordAuthenticationClient = new PasswordAuthenticationClient
+		passwordAuthenticationClient.setUsername(userName)
+		passwordAuthenticationClient.setPassword(password)
+		val result = ssh.authenticate(passwordAuthenticationClient)
+		if (result != AuthenticationProtocolState.COMPLETE) {
+			 logger.error("Login to " + host + ":" + port + " " + userName + "/" + password + " failed");
+		}
+		//Open the SFTP channel
+		val client = ssh.openSftpClient
+		val client2 = ssh.openSessionChannel
+		println("XXXX" + client2.executeCommand("mkdir /tmp/DUPA"))
+		client2.close
+		//Send the file
+		client.put("/tmp/FileCache/http:__www_google_pl_images_nav_logo4_png","/tmp/dupa" + uuid + ".png")
+		//disconnect
+		client.quit
+		ssh.disconnect
+	}
+
 	def doDeployOnServer = {
 		logger.info("Preparing for deploying files to server")
-		var element = new JarEntryComparator
+		var comparator = new JarEntryComparator
+		doSSHConnection
 //		element.load("s","a")
 		
 		Deployer ! 'End
