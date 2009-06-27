@@ -74,7 +74,9 @@ sealed class Preferences(absolutePathToBot: String) {
 		"ODBPort" -> 50604,
 		"ODBName" -> "scalaBotCommitDatabase",
 		"ODBListenAddress" -> "127.0.0.1",
-		"remoteWebStartDeployDir" -> "/home/verknowsys/public_html/javaws/coviob2/dist/"
+		"remoteWebStartDeployDir" -> "/home/verknowsys/public_html/javaws/coviob2/dist/",
+		"deployOnlyBasicFiles" -> true,
+		"remoteProjectToolsDir" -> "/home/verknowsys/JAVA/project.tools/"
 	)
 	
 	def toXML = 
@@ -130,7 +132,9 @@ sealed class Preferences(absolutePathToBot: String) {
 				</file>
 			}
 			</deployFilesAdditionalDependencies>
-			<remoteWebStartDeployDir>{value("remoteWebStartDeployDir")}</remoteWebStartDeployDir>	
+			<remoteWebStartDeployDir>{value("remoteWebStartDeployDir")}</remoteWebStartDeployDir>
+			<deployOnlyBasicFiles>{value("deployOnlyBasicFiles")}</deployOnlyBasicFiles>
+			<remoteProjectToolsDir>{value("remoteProjectToolsDir")}</remoteProjectToolsDir>
 		</preferences>
 	
 	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
@@ -179,7 +183,8 @@ sealed class Preferences(absolutePathToBot: String) {
 			hashMap.update( "deployFilesAdditionalDependencies", list2 )
 
 			hashMap.update( "remoteWebStartDeployDir", (node \ "remoteWebStartDeployDir").text)
-
+		    hashMap.update( "deployOnlyBasicFiles", (node \ "deployOnlyBasicFiles").text.toBoolean)
+			hashMap.update( "remoteProjectToolsDir", (node \ "remoteProjectToolsDir").text)
 			hashMap.asInstanceOf[HashMap[String,Any]]
 	}	
 	

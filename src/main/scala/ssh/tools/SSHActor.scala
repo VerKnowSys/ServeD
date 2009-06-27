@@ -1,3 +1,6 @@
+// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
+// This Software is a close code project. You may not redistribute this code without permission of author.
+
 package ssh.tools
 
 
@@ -5,7 +8,8 @@ import actors.Actor
 import com.sshtools.j2ssh.authentication.{PasswordAuthenticationClient, AuthenticationProtocolState}
 import com.sshtools.j2ssh.SshClient
 import deployer.Deployer
-import java.io.File
+import java.io.{BufferedReader, InputStreamReader, File}
+
 import java.util.ArrayList
 import org.apache.log4j.Logger
 import prefs.{Preferences, PreferencesActor}
@@ -63,7 +67,19 @@ object SSHActor extends Actor {
 		//Open the SFTP channel
 		val client = ssh.openSftpClient
 		val client2 = ssh.openSessionChannel
-		println("XXXX" + client2.executeCommand("mkdir /tmp/DUPA"))
+		val remoteDeployDir = prefs.get("remoteWebStartDeployDir") + "lib/"
+		val remoteProjectToolsDir = prefs.get("remoteProjectToolsDir")
+		client2.executeCommand("cd " + remoteProjectToolsDir + "; ./getcrcs " + remoteDeployDir + "codadris.dbgui-0.0.1-SNAPSHOT.jar")
+		val input = new BufferedReader(new InputStreamReader(client2.getInputStream))
+		var output = ""
+		var line = ""
+			while (line != null) {
+				output += line + ","
+				line = input.readLine
+			}
+		input.close
+		println(output)
+
 		client2.close
 		//Send the file
 		client.put("/tmp/FileCache/http:__www_google_pl_images_nav_logo4_png","/tmp/dupa" + uuid + ".png")

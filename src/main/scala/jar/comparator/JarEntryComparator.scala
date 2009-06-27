@@ -38,6 +38,28 @@ class JarEntryComparator {
 
 	def size2 = p_elements2 size
 
+	def loadAndThrowListOfCrcs(file :String): List[String] = {
+		var outList = List[String]()
+		try {
+			val jarFile = new JarFile(file)
+			val entries = jarFile.entries
+			while (entries.hasMoreElements) {
+				entries.nextElement match {
+					case ne: JarEntry => {
+						if (!ne.isDirectory) {
+							outList ::= ne.getCrc.toString
+						}
+					}
+				}
+			}
+		} catch {
+			case x: ZipException => {
+				return List()
+			}
+		}
+		outList
+	}
+
 	def load(file: String, file2: String) = {
 		try {
 			val jarFile = new JarFile(file)

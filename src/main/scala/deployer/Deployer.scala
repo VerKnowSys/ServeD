@@ -30,7 +30,6 @@ trait P {
 
 object Deployer extends Actor {
 
-	private val basicOnly_? = true
 	private val uuid = UUID.randomUUID.toString
 	private val deployDir = "/tmp/deployer-" + uuid + "/"
 	private val filesToBeDeployed = new ArrayList[File]()
@@ -38,6 +37,7 @@ object Deployer extends Actor {
 	private val logger = Logger.getLogger(Deployer.getClass)
 	private var prefs: Preferences = null
 	private var debug: Boolean = false
+	private var basicOnly_? = true
 
 	var BASIC_JAR_NAMES: List[String] = _
 
@@ -117,6 +117,7 @@ object Deployer extends Actor {
 				case s: Preferences => {
 					prefs = s
 					debug = prefs.getb("debug")
+					basicOnly_? = prefs.getb("deployOnlyBasicFiles")
 					BASIC_JAR_NAMES = prefs.getl("deployFilesBasic")
 					DEPENDENCY_JAR_NAMES = prefs.getl("deployFilesAdditionalDependencies")
 					getFilesFromMavenRepositoryAndSignThem
