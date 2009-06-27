@@ -1,0 +1,8 @@
+#!/bin/bash
+# This Software is a close code project. You may not redistribute this code without permission of author.
+
+main="jar.comparator.GiveCRC"
+
+scala -classpath \
+$HOME/.m2/repository/org/scala-lang/scala-library/2.7.5/scala-library-2.7.5.jar:\
+target/scala.project.tools-1.0-SNAPSHOT.jar $main $1
