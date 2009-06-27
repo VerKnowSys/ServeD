@@ -6,6 +6,7 @@ package prefs
 import deployer.Deployer
 import scala.actors._
 import scalabot.{ODBServerActor, XMPPActor}
+import ssh.tools.SSHActor
 
 object PreferencesActor extends Actor {
 	
@@ -22,6 +23,10 @@ object PreferencesActor extends Actor {
 							}
 							case 'XMPPActorNeedPreferences => {
 								XMPPActor ! prefs
+								act
+							}
+							case 'SSHActorNeedPreferences => {
+								SSHActor ! prefs
 								act
 							}
 							case 'DeployerNeedPreferences => {
