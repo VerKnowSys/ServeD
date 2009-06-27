@@ -93,7 +93,7 @@ sealed class Preferences(absolutePathToBot: String) {
 			hashMap.update( "sshPassword", (node \ "sshPassword").text)
 			hashMap.update( "sshUserName", (node \ "sshUserName").text)
 			hashMap.update( "sshHost", (node \ "sshHost").text)
-			hashMap.update( "sshPort", (node \ "sshPort").text)
+			hashMap.update( "sshPort", (node \ "sshPort").text.toInt)
 			hashMap.update( "repositoryDir", (node \ "repositoryDir").text)
 			hashMap.update( "statusDescription", (node \ "statusDescription").text)
 			hashMap.update( "ODBPort", (node \ "ODBPort").text.toInt)
