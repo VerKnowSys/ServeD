@@ -3,6 +3,11 @@
 
 package deployer
 
+
+import com.sun.tools.javac.resources.version
+import xml.dtd.DocType
+import xml.XML
+
 /**
  * User: dmilith
  * Date: Jun 27, 2009
@@ -61,7 +66,6 @@ class JNLPSkeleton(var mainClass: String,
 	         icon: String) = this(mainClass, title, codebaseURL, jnlpFileName, jars, paramsJVM, vendor, homepage, icon, "")
 
 	def getJNLP =
-		"<? xml version='1.0' encoding='UTF-8' ?>"
 		<jnlp spec="1.0+" codebase={codebaseURL} href={jnlpFileName}>
 		    <information>
 		        <title>{title}</title>
@@ -84,6 +88,7 @@ class JNLPSkeleton(var mainClass: String,
 		    </resources>
 		    <application-desc main-class={mainClass}>
 		    </application-desc>
-		</jnlp>
+		</jnlp>;
 
+	def saveJNLP(file: String) = XML.saveFull(file, getJNLP, "UTF-8", true, null)
 }

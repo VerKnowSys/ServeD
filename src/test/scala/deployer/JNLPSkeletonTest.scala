@@ -48,6 +48,7 @@ class JNLPSkeletonTest extends TestCase("app") {
 		</jnlp>
 		}
 		assertTrue(myXML.equals(z.getJNLP))
+		z.saveJNLP("/tmp/file.jnlp")
 	}
 
 }
