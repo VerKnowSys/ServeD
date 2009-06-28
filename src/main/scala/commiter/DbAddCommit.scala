@@ -7,7 +7,7 @@ import command.exec.CommandExec
 import org.neodatis.odb.{ODBFactory, ODB}
 import prefs.Preferences
 import scalabot._
-import scala.actors._
+
 
 object DbAddCommit {
 	
@@ -45,7 +45,7 @@ object DbAddCommit {
 	 */
 	def main(args: Array[String]) {
 		try{
-			prefs = new Preferences(args(2))
+			prefs = (new Preferences).loadPreferences
 			debug = prefs.getb("debug")
 			repositoryDir = prefs.get("repositoryDir")
 			databaseName = args(2) + prefs.get("databaseName")

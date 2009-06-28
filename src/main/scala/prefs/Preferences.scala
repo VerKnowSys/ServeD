@@ -4,13 +4,13 @@
 package prefs
 
 import scala.collection.mutable.HashMap
-import java.io._
 import scala.xml.XML
 
 
-sealed class Preferences(absolutePathToBot: String) {
+sealed class Preferences {
 
-	val absolutePathToBotODB = absolutePathToBot
+	val absoluteProjectRootPath = System.getProperty("user.dir")
+	val configFileName = "project.tools.xml"
 	var value = HashMap[String,Any] (
 		"debug" -> true,
 		"resource" -> "scalaBot-2",
@@ -82,7 +82,6 @@ sealed class Preferences(absolutePathToBot: String) {
 			"-ea",
 			"-XX:+UseParallelGC"
 		),
-		"configFile" -> "project.tools.xml",
 		"statusDescription" -> "I should work fine.",
 		"databaseName" -> "ScalaBotCommitDataBase.neodatis",
 		"ODBPort" -> 50604,
@@ -205,8 +204,8 @@ sealed class Preferences(absolutePathToBot: String) {
 			var list = List[HashMap[String,String]]()
 			(node \\ "user").foreach { user =>
 				user.foreach { nod =>
-					val name = (nod \ "name").text
-					val params = (nod \ "params").text
+					val name = (nod \ "name").text.trim
+					val params = (nod \ "params").text.trim
 					list = list ::: List( HashMap( "user" -> name, "params" -> params ) ).asInstanceOf[List[HashMap[String,String]]]
 				}
 			}
@@ -266,23 +265,22 @@ sealed class Preferences(absolutePathToBot: String) {
 	}
 	
 	def loadPreferences: Preferences = {
-		var sett = new Preferences(absolutePathToBotODB)
-		var oldCfgFile = sett.get("configFile") // XXX: cause we don't write it's value to config. It's hardcoded
+		val sett = new Preferences
 		try {
-			val loadnode = XML.loadFile(absolutePathToBotODB + sett.get("configFile")) 
+			val loadnode = XML.loadFile(absoluteProjectRootPath + configFileName)
 			sett.value = fromXML(loadnode)
-			sett.value("configFile") = oldCfgFile
 		} catch {
 			case x: Throwable => {
-				println("*** config file " +
-						absolutePathToBotODB + sett.get("configFile") + " doesn't exists! creating new one")
+				println("*** Config file " +
+					absoluteProjectRootPath +
+					configFileName + " doesn't exists! Creating new one")
 				sett.savePreferences
 			}
 		}
 		sett
 	}
 
-	def savePreferences = XML.saveFull( absolutePathToBotODB + get("configFile"), toXML, "UTF-8", true, null)
+	def savePreferences = XML.saveFull( absoluteProjectRootPath + configFileName, toXML, "UTF-8", true, null)
 	
 	def savePreferences(fileName: String) = XML.saveFull(fileName, toXML, "UTF-8", true, null)
 	

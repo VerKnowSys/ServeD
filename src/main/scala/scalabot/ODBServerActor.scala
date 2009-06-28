@@ -16,18 +16,17 @@ import org.neodatis.odb.core.query.criteria._
 
 object ODBServerActor extends Actor {
 	
+	private val prefs = (new Preferences).loadPreferences
+	private val debug = prefs.getb("debug")
+	private val absolutePathToBotODB = System.getProperty("user.dir")
 	private var server: ODBServer = null
-	private var absolutePathToBotODB = ""
-	private var prefs: Preferences = null
-	private var debug = true
-	
+
 	def initServer = {
 		try {
 			Configuration.setDatabaseCharacterEncoding( "UTF8" )
 			server = ODBFactory.openServer(prefs.geti("ODBPort"))
 			server.addBase(prefs.get("ODBName"), absolutePathToBotODB + prefs.get("databaseName"))
 			server.startServer(false) //start server in current thread
-			
 		} catch {
 			case x: Throwable => {
 				println("### Error: exception occured in ODBServerActor!")
@@ -41,11 +40,9 @@ object ODBServerActor extends Actor {
 	}
 	
  	override def act = {
-		loop {
+		Actor.loop {
 			react {
-				case (a: Preferences) => {
-					prefs = a
-					debug = prefs.getb("debug")
+				case 'Init => {
 					initServer
 					act
 				}
@@ -53,11 +50,6 @@ object ODBServerActor extends Actor {
 					if (debug) println("*** ODBServer received Quit command.")
 					if (server != null) server.close
 					exit
-				}
-				case args: Array[String] => {
-					if (debug) println("*** ODBServerActor recived arguments: " + args)
-					absolutePathToBotODB = args(0)
-					act
 				}
 			}
 		}

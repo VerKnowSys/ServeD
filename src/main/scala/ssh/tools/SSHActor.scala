@@ -13,7 +13,8 @@ import java.io.{BufferedReader, InputStreamReader, File}
 
 import java.util.ArrayList
 import org.apache.log4j.Logger
-import prefs.{Preferences, PreferencesActor}
+import prefs.Preferences
+
 /**
  * User: dmilith
  * Date: Jun 27, 2009
@@ -23,32 +24,25 @@ import prefs.{Preferences, PreferencesActor}
 object SSHActor extends Actor {
 
 	private val logger = Logger.getLogger(SSHActor.getClass)
-	private var prefs: Preferences = null
-	private var debug: Boolean = false
-	private var host = ""
-	private var port = 22
-	private var userName = ""
-	private var password = ""
+	private val prefs: Preferences = (new Preferences).loadPreferences
+	private val debug = prefs.getb("debug")
+	private val host = prefs.get("sshHost")
+	private val port = prefs.geti("sshPort")
+	private val userName = prefs.get("sshUserName")
+	private val password = prefs.get("sshPassword")
+	private val ssh = new SshClient
 	private var uuid = ""
-	val ssh = new SshClient
 
 	override
 	def act = {
 		Actor.loop {
 			react {
-				case s: Preferences => {
-					prefs = s
-					debug = prefs.getb("debug")
-					host = prefs.get("sshHost")
-					port = prefs.geti("sshPort")
-					userName = prefs.get("sshUserName")
-					password = prefs.get("sshPassword")
+				case 'Init => {
 					connect
 					auth
 					act
 				}
 				case 'Quit => {
-					PreferencesActor ! 'Quit
 					disconnect
 					Deployer ! 'Quit
 					exit
@@ -122,7 +116,8 @@ object SSHActor extends Actor {
 			prefs.get("jnlpVendor"),
 			prefs.get("jnlpHomePage"),
 			prefs.get("jnlpIcon"),
-			prefs.get("jnlpDescription"))
+			prefs.get("jnlpDescription")
+			)
 		val tempJnlpFileName = "/tmp/launch-" + uuid + ".jnlp"
 		jnlp.saveJNLP(tempJnlpFileName)
 		logger.warn("Putting JNLP file to remote server")

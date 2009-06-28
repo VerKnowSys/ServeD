@@ -3,7 +3,7 @@
 
 package scalabot
 
-import prefs.PreferencesActor
+import prefs.Preferences
 import scala.actors._
 
 object ScalaBot extends Actor {
@@ -16,7 +16,6 @@ object ScalaBot extends Actor {
 			XMPPActor ! 'CloseConnection
 			XMPPActor ! 'Quit
 			ODBServerActor ! 'Quit
-			PreferencesActor ! 'Quit
 			IRCActor ! 'Quit
 			ScalaBot ! 'Quit
 			println("Done\n")
@@ -33,16 +32,11 @@ object ScalaBot extends Actor {
 	}
 	
 	override def act = {
-		PreferencesActor.start
-		PreferencesActor ! arguments
-		
+
 		ODBServerActor.start
-		ODBServerActor ! arguments
-		PreferencesActor ! 'ODBServerActorNeedPreferences
-		
+		ODBServerActor ! 'Init
 		XMPPActor.start
-		PreferencesActor ! 'XMPPActorNeedPreferences
-		
+		XMPPActor ! 'Init
 		IRCActor.start
 		
 		react {

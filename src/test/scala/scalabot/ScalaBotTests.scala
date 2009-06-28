@@ -3,6 +3,7 @@
 
 package scalabot
 
+import org.junit.Ignore
 import prefs.Preferences
 import scalabot._
 
@@ -50,24 +51,21 @@ class CommitTest extends TestCase("commit") {
 
 
 class ConfigTest extends TestCase("config") {
-	var settings = new Preferences("")
-	
+	var settings = new Preferences
+
 	override def setUp {
-		settings.value("configFile") = "testing.config"
+//		settings.value("configFile") = "testing.config"
 	}
 
 	def testXML2 = {
 		settings.value("port") = 666
 		assertTrue( settings.loadPreferences != null )
 		println( settings.geti("port") )
-		// println( settings.loadPreferences.geti("port") )
-	//	settings = settings.loadPreferences
 	}
-	
+
 	def testConfigReadWrite = {
-		assertTrue(settings.get("configFile").equals("testing.config"))
 		try {
-			settings.savePreferences(settings.get("configFile"))
+			settings.savePreferences("testConfig.xml")
 		} catch {
 			case _ => {
 				fail("Cannot save preferences file!")
@@ -81,9 +79,9 @@ class ConfigTest extends TestCase("config") {
 			}
 		}
 	}
-	
+
 	def testConfigSettings = {
-		assertTrue(settings.get("configFile").equals("testing.config"))
+//		assertTrue(settings.get("configFile").equals("testing.config"))
 		settings.value("repositoryDir") = "/something"
 		assertTrue(settings.get("repositoryDir").equals("/something"))
 	}

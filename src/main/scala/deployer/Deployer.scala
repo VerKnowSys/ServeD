@@ -15,7 +15,7 @@ import java.util.{UUID, Date, ArrayList}
 import org.apache.commons.io.{FileUtils, CopyUtils}
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import java.util.regex.{Matcher, Pattern}
-import prefs.{PreferencesActor, Preferences}
+import prefs.Preferences
 import ssh.tools.SSHActor
 
 /**
@@ -30,21 +30,20 @@ trait P {
 
 object Deployer extends Actor {
 
+	private val filesToBeDeployed = new ArrayList[File]()
 	private val uuid = UUID.randomUUID.toString
 	private val deployTmpDir = "/tmp/deployer-" + uuid + "/"
-	private val filesToBeDeployed = new ArrayList[File]()
 	private val pathToMaven2Repo = System.getProperty("user.home") + "/.m2/repository/"
 	private val logger = Logger.getLogger(Deployer.getClass)
-	private var prefs: Preferences = null
-	private var debug: Boolean = false
-	private var basicOnly_? = true
-	private var basic_jar_names = List[String]()
-	private var dependency_jar_names = List[String]()
+	private val prefs: Preferences = (new Preferences).loadPreferences
+	private val debug: Boolean = prefs.getb("debug")
+	private val basicOnly_? = prefs.getb("deployOnlyBasicFiles")
+	private val basic_jar_names = prefs.getl("deployFilesBasic")
+	private val dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
 
 	def addShutdownHook =
 		Runtime.getRuntime.addShutdownHook( new Thread {
 			override def run = {
-				PreferencesActor ! 'Quit
 				SSHActor ! 'Quit
 				Deployer ! 'Quit
 				logger.warn("Done\n")
@@ -99,8 +98,6 @@ object Deployer extends Actor {
 				}
 			}, filesToBeDeployed)
 		}
-
-		SSHActor ! ('PerformTasks, filesToBeDeployed, uuid, deployTmpDir)
 	}
 
 	def signJar(fileToBeSigned: String) = {
@@ -118,22 +115,7 @@ object Deployer extends Actor {
 	def act = {
 		Actor.loop {
 			react {
-				case s: Preferences => {
-					prefs = s
-					debug = prefs.getb("debug")
-					basicOnly_? = prefs.getb("deployOnlyBasicFiles")
-					basic_jar_names = prefs.getl("deployFilesBasic")
-					dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
-					initLogger
-					logger.info("User home: " + System.getProperty("user.home"))
-					logger.info("Path to Maven2 repo: " + pathToMaven2Repo)
-					logger.info("Deploy tmp dir: " + deployTmpDir)
-					logger.warn("Starting Deployer..")
-					getFilesFromMavenRepositoryAndSignThem
-					act
-				}
 				case 'Quit => {
-					PreferencesActor ! 'Quit
 					SSHActor ! 'Quit
 					exit
 				}
@@ -146,10 +128,19 @@ object Deployer extends Actor {
 		addShutdownHook
 		this.start
 		SSHActor.start
-		PreferencesActor.start
-		PreferencesActor ! arguments
-		PreferencesActor ! 'DeployerNeedPreferences // tell PreferencesActor that DeployerActor wants his settings
-		PreferencesActor ! 'SSHActorNeedPreferences
+		SSHActor ! 'Init
+
+		initLogger
+		logger.info("User home dir: " + System.getProperty("user.home"))
+		logger.info("Working dir: " + System.getProperty("user.dir"))
+		logger.info("Maven 2 Repository dir: " + pathToMaven2Repo)
+		logger.info("Deploy tmp dir: " + deployTmpDir)
+		logger.warn("Starting Deployer..")
+
+		getFilesFromMavenRepositoryAndSignThem
+
+		SSHActor ! ('PerformTasks, filesToBeDeployed, uuid, deployTmpDir)
+		
 	}
 
 }
