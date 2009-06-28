@@ -166,25 +166,25 @@ sealed class Preferences(absolutePathToBot: String) {
 	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
 		var hashMap = HashMap[String,Any]()
 			hashMap.update( "debug", (node \ "debug").text.toBoolean)
-			hashMap.update( "resource", (node \ "resource").text)
-			hashMap.update( "login", (node \ "login").text)
-			hashMap.update( "password", (node \ "password").text)
-			hashMap.update( "server", (node \ "server").text)
+			hashMap.update( "resource", (node \ "resource").text.trim)
+			hashMap.update( "login", (node \ "login").text.trim)
+			hashMap.update( "password", (node \ "password").text.trim)
+			hashMap.update( "server", (node \ "server").text.trim)
 			hashMap.update( "port", (node \ "port").text.toInt)
-			hashMap.update( "databaseName", (node \ "databaseName").text)
-			hashMap.update( "gitExecutable", (node \ "gitExecutable").text)
-			hashMap.update( "jarSignerPassword", (node \ "jarSignerPassword").text)
-			hashMap.update( "jarSignerExecutable", (node \ "jarSignerExecutable").text)
-			hashMap.update( "jarSignerKeyName", (node \ "jarSignerKeyName").text)
-			hashMap.update( "sshPassword", (node \ "sshPassword").text)
-			hashMap.update( "sshUserName", (node \ "sshUserName").text)
-			hashMap.update( "sshHost", (node \ "sshHost").text)
+			hashMap.update( "databaseName", (node \ "databaseName").text.trim)
+			hashMap.update( "gitExecutable", (node \ "gitExecutable").text.trim)
+			hashMap.update( "jarSignerPassword", (node \ "jarSignerPassword").text.trim)
+			hashMap.update( "jarSignerExecutable", (node \ "jarSignerExecutable").text.trim)
+			hashMap.update( "jarSignerKeyName", (node \ "jarSignerKeyName").text.trim)
+			hashMap.update( "sshPassword", (node \ "sshPassword").text.trim)
+			hashMap.update( "sshUserName", (node \ "sshUserName").text.trim)
+			hashMap.update( "sshHost", (node \ "sshHost").text.trim)
 			hashMap.update( "sshPort", (node \ "sshPort").text.toInt)
-			hashMap.update( "repositoryDir", (node \ "repositoryDir").text)
-			hashMap.update( "statusDescription", (node \ "statusDescription").text)
+			hashMap.update( "repositoryDir", (node \ "repositoryDir").text.trim)
+			hashMap.update( "statusDescription", (node \ "statusDescription").text.trim)
 			hashMap.update( "ODBPort", (node \ "ODBPort").text.toInt)
-			hashMap.update( "ODBName", (node \ "ODBName").text)
-			hashMap.update( "ODBListenAddress", (node \ "ODBListenAddress").text)
+			hashMap.update( "ODBName", (node \ "ODBName").text.trim)
+			hashMap.update( "ODBListenAddress", (node \ "ODBListenAddress").text.trim)
 
 			var list = List[HashMap[String,String]]()
 			(node \\ "user").foreach { user =>
@@ -198,26 +198,26 @@ sealed class Preferences(absolutePathToBot: String) {
 
 			var list2 = List[String]()
 			(node \\ "file").foreach { file =>
-				list2 = list2 ::: List( file.text ).asInstanceOf[List[String]]
+				list2 = list2 ::: List( file.text.trim ).asInstanceOf[List[String]]
 			}
 			hashMap.update( "deployFilesBasic", list2 )
 
 			list2 = List[String]()
 			(node \\ "fileDep").foreach { file =>
-				list2 = list2 ::: List( file.text ).asInstanceOf[List[String]]
+				list2 = list2 ::: List( file.text.trim ).asInstanceOf[List[String]]
 			}
 			hashMap.update( "deployFilesAdditionalDependencies", list2 )
 
 			list2 = List[String]()
 			(node \\ "arg").foreach { file =>
-				list2 = list2 ::: List( file.text ).asInstanceOf[List[String]]
+				list2 = list2 ::: List( file.text.trim ).asInstanceOf[List[String]]
 			}
 			hashMap.update( "webstartArgumentsJVM", list2 )
 
-			hashMap.update( "remoteWebStartDeployDir", (node \ "remoteWebStartDeployDir").text)
+			hashMap.update( "remoteWebStartDeployDir", (node \ "remoteWebStartDeployDir").text.trim)
 		    hashMap.update( "deployOnlyBasicFiles", (node \ "deployOnlyBasicFiles").text.toBoolean)
-			hashMap.update( "remoteProjectToolsDir", (node \ "remoteProjectToolsDir").text)
-			hashMap.update( "remoteScalaBin", (node \ "remoteScalaBin").text)
+			hashMap.update( "remoteProjectToolsDir", (node \ "remoteProjectToolsDir").text.trim)
+			hashMap.update( "remoteScalaBin", (node \ "remoteScalaBin").text.trim)
 			hashMap.asInstanceOf[HashMap[String,Any]]
 	}	
 	

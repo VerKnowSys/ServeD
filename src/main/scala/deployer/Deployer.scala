@@ -84,11 +84,11 @@ object Deployer extends Actor {
 			logger.warn("Selected basic and dependendant jars to deploy")
 		}
 		jar_names.foreach { file =>
-			logger.info("*" + file.trim + "*")
+			logger.info("*" + file + "*")
 			findFile(new File(pathToMaven2Repo), new P {
 				override
 				def accept(t: String): Boolean = {
-					val fileRegex = ".*" + file.trim + "$"
+					val fileRegex = ".*" + file + "$"
 					val pattern = Pattern.compile(fileRegex)
 					val mat = pattern.matcher(t)
 					if ( mat.find ) {
