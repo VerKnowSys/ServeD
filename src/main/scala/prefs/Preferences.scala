@@ -9,7 +9,7 @@ import scala.xml.XML
 
 sealed class Preferences {
 
-	val absoluteProjectRootPath = System.getProperty("user.dir")
+	val absoluteProjectRootPath = System.getProperty("user.dir") + "/"
 	val configFileName = "project.tools.xml"
 	var value = HashMap[String,Any] (
 		"debug" -> true,
