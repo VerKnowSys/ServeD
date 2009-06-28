@@ -31,7 +31,7 @@ trait P {
 object Deployer extends Actor {
 
 	private val uuid = UUID.randomUUID.toString
-	private val deployDir = "/tmp/deployer-" + uuid + "/"
+	private val deployTmpDir = "/tmp/deployer-" + uuid + "/"
 	private val filesToBeDeployed = new ArrayList[File]()
 	private val pathToMaven2Repo = System.getProperty("user.home") + "/.m2/repository/"
 	private val logger = Logger.getLogger(Deployer.getClass)
@@ -100,16 +100,16 @@ object Deployer extends Actor {
 			}, filesToBeDeployed)
 		}
 
-		SSHActor ! ('PerformTasks, filesToBeDeployed, uuid, deployDir)
+		SSHActor ! ('PerformTasks, filesToBeDeployed, uuid, deployTmpDir)
 	}
 
 	def signJar(fileToBeSigned: String) = {
-		new File(deployDir).mkdir // make temporary place for jars before signinig
-		logger.info("Preparing for signing jar: " + deployDir + fileToBeSigned.split("/").last)
-		FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployDir)) // copy files to temporary dir
+		new File(deployTmpDir).mkdir // make temporary place for jars before signinig
+		logger.info("Preparing for signing jar: " + deployTmpDir + fileToBeSigned.split("/").last)
+		FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployTmpDir)) // copy files to temporary dir
 		val signCommand = Array(
 			prefs.get("jarSignerExecutable"), "-storepass", prefs.get("jarSignerPassword"),
-			deployDir + fileToBeSigned.split("/").last,	prefs.get("jarSignerKeyName")
+			deployTmpDir + fileToBeSigned.split("/").last,	prefs.get("jarSignerKeyName")
 			)
 		logger.warn(CommandExec.cmdExec(signCommand).trim)
 	}
@@ -126,9 +126,9 @@ object Deployer extends Actor {
 					dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
 					initLogger
 					logger.info("User home: " + System.getProperty("user.home"))
-					logger.info("Path to repo: " + pathToMaven2Repo)
-					logger.info("Deploy tmp dir: " + deployDir)
-					logger.info("Starting Deployer..")
+					logger.info("Path to Maven2 repo: " + pathToMaven2Repo)
+					logger.info("Deploy tmp dir: " + deployTmpDir)
+					logger.warn("Starting Deployer..")
 					getFilesFromMavenRepositoryAndSignThem
 					act
 				}

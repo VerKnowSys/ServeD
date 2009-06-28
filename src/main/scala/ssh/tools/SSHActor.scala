@@ -53,21 +53,21 @@ object SSHActor extends Actor {
 					Deployer ! 'Quit
 					exit
 				}
-				case ('PerformTasks, x: ArrayList[File], deployUuid: String, deployDir: String) => {
-					logger.info("Performing tasks with given list of files: " + x.toArray.map{ a => deployDir + a.toString.split("/").last })
+				case ('PerformTasks, x: ArrayList[File], deployUuid: String, deployTmpDir: String) => {
+					logger.info("Performing tasks with given list of files: " + x.toArray.map{ a => deployTmpDir + a.toString.split("/").last })
 					logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
 					uuid = deployUuid
-					performRemoteTasksAndQuit(x, deployUuid, deployDir)
+					deploy(x, deployUuid, deployTmpDir)
 					act
 				}
 			}
 		}
 	}
 
-	def performRemoteTasksAndQuit(list: ArrayList[File], deployUuid: String, deployDir: String) = {
+	def deploy(list: ArrayList[File], deployUuid: String, deployTmpDir: String) = {
 
 		val remoteDeployDir = prefs.get("remoteWebStartDeployDir") + "lib/"
-		val listOfSignedFiles = list.toArray.map{ a => deployDir + a.toString.split("/").last }
+		val listOfSignedFiles = list.toArray.map{ a => deployTmpDir + a.toString.split("/").last }
 
 		listOfSignedFiles foreach { localFile =>
 			val clientForRemoteCommand = ssh.openSessionChannel
@@ -98,9 +98,7 @@ object SSHActor extends Actor {
 			} else {
 				logger.warn("FILE DIFFERENT: " + localFile.split("/").last)
 				logger.warn("Uploading " + localFile.split("/").last)
-				//Open the SFTP channel
 				val client = ssh.openSftpClient
-				//Send the file
 				client.put(localFile, remoteDeployDir + localFile.split("/").last)
 				client.quit
 			}
@@ -125,10 +123,10 @@ object SSHActor extends Actor {
 			prefs.get("jnlpHomePage"),
 			prefs.get("jnlpIcon"),
 			prefs.get("jnlpDescription"))
-		val jnlpFileName = "/tmp/launch-" + uuid + ".jnlp"
-		jnlp.saveJNLP(jnlpFileName)
+		val tempJnlpFileName = "/tmp/launch-" + uuid + ".jnlp"
+		jnlp.saveJNLP(tempJnlpFileName)
 		logger.warn("Putting JNLP file to remote server")
-		client.put(jnlpFileName, prefs.get("remoteWebStartDeployDir") + prefs.get("jnlpFileName") )
+		client.put(tempJnlpFileName, prefs.get("remoteWebStartDeployDir") + prefs.get("jnlpFileName") )
 		client.quit
 		this ! 'Quit
 	}
