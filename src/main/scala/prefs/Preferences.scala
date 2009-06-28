@@ -68,6 +68,20 @@ sealed class Preferences(absolutePathToBot: String) {
 			"scala-compiler-2.7.5.jar",
 			"scala-library-2.7.5.jar"
 		),
+		"webstartArgumentsJVM" -> List(
+		  	"-Dcom.apple.macos.useScreenMenuBar=true",
+			"-Dcom.apple.mrj.application.apple.menu.about.name=Coviob2",
+			"-Dcom.apple.mrj.application.growbox.intrudes=false",
+            "-server",
+            "-Xmx1024m",
+            "-XX:MaxPermSize=512m",
+			"-XX:MaxHeapFreeRatio=10",
+			"-XX:MinHeapFreeRatio=5",
+			"-XX:+AggressiveOpts",
+			"-XX:CompileThreshold=1000",
+			"-ea",
+			"-XX:+UseParallelGC"
+		),
 		"configFile" -> "project.tools.xml",
 		"statusDescription" -> "I should work fine.",
 		"databaseName" -> "ScalaBotCommitDataBase.neodatis",
@@ -133,6 +147,16 @@ sealed class Preferences(absolutePathToBot: String) {
 				</fileDep>
 			}
 			</deployFilesAdditionalDependencies>
+			<webstartArgumentsJVM>
+			{
+				val list = value("webstartArgumentsJVM").asInstanceOf[List[String]]
+				for( i <- list)
+				yield
+				<arg>
+				{i}
+				</arg>
+			}
+			</webstartArgumentsJVM>
 			<remoteWebStartDeployDir>{value("remoteWebStartDeployDir")}</remoteWebStartDeployDir>
 			<deployOnlyBasicFiles>{value("deployOnlyBasicFiles")}</deployOnlyBasicFiles>
 			<remoteProjectToolsDir>{value("remoteProjectToolsDir")}</remoteProjectToolsDir>
@@ -183,6 +207,12 @@ sealed class Preferences(absolutePathToBot: String) {
 				list2 = list2 ::: List( file.text ).asInstanceOf[List[String]]
 			}
 			hashMap.update( "deployFilesAdditionalDependencies", list2 )
+
+			list2 = List[String]()
+			(node \\ "arg").foreach { file =>
+				list2 = list2 ::: List( file.text ).asInstanceOf[List[String]]
+			}
+			hashMap.update( "webstartArgumentsJVM", list2 )
 
 			hashMap.update( "remoteWebStartDeployDir", (node \ "remoteWebStartDeployDir").text)
 		    hashMap.update( "deployOnlyBasicFiles", (node \ "deployOnlyBasicFiles").text.toBoolean)
