@@ -5,6 +5,7 @@ package scalabot
 
 import commiter._
 
+import org.apache.log4j.Logger
 import prefs.Preferences
 import scala.actors._
 import scala.actors.Actor._
@@ -17,8 +18,9 @@ import org.neodatis.odb.core.query.criteria._
 object ODBServerActor extends Actor {
 	
 	private val prefs = (new Preferences).loadPreferences
+	private val logger = Logger.getLogger(ODBServerActor.getClass)
 	private val debug = prefs.getb("debug")
-	private val absolutePathToBotODB = System.getProperty("user.dir")
+	private val absolutePathToBotODB = System.getProperty("user.dir") + "/"
 	private var server: ODBServer = null
 
 	def initServer = {
@@ -29,8 +31,8 @@ object ODBServerActor extends Actor {
 			server.startServer(false) //start server in current thread
 		} catch {
 			case x: Throwable => {
-				println("### Error: exception occured in ODBServerActor!")
-				if (debug) println( x.printStackTrace )
+				logger.info("### Error: exception occured in ODBServerActor!")
+				if (debug) logger.info( x.printStackTrace )
 			}
 		} finally {
 			if (server != null) {
@@ -47,7 +49,7 @@ object ODBServerActor extends Actor {
 					act
 				}
 				case 'Quit => {
-					if (debug) println("*** ODBServer received Quit command.")
+					if (debug) logger.info("*** ODBServer received Quit command.")
 					if (server != null) server.close
 					exit
 				}

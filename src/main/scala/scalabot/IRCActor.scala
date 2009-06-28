@@ -3,6 +3,7 @@
 
 package scalabot
 
+import org.apache.log4j.Logger
 import scala.actors._
 import scala.actors.Actor._
 import scala.collection.mutable.HashMap
@@ -17,6 +18,8 @@ import org.neodatis.odb.core.query.criteria._
 
 object IRCActor extends PircBot with Actor {
 
+	private val logger = Logger.getLogger(IRCActor.getClass)
+	
 	def settings = {
 		this.setVerbose(false)
 		this.setName("ScalaBot")
@@ -52,8 +55,8 @@ object IRCActor extends PircBot with Actor {
 				}
 		} catch {
 			case x: Throwable => {
-				println("### Error in getLinks: " + x)
-				println(x.printStackTrace)
+				logger.info("### Error in getLinks: " + x)
+				logger.info(x.printStackTrace)
 			}
 		} finally {
 			if (odb != null) { 
@@ -71,7 +74,7 @@ object IRCActor extends PircBot with Actor {
 			odb.commit
 		} catch {
 			case x: Throwable => {
-				println("### Error: There were problems while connecting to ODB server.")
+				logger.info("### Error: There were problems while connecting to ODB server.")
 			}
 		} finally {
 			if (odb != null) { 
@@ -123,7 +126,7 @@ object IRCActor extends PircBot with Actor {
 			settings
 		} catch {
 			case x: Throwable => {
-				println("### Disconnected and cannot connect again! I'll keep trying.. " + x.getMessage)
+				logger.info("### Disconnected and cannot connect again! I'll keep trying.. " + x.getMessage)
 				settings
 			}
 		}
