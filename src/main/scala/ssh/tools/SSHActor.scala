@@ -94,7 +94,7 @@ object SSHActor extends Actor {
 			logger.info("2: " + listOfCRCLocalFile)
 			logger.info("result: " + (listOfCRCLocalFile -- out))
 			if ((out -- listOfCRCLocalFile) == List()) {
-				logger.warn("FILE IDENTICALLY: " + localFile.split("/").last)
+				logger.warn("FILE IDENTICAL: " + localFile.split("/").last)
 			} else {
 				logger.warn("FILE DIFFERENT: " + localFile.split("/").last)
 				logger.warn("Uploading " + localFile.split("/").last)
