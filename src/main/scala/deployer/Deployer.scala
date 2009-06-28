@@ -47,7 +47,7 @@ object Deployer extends Actor {
 				PreferencesActor ! 'Quit
 				SSHActor ! 'Quit
 				Deployer ! 'Quit
-				println("Done\n")
+				logger.warn("Done\n")
 			}
 		})
 
@@ -78,10 +78,10 @@ object Deployer extends Actor {
 		var jar_names = List[String]()
 		if (basicOnly_?) {
 			jar_names ++= basic_jar_names
-			logger.info("Selected only basic jars to deploy")
+			logger.warn("Selected only basic jars to deploy")
 		} else {
 			jar_names ++= basic_jar_names ++ dependency_jar_names
-			logger.info("Selected basic and dependendant jars to deploy")
+			logger.warn("Selected basic and dependendant jars to deploy")
 		}
 		jar_names.foreach { file =>
 			logger.info("*" + file.trim + "*")
@@ -111,7 +111,7 @@ object Deployer extends Actor {
 			prefs.get("jarSignerExecutable"), "-storepass", prefs.get("jarSignerPassword"),
 			deployDir + fileToBeSigned.split("/").last,	prefs.get("jarSignerKeyName")
 			)
-		println(CommandExec.cmdExec(signCommand).trim)
+		logger.warn(CommandExec.cmdExec(signCommand).trim)
 	}
 
 	override

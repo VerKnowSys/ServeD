@@ -90,13 +90,14 @@ object SSHActor extends Actor {
 			
 			var out = List[String]()
 			output.split(",").foreach{ a => out ++= List[String](a) }
-			logger.warn("1: " + out)
-			logger.warn("2: " + listOfCRCLocalFile)
-			logger.warn("result: " + (listOfCRCLocalFile -- out))
+			logger.info("1: " + out)
+			logger.info("2: " + listOfCRCLocalFile)
+			logger.info("result: " + (listOfCRCLocalFile -- out))
 			if ((out -- listOfCRCLocalFile) == List()) {
 				logger.warn("FILE IDENTICALLY: " + localFile.split("/").last)
 			} else {
 				logger.warn("FILE DIFFERENT: " + localFile.split("/").last)
+				logger.warn("Uploading " + localFile.split("/").last)
 				//Open the SFTP channel
 				val client = ssh.openSftpClient
 				//Send the file
