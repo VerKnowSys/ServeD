@@ -7,7 +7,7 @@ package ssh.tools
 import actors.Actor
 import com.sshtools.j2ssh.authentication.{PasswordAuthenticationClient, AuthenticationProtocolState}
 import com.sshtools.j2ssh.SshClient
-import deployer.Deployer
+import deployer.{JNLPSkeleton, Deployer}
 import jar.comparator.JarEntryComparator
 import java.io.{BufferedReader, InputStreamReader, File}
 
@@ -107,6 +107,29 @@ object SSHActor extends Actor {
 			clientForRemoteCommand.close
 		}
 
+		// deploying jnlp file
+		logger.warn("Generating JNLP file")
+		val client = ssh.openSftpClient
+		var arguments = ""
+		for( i <- prefs.getl("webstartArgumentsJVM")) { // TODO: XXX: maybe switch to normal String instead of List[String] 
+			arguments += i + " "
+		}
+		val jnlp = new JNLPSkeleton(
+			"codadris.coviob2.App_Coviob2",
+			"Coviob 2",
+			"http://coviob.verknowsys.info/",
+			"launch.jnlp",
+			(prefs.getl("deployFilesBasic").toArray ++ prefs.getl("deployFilesAdditionalDependencies").toArray),
+			arguments,
+			"VerKnowSys",
+			"http://coviob.verknowsys.info/",
+			"LogoIcon_Coviob2.svg.png",
+			"COmunicate VIa OBjects")
+		val jnlpFileName = "/tmp/launch-" + uuid + ".jnlp"
+		jnlp.saveJNLP(jnlpFileName)
+		logger.warn("Putting JNLP file to remote server")
+		client.put(jnlpFileName, prefs.get("remoteWebStartDeployDir") + "launch.jnlp" )
+		client.quit
 		this ! 'Quit
 	}
 
