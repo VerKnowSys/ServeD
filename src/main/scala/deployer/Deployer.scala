@@ -124,6 +124,11 @@ object Deployer extends Actor {
 					basicOnly_? = prefs.getb("deployOnlyBasicFiles")
 					basic_jar_names = prefs.getl("deployFilesBasic")
 					dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
+					initLogger
+					logger.info("User home: " + System.getProperty("user.home"))
+					logger.info("Path to repo: " + pathToMaven2Repo)
+					logger.info("Deploy tmp dir: " + deployDir)
+					logger.info("Starting Deployer..")
 					getFilesFromMavenRepositoryAndSignThem
 					act
 				}
@@ -145,11 +150,6 @@ object Deployer extends Actor {
 		PreferencesActor ! arguments
 		PreferencesActor ! 'DeployerNeedPreferences // tell PreferencesActor that DeployerActor wants his settings
 		PreferencesActor ! 'SSHActorNeedPreferences
-		initLogger
-		logger.info("User home: " + System.getProperty("user.home"))
-		logger.info("Path to repo: " + pathToMaven2Repo)
-		logger.info("Deploy tmp dir: " + deployDir)
-		logger.info("Starting Deployer..")
 	}
 
 }
