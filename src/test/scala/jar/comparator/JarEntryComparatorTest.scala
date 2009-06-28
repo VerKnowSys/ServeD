@@ -157,5 +157,6 @@ class JarEntryComparatorTest extends TestCase("app") {
 		assertTrue(z.size2 == 0)
 		assertTrue(z.elements == Nil || z.elements2 == Nil) // one should be broken so empty List is Nil
 		println("Differs: " + z.diff_?)
+		assertTrue(z.loadAndThrowListOfCrcs(currentDir + "broken.zip") == List())
     }
 }
