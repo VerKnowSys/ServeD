@@ -64,7 +64,7 @@ object DbAddCommit {
 			prefs = (new Preferences).loadPreferences
 			debug = prefs.getb("debug")
 			repositoryDir = prefs.get("repositoryDir")
-			databaseName = System.getProperty("user.dir") + prefs.get("databaseName")
+			databaseName = System.getProperty("user.dir") + "/" + prefs.get("databaseName")
 			git = prefs.get("gitExecutable")
 
 			val command = Array(git, "--git-dir=" + repositoryDir, "rev-list", args(0) + "..." + args(1))
