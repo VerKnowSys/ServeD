@@ -22,7 +22,7 @@ class JNLPSkeletonTest extends TestCase("app") {
 
 	def testJnlpCreation = {
 		val z = new JNLPSkeleton("main.Class", "title", "http://codebase.url/", "myShinyJNLPFile.jnlp",
-			Array("my1.jar","my2.jar","additional.jar", "last.jar"), "param1 param2 param3 param666",
+			List("my1.jar","my2.jar","additional.jar", "last.jar"), "param1 param2 param3 param666",
 			"ME - the vendor", "http://my.home.com/", "myShinyIcon.ico", "This is my description")
 		println(z.getJNLP)
 		assertTrue(z.getJNLP.toString.length > 0)
