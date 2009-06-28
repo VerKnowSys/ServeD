@@ -91,7 +91,15 @@ sealed class Preferences(absolutePathToBot: String) {
 		"remoteWebStartDeployDir" -> "/home/verknowsys/public_html/javaws/coviob2/dist/trunk/",
 		"deployOnlyBasicFiles" -> true,
 		"remoteProjectToolsDir" -> "/home/verknowsys/JAVA/project.tools/",
-		"remoteScalaBin" -> "/home/verknowsys/JAVA/scala/bin/scala"
+		"remoteScalaBin" -> "/home/verknowsys/JAVA/scala/bin/scala",
+		"jnlpMainClass" -> "codadris.coviob2.App_Coviob2",
+		"jnlpAppName" -> "Coviob 2",
+		"jnlpCodebase" -> "http://coviob.verknowsys.info/trunk",
+		"jnlpFileName" -> "launch.jnlp",
+		"jnlpVendor" -> "VerKnowSys",
+		"jnlpHomePage" -> "http://coviob.verknowsys.info/",
+		"jnlpIcon" -> "LogoIcon_Coviob2.svg.png",
+		"jnlpDescription" -> "COmunicate VIa OBjects"
 	)
 	
 	def toXML = 
@@ -161,6 +169,14 @@ sealed class Preferences(absolutePathToBot: String) {
 			<deployOnlyBasicFiles>{value("deployOnlyBasicFiles")}</deployOnlyBasicFiles>
 			<remoteProjectToolsDir>{value("remoteProjectToolsDir")}</remoteProjectToolsDir>
 			<remoteScalaBin>{value("remoteScalaBin")}</remoteScalaBin>
+			<jnlpMainClass>{value("jnlpMainClass")}</jnlpMainClass>
+			<jnlpAppName>{value("jnlpAppName")}</jnlpAppName>
+			<jnlpCodebase>{value("jnlpCodebase")}</jnlpCodebase>
+			<jnlpFileName>{value("jnlpFileName")}</jnlpFileName>
+			<jnlpVendor>{value("jnlpVendor")}</jnlpVendor>
+			<jnlpHomePage>{value("jnlpHomePage")}</jnlpHomePage>
+			<jnlpIcon>{value("jnlpIcon")}</jnlpIcon>
+			<jnlpDescription>{value("jnlpDescription")}</jnlpDescription>
 		</preferences>
 	
 	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
@@ -218,6 +234,14 @@ sealed class Preferences(absolutePathToBot: String) {
 		    hashMap.update( "deployOnlyBasicFiles", (node \ "deployOnlyBasicFiles").text.toBoolean)
 			hashMap.update( "remoteProjectToolsDir", (node \ "remoteProjectToolsDir").text.trim)
 			hashMap.update( "remoteScalaBin", (node \ "remoteScalaBin").text.trim)
+			hashMap.update( "jnlpMainClass", (node \ "jnlpMainClass").text.trim)
+			hashMap.update( "jnlpAppName", (node \ "jnlpAppName").text.trim)
+			hashMap.update( "jnlpCodebase", (node \ "jnlpCodebase").text.trim)
+			hashMap.update( "jnlpFileName", (node \ "jnlpFileName").text.trim)
+			hashMap.update( "jnlpVendor", (node \ "jnlpVendor").text.trim)
+			hashMap.update( "jnlpHomePage", (node \ "jnlpHomePage").text.trim)
+			hashMap.update( "jnlpIcon", (node \ "jnlpIcon").text.trim)
+			hashMap.update( "jnlpDescription", (node \ "jnlpDescription").text.trim)
 			hashMap.asInstanceOf[HashMap[String,Any]]
 	}	
 	

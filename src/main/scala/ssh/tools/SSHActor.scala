@@ -115,20 +115,20 @@ object SSHActor extends Actor {
 			arguments += i + " "
 		}
 		val jnlp = new JNLPSkeleton(
-			"codadris.coviob2.App_Coviob2",
-			"Coviob 2",
-			"http://coviob.verknowsys.info/",
-			"launch.jnlp",
-			(prefs.getl("deployFilesBasic").toArray ++ prefs.getl("deployFilesAdditionalDependencies").toArray),
+			prefs.get("jnlpMainClass"),
+			prefs.get("jnlpAppName"),
+			prefs.get("jnlpCodebase"),
+			prefs.get("jnlpFileName"),
+			(prefs.getl("deployFilesBasic") ++ prefs.getl("deployFilesAdditionalDependencies")),
 			arguments,
-			"VerKnowSys",
-			"http://coviob.verknowsys.info/",
-			"LogoIcon_Coviob2.svg.png",
-			"COmunicate VIa OBjects")
+			prefs.get("jnlpVendor"),
+			prefs.get("jnlpHomePage"),
+			prefs.get("jnlpIcon"),
+			prefs.get("jnlpDescription"))
 		val jnlpFileName = "/tmp/launch-" + uuid + ".jnlp"
 		jnlp.saveJNLP(jnlpFileName)
 		logger.warn("Putting JNLP file to remote server")
-		client.put(jnlpFileName, prefs.get("remoteWebStartDeployDir") + "launch.jnlp" )
+		client.put(jnlpFileName, prefs.get("remoteWebStartDeployDir") + prefs.get("jnlpFileName") )
 		client.quit
 		this ! 'Quit
 	}
