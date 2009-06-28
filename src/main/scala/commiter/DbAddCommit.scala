@@ -64,7 +64,7 @@ object DbAddCommit {
 			prefs = (new Preferences).loadPreferences
 			debug = prefs.getb("debug")
 			repositoryDir = prefs.get("repositoryDir")
-			databaseName = args(2) + prefs.get("databaseName")
+			databaseName = System.getProperty("user.dir") + prefs.get("databaseName")
 			git = prefs.get("gitExecutable")
 
 			val command = Array(git, "--git-dir=" + repositoryDir, "rev-list", args(0) + "..." + args(1))
@@ -80,7 +80,7 @@ object DbAddCommit {
 			exit(0)
 		} catch {
 			case x: Throwable => {
-				logger.info("### Error: bad arguments.\nUsage: scriptname sha1-start sha1-end absolutePathToGitRepo")
+				logger.info("### Error: bad arguments.\nUsage: scriptname sha1-start sha1-end")
 				if (debug) x.printStackTrace
 				exit(1)
 			}
