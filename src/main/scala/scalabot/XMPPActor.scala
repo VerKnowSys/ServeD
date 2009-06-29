@@ -163,11 +163,9 @@ object XMPPActor extends Actor with MessageListener {
 						prefs.getlh("users").foreach{
 							e => if (e("user") == element.getParticipant) currentUserPreferences = e("params")
 						}
-						val a = currentUserPreferences.split(' ')
-						// TODO: XXX: only and max 3 arguments max:
 						val git = prefs.get("gitExecutable")
-						val showCommand = Array(git,  "--git-dir="+ repositoryDir +"","show", a(0), a(1), a(2), commitSha)
-						val output = CommandExec.cmdExec(showCommand)
+						var showCommand = List(git, "--git-dir=" + repositoryDir, "show") ++ currentUserPreferences.split(' ') ++ List(commitSha)
+						val output = CommandExec.cmdExec(showCommand.toArray)
 						if (debug)
 							logger.info("*** sent message length: " + output.length)
 						element.sendMessage(output)
