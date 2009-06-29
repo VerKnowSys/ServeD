@@ -42,18 +42,18 @@ object XMPPActor extends Actor with MessageListener {
 		config.setCompressionEnabled(true)
 		config.setSASLAuthenticationEnabled(false)
 		connection.connect()
-		if (debug) logger.info("*** l:"+login + " p:" + password + " r:" + resource)
+		logger.debug("*** l:"+login + " p:" + password + " r:" + resource)
 		try {
 			connection.login(login, password, resource)
 		} catch {
 			case x: Throwable => {
 				logger.info("### Error while connecting to XMPP server. Please check login / password.")
-				if (debug) logger.info( x.printStackTrace )
+				logger.debug( x.printStackTrace )
                 exit
 			}
 		}
 		chatmanager = connection.getChatManager
-		if (debug) logger.info("*** num of users: " + chat.length)
+		logger.debug("*** num of users: " + chat.length)
 		prefs.getlh("users").foreach { x =>
 			try {
 				chat = chat ::: List( chatmanager.createChat(x("user"), this) )
@@ -65,31 +65,16 @@ object XMPPActor extends Actor with MessageListener {
 				}
 			}
 		}
-		if (debug) logger.info("*** num of users: " + chat.length)
+		logger.debug("*** num of users: " + chat.length)
 		presence.setStatus(prefs.get("statusDescription"))
 		presence.setMode(Presence.Mode.dnd)
 		connection.sendPacket(presence)
-		if (debug) logger.info("*** Connected as: " + login + "\nReady to enter main loop")
+		logger.debug("*** Connected as: " + login + "\nReady to enter main loop")
 		ScalaBot ! 'MainLoop
 	}
 
-	// def processPacket(packet: Packet) {
-	// 	val message = packet.asInstanceOf[Message]
-	// 		try {
-	// 			chat.sendMessage(message.getBody());
-	// 		} catch {
-	// 			case x: XMPPException => {
-	// 				logger.info("XMPP exception: " + x )
-	// 			}
-	// 		}
-	// 	//connection.sendPacket(packet)
-	// 	//sendMessage("dmilith@drakor.eu",packet.asInstanceOf[Message].getBody)
-	// 	logger.info("processPacket: " + packet)
-	// 	Console.flush
-	// }
-
 	def processMessage(chat: Chat, message: Message) {
-		if (debug) logger.info("*** Received message: " + message + " (\"" + message.getBody + "\")")
+		logger.debug("*** Received message: " + message + " (\"" + message.getBody + "\")")
 		if (message.getFrom.contains("dmilith")) {   // XXX: hardcoded value
 			message.getBody match {
 				case "last" => {
@@ -117,15 +102,6 @@ object XMPPActor extends Actor with MessageListener {
 		var list: List[String] = List()
 		try {
 		    odb = ODBFactory.openClient(prefs.get("ODBListenAddress"), prefs.geti("ODBPort"), prefs.get("ODBName"))
-			// try { //adding indexes before queries
-			// 				odb.getClassRepresentation(classOf[Commit]).addUniqueIndexOn("commitSha1", Array("commitSha1"), true)
-			// 				odb.getClassRepresentation(classOf[Commit]).addUniqueIndexOn("toRead", Array("toRead"), true)
-			// 				if (debug) logger.info("*** Indexes were added")
-			// 			} catch {
-			// 				case y: Throwable => {
-			// 					// XXX: NOOP
-			// 				}
-			// 			}
 		    var query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))
 			query.orderByDesc("date") 
 			val commit = odb.getObjects(query)
@@ -140,7 +116,7 @@ object XMPPActor extends Actor with MessageListener {
 		} catch {
 			case x: Throwable => {
 				logger.info("### Error in XMPPActor: " + x)
-				if (debug) logger.info(x.printStackTrace)
+				logger.debug(x.printStackTrace)
 			}
 		} finally {
 			if (odb != null) { 
@@ -164,7 +140,7 @@ object XMPPActor extends Actor with MessageListener {
 							e => if (e("user") == element.getParticipant) currentUserPreferences = e("params")
 						}
 						val git = prefs.get("gitExecutable")
-						var showCommand = List(git, "--git-dir=" + repositoryDir, "show") ++ currentUserPreferences.split(' ') ++ List(commitSha)
+						val showCommand = List(git, "--git-dir=" + repositoryDir, "show") ++ currentUserPreferences.split(' ') ++ List(commitSha)
 						val output = CommandExec.cmdExec(showCommand.toArray)
 						if (debug)
 							logger.info("*** sent message length: " + output.length)
@@ -188,11 +164,11 @@ object XMPPActor extends Actor with MessageListener {
 					act
 				}
 				case 'Quit => {
-					if (debug) logger.info("*** received Quit command.")
+					logger.debug("*** received Quit command.")
 					exit
 				}
 				case 'CloseConnection => {
-					if (debug) logger.info("*** received CloseConnection command.")
+					logger.debug("*** received CloseConnection command.")
 					closeConnection
 					act
 				}
@@ -201,7 +177,7 @@ object XMPPActor extends Actor with MessageListener {
 					act
 				}
 				case _ => {
-					if (debug) logger.info("*** received Unknown command.")
+					logger.debug("*** received Unknown command.")
 					act
 				}
 			}

@@ -68,12 +68,12 @@ object DbAddCommit {
 			git = prefs.get("gitExecutable")
 
 			val command = Array(git, "--git-dir=" + repositoryDir, "rev-list", args(0) + "..." + args(1))
-			if (debug) logger.info("*** performing "+command.map{ a => a })
+			logger.debug("*** performing "+command.map{ a => a })
 			var listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
 			listOfSha1.foreach { oneOf =>
 				val commit = new Commit(oneOf)
 				writeCommitToDataBase( commit )	// sha1, show?
-				if (debug) logger.info("*** writeCommitToDatabase: " + commit )
+				logger.debug("*** writeCommitToDatabase: " + commit )
 				logger.info("commit added")
 			}
 			logger.info("done")

@@ -32,7 +32,7 @@ object ODBServerActor extends Actor {
 		} catch {
 			case x: Throwable => {
 				logger.info("### Error: exception occured in ODBServerActor!")
-				if (debug) logger.info( x.printStackTrace )
+				logger.debug( x.printStackTrace )
 			}
 		} finally {
 			if (server != null) {
@@ -49,7 +49,7 @@ object ODBServerActor extends Actor {
 					act
 				}
 				case 'Quit => {
-					if (debug) logger.info("*** ODBServer received Quit command.")
+					logger.debug("*** ODBServer received Quit command.")
 					if (server != null) server.close
 					exit
 				}
