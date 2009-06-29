@@ -16,7 +16,7 @@ import org.neodatis.odb.core.query.criteria._
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
-import org.jivesoftware.smackx._
+//import org.jivesoftware.smackx._
 
 
 
@@ -75,7 +75,8 @@ object XMPPActor extends Actor with MessageListener {
 
 	def processMessage(chat: Chat, message: Message) {
 		logger.debug("*** Received message: " + message + " (\"" + message.getBody + "\")")
-		if (message.getFrom.contains("dmilith")) {   // XXX: hardcoded value
+		if (message.getFrom.contains("dmilith")) {   // TODO: XXX: hardcoded value
+			logger.info("Message contains dmilith: " + message.getFrom)
 			message.getBody match {
 				case "last" => {
 					chat.sendMessage("Requested last commit.\nNYI")
