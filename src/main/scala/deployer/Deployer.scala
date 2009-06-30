@@ -121,6 +121,9 @@ object Deployer extends Actor {
 					SSHActor ! Quit
 					exit
 				}
+				case _ => {
+					logger.warn("Unsupported action received")
+				}
 			}
 		}
 	}
@@ -135,24 +138,30 @@ object Deployer extends Actor {
 		logger.warn("Starting Deployer..")
 
 		// check given arguments
-		for (arg <- args) {
-			arg match {
-				case "local" => {
-					// local deploy without ssh actor
-					logger.warn("Requested to perform local deploy")
+		if (args.size > 0) {
 
-				}
-				case _ => {
-					// normal deploy based on config values
-					this.start
-					SSHActor.start
-					SSHActor ! Init
-
-					getFilesFromMavenRepositoryAndSignThem
-
-					SSHActor ! (filesToBeDeployed, uuid, deployTmpDir)
+			for (arg <- args) {
+				arg match {
+					case "local" => {
+						// local deploy without ssh actor
+						logger.warn("Requested to perform local deploy")
+						getFilesFromMavenRepositoryAndSignThem
+						
+					}
+					case _ => {
+						logger.warn("Bad parameters. Valid params are:\nlocal - for local deploy\nnone for deploy based on project.tools.xml config file.")
+					}
 				}
 			}
+			
+		} else {
+
+			this.start
+			// normal deploy based on config values
+			SSHActor.start
+			SSHActor ! Init
+			getFilesFromMavenRepositoryAndSignThem
+			SSHActor ! (filesToBeDeployed, uuid, deployTmpDir)
 		}
 	}
 
