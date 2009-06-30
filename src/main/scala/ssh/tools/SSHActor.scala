@@ -5,6 +5,8 @@ package ssh.tools
 
 
 import actors.Actor
+import cases.{Init, Quit}
+
 import com.sshtools.j2ssh.authentication.{PasswordAuthenticationClient, AuthenticationProtocolState}
 import com.sshtools.j2ssh.SshClient
 import deployer.{JNLPSkeleton, Deployer}
@@ -37,17 +39,17 @@ object SSHActor extends Actor {
 	def act = {
 		Actor.loop {
 			react {
-				case 'Init => {
+				case Init => {
 					connect
 					auth
 					act
 				}
-				case 'Quit => {
+				case Quit => {
 					disconnect
-					Deployer ! 'Quit
+					Deployer ! Quit
 					exit
 				}
-				case ('PerformTasks, x: ArrayList[File], deployUuid: String, deployTmpDir: String) => {
+				case (x: ArrayList[File], deployUuid: String, deployTmpDir: String) => {
 					logger.info("Performing tasks with given list of files: " + x.toArray.map{ a => deployTmpDir + a.toString.split("/").last })
 					logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
 					uuid = deployUuid
@@ -123,7 +125,7 @@ object SSHActor extends Actor {
 		logger.warn("Putting JNLP file to remote server")
 		client.put(tempJnlpFileName, prefs.get("remoteWebStartDeployDir") + prefs.get("jnlpFileName") )
 		client.quit
-		this ! 'Quit
+		this ! Quit
 	}
 
 	def auth = {

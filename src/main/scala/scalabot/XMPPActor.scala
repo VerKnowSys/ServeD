@@ -3,6 +3,10 @@
 
 package scalabot
 
+
+
+
+import cases.{Init, Quit, ProcessMessages, MainLoop}
 import command.exec.CommandExec
 import commiter.DbAddCommit
 import org.apache.log4j.Logger
@@ -70,11 +74,14 @@ object XMPPActor extends Actor with MessageListener {
 		presence.setMode(Presence.Mode.dnd)
 		connection.sendPacket(presence)
 		logger.debug("*** Connected as: " + login + "\nReady to enter main loop")
-		ScalaBot ! 'MainLoop
+		ScalaBot ! MainLoop
 	}
 
 	def processMessage(chat: Chat, message: Message) {
 		logger.debug("*** Received message: " + message + " (\"" + message.getBody + "\")")
+//		prefs.getlh("users").foreach { x =>
+//			x("user")
+//		}
 		if (message.getFrom.contains("dmilith")) {   // TODO: XXX: hardcoded value
 			logger.info("Message contains dmilith: " + message.getFrom)
 			message.getBody match {
@@ -141,6 +148,7 @@ object XMPPActor extends Actor with MessageListener {
 							e => if (e("user") == element.getParticipant) currentUserPreferences = e("params")
 						}
 						val git = prefs.get("gitExecutable")
+						// NOTE: ListBuffer provides append method, and it should be used for large Lists
 						val showCommand = List(git, "--git-dir=" + repositoryDir, "show") ++ currentUserPreferences.split(' ') ++ List(commitSha)
 						val output = CommandExec.cmdExec(showCommand.toArray)
 						if (debug)
@@ -160,20 +168,16 @@ object XMPPActor extends Actor with MessageListener {
 	override def act = {
 		Actor.loop {
 			react {
-				case 'Init => {
+				case Init => {
 					initConnection // init connection after getting preferences
 					act
 				}
-				case 'Quit => {
-					logger.debug("*** received Quit command.")
+				case Quit => {
+					logger.debug("*** received Quit command, closing connection with XMPP server.")
+					closeConnection
 					exit
 				}
-				case 'CloseConnection => {
-					logger.debug("*** received CloseConnection command.")
-					closeConnection
-					act
-				}
-				case 'ProcessMessages => {
+				case ProcessMessages => {
 					tryToSendMessages
 					act
 				}

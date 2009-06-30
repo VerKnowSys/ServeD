@@ -5,6 +5,8 @@ package deployer
 
 
 import actors._
+import cases.{Init, Quit}
+
 import collection.mutable.HashMap
 import com.sshtools.j2ssh.{SshClient, SftpClient}
 import com.sshtools.j2ssh.authentication.{PasswordAuthenticationClient, AuthenticationProtocolState}
@@ -44,8 +46,8 @@ object Deployer extends Actor {
 	def addShutdownHook =
 		Runtime.getRuntime.addShutdownHook( new Thread {
 			override def run = {
-				SSHActor ! 'Quit
-				Deployer ! 'Quit
+				SSHActor ! Quit
+				Deployer ! Quit
 				logger.warn("Done\n")
 			}
 		})
@@ -115,8 +117,8 @@ object Deployer extends Actor {
 	def act = {
 		Actor.loop {
 			react {
-				case 'Quit => {
-					SSHActor ! 'Quit
+				case Quit => {
+					SSHActor ! Quit
 					exit
 				}
 			}
@@ -124,12 +126,7 @@ object Deployer extends Actor {
 	}
 
 	def main(args: Array[String]) {
-		val arguments = Array[String]("./") // XXX: should be based on given arguments
 		addShutdownHook
-		this.start
-		SSHActor.start
-		SSHActor ! 'Init
-
 		initLogger
 		logger.info("User home dir: " + System.getProperty("user.home"))
 		logger.info("Working dir: " + System.getProperty("user.dir"))
@@ -137,10 +134,26 @@ object Deployer extends Actor {
 		logger.info("Deploy tmp dir: " + deployTmpDir)
 		logger.warn("Starting Deployer..")
 
-		getFilesFromMavenRepositoryAndSignThem
+		// check given arguments
+		for (arg <- args) {
+			arg match {
+				case "local" => {
+					// local deploy without ssh actor
+					logger.warn("Requested to perform local deploy")
 
-		SSHActor ! ('PerformTasks, filesToBeDeployed, uuid, deployTmpDir)
-		
+				}
+				case _ => {
+					// normal deploy based on config values
+					this.start
+					SSHActor.start
+					SSHActor ! Init
+
+					getFilesFromMavenRepositoryAndSignThem
+
+					SSHActor ! (filesToBeDeployed, uuid, deployTmpDir)
+				}
+			}
+		}
 	}
 
 }

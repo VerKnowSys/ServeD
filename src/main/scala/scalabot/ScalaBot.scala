@@ -4,12 +4,11 @@
 package scalabot
 
 
-
+import cases.{ProcessMessages, MainLoop, Init, Quit}
 import java.io.OutputStreamWriter
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
-
-import prefs.Preferences
 import scala.actors._
+
 
 object ScalaBot extends Actor {
 	
@@ -19,11 +18,10 @@ object ScalaBot extends Actor {
 	Runtime.getRuntime.addShutdownHook( new Thread {
 		override def run = {
 			logger.info("Bot shutdown requested.")
-			XMPPActor ! 'CloseConnection
-			XMPPActor ! 'Quit
-			ODBServerActor ! 'Quit
-			IRCActor ! 'Quit
-			ScalaBot ! 'Quit
+			XMPPActor ! Quit
+			ODBServerActor ! Quit
+			IRCActor ! Quit
+			ScalaBot ! Quit
 			logger.info("Done\n")
 		}
 	})
@@ -54,19 +52,19 @@ object ScalaBot extends Actor {
 	override def act = {
 
 		ODBServerActor.start
-		ODBServerActor ! 'Init
+		ODBServerActor ! Init
 		XMPPActor.start
-		XMPPActor ! 'Init
+		XMPPActor ! Init
 		IRCActor.start
 		
 		react {
-			case 'MainLoop => {
+			case MainLoop => {
 				Actor.loop {
 					Thread sleep 500 // 500 ms for each check. That's enough even for very often updated repository
-					XMPPActor ! 'ProcessMessages
+					XMPPActor ! ProcessMessages
 				}
 			}
-			case 'Quit => {
+			case Quit => {
 				exit
 			}
 		}

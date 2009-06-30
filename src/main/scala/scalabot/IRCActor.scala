@@ -3,6 +3,7 @@
 
 package scalabot
 
+import cases.Quit
 import org.apache.log4j.Logger
 import scala.actors._
 import scala.actors.Actor._
@@ -33,9 +34,9 @@ object IRCActor extends PircBot with Actor {
 	}
 
 	override def act = {
-//		settings
+//		settings // TODO: XXX: IRC Actor is inactive ATM, it's useless now, maybe we could do something with it later. Maybe logging of irc chats?
 		react {
-			case 'Quit => {
+			case Quit => {
 				this.disconnect
 			}
 		}

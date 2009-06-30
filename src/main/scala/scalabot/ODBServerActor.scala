@@ -3,16 +3,15 @@
 
 package scalabot
 
-import commiter._
 
+import cases.{Init, Quit}
 import org.apache.log4j.Logger
 import prefs.Preferences
 import scala.actors._
-import scala.actors.Actor._
 
 import org.neodatis.odb._
-import org.neodatis.odb.impl.core.query.criteria._
-import org.neodatis.odb.core.query.criteria._
+//import org.neodatis.odb.impl.core.query.criteria._
+//import org.neodatis.odb.core.query.criteria._
 
 
 object ODBServerActor extends Actor {
@@ -44,11 +43,11 @@ object ODBServerActor extends Actor {
  	override def act = {
 		Actor.loop {
 			react {
-				case 'Init => {
+				case Init => {
 					initServer
 					act
 				}
-				case 'Quit => {
+				case Quit => {
 					logger.debug("*** ODBServer received Quit command.")
 					if (server != null) server.close
 					exit
