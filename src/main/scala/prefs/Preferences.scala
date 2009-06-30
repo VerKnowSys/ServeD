@@ -98,7 +98,8 @@ sealed class Preferences {
 		"jnlpVendor" -> "VerKnowSys",
 		"jnlpHomePage" -> "http://coviob.verknowsys.info/",
 		"jnlpIcon" -> "LogoIcon_Coviob2.svg.png",
-		"jnlpDescription" -> "COmunicate VIa OBjects"
+		"jnlpDescription" -> "COmunicate VIa OBjects",
+		"directoryForLocalDeploy" -> ".codadris/LOCAL_COVIOB2_DEPLOY_DIR"
 	)
 	
 	def toXML = 
@@ -176,6 +177,7 @@ sealed class Preferences {
 			<jnlpHomePage>{value("jnlpHomePage")}</jnlpHomePage>
 			<jnlpIcon>{value("jnlpIcon")}</jnlpIcon>
 			<jnlpDescription>{value("jnlpDescription")}</jnlpDescription>
+			<directoryForLocalDeploy>{value("directoryForLocalDeploy")}</directoryForLocalDeploy>
 		</preferences>
 	
 	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
@@ -241,6 +243,7 @@ sealed class Preferences {
 			hashMap.update( "jnlpHomePage", (node \ "jnlpHomePage").text.trim)
 			hashMap.update( "jnlpIcon", (node \ "jnlpIcon").text.trim)
 			hashMap.update( "jnlpDescription", (node \ "jnlpDescription").text.trim)
+			hashMap.update( "directoryForLocalDeploy", (node \ "directoryForLocalDeploy").text.trim)
 			hashMap.asInstanceOf[HashMap[String,Any]]
 	}	
 	
