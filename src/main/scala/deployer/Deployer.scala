@@ -39,7 +39,7 @@ object Deployer extends Actor {
 	private val logger = Logger.getLogger(Deployer.getClass)
 	private val prefs: Preferences = (new Preferences).loadPreferences
 	private val debug: Boolean = prefs.getb("debug")
-	private val basicOnly_? = prefs.getb("deployOnlyBasicFiles")
+	private var basicOnly_? = prefs.getb("deployOnlyBasicFiles")
 	private val basic_jar_names = prefs.getl("deployFilesBasic")
 	private val dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
 
@@ -110,7 +110,7 @@ object Deployer extends Actor {
 			prefs.get("jarSignerExecutable"), "-storepass", prefs.get("jarSignerPassword"),
 			deployTmpDir + fileToBeSigned.split("/").last,	prefs.get("jarSignerKeyName")
 			)
-		logger.warn(CommandExec.cmdExec(signCommand).trim)
+		logger.info(CommandExec.cmdExec(signCommand).trim)
 	}
 
 	override
@@ -128,6 +128,46 @@ object Deployer extends Actor {
 		}
 	}
 
+	
+	def deployLocal = {
+
+		val codebaseLocalDir: String = System.getProperty("user.home") + "/LOCAL_COVIOB2_DEPLOY/"
+		filesToBeDeployed.toArray foreach {
+			localFile => {
+				val comparator = new JarEntryComparator
+				comparator.load(deployTmpDir + localFile.toString.split("/").last, codebaseLocalDir + "lib/" + localFile.toString.split("/").last)
+				if (comparator.diff_?) {
+					logger.warn("File DIFFERENT: " + localFile.toString.split("/").last)
+					FileUtils.copyFileToDirectory( new File(deployTmpDir + localFile.toString.split("/").last), new File(codebaseLocalDir + "lib/"))
+				} else {
+					logger.warn("File IDENTICAL: " + localFile.toString.split("/").last)
+				}
+			}
+		}
+		logger.warn("Generating JNLP file")
+		var arguments = ""
+		for( i <- prefs.getl("webstartArgumentsJVM")) {
+			arguments += i + " "
+		}
+		val jnlp = new JNLPSkeleton(
+			prefs.get("jnlpMainClass"),
+			prefs.get("jnlpAppName"),
+			"file://" + codebaseLocalDir,
+			prefs.get("jnlpFileName"),
+			(prefs.getl("deployFilesBasic") ++ prefs.getl("deployFilesAdditionalDependencies")),
+			arguments,
+			prefs.get("jnlpVendor"),
+			"file://" + codebaseLocalDir,
+			prefs.get("jnlpIcon"),
+			prefs.get("jnlpDescription")
+			)
+		val tempJnlpFileName = "/tmp/" + prefs.get("jnlpFileName") 
+		jnlp.saveJNLP(tempJnlpFileName)
+		logger.warn("Putting JNLP file to local deploy dir")
+		FileUtils.copyFileToDirectory(new File(tempJnlpFileName), new File(codebaseLocalDir))
+	}
+
+	
 	def main(args: Array[String]) {
 		addShutdownHook
 		initLogger
@@ -142,14 +182,28 @@ object Deployer extends Actor {
 
 			for (arg <- args) {
 				arg match {
+					case "mac-app" => {
+						logger.warn("Requested to perform Mac Application instead of web-start app\nNYI!")
+						// TODO: implement Mac Application deploy support
+					}
+					case "full-local" => {
+						// local deploy without ssh actor
+						logger.warn("Requested to perform FULL local deploy")
+						basicOnly_? = false
+						getFilesFromMavenRepositoryAndSignThem
+						deployLocal
+					}
 					case "local" => {
 						// local deploy without ssh actor
 						logger.warn("Requested to perform local deploy")
 						getFilesFromMavenRepositoryAndSignThem
-						
+						deployLocal
 					}
 					case _ => {
-						logger.warn("Bad parameters. Valid params are:\nlocal - for local deploy\nnone for deploy based on project.tools.xml config file.")
+						logger.warn("Bad parameters. Valid params are:\nlocal - for basic local deploy\n" +
+								"full-local - for full local deploy\n" +
+								"mac-app - for Macintosh application\n" +
+								"none for remote ssh deploy based on project.tools.xml config file.")
 					}
 				}
 			}
