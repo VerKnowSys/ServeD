@@ -12,7 +12,7 @@ sealed class Preferences {
 	val absoluteProjectRootPath = System.getProperty("user.dir") + "/"
 	val configFileName = "project.tools.xml"
 	var value = HashMap[String,Any] (
-		"debug" -> true,
+		"debug" -> false,
 		"resource" -> "scalaBot-2",
 		"login" -> "varra",
 		"password" -> "varrajabber",
