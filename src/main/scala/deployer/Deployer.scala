@@ -215,7 +215,6 @@ object Deployer extends Actor {
 						// remote trunk deploy
 						logger.warn("Requested to perform trunk deploy")
 						this.start
-						// normal deploy based on config values
 						SSHActor.start
 						SSHActor ! Init
 						getFilesFromMavenRepositoryAndSignThem
@@ -223,9 +222,12 @@ object Deployer extends Actor {
 						SSHActor ! (filesToBeDeployed, uuid, deployTmpDir, trunk)
 					}
 					case _ => {
-						logger.warn("Bad parameters. Valid params are:\nlocal - for basic local deploy\n" +
-								"full-local - for full local deploy\n" +
-								"mac-app - for Macintosh application\n" +
+						// help
+						logger.warn("Bad parameters. Valid params are:\n" +
+								"\ttrunk -> for trunk deploy\n" +
+								"\tlocal -> for basic local deploy\n" +
+								"\tfull-local -> for full local deploy\n" +
+								"\tmac-app -> for Macintosh application (NYI)\n" +
 								"none for remote ssh deploy based on project.tools.xml config file.")
 					}
 				}
