@@ -99,7 +99,7 @@ sealed class Preferences {
 		"jnlpHomePage" -> "http://coviob.verknowsys.info/",
 		"jnlpIcon" -> "LogoIcon_Coviob2.svg.png",
 		"jnlpDescription" -> "COmunicate VIa OBjects",
-		"directoryForLocalDeploy" -> ".codadris/LOCAL_COVIOB2_DEPLOY_DIR"
+		"directoryForLocalDeploy" -> ".codadris/LOCAL_COVIOB2_DEPLOY_DIR/"
 	)
 	
 	def toXML = 
