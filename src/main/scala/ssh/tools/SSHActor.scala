@@ -94,7 +94,6 @@ object SSHActor extends Actor {
 			clientForRemoteCommand.executeCommand(
 				prefs.get("remoteProjectToolsDir") + "getcrcs" + " " +
 				remoteDeployDir + localFile.split("/").last + " " +
-				prefs.get("remoteProjectToolsDir") + " " +
 				prefs.get("remoteScalaBin"))
 			val input = new BufferedReader(new InputStreamReader(clientForRemoteCommand.getInputStream))
 			var output = ""

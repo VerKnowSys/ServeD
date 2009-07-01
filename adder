@@ -15,5 +15,6 @@ $HOME/.m2/repository/org/neodatis/odb/neodatis-odb/1.9-SNAPSHOT/neodatis-odb-1.9
 $HOME/.m2/repository/pircbot/pircbot/1.4.2/pircbot-1.4.2.jar:\
 $HOME/.m2/repository/jivesoftware/smack/3.0.4/smack-3.0.4.jar:\
 $HOME/.m2/repository/jivesoftware/smackx/3.0.4/smackx-3.0.4.jar:\
-target/scala.project.tools-1.0-SNAPSHOT.jar commiter.DbAddCommit $1 $2 $3
+$HOME/.m2/repository/scala/project/tools/scala.project.tools/1.0-SNAPSHOT/scala.project.tools-1.0-SNAPSHOT.jar \
+commiter.DbAddCommit $1 $2 $3
 

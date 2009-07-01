@@ -7,6 +7,7 @@ main="jar.comparator.GiveCRC"
 # $2 - dir to this script (project.tools dir)
 # $3 - path to scala bin
 
-$3 -classpath \
+$2 -classpath \
 $HOME/.m2/repository/org/scala-lang/scala-library/2.7.5/scala-library-2.7.5.jar:\
-$2/target/scala.project.tools-1.0-SNAPSHOT.jar $main $1
+$HOME/.m2/repository/scala/project/tools/scala.project.tools/1.0-SNAPSHOT/scala.project.tools-1.0-SNAPSHOT.jar \
+$main $1
