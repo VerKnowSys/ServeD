@@ -6,10 +6,6 @@ package deployer
 
 import actors._
 import cases.{Init, Quit}
-
-import collection.mutable.HashMap
-import com.sshtools.j2ssh.{SshClient, SftpClient}
-import com.sshtools.j2ssh.authentication.{PasswordAuthenticationClient, AuthenticationProtocolState}
 import command.exec.CommandExec
 import jar.comparator.JarEntryComparator
 import java.io._
@@ -26,9 +22,11 @@ import ssh.tools.SSHActor
  * Time: 12:04:35 PM
  */
 
+
 trait P {
 	def accept(t: String): Boolean
 }
+
 
 object Deployer extends Actor {
 
@@ -44,14 +42,16 @@ object Deployer extends Actor {
 	private val dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
 	private val codebaseLocalDir = System.getProperty("user.home") + "/" + prefs.get("directoryForLocalDeploy")
 
+
 	def addShutdownHook =
 		Runtime.getRuntime.addShutdownHook( new Thread {
 			override def run = {
 				SSHActor ! Quit
 				Deployer ! Quit
-				logger.warn("Done\n")
+				logger.warn("Done")
 			}
 		})
+
 
 	def initLogger = {
 		val appender = new ConsoleAppender
@@ -62,6 +62,7 @@ object Deployer extends Actor {
 		appender.setLayout(new PatternLayout("{ %-5p %d : %m }%n"));
 		Logger.getRootLogger.addAppender(appender)
 	}
+
 
 	def findFile(f: File, p: P, r: ArrayList[File]) {
 		if (f.isDirectory) {
@@ -74,9 +75,9 @@ object Deployer extends Actor {
 		}
 	}
 
-	def getFilesFromMavenRepositoryAndSignThem = {
-		logger.info("Searching for jars in Maven repository and signing them..")
 
+	def getFilesFromMavenRepositoryAndSignThem = {
+		logger.warn("Searching for jars in Maven repository and signing them..")
 		var jar_names = List[String]()
 		if (basicOnly_?) {
 			jar_names ++= basic_jar_names
@@ -103,9 +104,10 @@ object Deployer extends Actor {
 		}
 	}
 
+
 	def signJar(fileToBeSigned: String) = {
 		new File(deployTmpDir).mkdir // make temporary place for jars before signinig
-		logger.info("Preparing for signing jar: " + deployTmpDir + fileToBeSigned.split("/").last)
+		logger.warn("Signing jar: " + fileToBeSigned.split("/").last)
 		FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployTmpDir)) // copy files to temporary dir
 		val signCommand = Array(
 			prefs.get("jarSignerExecutable"), "-storepass", prefs.get("jarSignerPassword"),
@@ -113,6 +115,7 @@ object Deployer extends Actor {
 			)
 		logger.info(CommandExec.cmdExec(signCommand).trim)
 	}
+
 
 	override
 	def act = {
@@ -136,14 +139,13 @@ object Deployer extends Actor {
 		val localDeployDir = new File (codebaseLocalDir)
 		backupDir.mkdir
 		localDeployDir.mkdir
-		logger.info("Copying files from " + localDeployDir + " to " + backupDir)
+		logger.warn("Copying files from " + localDeployDir + " to " + backupDir)
 		FileUtils.copyDirectory(localDeployDir, backupDir)
 	}
 
-	def deployLocal = {
 
+	def deployLocal = {
 		backupLocal
-		
 		filesToBeDeployed.toArray foreach {
 			localFile => {
 				val comparator = new JarEntryComparator
@@ -183,15 +185,13 @@ object Deployer extends Actor {
 	def main(args: Array[String]) {
 		addShutdownHook
 		initLogger
-		logger.info("User home dir: " + System.getProperty("user.home"))
-		logger.info("Working dir: " + System.getProperty("user.dir"))
-		logger.info("Maven 2 Repository dir: " + pathToMaven2Repo)
-		logger.info("Deploy tmp dir: " + deployTmpDir)
+		logger.warn("User home dir: " + System.getProperty("user.home"))
+		logger.warn("Working dir: " + System.getProperty("user.dir"))
+		logger.warn("Maven 2 Repository dir: " + pathToMaven2Repo)
+		logger.warn("Deploy tmp dir: " + deployTmpDir)
 		logger.warn("Starting Deployer..")
-
 		// check given arguments
 		if (args.size > 0) {
-
 			for (arg <- args) {
 				arg match {
 					case "mac-app" => {
@@ -219,9 +219,8 @@ object Deployer extends Actor {
 					}
 				}
 			}
-			
 		} else {
-
+			logger.warn("Requested to perform remote deploy")
 			this.start
 			// normal deploy based on config values
 			SSHActor.start
