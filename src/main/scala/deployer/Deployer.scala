@@ -41,7 +41,7 @@ object Deployer extends Actor {
 	private val basic_jar_names = prefs.getl("deployFilesBasic")
 	private val dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
 	private val codebaseLocalDir = System.getProperty("user.home") + "/" + prefs.get("directoryForLocalDeploy")
-
+	private var trunk = false
 
 	def addShutdownHook =
 		Runtime.getRuntime.addShutdownHook( new Thread {
@@ -134,7 +134,7 @@ object Deployer extends Actor {
 
 
 	def backupLocal = {
-		val backupDate = (new Date).toString.replaceAll(" ", "_").replaceAll("/","_") // TODO: optimize
+		val backupDate = (new Date).toString.replaceAll(" |:", "_")
 		val backupDir = new File(codebaseLocalDir + "../OLD_LOCAL_DEPLOY_" +  backupDate + "/")
 		val localDeployDir = new File (codebaseLocalDir)
 		backupDir.mkdir
@@ -211,6 +211,17 @@ object Deployer extends Actor {
 						getFilesFromMavenRepositoryAndSignThem
 						deployLocal
 					}
+					case "trunk" => {
+						// remote trunk deploy
+						logger.warn("Requested to perform trunk deploy")
+						this.start
+						// normal deploy based on config values
+						SSHActor.start
+						SSHActor ! Init
+						getFilesFromMavenRepositoryAndSignThem
+						trunk = true
+						SSHActor ! (filesToBeDeployed, uuid, deployTmpDir, trunk)
+					}
 					case _ => {
 						logger.warn("Bad parameters. Valid params are:\nlocal - for basic local deploy\n" +
 								"full-local - for full local deploy\n" +
@@ -220,13 +231,13 @@ object Deployer extends Actor {
 				}
 			}
 		} else {
-			logger.warn("Requested to perform remote deploy")
+			logger.warn("Requested to perform standard remote deploy")
 			this.start
 			// normal deploy based on config values
 			SSHActor.start
 			SSHActor ! Init
 			getFilesFromMavenRepositoryAndSignThem
-			SSHActor ! (filesToBeDeployed, uuid, deployTmpDir)
+			SSHActor ! (filesToBeDeployed, uuid, deployTmpDir, trunk)
 		}
 	}
 

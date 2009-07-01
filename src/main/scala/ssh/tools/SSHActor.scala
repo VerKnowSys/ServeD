@@ -13,7 +13,7 @@ import deployer.{JNLPSkeleton, Deployer}
 import jar.comparator.JarEntryComparator
 import java.io.{BufferedReader, InputStreamReader, File}
 
-import java.util.ArrayList
+import java.util.{Date, ArrayList}
 import org.apache.log4j.Logger
 import prefs.Preferences
 
@@ -49,9 +49,15 @@ object SSHActor extends Actor {
 					Deployer ! Quit
 					exit
 				}
-				case (x: ArrayList[File], deployUuid: String, deployTmpDir: String) => {
+				case (x: ArrayList[File], deployUuid: String, deployTmpDir: String, trunk: Boolean) => {
 					logger.info("Performing tasks with given list of files: " + x.toArray.map{ a => deployTmpDir + a.toString.split("/").last })
-					logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
+					if (trunk) {
+						logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
+						prefs.value.update("remoteWebStartDeployDir", prefs.get("remoteWebStartDeployDir") + "trunk/")
+						prefs.value.update("jnlpCodebase", prefs.get("jnlpCodebase") + "trunk/")
+					} else {
+						logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
+					}
 					uuid = deployUuid
 					deploy(x, deployUuid, deployTmpDir)
 					act
@@ -60,16 +66,31 @@ object SSHActor extends Actor {
 		}
 	}
 
+	def backup = {
+		val clientForRemoteCommand = ssh.openSessionChannel
+		val backupDate = (new Date).toString.replaceAll(" |:", "_")
+		val source = prefs.get("remoteWebStartDeployDir")
+		var adder = ""
+		if (source.contains("trunk")) adder = "../" 
+		val destination = prefs.get("remoteWebStartDeployDir") + adder + "../OLD_dist_" + backupDate
+		logger.warn("Copying " + source + " to " + destination)
+		clientForRemoteCommand.executeCommand("cp -r " + source + " " + destination)
+		clientForRemoteCommand.close
+	}
+
 	def deploy(list: ArrayList[File], deployUuid: String, deployTmpDir: String) = {
 
 		val remoteDeployDir = prefs.get("remoteWebStartDeployDir") + "lib/"
 		val listOfSignedFiles = list.toArray.map{ a => deployTmpDir + a.toString.split("/").last }
+		val clientForRemoteCommand = ssh.openSessionChannel
+		clientForRemoteCommand.executeCommand("mkdir -p " + remoteDeployDir)  // make sure that directories exists
+		clientForRemoteCommand.close
+		backup
 
 		listOfSignedFiles foreach { localFile =>
 			val clientForRemoteCommand = ssh.openSessionChannel
 			val comparator = new JarEntryComparator
-			var listOfCRCLocalFile = comparator.loadAndThrowListOfCrcs(localFile)	
-
+			var listOfCRCLocalFile = comparator.loadAndThrowListOfCrcs(localFile)
 			clientForRemoteCommand.executeCommand(
 				prefs.get("remoteProjectToolsDir") + "getcrcs" + " " +
 				remoteDeployDir + localFile.split("/").last + " " +
