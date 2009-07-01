@@ -28,7 +28,6 @@ sealed class Preferences {
 		"sshHost" -> "verknowsys.info",
 		"sshPort" -> 22,
 		"users" -> List(
-			// XXX: only three arguments in Preferences:
 			HashMap( "user" -> "dmilith@drakor.eu", "params" -> "--numstat --no-merges --abbrev-commit" ),
 			HashMap( "user" -> "szymon@jez.net.pl", "params" -> "--full-diff --numstat --no-merges" ),
 			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "params" -> "--numstat --no-merges" ),
