@@ -42,6 +42,7 @@ object Deployer extends Actor {
 	private var basicOnly_? = prefs.getb("deployOnlyBasicFiles")
 	private val basic_jar_names = prefs.getl("deployFilesBasic")
 	private val dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
+	private val codebaseLocalDir = System.getProperty("user.home") + "/" + prefs.get("directoryForLocalDeploy")
 
 	def addShutdownHook =
 		Runtime.getRuntime.addShutdownHook( new Thread {
@@ -128,10 +129,21 @@ object Deployer extends Actor {
 		}
 	}
 
-	
+
+	def backupLocal = {
+		val backupDate = (new Date).toString.replaceAll(" ", "_").replaceAll("/","_") // TODO: optimize
+		val backupDir = new File(codebaseLocalDir + "../OLD_LOCAL_DEPLOY_" +  backupDate + "/")
+		val localDeployDir = new File (codebaseLocalDir)
+		backupDir.mkdir
+		localDeployDir.mkdir
+		logger.info("Copying files from " + localDeployDir + " to " + backupDir)
+		FileUtils.copyDirectory(localDeployDir, backupDir)
+	}
+
 	def deployLocal = {
 
-		val codebaseLocalDir: String = System.getProperty("user.home") + "/LOCAL_COVIOB2_DEPLOY/"
+		backupLocal
+		
 		filesToBeDeployed.toArray foreach {
 			localFile => {
 				val comparator = new JarEntryComparator
