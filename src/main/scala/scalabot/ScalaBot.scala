@@ -4,7 +4,7 @@
 package scalabot
 
 
-import cases.{ProcessMessages, MainLoop, Init, Quit}
+import signals.{ProcessMessages, MainLoop, Init, Quit}
 import java.io.OutputStreamWriter
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import scala.actors._

@@ -3,7 +3,7 @@
 
 package scalabot
 
-import cases.Quit
+import signals.Quit
 import org.apache.log4j.Logger
 import scala.actors._
 import scala.actors.Actor._

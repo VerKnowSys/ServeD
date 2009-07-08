@@ -6,7 +6,7 @@ package scalabot
 
 
 
-import cases.{Init, Quit, ProcessMessages, MainLoop}
+import signals.{Init, Quit, ProcessMessages, MainLoop}
 import command.exec.CommandExec
 import commiter.DbAddCommit
 import org.apache.log4j.Logger

@@ -5,7 +5,7 @@ package ssh.tools
 
 
 import actors.Actor
-import cases.{Init, Quit}
+import signals.{Init, Quit}
 
 import com.sshtools.j2ssh.authentication.{PasswordAuthenticationClient, AuthenticationProtocolState}
 import com.sshtools.j2ssh.SshClient

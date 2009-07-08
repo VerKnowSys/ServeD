@@ -4,7 +4,7 @@
 package scalabot
 
 
-import cases.{Init, Quit}
+import signals.{Init, Quit}
 import org.apache.log4j.Logger
 import prefs.Preferences
 import scala.actors._

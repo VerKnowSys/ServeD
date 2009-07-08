@@ -5,7 +5,7 @@ package deployer
 
 
 import actors._
-import cases.{Init, Quit}
+import signals.{Init, Quit}
 import command.exec.CommandExec
 import jar.comparator.JarEntryComparator
 import java.io._
