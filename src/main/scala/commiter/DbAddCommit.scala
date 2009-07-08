@@ -64,7 +64,7 @@ object DbAddCommit {
 			prefs = (new Preferences).loadPreferences
 			debug = prefs.getb("debug")
 			gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
-			databaseName = System.getProperty("user.dir") + "/" + prefs.get("xmppDatabaseFileName")
+			databaseName = System.getProperty("user.home") + "/" + ".codadris/" + prefs.get("xmppDatabaseFileName")
 			git = prefs.get("gitExecutable")
 
 			val command = Array(git, "--git-dir=" + gitRepositoryProjectDir, "rev-list", args(0) + "..." + args(1))
