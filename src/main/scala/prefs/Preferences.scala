@@ -10,16 +10,16 @@ import scala.xml.XML
 sealed class Preferences {
 
 	val absoluteProjectRootPath = System.getProperty("user.dir") + "/"
-	val configFileName = System.getProperty("user.home") + "/" + ".codadris/project.tools.xml"
+	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + "project.tools.xml"
 	var value = HashMap[String,Any] (
 		"debug" -> false,
-		"resource" -> "scalaBot-2",
-		"login" -> "varra",
-		"password" -> "varrajabber",
-		"server" -> "drakor.eu",
-		"port" -> 5222,
+		"xmppResourceString" -> "scalaBot-2",
+		"xmppLogin" -> "varra",
+		"xmppPassword" -> "varrajabber",
+		"xmppServer" -> "drakor.eu",
+		"xmppPort" -> 5222,
 		"gitExecutable" -> "git",
-		"repositoryDir" -> "/git/scala.project.tools.git/.git",
+		"gitRepositoryProjectDir" -> "/git/scala.project.tools.git/.git",
 		"jarSignerPassword" -> "gru5zka.",
 		"jarSignerExecutable" -> "jarsigner",
 		"jarSignerKeyName" -> "VerKnowSys",
@@ -81,11 +81,6 @@ sealed class Preferences {
 			"-ea",
 			"-XX:+UseParallelGC"
 		),
-		"statusDescription" -> "I should work fine.",
-		"databaseName" -> "ScalaBotCommitDataBase.neodatis",
-		"ODBPort" -> 50604,
-		"ODBName" -> "scalaBotCommitDatabase",
-		"ODBListenAddress" -> "127.0.0.1",
 		"remoteWebStartDeployDir" -> "/home/verknowsys/public_html/javaws/coviob2/dist/",
 		"deployOnlyBasicFiles" -> true,
 		"remoteProjectToolsDir" -> "/home/verknowsys/JAVA/project.tools/",
@@ -98,18 +93,32 @@ sealed class Preferences {
 		"jnlpHomePage" -> "http://coviob.verknowsys.info/",
 		"jnlpIcon" -> "LogoIcon_Coviob2.svg.png",
 		"jnlpDescription" -> "COmunicate VIa OBjects",
-		"directoryForLocalDeploy" -> ".codadris/LOCAL_COVIOB2_DEPLOY_DIR/"
+		"directoryForLocalDeploy" -> ".codadris/LOCAL_COVIOB2_DEPLOY_DIR/",
+		"xmppStatusDescription" -> "I should work fine.",
+		"xmppDatabaseFileName" -> "ScalaXMPPBotDataBase.neodatis",
+		"xmppDatabaseODBPort" -> 50604,
+		"xmppDatabaseName" -> "xmppBotCommitDatabase",
+		"xmppDatabaseListenAddress" -> "127.0.0.1",
+		"ircDatabaseODBPort" -> 50604, // same port means same database file used
+		"ircDatabaseName" -> "ircBotDataBase",
+		"ircDatabaseFileName" -> "ScalaIRCBotDataBase.neodatis",
+		"ircDatabaseListenAddress" -> "127.0.0.1",
+		"ircServer" -> "irc.freenode.net",
+		"ircName" -> "linkB",
+		"ircDebugInfo" -> true,
+		"ircAutoNickChange" -> true,
+		"ircVersionString" -> "None v1.0",
+		"ircEncoding" -> "UTF-8",
+		"ircAutoJoinChannels" -> List(
+			"#scala.pl",
+			"#scala",
+			"#ruby.pl"
+		)
 	)
 	
 	def toXML = 
 		<preferences> 
 			<debug>{value("debug")}</debug> 
-			<resource>{value("resource")}</resource> 
-			<login>{value("login")}</login> 
-			<password>{value("password")}</password> 
-			<server>{value("server")}</server> 
-			<port>{value("port")}</port> 
-			<databaseName>{value("databaseName")}</databaseName>
 			<gitExecutable>{value("gitExecutable")}</gitExecutable>
 			<jarSignerPassword>{value("jarSignerPassword")}</jarSignerPassword>
 			<jarSignerExecutable>{value("jarSignerExecutable")}</jarSignerExecutable>
@@ -118,11 +127,17 @@ sealed class Preferences {
 			<sshUserName>{value("sshUserName")}</sshUserName>
 			<sshHost>{value("sshHost")}</sshHost>
 			<sshPort>{value("sshPort")}</sshPort>
-			<repositoryDir>{value("repositoryDir")}</repositoryDir>
-			<statusDescription>{value("statusDescription")}</statusDescription>
-			<ODBPort>{value("ODBPort")}</ODBPort>
-			<ODBName>{value("ODBName")}</ODBName>
-			<ODBListenAddress>{value("ODBListenAddress")}</ODBListenAddress>
+			<gitRepositoryProjectDir>{value("gitRepositoryProjectDir")}</gitRepositoryProjectDir>
+			<xmppResourceString>{value("xmppResourceString")}</xmppResourceString>
+			<xmppLogin>{value("xmppLogin")}</xmppLogin>
+			<xmppPassword>{value("xmppPassword")}</xmppPassword>
+			<xmppServer>{value("xmppServer")}</xmppServer>
+			<xmppPort>{value("xmppPort")}</xmppPort>
+			<xmppDatabaseFileName>{value("xmppDatabaseFileName")}</xmppDatabaseFileName>
+			<xmppStatusDescription>{value("xmppStatusDescription")}</xmppStatusDescription>
+			<xmppDatabaseODBPort>{value("xmppDatabaseODBPort")}</xmppDatabaseODBPort>
+			<xmppDatabaseName>{value("xmppDatabaseName")}</xmppDatabaseName>
+			<xmppDatabaseListenAddress>{value("xmppDatabaseListenAddress")}</xmppDatabaseListenAddress>
 			<users>
 			{
 				val list = value("users").asInstanceOf[List[HashMap[String,String]]]
@@ -177,17 +192,31 @@ sealed class Preferences {
 			<jnlpIcon>{value("jnlpIcon")}</jnlpIcon>
 			<jnlpDescription>{value("jnlpDescription")}</jnlpDescription>
 			<directoryForLocalDeploy>{value("directoryForLocalDeploy")}</directoryForLocalDeploy>
+			<ircDatabaseODBPort>{value("ircDatabaseODBPort")}</ircDatabaseODBPort>
+			<ircDatabaseName>{value("ircDatabaseName")}</ircDatabaseName>
+			<ircDatabaseFileName>{value("ircDatabaseFileName")}</ircDatabaseFileName>
+			<ircDatabaseListenAddress>{value("ircDatabaseListenAddress")}</ircDatabaseListenAddress>
+			<ircServer>{value("ircServer")}</ircServer>
+			<ircName>{value("ircName")}</ircName>
+			<ircDebugInfo>{value("ircDebugInfo")}</ircDebugInfo>
+			<ircAutoNickChange>{value("ircAutoNickChange")}</ircAutoNickChange>
+			<ircVersionString>{value("ircVersionString")}</ircVersionString>
+			<ircEncoding>{value("ircEncoding")}</ircEncoding>
+		    <ircAutoJoinChannels>
+			{
+				val list = value("ircAutoJoinChannels").asInstanceOf[List[String]]
+				for( i <- list)
+				yield
+				<channel>
+				{i}
+				</channel>
+			}
+			</ircAutoJoinChannels>
 		</preferences>
 	
 	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
-		var hashMap = HashMap[String,Any]()
+		val hashMap = HashMap[String,Any]()
 			hashMap.update( "debug", (node \ "debug").text.toBoolean)
-			hashMap.update( "resource", (node \ "resource").text.trim)
-			hashMap.update( "login", (node \ "login").text.trim)
-			hashMap.update( "password", (node \ "password").text.trim)
-			hashMap.update( "server", (node \ "server").text.trim)
-			hashMap.update( "port", (node \ "port").text.toInt)
-			hashMap.update( "databaseName", (node \ "databaseName").text.trim)
 			hashMap.update( "gitExecutable", (node \ "gitExecutable").text.trim)
 			hashMap.update( "jarSignerPassword", (node \ "jarSignerPassword").text.trim)
 			hashMap.update( "jarSignerExecutable", (node \ "jarSignerExecutable").text.trim)
@@ -196,21 +225,27 @@ sealed class Preferences {
 			hashMap.update( "sshUserName", (node \ "sshUserName").text.trim)
 			hashMap.update( "sshHost", (node \ "sshHost").text.trim)
 			hashMap.update( "sshPort", (node \ "sshPort").text.toInt)
-			hashMap.update( "repositoryDir", (node \ "repositoryDir").text.trim)
-			hashMap.update( "statusDescription", (node \ "statusDescription").text.trim)
-			hashMap.update( "ODBPort", (node \ "ODBPort").text.toInt)
-			hashMap.update( "ODBName", (node \ "ODBName").text.trim)
-			hashMap.update( "ODBListenAddress", (node \ "ODBListenAddress").text.trim)
+			hashMap.update( "gitRepositoryProjectDir", (node \ "gitRepositoryProjectDir").text.trim)
+			hashMap.update( "xmppResourceString", (node \ "xmppResourceString").text.trim)
+			hashMap.update( "xmppLogin", (node \ "xmppLogin").text.trim)
+			hashMap.update( "xmppPassword", (node \ "xmppPassword").text.trim)
+			hashMap.update( "xmppServer", (node \ "xmppServer").text.trim)
+			hashMap.update( "xmppPort", (node \ "xmppPort").text.toInt)
+			hashMap.update( "xmppDatabaseFileName", (node \ "xmppDatabaseFileName").text.trim)
+			hashMap.update( "xmppStatusDescription", (node \ "xmppStatusDescription").text.trim)
+			hashMap.update( "xmppDatabaseODBPort", (node \ "xmppDatabaseODBPort").text.toInt)
+			hashMap.update( "xmppDatabaseName", (node \ "xmppDatabaseName").text.trim)
+			hashMap.update( "xmppDatabaseListenAddress", (node \ "xmppDatabaseListenAddress").text.trim)
 
-			var list = List[HashMap[String,String]]()
+			var hashMapList = List[HashMap[String,String]]()
 			(node \\ "user").foreach { user =>
 				user.foreach { nod =>
 					val name = (nod \ "name").text.trim
 					val params = (nod \ "params").text.trim
-					list = list ::: List( HashMap( "user" -> name, "params" -> params ) ).asInstanceOf[List[HashMap[String,String]]]
+					hashMapList = hashMapList ::: List( HashMap( "user" -> name, "params" -> params ) ).asInstanceOf[List[HashMap[String,String]]]
 				}
 			}
-			hashMap.update( "users", list )
+			hashMap.update( "users", hashMapList )
 
 			var list2 = List[String]()
 			(node \\ "file").foreach { file =>
@@ -243,6 +278,21 @@ sealed class Preferences {
 			hashMap.update( "jnlpIcon", (node \ "jnlpIcon").text.trim)
 			hashMap.update( "jnlpDescription", (node \ "jnlpDescription").text.trim)
 			hashMap.update( "directoryForLocalDeploy", (node \ "directoryForLocalDeploy").text.trim)
+			hashMap.update( "ircDatabaseODBPort", (node \ "ircDatabaseODBPort").text.toInt)
+			hashMap.update( "ircDatabaseName", (node \ "ircDatabaseName").text.trim)
+			hashMap.update( "ircDatabaseFileName", (node \ "ircDatabaseFileName").text.trim)
+			hashMap.update( "ircDatabaseListenAddress", (node \ "ircDatabaseListenAddress").text.trim)
+			hashMap.update( "ircServer", (node \ "ircServer").text.trim)
+			hashMap.update( "ircName", (node \ "ircName").text.trim)
+			hashMap.update( "ircDebugInfo", (node \ "ircDebugInfo").text.toBoolean)
+			hashMap.update( "ircAutoNickChange", (node \ "ircAutoNickChange").text.toBoolean)
+			hashMap.update( "ircVersionString", (node \ "ircVersionString").text.trim)
+			hashMap.update( "ircEncoding", (node \ "ircEncoding").text.trim)
+		    list2 = List[String]()
+			(node \\ "channel").foreach { file =>
+				list2 = list2 ::: List( file.text.trim ).asInstanceOf[List[String]]
+			}
+			hashMap.update( "ircAutoJoinChannels", list2 )
 			hashMap.asInstanceOf[HashMap[String,Any]]
 	}	
 	
