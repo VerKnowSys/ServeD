@@ -4,7 +4,9 @@
 main="deployer.Deployer"
 
 echo "Running $main"
-scala -classpath \
+java -classpath \
+$HOME/.m2/repository/org/scala-lang/scala-compiler/2.7.5/scala-compiler-2.7.5.jar:\
+$HOME/.m2/repository/org/scala-lang/scala-library/2.7.5/scala-library-2.7.5.jar:\
 $HOME/.m2/repository/junit/junit/4.5/junit-4.5.jar:\
 $HOME/.m2/repository/sshtools/j2ssh-common/0.2.2/j2ssh-common-0.2.2.jar:\
 $HOME/.m2/repository/sshtools/j2ssh-core/0.2.2/j2ssh-core-0.2.2.jar:\
