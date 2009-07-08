@@ -18,14 +18,14 @@ object DbAddCommit {
 	private val logger = Logger.getLogger(DbAddCommit.getClass)
 	private var prefs: Preferences = null
 	private var debug = true
-	private var repositoryDir: String = null
+	private var gitRepositoryProjectDir: String = null
 	private var databaseName = ""
 	private var git = ""
 	
 	def writeCommitToDataBase(arg: Commit) = {
 		var odb: ODB = null
 		try {
-			odb = ODBFactory.openClient(prefs.get("ODBListenAddress"), prefs.geti("ODBPort"), prefs.get("ODBName"))
+			odb = ODBFactory.openClient(prefs.get("xmppDatabaseListenAddress"), prefs.geti("xmppDatabaseODBPort"), prefs.get("xmppDatabaseName"))
 			odb.store( arg )
 			odb.commit
 		} catch {
@@ -63,11 +63,11 @@ object DbAddCommit {
 		try{
 			prefs = (new Preferences).loadPreferences
 			debug = prefs.getb("debug")
-			repositoryDir = prefs.get("repositoryDir")
-			databaseName = System.getProperty("user.dir") + "/" + prefs.get("databaseName")
+			gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
+			databaseName = System.getProperty("user.dir") + "/" + prefs.get("xmppDatabaseFileName")
 			git = prefs.get("gitExecutable")
 
-			val command = Array(git, "--git-dir=" + repositoryDir, "rev-list", args(0) + "..." + args(1))
+			val command = Array(git, "--git-dir=" + gitRepositoryProjectDir, "rev-list", args(0) + "..." + args(1))
 			logger.debug("*** performing "+command.map{ a => a })
 			var listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
 			listOfSha1.foreach { oneOf =>
