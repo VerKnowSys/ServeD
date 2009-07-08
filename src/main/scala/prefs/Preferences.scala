@@ -10,7 +10,7 @@ import scala.xml.XML
 sealed class Preferences {
 
 	val absoluteProjectRootPath = System.getProperty("user.dir") + "/"
-	val configFileName = "project.tools.xml"
+	val configFileName = System.getProperty("user.home") + "/" + ".codadris/project.tools.xml"
 	var value = HashMap[String,Any] (
 		"debug" -> false,
 		"resource" -> "scalaBot-2",
@@ -18,10 +18,10 @@ sealed class Preferences {
 		"password" -> "varrajabber",
 		"server" -> "drakor.eu",
 		"port" -> 5222,
-		"gitExecutable" -> "/opt/local/bin/git",
+		"gitExecutable" -> "git",
 		"repositoryDir" -> "/git/scala.project.tools.git/.git",
 		"jarSignerPassword" -> "gru5zka.",
-		"jarSignerExecutable" -> "/usr/bin/jarsigner",
+		"jarSignerExecutable" -> "jarsigner",
 		"jarSignerKeyName" -> "VerKnowSys",
 		"sshUserName" -> "verknowsys",
 		"sshPassword" -> "gru5zka.",
@@ -269,12 +269,11 @@ sealed class Preferences {
 	def loadPreferences: Preferences = {
 		val sett = new Preferences
 		try {
-			val loadnode = XML.loadFile(absoluteProjectRootPath + configFileName)
+			val loadnode = XML.loadFile(configFileName)
 			sett.value = fromXML(loadnode)
 		} catch {
 			case x: Throwable => {
 				println("*** Config file " +
-					absoluteProjectRootPath +
 					configFileName + " doesn't exists! Creating new one")
 				sett.savePreferences
 			}
@@ -282,7 +281,7 @@ sealed class Preferences {
 		sett
 	}
 
-	def savePreferences = XML.saveFull( absoluteProjectRootPath + configFileName, toXML, "UTF-8", true, null)
+	def savePreferences = XML.saveFull(configFileName, toXML, "UTF-8", true, null)
 	
 	def savePreferences(fileName: String) = XML.saveFull(fileName, toXML, "UTF-8", true, null)
 	
