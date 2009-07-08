@@ -1,7 +1,7 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package cases
+package signals
 
 /**
  * User: dmilith
@@ -9,4 +9,4 @@ package cases
  * Time: 11:53:57 PM
  */
 
-case object Init 
+case object Quit 
