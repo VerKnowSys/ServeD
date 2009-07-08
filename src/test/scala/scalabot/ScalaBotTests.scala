@@ -51,10 +51,10 @@ class CommitTest extends TestCase("commit") {
 
 
 class ConfigTest extends TestCase("config") {
-	var settings = new Preferences
+	var settings: Preferences = _
 
 	override def setUp {
-//		settings.value("configFile") = "testing.config"
+		settings = new Preferences
 	}
 
 	def testXML2 = {
