@@ -58,9 +58,9 @@ class ConfigTest extends TestCase("config") {
 	}
 
 	def testXML2 = {
-		settings.value("port") = 666
+		settings.value("xmppPort") = 666
 		assertTrue( settings.loadPreferences != null )
-		println( settings.geti("port") )
+		println( settings.geti("xmppPort") )
 	}
 
 	def testConfigReadWrite = {
@@ -82,8 +82,8 @@ class ConfigTest extends TestCase("config") {
 
 	def testConfigSettings = {
 //		assertTrue(settings.get("configFile").equals("testing.config"))
-		settings.value("repositoryDir") = "/something"
-		assertTrue(settings.get("repositoryDir").equals("/something"))
+		settings.value("gitRepositoryProjectDir") = "/something"
+		assertTrue(settings.get("gitRepositoryProjectDir").equals("/something"))
 	}
 	
 }

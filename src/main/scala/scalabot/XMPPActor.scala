@@ -29,13 +29,13 @@ object XMPPActor extends Actor with MessageListener {
 	private val prefs: Preferences = (new Preferences).loadPreferences
 	private val logger = Logger.getLogger(XMPPActor.getClass)
 	private val debug = prefs.getb("debug")
-	private val config = new ConnectionConfiguration(prefs.get("server"), prefs.geti("port"))
+	private val config = new ConnectionConfiguration(prefs.get("xmppServer"), prefs.geti("xmppPort"))
 	private val connection = new XMPPConnection(config)
 	private val presence = new Presence(Presence.Type.available)
-	private val login = prefs.get("login")
-	private val password = prefs.get("password")
-	private val resource = prefs.get("resource")
-	private val repositoryDir = prefs.get("repositoryDir")
+	private val login = prefs.get("xmppLogin")
+	private val password = prefs.get("xmppPassword")
+	private val resource = prefs.get("xmppResourceString")
+	private val gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
 
 	private var filter: AndFilter = null
 	private var chatmanager: ChatManager = null
@@ -70,7 +70,7 @@ object XMPPActor extends Actor with MessageListener {
 			}
 		}
 		logger.debug("*** num of users: " + chat.length)
-		presence.setStatus(prefs.get("statusDescription"))
+		presence.setStatus(prefs.get("xmppStatusDescription"))
 		presence.setMode(Presence.Mode.dnd)
 		connection.sendPacket(presence)
 		logger.debug("*** Connected as: " + login + "\nReady to enter main loop")
@@ -109,7 +109,7 @@ object XMPPActor extends Actor with MessageListener {
 		var odb: ODB = null
 		var list: List[String] = List()
 		try {
-		    odb = ODBFactory.openClient(prefs.get("ODBListenAddress"), prefs.geti("ODBPort"), prefs.get("ODBName"))
+		    odb = ODBFactory.openClient(prefs.get("xmppDatabaseListenAddress"), prefs.geti("xmppDatabaseODBPort"), prefs.get("xmppDatabaseName"))
 		    var query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))
 			query.orderByDesc("date") 
 			val commit = odb.getObjects(query)
@@ -149,7 +149,7 @@ object XMPPActor extends Actor with MessageListener {
 						}
 						val git = prefs.get("gitExecutable")
 						// NOTE: ListBuffer provides append method, and it should be used for large Lists
-						val showCommand = List(git, "--git-dir=" + repositoryDir, "show") ++ currentUserPreferences.split(' ') ++ List(commitSha)
+						val showCommand = List(git, "--git-dir=" + gitRepositoryProjectDir, "show") ++ currentUserPreferences.split(' ') ++ List(commitSha)
 						val output = CommandExec.cmdExec(showCommand.toArray)
 						if (debug)
 							logger.info("*** sent message length: " + output.length)
