@@ -43,13 +43,10 @@ object Deployer extends Actor {
 	private val codebaseLocalDir = System.getProperty("user.home") + "/" + prefs.get("directoryForLocalDeploy")
 	private var trunk = false
 
-	def addShutdownHook =
+
+	def addShutdownHook(block: => Unit) =
 		Runtime.getRuntime.addShutdownHook( new Thread {
-			override def run = {
-				SSHActor ! Quit
-				Deployer ! Quit
-				logger.warn("Done")
-			}
+			override def run = block
 		})
 
 
@@ -126,7 +123,7 @@ object Deployer extends Actor {
 					exit
 				}
 				case _ => {
-					logger.warn("Unsupported action received")
+					logger.error("Unsupported action received!")
 				}
 			}
 		}
@@ -135,7 +132,7 @@ object Deployer extends Actor {
 
 	def backupLocal = {
 		val backupDate = (new Date).toString.replaceAll(" |:", "_")
-		val backupDir = new File(codebaseLocalDir + "../OLD_LOCAL_DEPLOY_" +  backupDate + "/")
+		val backupDir = new File(codebaseLocalDir + "../OLD_DEPLOYS/OLD_LOCAL_DEPLOY_" +  backupDate + "/")
 		val localDeployDir = new File (codebaseLocalDir)
 		backupDir.mkdir
 		localDeployDir.mkdir
@@ -183,8 +180,12 @@ object Deployer extends Actor {
 
 	
 	def main(args: Array[String]) {
-		addShutdownHook
 		initLogger
+		addShutdownHook {
+			SSHActor ! Quit
+			Deployer ! Quit
+			logger.warn("Done deploying")
+		}
 		logger.warn("User home dir: " + System.getProperty("user.home"))
 		logger.warn("Working dir: " + System.getProperty("user.dir"))
 		logger.warn("Maven 2 Repository dir: " + pathToMaven2Repo)
