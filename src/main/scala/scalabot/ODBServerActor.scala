@@ -10,8 +10,6 @@ import prefs.Preferences
 import scala.actors._
 
 import org.neodatis.odb._
-//import org.neodatis.odb.impl.core.query.criteria._
-//import org.neodatis.odb.core.query.criteria._
 
 
 object ODBServerActor extends Actor {
@@ -19,14 +17,15 @@ object ODBServerActor extends Actor {
 	private val prefs = (new Preferences).loadPreferences
 	private val logger = Logger.getLogger(ODBServerActor.getClass)
 	private val debug = prefs.getb("debug")
-	private val absolutePathToBotODB = System.getProperty("user.dir") + "/"
+	private val absolutePathToBotODBDir = System.getProperty("user.home") + "/" + ".codadris/"
 	private var server: ODBServer = null
 
 	def initServer = {
 		try {
 			Configuration.setDatabaseCharacterEncoding( "UTF8" )
-			server = ODBFactory.openServer(prefs.geti("ODBPort"))
-			server.addBase(prefs.get("ODBName"), absolutePathToBotODB + prefs.get("databaseName"))
+			server = ODBFactory.openServer(prefs.geti("xmppDatabaseODBPort"))
+			server.addBase(prefs.get("xmppDatabaseName"), absolutePathToBotODBDir + prefs.get("xmppDatabaseFileName"))
+			server.addBase(prefs.get("ircDatabaseName"), absolutePathToBotODBDir + prefs.get("ircDatabaseFileName"))
 			server.startServer(false) //start server in current thread
 		} catch {
 			case x: Throwable => {
