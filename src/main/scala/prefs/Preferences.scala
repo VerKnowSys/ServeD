@@ -9,7 +9,6 @@ import scala.xml.XML
 
 sealed class Preferences {
 
-	val absoluteProjectRootPath = System.getProperty("user.dir") + "/"
 	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + "project.tools.xml"
 	var value = HashMap[String,Any] (
 		"debug" -> false,
@@ -28,7 +27,7 @@ sealed class Preferences {
 		"sshHost" -> "verknowsys.info",
 		"sshPort" -> 22,
 		"users" -> List(
-			HashMap( "user" -> "dmilith@drakor.eu", "params" -> "--numstat --no-merges --abbrev-commit" ),
+			HashMap( "user" -> "dmilith@jabber.verknowsys.info", "params" -> "--numstat --no-merges --abbrev-commit" ),
 			HashMap( "user" -> "szymon@jez.net.pl", "params" -> "--full-diff --numstat --no-merges" ),
 			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "params" -> "--numstat --no-merges" ),
 			HashMap( "user" -> "vara@jabber.verknowsys.info", "params" -> "--numstat --no-merges" )
@@ -105,7 +104,7 @@ sealed class Preferences {
 		"ircDatabaseListenAddress" -> "127.0.0.1",
 		"ircServer" -> "irc.freenode.net",
 		"ircName" -> "linkB",
-		"ircDebugInfo" -> true,
+		"ircDebugInfo" -> false,
 		"ircAutoNickChange" -> true,
 		"ircVersionString" -> "None v1.0",
 		"ircEncoding" -> "UTF-8",
