@@ -6,9 +6,9 @@ package scalabot
 
 
 
+import commiter.{Commit, DbAddCommit}
 import signals.{Init, Quit, ProcessMessages, MainLoop}
 import command.exec.CommandExec
-import commiter.DbAddCommit
 import org.apache.log4j.Logger
 import prefs.Preferences
 import scala.actors._

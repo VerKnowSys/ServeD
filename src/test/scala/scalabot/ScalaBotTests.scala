@@ -3,6 +3,7 @@
 
 package scalabot
 
+import commiter.Commit
 import org.junit.Ignore
 import prefs.Preferences
 import scalabot._
