@@ -3,7 +3,10 @@
 
 package deployer
 
-import java.awt.{Dimension, Rectangle}
+import java.awt.Dimension
+import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
+
+import prefs.Preferences
 import swing.{MainFrame, Frame, SimpleGUIApplication}
 
 /**
@@ -15,9 +18,18 @@ import swing.{MainFrame, Frame, SimpleGUIApplication}
 
 object DeployerGUI extends SimpleGUIApplication {
 
+	private val logger = Logger.getLogger(DeployerGUI.getClass)
+	private val prefs = (new Preferences).loadPreferences
+
 	def top = new MainFrame {
+		Deployer.initLogger
+		Deployer.addShutdownHook {
+			logger.warn("Done")
+		}
 		title = "Deployer GUI"
-		size = new Dimension(400,600)
+		size = new Dimension(600,750)
 	}
+
+
 
 }
