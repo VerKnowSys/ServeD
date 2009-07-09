@@ -4,14 +4,10 @@
 package commiter
 
 import command.exec.CommandExec
-import prefs.Preferences
-import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import java.io.OutputStreamWriter
-
-
+import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import org.neodatis.odb.{ODBFactory, ODB}
 import prefs.Preferences
-import scalabot._
 
 
 object DbAddCommit {
@@ -19,9 +15,9 @@ object DbAddCommit {
 	private val logger = Logger.getLogger(DbAddCommit.getClass)
 	private val prefs = (new Preferences).loadPreferences
 	private val debug = prefs.getb("debug")
-	private var gitRepositoryProjectDir = ""
-	private var databaseName = ""
-	private var git = ""
+	private var gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
+	private var databaseName = System.getProperty("user.home") + "/" + ".codadris/" + prefs.get("xmppDatabaseFileName")
+	private val git = prefs.get("gitExecutable")
 	
 	def writeCommitToDataBase(arg: Commit) = {
 		var odb: ODB = null
@@ -61,21 +57,16 @@ object DbAddCommit {
 	 */
 	def main(args: Array[String]) {
 		initLogger
-		try{
-			gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
-			databaseName = System.getProperty("user.home") + "/" + ".codadris/" + prefs.get("xmppDatabaseFileName")
-			git = prefs.get("gitExecutable")
-
+		try {
 			val command = Array(git, "--git-dir=" + gitRepositoryProjectDir, "rev-list", args(0) + "..." + args(1))
-			logger.debug("*** performing "+command.map{ a => a })
-			var listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
+			logger.debug("*** performing " + command.map{ a => a })
+			val listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
 			listOfSha1.foreach { oneOf =>
 				val commit = new Commit(oneOf)
 				writeCommitToDataBase( commit )	// sha1, show?
-				logger.debug("*** writeCommitToDatabase: " + commit )
-				logger.info("commit added")
+				logger.debug("*** writeCommitToDatabase: " + oneOf )
 			}
-			logger.info("done")
+			logger.info("Commited. Done")
 			exit(0)
 		} catch {
 			case x: Throwable => {
