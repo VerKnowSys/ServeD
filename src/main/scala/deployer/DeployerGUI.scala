@@ -3,12 +3,11 @@
 
 package deployer
 
-import java.awt.Dimension
+import java.awt.Point
 import java.io.{OutputStreamWriter, File}
 import java.util.regex.Pattern
 import java.util.{NoSuchElementException, ArrayList}
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
-
 import prefs.Preferences
 import swing.{MainFrame, Frame, SimpleGUIApplication}
 
@@ -21,21 +20,25 @@ import swing.{MainFrame, Frame, SimpleGUIApplication}
 
 object DeployerGUI extends SimpleGUIApplication {
 
-	private val logger = Logger.getLogger(DeployerGUI.getClass)
-	private val prefs = new Preferences
-	private val searchIn = Array(
-				new File("/opt/local/bin/"), // XXX hardcoded paths
-				new File("/bin/"),
-				new File("/usr/bin/"),
-				new File("/usr/local/bin/")
+	val logger = Logger.getLogger(DeployerGUI.getClass)
+	val prefs = new Preferences
+//	val PATH = System.getProperty("PATH")
+//	val command = CommandExec.cmdExec(Array("env")).trim
+//	val searchIn = PATH.split(
+//		System.getProperty("path.separator")
+//	).toArray.foreach { element => new File(element) }
+	val searchIn = Array(
+		new File("/opt/local/bin/"), // XXX hardcoded paths
+		new File("/bin/"),
+		new File("/usr/bin/"),
+		new File("/usr/local/bin/")
 	)
-	private val requirements = Array(
-			("git", "gitExecutable"),
-			("jarsigner", "jarSignerExecutable")
+	val requirements = Array(
+		("git", "gitExecutable"),
+		("jarsigner", "jarSignerExecutable")
 	)
 
 	def autoDetectRequirements = {
-		logger.info("Detecting requirements")
 		for (i <- 0 until requirements.size)
 			if (!(new File(prefs.get(requirements(i)._2)).exists)) {
 				val al = new ArrayList[File]()
@@ -75,7 +78,8 @@ object DeployerGUI extends SimpleGUIApplication {
 			logger.warn("Done")
 		}
 		title = "Deployer GUI"
-		size = new Dimension(600,750)
+		size = (600,750)
+		location = new Point(300, 50)
 		prepare
 	}
 
