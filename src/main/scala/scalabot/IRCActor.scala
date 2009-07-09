@@ -42,7 +42,7 @@ object IRCActor extends PircBot with Actor {
 		var odb: ODB = null
 		var list: List[LinkInfo] = List()
 		try {
-		    odb = ODBFactory.openClient(prefs.get("ircDatabaseListenAddress"), prefs.geti("ircDatabaseODBPort"), prefs.get("ircDatabaseName"))
+		    odb = ODBFactory.openClient(prefs.get("ircDatabaseListenAddress"), prefs.geti("databaseODBPort"), prefs.get("ircDatabaseName"))
 		    val query = new CriteriaQuery(classOf[LinkInfo]) //, Where.equal("date.getDay", (new Date).getDay))
 			val link = odb.getObjects(query.orderByDesc("date"))
 				while (link.hasNext && (list.size <= howMany)) {
@@ -65,7 +65,7 @@ object IRCActor extends PircBot with Actor {
 	def putLinkToDatabase(arg: LinkInfo) {
 		var odb: ODB = null
 		try {
-			odb = ODBFactory.openClient(prefs.get("ircDatabaseListenAddress"), prefs.geti("ircDatabaseODBPort"), prefs.get("ircDatabaseName"))
+			odb = ODBFactory.openClient(prefs.get("ircDatabaseListenAddress"), prefs.geti("databaseODBPort"), prefs.get("ircDatabaseName"))
 			odb.store( arg )
 			odb.commit
 		} catch {
