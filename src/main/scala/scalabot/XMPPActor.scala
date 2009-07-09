@@ -4,8 +4,6 @@
 package scalabot
 
 
-
-
 import commiter.{Commit, DbAddCommit}
 import signals.{Init, Quit, ProcessMessages, MainLoop}
 import command.exec.CommandExec
@@ -109,7 +107,7 @@ object XMPPActor extends Actor with MessageListener {
 		var odb: ODB = null
 		var list: List[String] = List()
 		try {
-		    odb = ODBFactory.openClient(prefs.get("xmppDatabaseListenAddress"), prefs.geti("xmppDatabaseODBPort"), prefs.get("xmppDatabaseName"))
+		    odb = ODBFactory.openClient(prefs.get("xmppDatabaseListenAddress"), prefs.geti("databaseODBPort"), prefs.get("xmppDatabaseName"))
 		    var query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))
 			query.orderByDesc("date") 
 			val commit = odb.getObjects(query)

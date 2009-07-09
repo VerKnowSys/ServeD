@@ -23,7 +23,7 @@ object ODBServerActor extends Actor {
 	def initServer = {
 		try {
 			Configuration.setDatabaseCharacterEncoding( "UTF8" )
-			server = ODBFactory.openServer(prefs.geti("xmppDatabaseODBPort"))
+			server = ODBFactory.openServer(prefs.geti("databaseODBPort"))
 			server.addBase(prefs.get("xmppDatabaseName"), absolutePathToBotODBDir + prefs.get("xmppDatabaseFileName"))
 			server.addBase(prefs.get("ircDatabaseName"), absolutePathToBotODBDir + prefs.get("ircDatabaseFileName"))
 			server.startServer(false) //start server in current thread

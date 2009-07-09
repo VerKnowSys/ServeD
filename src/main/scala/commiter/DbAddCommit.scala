@@ -25,7 +25,7 @@ object DbAddCommit {
 	def writeCommitToDataBase(arg: Commit) = {
 		var odb: ODB = null
 		try {
-			odb = ODBFactory.openClient(prefs.get("xmppDatabaseListenAddress"), prefs.geti("xmppDatabaseODBPort"), prefs.get("xmppDatabaseName"))
+			odb = ODBFactory.openClient(prefs.get("xmppDatabaseListenAddress"), prefs.geti("databaseODBPort"), prefs.get("xmppDatabaseName"))
 			odb.store( arg )
 			odb.commit
 		} catch {

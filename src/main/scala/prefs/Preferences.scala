@@ -95,10 +95,9 @@ sealed class Preferences {
 		"directoryForLocalDeploy" -> ".codadris/LOCAL_COVIOB2_DEPLOY_DIR/",
 		"xmppStatusDescription" -> "I should work fine.",
 		"xmppDatabaseFileName" -> "ScalaXMPPBotDataBase.neodatis",
-		"xmppDatabaseODBPort" -> 50604,
+		"databaseODBPort" -> 50609,
 		"xmppDatabaseName" -> "xmppBotCommitDatabase",
 		"xmppDatabaseListenAddress" -> "127.0.0.1",
-		"ircDatabaseODBPort" -> 50604, // same port means same database file used
 		"ircDatabaseName" -> "ircBotDataBase",
 		"ircDatabaseFileName" -> "ScalaIRCBotDataBase.neodatis",
 		"ircDatabaseListenAddress" -> "127.0.0.1",
@@ -134,7 +133,7 @@ sealed class Preferences {
 			<xmppPort>{value("xmppPort")}</xmppPort>
 			<xmppDatabaseFileName>{value("xmppDatabaseFileName")}</xmppDatabaseFileName>
 			<xmppStatusDescription>{value("xmppStatusDescription")}</xmppStatusDescription>
-			<xmppDatabaseODBPort>{value("xmppDatabaseODBPort")}</xmppDatabaseODBPort>
+			<databaseODBPort>{value("databaseODBPort")}</databaseODBPort>
 			<xmppDatabaseName>{value("xmppDatabaseName")}</xmppDatabaseName>
 			<xmppDatabaseListenAddress>{value("xmppDatabaseListenAddress")}</xmppDatabaseListenAddress>
 			<users>
@@ -191,7 +190,6 @@ sealed class Preferences {
 			<jnlpIcon>{value("jnlpIcon")}</jnlpIcon>
 			<jnlpDescription>{value("jnlpDescription")}</jnlpDescription>
 			<directoryForLocalDeploy>{value("directoryForLocalDeploy")}</directoryForLocalDeploy>
-			<ircDatabaseODBPort>{value("ircDatabaseODBPort")}</ircDatabaseODBPort>
 			<ircDatabaseName>{value("ircDatabaseName")}</ircDatabaseName>
 			<ircDatabaseFileName>{value("ircDatabaseFileName")}</ircDatabaseFileName>
 			<ircDatabaseListenAddress>{value("ircDatabaseListenAddress")}</ircDatabaseListenAddress>
@@ -232,7 +230,7 @@ sealed class Preferences {
 			hashMap.update( "xmppPort", (node \ "xmppPort").text.toInt)
 			hashMap.update( "xmppDatabaseFileName", (node \ "xmppDatabaseFileName").text.trim)
 			hashMap.update( "xmppStatusDescription", (node \ "xmppStatusDescription").text.trim)
-			hashMap.update( "xmppDatabaseODBPort", (node \ "xmppDatabaseODBPort").text.toInt)
+			hashMap.update( "databaseODBPort", (node \ "databaseODBPort").text.toInt)
 			hashMap.update( "xmppDatabaseName", (node \ "xmppDatabaseName").text.trim)
 			hashMap.update( "xmppDatabaseListenAddress", (node \ "xmppDatabaseListenAddress").text.trim)
 
@@ -277,7 +275,6 @@ sealed class Preferences {
 			hashMap.update( "jnlpIcon", (node \ "jnlpIcon").text.trim)
 			hashMap.update( "jnlpDescription", (node \ "jnlpDescription").text.trim)
 			hashMap.update( "directoryForLocalDeploy", (node \ "directoryForLocalDeploy").text.trim)
-			hashMap.update( "ircDatabaseODBPort", (node \ "ircDatabaseODBPort").text.toInt)
 			hashMap.update( "ircDatabaseName", (node \ "ircDatabaseName").text.trim)
 			hashMap.update( "ircDatabaseFileName", (node \ "ircDatabaseFileName").text.trim)
 			hashMap.update( "ircDatabaseListenAddress", (node \ "ircDatabaseListenAddress").text.trim)
