@@ -4,6 +4,7 @@
 package commiter
 
 import command.exec.CommandExec
+import prefs.Preferences
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import java.io.OutputStreamWriter
 
@@ -16,9 +17,9 @@ import scalabot._
 object DbAddCommit {
 
 	private val logger = Logger.getLogger(DbAddCommit.getClass)
-	private var prefs: Preferences = null
-	private var debug = true
-	private var gitRepositoryProjectDir: String = null
+	private val prefs = (new Preferences).loadPreferences
+	private val debug = prefs.getb("debug")
+	private var gitRepositoryProjectDir = ""
 	private var databaseName = ""
 	private var git = ""
 	
@@ -61,8 +62,6 @@ object DbAddCommit {
 	def main(args: Array[String]) {
 		initLogger
 		try{
-			prefs = (new Preferences).loadPreferences
-			debug = prefs.getb("debug")
 			gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
 			databaseName = System.getProperty("user.home") + "/" + ".codadris/" + prefs.get("xmppDatabaseFileName")
 			git = prefs.get("gitExecutable")
