@@ -125,7 +125,7 @@ object SSHActor extends Actor {
 		logger.warn("Generating JNLP file")
 		val client = ssh.openSftpClient
 		var arguments = ""
-		for( i <- prefs.getl("webstartArgumentsJVM")) { // TODO: XXX: maybe switch to normal String instead of List[String] 
+		for( i <- prefs.getl("webstartArgumentsJVM")) { // XXX: maybe switch to normal String instead of List[String] 
 			arguments += i + " "
 		}
 		val jnlp = new JNLPSkeleton(

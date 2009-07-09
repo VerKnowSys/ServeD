@@ -80,7 +80,7 @@ object XMPPActor extends Actor with MessageListener {
 //		prefs.getlh("users").foreach { x =>
 //			x("user")
 //		}
-		if (message.getFrom.contains("dmilith")) {   // TODO: XXX: hardcoded value
+		if (message.getFrom.contains("dmilith")) {   // XXX: hardcoded value
 			logger.info("Message contains dmilith: " + message.getFrom)
 			message.getBody match {
 				case "last" => {
