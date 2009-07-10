@@ -182,7 +182,6 @@ object Deployer extends Actor {
 	
 	def main(args: Array[String]) {
 
-		initLogger
 		addShutdownHook {
 			SSHActor ! Quit
 			Deployer ! Quit
