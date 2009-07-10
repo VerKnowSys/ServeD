@@ -187,7 +187,6 @@ object Deployer extends Actor {
 			logger.warn("Done deploying")
 		}
 		logger.warn("User home dir: " + System.getProperty("user.home"))
-		logger.warn("Working dir: " + System.getProperty("user.dir"))
 		logger.warn("Maven 2 Repository dir: " + pathToMaven2Repo)
 		logger.warn("Deploy tmp dir: " + deployTmpDir)
 		logger.warn("Starting Deployer..")

@@ -44,7 +44,6 @@ object ScalaBot extends Actor {
 
 		initLogger
 		logger.info("User home dir: " + System.getProperty("user.home"))
-		logger.info("Working dir: " + System.getProperty("user.dir"))
 		logger.info("Initializing scalaBot..")
 		this.start
 	}
