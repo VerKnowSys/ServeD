@@ -24,7 +24,7 @@ import org.jivesoftware.smack.filter._
 
 object XMPPActor extends Actor with MessageListener { 
 	
-	private val prefs: Preferences = (new Preferences).loadPreferences
+	private val prefs: Preferences = new Preferences
 	private val logger = Logger.getLogger(XMPPActor.getClass)
 	private val debug = prefs.getb("debug")
 	private val config = new ConnectionConfiguration(prefs.get("xmppServer"), prefs.geti("xmppPort"))

@@ -6,9 +6,9 @@ package prefs
  * Time: 10:23:04 PM
  */
 
-object GeneratePreferencesFile extends Application {
+object GeneratePreferencesSkeletonFile extends Application {
 
-	val prefs = (new Preferences).loadPreferences
+	val prefs = new Preferences
 	prefs.savePreferences
 
 }

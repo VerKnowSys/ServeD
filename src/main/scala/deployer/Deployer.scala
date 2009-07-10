@@ -15,6 +15,7 @@ import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import java.util.regex.{Matcher, Pattern}
 import prefs.Preferences
 import ssh.tools.SSHActor
+import utils.Utils
 
 /**
  * User: dmilith
@@ -23,55 +24,24 @@ import ssh.tools.SSHActor
  */
 
 
-trait P {
-	def accept(t: String): Boolean
-}
+object Deployer extends Actor with Utils {
 
-
-object Deployer extends Actor {
-
-	def initLogger = {
-		val appender = new ConsoleAppender
-		appender.setName(ConsoleAppender.SYSTEM_OUT);
-		appender.setWriter(new OutputStreamWriter(System.out))
-		val level = if (debug) Level.TRACE else Level.WARN
-		appender.setThreshold(level)
-		appender.setLayout(new PatternLayout("{ %-5p %d : %m }%n"));
-		Logger.getRootLogger.addAppender(appender)
-	}
 	initLogger
 	private val filesToBeDeployed = new ArrayList[File]()
 	private val uuid = UUID.randomUUID.toString
 	private val deployTmpDir = "/tmp/deployer-" + uuid + "/"
 	private val pathToMaven2Repo = System.getProperty("user.home") + "/.m2/repository/"
 	private val logger = Logger.getLogger(Deployer.getClass)
-	private var prefs = (new Preferences("project.tools.xml")).loadPreferences // default file name
+	private var prefs = new Preferences("project.tools.xml") // default file name
 	private val debug = prefs.getb("debug")
+	if (prefs.getb("debug")) {
+		setLoggerLevelDebug_?(Level.TRACE)
+	}
 	private var basicOnly_? = prefs.getb("deployOnlyBasicFiles")
 	private val basic_jar_names = prefs.getl("deployFilesBasic")
 	private val dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
 	private val codebaseLocalDir = System.getProperty("user.home") + "/" + prefs.get("directoryForLocalDeploy")
 	private var trunk = false
-
-
-	def addShutdownHook(block: => Unit) =
-	Runtime.getRuntime.addShutdownHook( new Thread {
-			override def run = block
-		})
-
-
-
-
-	def findFile(f: File, p: P, r: ArrayList[File]) {
-		if (f.isDirectory) {
-			val files = f.listFiles
-			for (i <- 0 until files.length) {
-				findFile(files(i), p, r)
-			}
-		} else if (p.accept(f + "")) {
-			r.add(f)
-		}
-	}
 
 
 	def getFilesFromMavenRepositoryAndSignThem = {
@@ -111,7 +81,7 @@ object Deployer extends Actor {
 			prefs.get("jarSignerExecutable"), "-storepass", prefs.get("jarSignerPassword"),
 			deployTmpDir + fileToBeSigned.split("/").last,	prefs.get("jarSignerKeyName")
 			)
-		logger.info(CommandExec.cmdExec(signCommand).trim)
+		logger.debug(CommandExec.cmdExec(signCommand).trim)
 	}
 
 
@@ -198,7 +168,7 @@ object Deployer extends Actor {
 			logger.error("Missing argument: (config filename)")
 			exit
 		}
-		prefs = (new Preferences(args(0))).loadPreferences
+		prefs = new Preferences(args(0))
 		logger.warn("Starting Deployer..")
 
 		// check given arguments

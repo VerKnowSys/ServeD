@@ -8,12 +8,13 @@ import java.io.OutputStreamWriter
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import org.neodatis.odb.{ODBFactory, ODB}
 import prefs.Preferences
+import utils.Utils
 
 
-object DbAddCommit {
+object DbAddCommit extends Utils {
 
 	private val logger = Logger.getLogger(DbAddCommit.getClass)
-	private val prefs = (new Preferences).loadPreferences
+	private val prefs = new Preferences       // TODO: add custom config file support
 	private val debug = prefs.getb("debug")
 	private val gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
 	private val databaseName = System.getProperty("user.home") + "/" + ".codadris/" + prefs.get("xmppDatabaseFileName")
@@ -38,16 +39,6 @@ object DbAddCommit {
 				odb.close
 			} 
 		}
-	}
-
-	def initLogger = {
-		val appender = new ConsoleAppender
-		appender.setName(ConsoleAppender.SYSTEM_OUT);
-		appender.setWriter(new OutputStreamWriter(System.out))
-		val level = if (debug) Level.TRACE else Level.WARN
-		appender.setThreshold(level)
-		appender.setLayout(new PatternLayout("{ %-5p %d : %m }%n"));
-		Logger.getRootLogger.addAppender(appender)
 	}
 
 	/**

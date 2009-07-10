@@ -10,7 +10,7 @@ import java.util.{NoSuchElementException, ArrayList}
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import prefs.Preferences
 import swing.{MainFrame, Frame, SimpleGUIApplication}
-
+import utils.{Utils}
 /**
  * User: dmilith
  * Date: Jul 6, 2009
@@ -18,11 +18,15 @@ import swing.{MainFrame, Frame, SimpleGUIApplication}
  */
 
 
-object DeployerGUI extends SimpleGUIApplication {
+object DeployerGUI extends SimpleGUIApplication with Utils {
 
 	val logger = Logger.getLogger(DeployerGUI.getClass)
 	val prefs = new Preferences
-//	val PATH = System.getProperty("PATH")
+	if (prefs.getb("debug")) {
+		setLoggerLevelDebug_?(Level.TRACE)
+	}
+
+	//	val PATH = System.getProperty("PATH")
 //	val command = CommandExec.cmdExec(Array("env")).trim
 //	val searchIn = PATH.split(
 //		System.getProperty("path.separator")
@@ -46,7 +50,7 @@ object DeployerGUI extends SimpleGUIApplication {
 					System.getProperty("os.name").contains("Mac")) {
 					for (path <- searchIn) {
 						if (path.exists) {
-							Deployer.findFile( path, new P {
+							findFile( path, new P {
 								override
 								def accept(t: String): Boolean = {
 									val fileRegex = ".*" + requirements(i)._1 + "$"
@@ -73,8 +77,8 @@ object DeployerGUI extends SimpleGUIApplication {
 	}
 
 	def top = new MainFrame {
-		Deployer.initLogger
-		Deployer.addShutdownHook {
+		initLogger
+		addShutdownHook {
 			logger.warn("Done")
 		}
 		title = "Deployer GUI"

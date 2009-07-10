@@ -8,43 +8,28 @@ import signals.{ProcessMessages, MainLoop, Init, Quit}
 import java.io.OutputStreamWriter
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import scala.actors._
+import utils.Utils
 
 
-object ScalaBot extends Actor {
-	
-	private var arguments: Array[String] = Array()
+object ScalaBot extends Actor with Utils {
+
 	private val logger = Logger.getLogger(ScalaBot.getClass)
-
-	Runtime.getRuntime.addShutdownHook( new Thread {
-		override def run = {
-			logger.info("Bot shutdown requested.")
-			XMPPActor ! Quit
-			ODBServerActor ! Quit
-			IRCActor ! Quit
-			ScalaBot ! Quit
-			logger.info("Done\n")
-		}
-	})
-
-	def initLogger = {
-		val appender = new ConsoleAppender
-		appender.setName(ConsoleAppender.SYSTEM_OUT);
-		appender.setWriter(new OutputStreamWriter(System.out))
-		val level = Level.INFO
-		appender.setThreshold(level)
-		appender.setLayout(new PatternLayout("{ %-5p %d : %m }%n"));
-		Logger.getRootLogger.addAppender(appender)
+	initLogger
+	addShutdownHook {
+		XMPPActor ! Quit
+		ODBServerActor ! Quit
+		IRCActor ! Quit
+		ScalaBot ! Quit
+		logger.info("Done\n")
 	}
 
 	def main(args: Array[String]) {
-		initLogger
 		logger.info("User home dir: " + System.getProperty("user.home"))
 		logger.info("Initializing scalaBot..")
 		this.start
 	}
 	
 	override def act = {
-
 		ODBServerActor.start
 		ODBServerActor ! Init
 		XMPPActor.start

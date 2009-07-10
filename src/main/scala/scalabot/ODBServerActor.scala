@@ -14,7 +14,7 @@ import org.neodatis.odb._
 
 object ODBServerActor extends Actor {
 	
-	private val prefs = (new Preferences).loadPreferences
+	private val prefs = new Preferences
 	private val logger = Logger.getLogger(ODBServerActor.getClass)
 	private val debug = prefs.getb("debug")
 	private val absolutePathToBotODBDir = System.getProperty("user.home") + "/" + ".codadris/"

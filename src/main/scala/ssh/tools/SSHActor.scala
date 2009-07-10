@@ -26,7 +26,7 @@ import prefs.Preferences
 object SSHActor extends Actor {
 
 	private val logger = Logger.getLogger(SSHActor.getClass)
-	private val prefs: Preferences = (new Preferences).loadPreferences
+	private val prefs = new Preferences
 	private val debug = prefs.getb("debug")
 	private val host = prefs.get("sshHost")
 	private val port = prefs.geti("sshPort")

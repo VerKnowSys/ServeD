@@ -16,7 +16,7 @@ import org.neodatis.odb.impl.core.query.criteria._
 object IRCActor extends PircBot with Actor {
 
 	private val logger = Logger.getLogger(IRCActor.getClass)
-	private val prefs = (new Preferences).loadPreferences
+	private val prefs = new Preferences
 	
 	def settings = {
 		setVerbose(prefs.getb("ircDebugInfo"))

@@ -3,18 +3,64 @@
 
 package prefs
 
+
 import java.io.File
+import java.util.ArrayList
+import java.util.regex.Pattern
 import org.apache.log4j.Logger
 import scala.collection.mutable.HashMap
 import scala.xml.XML
+import utils.Utils
 
 
-sealed class Preferences(configFileNameInput: String) {
+sealed class Preferences(configFileNameInput: String) extends Utils {
 
 	def this() = this("project.tools.xml")
 	val logger = Logger.getLogger(classOf[Preferences])
 	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + configFileNameInput
-	var value = HashMap[String,Any] (
+	initLogger
+	loadPreferences
+
+	def requirements = Array(
+		("git", "gitExecutable"),
+		("jarsigner", "jarSignerExecutable")
+	)
+
+
+	def autoDetectRequirements = {
+		for (i <- 0 until requirements.size)
+			if (!(new File(get(requirements(i)._2)).exists)) {
+				val al = new ArrayList[File]()
+				if (System.getProperty("os.name").contains("Linux") ||
+					System.getProperty("os.name").contains("Mac")) {
+					for (path <- pathsToSearchForExecutables) {
+						if (path.exists) {
+							findFile( path, new P {
+								override
+								def accept(t: String): Boolean = {
+									val fileRegex = ".*" + requirements(i)._1 + "$"
+									val pattern = Pattern.compile(fileRegex)
+									val mat = pattern.matcher(t)
+									if ( mat.find ) return true
+									return false
+								}
+							}, al)
+						}
+					}
+					try {
+						value.update(requirements(i)._2, al.toArray.first.toString)
+					} catch {
+						case x: NoSuchElementException => {
+							logger.error(requirements(i)._1 + " executable not found")
+						}
+					}
+				} else {
+					logger.error("Windows hosts not yet supported")
+					exit(1)
+				}
+			}
+	}
+	var value = HashMap[String,Any] ( // XXX hardcoded values will be removed when GUI will be ready
 		"debug" -> false,
 		"xmppResourceString" -> "scalaBot-2",
 		"xmppLogin" -> "varra",
@@ -330,8 +376,11 @@ sealed class Preferences(configFileNameInput: String) {
 		this
 	}
 
-	def savePreferences = XML.saveFull(configFileName, toXML, "UTF-8", true, null)
+	def savePreferences = {
+		autoDetectRequirements
+		XML.saveFull(configFileName, toXML, "UTF-8", true, null)
+	}
 	
-	def savePreferences(fileName: String) = XML.saveFull(fileName, toXML, "UTF-8", true, null)
+//	def savePreferences(fileName: String) = XML.saveFull(fileName, toXML, "UTF-8", true, null)
 	
 }
