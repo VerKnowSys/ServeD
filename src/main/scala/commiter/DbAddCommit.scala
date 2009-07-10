@@ -15,8 +15,8 @@ object DbAddCommit {
 	private val logger = Logger.getLogger(DbAddCommit.getClass)
 	private val prefs = (new Preferences).loadPreferences
 	private val debug = prefs.getb("debug")
-	private var gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
-	private var databaseName = System.getProperty("user.home") + "/" + ".codadris/" + prefs.get("xmppDatabaseFileName")
+	private val gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
+	private val databaseName = System.getProperty("user.home") + "/" + ".codadris/" + prefs.get("xmppDatabaseFileName")
 	private val git = prefs.get("gitExecutable")
 	
 	def writeCommitToDataBase(arg: Commit) = {
