@@ -13,12 +13,11 @@ import scala.xml.XML
 import utils.Utils
 
 
-sealed class Preferences(configFileNameInput: String) extends Utils {
+class Preferences(configFileNameInput: String) extends Utils {
 
 	def this() = this("project.tools.xml")
 	val logger = Logger.getLogger(classOf[Preferences])
 	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + configFileNameInput
-	loadPreferences
 
 	def requirements = Array(
 		("git", "gitExecutable"),
@@ -378,6 +377,8 @@ sealed class Preferences(configFileNameInput: String) extends Utils {
 		autoDetectRequirements
 		XML.saveFull(configFileName, toXML, "UTF-8", true, null)
 	}
+
+	loadPreferences
 	
 //	def savePreferences(fileName: String) = XML.saveFull(fileName, toXML, "UTF-8", true, null)
 	
