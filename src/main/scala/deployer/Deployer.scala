@@ -30,26 +30,6 @@ trait P {
 
 object Deployer extends Actor {
 
-	private val filesToBeDeployed = new ArrayList[File]()
-	private val uuid = UUID.randomUUID.toString
-	private val deployTmpDir = "/tmp/deployer-" + uuid + "/"
-	private val pathToMaven2Repo = System.getProperty("user.home") + "/.m2/repository/"
-	private val logger = Logger.getLogger(Deployer.getClass)
-	private val prefs: Preferences = (new Preferences).loadPreferences
-	private val debug: Boolean = prefs.getb("debug")
-	private var basicOnly_? = prefs.getb("deployOnlyBasicFiles")
-	private val basic_jar_names = prefs.getl("deployFilesBasic")
-	private val dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
-	private val codebaseLocalDir = System.getProperty("user.home") + "/" + prefs.get("directoryForLocalDeploy")
-	private var trunk = false
-
-
-	def addShutdownHook(block: => Unit) =
-		Runtime.getRuntime.addShutdownHook( new Thread {
-			override def run = block
-		})
-
-
 	def initLogger = {
 		val appender = new ConsoleAppender
 		appender.setName(ConsoleAppender.SYSTEM_OUT);
@@ -59,6 +39,27 @@ object Deployer extends Actor {
 		appender.setLayout(new PatternLayout("{ %-5p %d : %m }%n"));
 		Logger.getRootLogger.addAppender(appender)
 	}
+	initLogger
+	private val filesToBeDeployed = new ArrayList[File]()
+	private val uuid = UUID.randomUUID.toString
+	private val deployTmpDir = "/tmp/deployer-" + uuid + "/"
+	private val pathToMaven2Repo = System.getProperty("user.home") + "/.m2/repository/"
+	private val logger = Logger.getLogger(Deployer.getClass)
+	private var prefs = (new Preferences("project.tools.xml")).loadPreferences // default file name
+	private val debug = prefs.getb("debug")
+	private var basicOnly_? = prefs.getb("deployOnlyBasicFiles")
+	private val basic_jar_names = prefs.getl("deployFilesBasic")
+	private val dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
+	private val codebaseLocalDir = System.getProperty("user.home") + "/" + prefs.get("directoryForLocalDeploy")
+	private var trunk = false
+
+
+	def addShutdownHook(block: => Unit) =
+	Runtime.getRuntime.addShutdownHook( new Thread {
+			override def run = block
+		})
+
+
 
 
 	def findFile(f: File, p: P, r: ArrayList[File]) {
@@ -180,16 +181,27 @@ object Deployer extends Actor {
 
 	
 	def main(args: Array[String]) {
+
 		initLogger
 		addShutdownHook {
 			SSHActor ! Quit
 			Deployer ! Quit
-			logger.warn("Done deploying")
+			logger.warn("Done.")
 		}
 		logger.warn("User home dir: " + System.getProperty("user.home"))
 		logger.warn("Maven 2 Repository dir: " + pathToMaven2Repo)
 		logger.warn("Deploy tmp dir: " + deployTmpDir)
+		logger.warn("Given arguments:")
+		args.foreach{
+			a => logger.warn(a)
+		}
+		if (args.size == 0) {
+			logger.error("Missing argument: (config filename)")
+			exit
+		}
+		prefs = (new Preferences(args(0))).loadPreferences
 		logger.warn("Starting Deployer..")
+
 		// check given arguments
 		if (args.size > 0) {
 			for (arg <- args) {
@@ -198,8 +210,8 @@ object Deployer extends Actor {
 						logger.warn("Requested to perform Mac Application instead of web-start app\nNYI!")
 						// TODO: implement Mac Application deploy support
 					}
-					case "full-local" => {
-						// local deploy without ssh actor
+					case "local-full" => {
+						// local full deploy without ssh actor
 						logger.warn("Requested to perform FULL local deploy")
 						basicOnly_? = false
 						getFilesFromMavenRepositoryAndSignThem
@@ -221,14 +233,29 @@ object Deployer extends Actor {
 						trunk = true
 						SSHActor ! (filesToBeDeployed, uuid, deployTmpDir, trunk)
 					}
-					case _ => {
+					case "trunk-full" => {
+						// remote full trunk deploy
+						logger.warn("Requested to perform FULL trunk deploy")
+						this.start
+						SSHActor.start
+						SSHActor ! Init
+						basicOnly_? = false
+						trunk = true
+						getFilesFromMavenRepositoryAndSignThem
+						SSHActor ! (filesToBeDeployed, uuid, deployTmpDir, trunk)
+					}
+					case "help" => {
 						// help
-						logger.warn("Bad parameters. Valid params are:\n" +
+						logger.warn("\n\nDeployer quick help:\nValid params:\n" +
 								"\ttrunk -> for trunk deploy\n" +
+								"\ttrunk-full -> for full trunk deploy\n" +
 								"\tlocal -> for basic local deploy\n" +
-								"\tfull-local -> for full local deploy\n" +
+								"\tlocal-full -> for full local deploy\n" +
 								"\tmac-app -> for Macintosh application (NYI)\n" +
-								"none for remote ssh deploy based on project.tools.xml config file.")
+								"\tTo run remote deploying, no arguments (default).")
+					}
+					case _ => {
+
 					}
 				}
 			}

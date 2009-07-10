@@ -3,13 +3,17 @@
 
 package prefs
 
+import java.io.File
+import org.apache.log4j.Logger
 import scala.collection.mutable.HashMap
 import scala.xml.XML
 
 
-sealed class Preferences {
+sealed class Preferences(configFileNameInput: String) {
 
-	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + "project.tools.xml"
+	def this() = this("project.tools.xml")
+	val logger = Logger.getLogger(classOf[Preferences])
+	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + configFileNameInput
 	var value = HashMap[String,Any] (
 		"debug" -> false,
 		"xmppResourceString" -> "scalaBot-2",
@@ -313,18 +317,17 @@ sealed class Preferences {
 	}
 	
 	def loadPreferences: Preferences = {
-		val sett = new Preferences
 		try {
-			val loadnode = XML.loadFile(configFileName)
-			sett.value = fromXML(loadnode)
+			value = fromXML(XML.loadFile(configFileName))
+			logger.warn("Config file found")
 		} catch {
 			case x: Throwable => {
-				println("*** Config file " +
+				logger.warn("*** Config file " +
 					configFileName + " doesn't exists! Creating new one")
-				sett.savePreferences
+				savePreferences
 			}
 		}
-		sett
+		this
 	}
 
 	def savePreferences = XML.saveFull(configFileName, toXML, "UTF-8", true, null)
