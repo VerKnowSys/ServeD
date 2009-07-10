@@ -21,6 +21,7 @@ import utils.{Utils}
 object DeployerGUI extends SimpleGUIApplication with Utils {
 
 	val logger = Logger.getLogger(DeployerGUI.getClass)
+	initLogger
 	val prefs = new Preferences
 	if (prefs.getb("debug")) {
 		setLoggerLevelDebug_?(Level.TRACE)
@@ -77,7 +78,6 @@ object DeployerGUI extends SimpleGUIApplication with Utils {
 	}
 
 	def top = new MainFrame {
-		initLogger
 		addShutdownHook {
 			logger.warn("Done")
 		}

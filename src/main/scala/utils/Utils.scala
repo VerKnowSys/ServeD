@@ -17,7 +17,7 @@ trait Utils {
 	trait P { def accept(t: String): Boolean }
 
 	val appender = new ConsoleAppender
-	val level = Level.INFO
+	val level = Level.WARN
 
 	def initLogger = {
 		appender.setName(ConsoleAppender.SYSTEM_OUT);

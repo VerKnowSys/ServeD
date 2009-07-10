@@ -18,7 +18,6 @@ sealed class Preferences(configFileNameInput: String) extends Utils {
 	def this() = this("project.tools.xml")
 	val logger = Logger.getLogger(classOf[Preferences])
 	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + configFileNameInput
-	initLogger
 	loadPreferences
 
 	def requirements = Array(
@@ -365,11 +364,10 @@ sealed class Preferences(configFileNameInput: String) extends Utils {
 	def loadPreferences: Preferences = {
 		try {
 			value = fromXML(XML.loadFile(configFileName))
-			logger.warn("Config file found")
+			logger.debug("*** Config file found (" + configFileName + ")")
 		} catch {
 			case x: Throwable => {
-				logger.warn("*** Config file " +
-					configFileName + " doesn't exists! Creating new one")
+				logger.debug("*** Config file " + configFileName + " doesn't exists! Creating new one")
 				savePreferences
 			}
 		}

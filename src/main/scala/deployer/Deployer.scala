@@ -26,15 +26,15 @@ import utils.Utils
 
 object Deployer extends Actor with Utils {
 
-	initLogger
 	private val filesToBeDeployed = new ArrayList[File]()
 	private val uuid = UUID.randomUUID.toString
 	private val deployTmpDir = "/tmp/deployer-" + uuid + "/"
 	private val pathToMaven2Repo = System.getProperty("user.home") + "/.m2/repository/"
 	private val logger = Logger.getLogger(Deployer.getClass)
-	private var prefs = new Preferences("project.tools.xml") // default file name
+	initLogger
+	private var prefs = new Preferences // default file name
 	private val debug = prefs.getb("debug")
-	if (prefs.getb("debug")) {
+	if (debug) {
 		setLoggerLevelDebug_?(Level.TRACE)
 	}
 	private var basicOnly_? = prefs.getb("deployOnlyBasicFiles")
@@ -157,6 +157,12 @@ object Deployer extends Actor with Utils {
 			Deployer ! Quit
 			logger.warn("Done.")
 		}
+		if (args.size == 0) {
+			logger.error("Missing argument: (config filename)")
+			exit
+		}
+		prefs = new Preferences(args(0))
+		logger.warn("Starting Deployer..")
 		logger.warn("User home dir: " + System.getProperty("user.home"))
 		logger.warn("Maven 2 Repository dir: " + pathToMaven2Repo)
 		logger.warn("Deploy tmp dir: " + deployTmpDir)
@@ -164,12 +170,6 @@ object Deployer extends Actor with Utils {
 		args.foreach{
 			a => logger.warn(a)
 		}
-		if (args.size == 0) {
-			logger.error("Missing argument: (config filename)")
-			exit
-		}
-		prefs = new Preferences(args(0))
-		logger.warn("Starting Deployer..")
 
 		// check given arguments
 		if (args.size > 0) {
