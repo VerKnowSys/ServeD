@@ -37,11 +37,6 @@ object ScalaBot extends Actor {
 	}
 
 	def main(args: Array[String]) {
-		if (args.size < 1)
-            arguments = Array("./") // set current dir if there's no given path to bot dir
-        else
-            arguments = args
-
 		initLogger
 		logger.info("User home dir: " + System.getProperty("user.home"))
 		logger.info("Initializing scalaBot..")
