@@ -87,7 +87,7 @@ object SSHActor extends Actor {
 		clientForRemoteCommand.close
 		backup
 
-		listOfSignedFiles foreach { localFile =>
+		def block(localFile: String): Unit = {
 			val clientForRemoteCommand = ssh.openSessionChannel
 			val comparator = new JarEntryComparator
 			var listOfCRCLocalFile = comparator.loadAndThrowListOfCrcs(localFile)
@@ -103,7 +103,7 @@ object SSHActor extends Actor {
 				line = input.readLine
 			}
 			input.close
-			
+
 			var out = List[String]()
 			output.split(",").foreach{ a => out ++= List[String](a) }
 			logger.info("1: " + out)
@@ -120,7 +120,14 @@ object SSHActor extends Actor {
 			}
 			clientForRemoteCommand.close
 		}
-
+		logger.warn("Deploying")
+		listOfSignedFiles foreach {
+			block(_)
+		}
+		logger.warn("Verifying deploy")
+		listOfSignedFiles foreach {
+			block(_)
+		}
 		// deploying jnlp file
 		logger.warn("Generating JNLP file")
 		val client = ssh.openSftpClient
