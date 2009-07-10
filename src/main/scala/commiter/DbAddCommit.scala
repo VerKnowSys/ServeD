@@ -53,7 +53,6 @@ object DbAddCommit {
 	/**
 	 * args(0) -> commit sha (beginning of range)
 	 * args(1) -> commit sha (end of range)
-	 * args(2) -> absolute path to git repository
 	 */
 	def main(args: Array[String]) {
 		initLogger
