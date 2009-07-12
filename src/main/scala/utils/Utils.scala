@@ -3,6 +3,7 @@ package utils
 
 import java.io.{File, OutputStreamWriter}
 import java.util.ArrayList
+import java.util.regex.Pattern
 import org.apache.log4j._
 /**
  * User: dmilith
@@ -54,4 +55,43 @@ trait Utils {
 		new File("/usr/local/bin/")
 	)
 
+	val requirements = Array(
+		("git", "gitExecutable"),
+		("jarsigner", "jarSignerExecutable")
+	)
+
+	def autoDetectRequirements = {
+		for (i <- 0 until requirements.size)
+			if (!(new File(prefs.get(requirements(i)._2)).exists)) {
+				val al = new ArrayList[File]()
+				if (System.getProperty("os.name").contains("Linux") ||
+					System.getProperty("os.name").contains("Mac")) {
+					for (path <- searchIn) {
+						if (path.exists) {
+							findFile( path, new P {
+								override
+								def accept(t: String): Boolean = {
+									val fileRegex = ".*" + requirements(i)._1 + "$"
+									val pattern = Pattern.compile(fileRegex)
+									val mat = pattern.matcher(t)
+									if ( mat.find ) return true
+									return false
+								}
+							}, al)
+						}
+					}
+					try {
+						prefs.value.update(requirements(i)._2, al.toArray.first.toString)
+					} catch {
+						case x: NoSuchElementException => {
+							logger.error(requirements(i)._1 + " executable not found")
+						}
+					}
+				} else {
+					logger.error("Windows hosts not yet supported")
+					exit(1)
+				}
+			}
+	}
+	
 }

@@ -15,49 +15,9 @@ import utils.Utils
 
 class Preferences(configFileNameInput: String) extends Utils {
 
-	def this() = this("project.tools.xml")
+	def this() = this("project.tools.xml") // additional Constructor
 	val logger = Logger.getLogger(classOf[Preferences])
 	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + configFileNameInput
-
-	def requirements = Array(
-		("git", "gitExecutable"),
-		("jarsigner", "jarSignerExecutable")
-	)
-
-
-	def autoDetectRequirements = {
-		for (i <- 0 until requirements.size)
-			if (!(new File(get(requirements(i)._2)).exists)) {
-				val al = new ArrayList[File]()
-				if (System.getProperty("os.name").contains("Linux") ||
-					System.getProperty("os.name").contains("Mac")) {
-					for (path <- pathsToSearchForExecutables) {
-						if (path.exists) {
-							findFile( path, new P {
-								override
-								def accept(t: String): Boolean = {
-									val fileRegex = ".*" + requirements(i)._1 + "$"
-									val pattern = Pattern.compile(fileRegex)
-									val mat = pattern.matcher(t)
-									if ( mat.find ) return true
-									return false
-								}
-							}, al)
-						}
-					}
-					try {
-						value.update(requirements(i)._2, al.toArray.first.toString)
-					} catch {
-						case x: NoSuchElementException => {
-							logger.error(requirements(i)._1 + " executable not found")
-						}
-					}
-				} else {
-					logger.error("Windows hosts not yet supported")
-					exit(1)
-				}
-			}
-	}
 	var value = HashMap[String,Any] ( // XXX hardcoded values will be removed when GUI will be ready
 		"debug" -> false,
 		"xmppResourceString" -> "scalaBot-2",
