@@ -16,7 +16,7 @@ import utils.Utils
 class Preferences(configFileNameInput: String) extends Utils {
 
 	def this() = this("project.tools.xml") // additional Constructor
-	val logger = Logger.getLogger(classOf[Preferences])
+	var logger = Logger.getLogger(classOf[Preferences])
 	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + configFileNameInput
 	var value = HashMap[String,Any] ( // XXX hardcoded values will be removed when GUI will be ready
 		"debug" -> false,
@@ -334,7 +334,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 	}
 
 	def savePreferences = {
-		autoDetectRequirements(prefs)
+		autoDetectRequirements(this)
 		XML.saveFull(configFileName, toXML, "UTF-8", true, null)
 	}
 

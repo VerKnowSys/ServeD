@@ -20,7 +20,7 @@ import utils.{Utils}
 
 object DeployerGUI extends SimpleGUIApplication with Utils {
 
-	val logger = Logger.getLogger(DeployerGUI.getClass)
+	var logger = Logger.getLogger(DeployerGUI.getClass)
 	initLogger
 	val prefs = new Preferences
 	if (prefs.getb("debug")) {
