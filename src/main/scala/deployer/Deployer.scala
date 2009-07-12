@@ -30,7 +30,7 @@ object Deployer extends Actor with Utils {
 	private val uuid = UUID.randomUUID.toString
 	private val deployTmpDir = "/tmp/deployer-" + uuid + "/"
 	private val pathToMaven2Repo = System.getProperty("user.home") + "/.m2/repository/"
-	private val logger = Logger.getLogger(Deployer.getClass)
+	var logger = Logger.getLogger(Deployer.getClass)
 	initLogger
 	private var prefs = new Preferences // default file name
 	private val debug = prefs.getb("debug")

@@ -5,6 +5,7 @@ import java.io.{File, OutputStreamWriter}
 import java.util.ArrayList
 import java.util.regex.Pattern
 import org.apache.log4j._
+import prefs.Preferences
 /**
  * User: dmilith
  * Date: Jul 10, 2009
@@ -17,6 +18,7 @@ trait Utils {
 
 	trait P { def accept(t: String): Boolean }
 
+	var logger: Logger
 	val appender = new ConsoleAppender
 	val level = Level.WARN
 
@@ -49,24 +51,24 @@ trait Utils {
 	}
 
 	def pathsToSearchForExecutables = Array(
-		new File("/opt/local/bin/"), // XXX hardcoded paths
+		new File("/opt/local/bin/"), // XXX: hardcoded paths
 		new File("/bin/"),
 		new File("/usr/bin/"),
 		new File("/usr/local/bin/")
 	)
 
-	val requirements = Array(
-		("git", "gitExecutable"),
+	def requirements = Array(
+		("git", "gitExecutable"), // XXX: hardcoded executables
 		("jarsigner", "jarSignerExecutable")
 	)
 
-	def autoDetectRequirements = {
+	def autoDetectRequirements(prefs: Preferences) = {
 		for (i <- 0 until requirements.size)
 			if (!(new File(prefs.get(requirements(i)._2)).exists)) {
 				val al = new ArrayList[File]()
 				if (System.getProperty("os.name").contains("Linux") ||
 					System.getProperty("os.name").contains("Mac")) {
-					for (path <- searchIn) {
+					for (path <- pathsToSearchForExecutables) {
 						if (path.exists) {
 							findFile( path, new P {
 								override

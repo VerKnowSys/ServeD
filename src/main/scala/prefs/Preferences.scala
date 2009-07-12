@@ -334,7 +334,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 	}
 
 	def savePreferences = {
-		autoDetectRequirements
+		autoDetectRequirements(prefs)
 		XML.saveFull(configFileName, toXML, "UTF-8", true, null)
 	}
 

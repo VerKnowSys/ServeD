@@ -45,7 +45,7 @@ object DeployerGUI extends SimpleGUIApplication with Utils {
 	}
 
 	def prepare = {
-		autoDetectRequirements
+		autoDetectRequirements(prefs)
 		logger.warn(prefs.get("gitExecutable"))
 		logger.warn(prefs.get("jarSignerExecutable"))
 	}
