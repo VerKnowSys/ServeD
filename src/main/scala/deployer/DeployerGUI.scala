@@ -27,13 +27,6 @@ object DeployerGUI extends SimpleGUIApplication with Utils {
 		setLoggerLevelDebug_?(Level.TRACE)
 	}
 
-	//	val PATH = System.getProperty("PATH")
-//	val command = CommandExec.cmdExec(Array("env")).trim
-//	val searchIn = PATH.split(
-//		System.getProperty("path.separator")
-//	).toArray.foreach { element => new File(element) }
-
-
 	def top = new MainFrame {
 		addShutdownHook {
 			logger.warn("Done")
