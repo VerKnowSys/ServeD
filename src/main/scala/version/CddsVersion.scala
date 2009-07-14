@@ -26,7 +26,7 @@ object CddsVersion extends Application with Utils {
 	val prefs = new Preferences
 	val debug = prefs.getb("debug")
 	if (debug) {
-		setLoggerLevelDebug(Level.TRACE) // XXX: hardcoded
+		setLoggerLevelDebug(Level.INFO) // XXX: hardcoded
 	}
 	val repositoryDir = prefs.get("gitRepositoryProjectDir")
 	val gitExecutable = prefs.get("gitExecutable")
@@ -132,20 +132,20 @@ object CddsVersion extends Application with Utils {
 
 	def loadAndUpdate = {
 		try {
-			logger.warn("Build file located in: " + resourceBuildFile)
+			logger.info("Build file located in: " + resourceBuildFile)
 			for (line <- Source.fromURL(resourceBuildFile).getLines) {
-				logger.warn("Old version: " + getVersion)
-				logger.warn("Current build number: " + (buildNumber + 1))
+				logger.info("Old version: " + getVersion)
+				logger.info("Current build number: " + (buildNumber + 1))
 				writeNewContentToBuildFile
 				updateRemoteVersion
-				logger.warn("Updated successfully")
+				logger.info("Updated successfully")
 			}
 		} catch {
 			case x: Throwable => {
 				logger.error("Error occured in intialization: Cannot open " + buildTextFile + " file. Generating new one", x)
 				writeNewContentToBuildFile
 				updateRemoteVersion
-				logger.warn("Updated successfully")
+				logger.info("Updated successfully")
 			}
 		}
 	}
