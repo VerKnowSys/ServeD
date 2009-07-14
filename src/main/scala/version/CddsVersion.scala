@@ -20,6 +20,7 @@ import utils.Utils
 
 
 object CddsVersion extends Application with Utils {
+
 	var logger = Logger.getLogger(CddsVersion.getClass)
 	initLogger
 	val prefs = new Preferences
@@ -42,7 +43,6 @@ object CddsVersion extends Application with Utils {
 		}
 	}
 	val buildNumber = getVersionBuild
-	logger.info("Build number: " + buildNumber)
 
 
 	/**
@@ -51,6 +51,7 @@ object CddsVersion extends Application with Utils {
 	def getVersion: String = {
 		getVersion("2.0.") // XXX: hardcoded	
 	}
+
 
 	def getVersionBuild: Int = {
 		var line = ""
@@ -64,6 +65,7 @@ object CddsVersion extends Application with Utils {
 		}
 	}
 
+
 	def getVersion(prefix: String): String = {
 		var line = ""
 		if ( resourceBuildFile != null ) {
@@ -75,6 +77,7 @@ object CddsVersion extends Application with Utils {
 			return "Unknown";
 		}
 	}
+
 
 	/**
 	 * getVersionFull will get full version from jar file, which is compiled in jar as resource file
@@ -92,6 +95,7 @@ object CddsVersion extends Application with Utils {
 		}
 	}
 
+	
 	def withPrintWriter(file: File)(op: PrintWriter => Unit) = {
 		val writer = new PrintWriter(file)
 		try {

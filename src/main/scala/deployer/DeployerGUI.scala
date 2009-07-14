@@ -24,7 +24,7 @@ object DeployerGUI extends SimpleGUIApplication with Utils {
 	initLogger
 	val prefs = new Preferences
 	if (prefs.getb("debug")) {
-		setLoggerLevelDebug_?(Level.TRACE)
+		setLoggerLevelDebug(Level.TRACE)
 	}
 
 	def top = new MainFrame {

@@ -175,6 +175,4 @@ object SSHActor extends Actor {
 	def connect = ssh.connect(host, port)
 
 	def disconnect = ssh.disconnect
-
-	def getSSH = ssh
 }

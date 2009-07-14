@@ -13,7 +13,7 @@ import utils.Utils
 
 object ScalaBot extends Actor with Utils {
 
-	private val logger = Logger.getLogger(ScalaBot.getClass)
+	var logger = Logger.getLogger(ScalaBot.getClass)
 	initLogger
 	addShutdownHook {
 		XMPPActor ! Quit
