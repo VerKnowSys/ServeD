@@ -35,7 +35,7 @@ object Deployer extends Actor with Utils {
 	private var prefs = new Preferences // default file name
 	private val debug = prefs.getb("debug")
 	if (debug) {
-		setLoggerLevelDebug_?(Level.TRACE)
+		setLoggerLevelDebug(Level.TRACE)
 	}
 	private var basicOnly_? = prefs.getb("deployOnlyBasicFiles")
 	private val basic_jar_names = prefs.getl("deployFilesBasic")
