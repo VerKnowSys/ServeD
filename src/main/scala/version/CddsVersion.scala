@@ -1,6 +1,5 @@
 package version
 
-import com.sun.javaws.security.Resource
 import command.exec.CommandExec
 import java.net.URL
 import org.apache.log4j._
@@ -8,6 +7,9 @@ import _root_.java.io.{OutputStreamWriter, PrintWriter, File}
 import _root_.java.util.Date
 import io.Source
 import prefs.Preferences
+import signals.{Init, Quit}
+
+import ssh.tools.SSHActor
 import utils.Utils
 
 /**
@@ -17,7 +19,7 @@ import utils.Utils
  */
 
 
-object CddsVersion extends Utils {
+object CddsVersion extends Application with Utils {
 	var logger = Logger.getLogger(CddsVersion.getClass)
 	initLogger
 	val prefs = new Preferences
@@ -80,7 +82,7 @@ object CddsVersion extends Utils {
 	def getVersionFull: String = {
 		var line = ""
 		if ( resourceBuildFile!= null ) {
-			for (lines <- Source.fromURL(resourceBuildFile.toString).getLines) {
+			for (lines <- Source.fromURL(resourceBuildFile).getLines) {
 				line = lines
 			}
 			return "Compiled at" + ": " + line.split("##")(0) + ", Build: " +
@@ -99,10 +101,6 @@ object CddsVersion extends Utils {
 		}
 	}
 
-	def writeNewContentToBuildFileWithBuildNo(build: String) = {
-		val intB = Integer.parseInt(build) + 1
-		writeNewContentToBuildFile
-	}
 
 	def writeNewContentToBuildFile = {
 		val file = new File("/tmp/" + buildTextFile)
@@ -113,30 +111,41 @@ object CddsVersion extends Utils {
 		withPrintWriter(file) {
 			writer => writer.print(
 				(new Date).toString + "##" +
-				buildNumber.toString + "##" +
+				(buildNumber + 1).toString + "##" +
 				outputSha + "##" +
 				outputHostname.trim
 			)
 		}
 	}
 
+
+	def updateRemoteVersion = {
+		SSHActor.start
+		SSHActor ! Init
+		SSHActor ! ("/tmp/" + buildTextFile, prefs.get("remoteWebStartDeployDir") + buildTextFile )
+	}
+
+
 	def loadAndUpdate = {
 		try {
 			logger.warn("Build file located in: " + resourceBuildFile)
 			for (line <- Source.fromURL(resourceBuildFile).getLines) {
-				logger.info("Current version: " + getVersion)
-				writeNewContentToBuildFileWithBuildNo(line.split("##")(1)) // give build number to iterate on
+				logger.warn("Old version: " + getVersion)
+				logger.warn("Current build number: " + (buildNumber + 1))
+				writeNewContentToBuildFile
+				updateRemoteVersion
+				logger.warn("Updated successfully")
 			}
 		} catch {
 			case x: Throwable => {
 				logger.error("Error occured in intialization: Cannot open " + buildTextFile + " file. Generating new one", x)
 				writeNewContentToBuildFile
+				updateRemoteVersion
+				logger.warn("Updated successfully")
 			}
 		}
 	}
 
-	def main(args: Array[String]) = {
-		loadAndUpdate
-	}
+	loadAndUpdate
 
 }

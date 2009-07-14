@@ -5,11 +5,11 @@ package ssh.tools
 
 
 import actors.Actor
+import deployer.{Deployer, JNLPSkeleton}
 import signals.{Init, Quit}
 
 import com.sshtools.j2ssh.authentication.{PasswordAuthenticationClient, AuthenticationProtocolState}
 import com.sshtools.j2ssh.SshClient
-import deployer.{JNLPSkeleton, Deployer}
 import jar.comparator.JarEntryComparator
 import java.io.{BufferedReader, InputStreamReader, File}
 
@@ -47,6 +47,11 @@ object SSHActor extends Actor {
 				case Quit => {
 					disconnect
 					Deployer ! Quit
+					exit
+				}
+				case (source: String, destination: String) => {
+					putLocalFileToRemoteHost(source, destination)
+					disconnect
 					exit
 				}
 				case (x: ArrayList[File], deployUuid: String, deployTmpDir: String, trunk: Boolean) => {
@@ -114,9 +119,7 @@ object SSHActor extends Actor {
 			} else {
 				logger.warn("FILE DIFFERENT: " + localFile.split("/").last)
 				logger.warn("Uploading " + localFile.split("/").last)
-				val client = ssh.openSftpClient
-				client.put(localFile, remoteDeployDir + localFile.split("/").last)
-				client.quit
+				putLocalFileToRemoteHost(localFile, remoteDeployDir + localFile.split("/").last)
 			}
 			clientForRemoteCommand.close
 		}
@@ -130,7 +133,6 @@ object SSHActor extends Actor {
 		}
 		// deploying jnlp file
 		logger.warn("Generating JNLP file")
-		val client = ssh.openSftpClient
 		var arguments = ""
 		for( i <- prefs.getl("webstartArgumentsJVM")) { // XXX: maybe switch to normal String instead of List[String] 
 			arguments += i + " "
@@ -150,9 +152,14 @@ object SSHActor extends Actor {
 		val tempJnlpFileName = "/tmp/launch-" + uuid + ".jnlp"
 		jnlp.saveJNLP(tempJnlpFileName)
 		logger.warn("Putting JNLP file to remote server")
-		client.put(tempJnlpFileName, prefs.get("remoteWebStartDeployDir") + prefs.get("jnlpFileName") )
-		client.quit
+		putLocalFileToRemoteHost(tempJnlpFileName, prefs.get("remoteWebStartDeployDir") + prefs.get("jnlpFileName") )
 		this ! Quit
+	}
+
+	def putLocalFileToRemoteHost(source: String, destination: String) = {
+		val client = ssh.openSftpClient
+		client.put(source, destination )
+		client.quit
 	}
 
 	def auth = {
@@ -168,5 +175,6 @@ object SSHActor extends Actor {
 	def connect = ssh.connect(host, port)
 
 	def disconnect = ssh.disconnect
-	
+
+	def getSSH = ssh
 }
