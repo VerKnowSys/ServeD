@@ -81,7 +81,7 @@ trait Utils {
 				if (System.getProperty("os.name").contains("Linux") ||
 					System.getProperty("os.name").contains("Mac")) {
 					for (path <- pathsToSearchForExecutables) {
-						if (path.exists) {
+						if (path.exists && !(path.toString.contains("X11"))) {
 							findFile( path, new P {
 								override
 								def accept(t: String): Boolean = {
