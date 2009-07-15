@@ -21,5 +21,3 @@ $HOME/.m2/repository/jivesoftware/smack/3.0.4/smack-3.0.4.jar:\
 $HOME/.m2/repository/jivesoftware/smackx/3.0.4/smackx-3.0.4.jar:\
 $HOME/.m2/repository/scala/project/tools/scala.project.tools/1.0-SNAPSHOT/scala.project.tools-1.0-SNAPSHOT.jar \
 $main "${YOUR_CONFIG_FILENAME}" $2 $3
-
-updateVersion
