@@ -8,7 +8,7 @@ import io.Source
 import prefs.Preferences
 import signals.{Init, Quit}
 
-import ssh.tools.SSHActor
+import utils.Utils
 
 /**
  * User: dmilith
@@ -17,7 +17,7 @@ import ssh.tools.SSHActor
  */
 
 
-trait CddsVersion {
+trait CddsVersion extends Utils {
 
 	var logger = Logger.getLogger(classOf[CddsVersion])
 	val prefs = new Preferences
@@ -26,16 +26,19 @@ trait CddsVersion {
 	val gitExecutable = prefs.get("gitExecutable")
 	val buildTextFile = "build.text" // XXX: hardcoded
 	val resourceBuildFile = prefs.get("jnlpCodebase") + buildTextFile // keep build.text file on remote server only in home of application url
+	val buildNumber = getVersionBuild
+	val file = new File("/tmp/" + buildTextFile)
+	val shaCommand = Array(gitExecutable,  "--git-dir=" + repositoryDir, "rev-list", "--no-merges", "HEAD...HEAD~1") // get newest commit sha
+	val outputSha = CommandExec.cmdExec(shaCommand).trim.split("\n")(0)
+	val outputHostname = CommandExec.cmdExec(Array("hostname", "-s"))
 	try {
 		Source.fromURL(resourceBuildFile) // check for existance
 	} catch {
 		case x: Exception => {
-			logger.error("Remote " + buildTextFile + " not found. Creating new file " + "\n" + x.printStackTrace)
-			// TODO: file creation code here
-				logger.info("NYI")
+			logger.warn("Remote " + buildTextFile + " not found. Creating new file ")
+			writeNewBuildFileFromScratch
 		}
 	}
-	val buildNumber = getVersionBuild
 
 
 	/**
@@ -92,22 +95,19 @@ trait CddsVersion {
 	}
 
 	
-	def withPrintWriter(file: File)(op: PrintWriter => Unit) = {
-		val writer = new PrintWriter(file)
-		try {
-			op(writer)
-		} finally {
-			writer.close
+	def writeNewBuildFileFromScratch = {
+		withPrintWriter(file) {
+			writer => writer.print(
+				(new Date).toString + "##" +
+				0.toString + "##" +
+				outputSha + "##" +
+				outputHostname.trim
+			)
 		}
 	}
 
 
 	def writeNewContentToBuildFile = {
-		val file = new File("/tmp/" + buildTextFile)
-		val shaCommand = Array(gitExecutable,  "--git-dir=" + repositoryDir, "rev-list", "--no-merges", "HEAD...HEAD~1") // get newest commit sha
-		val outputSha = CommandExec.cmdExec(shaCommand).trim.split("\n")(0)
-		val hostnameCommand = Array("hostname", "-s")
-		val outputHostname = CommandExec.cmdExec(hostnameCommand)
 		withPrintWriter(file) {
 			writer => writer.print(
 				(new Date).toString + "##" +

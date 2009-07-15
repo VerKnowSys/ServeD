@@ -1,7 +1,7 @@
 package utils
 
 
-import java.io.{File, OutputStreamWriter}
+import java.io.{PrintWriter, File, OutputStreamWriter}
 import java.util.ArrayList
 import java.util.regex.Pattern
 import org.apache.log4j._
@@ -34,6 +34,15 @@ trait Utils {
 		appender.setThreshold(arg)
 	}
 
+	def withPrintWriter(file: File)(op: PrintWriter => Unit) = {
+		val writer = new PrintWriter(file)
+		try {
+			op(writer)
+		} finally {
+			writer.close
+		}
+	}
+	
 	def addShutdownHook(block: => Unit) =
 		Runtime.getRuntime.addShutdownHook( new Thread {
 			override def run = block
