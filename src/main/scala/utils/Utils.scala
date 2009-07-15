@@ -63,7 +63,10 @@ trait Utils {
 		new File("/opt/local/bin/"), // XXX: hardcoded paths
 		new File("/bin/"),
 		new File("/usr/bin/"),
-		new File("/usr/local/bin/")
+		new File("/usr/local/bin/"),
+		new File("/sw/bin/"),
+		new File(System.getProperty("user.home") + "/bin"),
+		new File(System.getProperty("user.home") + "/Bin")
 	)
 
 	def requirements = Array(
