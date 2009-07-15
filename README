@@ -1,0 +1,15 @@
+*** Project Tools Readme ***
+
+- Purpose?
+- Because all other tools sucks
+
+0. Requirements:
+	0.1 - Java 1.6.0_14 at least
+	0.2 - Maven 2.1.x
+	0.3 - Linux or Mac
+	
+1. Instalation
+	1.1 - mvn install
+	1.2 - You could do symbolic links (or just copy) from executable files located in project directory to /usr/local/bin/ for example. Do as You wish
+	
+That's all folks
