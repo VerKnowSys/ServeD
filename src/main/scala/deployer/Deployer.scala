@@ -41,7 +41,6 @@ object Deployer extends Actor with Utils {
 	private val basic_jar_names = prefs.getl("deployFilesBasic")
 	private val dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
 	private val codebaseLocalDir = System.getProperty("user.home") + "/" + prefs.get("directoryForLocalDeploy")
-	private var trunk = false
 
 
 	def getFilesFromMavenRepositoryAndSignThem = {
@@ -166,6 +165,7 @@ object Deployer extends Actor with Utils {
 		logger.warn("User home dir: " + System.getProperty("user.home"))
 		logger.warn("Maven 2 Repository dir: " + pathToMaven2Repo)
 		logger.warn("Deploy tmp dir: " + deployTmpDir)
+		logger.warn("Will deploy files to remote host to: " + prefs.get("remoteWebStartDeployDir"))
 		logger.warn("Given arguments:")
 		args.foreach{
 			a => logger.warn(a)
@@ -192,51 +192,30 @@ object Deployer extends Actor with Utils {
 						getFilesFromMavenRepositoryAndSignThem
 						deployLocal
 					}
-					case "trunk" => {
-						// remote trunk deploy
-						logger.warn("Requested to perform trunk deploy")
-						this.start
-						SSHActor.start
-						SSHActor ! Init
-						getFilesFromMavenRepositoryAndSignThem
-						trunk = true
-						SSHActor ! (filesToBeDeployed, uuid, deployTmpDir, trunk)
-					}
-					case "trunk-full" => {
-						// remote full trunk deploy
-						logger.warn("Requested to perform FULL trunk deploy")
-						this.start
-						SSHActor.start
-						SSHActor ! Init
-						basicOnly_? = false
-						trunk = true
-						getFilesFromMavenRepositoryAndSignThem
-						SSHActor ! (filesToBeDeployed, uuid, deployTmpDir, trunk)
-					}
 					case "help" => {
 						// help
 						logger.warn("\n\nDeployer quick help:\nValid params:\n" +
-								"\ttrunk -> for trunk deploy\n" +
-								"\ttrunk-full -> for full trunk deploy\n" +
 								"\tlocal -> for basic local deploy\n" +
 								"\tlocal-full -> for full local deploy\n" +
 								"\tmac-app -> for Macintosh application (NYI)\n" +
-								"\tTo run remote deploying, no arguments (default).")
+								"\tTo run remote deploy, no arguments (defaults based on xml config).")
 					}
 					case _ => {
 
 					}
 				}
 			}
-		} else {
+		}
+		if (args.size == 1) {
 			logger.warn("Requested to perform standard remote deploy")
 			this.start
 			// normal deploy based on config values
 			SSHActor.start
 			SSHActor ! Init
 			getFilesFromMavenRepositoryAndSignThem
-			SSHActor ! (filesToBeDeployed, uuid, deployTmpDir, trunk)
+			SSHActor ! (filesToBeDeployed, uuid, deployTmpDir)
 		}
+			
 	}
 
 }

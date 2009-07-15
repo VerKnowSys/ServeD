@@ -1,7 +1,6 @@
 package version
 
 import command.exec.CommandExec
-import java.net.URL
 import org.apache.log4j._
 import _root_.java.io.{OutputStreamWriter, PrintWriter, File}
 import _root_.java.util.Date
@@ -10,7 +9,6 @@ import prefs.Preferences
 import signals.{Init, Quit}
 
 import ssh.tools.SSHActor
-import utils.Utils
 
 /**
  * User: dmilith
@@ -19,22 +17,15 @@ import utils.Utils
  */
 
 
-object CddsVersion extends Application with Utils {
+trait CddsVersion {
 
-	var logger = Logger.getLogger(CddsVersion.getClass)
-	initLogger
+	var logger = Logger.getLogger(classOf[CddsVersion])
 	val prefs = new Preferences
 	val debug = prefs.getb("debug")
-	if (debug) {
-		setLoggerLevelDebug(Level.DEBUG) // XXX: hardcoded
-	} else {
-		setLoggerLevelDebug(Level.WARN)
-	}
 	val repositoryDir = prefs.get("gitRepositoryProjectDir")
 	val gitExecutable = prefs.get("gitExecutable")
-	val buildFileLocationRemote = prefs.get("jnlpCodebase") // keep build.text file on remote server only in home of application url
 	val buildTextFile = "build.text" // XXX: hardcoded
-	val resourceBuildFile = buildFileLocationRemote + buildTextFile
+	val resourceBuildFile = prefs.get("jnlpCodebase") + buildTextFile // keep build.text file on remote server only in home of application url
 	try {
 		Source.fromURL(resourceBuildFile) // check for existance
 	} catch {
@@ -57,26 +48,28 @@ object CddsVersion extends Application with Utils {
 
 	def getVersionBuild: Int = {
 		var line = ""
-		if ( resourceBuildFile != null ) {
+		try {
 			for (lines <- Source.fromURL(resourceBuildFile).getLines) {
 				line = lines
 			}
 			return line.split("##")(1).toInt
-		} else {
-			return 0;
+		} catch {
+			case _ =>
+				return 0;
 		}
 	}
 
 
 	def getVersion(prefix: String): String = {
 		var line = ""
-		if ( resourceBuildFile != null ) {
+		try {
 			for (lines <- Source.fromURL(resourceBuildFile).getLines) {
 				line = lines
 			}
 			return prefix + line.split("##")(1) + " (" + line.split("##")(2) + ")"
-		} else {
-			return "Unknown";
+		} catch {
+		    case _ =>
+			    return "Unknown";
 		}
 	}
 
@@ -86,14 +79,15 @@ object CddsVersion extends Application with Utils {
 	 */
 	def getVersionFull: String = {
 		var line = ""
-		if ( resourceBuildFile!= null ) {
+		try {
 			for (lines <- Source.fromURL(resourceBuildFile).getLines) {
 				line = lines
 			}
 			return "Compiled at" + ": " + line.split("##")(0) + ", Build: " +
 						line.split("##")(1) + ", " + "Last" + " Sha1: " + line.split("##")(2) + ", on: " + line.split("##")(3)
-		} else {
-			return "Unknown";
+		} catch {
+			case _ =>
+				return "Unknown";
 		}
 	}
 
@@ -125,33 +119,20 @@ object CddsVersion extends Application with Utils {
 	}
 
 
-	def updateRemoteVersion = {
-		SSHActor.start
-		SSHActor ! Init
-		SSHActor ! ("/tmp/" + buildTextFile, prefs.get("remoteWebStartDeployDir") + buildTextFile )
-	}
-
-
-	def loadAndUpdate = {
+	def loadAndUpdateVersion = {
 		try {
-			logger.info("Build file located in: " + resourceBuildFile)
+			logger.warn("Build file located in: " + resourceBuildFile)
 			for (line <- Source.fromURL(resourceBuildFile).getLines) {
 				logger.warn("Old version: " + getVersion)
 				logger.warn("Current build number: " + (buildNumber + 1))
 				writeNewContentToBuildFile
-				updateRemoteVersion
-				logger.info("Updated successfully")
 			}
 		} catch {
 			case x: Throwable => {
 				logger.error("Error occured in intialization: Cannot open " + buildTextFile + " file. Generating new one", x)
 				writeNewContentToBuildFile
-				updateRemoteVersion
-				logger.warn("Updated successfully")
 			}
 		}
 	}
-
-	loadAndUpdate
 
 }

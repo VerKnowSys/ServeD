@@ -16,6 +16,7 @@ import java.io.{BufferedReader, InputStreamReader, File}
 import java.util.{Date, ArrayList}
 import org.apache.log4j.Logger
 import prefs.Preferences
+import version.CddsVersion
 
 /**
  * User: dmilith
@@ -23,11 +24,8 @@ import prefs.Preferences
  * Time: 3:15:04 PM
  */
 
-object SSHActor extends Actor {
+object SSHActor extends Actor with CddsVersion {
 
-	private val logger = Logger.getLogger(SSHActor.getClass)
-	private val prefs = new Preferences
-	private val debug = prefs.getb("debug")
 	private val host = prefs.get("sshHost")
 	private val port = prefs.geti("sshPort")
 	private val userName = prefs.get("sshUserName")
@@ -49,39 +47,32 @@ object SSHActor extends Actor {
 					Deployer ! Quit
 					exit
 				}
-				case (source: String, destination: String) => {
-					putLocalFileToRemoteHost(source, destination)
-					disconnect
-					exit
-				}
-				case (x: ArrayList[File], deployUuid: String, deployTmpDir: String, trunk: Boolean) => {
+				case (x: ArrayList[File], deployUuid: String, deployTmpDir: String) => {
 					logger.info("Performing tasks with given list of files: " + x.toArray.map{ a => deployTmpDir + a.toString.split("/").last })
-					if (trunk) {
-						logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
-						prefs.value.update("remoteWebStartDeployDir", prefs.get("remoteWebStartDeployDir") + "trunk/")
-						prefs.value.update("jnlpCodebase", prefs.get("jnlpCodebase") + "trunk/")
-					} else {
-						logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
-					}
+					logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
 					uuid = deployUuid
 					deploy(x, deployUuid, deployTmpDir)
+					loadAndUpdateVersion // update version in local temporary file
+					logger.info("Putting build file to remote host..")
+					putLocalFileToRemoteHost("/tmp/" + buildTextFile, prefs.get("remoteWebStartDeployDir") + buildTextFile)
+					logger.warn("Remote file updated")
 					act
 				}
 			}
 		}
 	}
 
+
 	def backup = {
 		val clientForRemoteCommand = ssh.openSessionChannel
 		val backupDate = (new Date).toString.replaceAll(" |:", "_")
 		val source = prefs.get("remoteWebStartDeployDir")
-		var adder = ""
-		if (source.contains("trunk")) adder = "../" 
-		val destination = prefs.get("remoteWebStartDeployDir") + adder + "../OLD_dist_" + backupDate
+		val destination = prefs.get("remoteWebStartDeployDir") + "../OLD/" + backupDate
 		logger.warn("Copying " + source + " to " + destination)
 		clientForRemoteCommand.executeCommand("cp -r " + source + " " + destination)
 		clientForRemoteCommand.close
 	}
+
 
 	def deploy(list: ArrayList[File], deployUuid: String, deployTmpDir: String) = {
 
@@ -156,11 +147,13 @@ object SSHActor extends Actor {
 		this ! Quit
 	}
 
+
 	def putLocalFileToRemoteHost(source: String, destination: String) = {
 		val client = ssh.openSftpClient
 		client.put(source, destination )
 		client.quit
 	}
+
 
 	def auth = {
 		val passwordAuthenticationClient = new PasswordAuthenticationClient
@@ -172,7 +165,9 @@ object SSHActor extends Actor {
 		}
 	}
 
+
 	def connect = ssh.connect(host, port)
 
+	
 	def disconnect = ssh.disconnect
 }
