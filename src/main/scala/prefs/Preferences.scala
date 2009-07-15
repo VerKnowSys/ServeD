@@ -32,7 +32,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 		"jarSignerKeyName" -> "VerKnowSys",
 		"sshUserName" -> "verknowsys",
 		"sshPassword" -> "gru5zka.",
-		"sshHost" -> "verknowsys.com",
+		"sshHost" -> "drakor.eu",
 		"sshPort" -> 22,
 		"users" -> List(
 			HashMap( "user" -> "dmilith@jabber.verknowsys.info", "params" -> "--numstat --no-merges --abbrev-commit" ),
