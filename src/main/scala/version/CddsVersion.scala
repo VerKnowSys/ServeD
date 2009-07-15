@@ -36,7 +36,7 @@ trait CddsVersion extends Utils {
 	} catch {
 		case x: Exception => {
 			logger.warn("Remote " + buildTextFile + " not found. Creating new file ")
-			writeNewBuildFileFromScratch
+			writeNewContentToBuildFile(0)
 		}
 	}
 
@@ -95,23 +95,11 @@ trait CddsVersion extends Utils {
 	}
 
 	
-	def writeNewBuildFileFromScratch = {
+	def writeNewContentToBuildFile(p_buildNumber: Int) = {
 		withPrintWriter(file) {
 			writer => writer.print(
 				(new Date).toString + "##" +
-				0.toString + "##" +
-				outputSha + "##" +
-				outputHostname.trim
-			)
-		}
-	}
-
-
-	def writeNewContentToBuildFile = {
-		withPrintWriter(file) {
-			writer => writer.print(
-				(new Date).toString + "##" +
-				(buildNumber + 1).toString + "##" +
+				(p_buildNumber).toString + "##" +
 				outputSha + "##" +
 				outputHostname.trim
 			)
@@ -125,12 +113,12 @@ trait CddsVersion extends Utils {
 			for (line <- Source.fromURL(resourceBuildFile).getLines) {
 				logger.warn("Old version: " + getVersion)
 				logger.warn("Current build number: " + (buildNumber + 1))
-				writeNewContentToBuildFile
+				writeNewContentToBuildFile(buildNumber + 1)
 			}
 		} catch {
 			case x: Throwable => {
-				logger.error("Error occured in intialization: Cannot open " + buildTextFile + " file. Generating new one", x)
-				writeNewContentToBuildFile
+				logger.warn("Error occured in intialization: Cannot open " + buildTextFile + " file. Generating new one")
+				writeNewContentToBuildFile(buildNumber + 1)
 			}
 		}
 	}
