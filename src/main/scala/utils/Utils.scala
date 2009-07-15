@@ -49,7 +49,7 @@ trait Utils {
 		})
 
 	def findFile(f: File, p: P, r: ArrayList[File]) {
-		if (f.isDirectory && !(f.toString.contains("X11"))) {
+		if (f.isDirectory && !(f.toString.contains("X11"))) { // XXX: hack to prevent entering endless recursion in directories like those stupid fucks from linux does with /usr/bin/X11
 			val files = f.listFiles
 			for (i <- 0 until files.length) {
 				findFile(files(i), p, r)
