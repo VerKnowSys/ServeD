@@ -49,7 +49,7 @@ trait Utils {
 		})
 
 	def findFile(f: File, p: P, r: ArrayList[File]) {
-		if (f.isDirectory) {
+		if (f.isDirectory && !(f.toString.contains("X11"))) {
 			val files = f.listFiles
 			for (i <- 0 until files.length) {
 				findFile(files(i), p, r)
@@ -81,7 +81,7 @@ trait Utils {
 				if (System.getProperty("os.name").contains("Linux") ||
 					System.getProperty("os.name").contains("Mac")) {
 					for (path <- pathsToSearchForExecutables) {
-						if (path.exists && !(path.toString.contains("X11"))) {
+						if (path.exists) {
 							findFile( path, new P {
 								override
 								def accept(t: String): Boolean = {
