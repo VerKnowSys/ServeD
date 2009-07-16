@@ -148,6 +148,16 @@ object Deployer extends Actor with Utils {
 		FileUtils.copyFileToDirectory(new File(tempJnlpFileName), new File(codebaseLocalDir))
 	}
 
+
+	def copyAndInstallMacApp = {
+		logger.warn("Copying jars to temporary mac app")
+		FileUtils.copyDirectory(new File(deployTmpDir), new File(codebaseLocalDir + "../Coviob.app/lib")) // XXX: hardcoded Coviob.app name 
+		// XXX: application skeleton must be uploaded to ~/.codadris before deploy
+		logger.warn("Copying Application to /Applications")
+		FileUtils.copyDirectory(new File(codebaseLocalDir + "../Coviob.app"), new File("/Applications/Coviob.app"))
+		logger.warn("Making executable of app starting script..")
+		CommandExec.cmdExec(Array("chmod", "777", "/Applications/Coviob.app/Contents/MacOS/coviob2")) // XXX: why the fuck copying files will result changing permissions to files?!
+	}
 	
 	def main(args: Array[String]) {
 
@@ -176,7 +186,11 @@ object Deployer extends Actor with Utils {
 			for (arg <- args) {
 				arg match {
 					case "mac-app" => {
-						logger.warn("Requested to perform Mac Application instead of web-start app\nNYI!")
+						logger.warn("Requested to perform Mac Application deploy")
+						basicOnly_? = false
+						getFilesFromMavenRepositoryAndSignThem
+						deployLocal
+						copyAndInstallMacApp
 						// TODO: implement Mac Application deploy support
 					}
 					case "local-full" => {
