@@ -1,7 +1,6 @@
 #!/bin/bash
 # This Software is a close code project. You may not redistribute this code without permission of author.
 
-echo "Running DbAddCommit"
 # $1 => begin sha
 # $2 => end sha
 # $3 => absolute git repository dir
