@@ -7,6 +7,7 @@
   <inceptionYear>2009</inceptionYear>
   <properties>
     <scala.version>2.7.5</scala.version>
+	<neodatis.version>1.9.3.601</neodatis.version>
   </properties>
 
   <repositories>
@@ -68,9 +69,9 @@
 	    <version>3.0.4</version>
 	</dependency>
 	<dependency>
-	  <groupId>org.neodatis.odb</groupId>
+	  <groupId>org.neodatis</groupId>
 	  <artifactId>neodatis-odb</artifactId>
-	  <version>1.9-SNAPSHOT</version>
+	  <version>${neodatis.version}</version>
 	</dependency>
 	<dependency>
       <groupId>log4j</groupId>
