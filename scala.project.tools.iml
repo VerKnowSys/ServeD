@@ -37,15 +37,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MAVEN_REPOSITORY$/org/neodatis/odb/neodatis-odb/1.9-SNAPSHOT/neodatis-odb-1.9-SNAPSHOT.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MAVEN_REPOSITORY$/pircbot/pircbot/1.4.2/pircbot-1.4.2.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -119,6 +110,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-swing/2.7.5/scala-swing-2.7.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MAVEN_REPOSITORY$/org/neodatis/neodatis-odb/1.9.3.601/neodatis-odb-1.9.3.601.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
