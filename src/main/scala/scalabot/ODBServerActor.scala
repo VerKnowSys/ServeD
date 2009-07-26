@@ -4,13 +4,12 @@
 package scalabot
 
 
+
+import org.neodatis.odb.{OdbConfiguration, ODBServer, ODBFactory}
 import signals.{Init, Quit}
 import org.apache.log4j.Logger
 import prefs.Preferences
 import scala.actors._
-
-import org.neodatis.odb._
-
 
 object ODBServerActor extends Actor {
 	
@@ -22,7 +21,8 @@ object ODBServerActor extends Actor {
 
 	def initServer = {
 		try {
-			Configuration.setDatabaseCharacterEncoding( "UTF8" )
+			OdbConfiguration.setAutomaticCloseFileOnExit(true)
+			OdbConfiguration.setDatabaseCharacterEncoding( "UTF8" )
 			server = ODBFactory.openServer(prefs.geti("databaseODBPort"))
 			server.addBase(prefs.get("xmppDatabaseName"), absolutePathToBotODBDir + prefs.get("xmppDatabaseFileName"))
 			server.addBase(prefs.get("ircDatabaseName"), absolutePathToBotODBDir + prefs.get("ircDatabaseFileName"))
