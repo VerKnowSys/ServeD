@@ -1,0 +1,5 @@
+#!/bin/bash
+
+date=`date "+%Y-%m-%d"`
+
+mvn -e install:install-file -Ddescription="Neodatis ODB, build on $date" -Dfile="lib/neodatis.jar" -DgeneratePom=true -DgroupId="org.neodatis" -DartifactId="neodatis-odb" -Dversion="1.9.3.601" -Dpackaging=jar
