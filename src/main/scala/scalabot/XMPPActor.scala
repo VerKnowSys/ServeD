@@ -106,6 +106,8 @@ object XMPPActor extends Actor with MessageListener {
 	def getMessages: List[String] = {
 		var odb: ODB = null
 		var list: List[String] = List()
+		OdbConfiguration.setAutomaticCloseFileOnExit(true)
+		OdbConfiguration.setDatabaseCharacterEncoding( "UTF8" )
 		try {
 		    odb = ODBFactory.openClient(prefs.get("xmppDatabaseListenAddress"), prefs.geti("databaseODBPort"), prefs.get("xmppDatabaseName"))
 		    var query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))

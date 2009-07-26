@@ -41,6 +41,8 @@ object IRCActor extends PircBot with Actor {
 	def getLinks(howMany: Int): List[LinkInfo] = {
 		var odb: ODB = null
 		var list: List[LinkInfo] = List()
+		OdbConfiguration.setAutomaticCloseFileOnExit(true)
+		OdbConfiguration.setDatabaseCharacterEncoding( "UTF8" )
 		try {
 		    odb = ODBFactory.openClient(prefs.get("ircDatabaseListenAddress"), prefs.geti("databaseODBPort"), prefs.get("ircDatabaseName"))
 		    val query = new CriteriaQuery(classOf[LinkInfo]) //, Where.equal("date.getDay", (new Date).getDay))
