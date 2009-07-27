@@ -1,4 +1,4 @@
-// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved. 
+// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
 package prefs
@@ -72,7 +72,9 @@ class Preferences(configFileNameInput: String) extends Utils {
 			"timingframework-1.0.jar",
 			"scala-swing-2.7.5.jar",
 			"scala-compiler-2.7.5.jar",
-			"scala-library-2.7.5.jar"
+			"scala-library-2.7.5.jar",
+			"quaqua.swing-layout-5.4.1.jar",
+			"quaqua-5.4.1.jar"
 		),
 		"webstartArgumentsJVM" -> List(
 		  	"-Dcom.apple.macos.useScreenMenuBar=true",
