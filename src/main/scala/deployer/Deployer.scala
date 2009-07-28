@@ -200,6 +200,16 @@ object Deployer extends Actor with Utils {
 						getFilesFromMavenRepositoryAndSignThem
 						deployLocal
 					}
+					case "full" => {
+						// remote full deploy without ssh actor
+						logger.warn("Requested to perform FULL remote deploy")
+						basicOnly_? = false
+						this.start
+						SSHActor.start
+						SSHActor ! Init
+						getFilesFromMavenRepositoryAndSignThem
+						SSHActor ! (filesToBeDeployed, uuid, deployTmpDir)
+					}
 					case "local" => {
 						// local deploy without ssh actor
 						logger.warn("Requested to perform local deploy")
@@ -211,7 +221,8 @@ object Deployer extends Actor with Utils {
 						logger.warn("\n\nDeployer quick help:\nValid params:\n" +
 								"\tlocal -> for basic local deploy\n" +
 								"\tlocal-full -> for full local deploy\n" +
-								"\tmac-app -> for Macintosh application (NYI)\n" +
+								"\tmac-app -> for Macintosh application deploy and install\n" +
+								"\tfull -> for full remote deploy\n" +
 								"\tTo run remote deploy, no arguments (defaults based on xml config).")
 					}
 					case _ => {
