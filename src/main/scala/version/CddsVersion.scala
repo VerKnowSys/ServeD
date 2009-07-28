@@ -20,7 +20,7 @@ import utils.Utils
 trait CddsVersion extends Utils {
 
 	var logger = Logger.getLogger(classOf[CddsVersion])
-	val prefs = new Preferences
+	val prefs = (new Preferences).loadPreferences
 	val debug = prefs.getb("debug")
 	val repositoryDir = prefs.get("gitRepositoryProjectDir")
 	val gitExecutable = prefs.get("gitExecutable")
