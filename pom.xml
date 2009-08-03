@@ -10,17 +10,12 @@
 	<neodatis.version>1.9.3.601</neodatis.version>
   </properties>
 
-  <repositories>
+<!--  <repositories>
     <repository>
 		<id>scala-tools.org</id>
 		<name>Scala-Tools Maven2 Repository</name>
 		<url>http://scala-tools.org/repo-releases</url>
     </repository>
-	<repository>
-		<id>warp-persist-neodatis</id>
-		<name>warp-persist-neodatis</name>
-		<url>http://warp-persist-neodatis.googlecode.com/svn/trunk/repo/</url>
-	</repository>
   </repositories>
 
   <pluginRepositories>
@@ -29,7 +24,7 @@
       <name>Scala-Tools Maven2 Repository</name>
       <url>http://scala-tools.org/repo-releases</url>
     </pluginRepository>
-  </pluginRepositories>
+  </pluginRepositories> -->
 
   <dependencies>
     <dependency>
