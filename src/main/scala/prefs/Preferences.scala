@@ -75,7 +75,8 @@ class Preferences(configFileNameInput: String) extends Utils {
 			"scala-library-2.7.5.jar",
 			"org.quaqua.swing-layout-5.4.1.jar",
 			"org.quaqua-5.4.1.jar",
-			"substance-5.1.jar"
+			"substance-5.1.jar",
+			"beansbinding-1.2.1.jar"
 		),
 		"webstartArgumentsJVM" -> List(
 		  	"-Dcom.apple.macos.useScreenMenuBar=true",
