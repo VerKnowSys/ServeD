@@ -118,7 +118,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MAVEN_REPOSITORY$/org/neodatis/neodatis-odb/1.9.3.601/neodatis-odb-1.9.3.601.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/neodatis/neodatis-odb/1.9.5.609/neodatis-odb-1.9.5.609.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
