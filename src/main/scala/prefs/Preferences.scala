@@ -16,7 +16,8 @@ import utils.Utils
 class Preferences(configFileNameInput: String) extends Utils {
 
 	def this() = this("project.tools.xml") // additional Constructor
-	var logger = Logger.getLogger(classOf[Preferences])
+	override
+	def logger = Logger.getLogger(classOf[Preferences])
 	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + configFileNameInput
 	var value = HashMap[String,Any] ( // XXX hardcoded values will be removed when GUI will be ready
 		"debug" -> false,
