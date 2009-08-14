@@ -2,4 +2,4 @@
 
 date=`date "+%Y-%m-%d"`
 
-mvn -e install:install-file -DcreateChecksum=true -Ddescription="Neodatis ODB, build on $date" -Dfile="lib/neodatis.jar" -DgeneratePom=true -DgroupId="org.neodatis" -DartifactId="neodatis-odb" -Dversion="1.9.5.609" -Dpackaging=jar
+mvn -e install:install-file -DcreateChecksum=true -Ddescription="Neodatis ODB, build on $date" -Dfile="lib/neodatis.jar" -DgeneratePom=true -DgroupId="org.neodatis" -DartifactId="neodatis-odb" -Dversion="1.9.7.612" -Dpackaging=jar
