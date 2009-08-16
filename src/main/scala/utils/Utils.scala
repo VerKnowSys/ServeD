@@ -18,7 +18,7 @@ trait Utils {
 
 	trait P { def accept(t: String): Boolean }
 
-	var logger: Logger
+	def logger: Logger = Logger.getLogger(classOf[Utils])
 	val appender = new ConsoleAppender
 	val level = Level.WARN
 
@@ -26,8 +26,10 @@ trait Utils {
 		appender.setName(ConsoleAppender.SYSTEM_OUT);
 		appender.setWriter(new OutputStreamWriter(System.out))
 		appender.setThreshold(level)
-		appender.setLayout(new PatternLayout("{ %-5p %d : %m }%n"));
-		Logger.getRootLogger.addAppender(appender)
+		appender.setLayout(new PatternLayout("{ %-5p: [%c]: %m }%n"));
+		if (Logger.getRootLogger.getAppender(ConsoleAppender.SYSTEM_OUT) == null) {
+			Logger.getRootLogger.addAppender(appender)
+		}
 	}
 
 	def setLoggerLevelDebug(arg: Priority) = {

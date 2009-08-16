@@ -16,7 +16,8 @@ import utils.Utils
 class Preferences(configFileNameInput: String) extends Utils {
 
 	def this() = this("project.tools.xml") // additional Constructor
-	var logger = Logger.getLogger(classOf[Preferences])
+	override
+	def logger = Logger.getLogger(classOf[Preferences])
 	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + configFileNameInput
 	var value = HashMap[String,Any] ( // XXX hardcoded values will be removed when GUI will be ready
 		"debug" -> false,
@@ -75,7 +76,8 @@ class Preferences(configFileNameInput: String) extends Utils {
 			"scala-library-2.7.5.jar",
 			"org.quaqua.swing-layout-5.4.1.jar",
 			"org.quaqua-5.4.1.jar",
-			"substance-5.1.jar"
+			"substance-5.1.jar",
+			"beansbinding-1.2.1.jar"
 		),
 		"webstartArgumentsJVM" -> List(
 		  	"-Dcom.apple.macos.useScreenMenuBar=true",
