@@ -19,7 +19,8 @@ import utils.Utils
 
 trait CddsVersion extends Utils {
 
-	var logger = Logger.getLogger(classOf[CddsVersion])
+	override
+	def logger = Logger.getLogger(classOf[CddsVersion])
 	val prefs = new Preferences
 	val debug = prefs.getb("debug")
 	val repositoryDir = prefs.get("gitRepositoryProjectDir")
