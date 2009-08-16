@@ -173,7 +173,7 @@ object Deployer extends Actor with Utils {
 		}
 		prefs = new Preferences(args(0))
 		logger.warn("Starting Deployer..")
-		logger.warn("User home dir: " + System.getProperty("user.home"))
+		logger.warn("Deployer home dir: " + System.getProperty("user.home") + "/.codadris/" )
 		logger.warn("Maven 2 Repository dir: " + pathToMaven2Repo)
 		logger.warn("Deploy tmp dir: " + deployTmpDir)
 		logger.warn("Will deploy files to remote host to: " + prefs.get("remoteWebStartDeployDir"))
