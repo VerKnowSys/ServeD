@@ -289,7 +289,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 
 	try { // read values from config or generate new stub
 		value = fromXML(XML.loadFile(configFileName))
-		logger.warn("*** Config file found (" + configFileName + ")")
+		logger.warn("Config file used (" + configFileName + ")")
 	} catch {
 		case x: Throwable => {
 			logger.error("*** Config file " + configFileName + " doesn't exists! Creating new one")

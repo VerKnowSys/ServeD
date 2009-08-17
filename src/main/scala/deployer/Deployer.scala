@@ -42,6 +42,7 @@ object Deployer extends Actor with Utils {
 	private val basic_jar_names = prefs.getl("deployFilesBasic")
 	private val dependency_jar_names = prefs.getl("deployFilesAdditionalDependencies")
 	private val codebaseLocalDir = System.getProperty("user.home") + "/" + prefs.get("directoryForLocalDeploy")
+	private var macAppDeploy = false
 
 
 	def getFilesFromMavenRepositoryAndSignThem = {
@@ -63,7 +64,12 @@ object Deployer extends Actor with Utils {
 					val pattern = Pattern.compile(fileRegex)
 					val mat = pattern.matcher(t)
 					if ( mat.find ) {
-						signJar(t)
+						if (!macAppDeploy)
+							signJar(t)
+						else { // don't sign jars when it's mac-app deploy
+							logger.warn("Copying jar: " + t.split("/").last)
+							FileUtils.copyFileToDirectory(new File(t), new File(deployTmpDir)) // copy files to temporary dir
+						}
 						return true
 					}
 					return false
@@ -159,7 +165,16 @@ object Deployer extends Actor with Utils {
 		logger.warn("Making executable of app starting script..")
 		CommandExec.cmdExec(Array("chmod", "777", "/Applications/Coviob.app/Contents/MacOS/coviob2")) // XXX: why the fuck copying files will result changing permissions to files?!
 	}
-	
+
+
+	def deployerHelp = logger.warn("\n\nDeployer quick help:\nValid params:\n" +
+								"\tlocal -> for basic local deploy\n" +
+								"\tlocal-full -> for full local deploy\n" +
+								"\tmac-app -> for Macintosh application deploy and install\n" +
+								"\tfull -> for full remote deploy\n" +
+								"\tTo run remote deploy, no arguments (defaults based on xml config).")
+
+
 	def main(args: Array[String]) {
 
 		addShutdownHook {
@@ -184,11 +199,12 @@ object Deployer extends Actor with Utils {
 
 		// check given arguments
 		if (args.size > 0) {
-			for (arg <- args) {
-				arg match {
+//			for (arg <- args) {
+				args(1) match {
 					case "mac-app" => {
 						logger.warn("Requested to perform Mac Application deploy")
 						basicOnly_? = false
+						macAppDeploy = true
 						getFilesFromMavenRepositoryAndSignThem
 						deployLocal
 						copyAndInstallMacApp
@@ -217,19 +233,9 @@ object Deployer extends Actor with Utils {
 						getFilesFromMavenRepositoryAndSignThem
 						deployLocal
 					}
-					case "help" => {
-						// help
-						logger.warn("\n\nDeployer quick help:\nValid params:\n" +
-								"\tlocal -> for basic local deploy\n" +
-								"\tlocal-full -> for full local deploy\n" +
-								"\tmac-app -> for Macintosh application deploy and install\n" +
-								"\tfull -> for full remote deploy\n" +
-								"\tTo run remote deploy, no arguments (defaults based on xml config).")
-					}
-					case _ => {
-
-					}
-				}
+					case _ =>
+						deployerHelp
+//				}
 			}
 		}
 		if (args.size == 1) {
