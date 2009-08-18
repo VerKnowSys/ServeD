@@ -13,7 +13,8 @@ import utils.Utils
 
 object DbAddCommit extends Utils {
 
-	var logger = Logger.getLogger(DbAddCommit.getClass)
+	override
+	def logger = Logger.getLogger(DbAddCommit.getClass)
 	private val prefs = new Preferences       // TODO: add custom config file support
 	private val debug = prefs.getb("debug")
 	private val gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")

@@ -7,10 +7,10 @@ package prefs
 import java.io.File
 import java.util.ArrayList
 import java.util.regex.Pattern
-import org.apache.log4j.Logger
+import org.apache.log4j.{Level, Logger}
 import scala.collection.mutable.HashMap
-import scala.xml.XML
 import utils.Utils
+import xml.{Node, XML}
 
 
 class Preferences(configFileNameInput: String) extends Utils {
@@ -18,119 +18,75 @@ class Preferences(configFileNameInput: String) extends Utils {
 	def this() = this("project.tools.xml") // additional Constructor
 	override
 	def logger = Logger.getLogger(classOf[Preferences])
+	initLogger
 	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + configFileNameInput
-	var value = HashMap[String,Any] ( // XXX hardcoded values will be removed when GUI will be ready
+	var value = HashMap[String,Any] (
 		"debug" -> false,
-		"xmppResourceString" -> "scalaBot-2",
-		"xmppLogin" -> "varra",
-		"xmppPassword" -> "varrajabber",
-		"xmppServer" -> "drakor.eu",
+		"xmppResourceString" -> "",
+		"xmppLogin" -> "",
+		"xmppPassword" -> "",
+		"xmppServer" -> "",
 		"xmppPort" -> 5222,
-		"gitExecutable" -> "git",
-		"gitRepositoryProjectDir" -> "/git/scala.project.tools.git/.git",
-		"jarSignerPassword" -> "gru5zka.",
-		"jarSignerExecutable" -> "jarsigner",
-		"jarSignerKeyName" -> "VerKnowSys",
-		"sshUserName" -> "verknowsys",
-		"sshPassword" -> "gru5zka.",
-		"sshHost" -> "drakor.eu",
+		"gitExecutable" -> "",
+		"gitRepositoryProjectDir" -> "",
+		"jarSignerPassword" -> "",
+		"jarSignerExecutable" -> "",
+		"jarSignerKeyName" -> "",
+		"sshUserName" -> "",
+		"sshPassword" -> "",
+		"sshHost" -> "",
 		"sshPort" -> 22,
 		"users" -> List(
-			HashMap( "user" -> "dmilith@jabber.verknowsys.info", "params" -> "--numstat --no-merges --abbrev-commit" ),
-			HashMap( "user" -> "szymon@jez.net.pl", "params" -> "--full-diff --numstat --no-merges" ),
-			HashMap( "user" -> "karolrvn@jabber.verknowsys.info", "params" -> "--numstat --no-merges" ),
-			HashMap( "user" -> "vara@jabber.verknowsys.info", "params" -> "--numstat --no-merges" )
+			HashMap( "user" -> "someone@somehost.domain", "params" -> "--numstat --no-merges" )
 		),
 		"deployFilesBasic" -> List(
-			"codadris.utils-0.0.1-SNAPSHOT.jar",
-			"codadris.gui-0.0.1-SNAPSHOT.jar",
-			"codadris.gui.utils-0.0.1-SNAPSHOT.jar",
-			"codadris.gui.screenspace-0.0.1-SNAPSHOT.jar",
-			"codadris.gui.suite-0.0.1-SNAPSHOT.jar",
-			"codadris.gui.textedit-0.0.1-SNAPSHOT.jar",
-			"codadris.gui.treetable-0.0.1-SNAPSHOT.jar",
-			"codadris.gui.scala-0.0.1-SNAPSHOT.jar",
-			"codadris.dbgui-0.0.1-SNAPSHOT.jar",
-			"codadris.dbapp-0.0.1-SNAPSHOT.jar",
-			"flexdock_codadris-0.0.1-SNAPSHOT.jar",
-			"codadris.binblocklang-0.0.1-SNAPSHOT.jar"
+			"some-project-specific.jar"
 		),
 		"deployFilesAdditionalDependencies" -> List(
-			"commons-io-1.4.jar",
-			"commons-lang-2.4.jar",
-			"commons-logging-1.1.1.jar",
-			"log4j-1.2.14.jar",
-			"junit-4.4.jar",
-			"jcommon-1.0.12.jar",
-			"jargs-0.0.1-SNAPSHOT.jar",
-			"jfreechart-1.0.9.jar",
-			"looks-2.1.2.jar",
-			"net.jcip.annotations-0.0.1-SNAPSHOT.jar",
-			"skinlf-1.2.3.jar",
-			"swing-layout-1.0.jar",
-			"swingx-0.9.5-2.jar",
-			"filters-2.0.235.jar",
-			"timingframework-1.0.jar",
-			"scala-swing-2.7.5.jar",
-			"scala-compiler-2.7.5.jar",
-			"scala-library-2.7.5.jar",
-			"org.quaqua.swing-layout-5.4.1.jar",
-			"org.quaqua-5.4.1.jar",
-			"substance-5.1.jar",
-			"beansbinding-1.2.1.jar"
+			"some-project-specific-additional.jar"
 		),
 		"webstartArgumentsJVM" -> List(
-		  	"-Dcom.apple.macos.useScreenMenuBar=true",
-			"-Dcom.apple.mrj.application.apple.menu.about.name=Coviob2",
-			"-Dcom.apple.mrj.application.growbox.intrudes=false",
-            "-server",
-            "-Xmx1024m",
-            "-XX:MaxPermSize=512m",
-			"-XX:+UseCompressedOops",
-			"-XX:MaxHeapFreeRatio=10",
-			"-XX:MinHeapFreeRatio=5",
-			"-XX:+AggressiveOpts",
-			"-XX:CompileThreshold=1000",
-			"-ea",
-			"-XX:+UseParallelGC"
+		  	"-server"
 		),
-		"remoteWebStartDeployDir" -> "/home/verknowsys/public_html/javaws/coviob2/trunk/",
-		"deployOnlyBasicFiles" -> true,
-		"remoteProjectToolsDir" -> "/home/verknowsys/JAVA/project.tools/",
-		"remoteScalaBin" -> "/home/verknowsys/JAVA/scala/bin/scala",
-		"jnlpMainClass" -> "codadris.coviob2.App_Coviob2",
-		"jnlpAppName" -> "Coviob 2",
-		"jnlpCodebase" -> "http://trunk.verknowsys.com/",
-		"jnlpHomePage" -> "http://trunk.verknowsys.com/",
+		"remoteWebStartDeployDir" -> "/home/your-user/deploydir",
+		"deployOnlyBasicFiles" -> false,
+		"remoteProjectToolsDir" -> "/home/yout-user/project-tools-dir-on-remote-shell-accoun",
+		"remoteScalaBin" -> "/your/path/to/scala",
+		"jnlpMainClass" -> "your.company.MainClass",
+		"jnlpAppName" -> "Your Shiny Project name",
+		"jnlpCodebase" -> "http://your.project.domain/",
+		"jnlpHomePage" -> "http://your.company.homepage.domain/",
 		"jnlpFileName" -> "launch.jnlp",
-		"jnlpVendor" -> "VerKnowSys",
-		"jnlpIcon" -> "LogoIcon_Coviob2.svg.png",
-		"jnlpDescription" -> "COmunicate VIa OBjects",
-		"directoryForLocalDeploy" -> ".codadris/LOCAL_COVIOB2_DEPLOY_DIR/",
-		"xmppStatusDescription" -> "I should work fine.",
+		"jnlpVendor" -> "Your Shiny Company",
+		"jnlpIcon" -> "your_shiny_icon.png",
+		"jnlpDescription" -> "Your shiny description",
+		"directoryForLocalDeploy" -> ".your-company/dir/for/local/deploys",
+		"xmppStatusDescription" -> "I am Your xmpp company bot! Here's my description",
 		"xmppDatabaseFileName" -> "ScalaXMPPBotDataBase.neodatis",
-		"databaseODBPort" -> 50609,
+		"databaseODBPort" -> 6660,
 		"xmppDatabaseName" -> "xmppBotCommitDatabase",
 		"xmppDatabaseListenAddress" -> "127.0.0.1",
 		"ircDatabaseName" -> "ircBotDataBase",
 		"ircDatabaseFileName" -> "ScalaIRCBotDataBase.neodatis",
 		"ircDatabaseListenAddress" -> "127.0.0.1",
 		"ircServer" -> "irc.freenode.net",
-		"ircName" -> "linkB",
+		"ircName" -> "shiny-bot",
 		"ircDebugInfo" -> false,
 		"ircAutoNickChange" -> true,
 		"ircVersionString" -> "None v1.0",
 		"ircEncoding" -> "UTF-8",
 		"ircAutoJoinChannels" -> List(
-			"#scala.pl",
-			"#scala",
-			"#ruby.pl"
+			"#myshinychannel"
 		)
 	)
-	
-	def toXML = 
-		<preferences> 
-			<debug>{value("debug")}</debug> 
+
+	def validateValues = { // TODO: add validation for bad values in config
+
+	}
+
+	def toXML =
+		<preferences>
+			<debug>{value("debug")}</debug>
 			<gitExecutable>{value("gitExecutable")}</gitExecutable>
 			<jarSignerPassword>{value("jarSignerPassword")}</jarSignerPassword>
 			<jarSignerExecutable>{value("jarSignerExecutable")}</jarSignerExecutable>
@@ -213,7 +169,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 			<ircAutoNickChange>{value("ircAutoNickChange")}</ircAutoNickChange>
 			<ircVersionString>{value("ircVersionString")}</ircVersionString>
 			<ircEncoding>{value("ircEncoding")}</ircEncoding>
-		    <ircAutoJoinChannels>
+			<ircAutoJoinChannels>
 			{
 				val list = value("ircAutoJoinChannels").asInstanceOf[List[String]]
 				for( i <- list)
@@ -224,7 +180,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 			}
 			</ircAutoJoinChannels>
 		</preferences>
-	
+
 	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
 		val hashMap = HashMap[String,Any]()
 			hashMap.update( "debug", (node \ "debug").text.toBoolean)
@@ -326,26 +282,21 @@ class Preferences(configFileNameInput: String) extends Utils {
 		value(param).asInstanceOf[List[String]]
 	}
 	
-	def loadPreferences: Preferences = {
-		try {
-			value = fromXML(XML.loadFile(configFileName))
-			logger.debug("*** Config file found (" + configFileName + ")")
-		} catch {
-			case x: Throwable => {
-				logger.debug("*** Config file " + configFileName + " doesn't exists! Creating new one")
-				savePreferences
-			}
-		}
-		this
-	}
-
 	def savePreferences = {
 		autoDetectRequirements(this)
 		XML.saveFull(configFileName, toXML, "UTF-8", true, null)
 	}
 
-	loadPreferences
-	
+	try { // read values from config or generate new stub
+		value = fromXML(XML.loadFile(configFileName))
+		logger.warn("Config file used (" + configFileName + ")")
+	} catch {
+		case x: Throwable => {
+			logger.error("*** Config file " + configFileName + " doesn't exists! Creating new one")
+			savePreferences
+		}
+	}
+
 //	def savePreferences(fileName: String) = XML.saveFull(fileName, toXML, "UTF-8", true, null)
 	
 }
