@@ -198,8 +198,16 @@ object Deployer extends Actor with Utils {
 		}
 
 		// check given arguments
-		if (args.size > 0) {
-//			for (arg <- args) {
+		if (args.size == 1) {
+			logger.warn("Requested to perform standard remote deploy")
+			this.start
+			// normal deploy based on config values
+			SSHActor.start
+			SSHActor ! Init
+			getFilesFromMavenRepositoryAndSignThem
+			SSHActor ! (filesToBeDeployed, uuid, deployTmpDir)
+		} else {
+			if (args.size == 2) {
 				args(1) match {
 					case "mac-app" => {
 						logger.warn("Requested to perform Mac Application deploy")
@@ -235,19 +243,9 @@ object Deployer extends Actor with Utils {
 					}
 					case _ =>
 						deployerHelp
-//				}
+				}
 			}
 		}
-		if (args.size == 1) {
-			logger.warn("Requested to perform standard remote deploy")
-			this.start
-			// normal deploy based on config values
-			SSHActor.start
-			SSHActor ! Init
-			getFilesFromMavenRepositoryAndSignThem
-			SSHActor ! (filesToBeDeployed, uuid, deployTmpDir)
-		}
-			
 	}
 
 }
