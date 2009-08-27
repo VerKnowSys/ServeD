@@ -8,7 +8,6 @@ import org.junit.Ignore
 import prefs.Preferences
 import scalabot._
 
-import scala.collection.mutable.HashMap
 import scala._
 
 import junit.framework._;

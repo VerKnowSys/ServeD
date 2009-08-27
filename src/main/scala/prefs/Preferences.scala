@@ -5,10 +5,8 @@ package prefs
 
 
 import java.io.File
-import java.util.ArrayList
-import java.util.regex.Pattern
 import org.apache.log4j.{Level, Logger}
-import scala.collection.mutable.HashMap
+import scala.collection.mutable.Map
 import utils.Utils
 import xml.{Node, XML}
 
@@ -16,11 +14,11 @@ import xml.{Node, XML}
 class Preferences(configFileNameInput: String) extends Utils {
 
 	def this() = this("project.tools.xml") // additional Constructor
-	override
-	def logger = Logger.getLogger(classOf[Preferences])
+
+	override def logger = Logger.getLogger(classOf[Preferences])
 	initLogger
 	val configFileName = System.getProperty("user.home") + "/" + ".codadris/" + configFileNameInput
-	var value = HashMap[String,Any] (
+	var value = Map(
 		"debug" -> false,
 		"xmppResourceString" -> "",
 		"xmppLogin" -> "",
@@ -37,7 +35,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 		"sshHost" -> "",
 		"sshPort" -> 22,
 		"users" -> List(
-			HashMap( "user" -> "someone@somehost.domain", "params" -> "--numstat --no-merges" )
+			Map( "user" -> "someone@somehost.domain", "params" -> "--numstat --no-merges" )
 		),
 		"deployFilesBasic" -> List(
 			"some-project-specific.jar"
@@ -85,9 +83,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 
 	def validateValues = {
 		for (i <- value) i._2 match {
-			case "" => exc(i._1, i._2)
-			case Nil => exc(i._1, i._2)
-			case null => exc(i._1, i._2)
+			case "" | Nil | null => exc(i._1, i._2)
 			case list: List[Any] =>
 				for (l <- list) l match {
 					case Nil => exc(i, l)
@@ -121,8 +117,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 			<xmppDatabaseListenAddress>{value("xmppDatabaseListenAddress")}</xmppDatabaseListenAddress>
 			<users>
 			{
-				val list = value("users").asInstanceOf[List[HashMap[String,String]]]
-				for( i <- list)
+				for( i <- getlh("users"))
 				yield
 				<user>
 					<name>{i("user")}</name>
@@ -132,8 +127,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 			</users>
 			<deployFilesBasic>
 			{
-				val list = value("deployFilesBasic").asInstanceOf[List[String]]
-				for( i <- list)
+				for( i <- getl("deployFilesBasic"))
 				yield
 				<file>
 				{i}
@@ -142,8 +136,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 			</deployFilesBasic>
 			<deployFilesAdditionalDependencies>
 			{
-				val list = value("deployFilesAdditionalDependencies").asInstanceOf[List[String]]
-				for( i <- list)
+				for( i <- getl("deployFilesAdditionalDependencies"))
 				yield
 				<fileDep>
 				{i}
@@ -152,8 +145,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 			</deployFilesAdditionalDependencies>
 			<webstartArgumentsJVM>
 			{
-				val list = value("webstartArgumentsJVM").asInstanceOf[List[String]]
-				for( i <- list)
+				for( i <- getl("webstartArgumentsJVM"))
 				yield
 				<arg>
 				{i}
@@ -184,8 +176,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 			<ircEncoding>{value("ircEncoding")}</ircEncoding>
 			<ircAutoJoinChannels>
 			{
-				val list = value("ircAutoJoinChannels").asInstanceOf[List[String]]
-				for( i <- list)
+				for( i <- getl("ircAutoJoinChannels"))
 				yield
 				<channel>
 				{i}
@@ -194,90 +185,91 @@ class Preferences(configFileNameInput: String) extends Utils {
 			</ircAutoJoinChannels>
 		</preferences>
 
-	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
-		val hashMap = HashMap[String,Any]()
-		try {
-			hashMap.update( "debug", (node \ "debug").text.toBoolean)
-			hashMap.update( "gitExecutable", (node \ "gitExecutable").text.trim)
-			hashMap.update( "jarSignerPassword", (node \ "jarSignerPassword").text.trim)
-			hashMap.update( "jarSignerExecutable", (node \ "jarSignerExecutable").text.trim)
-			hashMap.update( "jarSignerKeyName", (node \ "jarSignerKeyName").text.trim)
-			hashMap.update( "sshPassword", (node \ "sshPassword").text.trim)
-			hashMap.update( "sshUserName", (node \ "sshUserName").text.trim)
-			hashMap.update( "sshHost", (node \ "sshHost").text.trim)
-			hashMap.update( "sshPort", (node \ "sshPort").text.toInt)
-			hashMap.update( "gitRepositoryProjectDir", (node \ "gitRepositoryProjectDir").text.trim)
-			hashMap.update( "xmppResourceString", (node \ "xmppResourceString").text.trim)
-			hashMap.update( "xmppLogin", (node \ "xmppLogin").text.trim)
-			hashMap.update( "xmppPassword", (node \ "xmppPassword").text.trim)
-			hashMap.update( "xmppServer", (node \ "xmppServer").text.trim)
-			hashMap.update( "xmppPort", (node \ "xmppPort").text.toInt)
-			hashMap.update( "xmppDatabaseFileName", (node \ "xmppDatabaseFileName").text.trim)
-			hashMap.update( "xmppStatusDescription", (node \ "xmppStatusDescription").text.trim)
-			hashMap.update( "databaseODBPort", (node \ "databaseODBPort").text.toInt)
-			hashMap.update( "xmppDatabaseName", (node \ "xmppDatabaseName").text.trim)
-			hashMap.update( "xmppDatabaseListenAddress", (node \ "xmppDatabaseListenAddress").text.trim)
 
-			var hashMapList = List[HashMap[String,String]]()
+	def fromXML(node: Node) = {
+		val map = Map[String,Any]()
+		try {
+			map.update( "debug", (node \ "debug").text.toBoolean)
+			map.update( "gitExecutable", (node \ "gitExecutable").text.trim)
+			map.update( "jarSignerPassword", (node \ "jarSignerPassword").text.trim)
+			map.update( "jarSignerExecutable", (node \ "jarSignerExecutable").text.trim)
+			map.update( "jarSignerKeyName", (node \ "jarSignerKeyName").text.trim)
+			map.update( "sshPassword", (node \ "sshPassword").text.trim)
+			map.update( "sshUserName", (node \ "sshUserName").text.trim)
+			map.update( "sshHost", (node \ "sshHost").text.trim)
+			map.update( "sshPort", (node \ "sshPort").text.toInt)
+			map.update( "gitRepositoryProjectDir", (node \ "gitRepositoryProjectDir").text.trim)
+			map.update( "xmppResourceString", (node \ "xmppResourceString").text.trim)
+			map.update( "xmppLogin", (node \ "xmppLogin").text.trim)
+			map.update( "xmppPassword", (node \ "xmppPassword").text.trim)
+			map.update( "xmppServer", (node \ "xmppServer").text.trim)
+			map.update( "xmppPort", (node \ "xmppPort").text.toInt)
+			map.update( "xmppDatabaseFileName", (node \ "xmppDatabaseFileName").text.trim)
+			map.update( "xmppStatusDescription", (node \ "xmppStatusDescription").text.trim)
+			map.update( "databaseODBPort", (node \ "databaseODBPort").text.toInt)
+			map.update( "xmppDatabaseName", (node \ "xmppDatabaseName").text.trim)
+			map.update( "xmppDatabaseListenAddress", (node \ "xmppDatabaseListenAddress").text.trim)
+
+			var mapList = List[Map[String,String]]()
 			(node \\ "user").foreach { user =>
 				user.foreach { nod =>
 					val name = (nod \ "name").text.trim
 					val params = (nod \ "params").text.trim
-					hashMapList = hashMapList ::: List( HashMap( "user" -> name, "params" -> params ) ).asInstanceOf[List[HashMap[String,String]]]
+					mapList ::= Map( "user" -> name, "params" -> params )
 				}
 			}
-			hashMap.update( "users", hashMapList )
+			map.update( "users", mapList )
 
 			var list2 = List[String]()
 			(node \\ "file").foreach { file =>
-				list2 = list2 ::: List( file.text.trim ).asInstanceOf[List[String]]
+				list2 ::= file.text.trim
 			}
-			hashMap.update( "deployFilesBasic", list2 )
+			map.update( "deployFilesBasic", list2 )
 
 			list2 = List[String]()
 			(node \\ "fileDep").foreach { file =>
-				list2 = list2 ::: List( file.text.trim ).asInstanceOf[List[String]]
+				list2 ::= file.text.trim
 			}
-			hashMap.update( "deployFilesAdditionalDependencies", list2 )
+			map.update( "deployFilesAdditionalDependencies", list2 )
 
 			list2 = List[String]()
 			(node \\ "arg").foreach { file =>
-				list2 = list2 ::: List( file.text.trim ).asInstanceOf[List[String]]
+				list2 ::= file.text.trim
 			}
-			hashMap.update( "webstartArgumentsJVM", list2 )
+			map.update( "webstartArgumentsJVM", list2 )
 
-			hashMap.update( "remoteWebStartDeployDir", (node \ "remoteWebStartDeployDir").text.trim)
-		    hashMap.update( "deployOnlyBasicFiles", (node \ "deployOnlyBasicFiles").text.toBoolean)
-			hashMap.update( "remoteProjectToolsDir", (node \ "remoteProjectToolsDir").text.trim)
-			hashMap.update( "remoteScalaBin", (node \ "remoteScalaBin").text.trim)
-			hashMap.update( "jnlpMainClass", (node \ "jnlpMainClass").text.trim)
-			hashMap.update( "jnlpAppName", (node \ "jnlpAppName").text.trim)
-			hashMap.update( "jnlpCodebase", (node \ "jnlpCodebase").text.trim)
-			hashMap.update( "jnlpFileName", (node \ "jnlpFileName").text.trim)
-			hashMap.update( "jnlpVendor", (node \ "jnlpVendor").text.trim)
-			hashMap.update( "jnlpHomePage", (node \ "jnlpHomePage").text.trim)
-			hashMap.update( "jnlpIcon", (node \ "jnlpIcon").text.trim)
-			hashMap.update( "jnlpDescription", (node \ "jnlpDescription").text.trim)
-			hashMap.update( "directoryForLocalDeploy", (node \ "directoryForLocalDeploy").text.trim)
-			hashMap.update( "ircDatabaseName", (node \ "ircDatabaseName").text.trim)
-			hashMap.update( "ircDatabaseFileName", (node \ "ircDatabaseFileName").text.trim)
-			hashMap.update( "ircDatabaseListenAddress", (node \ "ircDatabaseListenAddress").text.trim)
-			hashMap.update( "ircServer", (node \ "ircServer").text.trim)
-			hashMap.update( "ircName", (node \ "ircName").text.trim)
-			hashMap.update( "ircDebugInfo", (node \ "ircDebugInfo").text.toBoolean)
-			hashMap.update( "ircAutoNickChange", (node \ "ircAutoNickChange").text.toBoolean)
-			hashMap.update( "ircVersionString", (node \ "ircVersionString").text.trim)
-			hashMap.update( "ircEncoding", (node \ "ircEncoding").text.trim)
+			map.update( "remoteWebStartDeployDir", (node \ "remoteWebStartDeployDir").text.trim)
+		    map.update( "deployOnlyBasicFiles", (node \ "deployOnlyBasicFiles").text.toBoolean)
+			map.update( "remoteProjectToolsDir", (node \ "remoteProjectToolsDir").text.trim)
+			map.update( "remoteScalaBin", (node \ "remoteScalaBin").text.trim)
+			map.update( "jnlpMainClass", (node \ "jnlpMainClass").text.trim)
+			map.update( "jnlpAppName", (node \ "jnlpAppName").text.trim)
+			map.update( "jnlpCodebase", (node \ "jnlpCodebase").text.trim)
+			map.update( "jnlpFileName", (node \ "jnlpFileName").text.trim)
+			map.update( "jnlpVendor", (node \ "jnlpVendor").text.trim)
+			map.update( "jnlpHomePage", (node \ "jnlpHomePage").text.trim)
+			map.update( "jnlpIcon", (node \ "jnlpIcon").text.trim)
+			map.update( "jnlpDescription", (node \ "jnlpDescription").text.trim)
+			map.update( "directoryForLocalDeploy", (node \ "directoryForLocalDeploy").text.trim)
+			map.update( "ircDatabaseName", (node \ "ircDatabaseName").text.trim)
+			map.update( "ircDatabaseFileName", (node \ "ircDatabaseFileName").text.trim)
+			map.update( "ircDatabaseListenAddress", (node \ "ircDatabaseListenAddress").text.trim)
+			map.update( "ircServer", (node \ "ircServer").text.trim)
+			map.update( "ircName", (node \ "ircName").text.trim)
+			map.update( "ircDebugInfo", (node \ "ircDebugInfo").text.toBoolean)
+			map.update( "ircAutoNickChange", (node \ "ircAutoNickChange").text.toBoolean)
+			map.update( "ircVersionString", (node \ "ircVersionString").text.trim)
+			map.update( "ircEncoding", (node \ "ircEncoding").text.trim)
 		    list2 = List[String]()
 			(node \\ "channel").foreach { file =>
-				list2 = list2 ::: List( file.text.trim ).asInstanceOf[List[String]]
+				list2 ::= file.text.trim
 			}
-			hashMap.update( "ircAutoJoinChannels", list2 )
-			hashMap.asInstanceOf[HashMap[String,Any]]
+			map.update( "ircAutoJoinChannels", list2 )
+			map
 		} catch {
 			case x: Exception => {
 				logger.error("Exception while taking value from file!: " + x)
-				hashMap.asInstanceOf[HashMap[String,Any]]
+				map
 			}
 		}
 	}
@@ -294,8 +286,8 @@ class Preferences(configFileNameInput: String) extends Utils {
 		value(param).asInstanceOf[Boolean]
 	}
 	
-	def getlh(param: String): List[HashMap[String,String]] = {
-		value(param).asInstanceOf[List[HashMap[String,String]]]
+	def getlh(param: String): List[Map[String,String]] = {
+		value(param).asInstanceOf[List[Map[String,String]]]
 	}
 
 	def getl(param: String): List[String] = {
