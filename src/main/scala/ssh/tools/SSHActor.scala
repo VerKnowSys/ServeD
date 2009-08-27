@@ -5,7 +5,8 @@ package ssh.tools
 
 
 import actors.Actor
-import deployer.{Deployer, JNLPSkeleton}
+import deployer.Deployer
+import skeletons.JNLPSkeleton
 import signals.{Init, Quit}
 
 import com.sshtools.j2ssh.authentication.{PasswordAuthenticationClient, AuthenticationProtocolState}
