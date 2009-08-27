@@ -3,7 +3,8 @@
 
 package deployer
 
-import junit.framework._;
+import junit.framework._
+import skeletons.JNLPSkeleton;
 import Assert._;
 
 object JNLPSkeletonTest {

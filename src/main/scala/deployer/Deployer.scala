@@ -14,6 +14,7 @@ import org.apache.commons.io.{FileUtils, CopyUtils}
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import java.util.regex.{Matcher, Pattern}
 import prefs.Preferences
+import skeletons.JNLPSkeleton
 import ssh.tools.SSHActor
 import utils.Utils
 

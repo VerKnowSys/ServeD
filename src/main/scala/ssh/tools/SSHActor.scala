@@ -16,6 +16,7 @@ import java.io.{BufferedReader, InputStreamReader, File}
 import java.util.{Date, ArrayList}
 import org.apache.log4j.Logger
 import prefs.Preferences
+import skeletons.JNLPSkeleton
 import version.CddsVersion
 
 /**
