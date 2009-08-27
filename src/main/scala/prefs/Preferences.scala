@@ -80,8 +80,21 @@ class Preferences(configFileNameInput: String) extends Utils {
 		)
 	)
 
-	def validateValues = { // TODO: add validation for bad values in config
 
+	def exc(x: Any, y: Any) = throw new RuntimeException("Error reading config file! Key: " + x + " has BAD value: \"" + y + "\"")
+
+	def validateValues = {
+		for (i <- value) i._2 match {
+			case "" => exc(i._1, i._2)
+			case Nil => exc(i._1, i._2)
+			case null => exc(i._1, i._2)
+			case list: List[Any] =>
+				for (l <- list) l match {
+					case Nil => exc(i, l)
+					case _ =>
+				}
+			case _ =>
+		}
 	}
 
 	def toXML =
@@ -183,6 +196,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 
 	def fromXML(node: scala.xml.Node): HashMap[String,Any] = {
 		val hashMap = HashMap[String,Any]()
+		try {
 			hashMap.update( "debug", (node \ "debug").text.toBoolean)
 			hashMap.update( "gitExecutable", (node \ "gitExecutable").text.trim)
 			hashMap.update( "jarSignerPassword", (node \ "jarSignerPassword").text.trim)
@@ -260,7 +274,13 @@ class Preferences(configFileNameInput: String) extends Utils {
 			}
 			hashMap.update( "ircAutoJoinChannels", list2 )
 			hashMap.asInstanceOf[HashMap[String,Any]]
-	}	
+		} catch {
+			case x: Exception => {
+				logger.error("Exception while taking value from file!: " + x)
+				hashMap.asInstanceOf[HashMap[String,Any]]
+			}
+		}
+	}
 	
 	def get(param: String): String = {
 		value(param).asInstanceOf[String]
@@ -289,14 +309,17 @@ class Preferences(configFileNameInput: String) extends Utils {
 
 	try { // read values from config or generate new stub
 		value = fromXML(XML.loadFile(configFileName))
+		validateValues
 		logger.warn("Config file used (" + configFileName + ")")
 	} catch {
-		case x: Throwable => {
+		case x: RuntimeException => {
+			logger.error("Bad Value in config file found:\n " + x)
+			System.exit(1)
+		}
+		case x: Exception => {
 			logger.error("*** Config file " + configFileName + " doesn't exists! Creating new one")
 			savePreferences
 		}
 	}
 
-//	def savePreferences(fileName: String) = XML.saveFull(fileName, toXML, "UTF-8", true, null)
-	
 }
