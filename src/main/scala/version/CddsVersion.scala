@@ -50,21 +50,22 @@ trait CddsVersion extends Utils {
 		getVersion( MAJOR_VERSION + ".")
 	}
 
-
+	// XXX: FIX DOUBLED / COPY / PASTE CODE:
 	def getVersionBuild: Int = {
 		var line = ""
 		try {
 			for (lines <- Source.fromURL(resourceBuildFile).getLines) {
 				line = lines
 			}
+			// TODO: update jar entry if version differs
 			return line.split("##")(1).toInt
 		} catch {
 			case _ =>
-				return 0;
+				return 0; // TODO: should get version from jar shipped with project
 		}
 	}
 
-
+	// XXX: FIX DOUBLED / COPY / PASTE CODE:
 	def getVersion(prefix: String): String = {
 		var line = ""
 		try {
@@ -83,6 +84,7 @@ trait CddsVersion extends Utils {
 	/**
 	 * getVersionFull will get full version from jar file, which is compiled in jar as resource file
 	 */
+	// XXX: FIX DOUBLED / COPY / PASTE CODE:
 	def getVersionFull: String = {
 		var line = ""
 		try {
