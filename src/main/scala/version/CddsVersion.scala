@@ -19,13 +19,14 @@ import utils.Utils
 
 trait CddsVersion extends Utils {
 
+	val MAJOR_VERSION = "2.0"
 	override
 	def logger = Logger.getLogger(classOf[CddsVersion])
 	val prefs = new Preferences
 	val debug = prefs.getb("debug")
 	val repositoryDir = prefs.get("gitRepositoryProjectDir")
 	val gitExecutable = prefs.get("gitExecutable")
-	val buildTextFile = "build.text" // XXX: hardcoded
+	val buildTextFile = "build.text"
 	val resourceBuildFile = prefs.get("jnlpCodebase") + buildTextFile // keep build.text file on remote server only in home of application url
 	val buildNumber = getVersionBuild
 	val file = new File("/tmp/" + buildTextFile)
@@ -46,7 +47,7 @@ trait CddsVersion extends Utils {
 	 * getVersion will get version from jar file, which is compiled in jar as resource file
 	 */
 	def getVersion: String = {
-		getVersion("2.0.") // XXX: hardcoded	
+		getVersion( MAJOR_VERSION + ".")
 	}
 
 
@@ -70,10 +71,11 @@ trait CddsVersion extends Utils {
 			for (lines <- Source.fromURL(resourceBuildFile).getLines) {
 				line = lines
 			}
+			// TODO: update jar entry if version differs
 			return prefix + line.split("##")(1) + " (" + line.split("##")(2) + ")"
 		} catch {
 		    case _ =>
-			    return "Unknown";
+			    return "Unknown"; // TODO: should get version from jar shipped with project
 		}
 	}
 
@@ -87,11 +89,12 @@ trait CddsVersion extends Utils {
 			for (lines <- Source.fromURL(resourceBuildFile).getLines) {
 				line = lines
 			}
+			// TODO: update jar entry if version differs
 			return "Compiled at" + ": " + line.split("##")(0) + ", Build: " +
 						line.split("##")(1) + ", " + "Last" + " Sha1: " + line.split("##")(2) + ", on: " + line.split("##")(3)
 		} catch {
 			case _ =>
-				return "Unknown";
+				return "Unknown"; // TODO: should get version from jar shipped with project
 		}
 	}
 
