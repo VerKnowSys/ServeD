@@ -171,7 +171,9 @@ object Deployer extends Actor with Utils {
 	def deployerHelp = logger.warn("\n\nDeployer quick help:\nValid params:\n" +
 								"\tlocal -> for basic local deploy\n" +
 								"\tlocal-full -> for full local deploy\n" +
-								"\tmac-app -> for Macintosh application deploy and install\n" +
+								"\twindows-app -> for Windows application deploy\n" +
+								"\tlinux-app -> for Linux (distro independent) application deploy\n" +
+								"\tmac-app -> for Mac OS X application deploy and install\n" +
 								"\tfull -> for full remote deploy\n" +
 								"\tTo run remote deploy, no arguments (defaults based on xml config).")
 
@@ -218,6 +220,18 @@ object Deployer extends Actor with Utils {
 						deployLocal
 						copyAndInstallMacApp
 						// TODO: implement Mac Application deploy support
+					}
+					case "windows-app"  => {
+					    logger.warn("Requested to perform Windows Application deploy")
+						basicOnly_? = false
+						logger.error("Not yet implemented!")
+						// TODO: implement deployment of windows application
+					}
+					case "linux-app"  => {
+					    logger.warn("Requested to perform Linux Application deploy")
+						basicOnly_? = false
+						logger.error("Not yet implemented!")
+						// TODO: implement deployment of linux application
 					}
 					case "local-full" => {
 						// local full deploy without ssh actor
