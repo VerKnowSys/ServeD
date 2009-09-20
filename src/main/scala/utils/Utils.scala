@@ -73,7 +73,8 @@ trait Utils {
 
 	def requirements = Array(
 		("git", "gitExecutable"), // XXX: hardcoded executables
-		("jarsigner", "jarSignerExecutable")
+		("jarsigner", "jarSignerExecutable"),
+		("jar", "jarExecutable")
 	)
 
 	def autoDetectRequirements(prefs: Preferences) = {

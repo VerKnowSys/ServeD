@@ -1,9 +1,9 @@
 package version
 
 import command.exec.CommandExec
+import java.io._
+import java.util.{UUID, Date}
 import org.apache.log4j._
-import _root_.java.io.{OutputStreamWriter, PrintWriter, File}
-import _root_.java.util.Date
 import io.Source
 import prefs.Preferences
 import signals.{Init, Quit}
@@ -33,71 +33,94 @@ trait CddsVersion extends Utils {
 	val shaCommand = Array(gitExecutable,  "--git-dir=" + repositoryDir, "rev-list", "--no-merges", "HEAD...HEAD~1") // get newest commit sha
 	val outputSha = CommandExec.cmdExec(shaCommand).trim.split("\n")(0)
 	val outputHostname = CommandExec.cmdExec(Array("hostname", "-s"))
-	try {
-		Source.fromURL(resourceBuildFile) // check for existance
-	} catch {
-		case x: Exception => {
-			logger.warn("Remote " + buildTextFile + " not found. Creating new file ")
-			writeNewContentToBuildFile(0)
-		}
-	}
+//	try {
+//		Source.fromURL(resourceBuildFile) // check for existance
+//	} catch {
+//		case x: Exception => {
+//			logger.warn("Remote " + buildTextFile + " not found. Creating new file ")
+//			writeNewContentToBuildFile(0)
+//		}
+//	}
 
 
 	/**
-	 * getVersion will get version from jar file, which is compiled in jar as resource file
+	 * downloadVersion will get version from repote build.text file.
 	 */
-	def getVersion: String = {
-		getVersion( MAJOR_VERSION + ".")
-	}
-
-	// XXX: FIX DOUBLED / COPY / PASTE CODE:
-	def getVersionBuild: Int = {
-		var line = ""
+	def downloadVersion: String = {
+		var lines = ""
 		try {
-			for (lines <- Source.fromURL(resourceBuildFile).getLines) {
-				line = lines
+			for (line <- Source.fromURL(resourceBuildFile).getLines) {
+				lines += line
 			}
-			// TODO: update jar entry if version differs
-			return line.split("##")(1).toInt
+			lines
 		} catch {
 			case _ =>
-				return 0; // TODO: should get version from jar shipped with project
+				"UnKnown"
 		}
 	}
 
-	// XXX: FIX DOUBLED / COPY / PASTE CODE:
-	def getVersion(prefix: String): String = {
-		var line = ""
+
+	def createJarFileWithCurrentVersion = {
+		val versionFromURL = downloadVersion
+		writeNewContentToBuildFile(downloadVersion.split("##")(1).toInt)
+		val createJarCommand = Array(
+			prefs.get("jarExecutable"), "cf", "project-version.jar", "/tmp/" + buildTextFile
+			)
+		logger.warn(CommandExec.cmdExec(createJarCommand).trim)
+		downloadVersion
+	}
+
+	/**
+	 * getVersionFromJar will get version from jar file, which is compiled in jar as resource file
+	 */
+	def readFromJARFile(filename: String) = {
+		val is = getClass.getResourceAsStream(filename)
+        val isr = new InputStreamReader(is)
+        val br = new BufferedReader(isr)
+        val sb = new StringBuffer
+        var line = ""
 		try {
-			for (lines <- Source.fromURL(resourceBuildFile).getLines) {
-				line = lines
-			}
-			// TODO: update jar entry if version differs
-			return prefix + line.split("##")(1) + " (" + line.split("##")(2) + ")"
+            sb.append(br.readLine) // only one - first line is interesting
 		} catch {
-		    case _ =>
-			    return "Unknown"; // TODO: should get version from jar shipped with project
+			case x: Exception =>
 		}
+        br.close
+        isr.close
+        is.close
+        sb.toString
+	}
+
+	def getVersionFromJar = {
+		try {
+//			readFromJARFile(buildTextFile)
+		} catch {
+			case x: Exception => {
+				logger.warn("Exception occured while trying to read file from jar: " + x)
+				// TODO: create new jar file with current version
+				createJarFileWithCurrentVersion
+			}
+		}
+	}
+
+	def getVersionBuild: Int = {
+		getVersionFromJar.split("##")(1).toInt
+	}
+
+	def getVersion(prefix: String): String = {
+		val ver = getVersionFromJar
+		prefix + ver.split("##")(1) + " (" + ver.split("##")(2) + ")"
 	}
 
 
 	/**
 	 * getVersionFull will get full version from jar file, which is compiled in jar as resource file
 	 */
-	// XXX: FIX DOUBLED / COPY / PASTE CODE:
 	def getVersionFull: String = {
-		var line = ""
-		try {
-			for (lines <- Source.fromURL(resourceBuildFile).getLines) {
-				line = lines
-			}
-			// TODO: update jar entry if version differs
-			return "Compiled at" + ": " + line.split("##")(0) + ", Build: " +
-						line.split("##")(1) + ", " + "Last" + " Sha1: " + line.split("##")(2) + ", on: " + line.split("##")(3)
-		} catch {
-			case _ =>
-				return "Unknown"; // TODO: should get version from jar shipped with project
-		}
+		val ver = getVersionFromJar
+		"Compiled at" + ": " + ver.split("##")(0) +
+				", Build: " + ver.split("##")(1) + ", " +
+				"Last" + " Sha1: " + ver.split("##")(2) +
+				", on: " + ver.split("##")(3)
 	}
 
 	
@@ -117,7 +140,7 @@ trait CddsVersion extends Utils {
 		try {
 			logger.warn("Build file located in: " + resourceBuildFile)
 			for (line <- Source.fromURL(resourceBuildFile).getLines) {
-				logger.warn("Old version: " + getVersion)
+				logger.warn("Old version: " + getVersionFromJar)
 				logger.warn("Current build number: " + (buildNumber + 1))
 				writeNewContentToBuildFile(buildNumber + 1)
 			}

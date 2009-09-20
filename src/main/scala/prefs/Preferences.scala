@@ -28,6 +28,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 		"gitExecutable" -> "",
 		"gitRepositoryProjectDir" -> "",
 		"jarSignerPassword" -> "",
+		"jarExecutable" -> "",
 		"jarSignerExecutable" -> "",
 		"jarSignerKeyName" -> "",
 		"sshUserName" -> "",
@@ -98,6 +99,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 			<debug>{value("debug")}</debug>
 			<gitExecutable>{value("gitExecutable")}</gitExecutable>
 			<jarSignerPassword>{value("jarSignerPassword")}</jarSignerPassword>
+			<jarExecutable>{value("jarExecutable")}</jarExecutable>
 			<jarSignerExecutable>{value("jarSignerExecutable")}</jarSignerExecutable>
 			<jarSignerKeyName>{value("jarSignerKeyName")}</jarSignerKeyName>
 			<sshPassword>{value("sshPassword")}</sshPassword>
@@ -192,6 +194,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 			map.update( "debug", (node \ "debug").text.toBoolean)
 			map.update( "gitExecutable", (node \ "gitExecutable").text.trim)
 			map.update( "jarSignerPassword", (node \ "jarSignerPassword").text.trim)
+			map.update( "jarExecutable", (node \ "jarExecutable").text.trim)
 			map.update( "jarSignerExecutable", (node \ "jarSignerExecutable").text.trim)
 			map.update( "jarSignerKeyName", (node \ "jarSignerKeyName").text.trim)
 			map.update( "sshPassword", (node \ "sshPassword").text.trim)
