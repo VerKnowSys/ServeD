@@ -11,7 +11,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -34,8 +34,6 @@
     <orderEntry type="library" exported="" name="Maven: commons-io:commons-io:1.4" level="project" />
     <orderEntry type="library" exported="" name="Maven: sshtools:j2ssh-common:0.2.2" level="project" />
     <orderEntry type="library" exported="" name="Maven: sshtools:j2ssh-core:0.2.2" level="project" />
-    <orderEntry type="library" name="Maven: org.scala-lang:scala-library:2.7.6" level="project" />
-    <orderEntry type="library" name="Maven: org.scala-lang:scala-compiler:2.7.6" level="project" />
   </component>
 </module>
 
