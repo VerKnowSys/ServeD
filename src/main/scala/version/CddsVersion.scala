@@ -49,10 +49,9 @@ abstract class CddsVersion(
 
 	def getLocalBuildFileContentsFromResource = {
 		try {
-			lazy val fileFromResource = JarAccess.readLineFromJARFile("/codadris/" + buildTextFile)
-			fileFromResource
+			JarAccess.readLineFromJARFile("/codadris/" + buildTextFile)
 		} catch {
-			case x: FileNotFoundException =>
+			case x: NullPointerException =>
 				logger.warn("File: build.text doesn't exists! " + x)
 				"dev##1##dev##dev" // XXX: workaround to prevent ArrayOutOfBoundsException	
 			case x: Throwable =>
