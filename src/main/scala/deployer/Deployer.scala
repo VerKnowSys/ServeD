@@ -48,7 +48,7 @@ object Deployer extends Actor with Utils {
 	}
 
 
-	def main(args: Array[String]) = {
+	def main(args: Array[String]) {
 
 		lazy val filesToBeDeployed = new ArrayList[File]()
 		lazy val uuid = UUID.randomUUID.toString
