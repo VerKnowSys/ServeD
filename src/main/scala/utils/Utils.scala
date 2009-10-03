@@ -6,6 +6,7 @@ import java.util.ArrayList
 import java.util.regex.Pattern
 import org.apache.log4j._
 import prefs.Preferences
+
 /**
  * User: dmilith
  * Date: Jul 10, 2009
@@ -26,7 +27,7 @@ trait Utils {
 		appender.setName(ConsoleAppender.SYSTEM_OUT);
 		appender.setWriter(new OutputStreamWriter(System.out))
 		appender.setThreshold(level)
-		appender.setLayout(new PatternLayout("{ %-5p: [%c]: %m }%n"));
+		appender.setLayout(new ANSIColorLayout("{ %-5p: [%c]: %m }%n"))
 		if (Logger.getRootLogger.getAppender(ConsoleAppender.SYSTEM_OUT) == null) {
 			Logger.getRootLogger.addAppender(appender)
 		}
