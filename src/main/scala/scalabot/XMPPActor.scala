@@ -18,22 +18,21 @@ import org.neodatis.odb.core.query.criteria._
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
-//import org.jivesoftware.smackx._
 
 
-
+// TODO: to be refactored - Preferences should be parametrized
 object XMPPActor extends Actor with MessageListener { 
 	
-	private val prefs: Preferences = new Preferences
-	private val logger = Logger.getLogger(XMPPActor.getClass)
-	private val debug = prefs.getb("debug")
-	private val config = new ConnectionConfiguration(prefs.get("xmppServer"), prefs.geti("xmppPort"))
-	private val connection = new XMPPConnection(config)
-	private val presence = new Presence(Presence.Type.available)
-	private val login = prefs.get("xmppLogin")
-	private val password = prefs.get("xmppPassword")
-	private val resource = prefs.get("xmppResourceString")
-	private val gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
+	lazy val prefs: Preferences = new Preferences
+	lazy val logger = Logger.getLogger(XMPPActor.getClass)
+	lazy val debug = prefs.getb("debug")
+	lazy val config = new ConnectionConfiguration(prefs.get("xmppServer"), prefs.geti("xmppPort"))
+	lazy val connection = new XMPPConnection(config)
+	lazy val presence = new Presence(Presence.Type.available)
+	lazy val login = prefs.get("xmppLogin")
+	lazy val password = prefs.get("xmppPassword")
+	lazy val resource = prefs.get("xmppResourceString")
+	lazy val gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
 
 	private var filter: AndFilter = null
 	private var chatmanager: ChatManager = null

@@ -23,7 +23,7 @@ object DeployerGUI extends SimpleGUIApplication with Utils {
 	override
 	def logger = Logger.getLogger(DeployerGUI.getClass)
 	initLogger
-	val prefs = new Preferences
+	lazy val prefs = Deployer.prefs
 	if (prefs.getb("debug")) {
 		setLoggerLevelDebug(Level.TRACE)
 	}

@@ -7,7 +7,7 @@ import org.apache.log4j._
 import prefs.Preferences
 import jar.JarAccess
 import signals.{Init, Quit}
-
+import deployer.Deployer
 import utils.Utils
 
 /**
@@ -20,7 +20,8 @@ import utils.Utils
 abstract class CddsVersion(
 		val configFile: String
 		) extends Utils {
-	lazy val prefs = new Preferences(configFile)
+
+	lazy val prefs = Deployer.prefs
 	lazy val debug = prefs.getb("debug")
 	lazy val repositoryDir = prefs.get("gitRepositoryProjectDir")
 	lazy val gitExecutable = prefs.get("gitExecutable")

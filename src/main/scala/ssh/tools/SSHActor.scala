@@ -26,14 +26,17 @@ import version.CddsVersion
  * Time: 3:15:04 PM
  */
 
-object SSHActor extends Actor with CddsVersion {
+object SSHActor extends Actor {
 
-	private val host = prefs.get("sshHost")
-	private val port = prefs.geti("sshPort")
-	private val userName = prefs.get("sshUserName")
-	private val password = prefs.get("sshPassword")
-	private val ssh = new SshClient
-	private var uuid = ""
+	lazy val prefs = Deployer.prefs
+	lazy val logger = Logger.getLogger(SSHActor.getClass)
+	lazy val buildTextFile = "build.text" // XXX hardcoded but probably it will stay hardcoded anyway ;}
+	lazy val host = prefs.get("sshHost")
+	lazy val port = prefs.geti("sshPort")
+	lazy val userName = prefs.get("sshUserName")
+	lazy val password = prefs.get("sshPassword")
+	lazy val ssh = new SshClient
+	var uuid = ""
 
 	override
 	def act = {
@@ -54,7 +57,7 @@ object SSHActor extends Actor with CddsVersion {
 					logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
 					uuid = deployUuid
 					deploy(x, deployUuid, deployTmpDir)
-					loadAndUpdateVersion // update version in local temporary file
+					//loadAndUpdateVersion // update version in local temporary file
 					logger.info("Putting build file to remote host..")
 					putLocalFileToRemoteHost("/tmp/" + buildTextFile, prefs.get("remoteWebStartDeployDir") + buildTextFile)
 					logger.warn("Remote file updated")
@@ -127,7 +130,7 @@ object SSHActor extends Actor with CddsVersion {
 		// deploying jnlp file
 		logger.warn("Generating JNLP file")
 		var arguments = ""
-		for( i <- prefs.getl("webstartArgumentsJVM")) { // XXX: maybe switch to normal String instead of List[String] 
+		for( i <- prefs.getl("webstartArgumentsJVM")) { // XXX: maybe switch to normal String instead of List[String]
 			arguments += i + " "
 		}
 		val jnlp = new JNLPSkeleton(
