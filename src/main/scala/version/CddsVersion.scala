@@ -4,8 +4,8 @@ import command.exec.CommandExec
 import java.io._
 import java.util.{UUID, Date}
 import org.apache.log4j._
-import io.Source
 import prefs.Preferences
+import jar.JarAccess
 import signals.{Init, Quit}
 
 import utils.Utils
@@ -20,7 +20,6 @@ import utils.Utils
 abstract class CddsVersion(
 		val configFile: String
 		) extends Utils {
-
 	lazy val prefs = new Preferences(configFile)
 	lazy val debug = prefs.getb("debug")
 	lazy val repositoryDir = prefs.get("gitRepositoryProjectDir")
@@ -38,7 +37,7 @@ abstract class CddsVersion(
 	lazy val getBuildHostname = getLocalBuildFileContentsFromResource.split("##")(3)
 	lazy val currentVersion = versionPrefix + getBuildNumber
 	lazy val currentVersionFull =
-			"Compiled at" + ": " + getBuildDate +
+	"Compiled at" + ": " + getBuildDate +
 			", Build: " + getBuildNumber +
 			", Git sha: " + getBuildSha +
 			", on: " + getBuildHostname
@@ -47,21 +46,21 @@ abstract class CddsVersion(
 	def versionPrefix: String
 
 	def this() = this ("project.tools.xml")
-	
+
 	def getLocalBuildFileContentsFromResource = {
-		lazy val buildFileResource = getClass.getResource("/codadris/" + buildTextFile)
-		if (buildFileResource != null) {
-			lazy val fileFromResource = buildFileResource.getPath
-			//			lazy val source = if (sourceCache == null) Source.fromFile(fileFromResource).mkString.trim else sourceCache
-			//			sourceCache = source
-			//			sourceCache
-			lazy val source = Source.fromFile(fileFromResource, "utf-8").mkString.trim
-			source
-		} else {
-			throw new UnsupportedOperationException("No build.text file found in resources!")
-			"dev##1##dev##dev" // XXX: workaround to prevent ArrayOutOfBoundsException
+		try {
+			lazy val fileFromResource = JarAccess.readLineFromJARFile("/codadris/" + buildTextFile)
+			fileFromResource
+		} catch {
+			case x: FileNotFoundException =>
+				logger.warn("File: build.text doesn't exists! " + x)
+				"dev##1##dev##dev" // XXX: workaround to prevent ArrayOutOfBoundsException	
+			case x: Throwable =>
+				throw new UnsupportedOperationException("Unsupported error in CddsVersion: " + x)
+				"dev##1##dev##dev" // XXX: workaround to prevent ArrayOutOfBoundsException
 		}
 	}
+
 
 
 	//	def createJarFileWithCurrentVersion = {
@@ -73,28 +72,6 @@ abstract class CddsVersion(
 	//		logger.warn(CommandExec.cmdExec(createJarCommand).trim)
 	//		downloadVersion
 	//	}
-
-	//	def getVersionBuild: Int = {
-	//		getVersionFromJar.split("##")(1).toInt
-	//	}
-	//
-	//	def getVersion(prefix: String): String = {
-	//		val ver = getVersionFromJar
-	//		prefix + ver.split("##")(1) + " (" + ver.split("##")(2) + ")"
-	//	}
-	//
-	//
-	//	/**
-	//	 * getVersionFull will get full version from jar file, which is compiled in jar as resource file
-	//	 */
-	//	def getVersionFull: String = {
-	//		lazy val ver = getVersionFromJar
-	//		"Compiled at" + ": " + ver.split("##")(0) +
-	//				", Build: " + ver.split("##")(1) + ", " +
-	//				"Last" + " Sha1: " + ver.split("##")(2) +
-	//				", on: " + ver.split("##")(3)
-	//	}
-	//
 
 	//	def writeNewContentToBuildFile(p_buildNumber: Int) = {
 	//		withPrintWriter(file) {
