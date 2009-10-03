@@ -26,53 +26,47 @@ abstract class CddsVersion(
 	lazy val repositoryDir = prefs.get("gitRepositoryProjectDir")
 	lazy val gitExecutable = prefs.get("gitExecutable")
 	lazy val buildTextFile = "build.text"
-//	lazy val resourceBuildFile = prefs.get("jnlpCodebase") + buildTextFile // keep build.text file on remote server only in home of application url
-//	lazy val file = new File("/tmp/" + buildTextFile)
+	//	lazy val resourceBuildFile = prefs.get("jnlpCodebase") + buildTextFile // keep build.text file on remote server only in home of application url
+	//	lazy val file = new File("/tmp/" + buildTextFile)
 	lazy val shaCommand = Array(gitExecutable, "--git-dir=" + repositoryDir, "rev-list", "--no-merges", "HEAD...HEAD~1") // get newest commit sha
 	lazy val outputSha = CommandExec.cmdExec(shaCommand).trim.split("\n")(0)
 	lazy val outputHostname = CommandExec.cmdExec(Array("hostname", "-s"))
 
 	def this() = this ("project.tools.xml")
+
 	def versionPrefix: String
 
-	def currentVersion = {
+
+	private def getLocalBuildFileContentsFromResource = {
 		lazy val buildFileResource = getClass.getResource("/codadris/" + buildTextFile)
 		logger.info("Build file Resource: " + buildFileResource)
 		if (buildFileResource != null) {
 			lazy val fileFromResource = buildFileResource.getPath
-			lazy val source = Source.fromFile(fileFromResource).mkString
+			lazy val source = Source.fromFile(fileFromResource).mkString.trim // NOTE: this is one of best ways to read whole text file
 			logger.info("Build file contents: " + source)
-			versionPrefix + source  
+			source
 		} else {
-			versionPrefix + "dev"
+			"dev" // XXX: development version without data? it be needed?
 		}
 	}
 
+	def getBuildDate = getLocalBuildFileContentsFromResource.split("##")(0)
+	def getBuildNumber = getLocalBuildFileContentsFromResource.split("##")(1).toInt
+	def getBuildSha = getLocalBuildFileContentsFromResource.split("##")(2)
+	def getBuildHostname = getLocalBuildFileContentsFromResource.split("##")(3)
 
-	//	/**
-	//	 * downloadVersion will get version from remote build.text file.
-	//	 */
-	//	def downloadVersion = {
-	//		var lines = ""
-	//		try {
-	//			for (line <- Source.fromURL(resourceBuildFile).getLines) {
-	//				lines += line
-	//			}
-	//			lines
-	//		} catch {
-	//			case _ =>
-	//				"UnKnown"
-	//		}
-	//	}
+	def currentVersion = versionPrefix + currentVersionFull
 
-	//	try {
-	//		Source.fromURL(resourceBuildFile) // check for existance
-	//	} catch {
-	//		case x: Exception => {
-	//			logger.warn("Remote " + buildTextFile + " not found. Creating new file ")
-	//			writeNewContentToBuildFile(0)
-	//		}
-	//	}
+	
+	/**
+	 * getVersionFull will get full version from jar file, which is compiled in jar as resource file
+	 */
+	def currentVersionFull =
+		"Compiled at" + ": " + getBuildDate +
+		", Build: " + getBuildNumber +
+		", Git sha: " + getBuildSha +
+		", on: " + getBuildHostname
+
 
 	//	def createJarFileWithCurrentVersion = {
 	//		lazy val versionFromURL = downloadVersion
@@ -84,41 +78,6 @@ abstract class CddsVersion(
 	//		downloadVersion
 	//	}
 
-	//
-	//	/**
-	//	 * getVersionFromJar will get version from jar file, which is compiled in jar as resource file
-	//	 */
-	//	def readFromJARFile(filename: String) = {
-	//		lazy val is = getClass.getResourceAsStream(filename)
-	//        lazy val isr = new InputStreamReader(is)
-	//        lazy val br = new BufferedReader(isr)
-	//        lazy val sb = new StringBuffer
-	//        var line = ""
-	//		try {
-	//            sb.append(br.readLine) // only one - first line is interesting
-	//		} catch {
-	//			case x: Exception =>
-	//		}
-	//        br.close
-	//        isr.close
-	//        is.close
-	//        sb.toString
-	//	}
-
-	//	def getVersionFromJar = {
-	//		try {
-	//			// XXX: temporarely:
-	//			downloadVersion
-	////			readFromJARFile(buildTextFile)
-	//		} catch {
-	//			case x: Exception => {
-	//				logger.warn("Exception occured while trying to read file from jar: " + x)
-	//				// TODO: create new jar file with current version
-	//				createJarFileWithCurrentVersion
-	//			}
-	//		}
-	//	}
-	//
 	//	def getVersionBuild: Int = {
 	//		getVersionFromJar.split("##")(1).toInt
 	//	}
