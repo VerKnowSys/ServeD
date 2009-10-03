@@ -13,6 +13,7 @@ import org.neodatis.odb._
 import org.neodatis.odb.impl.core.query.criteria._
 
 
+// TODO: to be refactored - Preferences should be parametrized
 object IRCActor extends PircBot with Actor {
 
 	private val logger = Logger.getLogger(IRCActor.getClass)

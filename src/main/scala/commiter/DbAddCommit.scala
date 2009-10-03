@@ -11,6 +11,7 @@ import prefs.Preferences
 import utils.Utils
 
 
+// TODO: to be refactored - Preferences should be parametrized
 object DbAddCommit extends Utils {
 
 	override
