@@ -34,7 +34,19 @@ abstract class CddsVersion(
 
 	def this() = this ("project.tools.xml")
 	def versionPrefix: String
-	def currentVersion = versionPrefix + "0_0" // FIXME: TODO
+
+	def currentVersion = {
+		lazy val buildFileResource = getClass.getResource("/codadris/" + buildTextFile)
+		logger.info("Build file Resource: " + buildFileResource)
+		if (buildFileResource != null) {
+			lazy val fileFromResource = buildFileResource.getPath
+			lazy val source = Source.fromFile(fileFromResource).mkString
+			logger.info("Build file contents: " + source)
+			versionPrefix + source  
+		} else {
+			versionPrefix + "dev"
+		}
+	}
 
 
 	//	/**
