@@ -20,7 +20,7 @@ import utils.Utils
 abstract class CddsVersion(
 		val configFile: String
 		) extends Utils {
-	
+
 	lazy val prefs = new Preferences(configFile)
 	lazy val debug = prefs.getb("debug")
 	lazy val repositoryDir = prefs.get("gitRepositoryProjectDir")
@@ -31,41 +31,37 @@ abstract class CddsVersion(
 	lazy val shaCommand = Array(gitExecutable, "--git-dir=" + repositoryDir, "rev-list", "--no-merges", "HEAD...HEAD~1") // get newest commit sha
 	lazy val outputSha = CommandExec.cmdExec(shaCommand).trim.split("\n")(0)
 	lazy val outputHostname = CommandExec.cmdExec(Array("hostname", "-s"))
+	//	var sourceCache: String = null // XXX: not functional way
+	lazy val getBuildDate = getLocalBuildFileContentsFromResource.split("##")(0)
+	lazy val getBuildNumber = getLocalBuildFileContentsFromResource.split("##")(1).toInt
+	lazy val getBuildSha = getLocalBuildFileContentsFromResource.split("##")(2)
+	lazy val getBuildHostname = getLocalBuildFileContentsFromResource.split("##")(3)
+	lazy val currentVersion = versionPrefix + getBuildNumber
+	lazy val currentVersionFull =
+			"Compiled at" + ": " + getBuildDate +
+			", Build: " + getBuildNumber +
+			", Git sha: " + getBuildSha +
+			", on: " + getBuildHostname
 
-	def this() = this ("project.tools.xml")
 
 	def versionPrefix: String
 
-
-	private def getLocalBuildFileContentsFromResource = {
+	def this() = this ("project.tools.xml")
+	
+	def getLocalBuildFileContentsFromResource = {
 		lazy val buildFileResource = getClass.getResource("/codadris/" + buildTextFile)
-		logger.info("Build file Resource: " + buildFileResource)
 		if (buildFileResource != null) {
 			lazy val fileFromResource = buildFileResource.getPath
-			lazy val source = Source.fromFile(fileFromResource).mkString.trim // NOTE: this is one of best ways to read whole text file
-			logger.info("Build file contents: " + source)
+			//			lazy val source = if (sourceCache == null) Source.fromFile(fileFromResource).mkString.trim else sourceCache
+			//			sourceCache = source
+			//			sourceCache
+			lazy val source = Source.fromFile(fileFromResource, "utf-8").mkString.trim
 			source
 		} else {
-			"dev" // XXX: development version without data? it be needed?
+			throw new UnsupportedOperationException("No build.text file found in resources!")
+			"dev##1##dev##dev" // XXX: workaround to prevent ArrayOutOfBoundsException
 		}
 	}
-
-	def getBuildDate = getLocalBuildFileContentsFromResource.split("##")(0)
-	def getBuildNumber = getLocalBuildFileContentsFromResource.split("##")(1).toInt
-	def getBuildSha = getLocalBuildFileContentsFromResource.split("##")(2)
-	def getBuildHostname = getLocalBuildFileContentsFromResource.split("##")(3)
-
-	def currentVersion = versionPrefix + currentVersionFull
-
-	
-	/**
-	 * getVersionFull will get full version from jar file, which is compiled in jar as resource file
-	 */
-	def currentVersionFull =
-		"Compiled at" + ": " + getBuildDate +
-		", Build: " + getBuildNumber +
-		", Git sha: " + getBuildSha +
-		", on: " + getBuildHostname
 
 
 	//	def createJarFileWithCurrentVersion = {
