@@ -21,7 +21,7 @@ trait Utils {
 
 	def logger: Logger = Logger.getLogger(classOf[Utils])
 	val appender = new ConsoleAppender
-	val level = Level.WARN
+	val level = Level.INFO
 
 	def initLogger = {
 		appender.setName(ConsoleAppender.SYSTEM_OUT);

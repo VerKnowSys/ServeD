@@ -48,7 +48,7 @@ object XMPPActor extends Actor with MessageListener {
 			connection.login(login, password, resource)
 		} catch {
 			case x: Throwable => {
-				logger.info("### Error while connecting to XMPP server. Please check login / password.")
+				logger.error("### Error while connecting to XMPP server. Please check login / password.")
 				logger.debug( x.printStackTrace )
                 exit
 			}

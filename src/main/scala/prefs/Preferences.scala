@@ -305,14 +305,14 @@ class Preferences(configFileNameInput: String) extends Utils {
 	try { // read values from config or generate new stub
 		value = fromXML(XML.loadFile(configFileName))
 		validateValues
-		logger.warn("Config file used (" + configFileName + ")")
+		logger.info("Config file used (" + configFileName + ")")
 	} catch {
 		case x: RuntimeException => {
 			logger.error("Bad Value in config file found:\n " + x)
 			System.exit(1)
 		}
 		case x: Exception => {
-			logger.error("*** Config file " + configFileName + " doesn't exists! Creating new one")
+			logger.warn("*** Config file " + configFileName + " doesn't exists! Creating new one")
 			savePreferences
 		}
 	}

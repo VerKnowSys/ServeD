@@ -58,7 +58,7 @@ object SSHActor extends Actor {
 					uuid = deployUuid
 					deploy(x, deployUuid, deployTmpDir)
 					//loadAndUpdateVersion // update version in local temporary file
-					logger.info("Putting build file to remote host..")
+					logger.warn("Putting build file to remote host..")
 					putLocalFileToRemoteHost("/tmp/" + buildTextFile, prefs.get("remoteWebStartDeployDir") + buildTextFile)
 					logger.warn("Remote file updated")
 					act
@@ -73,7 +73,7 @@ object SSHActor extends Actor {
 		val backupDate = (new Date).toString.replaceAll(" |:", "_")
 		val source = prefs.get("remoteWebStartDeployDir")
 		val destination = prefs.get("remoteWebStartDeployDir") + "../OLD/" + backupDate
-		logger.warn("Copying " + source + " to " + destination)
+		logger.info("Copying " + source + " to " + destination)
 		clientForRemoteCommand.executeCommand("cp -r " + source + " " + destination)
 		clientForRemoteCommand.close
 	}
@@ -107,28 +107,28 @@ object SSHActor extends Actor {
 
 			var out = List[String]()
 			output.split(",").foreach{ a => out ++= List[String](a) }
-			logger.info("1: " + out)
-			logger.info("2: " + listOfCRCLocalFile)
-			logger.info("result: " + (listOfCRCLocalFile -- out))
+			logger.debug("1: " + out)
+			logger.debug("2: " + listOfCRCLocalFile)
+			logger.debug("result: " + (listOfCRCLocalFile -- out))
 			if ((out -- listOfCRCLocalFile) == List()) {
-				logger.warn("FILE IDENTICAL: " + localFile.split("/").last)
+				logger.info("FILE IDENTICAL: " + localFile.split("/").last)
 			} else {
 				logger.warn("FILE DIFFERENT: " + localFile.split("/").last)
-				logger.warn("Uploading " + localFile.split("/").last)
+				logger.info("Uploading " + localFile.split("/").last)
 				putLocalFileToRemoteHost(localFile, remoteDeployDir + localFile.split("/").last)
 			}
 			clientForRemoteCommand.close
 		}
-		logger.warn("Deploying")
+		logger.info("Deploying")
 		listOfSignedFiles foreach {
 			actionBlock(_)
 		}
-		logger.warn("Verifying deploy")
+		logger.info("Verifying deploy")
 		listOfSignedFiles foreach {
 			actionBlock(_)
 		}
 		// deploying jnlp file
-		logger.warn("Generating JNLP file")
+		logger.info("Generating JNLP file")
 		var arguments = ""
 		for( i <- prefs.getl("webstartArgumentsJVM")) { // XXX: maybe switch to normal String instead of List[String]
 			arguments += i + " "

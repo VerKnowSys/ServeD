@@ -28,6 +28,7 @@ import utils.Utils
 object Deployer extends Actor with Utils {
 	
 	var prefs: Preferences = null
+	Logger.getLogger("com.sshtools").setLevel(Level.WARN) // should quiet too verbose messages of sshtools
 
 	override def logger = Logger.getLogger(Deployer.getClass)
 	initLogger
@@ -58,7 +59,7 @@ object Deployer extends Actor with Utils {
 		addShutdownHook {
 			SSHActor ! Quit
 			Deployer ! Quit
-			logger.warn("Done.")
+			logger.info("Done.")
 		}
 
 		if (args.size == 0) {
@@ -78,12 +79,12 @@ object Deployer extends Actor with Utils {
 		var macAppDeploy = false
 		var basicOnly_? = prefs.getb("deployOnlyBasicFiles")
 
-		logger.warn("Starting Deployer..")
-		logger.warn("Deployer home dir: " + System.getProperty("user.home") + "/.codadris/")
-		logger.warn("Maven 2 Repository dir: " + pathToMaven2Repo)
-		logger.warn("Deploy tmp dir: " + deployTmpDir)
-		logger.warn("Will deploy files to remote host to: " + prefs.get("remoteWebStartDeployDir"))
-		logger.warn("Given arguments:")
+		logger.info("Starting Deployer..")
+		logger.info("Deployer home dir: " + System.getProperty("user.home") + "/.codadris/")
+		logger.info("Maven 2 Repository dir: " + pathToMaven2Repo)
+		logger.info("Deploy tmp dir: " + deployTmpDir)
+		logger.info("Will deploy files to remote host to: " + prefs.get("remoteWebStartDeployDir"))
+		logger.info("Given arguments:")
 		args.foreach {
 			logger.warn(_)
 		}
@@ -151,7 +152,7 @@ object Deployer extends Actor with Utils {
 		}
 
 		def getFilesFromMavenRepositoryAndSignThem = {
-			logger.warn("Searching for jars in Maven repository and signing them..")
+			logger.info("Searching for jars in Maven repository and signing them..")
 			var jar_names = List[String]()
 			if (basicOnly_?) {
 				jar_names ++= basic_jar_names
@@ -162,7 +163,7 @@ object Deployer extends Actor with Utils {
 			}
 			jar_names.foreach {
 				file =>
-						logger.info("*" + file + "*")
+						logger.debug("*" + file + "*")
 						findFile(new File(pathToMaven2Repo), new P {
 							override
 							def accept(t: String): Boolean = {
@@ -173,7 +174,7 @@ object Deployer extends Actor with Utils {
 									if (!macAppDeploy)
 										signJar(t)
 									else { // don't sign jars when it's mac-app deploy
-										logger.warn("Copying jar: " + t.split("/").last)
+										logger.info("Copying jar: " + t.split("/").last)
 										FileUtils.copyFileToDirectory(new File(t), new File(deployTmpDir)) // copy files to temporary dir
 									}
 									return true
@@ -187,7 +188,7 @@ object Deployer extends Actor with Utils {
 
 		def signJar(fileToBeSigned: String) = {
 			new File(deployTmpDir).mkdir // make temporary place for jars before signinig
-			logger.warn("Signing jar: " + fileToBeSigned.split("/").last)
+			logger.info("Signing jar: " + fileToBeSigned.split("/").last)
 			FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployTmpDir)) // copy files to temporary dir
 			val signCommand = Array(
 				prefs.get("jarSignerExecutable"), "-storepass", prefs.get("jarSignerPassword"),
@@ -203,7 +204,7 @@ object Deployer extends Actor with Utils {
 			val localDeployDir = new File(codebaseLocalDir)
 			backupDir.mkdir
 			localDeployDir.mkdir
-			logger.warn("Copying files from " + localDeployDir + " to " + backupDir)
+			logger.info("Copying files from " + localDeployDir + " to " + backupDir)
 			FileUtils.copyDirectory(localDeployDir, backupDir)
 		}
 
@@ -218,7 +219,7 @@ object Deployer extends Actor with Utils {
 						logger.warn("File DIFFERENT: " + localFile.toString.split("/").last)
 						FileUtils.copyFileToDirectory(new File(deployTmpDir + localFile.toString.split("/").last), new File(codebaseLocalDir + "lib/"))
 					} else {
-						logger.warn("File IDENTICAL: " + localFile.toString.split("/").last)
+						logger.info("File IDENTICAL: " + localFile.toString.split("/").last)
 					}
 				}
 			}
@@ -241,18 +242,18 @@ object Deployer extends Actor with Utils {
 				)
 			val tempJnlpFileName = "/tmp/" + prefs.get("jnlpFileName")
 			jnlp.saveJNLP(tempJnlpFileName)
-			logger.warn("Putting JNLP file to local deploy dir")
+			logger.info("Putting JNLP file to local deploy dir")
 			FileUtils.copyFileToDirectory(new File(tempJnlpFileName), new File(codebaseLocalDir))
 		}
 
 
 		def copyAndInstallMacApp = {
-			logger.warn("Copying jars to temporary mac app")
+			logger.info("Copying jars to temporary mac app")
 			FileUtils.copyDirectory(new File(deployTmpDir), new File(codebaseLocalDir + "../Coviob.app/lib")) // XXX: hardcoded Coviob.app name
 			// XXX: application skeleton must be uploaded to ~/.codadris before deploy
-			logger.warn("Copying Application to /Applications")
+			logger.info("Copying Application to /Applications")
 			FileUtils.copyDirectory(new File(codebaseLocalDir + "../Coviob.app"), new File("/Applications/Coviob.app"))
-			logger.warn("Making executable of app starting script..")
+			logger.info("Making executable of app starting script..")
 			CommandExec.cmdExec(Array("chmod", "777", "/Applications/Coviob.app/Contents/MacOS/coviob2")) // XXX: why the fuck copying files will result changing permissions to files?!
 		}
 
