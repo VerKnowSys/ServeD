@@ -153,15 +153,7 @@ object Deployer extends Actor with Utils {
 
 		def getFilesFromMavenRepositoryAndSignThem = {
 			logger.info("Searching for jars in Maven repository and signing them..")
-			var jar_names = List[String]()
-			if (basicOnly_?) {
-				jar_names ++= basic_jar_names
-				logger.warn("Selected only basic jars to deploy")
-			} else {
-				jar_names ++= basic_jar_names ++ dependency_jar_names
-				logger.warn("Selected basic and dependendant jars to deploy")
-			}
-			jar_names.foreach {
+			(basic_jar_names ++ (if (!basicOnly_?) dependency_jar_names else Nil)).foreach {
 				file =>
 						logger.debug("*" + file + "*")
 						findFile(new File(pathToMaven2Repo), new P {
