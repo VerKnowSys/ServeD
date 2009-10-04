@@ -216,10 +216,7 @@ object Deployer extends Actor with Utils {
 				}
 			}
 			logger.warn("Generating JNLP file")
-			var arguments = ""
-			for (i <- prefs.getl("webstartArgumentsJVM")) {
-				arguments += i + " "
-			}
+			val arguments = prefs.getl("webstartArgumentsJVM").map{ a => a + " " }.mkString
 			val jnlp = new JNLPSkeleton(
 				prefs.get("jnlpMainClass"),
 				prefs.get("jnlpAppName"),
