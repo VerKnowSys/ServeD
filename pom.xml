@@ -8,7 +8,7 @@
 	<inceptionYear>2009</inceptionYear>
 	<properties>
 		<scala.version>2.7.6</scala.version>
-		<neodatis.version>1.9.7.612</neodatis.version>
+		<neodatis.version>1.9.17.632</neodatis.version>
 	</properties>
 
 	<repositories>
