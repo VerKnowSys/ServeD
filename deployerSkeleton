@@ -5,8 +5,8 @@ main="deployer.Deployer"
 YOUR_CONFIG_FILENAME="project.tools.xml"
 
 java -classpath \
-$HOME/.m2/repository/org/scala-lang/scala-compiler/2.7.5/scala-compiler-2.7.5.jar:\
-$HOME/.m2/repository/org/scala-lang/scala-library/2.7.5/scala-library-2.7.5.jar:\
+$HOME/.m2/repository/org/scala-lang/scala-compiler/2.7.6/scala-compiler-2.7.6.jar:\
+$HOME/.m2/repository/org/scala-lang/scala-library/2.7.6/scala-library-2.7.6.jar:\
 $HOME/.m2/repository/junit/junit/4.5/junit-4.5.jar:\
 $HOME/.m2/repository/sshtools/j2ssh-common/0.2.2/j2ssh-common-0.2.2.jar:\
 $HOME/.m2/repository/sshtools/j2ssh-core/0.2.2/j2ssh-core-0.2.2.jar:\
@@ -18,5 +18,5 @@ $HOME/.m2/repository/org/neodatis/odb/neodatis-odb/1.9-SNAPSHOT/neodatis-odb-1.9
 $HOME/.m2/repository/pircbot/pircbot/1.4.2/pircbot-1.4.2.jar:\
 $HOME/.m2/repository/jivesoftware/smack/3.0.4/smack-3.0.4.jar:\
 $HOME/.m2/repository/jivesoftware/smackx/3.0.4/smackx-3.0.4.jar:\
-$HOME/.m2/repository/scala/project/tools/scala.project.tools/1.0-SNAPSHOT/scala.project.tools-1.0-SNAPSHOT.jar \
+$HOME/.m2/repository/project/tools/project.tools/1.1/project.tools-1.1.jar \
 $main "${YOUR_CONFIG_FILENAME}" $2 $3
