@@ -39,7 +39,7 @@ object Deployer extends Actor with Utils {
 		Actor.loop {
 			react {
 				case Quit => {
-					SSHCommand.disconnect
+//					SSHCommand.disconnect
 					exit
 				}
 				case _ => {
@@ -57,7 +57,8 @@ object Deployer extends Actor with Utils {
 		lazy val pathToMaven2Repo = System.getProperty("user.home") + "/.m2/repository/"
 
 		addShutdownHook {
-			SSHCommand.disconnect
+			logger.debug("Into shutdown hook")
+//			SSHCommand.disconnect
 			Deployer ! Quit
 			logger.info("Done.")
 		}
@@ -89,17 +90,20 @@ object Deployer extends Actor with Utils {
 			logger.warn(_)
 		}
 
+		def remoteSSHDeploy = {
+			SSHCommand
+			SSHCommand.connect
+			SSHCommand.auth
+			SSHCommand.prepareForDeployAndDeploy(filesToBeDeployed, deployTmpDir)
+		}
+
 		// check given arguments
 		if (args.size == 1) {
 			logger.warn("Requested to perform standard remote deploy")
 			this.start
 			// normal deploy based on config values
-//			SSHCommand.start
-			SSHCommand
-			SSHCommand.connect
-			SSHCommand.auth
 			getFilesFromMavenRepositoryAndSignThem
-			SSHCommand.prepareForDeployAndDeploy(filesToBeDeployed, deployTmpDir)
+			remoteSSHDeploy
 		} else {
 			if (args.size == 2) {
 				args(1) match {
@@ -136,11 +140,8 @@ object Deployer extends Actor with Utils {
 						logger.warn("Requested to perform FULL remote deploy")
 						basicOnly_? = false
 						this.start
-//						SSHCommand.start
-						SSHCommand
-						SSHCommand.connect
 						getFilesFromMavenRepositoryAndSignThem
-//	TODO:					SSHCommand ! (filesToBeDeployed, uuid, deployTmpDir)
+						remoteSSHDeploy
 					}
 					case "local" => {
 						// local deploy without ssh actor
@@ -259,7 +260,7 @@ object Deployer extends Actor with Utils {
 				"\tfull -> for full remote deploy\n" +
 				"\tTo run remote deploy, no arguments (defaults based on xml config).")
 
-		0 // main should return 0 
+		Deployer ! Quit
 	}
 
 }
