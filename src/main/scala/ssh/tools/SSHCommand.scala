@@ -6,6 +6,7 @@ package ssh.tools
 
 import actors.Actor
 import deployer.Deployer
+import java.net.UnknownHostException
 import skeletons.JNLPSkeleton
 import signals.{Init, Quit}
 
@@ -127,6 +128,7 @@ object SSHCommand extends Utils {
 			prefs.get("jnlpDescription")
 			)
 		val tempJnlpFileName = "/tmp/launch-" + Deployer.uuid + ".jnlp"
+		logger.debug("Temporary jnlp filename: " + tempJnlpFileName)
 		jnlp.saveJNLP(tempJnlpFileName)
 		logger.warn("Putting JNLP file to remote server")
 		putLocalFileToRemoteHost(tempJnlpFileName, prefs.get("remoteWebStartDeployDir") + prefs.get("jnlpFileName") )
@@ -135,8 +137,10 @@ object SSHCommand extends Utils {
 
 	def putLocalFileToRemoteHost(source: String, destination: String) = {
 		val client = ssh.openSftpClient
+		logger.debug("Source: " + source + " to destination: " + destination + " on connection: " + client)
 		client.put(source, destination )
 		client.quit
+		logger.debug("File sent to remote host")
 	}
 
 
@@ -151,7 +155,15 @@ object SSHCommand extends Utils {
 	}
 
 
-	def connect = ssh.connect(host, port)
+	def connect =
+		try {
+			logger.debug("Connection to host " + host + " at port " + port)
+			ssh.connect(host, port)
+		} catch {
+			case x: UnknownHostException =>
+				logger.error("Couldn't connect to remote host: " + host + " at port " + port)
+				exit
+		}
 
 	
 	def disconnect = ssh.disconnect
