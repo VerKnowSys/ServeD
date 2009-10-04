@@ -25,7 +25,7 @@ import utils.Utils
  */
 
 
-object Deployer extends Actor with Utils {
+object Deployer extends Utils {
 
 	val uuid = UUID.randomUUID.toString
 	var prefs: Preferences = null
@@ -34,22 +34,7 @@ object Deployer extends Actor with Utils {
 	override def logger = Logger.getLogger(Deployer.getClass)
 	initLogger
 
-	override
-	def act = {
-		Actor.loop {
-			react {
-				case Quit => {
-//					SSHCommand.disconnect
-					exit
-				}
-				case _ => {
-					logger.error("Unsupported action received!")
-				}
-			}
-		}
-	}
-
-
+	
 	def main(args: Array[String]) {
 
 		lazy val filesToBeDeployed = new ArrayList[File]()
@@ -58,8 +43,6 @@ object Deployer extends Actor with Utils {
 
 		addShutdownHook {
 			logger.debug("Into shutdown hook")
-//			SSHCommand.disconnect
-			Deployer ! Quit
 			logger.info("Done.")
 		}
 
@@ -100,7 +83,6 @@ object Deployer extends Actor with Utils {
 		// check given arguments
 		if (args.size == 1) {
 			logger.warn("Requested to perform standard remote deploy")
-			this.start
 			// normal deploy based on config values
 			getFilesFromMavenRepositoryAndSignThem
 			remoteSSHDeploy
@@ -139,7 +121,6 @@ object Deployer extends Actor with Utils {
 						// remote full deploy without ssh actor
 						logger.warn("Requested to perform FULL remote deploy")
 						basicOnly_? = false
-						this.start
 						getFilesFromMavenRepositoryAndSignThem
 						remoteSSHDeploy
 					}
@@ -184,7 +165,7 @@ object Deployer extends Actor with Utils {
 
 		def signJar(fileToBeSigned: String) = {
 			new File(deployTmpDir).mkdir // make temporary place for jars before signinig
-			logger.info("Signing jar: " + fileToBeSigned.split("/").last)
+			logger.info("Signing and copying jar: " + fileToBeSigned.split("/").last)
 			FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployTmpDir)) // copy files to temporary dir
 			val signCommand = Array(
 				prefs.get("jarSignerExecutable"), "-storepass", prefs.get("jarSignerPassword"),
@@ -260,7 +241,7 @@ object Deployer extends Actor with Utils {
 				"\tfull -> for full remote deploy\n" +
 				"\tTo run remote deploy, no arguments (defaults based on xml config).")
 
-		Deployer ! Quit
+		 exit
 	}
 
 }
