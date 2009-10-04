@@ -15,7 +15,7 @@ import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import java.util.regex.{Matcher, Pattern}
 import prefs.Preferences
 import skeletons.JNLPSkeleton
-import ssh.tools.SSHActor
+import ssh.tools.SSHCommand
 import utils.Utils
 
 /**
@@ -26,7 +26,8 @@ import utils.Utils
 
 
 object Deployer extends Actor with Utils {
-	
+
+	val uuid = UUID.randomUUID.toString
 	var prefs: Preferences = null
 	Logger.getLogger("com.sshtools").setLevel(Level.WARN) // should quiet too verbose messages of sshtools
 
@@ -38,7 +39,7 @@ object Deployer extends Actor with Utils {
 		Actor.loop {
 			react {
 				case Quit => {
-					SSHActor ! Quit
+					SSHCommand.disconnect
 					exit
 				}
 				case _ => {
@@ -52,12 +53,11 @@ object Deployer extends Actor with Utils {
 	def main(args: Array[String]) {
 
 		lazy val filesToBeDeployed = new ArrayList[File]()
-		lazy val uuid = UUID.randomUUID.toString
 		lazy val deployTmpDir = "/tmp/deployer-" + uuid + "/"
 		lazy val pathToMaven2Repo = System.getProperty("user.home") + "/.m2/repository/"
 
 		addShutdownHook {
-			SSHActor ! Quit
+			SSHCommand.disconnect
 			Deployer ! Quit
 			logger.info("Done.")
 		}
@@ -79,7 +79,7 @@ object Deployer extends Actor with Utils {
 		var macAppDeploy = false
 		var basicOnly_? = prefs.getb("deployOnlyBasicFiles")
 
-		logger.info("Starting Deployer..")
+		logger.info("Starting Deployer.. v1.1")
 		logger.info("Deployer home dir: " + System.getProperty("user.home") + "/.codadris/")
 		logger.info("Maven 2 Repository dir: " + pathToMaven2Repo)
 		logger.info("Deploy tmp dir: " + deployTmpDir)
@@ -94,10 +94,12 @@ object Deployer extends Actor with Utils {
 			logger.warn("Requested to perform standard remote deploy")
 			this.start
 			// normal deploy based on config values
-			SSHActor.start
-			SSHActor ! Init
+//			SSHCommand.start
+			SSHCommand
+			SSHCommand.connect
+			SSHCommand.auth
 			getFilesFromMavenRepositoryAndSignThem
-			SSHActor ! (filesToBeDeployed, uuid, deployTmpDir)
+			SSHCommand.prepareForDeployAndDeploy(filesToBeDeployed, deployTmpDir)
 		} else {
 			if (args.size == 2) {
 				args(1) match {
@@ -134,10 +136,11 @@ object Deployer extends Actor with Utils {
 						logger.warn("Requested to perform FULL remote deploy")
 						basicOnly_? = false
 						this.start
-						SSHActor.start
-						SSHActor ! Init
+//						SSHCommand.start
+						SSHCommand
+						SSHCommand.connect
 						getFilesFromMavenRepositoryAndSignThem
-						SSHActor ! (filesToBeDeployed, uuid, deployTmpDir)
+//	TODO:					SSHCommand ! (filesToBeDeployed, uuid, deployTmpDir)
 					}
 					case "local" => {
 						// local deploy without ssh actor
