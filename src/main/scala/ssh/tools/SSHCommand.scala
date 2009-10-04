@@ -18,6 +18,7 @@ import java.util.{Date, ArrayList}
 import org.apache.log4j.Logger
 import prefs.Preferences
 import skeletons.JNLPSkeleton
+import utils.Utils
 import version.CddsVersion
 
 /**
@@ -26,47 +27,28 @@ import version.CddsVersion
  * Time: 3:15:04 PM
  */
 
-object SSHCommand extends Actor {
+object SSHCommand extends Utils {
 
-	lazy val prefs = Deployer.prefs
-	lazy val logger = Logger.getLogger(SSHCommand.getClass)
-	lazy val buildTextFile = "build.text" // XXX hardcoded but probably it will stay hardcoded anyway ;}
-	lazy val host = prefs.get("sshHost")
-	lazy val port = prefs.geti("sshPort")
-	lazy val userName = prefs.get("sshUserName")
-	lazy val password = prefs.get("sshPassword")
-	lazy val ssh = new SshClient
-	var uuid = ""
+	val prefs = Deployer.prefs
+	override def logger = Logger.getLogger(SSHCommand.getClass)
+	initLogger
+	val buildTextFile = "build.text" // XXX hardcoded but probably it will stay hardcoded anyway ;}
+	val host = prefs.get("sshHost")
+	val port = prefs.geti("sshPort")
+	val userName = prefs.get("sshUserName")
+	val password = prefs.get("sshPassword")
+	val ssh = new SshClient
 
-	override
-	def act = {
-		Actor.loop {
-			react {
-				case Init => {
-					connect
-					auth
-					act
-				}
-				case Quit => {
-					disconnect
-					Deployer ! Quit
-					exit
-				}
-				case (x: ArrayList[File], deployUuid: String, deployTmpDir: String) => {
-					logger.info("Performing tasks with given list of files: " + x.toArray.map{ a => deployTmpDir + a.toString.split("/").last })
-					logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
-					uuid = deployUuid
-					deploy(x, deployUuid, deployTmpDir)
-					//loadAndUpdateVersion // update version in local temporary file
-					logger.warn("Putting build file to remote host..")
-					putLocalFileToRemoteHost("/tmp/" + buildTextFile, prefs.get("remoteWebStartDeployDir") + buildTextFile)
-					logger.warn("Remote file updated")
-					act
-				}
-			}
-		}
+
+	def prepareForDeployAndDeploy(x: ArrayList[File], deployTmpDir: String) = {
+		logger.info("Performing tasks with given list of files: " + x.toArray.map {a => deployTmpDir + a.toString.split("/").last})
+		logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
+		deploy(x, deployTmpDir)
+		//loadAndUpdateVersion // update version in local temporary file
+//		logger.warn("Putting build file to remote host..")
+//		putLocalFileToRemoteHost("/tmp/" + buildTextFile, prefs.get("remoteWebStartDeployDir") + buildTextFile)
+//		logger.warn("Remote file updated")
 	}
-
 
 	def backup = {
 		val clientForRemoteCommand = ssh.openSessionChannel
@@ -79,8 +61,7 @@ object SSHCommand extends Actor {
 	}
 
 
-	def deploy(list: ArrayList[File], deployUuid: String, deployTmpDir: String) = {
-
+	def deploy(list: ArrayList[File], deployTmpDir: String) = {
 		val remoteDeployDir = prefs.get("remoteWebStartDeployDir") + "lib/"
 		val listOfSignedFiles = list.toArray.map{ a => deployTmpDir + a.toString.split("/").last }
 		val clientForRemoteCommand = ssh.openSessionChannel
@@ -145,11 +126,10 @@ object SSHCommand extends Actor {
 			prefs.get("jnlpIcon"),
 			prefs.get("jnlpDescription")
 			)
-		val tempJnlpFileName = "/tmp/launch-" + uuid + ".jnlp"
+		val tempJnlpFileName = "/tmp/launch-" + Deployer.uuid + ".jnlp"
 		jnlp.saveJNLP(tempJnlpFileName)
 		logger.warn("Putting JNLP file to remote server")
 		putLocalFileToRemoteHost(tempJnlpFileName, prefs.get("remoteWebStartDeployDir") + prefs.get("jnlpFileName") )
-		this ! Quit
 	}
 
 
@@ -175,4 +155,5 @@ object SSHCommand extends Actor {
 
 	
 	def disconnect = ssh.disconnect
+	
 }
