@@ -26,10 +26,10 @@ import version.CddsVersion
  * Time: 3:15:04 PM
  */
 
-object SSHActor extends Actor {
+object SSHCommand extends Actor {
 
 	lazy val prefs = Deployer.prefs
-	lazy val logger = Logger.getLogger(SSHActor.getClass)
+	lazy val logger = Logger.getLogger(SSHCommand.getClass)
 	lazy val buildTextFile = "build.text" // XXX hardcoded but probably it will stay hardcoded anyway ;}
 	lazy val host = prefs.get("sshHost")
 	lazy val port = prefs.geti("sshPort")
