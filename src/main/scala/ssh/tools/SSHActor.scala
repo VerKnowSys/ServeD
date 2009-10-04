@@ -84,7 +84,7 @@ object SSHActor extends Actor {
 		val remoteDeployDir = prefs.get("remoteWebStartDeployDir") + "lib/"
 		val listOfSignedFiles = list.toArray.map{ a => deployTmpDir + a.toString.split("/").last }
 		val clientForRemoteCommand = ssh.openSessionChannel
-		clientForRemoteCommand.executeCommand("mkdir -p " + remoteDeployDir)  // make sure that directories exists
+		clientForRemoteCommand.executeCommand("mkdir -p " + remoteDeployDir)  // make sure that directories exist
 		clientForRemoteCommand.close
 		backup
 
