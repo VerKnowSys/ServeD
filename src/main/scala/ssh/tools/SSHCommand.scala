@@ -41,16 +41,6 @@ object SSHCommand extends Utils {
 	val ssh = new SshClient
 
 
-	def prepareForDeployAndDeploy(x: ArrayList[File], deployTmpDir: String) = {
-		logger.info("Performing tasks with given list of files: " + x.toArray.map {a => deployTmpDir + a.toString.split("/").last})
-		logger.info("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
-		deploy(x, deployTmpDir)
-		//loadAndUpdateVersion // update version in local temporary file
-//		logger.warn("Putting build file to remote host..")
-//		putLocalFileToRemoteHost("/tmp/" + buildTextFile, prefs.get("remoteWebStartDeployDir") + buildTextFile)
-//		logger.warn("Remote file updated")
-	}
-
 	def backup = {
 		val clientForRemoteCommand = ssh.openSessionChannel
 		val backupDate = (new Date).toString.replaceAll(" |:", "_")
