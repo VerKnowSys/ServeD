@@ -147,7 +147,7 @@ object SSHCommand extends Utils {
 
 	def connect =
 		try {
-			logger.debug("Connection to host " + host + " at port " + port)
+			logger.info("Connecting to host " + host + ":" + port)
 			ssh.connect(host, port)
 		} catch {
 			case x: UnknownHostException =>
