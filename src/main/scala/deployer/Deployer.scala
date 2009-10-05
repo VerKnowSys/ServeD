@@ -43,7 +43,7 @@ object Deployer extends Utils {
 
 		addShutdownHook {
 			logger.debug("Into shutdown hook")
-			logger.info("Done.")
+			logger.info("Finished.")
 		}
 
 		if (args.size == 0) {
@@ -74,16 +74,17 @@ object Deployer extends Utils {
 		}
 
 		def remoteSSHDeploy = {
-			SSHCommand
-			SSHCommand.connect
 			SSHCommand.auth
-			SSHCommand.prepareForDeployAndDeploy(filesToBeDeployed, deployTmpDir)
+			logger.debug("Performing tasks with given list of files: " + filesToBeDeployed.toArray.map {a => deployTmpDir + a.toString.split("/").last})
+			logger.debug("Remote dir containing jars: " + prefs.get("remoteWebStartDeployDir") + "lib/")
+			SSHCommand.deploy(filesToBeDeployed, deployTmpDir)
 		}
 
 		// check given arguments
 		if (args.size == 1) {
 			logger.warn("Requested to perform standard remote deploy")
 			// normal deploy based on config values
+			SSHCommand.connect
 			getFilesFromMavenRepositoryAndSignThem
 			remoteSSHDeploy
 		} else {
@@ -121,6 +122,7 @@ object Deployer extends Utils {
 						// remote full deploy without ssh actor
 						logger.warn("Requested to perform FULL remote deploy")
 						basicOnly_? = false
+						SSHCommand.connect
 						getFilesFromMavenRepositoryAndSignThem
 						remoteSSHDeploy
 					}
