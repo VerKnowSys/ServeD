@@ -64,6 +64,7 @@ object Deployer extends Utils {
 		var basicOnly_? = prefs.getb("deployOnlyBasicFiles")
 
 		logger.info("Starting Deployer.. v1.1")
+		logger.info("Deployer mode: " + (if (debug) "DEBUG" else "NORMAL"))
 		logger.info("Deployer home dir: " + System.getProperty("user.home") + "/.codadris/")
 		logger.info("Maven 2 Repository dir: " + pathToMaven2Repo)
 		logger.info("Deploy tmp dir: " + deployTmpDir)
@@ -202,24 +203,26 @@ object Deployer extends Utils {
 					}
 				}
 			}
-			logger.warn("Generating JNLP file")
-			val arguments = prefs.getl("webstartArgumentsJVM").map{ a => a + " " }.mkString
-			val jnlp = new JNLPSkeleton(
-				prefs.get("jnlpMainClass"),
-				prefs.get("jnlpAppName"),
-				"file://" + codebaseLocalDir,
-				prefs.get("jnlpFileName"),
-				(prefs.getl("deployFilesBasic") ++ prefs.getl("deployFilesAdditionalDependencies")),
-				arguments,
-				prefs.get("jnlpVendor"),
-				"file://" + codebaseLocalDir,
-				prefs.get("jnlpIcon"),
-				prefs.get("jnlpDescription")
-				)
-			val tempJnlpFileName = "/tmp/" + prefs.get("jnlpFileName")
-			jnlp.saveJNLP(tempJnlpFileName)
-			logger.info("Putting JNLP file to local deploy dir")
-			FileUtils.copyFileToDirectory(new File(tempJnlpFileName), new File(codebaseLocalDir))
+			if (!macAppDeploy) {
+				logger.warn("Generating JNLP file")
+				val arguments = prefs.getl("webstartArgumentsJVM").map{ a => a + " " }.mkString
+				val jnlp = new JNLPSkeleton(
+					prefs.get("jnlpMainClass"),
+					prefs.get("jnlpAppName"),
+					"file://" + codebaseLocalDir,
+					prefs.get("jnlpFileName"),
+					(prefs.getl("deployFilesBasic") ++ prefs.getl("deployFilesAdditionalDependencies")),
+					arguments,
+					prefs.get("jnlpVendor"),
+					"file://" + codebaseLocalDir,
+					prefs.get("jnlpIcon"),
+					prefs.get("jnlpDescription")
+					)
+				val tempJnlpFileName = "/tmp/" + prefs.get("jnlpFileName")
+				jnlp.saveJNLP(tempJnlpFileName)
+				logger.info("Putting JNLP file to local deploy dir")
+				FileUtils.copyFileToDirectory(new File(tempJnlpFileName), new File(codebaseLocalDir))
+			}
 		}
 
 
