@@ -2,4 +2,4 @@
 
 date=`date "+%Y-%m-%d"`
 
-mvn -e install:install-file -DcreateChecksum=true -Ddescription="Quaqua, build on $date" -Dfile="lib/quaqua.jar" -DgeneratePom=true -DgroupId="org.quaqua" -DartifactId="org.quaqua" -Dversion="6.0.1" -Dpackaging=jar
+mvn -e install:install-file -DcreateChecksum=true -Ddescription="Quaqua, build on $date" -Dfile="lib/quaqua.jar" -DgeneratePom=true -DgroupId="org.quaqua" -DartifactId="org.quaqua" -Dversion="6.1.1" -Dpackaging=jar
