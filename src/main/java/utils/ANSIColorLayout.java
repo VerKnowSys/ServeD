@@ -48,7 +48,11 @@ public class ANSIColorLayout extends PatternLayout {
 	public static final String DEFAULT_COLOR_DEBUG = "\u001B[0;36m";
 	public static final String DEFAULT_COLOR_RESET = "\u001B[1;37m";
 	public static final String DEFAULT_COLOR_STACKTRACE = "\u001B[0;31m";
-	public static final String DEFAULT_COLOR = "\u001B[1;37m";
+	//public static final String DEFAULT_COLOR = "\u001B[1;37m";
+	public static final String DEFAULT_COLOR = "\u001B[0;39m"; 
+	// 2009-10-19 00:13:05 ; karolrvn ; ^^^ changed from white (7) to reset (9) ; bold to reset/normal ; dmilith check
+	// white was invisible on my console
+	// http://en.wikipedia.org/wiki/ANSI_escape_code
 
 	public ANSIColorLayout() {
 		setDefaultColors();
