@@ -191,10 +191,12 @@ object Deployer extends Utils {
 
 		def deployLocal = {
 			backupLocal
+			logger.debug("Files to be deployed: " + filesToBeDeployed.toArray.map{ a => a + ", " }.mkString)
 			filesToBeDeployed.toArray foreach {
 				localFile => {
 					val comparator = new JarEntryComparator
 					comparator.load(deployTmpDir + localFile.toString.split("/").last, codebaseLocalDir + "lib/" + localFile.toString.split("/").last)
+					logger.debug("COMPARATOR: " + comparator + ", -- diff?: " + comparator.diff_?)
 					if (comparator.diff_?) {
 						logger.warn("File DIFFERENT: " + localFile.toString.split("/").last)
 						FileUtils.copyFileToDirectory(new File(deployTmpDir + localFile.toString.split("/").last), new File(codebaseLocalDir + "lib/"))
