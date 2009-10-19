@@ -17,6 +17,7 @@ import prefs.Preferences
 import skeletons.JNLPSkeleton
 import ssh.tools.SSHCommand
 import utils.Utils
+import java.lang.String
 
 /**
  * User: dmilith
@@ -69,10 +70,7 @@ object Deployer extends Utils {
 		logger.info("Maven 2 Repository dir: " + pathToMaven2Repo)
 		logger.info("Deploy tmp dir: " + deployTmpDir)
 		logger.info("Will deploy files to remote host to: " + prefs.get("remoteWebStartDeployDir"))
-		logger.info("Given arguments:")
-		args.foreach {
-			logger.warn(_)
-		}
+		logger.info("Given arguments: " + args.map{ a => if (a == args.last) a + ". " else a + ", " }.mkString)
 
 		def remoteSSHDeploy = {
 			SSHCommand.auth
@@ -83,7 +81,7 @@ object Deployer extends Utils {
 
 		// check given arguments
 		if (args.size == 1) {
-			logger.warn("Requested to perform standard remote deploy")
+			logger.warn("Requested to perform remote deploy")
 			// normal deploy based on config values
 			SSHCommand.connect
 			getFilesFromMavenRepositoryAndSignThem
@@ -140,11 +138,11 @@ object Deployer extends Utils {
 		}
 
 		def getFilesFromMavenRepositoryAndSignThem = {
-			logger.info("Searching for jars in Maven repository and signing them..")
+			logger.info("Searching for jars in Maven repository..")
 			(basic_jar_names ++ (if (!basicOnly_?) dependency_jar_names else Nil)).foreach {
 				file =>
-						logger.debug("*" + file + "*")
-						findFile(new File(pathToMaven2Repo), new P {
+						logger.debug("found: *" + file + "*")
+						findFile(new File(pathToMaven2Repo + prefs.get("projectGroupId")), new P { // NOTE: 2009-10-19 03:04:00 - dmilith - projectGroupId gives huge boost in deployment time
 							override
 							def accept(t: String): Boolean = {
 								val fileRegex = ".*" + file + "$"

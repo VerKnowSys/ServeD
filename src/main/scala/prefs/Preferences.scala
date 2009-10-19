@@ -49,6 +49,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 		),
 		"remoteWebStartDeployDir" -> "/home/your-user/deploydir",
 		"deployOnlyBasicFiles" -> false,
+		"projectGroupId" -> "/codadris",
 		"remoteProjectToolsDir" -> "/home/yout-user/project-tools-dir-on-remote-shell-accoun",
 		"remoteScalaBin" -> "/your/path/to/scala",
 		"jnlpMainClass" -> "your.company.MainClass",
@@ -117,6 +118,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 			<databaseODBPort>{value("databaseODBPort")}</databaseODBPort>
 			<xmppDatabaseName>{value("xmppDatabaseName")}</xmppDatabaseName>
 			<xmppDatabaseListenAddress>{value("xmppDatabaseListenAddress")}</xmppDatabaseListenAddress>
+			<projectGroupId>{value("projectGroupId")}</projectGroupId>
 			<users>
 			{
 				for( i <- getlh("users"))
@@ -244,6 +246,7 @@ class Preferences(configFileNameInput: String) extends Utils {
 			map.update( "remoteWebStartDeployDir", (node \ "remoteWebStartDeployDir").text.trim)
 		    map.update( "deployOnlyBasicFiles", (node \ "deployOnlyBasicFiles").text.toBoolean)
 			map.update( "remoteProjectToolsDir", (node \ "remoteProjectToolsDir").text.trim)
+			map.update( "projectGroupId", (node \ "projectGroupId").text.trim)
 			map.update( "remoteScalaBin", (node \ "remoteScalaBin").text.trim)
 			map.update( "jnlpMainClass", (node \ "jnlpMainClass").text.trim)
 			map.update( "jnlpAppName", (node \ "jnlpAppName").text.trim)
