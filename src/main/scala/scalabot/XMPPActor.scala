@@ -22,7 +22,7 @@ import org.jivesoftware.smack.filter._
 
 // TODO: to be refactored - Preferences should be parametrized
 object XMPPActor extends Actor with MessageListener { 
-	
+
 	lazy val prefs: Preferences = new Preferences
 	lazy val logger = Logger.getLogger(XMPPActor.getClass)
 	lazy val debug = prefs.getb("debug")
@@ -57,7 +57,7 @@ object XMPPActor extends Actor with MessageListener {
 		logger.debug("*** num of users: " + chat.length)
 		prefs.getlh("users").foreach { x =>
 			try {
-				chat = chat ::: List( chatmanager.createChat(x("user"), this) )
+				chat ::= chatmanager.createChat(x("user"), this)
 			} catch {
 				case x: Throwable => {
 					if (debug) {
@@ -79,7 +79,7 @@ object XMPPActor extends Actor with MessageListener {
 //		prefs.getlh("users").foreach { x =>
 //			x("user")
 //		}
-		if (message.getFrom.contains("dmilith")) {   // XXX: hardcoded value
+		if (message.getFrom.contains("dmilith") || message.getFrom.contains("vara")) {   // XXX: hardcoded value
 			logger.info("Message contains dmilith: " + message.getFrom)
 			message.getBody match {
 				case "last" => {
