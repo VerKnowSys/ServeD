@@ -35,7 +35,7 @@ object ScalaBot extends Actor with Utils {
 		ODBServerActor ! Init
 		XMPPActor.start
 		XMPPActor ! Init
-		IRCActor.start
+//		IRCActor.start
 		
 		react {
 			case MainLoop => {
