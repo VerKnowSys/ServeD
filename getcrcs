@@ -7,6 +7,6 @@ main="jar.comparator.GiveCRC"
 # $2 - path to scala bin
 
 $2 -classpath \
-$HOME/.m2/repository/org/scala-lang/scala-library/2.7.6/scala-library-2.7.6.jar:\                                                                               
+$HOME/.m2/repository/org/scala-lang/scala-library/2.7.6/scala-library-2.7.6.jar:\
 $HOME/.m2/repository/project/tools/project.tools/1.1/project.tools-1.1.jar \
 $main $1
