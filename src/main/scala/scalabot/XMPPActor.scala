@@ -39,7 +39,7 @@ object XMPPActor extends Actor with MessageListener {
 	private var chat: List[Chat] = List()
 	
 	def initConnection = {
-		XMPPConnection.DEBUG_ENABLED = true
+		XMPPConnection.DEBUG_ENABLED = false // NOTE: 2009-10-20 17:12:58 - dmilith - please look out for this bullshitting method added by some stupid fucks with requirement for X11 display
 		config.setCompressionEnabled(true)
 		config.setSASLAuthenticationEnabled(false)
 		connection.connect()
