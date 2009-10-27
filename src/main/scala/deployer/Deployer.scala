@@ -141,7 +141,7 @@ object Deployer extends Utils {
 			logger.info("Searching for jars in Maven repository..")
 			(basic_jar_names ++ (if (!basicOnly_?) dependency_jar_names else Nil)).foreach {
 				file =>
-						logger.debug("FileName: *" + file + "*" + " --> " + basic_jar_names + " ---> " + file)
+						logger.debug("FileName: *" + file + "*" + " <- " + basic_jar_names)
 						logger.debug("Basic Jar names contains given file? " + basic_jar_names.contains(file))
 						findFile(new File(pathToMaven2Repo + (if (basic_jar_names.contains(file)) prefs.get("projectGroupId") else "")), new P { // NOTE: 2009-10-19 03:04:00 - dmilith - projectGroupId gives huge boost in deployment time
 							override
