@@ -17,9 +17,8 @@
     </content>
     <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="Maven: org.scala-lang:scala-library:2.7.6" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.scala-lang:scala-compiler:2.7.6" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.scala-lang:scala-swing:2.7.6" level="project" />
+    <orderEntry type="library" exported="" name="Maven: org.scala-lang:scala-library:2.7.7" level="project" />
+    <orderEntry type="library" exported="" name="Maven: org.scala-lang:scala-compiler:2.7.7" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.5" level="project" />
     <orderEntry type="library" exported="" name="Maven: pircbot:pircbot:1.4.2" level="project" />
     <orderEntry type="library" exported="" name="Maven: jivesoftware:smack:3.0.4" level="project" />
