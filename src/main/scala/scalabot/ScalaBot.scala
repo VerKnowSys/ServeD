@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import scala.actors._
 import utils.Utils
+import prefs.Preferences
 
 
 object ScalaBot extends Actor with Utils {
@@ -23,10 +24,17 @@ object ScalaBot extends Actor with Utils {
 		ScalaBot ! Quit
 		logger.info("Done\n")
 	}
+	var prefs: Preferences = null // global preferences
 
 	def main(args: Array[String]) {
+		if (args.length == 0) {
+			prefs = new Preferences
+		} else {
+			prefs = new Preferences(args(0)) // initialize preferences based on given argument (project config file)
+		}
+		setLoggerLevelDebug(if (prefs.getb("debug")) Level.TRACE else Level.INFO)
 		logger.info("User home dir: " + System.getProperty("user.home"))
-		logger.info("Initializing scalaBot..")
+		logger.debug("Params: " + args + ". Params size: " + args.length)
 		this.start
 	}
 	

@@ -23,7 +23,7 @@ import org.jivesoftware.smack.filter._
 // TODO: to be refactored - Preferences should be parametrized
 object XMPPActor extends Actor with MessageListener { 
 
-	lazy val prefs: Preferences = new Preferences
+	lazy val prefs = ScalaBot.prefs
 	lazy val logger = Logger.getLogger(XMPPActor.getClass)
 	lazy val debug = prefs.getb("debug")
 	lazy val config = new ConnectionConfiguration(prefs.get("xmppServer"), prefs.geti("xmppPort"))

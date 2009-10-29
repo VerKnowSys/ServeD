@@ -14,10 +14,11 @@ import org.neodatis.odb.impl.core.query.criteria._
 
 
 // TODO: to be refactored - Preferences should be parametrized
+// 2009-10-29 12:54:11 - dmilith - NOTE: this module is deprecated, and temporarely wont be used and managed.
 object IRCActor extends PircBot with Actor {
 
 	private val logger = Logger.getLogger(IRCActor.getClass)
-	private val prefs = new Preferences
+	private val prefs = ScalaBot.prefs
 	
 	def settings = {
 		setVerbose(prefs.getb("ircDebugInfo"))
