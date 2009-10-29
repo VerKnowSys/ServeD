@@ -33,7 +33,7 @@ trait Utils {
 		}
 	}
 
-	def setLoggerLevelDebug(arg: Priority) = {
+	def setLoggerLevelDebug(arg: Level) = {
 		appender.setThreshold(arg)
 	}
 
