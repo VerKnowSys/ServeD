@@ -1,13 +1,13 @@
 #!/bin/bash
 # This Software is a close code project. You may not redistribute this code without permission of author.
 
-# $1 => begin sha
-# $2 => end sha
-# $3 => absolute git repository dir
+# $1 => config file (xml)
+# $2 => begin sha
+# $3 => end sha
 
 java -classpath \
-$HOME/.m2/repository/org/scala-lang/scala-compiler/2.7.6/scala-compiler-2.7.6.jar:\
-$HOME/.m2/repository/org/scala-lang/scala-library/2.7.6/scala-library-2.7.6.jar:\
+$HOME/.m2/repository/org/scala-lang/scala-compiler/2.7.7/scala-compiler-2.7.7.jar:\
+$HOME/.m2/repository/org/scala-lang/scala-library/2.7.7/scala-library-2.7.7.jar:\
 $HOME/.m2/repository/junit/junit/4.5/junit-4.5.jar:\
 $HOME/.m2/repository/sshtools/j2ssh-common/0.2.2/j2ssh-common-0.2.2.jar:\
 $HOME/.m2/repository/sshtools/j2ssh-core/0.2.2/j2ssh-core-0.2.2.jar:\

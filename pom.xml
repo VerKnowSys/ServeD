@@ -7,7 +7,7 @@
 	<version>1.1</version>
 	<inceptionYear>2009</inceptionYear>
 	<properties>
-		<scala.version>2.7.6</scala.version>
+		<scala.version>2.7.7</scala.version>
 		<neodatis.version>1.9.17.632</neodatis.version>
 	</properties>
 
@@ -39,11 +39,11 @@
 			<artifactId>scala-compiler</artifactId>
 			<version>${scala.version}</version>
 		</dependency>
-		<dependency>
+<!--		<dependency>
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-swing</artifactId>
 			<version>${scala.version}</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
