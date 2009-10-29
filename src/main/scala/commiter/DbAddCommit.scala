@@ -16,11 +16,11 @@ object DbAddCommit extends Utils {
 
 	override
 	def logger = Logger.getLogger(DbAddCommit.getClass)
-	private val prefs = new Preferences       // TODO: add custom config file support
-	private val debug = prefs.getb("debug")
-	private val gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
-	private val databaseName = System.getProperty("user.home") + "/" + ".codadris/" + prefs.get("xmppDatabaseFileName")
-	private val git = prefs.get("gitExecutable")
+	var prefs: Preferences = null
+	lazy val debug = prefs.getb("debug")
+	lazy val gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
+	lazy val databaseName = System.getProperty("user.home") + "/" + ".codadris/" + prefs.get("xmppDatabaseFileName")
+	lazy val git = prefs.get("gitExecutable")
 	
 	def writeCommitToDataBase(arg: Commit) = {
 		var odb: ODB = null
@@ -43,15 +43,23 @@ object DbAddCommit extends Utils {
 		}
 	}
 
+	def doError {
+		logger.error("### Error: bad arguments.\nUsage: scriptname config-file sha1-start sha1-end")
+		exit(1)
+	}
+
 	/**
-	 * args(0) -> commit sha (beginning of range)
-	 * args(1) -> commit sha (end of range)
+	 * args(0) -> name of config file to be used
+	 * args(1) -> commit sha (beginning of range)
+	 * args(2) -> commit sha (end of range)
 	 */
 	def main(args: Array[String]) {
 		initLogger
+		if (args.length == 0) doError
+		prefs = new Preferences(args(0)) // initialize preferences based on given argument (project config file)
 		try {
-			val command = Array(git, "--git-dir=" + gitRepositoryProjectDir, "rev-list", args(0) + "..." + args(1))
-			logger.debug("*** performing " + command.map{ a => a })
+			val command = Array(git, "--git-dir=" + gitRepositoryProjectDir, "rev-list", args(1) + "..." + args(2))
+			logger.debug("*** performing " + command.map{ a => a + ", "}.mkString)
 			val listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
 			listOfSha1.foreach { oneOf =>
 				val commit = new Commit(oneOf)
@@ -62,9 +70,8 @@ object DbAddCommit extends Utils {
 			exit(0)
 		} catch {
 			case x: Throwable => {
-				logger.info("### Error: bad arguments.\nUsage: scriptname sha1-start sha1-end")
-				if (debug) x.printStackTrace
-				exit(1)
+				logger.debug("StackTrace: " + x)
+				doError
 			}
 		} 
 	}
