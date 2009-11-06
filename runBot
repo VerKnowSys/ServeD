@@ -3,7 +3,7 @@
 
 main="scalabot.ScalaBot"
 
-java -classpath \
+java -Xmx256m -classpath \
 $HOME/.m2/repository/org/scala-lang/scala-compiler/2.7.7/scala-compiler-2.7.7.jar:\
 $HOME/.m2/repository/org/scala-lang/scala-library/2.7.7/scala-library-2.7.7.jar:\
 $HOME/.m2/repository/junit/junit/4.5/junit-4.5.jar:\
