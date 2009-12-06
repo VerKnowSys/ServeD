@@ -1,10 +1,12 @@
-*** Project Tools Readme ***
 
-- Purpose?
-- Because all other tools sucks
+
+*** Continuous Repository - Readme    ***
+*** Author: Daniel (dmilith) Dettlaff ***
+
+
 
 0. Requirements:
-	0.1 - Java 1.6.0_14 at least
+	0.1 - Java 1.6.0_17 at least
 	0.2 - Maven 2.2.x
 	0.3 - POSIX compatible system
 	
@@ -17,5 +19,5 @@ That's all folks
 Questions?
 	I'm as "dmilith" on:
 	- #scala.pl, #scala at irc.freenode.net
-	- xmpp:dmilith@drakor.eu on jabber
+	- xmpp:dmilith@verknowsys.com on jabber
 	- xmpp:dmilith@gmail.com on google sucking asses jabber

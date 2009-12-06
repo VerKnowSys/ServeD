@@ -1,5 +1,0 @@
-#!/bin/bash
-
-date=`date "+%Y-%m-%d"`
-
-mvn -e install:install-file -DcreateChecksum=true -Ddescription="Quaqua swing-layout, build on $date" -Dfile="lib/quaqua-swing-layout.jar" -DgeneratePom=true -DgroupId="org.quaqua.swing-layout" -DartifactId="org.quaqua.swing-layout" -Dversion="6.2" -Dpackaging=jar
