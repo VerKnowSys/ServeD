@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module MavenProjectsManager.isMavenModule="true" org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" relativePaths="true" type="JAVA_MODULE" version="4">
+<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Scala" name="Scala">
       <configuration />
@@ -12,22 +12,24 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/scala" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/scala" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/lib" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="Maven: org.scala-lang:scala-library:2.7.7" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.scala-lang:scala-compiler:2.7.7" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.5" level="project" />
+    <orderEntry type="module" module-name="continuous.tools" exported="" />
+    <orderEntry type="library" exported="" name="Maven: com.qt4:com.qt4:4.5.2" level="project" />
+    <orderEntry type="library" exported="" name="Maven: com.qt4:com.qt4.lib.macosx32:4.5.2" level="project" />
     <orderEntry type="library" exported="" name="Maven: pircbot:pircbot:1.4.2" level="project" />
     <orderEntry type="library" exported="" name="Maven: jivesoftware:smack:3.0.4" level="project" />
     <orderEntry type="library" exported="" name="Maven: jivesoftware:smackx:3.0.4" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.neodatis:neodatis-odb:1.9.17.632" level="project" />
+    <orderEntry type="library" exported="" name="Maven: org.neodatis:neodatis-odb:1.9.21.670" level="project" />
     <orderEntry type="library" exported="" name="Maven: log4j:log4j:1.2.14" level="project" />
     <orderEntry type="library" exported="" name="Maven: commons-io:commons-io:1.4" level="project" />
     <orderEntry type="library" exported="" name="Maven: sshtools:j2ssh-common:0.2.2" level="project" />
     <orderEntry type="library" exported="" name="Maven: sshtools:j2ssh-core:0.2.2" level="project" />
+    <orderEntry type="library" exported="" name="Maven: org.scala-lang:scala-library:2.7.7" level="project" />
+    <orderEntry type="library" exported="" name="Maven: org.scala-lang:scala-compiler:2.7.7" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.5" level="project" />
   </component>
 </module>
 

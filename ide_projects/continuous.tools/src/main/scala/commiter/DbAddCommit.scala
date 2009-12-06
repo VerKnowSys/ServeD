@@ -4,14 +4,12 @@
 package commiter
 
 import command.exec.CommandExec
-import java.io.OutputStreamWriter
-import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
+import org.apache.log4j.{Logger}
 import org.neodatis.odb.{ODBFactory, ODB}
 import prefs.Preferences
 import utils.Utils
 
 
-// TODO: to be refactored - Preferences should be parametrized
 object DbAddCommit extends Utils {
 
 	override
@@ -44,7 +42,7 @@ object DbAddCommit extends Utils {
 	}
 
 	def doError {
-		logger.error("### Error: bad arguments.\nUsage: scriptname config-file sha1-start sha1-end")
+		logger.error("### Error: bad arguments.\nUsage: " + getClass.getName + " config-file sha1-start sha1-end")
 		exit(1)
 	}
 
@@ -59,18 +57,18 @@ object DbAddCommit extends Utils {
 		prefs = new Preferences(args(0)) // initialize preferences based on given argument (project config file)
 		try {
 			val command = Array(git, "--git-dir=" + gitRepositoryProjectDir, "rev-list", args(1) + "..." + args(2))
-			logger.debug("*** performing " + command.map{ a => a + ", "}.mkString)
+			logger.debug("*** performing action: \"" + command.map{ a => a + ", "}.mkString + "\"")
 			val listOfSha1 = List.fromString(CommandExec.cmdExec(command), '\n')
 			listOfSha1.foreach { oneOf =>
 				val commit = new Commit(oneOf)
 				writeCommitToDataBase( commit )	// sha1, show?
-				logger.debug("*** writeCommitToDatabase: " + oneOf )
+				logger.info("Adding commit: sha1: " + commit.commitSha1 + " commited at: " + commit.date)
 			}
 			logger.info("Commited. Done")
 			exit(0)
 		} catch {
 			case x: Throwable => {
-				logger.debug("StackTrace: " + x)
+				logger.debug("StackTrace:\n" + x)
 				doError
 			}
 		} 
