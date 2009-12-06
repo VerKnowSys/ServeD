@@ -1,0 +1,4 @@
+#!/bin/bash
+
+export JAVA_OPTS="-d32 -Xms64m -Xmx128m -Dfile.encoding=UTF-8 -XX:-UseParallelGC -XX:+AggressiveOpts -XX:-UseConcMarkSweepGC -XX:+UseFastAccessorMethods"
+export MAVEN_OPTS="$JAVA_OPTS"

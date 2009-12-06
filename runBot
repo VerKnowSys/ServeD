@@ -1,6 +1,8 @@
 #!/bin/bash
 # This Software is a close code project. You may not redistribute this code without permission of author.
 
+. OPTS
+
 main="scalabot.ScalaBot"
 args="project.tools.xml"
 cd ide_projects/continuous.tools
