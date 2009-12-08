@@ -1,5 +1,0 @@
-#!/bin/bash
-
-date=`date "+%Y-%m-%d"`
-
-mvn -e install:install-file -DcreateChecksum=true -Ddescription="Quaqua, build on $date" -Dfile="lib/quaqua.jar" -DgeneratePom=true -DgroupId="org.quaqua" -DartifactId="org.quaqua" -Dversion="6.2" -Dpackaging=jar

@@ -3,5 +3,4 @@
 *.class
 target/
 *.neodatis
-*.xml
 .idea

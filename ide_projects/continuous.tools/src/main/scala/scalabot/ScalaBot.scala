@@ -20,7 +20,7 @@ object ScalaBot extends Actor with Utils {
 	addShutdownHook {
 		XMPPActor ! Quit
 		ODBServerActor ! Quit
-		IRCActor ! Quit
+//		IRCActor ! Quit
 		ScalaBot ! Quit
 		logger.info("Done\n")
 	}

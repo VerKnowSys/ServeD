@@ -1,4 +1,8 @@
 #!/bin/bash
 # This Software is a close code project. You may not redistribute this code without permission of author.
 
-mvn install -Dmaven.test.skip.exec=true $@
+set -x
+. OPTS
+
+cd ide_projects/
+mvn compile -Dmaven.test.skip.exec=true $@
