@@ -57,12 +57,10 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 					<jvmArgs>
 						<jvmArg>-Dfsc=true</jvmArg>
 						<jvmArg>-d32</jvmArg>
-						<jvmArg>-Xms64m</jvmArg>
-						<jvmArg>-Xmx128m</jvmArg>
+						<jvmArg>-XX:NewRatio=1</jvmArg>
+						<jvmArg>-Xms512m</jvmArg>
+						<jvmArg>-Xmx512m</jvmArg>
 						<jvmArg>-Dfile.encoding=UTF-8</jvmArg>
-						<jvmArg>-XX:+AggressiveOpts</jvmArg>
-						<jvmArg>-XX:-UseConcMarkSweepGC</jvmArg>
-						<jvmArg>-XX:+UseFastAccessorMethods</jvmArg>
 					</jvmArgs>
 					<useRuntimeClasspath>true</useRuntimeClasspath>
 				</configuration>				

@@ -5,4 +5,4 @@ set -x
 . OPTS
 
 cd ide_projects/
-mvn compile -o -Dmaven.test.skip.exec=true $@
+mvn install -o -Dmaven.test.skip.exec=true $@
