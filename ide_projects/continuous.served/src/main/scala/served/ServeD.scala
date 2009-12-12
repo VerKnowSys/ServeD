@@ -1,3 +1,6 @@
+// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
+// This Software is a close code project. You may not redistribute this code without permission of author.
+
 package served
 
 import utils.Utils
@@ -18,7 +21,7 @@ class ServeDActor extends Actor {
 
 	def logger: Logger = Logger.getLogger(classOf[ServeDActor])
 	var users = List("dmilith", "guest") // XXX: temporary list
-	val checkInterval = 250 // in ms XXX: should be more for production, but small values will make me see average performance of ServeD
+	val checkInterval = 2500 // in ms XXX: should be more for production, but small values will make me see average performance of ServeD
 
 
 	def checkout(users: List[String]) = {
