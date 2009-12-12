@@ -31,6 +31,7 @@
     <orderEntry type="library" exported="" name="Maven: commons-io:commons-io:1.4" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.neodatis:neodatis-odb:1.9.21.670" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.scala-lang:scala-library:2.7.7" level="project" />
+    <orderEntry type="library" exported="" name="Maven: net.java.dev.jna:jna:3.2.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.5" level="project" />
   </component>
 </module>
