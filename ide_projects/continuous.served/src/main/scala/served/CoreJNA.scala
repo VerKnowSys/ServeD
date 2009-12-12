@@ -1,3 +1,6 @@
+// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
+// This Software is a close code project. You may not redistribute this code without permission of author.
+
 package served
 
 /**
@@ -6,4 +9,42 @@ package served
  * Time: 1:34:27 AM
  */
 
-class CoreJNA
+import com.sun.jna.Library
+import com.sun.jna.Native
+
+object CoreJNA {
+
+	/**Simple example of native C POSIX library declaration and usage. */
+
+	trait POSIX extends Library {
+		def chmod(filename: String, mode: Int)
+
+		def chown(filename: String, user: Int, group: Int)
+
+		def creat(filename: String)
+
+		def rename(oldpath: String, newpath: String)
+
+		def kill(pid: Int, signal: Int): Int
+
+		//def link(oldpath: String, newpath: String): Int
+
+		def mkdir(path: String, mode: Int): Int
+
+		def execl(comm: String): Int
+		
+		def rmdir(path: String): Int
+
+	}
+
+	def main(args: Array[String]) {
+		val posix = Native.loadLibrary("c", classOf[POSIX]).asInstanceOf[POSIX]
+		println(posix)
+		posix.mkdir("/tmp/newdir", 0777)
+		posix.rename("/tmp/newdir", "/tmp/renamedir")
+		posix.creat("/tmp/renamedir/file1")
+		posix.chmod("/tmp/renamedir/file1", 0755)
+		posix.execl("/bin/")
+	}
+
+}
