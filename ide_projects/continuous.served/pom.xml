@@ -17,6 +17,11 @@
 
 	<repositories>
 		<repository>
+			<name>java.net</name>
+			<id>java.net-maven2-repository</id>
+			<url>http://download.java.net/maven/2/</url>
+		</repository>
+		<repository>
 			<id>media.verknowsys.com</id>
 			<name>Verknowsys Maven 2 repository</name>
 			<url>http://media.verknowsys.com/.m2/repository/</url>
@@ -28,6 +33,11 @@
 			<groupId>continuous</groupId>
 			<artifactId>continuous.tools</artifactId>
 			<version>1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>3.2.4</version>
 		</dependency>
 	</dependencies>
 </project>
