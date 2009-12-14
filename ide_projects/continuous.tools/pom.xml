@@ -28,6 +28,11 @@
 	
 	<dependencies>
 		<dependency>
+			<groupId>net.sourceforge.messadmin</groupId>
+			<artifactId>MessAdmin-Core</artifactId>
+			<version>4.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.qt4</groupId>
 			<artifactId>com.qt4</artifactId>
 			<version>${qt4.version}</version>

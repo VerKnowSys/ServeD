@@ -9,6 +9,7 @@ import java.util.ArrayList
 import java.util.regex.Pattern
 import org.apache.log4j._
 import prefs.Preferences
+import clime.messadmin.providers.sizeof.ObjectProfiler
 
 /**
  * User: dmilith
@@ -113,6 +114,10 @@ trait Utils {
 					exit(1)
 				}
 			}
+	}
+
+	def sizeof(any: Any) = {
+		ObjectProfiler.sizeof(any)
 	}
 	
 }

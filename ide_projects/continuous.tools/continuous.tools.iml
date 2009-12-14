@@ -20,6 +20,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="Maven: net.sourceforge.messadmin:MessAdmin-Core:4.0" level="project" />
     <orderEntry type="library" exported="" name="Maven: com.qt4:com.qt4:4.5.2" level="project" />
     <orderEntry type="library" exported="" name="Maven: com.qt4:com.qt4.lib.macosx32:4.5.2" level="project" />
     <orderEntry type="library" exported="" name="Maven: pircbot:pircbot:1.4.2" level="project" />
