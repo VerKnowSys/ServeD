@@ -4,3 +4,4 @@
 target/
 *.neodatis
 .idea
+*~
