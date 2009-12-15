@@ -11,11 +11,15 @@ package served
 
 import com.sun.jna.Library
 import com.sun.jna.Native
+import utils.Utils
+import java.nio.charset.Charset
 
-object CoreJNA {
+object CoreJNA extends Utils {
 
 	/**Simple example of native C POSIX library declaration and usage. */
 
+	def posix = Native.loadLibrary("c", classOf[POSIX]).asInstanceOf[POSIX]
+	
 	trait POSIX extends Library {
 		def chmod(filename: String, mode: Int)
 
@@ -38,13 +42,12 @@ object CoreJNA {
 	}
 
 	def main(args: Array[String]) {
-		val posix = Native.loadLibrary("c", classOf[POSIX]).asInstanceOf[POSIX]
-		println(posix)
+
 		posix.mkdir("/tmp/newdir", 0777)
 		posix.rename("/tmp/newdir", "/tmp/renamedir")
 		posix.creat("/tmp/renamedir/file1")
 		posix.chmod("/tmp/renamedir/file1", 0755)
-		posix.execl("/bin/")
+		
 	}
 
 }
