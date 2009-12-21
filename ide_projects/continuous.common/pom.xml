@@ -24,6 +24,14 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 		<relativePath>../codadris.pom/scala</relativePath>
 	</parent>
 
+	<repositories>
+		<repository>
+        	<id>codadris_maven2_repo</id>
+			<name>codadris_maven2_repo</name>
+			<url>http://media.verknowsys.com/.m2/repository/</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>log4j</groupId>
