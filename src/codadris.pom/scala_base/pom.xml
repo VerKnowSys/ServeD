@@ -1,0 +1,91 @@
+
+<!--
+  ~ This is closed code project. You may not redistibute it without permission of author.
+  ~ Copyright © 2oo9/2o1o by Daniel (dmilith) Dettlaff. All Rights Reserved.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd
+http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>codadris</groupId>
+	<artifactId>codadris.pom.scala_base</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>codadris.pom.scala_base</name>
+	
+	<!-- 2009-10-19 03:13:02 ; karolrvn ; no execution goals here -->
+	
+	<parent> <!-- 2009-10-19 01:37:59 ; karolrvn ; pom inheritance -->
+		<groupId>codadris</groupId>
+		<artifactId>codadris</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../..</relativePath>
+	</parent>
+	
+	<properties>
+		<scala.version>2.7.7</scala.version>
+	</properties>
+	
+	<repositories>
+		<repository>
+			<id>scala-tools.org</id>
+			<name>Scala-tools Maven2 Repository</name>
+			<url>http://scala-tools.org/repo-releases</url>
+		</repository>
+	</repositories>
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>scala-tools.org</id>
+			<name>Scala-tools Maven2 Repository</name>
+			<url>http://scala-tools.org/repo-releases</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.scala-tools</groupId>
+				<artifactId>maven-scala-plugin</artifactId>
+				
+				<!-- 2009-10-19 02:52:41 ; karolrvn : -->
+				<configuration>
+					<!--<scalaVersion>${scala.version}</scalaVersion>-->
+					<useFsc>true</useFsc>
+					<displayCmd>true</displayCmd>
+					<jvmArgs>
+						<jvmArg>-Dfsc=true</jvmArg>
+						<jvmArg>-d32</jvmArg>
+						<jvmArg>-XX:NewRatio=1</jvmArg>
+						<jvmArg>-Xms512m</jvmArg>
+						<jvmArg>-Xmx512m</jvmArg>
+						<jvmArg>-Dfile.encoding=UTF-8</jvmArg>
+					</jvmArgs>
+					<useRuntimeClasspath>true</useRuntimeClasspath>
+				</configuration>				
+			</plugin>
+			<plugin>
+				<groupId>org.scala-tools</groupId>
+				<artifactId>maven-scala-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>${scala.version}</version>
+		</dependency>
+	</dependencies>
+	
+</project>

@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd
+http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>continuous</groupId>
+	<artifactId>continuous</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Continuous Agregate</name>
+	<url>http://maven.apache.org</url>
+	<modules>
+		<module>codadris.pom/scala</module>
+		<module>codadris.pom/scala_base</module>
+		<module>codadris.pom/scala_from_java</module>
+		<module>continuous.common</module>
+		<module>continuous.served</module>
+		<module>continuous.tools</module>
+	</modules>
+	
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<!-- 				<version>2.4.2</version> -->
+				<configuration>
+					<aggregate>true</aggregate>
+					<!--also set this to link to generated source reports-->
+					<linkXRef>true</linkXRef>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+	<build> <!-- 2009-10-19 00:59:42 ; karolrvn ; moved (extracted plugin stuff to this super-pom) -->
+		<plugins>			
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
