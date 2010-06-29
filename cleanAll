@@ -4,5 +4,5 @@
 set -x
 . OPTS
 
-cd ide_projects/
+cd src/
 mvn clean
