@@ -2,9 +2,10 @@
 # This Software is a close code project. You may not redistribute this code without permission of author.
 
 set -x
-. OPTS
 
 cd src/
+. ../bin/OPTS
+
 mvn install -Dmaven.test.skip.exec=true $@
 echo "Hit Enter to perform tests, SIGINT to terminate"
 read
