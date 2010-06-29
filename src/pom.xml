@@ -15,6 +15,7 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 		<module>continuous.common</module>
 		<module>continuous.served</module>
 		<module>continuous.tools</module>
+		<module>continuous.gitinfo</module>
 	</modules>
 	
 	<reporting>
