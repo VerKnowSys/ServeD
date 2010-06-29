@@ -6,3 +6,17 @@ target/
 .idea
 *~
 *~*
+*.log
+*.temp
+backups
+bin
+.swp
+target
+target-eclipse
+build
+.idea/
+*.iml
+*.iws
+*.ipr
+*.tmproj
+*.xcodeproj

@@ -4,7 +4,7 @@
 set -x
 . OPTS
 
-cd ide_projects/
+cd src/
 mvn install -Dmaven.test.skip.exec=true $@
 echo "Hit Enter to perform tests, SIGINT to terminate"
 read

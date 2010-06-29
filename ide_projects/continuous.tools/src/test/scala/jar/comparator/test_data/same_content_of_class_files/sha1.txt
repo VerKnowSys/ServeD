@@ -1,2 +1,0 @@
-71d139d24c3d6afe9ab853e1f7279a2d5955baa6  codadris.dbapp-0.0.1-SNAPSHOT---1.jar
-d78aa635fb513500a0beb0061ce85a1fe1071cff  codadris.dbapp-0.0.1-SNAPSHOT---2.jar
