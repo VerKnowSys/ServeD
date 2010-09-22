@@ -1,13 +1,13 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package prefs
+package com.verknowsys.served.utils.prefs
 
 
+import scala.collection.mutable.Map
 import java.io.File
 import org.apache.log4j.{Level, Logger}
-import scala.collection.mutable.Map
-import utils.Utils
+import com.verknowsys.served.utils.Utils
 import xml.{Node, XML}
 
 

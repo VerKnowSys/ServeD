@@ -1,10 +1,11 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package jar.comparator
+package com.verknowsys.served.utils.jar.comparator
 
 import junit.framework._;
 import Assert._;
+
 
 object JarEntryComparatorTest {
 

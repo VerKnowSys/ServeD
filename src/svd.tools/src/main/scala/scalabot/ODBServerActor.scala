@@ -1,14 +1,14 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package scalabot
+package com.verknowsys.served.utils.scalabot
 
 
 
 import org.neodatis.odb.{OdbConfiguration, ODBServer, ODBFactory}
-import signals.{Init, Quit}
+import com.verknowsys.served.utils.signals.{Init, Quit}
 import org.apache.log4j.Logger
-import prefs.Preferences
+import com.verknowsys.served.utils.prefs.Preferences
 import scala.actors._
 
 object ODBServerActor extends Actor {

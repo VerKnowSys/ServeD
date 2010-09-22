@@ -1,14 +1,14 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package utils
+package com.verknowsys.served.utils
 
 
 import java.io.{PrintWriter, File, OutputStreamWriter}
 import java.util.ArrayList
 import java.util.regex.Pattern
 import org.apache.log4j._
-import prefs.Preferences
+import com.verknowsys.served.utils.prefs.Preferences
 import clime.messadmin.providers.sizeof.ObjectProfiler
 
 /**

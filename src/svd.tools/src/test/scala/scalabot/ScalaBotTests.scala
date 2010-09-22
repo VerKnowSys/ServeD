@@ -1,17 +1,18 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package scalabot
+package com.verknowsys.served.utils.scalabot
 
-import commiter.Commit
+
+import com.verknowsys.served.utils.commiter.Commit
 import org.junit.Ignore
-import prefs.Preferences
-import scalabot._
+import com.verknowsys.served.utils.prefs.Preferences
+import com.verknowsys.served.utils.scalabot._
 
 import scala._
-
 import junit.framework._;
 import Assert._;
+
 
 object ScalaBotTests {
 
@@ -25,6 +26,7 @@ object ScalaBotTests {
         junit.textui.TestRunner.run(suite);
     }
 }
+
 
 class CommitTest extends TestCase("commit") {
 	var commit: Commit = null

@@ -1,17 +1,19 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package version
+package com.verknowsys.served.utils.version
 
-import command.exec.CommandExec
+
+import com.verknowsys.served.utils.command.exec.CommandExec
+import com.verknowsys.served.utils.prefs.Preferences
+import com.verknowsys.served.utils.jar.JarAccess
+import com.verknowsys.served.utils.signals.{Init, Quit}
+import com.verknowsys.served.utils.deployer.Deployer
+import com.verknowsys.served.utils.Utils
+
 import java.io._
 import java.util.{UUID, Date}
 import org.apache.log4j._
-import prefs.Preferences
-import jar.JarAccess
-import signals.{Init, Quit}
-import deployer.Deployer
-import utils.Utils
 
 /**
  * User: dmilith

@@ -1,26 +1,24 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package ssh.tools
+package com.verknowsys.served.utils.ssh.tools
 
+
+import com.verknowsys.served.utils.deployer.Deployer
+import com.verknowsys.served.utils.skeletons.JNLPSkeleton
+import com.verknowsys.served.utils.signals.{Init, Quit}
+import com.verknowsys.served.utils.jar.comparator.JarEntryComparator
+import com.verknowsys.served.utils.prefs.Preferences
+import com.verknowsys.served.utils.Utils
+import com.verknowsys.served.utils.version.CddsVersion
 
 import actors.Actor
-import deployer.Deployer
 import java.net.UnknownHostException
-import skeletons.JNLPSkeleton
-import signals.{Init, Quit}
-
 import com.sshtools.j2ssh.authentication.{PasswordAuthenticationClient, AuthenticationProtocolState}
 import com.sshtools.j2ssh.SshClient
-import jar.comparator.JarEntryComparator
 import java.io.{BufferedReader, InputStreamReader, File}
-
 import java.util.{Date, ArrayList}
 import org.apache.log4j.Logger
-import prefs.Preferences
-import skeletons.JNLPSkeleton
-import utils.Utils
-import version.CddsVersion
 
 /**
  * User: dmilith
@@ -63,21 +61,21 @@ object SSHCommand extends Utils {
 		def actionBlock(localFile: String): Unit = {
 			val clientForRemoteCommand = ssh.openSessionChannel
 			val comparator = new JarEntryComparator
-			var listOfCRCLocalFile = comparator.loadAndThrowListOfCrcs(localFile)
+			var listOfCRCLocalFile = comparator.loadAndThrowListOfCrcs(localFile) // XXX: variable
 			clientForRemoteCommand.executeCommand(
 				prefs.get("remoteProjectToolsDir") + "getcrcs" + " " +
 				remoteDeployDir + localFile.split("/").last + " " +
 				prefs.get("remoteScalaBin"))
 			val input = new BufferedReader(new InputStreamReader(clientForRemoteCommand.getInputStream))
-			var output = ""
-			var line = ""
+			var output = "" // XXX: variable
+			var line = "" // XXX: variable
 			while (line != null) {
 				output += line
 				line = input.readLine
 			}
 			input.close
 
-			var out = List[String]()
+			var out = List[String]() // XXX: variable
 			output.split(",").foreach{ a => out ++= List[String](a) }
 			logger.debug("1: " + out)
 			logger.debug("2: " + listOfCRCLocalFile)
@@ -101,7 +99,7 @@ object SSHCommand extends Utils {
 		}
 		// deploying jnlp file
 		logger.info("Generating JNLP file")
-		var arguments = ""
+		var arguments = "" // XXX: variable
 		for( i <- prefs.getl("webstartArgumentsJVM")) { // XXX: maybe switch to normal String instead of List[String]
 			arguments += i + " "
 		}

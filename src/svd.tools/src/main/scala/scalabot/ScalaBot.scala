@@ -1,15 +1,15 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package scalabot
+package com.verknowsys.served.utils.scalabot
 
 
 import signals.{ProcessMessages, MainLoop, Init, Quit}
 import java.io.OutputStreamWriter
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import scala.actors._
-import utils.Utils
-import prefs.Preferences
+import com.verknowsys.served.utils.Utils
+import com.verknowsys.served.utils.prefs.Preferences
 
 
 object ScalaBot extends Actor with Utils {

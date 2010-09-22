@@ -1,12 +1,12 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-//package served
+package com.verknowsys.served.maintainer
 
-import utils.Utils
+import com.verknowsys.served.utils.Utils
+import com.verknowsys.served.signals.{ProcessMessages, MainLoop, Quit, Init}
 import actors.Actor
 import org.apache.log4j.{Level, Logger}
-import signals.{ProcessMessages, MainLoop, Quit, Init}
 
 /**
  * User: dmilith

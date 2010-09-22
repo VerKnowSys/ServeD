@@ -1,10 +1,10 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package scalabot
+package com.verknowsys.served.utils.scalabot
 
-import prefs.Preferences
-import signals.Quit
+import com.verknowsys.served.prefs.Preferences
+import com.verknowsys.served.signals.Quit
 import org.apache.log4j.Logger
 import scala.actors._
 import scala.actors.Actor._

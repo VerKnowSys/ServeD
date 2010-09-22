@@ -1,7 +1,7 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package served
+package com.verknowsys.served.systemmanager
 
 /**
  * User: dmilith
@@ -9,12 +9,13 @@ package served
  * Time: 1:34:27 AM
  */
 
+import com.verknowsys.served.utils.Utils
 import com.sun.jna.Library
 import com.sun.jna.Native
-import utils.Utils
 import java.nio.charset.Charset
 
-object CoreJNA extends Utils {
+
+object SystemManager extends Utils {
 
 	/**Simple example of native C POSIX library declaration and usage. */
 

@@ -7,6 +7,7 @@ import org.eclipse.jgit.revwalk.filter.RevFilter
 import org.eclipse.jgit.revwalk.{RevCommit, RevWalk}
 import org.eclipse.jgit.lib.{PersonIdent, Constants, Repository}
 
+
 class Repo(dir: String) {
   val repository = new Repository(new File(dir, ".git"))
 

@@ -1,4 +1,4 @@
-package utils;
+package com.verknowsys.served.utils;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
