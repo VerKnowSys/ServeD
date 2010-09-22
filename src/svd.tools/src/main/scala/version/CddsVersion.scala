@@ -51,7 +51,7 @@ abstract class CddsVersion(
 
 	def versionPrefix: String
 
-	def this() = this ("project.tools.xml")
+	def this() = this ("served.xml")
 
 	def getLocalBuildFileContentsFromResource = {
 		try {

@@ -13,7 +13,7 @@ import xml.{Node, XML}
 
 class Preferences(configFileNameInput: String) extends Utils {
 
-	def this() = this("project.tools.xml") // additional Constructor
+	def this() = this("served.xml") // additional Constructor
 
 	override def logger = Logger.getLogger(classOf[Preferences])
 	initLogger
