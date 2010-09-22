@@ -3,11 +3,13 @@
 
 package com.verknowsys.served.utils.commiter
 
-import command.exec.CommandExec
+
+import com.verknowsys.served.utils.command.exec.CommandExec
+import com.verknowsys.served.utils.prefs.Preferences
+import com.verknowsys.served.utils.Utils
+
 import org.apache.log4j.{Logger}
 import org.neodatis.odb.{ODBFactory, ODB}
-import prefs.Preferences
-import utils.Utils
 
 
 object DbAddCommit extends Utils {

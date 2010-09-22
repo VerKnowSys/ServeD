@@ -5,11 +5,12 @@ package com.verknowsys.served.utils.scalabot
 
 
 
-import org.neodatis.odb.{OdbConfiguration, ODBServer, ODBFactory}
 import com.verknowsys.served.utils.signals.{Init, Quit}
-import org.apache.log4j.Logger
 import com.verknowsys.served.utils.prefs.Preferences
+import org.neodatis.odb.{OdbConfiguration, ODBServer, ODBFactory}
+import org.apache.log4j.Logger
 import scala.actors._
+
 
 object ODBServerActor extends Actor {
 	

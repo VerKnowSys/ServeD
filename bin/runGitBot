@@ -3,7 +3,7 @@
 
 . bin/OPTS
 
-main="scalabot.ScalaBot"
+main="com.verknowsys.served.utils.scalabot.ScalaBot"
 args="project.tools.xml"
 cd src/svd.tools
 mvn -e exec:java -Dexec.mainClass=$main -Dexec.args=$args $@

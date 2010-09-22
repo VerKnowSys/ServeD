@@ -4,19 +4,20 @@
 package com.verknowsys.served.utils.deployer
 
 
+import com.verknowsys.served.utils.prefs.Preferences
+import com.verknowsys.served.utils.skeletons.JNLPSkeleton
+import com.verknowsys.served.utils.ssh.tools.SSHCommand
+import com.verknowsys.served.utils.Utils
+import com.verknowsys.served.utils.signals.{Init, Quit}
+import com.verknowsys.served.utils.command.exec.CommandExec
+import com.verknowsys.served.utils.jar.comparator.JarEntryComparator
+
 import actors._
-import signals.{Init, Quit}
-import command.exec.CommandExec
-import jar.comparator.JarEntryComparator
 import java.io._
 import java.util.{UUID, Date, ArrayList}
 import org.apache.commons.io.{FileUtils, CopyUtils}
 import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import java.util.regex.{Matcher, Pattern}
-import prefs.Preferences
-import skeletons.JNLPSkeleton
-import ssh.tools.SSHCommand
-import utils.Utils
 import java.lang.String
 
 /**

@@ -3,8 +3,9 @@
 
 package com.verknowsys.served.maintainer
 
+
 import com.verknowsys.served.utils.Utils
-import com.verknowsys.served.signals.{ProcessMessages, MainLoop, Quit, Init}
+import com.verknowsys.served.utils.signals.{ProcessMessages, MainLoop, Quit, Init}
 import actors.Actor
 import org.apache.log4j.{Level, Logger}
 

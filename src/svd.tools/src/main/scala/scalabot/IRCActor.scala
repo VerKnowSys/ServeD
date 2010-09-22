@@ -3,8 +3,8 @@
 
 package com.verknowsys.served.utils.scalabot
 
-import com.verknowsys.served.prefs.Preferences
-import com.verknowsys.served.signals.Quit
+import com.verknowsys.served.utils.prefs.Preferences
+import com.verknowsys.served.utils.signals.Quit
 import org.apache.log4j.Logger
 import scala.actors._
 import scala.actors.Actor._

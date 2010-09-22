@@ -1,20 +1,19 @@
 // © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package scalabot
+package com.verknowsys.served.utils.scalabot
 
 
-import commiter.{Commit, DbAddCommit}
-import signals.{Init, Quit, ProcessMessages, MainLoop}
-import command.exec.CommandExec
+import com.verknowsys.served.utils.commiter.{Commit, DbAddCommit}
+import com.verknowsys.served.utils.signals.{Init, Quit, ProcessMessages, MainLoop}
+import com.verknowsys.served.utils.command.exec.CommandExec
+import com.verknowsys.served.utils.prefs.Preferences
+
 import org.apache.log4j.Logger
-import prefs.Preferences
 import scala.actors._
-
 import org.neodatis.odb._
 import org.neodatis.odb.impl.core.query.criteria._
 import org.neodatis.odb.core.query.criteria._
-
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
