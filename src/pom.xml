@@ -2,20 +2,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd
 http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>continuous</groupId>
-	<artifactId>continuous</artifactId>
+	<groupId>svd</groupId>
+	<artifactId>svd</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Continuous Agregate</name>
+	<name>ServeD Agregate</name>
 	<url>http://maven.apache.org</url>
 	<modules>
-		<module>codadris.pom/scala</module>
-		<module>codadris.pom/scala_base</module>
-		<module>codadris.pom/scala_from_java</module>
-		<module>continuous.common</module>
-		<module>continuous.served</module>
-		<module>continuous.tools</module>
-		<module>continuous.gitinfo</module>
+		<module>svd.pom/scala</module>
+		<module>svd.pom/scala_base</module>
+		<module>svd.pom/scala_from_java</module>
+		<module>svd.common</module>
+		<module>svd.maintainer</module>
+		<module>svd.tools</module>
+		<module>svd.gitbotnotifier</module>
 	</modules>
 	
 	<reporting>

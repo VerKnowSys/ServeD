@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Project documentationType="html" exportedFromDifferentName="false" exporterVersion="7.0.0" name="Continuous Tools" textualAnalysisHighlightCaseSensitive="false" umlVersion="2.x">
+<Project documentationType="html" exportedFromDifferentName="false" exporterVersion="7.0.0" name="ServeD Tools" textualAnalysisHighlightCaseSensitive="false" umlVersion="2.x">
 	<ProjectInfo>
 		<LogicalView/>
 	</ProjectInfo>
@@ -11,7 +11,7 @@
 				<ModelRefsProperty displayName="Stereotypes" name="stereotypes"/>
 				<ModelProperty displayName="Tagged Values" name="taggedValues"/>
 				<ModelsProperty displayName="Comments" name="comments"/>
-				<HTMLProperty displayName="Documentation" name="documentation" plainTextValue="Driven by ServeD" value="&lt;html&gt;&#10;  &lt;head&gt;&#10;    &lt;style type=&quot;text/css&quot;&gt;&#10;      &lt;!--&#10;        body { color: #000000; font-family: Courier New; font-size: 11px }&#10;      --&gt;&#10;    &lt;/style&gt;&#10;    &#10;  &lt;/head&gt;&#10;  &lt;body&gt;&#10;    &lt;p&gt;&#10;      Driven by ServeD&#10;    &lt;/p&gt;&#10;  &lt;/body&gt;&#10;&lt;/html&gt;&#10;"/>
+				<HTMLProperty displayName="Documentation" name="documentation" plainTextValue="Driven by Maintainer" value="&lt;html&gt;&#10;  &lt;head&gt;&#10;    &lt;style type=&quot;text/css&quot;&gt;&#10;      &lt;!--&#10;        body { color: #000000; font-family: Courier New; font-size: 11px }&#10;      --&gt;&#10;    &lt;/style&gt;&#10;    &#10;  &lt;/head&gt;&#10;  &lt;body&gt;&#10;    &lt;p&gt;&#10;      Driven by Maintainer&#10;    &lt;/p&gt;&#10;  &lt;/body&gt;&#10;&lt;/html&gt;&#10;"/>
 				<ModelsProperty displayName="Voices" name="voices"/>
 				<ModelsProperty displayName="References" name="references"/>
 				<StringProperty displayName="Transit From" name="transitFrom"/>
@@ -4209,9 +4209,9 @@
 				<RelationshipRef from="3Jq.eaSAUAAEARid" id="YV6.eaSAUAAEARl3" to="AV6.eaSAUAAEARlx"/>
 			</ToSimpleRelationships>
 		</Model>
-		<Model composite="false" considerDefaultProperties="false" displayModelType="Activity" id="NE7xeaSAUAAEAR8S" modelType="Activity" name="Send new build file to remote codadris.com server">
+		<Model composite="false" considerDefaultProperties="false" displayModelType="Activity" id="NE7xeaSAUAAEAR8S" modelType="Activity" name="Send new build file to remote svd.com server">
 			<ModelProperties>
-				<StringProperty displayName="Name" name="name" value="Send new build file to remote codadris.com server"/>
+				<StringProperty displayName="Name" name="name" value="Send new build file to remote svd.com server"/>
 				<StringProperty displayName="Model Type" name="modelType" value="Activity"/>
 				<ModelRefsProperty displayName="Parameters" name="parameters"/>
 				<BooleanProperty displayName="Reentrant" name="reentrant" value="false"/>
@@ -4232,7 +4232,7 @@
 				<StringProperty displayName="Language" name="language"/>
 				<ModelsProperty displayName="Variables" name="variables"/>
 				<DiagramElementRefProperty displayName="Master View" name="masterView">
-					<DiagramElementRef displayShapeType="Activity" id="NE7xeaSAUAAEAR8R" model="NE7xeaSAUAAEAR8S" name="Send new build file to remote codadris.com server" shapeType="Activity"/>
+					<DiagramElementRef displayShapeType="Activity" id="NE7xeaSAUAAEAR8R" model="NE7xeaSAUAAEAR8S" name="Send new build file to remote svd.com server" shapeType="Activity"/>
 				</DiagramElementRefProperty>
 			</ModelProperties>
 			<FromSimpleRelationships>
@@ -4242,9 +4242,9 @@
 				<RelationshipRef from="xhzxeaSAUAAEAR5M" id="TE7xeaSAUAAEAR8Y" to="NE7xeaSAUAAEAR8S"/>
 			</ToSimpleRelationships>
 		</Model>
-		<Model composite="false" considerDefaultProperties="false" displayModelType="Use Case" id="UuUSeaSAUAAEAXrX" modelType="UseCase" name="ServeD Continuous Monitor Actor">
+		<Model composite="false" considerDefaultProperties="false" displayModelType="Use Case" id="UuUSeaSAUAAEAXrX" modelType="UseCase" name="Maintainer ServeD Monitor Actor">
 			<ModelProperties>
-				<StringProperty displayName="Name" name="name" value="ServeD Continuous Monitor Actor"/>
+				<StringProperty displayName="Name" name="name" value="Maintainer ServeD Monitor Actor"/>
 				<StringProperty displayName="Model Type" name="modelType" value="UseCase"/>
 				<BooleanProperty displayName="Abstract" name="abstract" value="false"/>
 				<BooleanProperty displayName="Leaf" name="leaf" value="false"/>
@@ -4432,7 +4432,7 @@
 				<ModelRefsProperty displayName="Primary Actors" name="primaryActors"/>
 				<ModelRefsProperty displayName="Supporting Actors" name="supportingActors"/>
 				<DiagramElementRefProperty displayName="Master View" name="masterView">
-					<DiagramElementRef displayShapeType="Use Case" id="UuUSeaSAUAAEAXrW" model="UuUSeaSAUAAEAXrX" name="ServeD Continuous Monitor Actor" shapeType="UseCase"/>
+					<DiagramElementRef displayShapeType="Use Case" id="UuUSeaSAUAAEAXrW" model="UuUSeaSAUAAEAXrX" name="Maintainer ServeD Monitor Actor" shapeType="UseCase"/>
 				</DiagramElementRefProperty>
 			</ModelProperties>
 			<ToSimpleRelationships>
@@ -10204,9 +10204,9 @@
 				<StringProperty displayName="Transit To" name="transitTo"/>
 			</ModelProperties>
 		</Model>
-		<Model composite="false" considerDefaultProperties="false" displayModelType="Activity" id="ejeReaSAUAAEARZy" modelType="Activity" name="try to get version from&#10;local cache (~/.codadris)">
+		<Model composite="false" considerDefaultProperties="false" displayModelType="Activity" id="ejeReaSAUAAEARZy" modelType="Activity" name="try to get version from&#10;local cache (~/.svd)">
 			<ModelProperties>
-				<StringProperty displayName="Name" name="name" value="try to get version from&#10;local cache (~/.codadris)"/>
+				<StringProperty displayName="Name" name="name" value="try to get version from&#10;local cache (~/.svd)"/>
 				<StringProperty displayName="Model Type" name="modelType" value="Activity"/>
 				<ModelRefsProperty displayName="Parameters" name="parameters"/>
 				<BooleanProperty displayName="Reentrant" name="reentrant" value="false"/>
@@ -10227,7 +10227,7 @@
 				<StringProperty displayName="Language" name="language"/>
 				<ModelsProperty displayName="Variables" name="variables"/>
 				<DiagramElementRefProperty displayName="Master View" name="masterView">
-					<DiagramElementRef displayShapeType="Activity" id="ejeReaSAUAAEARZx" model="ejeReaSAUAAEARZy" name="try to get version from&#10;local cache (~/.codadris)" shapeType="Activity"/>
+					<DiagramElementRef displayShapeType="Activity" id="ejeReaSAUAAEARZx" model="ejeReaSAUAAEARZy" name="try to get version from&#10;local cache (~/.svd)" shapeType="Activity"/>
 				</DiagramElementRefProperty>
 			</ModelProperties>
 			<FromSimpleRelationships>
@@ -10770,7 +10770,7 @@
 				</Connector>
 			</Connectors>
 		</Diagram>
-		<Diagram connectorStyle="Oblique" diagramType="UseCaseDiagram" displayDiagramType="Use Case Diagram" documentation="" id="zlDieaSAUAAEAXf8" imageFileName="ServeD.png" imageHeight="236" imageScale="1.0" imageWidth="853" name="ServeD" rtfDocumentation="&lt;html&gt;&#10;  &lt;head&gt;&#10;    &#10;  &lt;/head&gt;&#10;  &lt;body&gt;&#10;  &lt;/body&gt;&#10;&lt;/html&gt;&#10;" trimmedHeight="78" trimmedWidth="11">
+		<Diagram connectorStyle="Oblique" diagramType="UseCaseDiagram" displayDiagramType="Use Case Diagram" documentation="" id="zlDieaSAUAAEAXf8" imageFileName="Maintainer.png" imageHeight="236" imageScale="1.0" imageWidth="853" name="Maintainer" rtfDocumentation="&lt;html&gt;&#10;  &lt;head&gt;&#10;    &#10;  &lt;/head&gt;&#10;  &lt;body&gt;&#10;  &lt;/body&gt;&#10;&lt;/html&gt;&#10;" trimmedHeight="78" trimmedWidth="11">
 			<DiagramProperties>
 				<IntegerProperty displayName="Show Package Name Style" name="showPackageNameStyle" value="0"/>
 				<IntegerProperty displayName="Show Connector Name" name="showConnectorName" value="0"/>
@@ -10891,7 +10891,7 @@
 					<Caption height="14" side="South" visible="true" width="44" x="2" y="152"/>
 					<FillColor color="Cr:122,207,245,255" style="1" transparency="0" type="1"/>
 				</Shape>
-				<Shape height="40" id="UuUSeaSAUAAEAXrW" model="UuUSeaSAUAAEAXrX" name="ServeD Continuous Monitor Actor" shapeType="UseCase" width="190" x="139" y="2" zorder="12">
+				<Shape height="40" id="UuUSeaSAUAAEAXrW" model="UuUSeaSAUAAEAXrX" name="Maintainer ServeD Monitor Actor" shapeType="UseCase" width="190" x="139" y="2" zorder="12">
 					<DiagramElementProperties>
 						<ModelRefProperty displayName="Meta Model Element" name="metaModelElement">
 							<ModelRef id="UuUSeaSAUAAEAXrX"/>
@@ -14477,7 +14477,7 @@
 					<Caption height="40" side="Invisible" visible="false" width="20" x="-38" y="-78"/>
 					<FillColor color="Cr:122,207,245,255" style="1" transparency="0" type="1"/>
 				</Shape>
-				<Shape height="40" id="ejeReaSAUAAEARZx" model="ejeReaSAUAAEARZy" name="try to get version from&#10;local cache (~/.codadris)" shapeType="Activity" width="160" x="52" y="382" zorder="22">
+				<Shape height="40" id="ejeReaSAUAAEARZx" model="ejeReaSAUAAEARZy" name="try to get version from&#10;local cache (~/.svd)" shapeType="Activity" width="160" x="52" y="382" zorder="22">
 					<DiagramElementProperties>
 						<ModelRefProperty displayName="Meta Model Element" name="metaModelElement">
 							<ModelRef id="ejeReaSAUAAEARZy"/>
@@ -14745,7 +14745,7 @@
 					<Caption height="40" side="Invisible" visible="false" width="20" x="-38" y="-78"/>
 					<FillColor color="Cr:122,207,245,255" style="1" transparency="0" type="1"/>
 				</Shape>
-				<Shape height="40" id="NE7xeaSAUAAEAR8R" model="NE7xeaSAUAAEAR8S" name="Send new build file to remote codadris.com server" shapeType="Activity" width="300" x="692" y="262" zorder="8">
+				<Shape height="40" id="NE7xeaSAUAAEAR8R" model="NE7xeaSAUAAEAR8S" name="Send new build file to remote svd.com server" shapeType="Activity" width="300" x="692" y="262" zorder="8">
 					<DiagramElementProperties>
 						<ModelRefProperty displayName="Meta Model Element" name="metaModelElement">
 							<ModelRef id="NE7xeaSAUAAEAR8S"/>

@@ -1,0 +1,60 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>jar</packaging>
+	<name>ServeD Tools</name>
+	<groupId>svd</groupId>
+	<artifactId>svd.tools</artifactId>
+	<version>1.2</version>
+	<inceptionYear>2009</inceptionYear>
+	<properties>
+		<neodatis.version>1.9.21.670</neodatis.version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>maven.verknowsys.com</id>
+			<name>Verknowsys Maven repository</name>
+			<url>http://maven.verknowsys.com/</url>
+		</repository>
+	</repositories>
+	<parent>
+		<groupId>svd</groupId>
+		<artifactId>svd.common</artifactId>
+		<version>1.0</version>
+		<relativePath>../svd.common/pom.xml</relativePath>
+	</parent>
+	
+	<dependencies>
+		<dependency>
+			<groupId>net.sourceforge.messadmin</groupId>
+			<artifactId>MessAdmin-Core</artifactId>
+			<version>4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>pircbot</groupId>
+			<artifactId>pircbot</artifactId>
+			<version>1.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>jivesoftware</groupId>
+			<artifactId>smack</artifactId>
+			<version>3.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>jivesoftware</groupId>
+			<artifactId>smackx</artifactId>
+			<version>3.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>sshtools</groupId>
+			<artifactId>j2ssh-common</artifactId>
+			<version>0.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>sshtools</groupId>
+			<artifactId>j2ssh-core</artifactId>
+			<version>0.2.2</version>
+		</dependency>
+	</dependencies>
+</project>

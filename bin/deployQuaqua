@@ -4,7 +4,7 @@
 
 commonPart="mvn -e deploy:deploy-file -DgeneratePom=true -Dpackaging=jar -Durl=file:./mvn_deploy"
 
-# -DrepositoryId=codadris_maven2_repo
+# -DrepositoryId=svd_maven2_repo
 
 $commonPart -Ddescription="Quaqua"              -Dfile="lib/quaqua.jar"              -DgroupId="org.quaqua"              -DartifactId="org.quaqua"              -Dversion="5.4.1"
 $commonPart -Ddescription="Quaqua swing-layout" -Dfile="lib/quaqua-swing-layout.jar" -DgroupId="org.quaqua.swing-layout" -DartifactId="org.quaqua.swing-layout" -Dversion="5.4.1"

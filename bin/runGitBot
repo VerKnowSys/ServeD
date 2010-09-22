@@ -5,7 +5,7 @@
 
 main="scalabot.ScalaBot"
 args="project.tools.xml"
-cd src/continuous.tools
+cd src/svd.tools
 mvn -e exec:java -Dexec.mainClass=$main -Dexec.args=$args $@
 
 exit 0

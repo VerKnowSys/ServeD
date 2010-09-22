@@ -1,12 +1,12 @@
 
-*** Continuous ServeD Repository - Readme
+*** ServeD Repository - Readme
 *** Author: Daniel (dmilith) Dettlaff
 
 
 
 0. Requirements:
-	0.1 - Java 1.6.0_19 at least
-	0.2 - Maven 2.2.x
+	0.1 - Java 1.6.0_20 at least
+	0.2 - Maven 3.x
 	0.3 - POSIX compatible system
 	
 1. Instalation
@@ -20,6 +20,11 @@ Questions?
 	- #scala.pl, #scala at irc.freenode.net
 	- dmilith@verknowsys.com on jabber/mail
 	- dmilith@gmail.com on google sucking asses jabber/mail
+
+
+Rules for colab-team:
+	- Every var should contain "XXX" mark in code comments
+	- FP is the main rule here for coding
 
 
 *** This is closed code project. You may not redistribute it without permission of author.

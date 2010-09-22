@@ -4,7 +4,7 @@
 # 2009-12-06 03:57:41 - dmilith - run by maven exec by default
 main="shiny.app.Main"
 args="your.config.xml"
-cd ../src/continuous.tools
+cd ../src/svd.tools
 mvn -e exec:java -Dexec.mainClass=$main -Dexec.args=$args $@
 
 exit
