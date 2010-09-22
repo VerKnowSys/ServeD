@@ -7,6 +7,7 @@ package com.verknowsys.served.utils.scalabot
 
 import com.verknowsys.served.utils.signals.{Init, Quit}
 import com.verknowsys.served.utils.prefs.Preferences
+
 import org.neodatis.odb.{OdbConfiguration, ODBServer, ODBFactory}
 import org.apache.log4j.Logger
 import scala.actors._

@@ -4,10 +4,11 @@
 package com.verknowsys.served.utils.prefs
 
 
+import com.verknowsys.served.utils.Utils
+
 import scala.collection.mutable.Map
 import java.io.File
 import org.apache.log4j.{Level, Logger}
-import com.verknowsys.served.utils.Utils
 import xml.{Node, XML}
 
 

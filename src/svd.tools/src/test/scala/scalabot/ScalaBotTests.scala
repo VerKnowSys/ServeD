@@ -5,10 +5,10 @@ package com.verknowsys.served.utils.scalabot
 
 
 import com.verknowsys.served.utils.commiter.Commit
-import org.junit.Ignore
 import com.verknowsys.served.utils.prefs.Preferences
 import com.verknowsys.served.utils.scalabot._
 
+import org.junit.Ignore
 import scala._
 import junit.framework._;
 import Assert._;
@@ -18,7 +18,7 @@ object ScalaBotTests {
 
 	def suite: Test = {
         val suite = new TestSuite(classOf[CommitTest])
-		suite.addTestSuite(classOf[ConfigTest])
+        suite.addTestSuite(classOf[ConfigTest])
         suite
     }
 
