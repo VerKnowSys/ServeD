@@ -34,10 +34,5 @@
 			<artifactId>svd.tools</artifactId>
 			<version>1.2</version>
 		</dependency>
-		<dependency>
-			<groupId>net.java.dev.jna</groupId>
-			<artifactId>jna</artifactId>
-			<version>3.2.4</version>
-		</dependency>
 	</dependencies>
 </project>
