@@ -62,6 +62,7 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.6</version>
 				<configuration>
 					<useFile>false</useFile> <!-- It's for putting compilation errors to console not file -->
 				</configuration>

@@ -48,33 +48,20 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 			<plugin>
 				<groupId>org.scala-tools</groupId>
 				<artifactId>maven-scala-plugin</artifactId>
-				
+				<version>2.14.1</version>
 				<configuration>
-					<!--<scalaVersion>${scala.version}</scalaVersion>-->
 					<useFsc>true</useFsc>
-					<displayCmd>true</displayCmd>
+					<displayCmd>false</displayCmd>
 					<jvmArgs>
 						<jvmArg>-Dfsc=true</jvmArg>
 						<jvmArg>-d32</jvmArg>
 						<jvmArg>-XX:NewRatio=1</jvmArg>
-						<jvmArg>-Xms512m</jvmArg>
-						<jvmArg>-Xmx512m</jvmArg>
+						<jvmArg>-Xms128m</jvmArg>
+						<jvmArg>-Xmx128m</jvmArg>
 						<jvmArg>-Dfile.encoding=UTF-8</jvmArg>
 					</jvmArgs>
 					<useRuntimeClasspath>true</useRuntimeClasspath>
 				</configuration>				
-			</plugin>
-			<plugin>
-				<groupId>org.scala-tools</groupId>
-				<artifactId>maven-scala-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>compile</goal>
-							<goal>testCompile</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
