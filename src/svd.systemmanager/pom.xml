@@ -19,6 +19,11 @@
       <id>jgit-repository</id>
       <url>http://download.eclipse.org/jgit/maven</url>
     </repository>
+    
+    <repository>
+      <id>java.net</id>
+      <url>http://download.java.net/maven/2</url>
+    </repository>
   </repositories>
 
 
@@ -26,7 +31,7 @@
 	<dependency>
 		<groupId>net.java.dev.jna</groupId>
 		<artifactId>jna</artifactId>
-		<version>3.2.4</version>
+		<version>3.2.5</version>
 	</dependency>
 	<dependency>
 		<groupId>svd</groupId>
