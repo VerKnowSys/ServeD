@@ -8,9 +8,9 @@
 
 	<parent>
 		<groupId>svd</groupId>
-		<artifactId>svd.systemmanager</artifactId>
+		<artifactId>svd.common</artifactId>
 		<version>1.0</version>
-		<relativePath>../svd.common</relativePath>
+		<relativePath>../svd.common/pom.xml</relativePath>
 	</parent>
 
   
