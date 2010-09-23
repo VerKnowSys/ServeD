@@ -1,42 +1,119 @@
 package com.verknowsys.served.tools
 
+import com.verknowsys.served.utils.Utils // FIXME: Package naming
 import scala.collection.mutable.Map
 import scala.collection.JavaConversions._
 
 /**
- * Class for handling Java Properties
- *	Example usage:
+ *	Class for handling Java Properties
+ *	@example
  *		val props = new Properties("config.properties")
  *		props("foo.bar.baz") getOrElse "default"
+ *		props.int("foo.bar.baz") getOrElse 0
+ *		props.double("foo.bar.baz") getOrElse 1.0
+ *		props.bool("foo.bar.baz") getOrElse true
  *		props("foo.bar.baz") = "new value"
+ *		props("foo.bar.baz") = 409
+ *		props("foo.bar.baz") = true
  *	
  *	@author teamon	
  */
-class Properties(filename: String){
-	val data = loadFile(filename)
-	
+class Properties(filename: String) extends Utils {
+	lazy val data = load
+
+	/**
+	 *	Get value as String
+	 *
+	 *	@author teamon
+	 */
 	def apply(key: String) = data.flatMap(_ get key)
-	
+
+	/**
+	 *	Get value as Int
+	 *
+	 *	@author teamon
+	 */
+	def int(key: String) = apply(key).flatMap { s =>
+		try { Some(s.toInt) } catch { case _ => None }
+	}
+
+	/**
+	 *	Get value as Double
+	 *
+	 *	@author teamon
+	 */
+	def double(key: String) = apply(key).flatMap { s =>
+		try { Some(s.toDouble) } catch { case _ => None }
+	}
+
+	/**
+	 *	Get value as Boolean
+	 *
+	 *	@author teamon
+	 */
+	def bool(key: String) = apply(key).flatMap { s =>
+		try { Some(s.toBoolean) } catch { case _ => None }
+	}
+
+	/**
+	 *	Update value with String
+	 *
+	 *	@author teamon
+	 */
 	def update(key: String, value: String) {
 		data.foreach(_(key) = value)
 		save
 	}
-	
-	protected def loadFile(fname: String) = {
+
+	/**
+	 *	Update value with Int
+	 *
+	 *	@author teamon
+	 */
+	def update(key: String, value: Int) { update(key, value.toString) }
+
+	/**
+	 *	Update value with Double
+	 *
+	 *	@author teamon
+	 */
+	def update(key: String, value: Double) { update(key, value.toString) }
+
+	/**
+	 *	Update value with Boolean
+	 *
+	 *	@author teamon
+	 */
+	def update(key: String, value: Boolean) { update(key, value.toString) }
+
+	/**
+	 *	Loads properties file and returns Map
+	 *
+	 *	@author teamon
+	 */
+	protected def load = {
 		try {
 			val jprops = new java.util.Properties
-			jprops.load(new java.io.FileInputStream(fname))
+			jprops.load(new java.io.FileInputStream(filename))
 					
+			logger.info("Loaded file: " + filename)
 			Some(jprops.entrySet.iterator.foldLeft(Map[String,String]()) { case(map, item) =>
 				map += (item.getKey.toString -> item.getValue.toString)
 			})
 			
-		}
-		catch {
-			case e: Exception => None
+		} catch {
+			case e: Exception => 
+				logger.error("Couldn`t load file %s".format(filename))
+				None
 		}
 	}
-	
+
+	/**
+	 *	Saves data Map to file
+	 *
+	 *	@param fname filename
+	 *	@author teamon
+	 */
 	protected def save {
 		try {
 			val jprops = new java.util.Properties
@@ -44,8 +121,9 @@ class Properties(filename: String){
 			val file = new java.io.FileOutputStream(filename)
 			jprops.store(file, "Scala Properties: " + filename)
 			file.close
+			logger.info("Saved file: " + filename)
 		} catch {
-			case e: Exception => println("[ERROR] Properties.save: " + e)
+			case e: Exception => logger.error("Couldn`t save file %s" + filename)
 		}
 	}	
 }
