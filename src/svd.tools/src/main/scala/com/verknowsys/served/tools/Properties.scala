@@ -1,6 +1,7 @@
-package com.verknowsys.properties
+package com.verknowsys.served.tools
 
 import scala.collection.mutable.Map
+import scala.collection.JavaConversions._
 
 /**
  * Class for handling Java Properties
