@@ -1,7 +1,7 @@
 #!/bin/bash
 # This Software is a close code project. You may not redistribute this code without permission of author.
 
-set -x
+#set -x
 
 cd src/
 . ../bin/OPTS
@@ -9,4 +9,4 @@ cd src/
 mvn install -Dmaven.test.skip.exec=true $@
 echo "Hit Enter to perform tests, SIGINT to terminate"
 read
-mvn test -o
+mvn test
