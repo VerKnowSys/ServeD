@@ -18,6 +18,11 @@
 	1.1 - mvn install
 	1.2 - You may do symbolic links (or just copy) executable files located in project directory to /usr/local/bin/ for example. Do as You wish
 	
+2. Testing
+  2.1 Use scala-specs
+  2.2 Run all with mvn -q test
+  2.3 Run one test class with mvn -q -Dtest=com.verknowsys.served.MyTestClass test
+	
 That's all folks
 
 
