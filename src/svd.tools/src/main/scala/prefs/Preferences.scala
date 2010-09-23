@@ -16,8 +16,8 @@ class Preferences(configFileNameInput: String) extends Utils {
 
 	def this() = this("served.xml") // additional Constructor
 
-	override def logger = Logger.getLogger(classOf[Preferences])
-	initLogger
+	// override def logger = Logger.getLogger(classOf[Preferences])
+	// initLogger
 	val configFileName = System.getProperty("user.home") + "/" + ".svd/" + configFileNameInput
 	var value = Map(
 		"debug" -> false,

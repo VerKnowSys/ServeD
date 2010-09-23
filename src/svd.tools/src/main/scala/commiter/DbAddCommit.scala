@@ -14,8 +14,8 @@ import org.neodatis.odb.{ODBFactory, ODB}
 
 object DbAddCommit extends Utils {
 
-	override
-	def logger = Logger.getLogger(DbAddCommit.getClass)
+	// override
+	// def logger = Logger.getLogger(DbAddCommit.getClass)
 	var prefs: Preferences = null
 	lazy val debug = prefs.getb("debug")
 	lazy val gitRepositoryProjectDir = prefs.get("gitRepositoryProjectDir")
@@ -54,7 +54,7 @@ object DbAddCommit extends Utils {
 	 * args(2) -> commit sha (end of range)
 	 */
 	def main(args: Array[String]) {
-		initLogger
+		// initLogger
 		if (args.length == 0) doError
 		prefs = new Preferences(args(0)) // initialize preferences based on given argument (project config file)
 		try {

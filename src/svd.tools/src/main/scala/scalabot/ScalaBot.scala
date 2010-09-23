@@ -15,9 +15,9 @@ import scala.actors._
 
 object ScalaBot extends Actor with Utils {
 
-	override
-	def logger = Logger.getLogger(ScalaBot.getClass)
-	initLogger
+	// override
+	// def logger = Logger.getLogger(ScalaBot.getClass)
+	// initLogger
 	addShutdownHook {
 		XMPPActor ! Quit
 		ODBServerActor ! Quit

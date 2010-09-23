@@ -23,11 +23,15 @@ trait Utils {
 
 	trait P { def accept(t: String): Boolean }
 
-	def logger: Logger = Logger.getLogger(classOf[Utils])
+	lazy val logger = {
+		initLogger
+		Logger.getLogger(this.getClass)
+	}
+		
 	val appender = new ConsoleAppender
 	val level = Level.INFO
 
-	def initLogger = {
+	def initLogger {
 		appender.setName(ConsoleAppender.SYSTEM_OUT);
 		appender.setWriter(new OutputStreamWriter(System.out))
 		appender.setThreshold(level)

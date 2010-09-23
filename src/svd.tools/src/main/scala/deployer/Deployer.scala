@@ -33,8 +33,8 @@ object Deployer extends Utils {
 	var prefs: Preferences = null
 	Logger.getLogger("com.sshtools").setLevel(Level.WARN) // should quiet too verbose messages of sshtools
 
-	override def logger = Logger.getLogger(Deployer.getClass)
-	initLogger
+	// override def logger = Logger.getLogger(Deployer.getClass)
+	// initLogger
 
 	
 	def main(args: Array[String]) {

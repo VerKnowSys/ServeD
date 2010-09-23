@@ -29,8 +29,8 @@ import org.apache.log4j.Logger
 object SSHCommand extends Utils {
 
 	val prefs = Deployer.prefs
-	override def logger = Logger.getLogger(SSHCommand.getClass)
-	initLogger
+	// override def logger = Logger.getLogger(SSHCommand.getClass)
+	// initLogger
 	val buildTextFile = "build.text" // XXX hardcoded but probably it will stay hardcoded anyway ;}
 	val host = prefs.get("sshHost")
 	val port = prefs.geti("sshPort")
