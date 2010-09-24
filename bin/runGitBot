@@ -3,9 +3,9 @@
 
 . bin/OPTS
 
-main="com.verknowsys.served.utils.scalabot.ScalaBot"
+main="com.verknowsys.served.utils.scalabot.SvdBot"
 args="served.xml"
-cd src/svd.tools
+cd src/svd.utils
 mvn -e exec:java -Dexec.mainClass=$main -Dexec.args=$args $@
 
 exit 0
@@ -25,6 +25,6 @@ exit 0
 # $HOME/.m2/repository/pircbot/pircbot/1.4.2/pircbot-1.4.2.jar:\
 # $HOME/.m2/repository/jivesoftware/smack/3.0.4/smack-3.0.4.jar:\
 # $HOME/.m2/repository/jivesoftware/smackx/3.0.4/smackx-3.0.4.jar:\
-# $HOME/.m2/repository/project/tools/project.tools/1.1/project.tools-1.1.jar \
+# $HOME/.m2/repository/project/utils/project.utils/1.1/project.utils-1.1.jar \
 # $main $1
 #eof doc

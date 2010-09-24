@@ -14,7 +14,7 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 		<module>svd.pom/scala_from_java</module>
 		<module>svd.common</module>
 		<module>svd.maintainer</module>
-		<module>svd.tools</module>
+		<module>svd.utils</module>
 		<module>svd.systemmanager</module>
 		<module>svd.gitbotnotifier</module>
 	</modules>

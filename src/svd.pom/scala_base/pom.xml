@@ -30,7 +30,7 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<repositories>
 		<repository>
 			<id>scala-tools.org</id>
-			<name>Scala-tools Maven2 Repository</name>
+			<name>scala-tools Maven2 Repository</name>
 			<url>http://scala-tools.org/repo-releases</url>
 		</repository>
 	</repositories>
@@ -38,7 +38,7 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<pluginRepositories>
 		<pluginRepository>
 			<id>scala-tools.org</id>
-			<name>Scala-tools Maven2 Repository</name>
+			<name>scala-tools Maven2 Repository</name>
 			<url>http://scala-tools.org/repo-releases</url>
 		</pluginRepository>
 	</pluginRepositories>

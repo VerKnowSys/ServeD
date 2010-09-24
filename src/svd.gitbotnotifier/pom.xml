@@ -25,7 +25,7 @@
   <dependencies>
 	<dependency>
 		<groupId>svd</groupId>
-		<artifactId>svd.tools</artifactId>
+		<artifactId>svd.utils</artifactId>
 		<version>1.2</version>
 	</dependency>
 	<dependency>

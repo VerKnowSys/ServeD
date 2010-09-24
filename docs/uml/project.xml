@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Project documentationType="html" exportedFromDifferentName="false" exporterVersion="7.0.0" name="ServeD Tools" textualAnalysisHighlightCaseSensitive="false" umlVersion="2.x">
+<Project documentationType="html" exportedFromDifferentName="false" exporterVersion="7.0.0" name="ServeD utils" textualAnalysisHighlightCaseSensitive="false" umlVersion="2.x">
 	<ProjectInfo>
 		<LogicalView/>
 	</ProjectInfo>
@@ -1508,9 +1508,9 @@
 				<RelationshipRef from="P924JaSAUAAEAWQE" id="6xFZJaSAUAAEAbj6" to="cxFZJaSAUAAEAbj0"/>
 			</ToSimpleRelationships>
 		</Model>
-		<Model composite="false" considerDefaultProperties="false" displayModelType="Activity" id="8P8BeaSAUAAEASD5" modelType="Activity" name="Close all running ScalaBot Actors">
+		<Model composite="false" considerDefaultProperties="false" displayModelType="Activity" id="8P8BeaSAUAAEASD5" modelType="Activity" name="Close all running SvdBot Actors">
 			<ModelProperties>
-				<StringProperty displayName="Name" name="name" value="Close all running ScalaBot Actors"/>
+				<StringProperty displayName="Name" name="name" value="Close all running SvdBot Actors"/>
 				<StringProperty displayName="Model Type" name="modelType" value="Activity"/>
 				<ModelRefsProperty displayName="Parameters" name="parameters"/>
 				<BooleanProperty displayName="Reentrant" name="reentrant" value="false"/>
@@ -1531,7 +1531,7 @@
 				<StringProperty displayName="Language" name="language"/>
 				<ModelsProperty displayName="Variables" name="variables"/>
 				<DiagramElementRefProperty displayName="Master View" name="masterView">
-					<DiagramElementRef displayShapeType="Activity" id="8P8BeaSAUAAEASD4" model="8P8BeaSAUAAEASD5" name="Close all running ScalaBot Actors" shapeType="Activity"/>
+					<DiagramElementRef displayShapeType="Activity" id="8P8BeaSAUAAEASD4" model="8P8BeaSAUAAEASD5" name="Close all running SvdBot Actors" shapeType="Activity"/>
 				</DiagramElementRefProperty>
 			</ModelProperties>
 			<FromSimpleRelationships>
@@ -2460,9 +2460,9 @@
 				<RelationshipRef from="bXOIJaSAUAAEAVaV" id="3W2oJaSAUAAEAVu8" to="rW2oJaSAUAAEAVu2"/>
 			</ToSimpleRelationships>
 		</Model>
-		<Model composite="false" considerDefaultProperties="false" displayModelType="Activity" id="ozY.eaSAUAAEARbJ" modelType="Activity" name="For each repository, relaunch separated ScalaBot Actor">
+		<Model composite="false" considerDefaultProperties="false" displayModelType="Activity" id="ozY.eaSAUAAEARbJ" modelType="Activity" name="For each repository, relaunch separated SvdBot Actor">
 			<ModelProperties>
-				<StringProperty displayName="Name" name="name" value="For each repository, relaunch separated ScalaBot Actor"/>
+				<StringProperty displayName="Name" name="name" value="For each repository, relaunch separated SvdBot Actor"/>
 				<StringProperty displayName="Model Type" name="modelType" value="Activity"/>
 				<ModelRefsProperty displayName="Parameters" name="parameters"/>
 				<BooleanProperty displayName="Reentrant" name="reentrant" value="false"/>
@@ -2483,7 +2483,7 @@
 				<StringProperty displayName="Language" name="language"/>
 				<ModelsProperty displayName="Variables" name="variables"/>
 				<DiagramElementRefProperty displayName="Master View" name="masterView">
-					<DiagramElementRef displayShapeType="Activity" id="ozY.eaSAUAAEARbI" model="ozY.eaSAUAAEARbJ" name="For each repository, relaunch separated ScalaBot Actor" shapeType="Activity"/>
+					<DiagramElementRef displayShapeType="Activity" id="ozY.eaSAUAAEARbI" model="ozY.eaSAUAAEARbJ" name="For each repository, relaunch separated SvdBot Actor" shapeType="Activity"/>
 				</DiagramElementRefProperty>
 			</ModelProperties>
 			<FromSimpleRelationships>
@@ -2810,9 +2810,9 @@
 				<RelationshipRef from="ZrpReaSAUAAEAReG" id="VD5xeaSAUAAEARwy" to="4CLReaSAUAAEARjo"/>
 			</ToSimpleRelationships>
 		</Model>
-		<Model composite="false" considerDefaultProperties="false" displayModelType="Activity" id="mMv.eaSAUAAEAR5t" modelType="Activity" name="Inform monitor&#10;about state of current ScalaBot">
+		<Model composite="false" considerDefaultProperties="false" displayModelType="Activity" id="mMv.eaSAUAAEAR5t" modelType="Activity" name="Inform monitor&#10;about state of current SvdBot">
 			<ModelProperties>
-				<StringProperty displayName="Name" name="name" value="Inform monitor&#10;about state of current ScalaBot"/>
+				<StringProperty displayName="Name" name="name" value="Inform monitor&#10;about state of current SvdBot"/>
 				<StringProperty displayName="Model Type" name="modelType" value="Activity"/>
 				<ModelRefsProperty displayName="Parameters" name="parameters"/>
 				<BooleanProperty displayName="Reentrant" name="reentrant" value="false"/>
@@ -2833,7 +2833,7 @@
 				<StringProperty displayName="Language" name="language"/>
 				<ModelsProperty displayName="Variables" name="variables"/>
 				<DiagramElementRefProperty displayName="Master View" name="masterView">
-					<DiagramElementRef displayShapeType="Activity" id="mMv.eaSAUAAEAR5s" model="mMv.eaSAUAAEAR5t" name="Inform monitor&#10;about state of current ScalaBot" shapeType="Activity"/>
+					<DiagramElementRef displayShapeType="Activity" id="mMv.eaSAUAAEAR5s" model="mMv.eaSAUAAEAR5t" name="Inform monitor&#10;about state of current SvdBot" shapeType="Activity"/>
 				</DiagramElementRefProperty>
 			</ModelProperties>
 			<FromSimpleRelationships>
@@ -12034,7 +12034,7 @@
 					<Caption height="34" side="FreeMove" visible="true" width="157" x="0" y="-78"/>
 					<FillColor color="Cr:122,207,245,255" style="1" transparency="0" type="1"/>
 				</Shape>
-				<Shape height="40" id="ozY.eaSAUAAEARbI" model="ozY.eaSAUAAEARbJ" name="For each repository, relaunch separated ScalaBot Actor" shapeType="Activity" width="330" x="0" y="452" zorder="30">
+				<Shape height="40" id="ozY.eaSAUAAEARbI" model="ozY.eaSAUAAEARbJ" name="For each repository, relaunch separated SvdBot Actor" shapeType="Activity" width="330" x="0" y="452" zorder="30">
 					<DiagramElementProperties>
 						<ModelRefProperty displayName="Meta Model Element" name="metaModelElement">
 							<ModelRef id="ozY.eaSAUAAEARbJ"/>
@@ -12225,7 +12225,7 @@
 					<Caption height="20" side="FreeMove" visible="true" width="221" x="0" y="-78"/>
 					<FillColor color="Cr:122,207,245,255" style="1" transparency="0" type="1"/>
 				</Shape>
-				<Shape height="40" id="mMv.eaSAUAAEAR5s" model="mMv.eaSAUAAEAR5t" name="Inform monitor&#10;about state of current ScalaBot" shapeType="Activity" width="190" x="70" y="812" zorder="20">
+				<Shape height="40" id="mMv.eaSAUAAEAR5s" model="mMv.eaSAUAAEAR5t" name="Inform monitor&#10;about state of current SvdBot" shapeType="Activity" width="190" x="70" y="812" zorder="20">
 					<DiagramElementProperties>
 						<ModelRefProperty displayName="Meta Model Element" name="metaModelElement">
 							<ModelRef id="mMv.eaSAUAAEAR5t"/>
@@ -12416,7 +12416,7 @@
 					<Caption height="20" side="FreeMove" visible="true" width="55" x="0" y="-78"/>
 					<FillColor color="Cr:122,207,245,255" style="1" transparency="0" type="1"/>
 				</Shape>
-				<Shape height="40" id="8P8BeaSAUAAEASD4" model="8P8BeaSAUAAEASD5" name="Close all running ScalaBot Actors" shapeType="Activity" width="210" x="420" y="722" zorder="10">
+				<Shape height="40" id="8P8BeaSAUAAEASD4" model="8P8BeaSAUAAEASD5" name="Close all running SvdBot Actors" shapeType="Activity" width="210" x="420" y="722" zorder="10">
 					<DiagramElementProperties>
 						<ModelRefProperty displayName="Meta Model Element" name="metaModelElement">
 							<ModelRef id="8P8BeaSAUAAEASD5"/>

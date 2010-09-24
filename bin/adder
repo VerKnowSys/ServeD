@@ -19,6 +19,6 @@ $HOME/.m2/repository/org/neodatis/neodatis-odb/1.9.21.670/neodatis-odb-1.9.21.67
 $HOME/.m2/repository/pircbot/pircbot/1.4.2/pircbot-1.4.2.jar:\
 $HOME/.m2/repository/jivesoftware/smack/3.0.4/smack-3.0.4.jar:\
 $HOME/.m2/repository/jivesoftware/smackx/3.0.4/smackx-3.0.4.jar:\
-$HOME/.m2/repository/project/tools/svd.tools/1.2/svd.tools-1.2.jar \
+$HOME/.m2/repository/project/utils/svd.utils/1.2/svd.utils-1.2.jar \
 commiter.DbAddCommit $1 $2 $3
 

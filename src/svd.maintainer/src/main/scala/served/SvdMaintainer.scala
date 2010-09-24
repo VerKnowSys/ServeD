@@ -18,11 +18,10 @@ import org.apache.log4j.{Level, Logger}
 /**
  * Actor class
  */
-class SvdMaintainer extends Actor {
+class SvdMaintainer extends Actor with Utils {
 
 
-	def logger: Logger = Logger.getLogger(classOf[SvdMaintainer])
-	var users = List("dmilith", "guest") // XXX: temporary list
+	val users = List("dmilith", "guest") // XXX: temporary list
 	val checkInterval = 2500 // in ms XXX: should be more for production, but small values will make me see average performance of Maintainer
 
 
@@ -70,8 +69,6 @@ class SvdMaintainer extends Actor {
  */
 object SvdMaintainer extends Utils {
 
-	override def logger: Logger = Logger.getLogger(SvdMaintainer.getClass)
-	initLogger
 	setLoggerLevelDebug(Level.DEBUG)
 	val maintainer = new SvdMaintainer
 	maintainer.start
