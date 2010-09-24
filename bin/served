@@ -1,0 +1,14 @@
+#!/bin/bash
+# This Software is a close code project. You may not redistribute this code without permission of author.
+
+. bin/OPTS
+
+main="com.verknowsys.served.maintainer.SvdMaintainer"
+args=""
+
+bin/installAll
+
+cd src/svd.maintainer/
+mvn -e exec:java -Dexec.mainClass=$main -Dexec.args=$args $@
+
+exit 0
