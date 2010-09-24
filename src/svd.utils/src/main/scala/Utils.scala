@@ -23,7 +23,7 @@ trait Utils {
 
 	trait P { def accept(t: String): Boolean }
   
-  lazy val MAIN_CONFIG_PROPERTIES_FILE = "ServeD.properties"
+  final val MAIN_CONFIG_PROPERTIES_FILE = "ServeD.properties"
   lazy val props = new Properties(MAIN_CONFIG_PROPERTIES_FILE)
 	lazy val logger = {
 		initLogger
