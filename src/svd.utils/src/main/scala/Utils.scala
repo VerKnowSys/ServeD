@@ -4,6 +4,8 @@
 package com.verknowsys.served.utils
 
 
+import com.verknowsys.served._
+
 import java.io.{PrintWriter, File, OutputStreamWriter}
 import java.util.ArrayList
 import java.util.regex.Pattern
@@ -16,46 +18,56 @@ import clime.messadmin.providers.sizeof.ObjectProfiler
  * Time: 4:28:05 PM
  */
 
-
-
 trait Utils {
   
 
 	trait P { def accept(t: String): Boolean }
   
-  final val MAIN_CONFIG_PROPERTIES_FILE = "ServeD.properties"
-  lazy val props = new Properties(MAIN_CONFIG_PROPERTIES_FILE)
+	lazy val loggerAppender = new ConsoleAppender
 	lazy val logger = {
-		initLogger
+		loggerAppender.setName(ConsoleAppender.SYSTEM_OUT);
+		loggerAppender.setWriter(new OutputStreamWriter(System.out))
+		loggerAppender.setThreshold(Level.INFO)
+		loggerAppender.setLayout(new ANSIColorLayout("{ %-5p: [%c]: %m }%n"))
+		if (Logger.getRootLogger.getAppender(ConsoleAppender.SYSTEM_OUT) == null) {
+			Logger.getRootLogger.addAppender(loggerAppender)
+		}
 		Logger.getLogger(this.getClass)
 	}
-		
-	val appender = new ConsoleAppender
-	val level = Level.INFO
+  lazy val mainConfigFile = Config.home + Config.vendorDir + Config.propertiesFile
+  lazy val props = new Properties(mainConfigFile)
 
-	def initLogger {
-		appender.setName(ConsoleAppender.SYSTEM_OUT);
-		appender.setWriter(new OutputStreamWriter(System.out))
-		appender.setThreshold(level)
-		appender.setLayout(new ANSIColorLayout("{ %-5p: [%c]: %m }%n"))
-		if (Logger.getRootLogger.getAppender(ConsoleAppender.SYSTEM_OUT) == null) {
-			Logger.getRootLogger.addAppender(appender)
-		}
-	}
+  
+  def checkOrCreateVendorDir = {
+    if (new File(Config.home + Config.vendorDir).exists) {
+      logger.info("Vendor directory exists…")
+    } else {
+      logger.info("Creating vendor directory…")
+      new File(Config.home + Config.vendorDir).mkdir
+    }
+    Config.home + Config.vendorDir + Config.propertiesFile    
+  }
 
-	def setLoggerLevelDebug(arg: Level) = {
-		appender.setThreshold(arg)
-	}
 
-	def withPrintWriter(file: File)(op: PrintWriter => Unit) = {
-		val writer = new PrintWriter(file)
-		try {
-			op(writer)
-		} finally {
-			writer.close
-		}
-	}
+  def writeDefaultConfig {
+    props("vendor") = "ServeD"
+  }
 	
+	def threshold(level: Level) = {
+	  logger // initialize cause it's lazy       \ debug
+    loggerAppender.setThreshold(level)//       / purpose
+	}	
+		
+  // def withPrintWriter(file: File)(op: PrintWriter => Unit) = {
+  //  val writer = new PrintWriter(file)
+  //  try {
+  //    op(writer)
+  //  } finally {
+  //    writer.close
+  //  }
+  // }
+	
+
 	def addShutdownHook(block: => Unit) =
 		Runtime.getRuntime.addShutdownHook( new Thread {
 			override def run = block
@@ -90,7 +102,7 @@ trait Utils {
 
   // def autoDetectRequirements = {
   //  for (i <- 0 until requirements.size)
-  //    if (!(new File(props(requirements(i)._2) getOrElse MAIN_CONFIG_PROPERTIES_FILE).exists)) {
+  //    if (!(new File(props(requirements(i)._2) getOrElse mainConfigFile).exists)) {
   //      val al = new ArrayList[File]()
   //      if (System.getProperty("os.name").contains("Linux") ||
   //        System.getProperty("os.name").contains("Mac")) {
