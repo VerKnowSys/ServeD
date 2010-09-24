@@ -4,6 +4,7 @@
 package com.verknowsys.served.maintainer
 
 
+import com.verknowsys.served.Config
 import com.verknowsys.served.utils.Utils
 import com.verknowsys.served.utils.signals.{ProcessMessages, MainLoop, Quit, Init}
 import actors.Actor
@@ -22,7 +23,7 @@ class SvdMaintainer extends Actor with Utils {
 
 
 	val users = List("dmilith", "guest") // XXX: temporary list
-	val checkInterval = 2500 // in ms XXX: should be more for production, but small values will make me see average performance of Maintainer
+	val checkInterval = 25000 // in ms XXX: should be more for production, but small values will make me see average performance of Maintainer
 
 
   def initialize {
@@ -41,7 +42,8 @@ class SvdMaintainer extends Actor with Utils {
 				case MainLoop =>
 					logger.info("SvdMaintainer is up")
 					while(true) {
-						logger.debug("Processing messages..")
+					  if (props.bool("debug") == true)
+						  logger.debug("…")
 						this ! ProcessMessages
 						Thread sleep checkInterval
 					}
@@ -69,16 +71,20 @@ class SvdMaintainer extends Actor with Utils {
  */
 object SvdMaintainer extends Utils {
 
-	setLoggerLevelDebug(Level.DEBUG)
+  threshold(Level.DEBUG)
+  
 	val maintainer = new SvdMaintainer
 	maintainer.start
 
 
 	def main(args: Array[String]) {
-
-		logger.info("Home dir: " + System.getProperty("user.home"))
+    
+    checkOrCreateVendorDir
+    writeDefaultConfig
+    
+		logger.info("Home dir: " + Config.home)
 		logger.debug("Params: " + args.mkString(", ") + ". Params size: " + args.length)
-
+		
 		addShutdownHook {
 			maintainer ! "Quit"
 			logger.info("Maintainer has ended")
