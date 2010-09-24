@@ -40,7 +40,7 @@ class Commit(val origin: RevCommit) {
 	/**
 	 * Returns commit`s author
 	 * 
-w	 * @author teamon
+	 * @author teamon
 	 */
 	def author = origin.getAuthorIdent
 }

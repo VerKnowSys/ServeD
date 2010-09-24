@@ -5,8 +5,7 @@ package com.verknowsys.served.utils.scalabot
 
 
 import com.verknowsys.served.utils.commiter.Commit
-import com.verknowsys.served.utils.props.Preferences
-import com.verknowsys.served.utils.scalabot._
+import com.verknowsys.served.utils._
 
 import org.junit.Ignore
 import scala._
@@ -28,7 +27,7 @@ object SvdBotTests {
 }
 
 
-class CommitTest extends TestCase("commit") {
+class CommitTest extends TestCase("commit") with Utils {
 	var commit: Commit = null
 
 	override def setUp {
