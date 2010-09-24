@@ -38,6 +38,12 @@ trait Utils {
   lazy val props = new Properties(mainConfigFile)
 
   
+  /**
+  * @author dmilith
+  * 
+  * Checks and creates (if missing) config property file for application
+  * 
+  */
   def checkOrCreateVendorDir = {
     if (new File(Config.home + Config.vendorDir).exists) {
       logger.info("Vendor directory exists…")
@@ -49,40 +55,53 @@ trait Utils {
   }
 
 
-  def writeDefaultConfig {
-    props("vendor") = "ServeD"
-  }
-	
+  /**
+  * @author dmilith
+  * 
+  * Setting threshold of logger.
+  * Default value is Level.INFO
+  * 
+  * @example
+  *   threshold(Level.DEBUG)
+  * 
+  */ 
 	def threshold(level: Level) = {
 	  logger // initialize cause it's lazy       \ debug
     loggerAppender.setThreshold(level)//       / purpose
 	}	
 		
-  // def withPrintWriter(file: File)(op: PrintWriter => Unit) = {
-  //  val writer = new PrintWriter(file)
-  //  try {
-  //    op(writer)
-  //  } finally {
-  //    writer.close
-  //  }
-  // }
 	
-
+  /**
+  * @author dmilith
+  * 
+  * Adds a hook for SIGINT/ SIGTERM signals to gracefully close the app
+  * 
+  * @example
+  *   addShutdownHook {
+  *     closeMySockets
+  *     logger.info("Dying!")
+  *   }
+  * 
+  */
 	def addShutdownHook(block: => Unit) =
 		Runtime.getRuntime.addShutdownHook( new Thread {
 			override def run = block
 		})
 
-	def findFile(f: File, p: P, r: ArrayList[File]) {
-		if (f.isDirectory && !(f.toString.contains("X11"))) { // XXX: hack to prevent entering endless recursion in directories like those stupid fucks from linux does with /usr/bin/X11
-			val files = f.listFiles
-			for (i <- 0 until files.length) {
-				findFile(files(i), p, r)
-			}
-		} else if (p.accept(f + "")) {
-			r.add(f)
-		}
+
+  /**
+  * @author dmilith
+  * 
+  * Returns size (in bytes) of given object in JVM memory
+  * 
+  * @example
+  *   logger.info(sizeof(new Date()))
+  * 
+  */
+	def sizeof(any: Any) = {
+		ObjectProfiler.sizeof(any)
 	}
+
 
   // def pathsToSearchForExecutables = Array(
   //  new File("/opt/local/bin/"), // XXX: hardcoded paths
@@ -134,8 +153,5 @@ trait Utils {
   //    }
   // }
 
-	def sizeof(any: Any) = {
-		ObjectProfiler.sizeof(any)
-	}
 	
 }
