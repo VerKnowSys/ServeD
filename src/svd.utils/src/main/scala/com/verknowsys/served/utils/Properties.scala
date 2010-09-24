@@ -1,5 +1,8 @@
 package com.verknowsys.served.utils
 
+
+import com.verknowsys.served._
+
 import scala.collection.mutable.Map
 import scala.collection.JavaConversions._
 
@@ -122,7 +125,7 @@ class Properties(filename: String) extends Utils {
 			file.close
 			logger.info("Saved file: " + filename)
 		} catch {
-			case e: Exception => logger.error("Couldn`t save file %s" + filename)
+			case e: Exception => logger.error("Couldn`t save file %s".format(filename))
 		}
 	}	
 }
