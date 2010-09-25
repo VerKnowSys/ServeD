@@ -43,7 +43,7 @@ object SvdMaintainer extends Actor with Utils {
 					exit
         case GetUsers(x) => 
           val content = x.map{ a => "userName: " + a.userName + ", pass: " + a.pass + ", uid: " + a.uid + ", gid: " + a.gid + ", homeDir: " + a.homeDir + ", shell: " + a.shell + ", information: " + a.information + "\n" }
-          logger.warn("Content:\n" + content)
+          logger.debug("Content:\n" + content)
 			  case x: AnyRef =>
 					logger.warn("Command not recognized. Maintainer will ignore Your signal: " + x.toString)
 			}
