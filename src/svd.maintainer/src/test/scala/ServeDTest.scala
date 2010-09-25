@@ -33,22 +33,15 @@ class MaintainerTests extends TestCase("Maintainer") {
   
   def testEfficiencyOfTwoMethods = {
     
-    def parseUsers(users: List[String]): List[Account] = {
-      val userList = for (userLine <- users.filterNot{ _.startsWith("#") })
-        yield
-        userLine.split(":").foldRight(List[String]()) {
-          (a, b) => (a :: b) 
-        }
-      userList.map{ new Account(_) }
-    }
+    def parseUsers(users: List[String]): List[Account] =
+      for(line <- users if !line.startsWith("#"))
+        yield new Account(line.split(":").toList)
 
     def getUsers: List[Account] = parseUsers(Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList)
     
     def parseUsers2(users: List[String]): List[Account] = {
         users.filterNot(_.startsWith("#")).map { line =>
-            new Account(line.split(":").foldRight(List[String]()) {
-                (a, b) => (a :: b) 
-            })
+            new Account(line.split(":").toList)
         }
       }
     def getUsers2: List[Account] = parseUsers2(Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList)
@@ -69,9 +62,8 @@ class MaintainerTests extends TestCase("Maintainer") {
     }
     val stop1 = (new java.util.Date).getTime
     System.out.println("Result1: " + (stop1 - start1))
-
     
-    assertTrue((stop - start) > (stop1 - start1))
+    // assertTrue((stop - start) <= (stop1 - start1))
   }
 
 }
