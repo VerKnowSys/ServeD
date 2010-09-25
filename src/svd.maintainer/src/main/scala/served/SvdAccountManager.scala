@@ -66,6 +66,12 @@ object SvdAccountManager extends Actor with Utils {
   }
   
 
+  /**
+  * @author dmilith
+  * 
+  * Function to parse and convert List[String] of passwd file entries to List[Account]
+  * 
+  */ 
   private
   def parseUsers(users: List[String]): List[Account] = {
     val userList = for (userLine <- users.filterNot{ _.startsWith("#") })
@@ -77,6 +83,12 @@ object SvdAccountManager extends Actor with Utils {
   }
 
 
+  /**
+  * @author dmilith
+  * 
+  * Function to read and parse List[Account] from passwd file
+  * 
+  */
   private
   def getUsers: List[Account] = parseUsers(Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList)
 
