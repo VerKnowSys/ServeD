@@ -34,7 +34,7 @@ object SvdMaintainer extends Actor with Utils {
 			receive {
 				case MainLoop =>
           // Send messages to actors
-          SvdAccountManager ! new GetUsers
+          SvdAccountManager ! GetUsers
           
 				case Init =>
 					logger.debug("Maintainer ready for tasks")
@@ -42,7 +42,8 @@ object SvdMaintainer extends Actor with Utils {
 					logger.info("Quitting Maintainer…")
 					exit
         case GetUsers(x) => 
-          logger.warn("Content:\n" + x)
+          val content = x.map{ a => "userName: " + a.userName + ", pass: " + a.pass + ", uid: " + a.uid + ", gid: " + a.gid + ", homeDir: " + a.homeDir + ", shell: " + a.shell + ", information: " + a.information + "\n" }
+          logger.warn("Content:\n" + content)
 			  case x: AnyRef =>
 					logger.warn("Command not recognized. Maintainer will ignore Your signal: " + x.toString)
 			}

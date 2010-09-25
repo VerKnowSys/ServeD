@@ -19,7 +19,30 @@ import scala.io.Source
 import org.apache.log4j.{Level, Logger}
 
 
-case class GetUsers(val some: String = "")
+case class GetUsers(val list: List[Account])
+
+
+case class Account(
+  val userName: String = "guest",
+  val pass: String = "x",
+  val uid: String = "1000",
+  val gid: String = "1000",
+  val information: String = "No information",
+  val homeDir: String = "/home/",
+  val shell: String = "/bin/bash"
+) {
+  
+  def this(a: List[String]) = this(
+    userName = a(0),
+    pass = a(1),
+    uid = a(2),
+    gid = a(3),
+    information = a(4),
+    homeDir = a(5),
+    shell = a(6)
+    )
+    
+}
 
 
 object SvdAccountManager extends Actor with Utils {
@@ -33,9 +56,10 @@ object SvdAccountManager extends Actor with Utils {
 				case Quit =>
 					logger.info("Quitting AccountManager…")
 					exit
-				case GetUsers(x) =>
-          logger.debug("Sending Users… " + getUsers.getClass)
+				case GetUsers =>
+          logger.debug("Sending Users… ")
 					SvdMaintainer ! GetUsers(getUsers)
+					logger.debug(getUsers)
 					logger.debug("After GetUsers case…")
 			  case x: AnyRef =>
 					logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)	
@@ -45,7 +69,18 @@ object SvdAccountManager extends Actor with Utils {
   
 
   private
-  def getUsers = Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.mkString("\n")
+  def parseUsers(users: List[String]): List[Account] = {
+    val userList = for (userLine <- users.filterNot{ _.startsWith("#") })
+      yield
+      userLine.split(":").foldRight(List[String]()) {
+        (a, b) => (a :: b) 
+      }
+    userList.map{ new Account(_) }
+  }
+
+
+  private
+  def getUsers: List[Account] = parseUsers(Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList)
 
 
 }
