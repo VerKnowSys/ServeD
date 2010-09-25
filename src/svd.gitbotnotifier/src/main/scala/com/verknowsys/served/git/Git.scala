@@ -3,7 +3,7 @@ package com.verknowsys.served.git
 import scala.collection.mutable.Map
 import org.eclipse.jgit.api._
 import org.eclipse.jgit.api.errors.JGitInternalException
-import org.eclipse.jgit.lib.{AnyObjectId, ObjectId, PersonIdent, Constants}
+import org.eclipse.jgit.lib.{AnyObjectId, ObjectId, PersonIdent, Constants, ProgressMonitor}
 import org.eclipse.jgit.storage.file.FileRepository
 import org.eclipse.jgit.revwalk.{RevCommit, RevWalk}
 import scala.collection.JavaConversions._
@@ -171,7 +171,27 @@ class GitRepository(dir: String) {
 	 */
 	def pull {
 		try {
-		    val head = git.fetch.call.getAdvertisedRef("HEAD")
+		    // XXX Temporary console dump progress monitor
+		    val monitor = new ProgressMonitor {
+		        def beginTask(title: String, totalWorks: Int){
+		            println("[pm] beginTask: %s, %d".format(title, totalWorks))
+		        }
+		        
+		        def endTask {
+		            println("[pm] endTask")
+		        }
+		        
+		        def start(totalTasks: Int) {
+		            println("[pm] start: %d".format(totalTasks))
+		        }
+		        
+		        def update(completed: Int) {
+		            println("[pm] update: %d".format(completed))
+		        }
+		        
+		        def isCancelled = false
+		    }
+		    val head = git.fetch.setProgressMonitor(monitor).call.getAdvertisedRef("HEAD")
 		    git.merge.include(head).call
 		} catch {
 		    case e: JGitInternalException => 
