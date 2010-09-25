@@ -21,7 +21,6 @@ import clime.messadmin.providers.sizeof.ObjectProfiler
 trait Utils {
   
 
-	trait P { def accept(t: String): Boolean }
   
 	lazy val loggerAppender = new ConsoleAppender
 	lazy val logger = {
@@ -34,6 +33,7 @@ trait Utils {
 		}
 		Logger.getLogger(this.getClass)
 	}
+  checkOrCreateVendorDir
   lazy val mainConfigFile = Config.home + Config.vendorDir + Config.propertiesFile
   lazy val props = new Properties(mainConfigFile)
 
@@ -46,9 +46,9 @@ trait Utils {
   */
   def checkOrCreateVendorDir = {
     if (new File(Config.home + Config.vendorDir).exists) {
-      logger.info("Vendor directory exists…")
+      logger.debug("Making sure that vendor directory exists…")
     } else {
-      logger.info("Creating vendor directory…")
+      logger.debug("No vendor directory available! Creating empty vendor directory…")
       new File(Config.home + Config.vendorDir).mkdir
     }
     Config.home + Config.vendorDir + Config.propertiesFile    
@@ -153,5 +153,4 @@ trait Utils {
   //    }
   // }
 
-	
 }

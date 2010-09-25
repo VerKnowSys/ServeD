@@ -7,6 +7,8 @@ package com.verknowsys.served.maintainer
 import com.verknowsys.served.Config
 import com.verknowsys.served.utils.Utils
 import com.verknowsys.served.utils.signals.{ProcessMessages, MainLoop, Quit, Init}
+
+import scala.collection.JavaConversions._
 import actors.Actor
 import org.apache.log4j.{Level, Logger}
 
@@ -16,83 +18,74 @@ import org.apache.log4j.{Level, Logger}
  * Time: 2:51:47 AM
  */
 
+
 /**
- * Actor class
- */
-class SvdMaintainer extends Actor with Utils {
+* @author dmilith
+* 
+* Main Maintainer loader.
+* 
+*/
 
-
-	val users = List("dmilith", "guest") // XXX: temporary list
-	val checkInterval = 25000 // in ms XXX: should be more for production, but small values will make me see average performance of Maintainer
-
-
-  def initialize {
-    
-  }
-  
-  
-	def checkout(users: List[String]) {
-		
-	}
+object SvdMaintainer extends Actor with Utils {
 
 
 	def act {
 		Actor.loop {
 			receive {
 				case MainLoop =>
-					logger.info("SvdMaintainer is up")
-					while(true) {
-					  if (props.bool("debug") == true)
-						  logger.debug("…")
-						this ! ProcessMessages
-						Thread sleep checkInterval
-					}
+          // Send messages to actors
+          SvdAccountManager ! new GetUsers
+          
 				case Init =>
-					logger.info("Initializing..")
-					initialize
-					logger.info("SvdMaintainer ready for tasks")
+					logger.debug("Maintainer ready for tasks")
 				case Quit =>
-					logger.info("Quitting SvdMaintainer")
+					logger.info("Quitting Maintainer…")
 					exit
-				case ProcessMessages =>
-					logger.info("Doing checkout for users: " + users.mkString(", "))
-					checkout(users)
-				case _ =>
-					logger.error("Command not recognized. SvdMaintainer will ignore You")
+        case GetUsers(x) => 
+          logger.warn("Content:\n" + x)
+			  case x: AnyRef =>
+					logger.warn("Command not recognized. Maintainer will ignore Your signal: " + x.toString)
 			}
 		}
 	}
 
-}
-
-
-/**
- * Main Maintainer loader.
- */
-object SvdMaintainer extends Utils {
-
-  threshold(Level.DEBUG)
   
-	val maintainer = new SvdMaintainer
-	maintainer.start
-
-
 	def main(args: Array[String]) {
     
-    checkOrCreateVendorDir
-    writeDefaultConfig
-    
-		logger.info("Home dir: " + Config.home)
-		logger.debug("Params: " + args.mkString(", ") + ". Params size: " + args.length)
+    val debug = props.bool("debug") getOrElse true
+    if (debug) {
+      threshold(Level.DEBUG)
+      props("debug") = true
+    }
+
+  	SvdMaintainer.start
+  	SvdAccountManager.start
+  	
+  	logger.debug("Mainainer object size: " + sizeof(SvdMaintainer))
+		logger.debug("Maintainer home dir: " + Config.home + Config.vendorDir)
+		logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
+		
 		
 		addShutdownHook {
-			maintainer ! "Quit"
-			logger.info("Maintainer has ended")
+			SvdMaintainer !! Quit
+			SvdAccountManager !! Quit
 		}
 
-		logger.info("Maintainer is loading")
-		maintainer ! Init
-		maintainer ! MainLoop
+		logger.info("Maintainer is loading…")
+		SvdMaintainer !! Init
+		logger.info("AccountManager is loading…")
+		SvdAccountManager !! Init
+		
+		logger.info("Entering main loop…")
+		while(true) {
+		  if (props.bool("debug") getOrElse true) {
+		    System.out.print("…")
+		  }
+		  SvdMaintainer ! MainLoop
+  		Thread sleep Config.checkInterval  
+		}
+		
 	}
+
 
 }

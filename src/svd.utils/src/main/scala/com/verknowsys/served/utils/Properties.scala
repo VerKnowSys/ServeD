@@ -98,7 +98,7 @@ class Properties(filename: String) extends Utils {
 			val jprops = new java.util.Properties
 			jprops.load(new java.io.FileInputStream(filename))
 					
-			logger.info("Loaded file: " + filename)
+			logger.debug("Loaded file: " + filename)
 			Some(jprops.entrySet.iterator.foldLeft(Map[String,String]()) { case(map, item) =>
 				map += (item.getKey.toString -> item.getValue.toString)
 			})
@@ -123,7 +123,7 @@ class Properties(filename: String) extends Utils {
 			val file = new java.io.FileOutputStream(filename)
 			jprops.store(file, "Scala Properties: " + filename)
 			file.close
-			logger.info("Saved file: " + filename)
+			logger.debug("Saved file: " + filename)
 		} catch {
 			case e: Exception => logger.error("Couldn`t save file %s".format(filename))
 		}
