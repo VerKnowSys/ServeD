@@ -2,7 +2,9 @@ package com.verknowsys.served.git
 
 import scala.collection.mutable.Map
 import org.eclipse.jgit.api._
-import org.eclipse.jgit.lib.{AnyObjectId, ObjectId, PersonIdent, Constants, Repository => JgitRepository}
+import org.eclipse.jgit.api.errors.JGitInternalException
+import org.eclipse.jgit.lib.{AnyObjectId, ObjectId, PersonIdent, Constants}
+import org.eclipse.jgit.storage.file.FileRepository
 import org.eclipse.jgit.revwalk.{RevCommit, RevWalk}
 import scala.collection.JavaConversions._
 import java.io.File
@@ -10,11 +12,15 @@ import java.util.Date
 
 // XXX: http://wiki.eclipse.org/JGit/User_Guide - last paragraph
 
+// NOTE: Jgit JavaDoc at http://s.teamon.eu/jgit-doc/
+// 
+// git pull == git fetch && git merge FETCH_HEAD
+
 /**
  * JGit RevCommit wrapper for more scala-like syntax
  *
  * @author teamon
- */
+**/
 class Commit(val origin: RevCommit) {
 	/**
 	 * Returns commit`s date
@@ -49,7 +55,7 @@ class Commit(val origin: RevCommit) {
  * JGit PersonIdent wrapper for more scala-like syntax
  *
  * @author teamon
- */
+**/
 class Author(val origin: PersonIdent){
 	/**
 	 * Returns authors`s name
@@ -73,13 +79,42 @@ class Author(val origin: PersonIdent){
 	def nameAndEmail = "%s [%s]".format(name, email)
 }
 
+object GitRepository {
+	
+	def create(dir: String, bare: Boolean): GitRepository = {
+		// XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
+		val repo = new GitRepository(dir)
+		repo.gitRepo.create(bare)
+		repo
+	}
+	
+	def create(dir: String): GitRepository = create(dir, false)
+	
+	
+	// XXX Remove this
+	// Run with $ mvn scala:run -DmainClass=com.verknowsys.served.git.GitRepository
+	def main(args: Array[String]): Unit = {
+        val repo = new GitRepository("/Users/teamon/Desktop/jgittest/deploy")
+        // val repo = new GitRepository("/Users/teamon/code/verknowsys/ServeD")
+		println("\nRepo history:")
+		repo.history.take(10).foreach { c =>
+			println(c.sha)
+			println(c.author.nameAndEmail)
+			println(c.message)
+			println()
+		}
+		
+		repo.pull
+	}
+}
+
 /**
  * GitRepository class  wrapper for more scala-like syntax
  *
  * @author teamon
  */
 class GitRepository(dir: String) {
-	lazy val gitRepo = new JgitRepository(new File(dir, ".git"))
+	lazy val gitRepo = new FileRepository(new File(dir, ".git"))
 	lazy val git = new Git(gitRepo)
 
 	/**
@@ -89,18 +124,13 @@ class GitRepository(dir: String) {
 	 */
 	def currentBranch = gitRepo.getBranch
 
-
 	/**
 	 * Returns commit history (all commits)
 	 *
 	 * @author teamon
 	 */	
-	def history = {
-		val rw = new RevWalk(gitRepo)
-		rw.markStart(rw.lookupCommit(gitRepo.mapCommit(Constants.HEAD).getCommitId))
-		rw
-	}
-	
+	def history = git.log.call
+
 	/**
 	 * Returns commit history for specified range
 	 *	@example
@@ -113,8 +143,8 @@ class GitRepository(dir: String) {
 	 *
 	 * @author teamon
 	 */
-	def history(from: AnyObjectId, to: AnyObjectId) = git.log.addRange(from, to).call
-	
+  	def history(from: AnyObjectId, to: AnyObjectId) = git.log.addRange(from, to).call
+
 	/**
 	 * Returns map of authors: (Author`s name and email -> number of commits)
 	 *
@@ -132,5 +162,22 @@ class GitRepository(dir: String) {
 		authors.toMap
 	}
 
+	/**
+     * Performs 'git pull' on repository
+     *    
+     * In fact it does 'git fetch' followed by 'git pull FEATCH_HEADA'
+	 *
+	 * @author teamon
+	 */
+	def pull {
+		try {
+		    val head = git.fetch.call.getAdvertisedRef("HEAD")
+		    git.merge.include(head).call
+		} catch {
+		    case e: JGitInternalException => 
+		        /// XXX Handle exception
+		        /// Caused by: org.eclipse.jgit.errors.TransportException: ssh://tunemates@git.verknowsys.com/git/ServeD.git: Auth fail
+    		    println(e.getCause)
+		}
+	}
 }
-
