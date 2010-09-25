@@ -81,14 +81,12 @@ class Author(val origin: PersonIdent){
 
 object GitRepository {
 	
-	def create(dir: String, bare: Boolean): GitRepository = {
+	def create(dir: String, bare: Boolean = false): GitRepository = {
 		// XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
 		val repo = new GitRepository(dir)
 		repo.gitRepo.create(bare)
 		repo
 	}
-	
-	def create(dir: String): GitRepository = create(dir, false)
 	
 	
 	// XXX Remove this
