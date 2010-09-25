@@ -53,27 +53,25 @@ class MaintainerTests extends TestCase("Maintainer") {
       }
     def getUsers2: List[Account] = parseUsers2(Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList)
     
-    
     getUsers // to cache content
+
     
     val start = (new java.util.Date).getTime
-    for (i <- 0 to 5000) {
+    for (i <- 0 to 100) {
       getUsers
     }
     val stop = (new java.util.Date).getTime
     System.out.println("Result: " + (stop - start))
 
-    
     val start1 = (new java.util.Date).getTime
-    for (i <- 0 to 5000) {
+    for (i <- 0 to 100) {
       getUsers2
     }
     val stop1 = (new java.util.Date).getTime
     System.out.println("Result1: " + (stop1 - start1))
+
     
-    
-    // assertTrue()
-    assertTrue(true)
+    assertTrue((stop - start) > (stop1 - start1))
   }
 
 }
