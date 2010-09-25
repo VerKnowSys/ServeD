@@ -59,8 +59,6 @@ object SvdAccountManager extends Actor with Utils {
 				case GetUsers =>
           logger.debug("Sending Users… ")
 					SvdMaintainer ! GetUsers(getUsers)
-					logger.debug(getUsers)
-					logger.debug("After GetUsers case…")
 			  case x: AnyRef =>
 					logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)	
 		  }
