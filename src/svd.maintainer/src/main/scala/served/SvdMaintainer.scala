@@ -67,8 +67,8 @@ object SvdMaintainer extends Actor with Utils {
 		
 		
 		addShutdownHook {
-			SvdMaintainer !! Quit
 			SvdAccountManager !! Quit
+			SvdMaintainer !! Quit
 		}
 
 		logger.info("Maintainer is loading…")
