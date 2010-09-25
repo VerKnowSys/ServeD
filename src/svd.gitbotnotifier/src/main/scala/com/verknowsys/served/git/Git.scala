@@ -6,6 +6,7 @@ import org.eclipse.jgit.api.errors.JGitInternalException
 import org.eclipse.jgit.lib.{AnyObjectId, ObjectId, PersonIdent, Constants, ProgressMonitor}
 import org.eclipse.jgit.storage.file.FileRepository
 import org.eclipse.jgit.revwalk.{RevCommit, RevWalk}
+import org.eclipse.jgit.transport.RemoteConfig
 import scala.collection.JavaConversions._
 import java.io.File
 import java.util.Date
@@ -92,17 +93,22 @@ object GitRepository {
 	// XXX Remove this
 	// Run with $ mvn scala:run -DmainClass=com.verknowsys.served.git.GitRepository
 	def main(args: Array[String]): Unit = {
-        val repo = new GitRepository("/Users/teamon/Desktop/jgittest/deploy")
-        // val repo = new GitRepository("/Users/teamon/code/verknowsys/ServeD")
-		println("\nRepo history:")
-		repo.history.take(10).foreach { c =>
-			println(c.sha)
-			println(c.author.nameAndEmail)
-			println(c.message)
-			println()
-		}
-		
-		repo.pull
+        //         val repo = new GitRepository("/Users/teamon/Desktop/jgittest/deploy")
+        //         // val repo = new GitRepository("/Users/teamon/code/verknowsys/ServeD")
+        // println("\nRepo history:")
+        // repo.history.take(10).foreach { c =>
+        //  println(c.sha)
+        //  println(c.author.nameAndEmail)
+        //  println(c.message)
+        //  println()
+        // }
+        // 
+        // repo.pull
+        
+        val repo = GitRepository.create("/Users/teamon/Desktop/jgittest/tsst")
+        repo.addRemote("origin", "/Users/teamon/Desktop/jgittest/org.git")
+        repo.pull
+        
 	}
 }
 
@@ -158,6 +164,24 @@ class GitRepository(dir: String) {
 		}
 
 		authors.toMap
+	}
+
+    /**
+     * Adds remote to repository
+     *
+     * @example
+	 *       val repo = GitRepository.create("/path/to/new/repo")
+     *       repo.addRemote("origin", "/path/to/remote/repo.git")
+     *       repo.pull
+     *
+     * @author teamon
+    **/
+	def addRemote(name: String, uri: String) {
+	    val config = gitRepo.getConfig
+	    val remoteConfig = new RemoteConfig(config, name)
+    	remoteConfig.addURI(uri)
+    	remoteConfig.update(config)
+    	println(config.save		)
 	}
 
 	/**

@@ -2,6 +2,7 @@ package com.verknowsys.served
 
 import org.eclipse.jgit.lib.{ObjectId, PersonIdent}
 import org.eclipse.jgit.revwalk.RevCommit
+import org.eclipse.jgit.transport.URIish
 
 /**
  * Package object holding implicit conversions from JGit objects to its wrappers
@@ -12,4 +13,5 @@ package object git {
 	implicit def RevCommitToCommit(c: RevCommit) = new Commit(c)
 	implicit def PersonIdentToAuthor(c: PersonIdent) = new Author(c)
 	implicit def StringToObjectId(s: String) = ObjectId.fromString(s)
+	implicit def StringToURIish(s: String) = new URIish(s)
 }
