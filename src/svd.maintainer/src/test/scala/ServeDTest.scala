@@ -3,7 +3,9 @@
 
 package com.verknowsys.served.maintainer
 
+
 import com.verknowsys.served._
+import com.verknowsys.served.maintainer._
 
 import scala.io.Source
 import scala._
@@ -65,5 +67,17 @@ class MaintainerTests extends TestCase("Maintainer") {
     
     // assertTrue((stop - start) <= (stop1 - start1))
   }
+  
+  
+  def testEfficiencyOfCountSize {
+    val start = (new java.util.Date).getTime
+    for (i <- 0 to 10) {
+      SvdAccountManager.getAccountSize("_carddav")
+    }
+    val stop = (new java.util.Date).getTime
+    System.out.println("Count size Result: " + (stop - start))
+    
+  }
+  
 
 }
