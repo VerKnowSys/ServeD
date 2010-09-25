@@ -67,6 +67,7 @@ object SvdAccountManager extends Actor with Utils {
   
 
   /**
+  * @author teamon
   * @author dmilith
   * 
   * Function to parse and convert List[String] of passwd file entries to List[Account]
@@ -74,12 +75,11 @@ object SvdAccountManager extends Actor with Utils {
   */ 
   private
   def parseUsers(users: List[String]): List[Account] = {
-    val userList = for (userLine <- users.filterNot{ _.startsWith("#") })
-      yield
-      userLine.split(":").foldRight(List[String]()) {
-        (a, b) => (a :: b) 
-      }
-    userList.map{ new Account(_) }
+    users.filterNot(_.startsWith("#")).map { line =>
+      new Account(line.split(":").foldRight(List[String]()) {
+        (a, b) => (a :: b)
+      })
+    }
   }
 
 
