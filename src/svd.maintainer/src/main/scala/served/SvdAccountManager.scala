@@ -13,6 +13,8 @@ import com.verknowsys.served._
 import com.verknowsys.served.utils.Utils
 import com.verknowsys.served.utils.signals._
 
+import java.io._
+import org.apache.commons.io._
 import actors.Actor
 import java.nio.charset.Charset
 import scala.io.Source
@@ -59,6 +61,8 @@ object SvdAccountManager extends Actor with Utils {
 				case GetUsers =>
           logger.debug("Sending Users… ")
 					SvdMaintainer ! GetUsers(getUsers)
+					getAccountSize("_carddav") // XXX: hardcoded for test
+					getAccountSize("nonExistantOne") // XXX: hardcoded for test
 			  case x: AnyRef =>
 					logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)	
 		  }
@@ -67,30 +71,50 @@ object SvdAccountManager extends Actor with Utils {
   
 
   /**
-  * @author teamon
   * @author dmilith
   * 
-  * Function to parse and convert List[String] of passwd file entries to List[Account]
+  * Parse users conversion tool from List[String] to List[Account]
   * 
   */ 
-  private
-  def parseUsers(users: List[String]): List[Account] = {
-    users.filterNot(_.startsWith("#")).map { line =>
-      new Account(line.split(":").foldRight(List[String]()) {
-        (a, b) => (a :: b)
-      })
-    }
-  }
+  def parseUsers(users: List[String]): List[Account] =
+    for(line <- users if !line.startsWith("#"))
+      yield
+        new Account(line.split(":").toList)
 
 
   /**
   * @author dmilith
   * 
-  * Function to read and parse List[Account] from passwd file
+  * Function to parse and convert List[String] of passwd file entries to List[Account]
   * 
   */
-  private
-  def getUsers: List[Account] = parseUsers(Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList)
+  def getUsers: List[Account] =
+    parseUsers(Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList)
 
+
+  /**
+  * @author dmilith
+  * 
+  * Returns size of account data
+  * 
+  */
+  def getAccountSize(userName: String): Long = {
+    getUsers.find(_.userName == userName) match {
+      case Some(x) =>
+        try {
+          val elementsSize = FileUtils.sizeOfDirectory(new File(x.homeDir))
+          logger.debug("getAccountSize: Some: " + elementsSize)
+          elementsSize
+        } catch {
+          case x: Exception =>
+            logger.error("Error: " + x)
+            -1
+        }
+      case None =>
+        logger.debug("getAccountSize: None. No such user?")
+        -1
+    }
+    
+  }
 
 }
