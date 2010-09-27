@@ -24,7 +24,7 @@
 		<repository>
 			<id>maven.verknowsys.com</id>
 			<name>Verknowsys Maven repository</name>
-			<url>http://maven.verknowsys.com/.m2/repository/</url>
+			<url>http://maven.verknowsys.com/</url>
 		</repository>
 	</repositories>
 
