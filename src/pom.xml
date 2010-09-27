@@ -51,6 +51,16 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+			<plugin>
+        <groupId>org.scala-tools</groupId>
+        <artifactId>maven-scala-plugin</artifactId>
+
+        <configuration>
+          <args>
+            <arg>-deprecation</arg>
+          </args>
+        </configuration>
+      </plugin>
 		</plugins>
 	</build>
 </project>
