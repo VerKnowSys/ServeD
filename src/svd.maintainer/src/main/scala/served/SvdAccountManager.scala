@@ -98,21 +98,21 @@ object SvdAccountManager extends Actor with Utils {
   * Returns size of account data
   * 
   */
-  def getAccountSize(userName: String): Long = {
+  def getAccountSize(userName: String): Option[Long] = {
     getUsers.find(_.userName == userName) match {
       case Some(x) =>
         try {
           val elementsSize = FileUtils.sizeOfDirectory(new File(x.homeDir))
           logger.debug("getAccountSize of " + x.homeDir + " folder: " + (elementsSize/Config.sizeMultiplier))
-          elementsSize
+          Some(elementsSize)
         } catch {
           case x: Exception =>
             logger.error("Error: " + x)
-            -1
+            None
         }
       case None =>
         logger.debug("getAccountSize: None. No such user?")
-        -1
+        None
     }
     
   }
