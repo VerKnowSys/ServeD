@@ -9,6 +9,7 @@
 	<inceptionYear>2009</inceptionYear>
 	<properties>
 		<neodatis.version>1.9.21.670</neodatis.version>
+		<build.platform>mac</build.platform> <!--> XXX: Hack!!! -->
 	</properties>
 
 	<repositories>
@@ -16,7 +17,7 @@
 			<id>maven.verknowsys.com</id>
 			<name>Verknowsys Maven repository</name>
 			<url>http://maven.verknowsys.com/</url>
-		</repository>
+		</repository>		
 	</repositories>
 	<parent>
 		<groupId>svd</groupId>
@@ -56,5 +57,51 @@
 			<artifactId>j2ssh-core</artifactId>
 			<version>0.2.2</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>net.contentobjects</groupId>
+			<artifactId>jnotify</artifactId>
+			<version>0.9.3</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.contentobjects</groupId>
+			<artifactId>jnotify-native</artifactId>
+			<version>0.9.3</version>
+			<classifier>${build.platform}</classifier>
+		</dependency>
+		
 	</dependencies>
+	
+  <build>
+		<plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+            			<groupId>net.contentobjects</groupId>
+            			<artifactId>jnotify-native</artifactId>
+                  <version>0.9.3</version>
+                  <classifier>${build.platform}</classifier>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>.</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+		</plugins>
+	</build>
+	
 </project>
