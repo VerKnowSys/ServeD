@@ -103,7 +103,7 @@ object SvdAccountManager extends Actor with Utils {
       case Some(x) =>
         try {
           val elementsSize = FileUtils.sizeOfDirectory(new File(x.homeDir))
-          logger.debug("getAccountSize: Some: " + elementsSize)
+          logger.debug("getAccountSize of " + x.homeDir + " folder: " + (elementsSize/Config.sizeMultiplier))
           elementsSize
         } catch {
           case x: Exception =>

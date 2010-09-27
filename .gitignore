@@ -1,5 +1,4 @@
 .DS_Store
-*.jar
 *.class
 target/
 *.neodatis
@@ -20,3 +19,8 @@ build
 *.tmproj
 *.xcodeproj
 tmtags
+.tmtags
+*.MF
+*.dylib
+*.so
+*.jar

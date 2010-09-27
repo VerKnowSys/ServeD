@@ -21,4 +21,5 @@ object Config {
 
   val checkInterval = 3000 // in ms XXX: should be more for production, but small values will make me see average performance of Maintainer
 
+  val sizeMultiplier = 1024 // bytes to kilobytes
 }
