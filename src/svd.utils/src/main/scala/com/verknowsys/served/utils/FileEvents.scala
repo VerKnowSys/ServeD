@@ -12,29 +12,25 @@ object FileEvents {
     // 
     // watch.stop
     //
-    def watchCreated(directory: String, recursive: Boolean = false)(f: (String) => Unit){
+    def watchCreated(directory: String, recursive: Boolean = false)(f: (String) => Unit) =
         new FileWatcher(directory, recursive, what = JNotify.FILE_CREATED){
             override def created(name: String){ f(name) }
         }
-    }
-    
-    def watchModified(directory: String, recursive: Boolean = false)(f: (String) => Unit){
+
+    def watchModified(directory: String, recursive: Boolean = false)(f: (String) => Unit) =
         new FileWatcher(directory, recursive, what = JNotify.FILE_MODIFIED){
             override def modified(name: String){ f(name) }
         }
-    }
     
-    def watchDeleted(directory: String, recursive: Boolean = false)(f: (String) => Unit){
+    def watchDeleted(directory: String, recursive: Boolean = false)(f: (String) => Unit) =
         new FileWatcher(directory, recursive, what = JNotify.FILE_DELETED){
             override def deleted(name: String){ f(name) }
         }
-    }
     
-    def watchRenamed(directory: String, recursive: Boolean = false)(f: (String, String) => Unit){
+    def watchRenamed(directory: String, recursive: Boolean = false)(f: (String, String) => Unit) =
         new FileWatcher(directory, recursive, what = JNotify.FILE_RENAMED){
             override def renamed(oldName: String, newName: String){ f(oldName, newName) }
         }
-    }
        
 }
 
