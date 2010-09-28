@@ -1,13 +1,13 @@
 package com.verknowsys.served.git
 
 import scala.collection.mutable.Map
+import scala.collection.JavaConversions._
 import org.eclipse.jgit.api._
 import org.eclipse.jgit.api.errors.JGitInternalException
 import org.eclipse.jgit.lib.{AnyObjectId, ObjectId, PersonIdent, Constants, ProgressMonitor}
 import org.eclipse.jgit.storage.file.FileRepository
 import org.eclipse.jgit.revwalk.{RevCommit, RevWalk}
 import org.eclipse.jgit.transport.RemoteConfig
-import scala.collection.JavaConversions._
 import java.io.File
 import java.util.Date
 
@@ -181,7 +181,6 @@ class GitRepository(dir: String) {
 	    val remoteConfig = new RemoteConfig(config, name)
     	remoteConfig.addURI(uri)
     	remoteConfig.update(config)
-    	println(config.save		)
 	}
 
 	/**
@@ -213,6 +212,7 @@ class GitRepository(dir: String) {
 		        
 		        def isCancelled = false
 		    }
+		    
 		    val head = git.fetch.setProgressMonitor(monitor).call.getAdvertisedRef("HEAD")
 		    git.merge.include(head).call
 		} catch {
