@@ -57,6 +57,7 @@ object SvdAccountManager extends Actor with Utils {
         
 
   def act {
+      logger.debug("Java Library Path Property: " + System.getProperty("java.library.path"))
         val watchEtc = new FileWatcher(Config.etcPath, recursive = true){
           // val createdList = ListBuffer[String]()
           // val modifiedList = ListBuffer[String]()
