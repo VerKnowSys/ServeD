@@ -36,6 +36,14 @@ trait Utils {
   checkOrCreateVendorDir
   lazy val mainConfigFile = Config.home + Config.vendorDir + Config.propertiesFile
   lazy val props = new Properties(mainConfigFile)
+  
+  /**
+  * @author teamon
+  * 
+  * Executes passed function only in debug mode
+  * 
+  */
+  def debug(f: => Unit) = if (props.bool("debug") getOrElse true) f
 
   
   /**

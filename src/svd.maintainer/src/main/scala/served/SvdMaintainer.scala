@@ -84,7 +84,7 @@ object SvdMaintainer extends Actor with Utils {
 		
 		logger.info("Entering main loop…")
 		while(true) {
-		  if (props.bool("debug") getOrElse true) {
+		  debug {
 		    System.out.print("…")
 		  }
           // SvdMaintainer ! MainLoop
