@@ -22,6 +22,7 @@ import org.apache.log4j.{Level, Logger}
 
 
 case class GetUsers(val list: List[Account])
+case class Message(val value: String)
 
 
 case class Account(
@@ -59,23 +60,20 @@ object SvdAccountManager extends Actor with Utils {
   def act {
       logger.debug("Java Library Path Property: " + System.getProperty("java.library.path"))
         val watchEtc = new FileWatcher(Config.etcPath, recursive = true){
-          // val createdList = ListBuffer[String]()
-          // val modifiedList = ListBuffer[String]()
-          // val deletedList = ListBuffer[String]()
 
           override def created(name: String){
               logger.debug("File created: " + name)
-              // createdList += name
           }
 
           override def modified(name: String){
               logger.debug("File modified: " + name)
-              // modifiedList += name
+              
+              // Thread sleep Config.checkInterval
+              SvdMaintainer ! Message("Modified file: " + name)
           }
 
           override def deleted(name: String){
               logger.debug("File deleted: " + name)
-              // deletedList += name
           }
         }
       
@@ -92,8 +90,8 @@ object SvdAccountManager extends Actor with Utils {
         		case GetUsers =>
           logger.debug("Sending Users… ")
         			SvdMaintainer ! GetUsers(getUsers)
-        			getAccountSize("_carddav") // XXX: hardcoded for test
-        			getAccountSize("nonExistantOne") // XXX: hardcoded for test
+                    // getAccountSize("_carddav") // XXX: hardcoded for test
+                    // getAccountSize("nonExistantOne") // XXX: hardcoded for test
         	  case x: AnyRef =>
         			logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)	
           }

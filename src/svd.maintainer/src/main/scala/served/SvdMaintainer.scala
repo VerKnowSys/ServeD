@@ -32,10 +32,12 @@ object SvdMaintainer extends Actor with Utils {
 	def act {
 		Actor.loop {
 			receive {
-				case MainLoop =>
+                // case MainLoop =>
           // Send messages to actors
-          SvdAccountManager ! GetUsers
+          // SvdAccountManager ! GetUsers
           
+                case Message(x) =>
+                    logger.debug("Received message: " + x)
 				case Init =>
 					logger.debug("Maintainer ready for tasks")
 
@@ -85,7 +87,7 @@ object SvdMaintainer extends Actor with Utils {
 		  if (props.bool("debug") getOrElse true) {
 		    System.out.print("…")
 		  }
-		  SvdMaintainer ! MainLoop
+          // SvdMaintainer ! MainLoop
   		Thread sleep Config.checkInterval  
 		}
 		
