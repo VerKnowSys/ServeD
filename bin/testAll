@@ -1,0 +1,16 @@
+#!/bin/bash
+# This Software is a close code project. You may not redistribute this code without permission of author.
+
+. bin/OPTS
+
+# 2010-09-30 00:06:07 - dmilith - HACK: copy dylib or so files to utils
+cp -f lib/*.dylib src/svd.utils/
+cp -f lib/*.so src/svd.utils/
+
+cd src/
+mvn test
+
+rm -rf src/svd.utils/*.dylib
+rm -rf src/svd.utils/*.so
+
+exit 0

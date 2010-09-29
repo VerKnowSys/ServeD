@@ -74,16 +74,16 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
           </execution>
         </executions>
         <configuration>
-          <mainClass>com.verknowsys.served.maintainer.SvdMaintainer</mainClass>
-          <!-- <arguments>
-                      <argument>-Djava.library.path=../../lib/</argument>
-                    </arguments>
-                    <systemProperties>
-                      <systemProperty>
-                        <key>java.library.path</key>
-          				<value>../../lib/</value>
-                      </systemProperty>
-                    </systemProperties> -->
+          	<!-- <arguments>
+   	              <argument>-Djava.library.path=../../lib/</argument>
+   	            </arguments> -->
+            <!-- <systemProperties>
+              <systemProperty>
+                <key>java.library.path</key>
+  				<value>../../../lib/</value>
+              </systemProperty>
+            </systemProperties> -->
+			<mainClass>com.verknowsys.served.maintainer.SvdMaintainer</mainClass>
         </configuration>
       </plugin>
     </plugins>
