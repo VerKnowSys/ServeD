@@ -4,8 +4,8 @@
 . bin/OPTS
 
 # 2010-09-30 00:06:07 - dmilith - HACK: copy dylib or so files to utils
-cp -f lib/*.dylib src/svd.utils/
-cp -f lib/*.so src/svd.utils/
+cp lib/*.dylib src/svd.utils/ 2&> /dev/null
+cp lib/*.so src/svd.utils/ 2&> /dev/null
 
 cd src/
 mvn test
