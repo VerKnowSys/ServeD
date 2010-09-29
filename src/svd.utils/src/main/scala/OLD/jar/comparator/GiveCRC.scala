@@ -11,11 +11,10 @@ package com.verknowsys.served.utils.jar.comparator
  */
 
 object GiveCRC {
-
-	def main(args: Array[String]) {
-		if (args.length == 0) exit
-		val comparator = new JarEntryComparator
-		comparator.loadAndThrowListOfCrcs(args(0)).map{ a => print(a + ",") }
-	}
+    def main(args: Array[String]) {
+        if (args.length == 0) exit
+        val comparator = new JarEntryComparator
+        comparator.loadAndThrowListOfCrcs(args(0)).map {a => print(a + ",")}
+    }
 
 }

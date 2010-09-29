@@ -20,73 +20,71 @@ import org.apache.log4j.{Level, Logger}
 
 
 /**
-* @author dmilith
-* 
-* Main Maintainer loader.
-* 
-*/
+ * @author dmilith
+ *
+ * Main Maintainer loader.
+ *
+ */
 
 object SvdMaintainer extends Actor with Utils {
-
-
-	def act {
-		Actor.loop {
-			receive {
+    def act {
+        Actor.loop {
+            receive {
                 // case MainLoop =>
-          // Send messages to actors
-          // SvdAccountManager ! GetUsers
-          
+                // Send messages to actors
+                // SvdAccountManager ! GetUsers
+
                 case Message(x) =>
                     logger.debug("Received message: " + x)
-				case Init =>
-					logger.debug("Maintainer ready for tasks")
+                case Init =>
+                    logger.debug("Maintainer ready for tasks")
 
-				case Quit =>
-					logger.info("Quitting Maintainer…")
-					exit
+                case Quit =>
+                    logger.info("Quitting Maintainer…")
+                    exit
 
-        case GetUsers(x) => 
-          val content = x.map{ a => "userName: " + a.userName + ", pass: " + a.pass + ", uid: " + a.uid + ", gid: " + a.gid + ", homeDir: " + a.homeDir + ", shell: " + a.shell + ", information: " + a.information + "\n" }
-          logger.debug("Content:\n" + content)
+                case GetUsers(x) =>
+                    val content = x.map {a => "userName: " + a.userName + ", pass: " + a.pass + ", uid: " + a.uid + ", gid: " + a.gid + ", homeDir: " + a.homeDir + ", shell: " + a.shell + ", information: " + a.information + "\n"}
+                    logger.debug("Content:\n" + content)
 
-			  case x: AnyRef =>
-					logger.warn("Command not recognized. Maintainer will ignore signal: " + x.toString)
+                case x: AnyRef =>
+                    logger.warn("Command not recognized. Maintainer will ignore signal: " + x.toString)
 
-			}
-		}
-	}
+            }
+        }
+    }
 
-  
-	def main(args: Array[String]) {
-    
-      	SvdMaintainer.start
-      	SvdAccountManager.start
-  	
-      	logger.debug("Mainainer object size: " + sizeof(SvdMaintainer))
-		logger.debug("Maintainer home dir: " + Config.home + Config.vendorDir)
-		logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
-		
-		
-		addShutdownHook {
-			SvdAccountManager !! Quit
-			SvdMaintainer !! Quit
-		}
 
-		logger.info("Maintainer is loading…")
-		SvdMaintainer !! Init
-		logger.info("AccountManager is loading…")
-		SvdAccountManager !! Init
-		
-		logger.info("Entering main loop…")
-		while(true) {
-		  debug {
-		    System.out.print("…")
-		  }
-          // SvdMaintainer ! MainLoop
-  		Thread sleep Config.checkInterval  
-		}
-		
-	}
+    def main(args: Array[String]) {
+
+        SvdMaintainer.start
+        SvdAccountManager.start
+
+        logger.debug("Mainainer object size: " + sizeof(SvdMaintainer))
+        logger.debug("Maintainer home dir: " + Config.home + Config.vendorDir)
+        logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
+
+
+        addShutdownHook {
+            SvdAccountManager !! Quit
+            SvdMaintainer !! Quit
+        }
+
+        logger.info("Maintainer is loading…")
+        SvdMaintainer !! Init
+        logger.info("AccountManager is loading…")
+        SvdAccountManager !! Init
+
+        logger.info("Entering main loop…")
+        while (true) {
+            debug {
+                System.out.print("…")
+            }
+            // SvdMaintainer ! MainLoop
+            Thread sleep Config.checkInterval
+        }
+
+    }
 
 
 }

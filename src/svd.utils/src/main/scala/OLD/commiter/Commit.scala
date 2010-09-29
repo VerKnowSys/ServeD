@@ -7,11 +7,10 @@ import java.util.Date
 
 
 class Commit(var commitSha1: String, var toRead: Boolean) {
-	
-	require(commitSha1.length != 0)
-	
-	val date = new Date
-	
-	def this(commitSha1: String) = this(commitSha1, true)
-	
+    require(commitSha1.length != 0)
+
+    val date = new Date
+
+    def this(commitSha1: String) = this (commitSha1, true)
+
 }

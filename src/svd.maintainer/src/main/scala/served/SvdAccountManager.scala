@@ -26,130 +26,126 @@ case class Message(val value: String)
 
 
 case class Account(
-  val userName: String = "guest",
-  val pass: String = "x",
-  val uid: String = "1000",
-  val gid: String = "1000",
-  val information: String = "No information",
-  val homeDir: String = "/home/",
-  val shell: String = "/bin/bash"
-) {
-  
-  def this(a: List[String]) = this(
-    userName = a(0),
-    pass = a(1),
-    uid = a(2),
-    gid = a(3),
-    information = a(4),
-    homeDir = a(5),
-    shell = a(6)
-    )
-    
+        val userName: String = "guest",
+        val pass: String = "x",
+        val uid: String = "1000",
+        val gid: String = "1000",
+        val information: String = "No information",
+        val homeDir: String = "/home/",
+        val shell: String = "/bin/bash"
+        ) {
+    def this(a: List[String]) = this (
+        userName = a(0),
+        pass = a(1),
+        uid = a(2),
+        gid = a(3),
+        information = a(4),
+        homeDir = a(5),
+        shell = a(6)
+        )
+
 }
 
 
 object SvdAccountManager extends Actor with Utils {
-    
+    def act {
+        logger.debug("Java Library Path Property: " + System.getProperty("java.library.path"))
 
-  def act {
-      logger.debug("Java Library Path Property: " + System.getProperty("java.library.path"))
-      
-      def matchIt(name:String) = name match {
-          case Config.passwdFileName =>
-            SvdMaintainer ! Message("Modified or Created system password file: " + Config.passwdFileName)
-            
-          case _ =>
-            
-      }
-      
-      
-        val watchEtc = new FileWatcher(Config.etcPath, recursive = true){
+        def matchIt(name: String) = name match {
+            case Config.passwdFileName =>
+                SvdMaintainer ! Message("Modified or Created system password file: " + Config.passwdFileName)
 
-          override def created(name: String){
-              logger.debug("File created: " + name)
-              matchIt(name)
-          }
+            case _ =>
 
-          override def modified(name: String){
-              logger.debug("File modified: " + name)
-              matchIt(name)
-              
-              // Thread sleep Config.checkInterval
-              // SvdMaintainer ! Message("Modified file: " + name)
-          }
-
-          override def deleted(name: String){
-              logger.debug("File deleted: " + name)
-          }
         }
-      
+
+
+        val watchEtc = new FileWatcher(Config.etcPath, recursive = true) {
+            override def created(name: String) {
+                logger.debug("File created: " + name)
+                matchIt(name)
+            }
+
+            override def modified(name: String) {
+                logger.debug("File modified: " + name)
+                matchIt(name)
+
+                // Thread sleep Config.checkInterval
+                // SvdMaintainer ! Message("Modified file: " + name)
+            }
+
+            override def deleted(name: String) {
+                logger.debug("File deleted: " + name)
+            }
+        }
+
         Actor.loop {
-        	receive {
-        	  case Init =>
-        			logger.debug("AccountManager ready for tasks")
-        			logger.debug("Initialized watch for " + Config.etcPath)
-        			logger.debug("WatchEtc: " + watchEtc)
-        		case Quit =>
-        			logger.info("Quitting AccountManager…")
-        			watchEtc.stop
-        			exit
-        		case GetUsers =>
-          logger.debug("Sending Users… ")
-        			SvdMaintainer ! GetUsers(getUsers)
-                    // getAccountSize("_carddav") // XXX: hardcoded for test
-                    // getAccountSize("nonExistantOne") // XXX: hardcoded for test
-        	  case x: AnyRef =>
-        			logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)	
-          }
+            receive {
+                case Init =>
+                    logger.debug("AccountManager ready for tasks")
+                    logger.debug("Initialized watch for " + Config.etcPath)
+                    logger.debug("WatchEtc: " + watchEtc)
+                case Quit =>
+                    logger.info("Quitting AccountManager…")
+                    watchEtc.stop
+                    exit
+                case GetUsers =>
+                    logger.debug("Sending Users… ")
+                    SvdMaintainer ! GetUsers(getUsers)
+                // getAccountSize("_carddav") // XXX: hardcoded for test
+                // getAccountSize("nonExistantOne") // XXX: hardcoded for test
+                case x: AnyRef =>
+                    logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)
+            }
         }
-  }
-  
-
-  /**
-  * @author dmilith
-  * 
-  * Parse users conversion tool from List[String] to List[Account]
-  * 
-  */ 
-  def parseUsers(users: List[String]): List[Account] =
-    for(line <- users if !line.startsWith("#"))
-      yield
-        new Account(line.split(":").toList)
-
-
-  /**
-  * @author dmilith
-  * 
-  * Function to parse and convert List[String] of passwd file entries to List[Account]
-  * 
-  */
-  def getUsers: List[Account] =
-    parseUsers(Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList)
-
-
-  /**
-  * @author dmilith
-  * 
-  * Returns size of account data
-  * 
-  */
-  def getAccountSize(userName: String): Option[Long] = {
-    getUsers.find(_.userName == userName) match {
-      case Some(x) =>
-        try {
-          val elementsSize = FileUtils.sizeOfDirectory(new File(x.homeDir))
-          logger.debug("getAccountSize of " + x.homeDir + " folder: " + (elementsSize/Config.sizeMultiplier))
-          Some(elementsSize)
-        } catch {
-          case x: Exception =>
-            logger.error("Error: " + x)
-            None
-        }
-      case None =>
-        logger.debug("getAccountSize: None. No such user?")
-        None
     }
-    
-  }
+
+
+    /**
+     * @author dmilith
+     *
+     * Parse users conversion tool from List[String] to List[Account]
+     *
+     */
+    def parseUsers(users: List[String]): List[Account] =
+        for (line <- users if !line.startsWith("#"))
+        yield
+            new Account(line.split(":").toList)
+
+
+    /**
+     * @author dmilith
+     *
+     * Function to parse and convert List[String] of passwd file entries to List[Account]
+     *
+     */
+    def getUsers: List[Account] =
+        parseUsers(Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList)
+
+
+    /**
+     * @author dmilith
+     *
+     * Returns size of account data
+     *
+     */
+    def getAccountSize(userName: String): Option[Long] = {
+        getUsers.find(_.userName == userName) match {
+            case Some(x) =>
+                try {
+                    val elementsSize = FileUtils.sizeOfDirectory(new File(x.homeDir))
+                    logger.debug("getAccountSize of " + x.homeDir + " folder: " + (elementsSize / Config.sizeMultiplier))
+                    Some(elementsSize)
+                } catch {
+                    case x: Exception =>
+                        logger.error("Error: " + x)
+                        None
+                }
+            case None =>
+                logger.debug("getAccountSize: None. No such user?")
+                None
+        }
+
+    }
 
 }

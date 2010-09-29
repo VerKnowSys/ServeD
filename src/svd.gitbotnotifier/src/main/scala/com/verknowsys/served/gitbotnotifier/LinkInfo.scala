@@ -8,11 +8,10 @@ import java.util.Date
 
 
 class LinkInfo(val author: String, val channel: String, val message: String) {
-	
-	require(author.length > 0)
-	require(channel.length > 0)
-	require(message.length > 0)
+    require(author.length > 0)
+    require(channel.length > 0)
+    require(message.length > 0)
 
-	val date = new Date
-	
+    val date = new Date
+
 }

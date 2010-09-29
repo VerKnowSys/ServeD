@@ -8,7 +8,7 @@ class PropertiesTest extends SpecificationWithJUnit {
     final val configFilename = "/tmp/config.properties"
 
     "Properties object" should {
-        doBefore { setupConfigFile }
+        doBefore {setupConfigFile}
         "read from file" in {
             val props = new Properties(configFilename)
             props("app.existing.config.one") must_== Some("foo bar baz")
@@ -53,20 +53,20 @@ class PropertiesTest extends SpecificationWithJUnit {
     }
 
     private def setupConfigFile {
-        val content =     "app.existing.config.one = foo bar baz" ::
-                          "app.existing.other.config.two = foo bar baz bar blah" ::
-                        "some.nice.integer = 259" ::
-                        "some.bad.integer = soifgj" ::
-                        "some.nice.double = 34.56" ::
-                        "some.bad.double = kokpo" ::
-                        "some.nice.true = true" ::
-                        "some.nice.false = false" ::
-                        "some.bad.boolean = ifj4rf" ::
-                        Nil mkString "\n"
+        val content = "app.existing.config.one = foo bar baz" ::
+                "app.existing.other.config.two = foo bar baz bar blah" ::
+                "some.nice.integer = 259" ::
+                "some.bad.integer = soifgj" ::
+                "some.nice.double = 34.56" ::
+                "some.bad.double = kokpo" ::
+                "some.nice.true = true" ::
+                "some.nice.false = false" ::
+                "some.bad.boolean = ifj4rf" ::
+                Nil mkString "\n"
 
         val file = new File(configFilename)
         val fw = new FileWriter(file)
-        try { fw.write(content) }
-        finally { fw.close }
+        try {fw.write(content)}
+        finally {fw.close}
     }
 }

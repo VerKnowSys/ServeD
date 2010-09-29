@@ -13,8 +13,7 @@ import org.specs._
 
 
 class SvdMaintainerTest extends SpecificationWithJUnit {
-    
-	"Maintainer" should {
+    "Maintainer" should {
         "Be efficient with counting folder size" in {
             val start = (new java.util.Date).getTime
             val size: Long = SvdAccountManager.getAccountSize("_carddav") getOrElse 0

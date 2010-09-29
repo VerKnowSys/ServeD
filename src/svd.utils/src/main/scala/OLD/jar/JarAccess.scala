@@ -13,23 +13,22 @@ import java.io.{InputStreamReader, BufferedReader}
  */
 
 object JarAccess {
-
-	def readLineFromJARFile(filename: String) = {
-		lazy val is = getClass.getResourceAsStream(filename)
-		lazy val isr = new InputStreamReader(is)
-		lazy val br = new BufferedReader(isr)
-		lazy val sb = new StringBuffer
-		var line = ""
-		try {
-			sb.append(br.readLine) // only one - first line is interesting
-		} catch {
-			case x: Exception =>
-		}
-		br.close
-		isr.close
-		is.close
-		sb.toString
-	}
+    def readLineFromJARFile(filename: String) = {
+        lazy val is = getClass.getResourceAsStream(filename)
+        lazy val isr = new InputStreamReader(is)
+        lazy val br = new BufferedReader(isr)
+        lazy val sb = new StringBuffer
+        var line = ""
+        try {
+            sb.append(br.readLine) // only one - first line is interesting
+        } catch {
+            case x: Exception =>
+        }
+        br.close
+        isr.close
+        is.close
+        sb.toString
+    }
 
 
 }
