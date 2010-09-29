@@ -30,7 +30,7 @@ class JarEntryComparatorTest extends TestCase("app") {
 
 	def prepare = {
 		z = new JarEntryComparator
-	    currentDir = System.getProperty("user.dir") + "/src/test/scala/jar/comparator/test_data/"
+	    currentDir = System.getProperty("user.dir") + "/src/test/scala/com/verknowsys/served/utils/jar/comparator/test_data/"
 	    println(currentDir)
 	}
 
