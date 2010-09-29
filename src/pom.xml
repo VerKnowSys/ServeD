@@ -1,57 +1,57 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd
 http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>svd</groupId>
-	<artifactId>svd</artifactId>
-	<packaging>pom</packaging>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>ServeD Agregate</name>
-	<url>http://maven.apache.org</url>
-	<modules>
-		<module>svd.pom/scala</module>
-		<module>svd.pom/scala_base</module>
-		<module>svd.pom/scala_from_java</module>
-		<module>svd.common</module>
-		<module>svd.maintainer</module>
-		<module>svd.utils</module>
-		<module>svd.systemmanager</module>
-		<module>svd.gitbotnotifier</module>
-	</modules>
-	
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<aggregate>true</aggregate>
-					<!--also set this to link to generated source reports-->
-					<linkXRef>true</linkXRef>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
-	<build> <!-- 2009-10-19 00:59:42 ; karolrvn ; moved (extracted plugin stuff to this super-pom) -->
-		<plugins>			
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>svd</groupId>
+    <artifactId>svd</artifactId>
+    <packaging>pom</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>ServeD Agregate</name>
+    <url>http://maven.apache.org</url>
+    <modules>
+        <module>svd.pom/scala</module>
+        <module>svd.pom/scala_base</module>
+        <module>svd.pom/scala_from_java</module>
+        <module>svd.common</module>
+        <module>svd.maintainer</module>
+        <module>svd.utils</module>
+        <module>svd.systemmanager</module>
+        <module>svd.gitbotnotifier</module>
+    </modules>
+    
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                    <!--also set this to link to generated source reports-->
+                    <linkXRef>true</linkXRef>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+    <build> <!-- 2009-10-19 00:59:42 ; karolrvn ; moved (extracted plugin stuff to this super-pom) -->
+        <plugins>           
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>
 
@@ -61,6 +61,32 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
           </args>
         </configuration>
       </plugin>
-		</plugins>
-	</build>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>java</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>com.verknowsys.served.maintainer.SvdMaintainer</mainClass>
+          <!-- <arguments>
+                      <argument>-Djava.library.path=../../lib/</argument>
+                    </arguments>
+                    <systemProperties>
+                      <systemProperty>
+                        <key>java.library.path</key>
+          				<value>../../lib/</value>
+                      </systemProperty>
+                    </systemProperties> -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+    
 </project>

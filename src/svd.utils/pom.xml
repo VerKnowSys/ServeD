@@ -94,7 +94,7 @@
                   <classifier>${build.platform}</classifier>
                   <type>jar</type>
                   <overWrite>true</overWrite>
-                  <outputDirectory>.</outputDirectory>
+                  <outputDirectory>../../lib/</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>

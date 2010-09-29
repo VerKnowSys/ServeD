@@ -8,4 +8,4 @@ elif [ `uname` == "Darwin" ]; then
     platform="mac";
 fi
 
-export MAVEN_OPTS="$JAVA_OPTS -Dbuild.platform=$platform"
+export MAVEN_OPTS="$JAVA_OPTS -Dbuild.platform=$platform -Djava.library.path=../../lib/"
