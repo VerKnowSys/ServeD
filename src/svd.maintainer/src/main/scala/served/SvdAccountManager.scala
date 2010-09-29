@@ -10,7 +10,7 @@ package com.verknowsys.served.maintainer
  */
 
 import com.verknowsys.served._
-import com.verknowsys.served.utils.Utils
+import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 
 import java.io._
@@ -48,25 +48,55 @@ case class Account(
 
 
 object SvdAccountManager extends Actor with Utils {
+    
 
+    if (props.bool("debug") getOrElse true) {
+      threshold(Level.DEBUG)
+      props("debug") = true
+    }
+        
 
   def act {
-		Actor.loop {
-			receive {
-			  case Init =>
-					logger.debug("AccountManager ready for tasks")
-				case Quit =>
-					logger.info("Quitting AccountManager…")
-					exit
-				case GetUsers =>
+        val watchEtc = new FileWatcher(Config.etcPath, recursive = true){
+          // val createdList = ListBuffer[String]()
+          // val modifiedList = ListBuffer[String]()
+          // val deletedList = ListBuffer[String]()
+
+          override def created(name: String){
+              logger.debug("File created: " + name)
+              // createdList += name
+          }
+
+          override def modified(name: String){
+              logger.debug("File modified: " + name)
+              // modifiedList += name
+          }
+
+          override def deleted(name: String){
+              logger.debug("File deleted: " + name)
+              // deletedList += name
+          }
+        }
+      
+        Actor.loop {
+        	receive {
+        	  case Init =>
+        			logger.debug("AccountManager ready for tasks")
+        			logger.debug("Initialized watch for " + Config.etcPath)
+        			logger.info("WatchEtc: " + watchEtc)
+        		case Quit =>
+        			logger.info("Quitting AccountManager…")
+        			watchEtc.stop
+        			exit
+        		case GetUsers =>
           logger.debug("Sending Users… ")
-					SvdMaintainer ! GetUsers(getUsers)
-					getAccountSize("_carddav") // XXX: hardcoded for test
-					getAccountSize("nonExistantOne") // XXX: hardcoded for test
-			  case x: AnyRef =>
-					logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)	
-		  }
-	  }
+        			SvdMaintainer ! GetUsers(getUsers)
+        			getAccountSize("_carddav") // XXX: hardcoded for test
+        			getAccountSize("nonExistantOne") // XXX: hardcoded for test
+        	  case x: AnyRef =>
+        			logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)	
+          }
+        }
   }
   
 
