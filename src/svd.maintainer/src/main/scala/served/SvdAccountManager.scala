@@ -51,25 +51,36 @@ case class Account(
 object SvdAccountManager extends Actor with Utils {
     
 
-    if (props.bool("debug") getOrElse true) {
-      threshold(Level.DEBUG)
-      props("debug") = true
+    debug {
+        threshold(Level.DEBUG)
     }
         
 
   def act {
       logger.debug("Java Library Path Property: " + System.getProperty("java.library.path"))
+      
+      def matchIt(name:String) = name match {
+          case Config.passwdFileName =>
+            SvdMaintainer ! Message("Modified or Created system password file: " + Config.passwdFileName)
+            
+          case _ =>
+            
+      }
+      
+      
         val watchEtc = new FileWatcher(Config.etcPath, recursive = true){
 
           override def created(name: String){
               logger.debug("File created: " + name)
+              matchIt(name)
           }
 
           override def modified(name: String){
               logger.debug("File modified: " + name)
+              matchIt(name)
               
               // Thread sleep Config.checkInterval
-              SvdMaintainer ! Message("Modified file: " + name)
+              // SvdMaintainer ! Message("Modified file: " + name)
           }
 
           override def deleted(name: String){

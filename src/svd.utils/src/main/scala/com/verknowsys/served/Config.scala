@@ -19,7 +19,9 @@ object Config {
   
   val etcPath = "/etc/"
   
-  val systemPasswdFile = etcPath + "passwd"
+  val passwdFileName = "passwd"
+  
+  val systemPasswdFile = etcPath + passwdFileName
 
   val checkInterval = 1500 // in ms XXX: should be more for production, but small values will make me see average performance of Maintainer
 

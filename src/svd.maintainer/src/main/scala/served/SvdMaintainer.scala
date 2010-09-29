@@ -59,9 +59,8 @@ object SvdMaintainer extends Actor with Utils {
   
 	def main(args: Array[String]) {
     
-    if (props.bool("debug") getOrElse true) {
-      threshold(Level.DEBUG)
-      props("debug") = true
+    debug {
+        threshold(Level.DEBUG)
     }
 
   	SvdMaintainer.start
