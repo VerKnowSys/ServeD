@@ -26,7 +26,7 @@ trait Utils {
 	lazy val logger = {
 		loggerAppender.setName(ConsoleAppender.SYSTEM_OUT);
 		loggerAppender.setWriter(new OutputStreamWriter(System.out))
-		loggerAppender.setThreshold(Level.INFO)
+		loggerAppender.setThreshold(if (Config.debug) Level.DEBUG else Level.INFO )
 		loggerAppender.setLayout(new ANSIColorLayout("{ %-5p: [%c]: %m }%n"))
 		if (Logger.getRootLogger.getAppender(ConsoleAppender.SYSTEM_OUT) == null) {
 			Logger.getRootLogger.addAppender(loggerAppender)
@@ -43,7 +43,7 @@ trait Utils {
   * Executes passed function only in debug mode
   * 
   */
-  def debug(f: => Unit) = if (props.bool("debug") getOrElse true) f
+  def debug(f: => Unit) = if (Config.debug) f
 
   
   /**
@@ -62,22 +62,22 @@ trait Utils {
     Config.home + Config.vendorDir + Config.propertiesFile    
   }
 
-
-  /**
-  * @author dmilith
-  * 
-  * Setting threshold of logger.
-  * Default value is Level.INFO
-  * 
-  * @example
-  *   threshold(Level.DEBUG)
-  * 
-  */ 
-	def threshold(level: Level) = {
-	  logger // initialize cause it's lazy       \ debug
-    loggerAppender.setThreshold(level)//       / purpose
-	}	
-		
+    
+    /**
+    * @author dmilith
+    * 
+    * Setting threshold of logger.
+    * Default value is Level.INFO
+    * 
+    * @example
+    *   threshold(Level.DEBUG)
+    * 
+    */ 
+    def threshold(level: Level) = {
+      logger // initialize cause it's lazy       \ debug
+        loggerAppender.setThreshold(level)//       / purpose
+    }    
+        
 	
   /**
   * @author dmilith

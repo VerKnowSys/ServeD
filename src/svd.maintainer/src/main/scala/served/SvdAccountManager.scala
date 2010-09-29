@@ -51,11 +51,6 @@ case class Account(
 object SvdAccountManager extends Actor with Utils {
     
 
-    debug {
-        threshold(Level.DEBUG)
-    }
-        
-
   def act {
       logger.debug("Java Library Path Property: " + System.getProperty("java.library.path"))
       
@@ -93,7 +88,7 @@ object SvdAccountManager extends Actor with Utils {
         	  case Init =>
         			logger.debug("AccountManager ready for tasks")
         			logger.debug("Initialized watch for " + Config.etcPath)
-        			logger.info("WatchEtc: " + watchEtc)
+        			logger.debug("WatchEtc: " + watchEtc)
         		case Quit =>
         			logger.info("Quitting AccountManager…")
         			watchEtc.stop

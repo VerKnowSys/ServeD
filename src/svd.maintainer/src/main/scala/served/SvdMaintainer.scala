@@ -59,14 +59,10 @@ object SvdMaintainer extends Actor with Utils {
   
 	def main(args: Array[String]) {
     
-    debug {
-        threshold(Level.DEBUG)
-    }
-
-  	SvdMaintainer.start
-  	SvdAccountManager.start
+      	SvdMaintainer.start
+      	SvdAccountManager.start
   	
-  	logger.debug("Mainainer object size: " + sizeof(SvdMaintainer))
+      	logger.debug("Mainainer object size: " + sizeof(SvdMaintainer))
 		logger.debug("Maintainer home dir: " + Config.home + Config.vendorDir)
 		logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
 		

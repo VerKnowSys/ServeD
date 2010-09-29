@@ -11,6 +11,11 @@ object Config {
   * 
   */
   
+  // 2010-09-30 01:02:38 - dmilith - NOTE: hopefully one and last var in whole app ;P
+  var debug = true
+  
+  
+  
   val home = System.getProperty("user.home") + "/"
   
   val vendorDir = ".svd/"
