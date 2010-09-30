@@ -12,7 +12,10 @@ package com.verknowsys.served.maintainer
 import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.gitbotnotifier._
+import com.verknowsys.served.git._
 
+import scala.collection.mutable.ListBuffer
 import java.io._
 import org.apache.commons.io._
 import actors.Actor
@@ -32,7 +35,8 @@ case class Account(
         val gid: String = "1000",
         val information: String = "No information",
         val homeDir: String = "/home/",
-        val shell: String = "/bin/bash"
+        val shell: String = "/bin/bash",
+        val gitRepositories: ListBuffer[String] = ListBuffer[String]()
         ) {
     def this(a: List[String]) = this (
         userName = a(0),
@@ -58,7 +62,9 @@ object SvdAccountManager extends Actor with Utils {
             case _ =>
 
         }
-
+        
+        val gitNotifier = new SvdGitNotifier(new GitRepository("/Users/dmilith/Projects/VerKnowSys/ServeD")) // XXX: hardcoded
+        gitNotifier.start
 
         val watchEtc = new FileWatcher(Config.etcPath, recursive = true) {
             override def created(name: String) {
@@ -85,9 +91,12 @@ object SvdAccountManager extends Actor with Utils {
                     logger.debug("AccountManager ready for tasks")
                     logger.debug("Initialized watch for " + Config.etcPath)
                     logger.debug("WatchEtc: " + watchEtc)
+                    gitNotifier !! Init
+                    logger.debug("GitNotifier initialized…")
                 case Quit =>
                     logger.info("Quitting AccountManager…")
                     watchEtc.stop
+                    gitNotifier !! Quit
                     exit
                 case GetUsers =>
                     logger.debug("Sending Users… ")
