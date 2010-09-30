@@ -34,5 +34,11 @@
 			<artifactId>svd.utils</artifactId>
 			<version>1.2</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>svd</groupId>
+			<artifactId>svd.gitbotnotifier</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 </project>
