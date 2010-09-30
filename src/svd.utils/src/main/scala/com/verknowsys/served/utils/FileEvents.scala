@@ -31,6 +31,13 @@ object FileEvents {
         new FileWatcher(directory, recursive, what = JNotify.FILE_RENAMED) {
             override def renamed(oldName: String, newName: String) {f(oldName, newName)}
         }
+        
+    def watch(directory: String, recursive: Boolean = false)(f: (String) => Unit) = 
+        new FileWatcher(directory, recursive, what = JNotify.FILE_ANY) {
+            override def created(name: String) = f(name)
+            override def modified(name: String) = f(name)
+            override def deleted(name: String) = f(name)
+        }
 
 }
 
