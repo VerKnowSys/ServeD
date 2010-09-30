@@ -91,7 +91,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
         val watchHEAD = FileEvents.watch(repo.dir + "/.git/logs") { name => name match {
             case "HEAD" =>
                 logger.debug("HEAD changed in repo: " + repo.dir)
-                val commit = repo.history("HEAD", "HEAD~1").map{ e => e.message }.mkString(", ") // XXX: hardcoded
+                val commit = repo.history("f182450863da40028f75a2166d1b9c9934b1c7cc", "76c3ac1756ec33f218324f8ecd70bd3071a53f74").map{ e => e.message }.mkString(", ") // XXX: hardcoded
                 logger.debug("Commit: " + commit)
                 chat.foreach { chatRecipient =>
                     try {
