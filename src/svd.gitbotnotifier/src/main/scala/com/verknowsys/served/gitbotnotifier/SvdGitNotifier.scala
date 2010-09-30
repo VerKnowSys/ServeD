@@ -93,12 +93,15 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
             case "HEAD" =>
                 logger.debug("HEAD changed in repo: " + repo.dir)
                 val commit = repo.history("HEAD", "HEAD~1").map{ e => e.message }.mkString(", ") // XXX: hardcoded
+                logger.debug("Commit: " + commit)
                 chat.foreach { element =>
                     try {
                         if (commit != null) {
-                            logger.debug("*** Trying to send messages, to User: " + element.getParticipant)
+                            logger.debug("Trying to send messages, to User: " + element.getParticipant)
                             element.sendMessage(commit)
-                            logger.debug("*** sent message: " + commit + " length: " + commit.length)
+                            logger.debug("Sent message: " + commit + " length: " + commit.length)
+                        } else {
+                            element.sendMessage("Emptiness")
                         }
                     } catch {
                         case e: Throwable =>
