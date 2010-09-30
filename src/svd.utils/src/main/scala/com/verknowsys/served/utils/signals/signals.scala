@@ -5,8 +5,13 @@ package com.verknowsys.served.utils.signals
 
 /**
  * User: dmilith
- * Date: Jul 1, 2009
- * Time: 12:00:45 AM
+ * Date: Jun 30, 2009
+ * Time: 11:53:57 PM
  */
 
+case object Init
+case object MainLoop
 case object ProcessMessages
+case object Quit
+case object RemoteBackupDone
+case object RevertBackup
