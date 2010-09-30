@@ -5,6 +5,7 @@ import java.io._
 import org.apache.commons.io.FileUtils
 import scala.collection.mutable.ListBuffer
 
+
 class FileEventsTest extends SpecificationWithJUnit {
     final val DIR = "/tmp/served/file_events_test"
 
