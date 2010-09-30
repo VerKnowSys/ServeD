@@ -69,7 +69,6 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                     exit
             }
             val chatmanager = connection.getChatManager
-            logger.debug("Number of users: " + chat.length)
             
             ("dmilith@verknowsys.com" :: "i@teamon.eu" :: Nil).foreach { user =>
                 try {
@@ -94,14 +93,14 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                 logger.debug("HEAD changed in repo: " + repo.dir)
                 val commit = repo.history("HEAD", "HEAD~1").map{ e => e.message }.mkString(", ") // XXX: hardcoded
                 logger.debug("Commit: " + commit)
-                chat.foreach { element =>
+                chat.foreach { chatRecipient =>
                     try {
                         if (commit != null) {
-                            logger.debug("Trying to send messages, to User: " + element.getParticipant)
-                            element.sendMessage(commit)
+                            logger.debug("Trying to send messages, to User: " + chatRecipient.getParticipant)
+                            chatRecipient.sendMessage(commit)
                             logger.debug("Sent message: " + commit + " length: " + commit.length)
                         } else {
-                            element.sendMessage("Emptiness")
+                            chatRecipient.sendMessage("Emptiness")
                         }
                     } catch {
                         case e: Throwable =>
