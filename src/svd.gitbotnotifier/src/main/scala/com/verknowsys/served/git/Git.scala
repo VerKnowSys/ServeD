@@ -116,7 +116,7 @@ object GitRepository {
  *
  * @author teamon
  */
-class GitRepository(dir: String) {
+class GitRepository(val dir: String) {
     lazy val gitRepo = new FileRepository(new File(dir, ".git"))
     lazy val git = new Git(gitRepo)
 
