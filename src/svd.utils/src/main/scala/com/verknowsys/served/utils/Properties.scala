@@ -21,7 +21,7 @@ import scala.collection.JavaConversions._
  * @author teamon
  */
 class Properties(filename: String) extends Utils {
-    val data = load
+    lazy val data = load
 
     /**
      * 	Get value as String
