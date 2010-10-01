@@ -19,29 +19,24 @@ import clime.messadmin.providers.sizeof.ObjectProfiler
  */
 
 trait Utils {
-    lazy val loggerAppender = new ConsoleAppender
+    
+    
+    checkOrCreateVendorDir
+    
+    
+    /**
+    * @author dmilith
+    *   
+    * Get and spread props for all believers..
+    */   
+    lazy val props = Config.props
+    
     lazy val logger = {
-        loggerAppender.setName(ConsoleAppender.SYSTEM_OUT);
-        loggerAppender.setWriter(new OutputStreamWriter(System.out))
-        loggerAppender.setThreshold(if (Config.debug) Level.DEBUG else Level.INFO)
-        loggerAppender.setLayout(new ANSIColorLayout("{ %-5p: [%c]: %m }%n"))
-        if (Logger.getRootLogger.getAppender(ConsoleAppender.SYSTEM_OUT) == null) {
-            Logger.getRootLogger.addAppender(loggerAppender)
-        }
+        BasicConfigurator.resetConfiguration
+        PropertyConfigurator.configureAndWatch(Config.mainLoggerFile, Config.checkInterval)
         Logger.getLogger(this.getClass)
     }
-    checkOrCreateVendorDir
-    lazy val mainConfigFile = Config.home + Config.vendorDir + Config.propertiesFile
-    lazy val props = new Properties(mainConfigFile)
-
-    /**
-     * @author teamon
-     *
-     * Executes passed function only in debug mode
-     *
-     */
-    def debug(f: => Unit) = if (Config.debug) f
-
+    
 
     /**
      * @author dmilith
@@ -50,29 +45,14 @@ trait Utils {
      *
      */
     def checkOrCreateVendorDir = {
-        if (new File(Config.home + Config.vendorDir).exists) {
+        val vendorPath = Config.homePath + Config.vendorDir
+        if (new File(vendorPath).exists) {
             logger.debug("Making sure that vendor directory exists…")
         } else {
             logger.debug("No vendor directory available! Creating empty vendor directory…")
-            new File(Config.home + Config.vendorDir).mkdir
+            new File(vendorPath).mkdir
         }
-        Config.home + Config.vendorDir + Config.propertiesFile
-    }
-
-
-    /**
-     * @author dmilith
-     *
-     * Setting threshold of logger.
-     * Default value is Level.INFO
-     *
-     * @example
-     * threshold ( Level.DEBUG )
-     *
-     */
-    def threshold(level: Level) = {
-        logger // initialize cause it's lazy       \ debug
-        loggerAppender.setThreshold(level) //       / purpose
+        vendorPath
     }
 
 
