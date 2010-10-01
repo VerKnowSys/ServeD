@@ -1,36 +1,61 @@
 package com.verknowsys.served
 
+import com.verknowsys.served.utils.Properties
+
 
 object Config {
 
 
     /**
-     * @author dmilith
-     *
-     * A very low level settings hardcoded into application
-     *
-     */
+    * @author dmilith
+    *
+    * A very low level settings hardcoded into application
+    *
+    */
 
-    // 2010-09-30 01:02:38 - dmilith - NOTE: hopefully one and last var in whole app ;P
-    var debug = true
+    final val vendorDir = ".svd/"
+    
+    final val mainPropertiesFile = "svd.properties"
+    
+    final val loggermainPropertiesFile = "logger.properties"
 
+    final val homePath = System.getProperty("user.home") + "/"
 
+    final val systemPasswdFile = etcPath + passwdFileName
+    
+    final val mainConfigFile = homePath + vendorDir + mainPropertiesFile
 
-    val home = System.getProperty("user.home") + "/"
+    final val mainLoggerFile = homePath + vendorDir + loggermainPropertiesFile
 
-    val vendorDir = ".svd/"
+    final val props = new Properties(mainConfigFile)
+    
+    
 
-    val propertiesFile = "ServeD.properties"
+    /**
+    *   @author dmilith
+    *   More dynamic settings from main properties file
+    */
 
-    val etcPath = "/etc/"
+    val etcPath = props("etcPath") getOrElse {
+        props("etcPath") = "/etc/"
+        "/etc/"
+    }
 
-    val passwdFileName = "passwd"
+    val passwdFileName = props("passwdFileName") getOrElse {
+        props("passwdFileName") = "passwd"
+        "passwd"
+    }
 
-    val systemPasswdFile = etcPath + passwdFileName
+    val checkInterval = props.int("checkInterval") getOrElse {
+        props("checkInterval") = 1500
+        1500
+    }
 
-    val checkInterval = 1500 // in ms XXX: should be more for production, but small values will make me see average performance of Maintainer
+    val sizeMultiplier = props.int("sizeMultiplier") getOrElse {
+        props("sizeMultiplier") = 1024
+        1024 // bytes to kilobytes
+    }
 
-    val sizeMultiplier = 1024 // bytes to kilobytes
 
 
 }
