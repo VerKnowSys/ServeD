@@ -6,7 +6,7 @@
 cd src/
 . ../bin/OPTS
 
-mvn install -Dmaven.test.skip.exec=true $@
+mvn -T C2 install -Dmaven.test.skip.exec=true $@
 #echo "Hit Enter to perform tests, SIGINT to terminate"
 #read
 #mvn test
