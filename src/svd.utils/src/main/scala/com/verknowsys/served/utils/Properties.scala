@@ -21,7 +21,7 @@ import scala.collection.JavaConversions._
  * @author teamon
  */
 class Properties(filename: String) extends Utils {
-    lazy val data = load
+    val data = load
 
     /**
      * 	Get value as String
@@ -35,7 +35,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
-    def int(key: String) = apply(key).flatMap {
+    def int(key: String): Option[Int] = apply(key).flatMap {
         s =>
             try {Some(s.toInt)} catch {case _ => None}
     }
@@ -45,7 +45,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
-    def double(key: String) = apply(key).flatMap {
+    def double(key: String): Option[Double] = apply(key).flatMap {
         s =>
             try {Some(s.toDouble)} catch {case _ => None}
     }
@@ -55,7 +55,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
-    def bool(key: String) = apply(key).flatMap {
+    def bool(key: String): Option[Boolean] = apply(key).flatMap {
         s =>
             try {Some(s.toBoolean)} catch {case _ => None}
     }
@@ -106,7 +106,7 @@ class Properties(filename: String) extends Utils {
                 case (map, item) =>
                     map += (item.getKey.toString -> item.getValue.toString)
             })
-
+            
         } catch {
             case e: Exception =>
                 logger.error("Couldn`t load file %s".format(filename))
@@ -121,15 +121,20 @@ class Properties(filename: String) extends Utils {
      * @author teamon
      */
     protected def save {
-        try {
+        // try {
             val jprops = new java.util.Properties
-            data foreach {_.foreach(a => jprops.put(a._1, a._2))}
             val file = new java.io.FileOutputStream(filename)
-            jprops.store(file, "Scala Properties: " + filename)
+            try {
+                data foreach {_.foreach(a => jprops.put(a._1, a._2))} 
+            } catch {
+                case _ => // 2010-10-02 00:35:14 - dmilith -  XXX: silent fail on first save
+            }
+            jprops.store(file, "ServeD Properties: " + filename)
             file.close
             logger.debug("Saved file: " + filename)
-        } catch {
-            case e: Exception => logger.error("Couldn`t save file %s".format(filename))
-        }
+        // } catch {
+            // case e: Exception => logger.error("Couldn`t save file %s, cause of exception: %s".format(filename, e))
+        // }
     }
+    
 }
