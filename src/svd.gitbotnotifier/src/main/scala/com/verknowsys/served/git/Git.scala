@@ -103,8 +103,15 @@ object GitRepository {
  * @author teamon
  */
 class GitRepository(val dir: String) {
-    lazy val gitRepo = new FileRepository(new File(dir, ".git"))
+    lazy val (gitRepo, isBare) = {
+        val file = new File(dir, ".git")
+        if(file.exists) (new FileRepository(file), false)
+        else (new FileRepository(new File(dir)), true)
+    }
+    
     lazy val git = new Git(gitRepo)
+
+    lazy val headPath = if(isBare) dir + "/refs/heads/master" else dir + "/.git/logs/HEAD"
 
     /**
      * Returns current branch name

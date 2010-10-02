@@ -103,33 +103,28 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
         // XXX: This doesnt work for bare repos.
         // in bare there is refs/heads/master file instead of .git/logs/HEAD
         // change this to FileEvents.watchFile(repo.headPath) { ... }
-        val watchHEAD = FileEvents.watch(repo.dir + "/.git/logs") { name => name match {
-            case "HEAD" =>
-                logger.debug("HEAD changed in repo: %s".format(repo.dir))
+        val watchHEAD = FileEvents.watchFile(repo.headPath) {
+            logger.debug("HEAD changed in repo: %s".format(repo.dir))
 
-                repo.history(oldHEAD).foreach { commit =>
-                    logger.trace("Commit: " + commit)
-                    val message = "%s\n%s %s\n%s".format(commit.sha, new SimpleDateFormat("yyyy-MM-dd HH:mm").format(commit.date), commit.author.nameAndEmail, commit.message)
+            repo.history(oldHEAD).foreach { commit =>
+                logger.trace("Commit: " + commit)
+                val message = "%s\n%s %s\n%s".format(commit.sha, new SimpleDateFormat("yyyy-MM-dd HH:mm").format(commit.date), commit.author.nameAndEmail, commit.message)
 
-                    chat.foreach { chatRecipient =>
-                        try {
-                            logger.debug("Trying to send messages, to User: " + chatRecipient.getParticipant)
-                            chatRecipient.sendMessage(message)
-                            logger.trace("Sent message: " + message + " length: " + message.length)
-                        } catch {
-                            case e: Throwable =>
-                                logger.info("### Error " + e + "\nTrying to put commit onto list cause errors.")
-                                // DbAddCommit.writeCommitToDataBase(new Commit(commitSha))
-                        }
+                chat.foreach { chatRecipient =>
+                    try {
+                        logger.debug("Trying to send messages, to User: " + chatRecipient.getParticipant)
+                        chatRecipient.sendMessage(message)
+                        logger.trace("Sent message: " + message + " length: " + message.length)
+                    } catch {
+                        case e: Throwable =>
+                            logger.info("### Error " + e + "\nTrying to put commit onto list cause errors.")
+                            // DbAddCommit.writeCommitToDataBase(new Commit(commitSha))
                     }
                 }
+            }
 
-                oldHEAD = repo.head
-
-
-            case x: AnyRef =>
-                logger.warn("Command not recognized. GitNotifier will ignore You: " + x.toString)
-        }}
+            oldHEAD = repo.head
+        }
 
 
         Actor.loop {
