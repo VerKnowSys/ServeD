@@ -16,11 +16,11 @@ import com.verknowsys.served.gitbotnotifier._
 import com.verknowsys.served.git._
 
 import scala.collection.mutable.ListBuffer
-import java.io._
-import org.apache.commons.io._
-import actors.Actor
-import java.nio.charset.Charset
+import scala.actors.Actor
 import scala.io.Source
+import java.io._
+import java.nio.charset.Charset
+import org.apache.commons.io._
 import org.apache.log4j.{Level, Logger}
 
 
