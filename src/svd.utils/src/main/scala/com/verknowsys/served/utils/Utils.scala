@@ -35,7 +35,7 @@ trait Utils {
         BasicConfigurator.resetConfiguration
         PropertyConfigurator.configure(Config.mainLoggerFile)
         
-        val watch = FileEvents.watchFile(Config.homePath + Config.vendorDir, Config.loggerPropertiesFile) {
+        val watch = FileEvents.watchFile(Config.mainLoggerFile) {
             PropertyConfigurator.configure(Config.mainLoggerFile)
         }
         addShutdownHook { watch.stop }
