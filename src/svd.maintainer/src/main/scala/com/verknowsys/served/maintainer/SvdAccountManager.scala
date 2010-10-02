@@ -60,13 +60,12 @@ object SvdAccountManager extends Actor with Utils {
                 SvdMaintainer ! Message("Modified or Created system password file: " + Config.passwdFileName)
 
             case _ =>
-
+                logger.debug("Nothing")
         }
         
         val gitNotifier = new SvdGitNotifier(new GitRepository("/Users/dmilith/Projects/VerKnowSys/ServeD")) // XXX: hardcoded
-        gitNotifier.start
 
-        val watchEtc = new FileWatcher(Config.etcPath, recursive = true) {
+        val watchEtc = new FileWatcher(Config.etcPath, recursive = false) {
             override def created(name: String) {
                 logger.debug("File created: " + name)
                 matchIt(name)
@@ -91,6 +90,7 @@ object SvdAccountManager extends Actor with Utils {
                     logger.debug("AccountManager ready for tasks")
                     logger.debug("Initialized watch for " + Config.etcPath)
                     logger.debug("WatchEtc: " + watchEtc)
+                    gitNotifier.start
                     gitNotifier !! Init
                     logger.debug("GitNotifier initialized…")
                 case Quit =>
