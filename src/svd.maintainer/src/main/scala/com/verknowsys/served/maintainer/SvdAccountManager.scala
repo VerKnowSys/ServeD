@@ -129,7 +129,7 @@ object SvdAccountManager extends Actor with Utils {
      *
      */
     def getUsers: List[Account] =
-        parseUsers(Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList)
+        parseUsers(Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList) // XXX: hardcode
 
 
     /**

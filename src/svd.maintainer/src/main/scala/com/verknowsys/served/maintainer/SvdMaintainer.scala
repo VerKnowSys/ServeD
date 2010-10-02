@@ -36,6 +36,7 @@ object SvdMaintainer extends Actor with Utils {
 
                 case Message(x) =>
                     logger.debug("Received message: " + x)
+
                 case Init =>
                     logger.debug("Maintainer ready for tasks")
 
@@ -61,7 +62,7 @@ object SvdMaintainer extends Actor with Utils {
         SvdAccountManager.start
 
         logger.debug("Mainainer object size: " + sizeof(SvdMaintainer))
-        logger.debug("Maintainer home dir: " + Config.home + Config.vendorDir)
+        logger.debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
         logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
 
 
@@ -77,9 +78,9 @@ object SvdMaintainer extends Actor with Utils {
 
         logger.info("Entering main loop…")
         while (true) {
-            debug {
-                System.out.print("…")
-            }
+            // debug {
+            // System.out.print("…")
+            // }
             // SvdMaintainer ! MainLoop
             Thread sleep Config.checkInterval
         }
