@@ -59,12 +59,11 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
             connection.connect
             try {
                 connection.login(login, password, resource)
-                logger.debug("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
+                logger.trace("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
             } catch {
                 case x: Throwable =>
                     logger.error("Error while connecting to XMPP server. Please check login / password.")
                     logger.debug( x.printStackTrace )
-                    exit
             }
             val chatmanager = connection.getChatManager
             
@@ -76,7 +75,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                         logger.info("Error: " + x )
                 }
             }
-            logger.debug("Number of users: " + chat.length)
+            logger.trace("Number of users: " + chat.length)
             presence.setStatus("ServeD Git Bot Notifier")
             presence.setMode(Presence.Mode.dnd)
             connection.sendPacket(presence)
@@ -91,13 +90,13 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                 val headSha = Source.fromFile(repo.dir + "/.git/refs/heads/master").mkString.trim // XXX: hardcoded
                 logger.debug("HEAD: %s changed in repo: %s".format(headSha, repo.dir))
                 val commit = repo.history("f182450863da40028f75a2166d1b9c9934b1c7cc", headSha).map{ e => e.message }.mkString(", ") // XXX: hardcoded
-                logger.debug("Commit: " + commit)
+                logger.trace("Commit: " + commit)
                 chat.foreach { chatRecipient =>
                     try {
                         if (commit != null) {
                             logger.debug("Trying to send messages, to User: " + chatRecipient.getParticipant)
                             chatRecipient.sendMessage(commit)
-                            logger.debug("Sent message: " + commit + " length: " + commit.length)
+                            logger.trace("Sent message: " + commit + " length: " + commit.length)
                         } else {
                             chatRecipient.sendMessage("Emptiness")
                         }

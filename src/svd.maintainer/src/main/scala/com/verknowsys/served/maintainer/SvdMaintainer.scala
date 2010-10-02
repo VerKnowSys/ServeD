@@ -75,10 +75,10 @@ object SvdMaintainer extends Actor with Utils {
         logger.info("AccountManager is loading…")
         SvdAccountManager ! Init
 
-        logger.info("Entering main loop…")
+        // logger.info("Entering main loop…")
         // while (true) {
             // debug {
-            // System.out.print("…")
+                // System.out.print("…")
             // }
             // SvdMaintainer ! MainLoop
             // Thread sleep Config.checkInterval
