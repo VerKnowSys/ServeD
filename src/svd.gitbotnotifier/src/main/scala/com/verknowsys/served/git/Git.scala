@@ -11,11 +11,8 @@ import org.eclipse.jgit.transport.RemoteConfig
 import java.io.File
 import java.util.Date
 
-// XXX: http://wiki.eclipse.org/JGit/User_Guide - last paragraph
-
 // NOTE: Jgit JavaDoc at http://s.teamon.eu/jgit-doc/
-// 
-// git pull == git fetch && git merge FETCH_HEAD
+
 
 /**
  * JGit RevCommit wrapper for more scala-like syntax
@@ -88,13 +85,6 @@ object GitRepository {
         repo
     }
 
-
-    // XXX Remove this
-    // Run with $ mvn scala:run -DmainClass=com.verknowsys.served.git.GitRepository
-    // def main(args: Array[String]): Unit = {
-    //     val repo = new GitRepository("/Users/teamon/code/verknowsys/ServeD")
-    //     println(repo.history("23ec4881666527bfd60537fdb83ef3e9b841dd65").toList.size)
-    // }
 }
 
 /**
@@ -193,28 +183,30 @@ class GitRepository(val dir: String) {
      */
     def pull {
         try {
-            // XXX Temporary console dump progress monitor
-            val monitor = new ProgressMonitor {
-                def beginTask(title: String, totalWorks: Int) {
-                    println("[pm] beginTask: %s, %d".format(title, totalWorks))
-                }
-
-                def endTask {
-                    println("[pm] endTask")
-                }
-
-                def start(totalTasks: Int) {
-                    println("[pm] start: %d".format(totalTasks))
-                }
-
-                def update(completed: Int) {
-                    println("[pm] update: %d".format(completed))
-                }
-
-                def isCancelled = false
-            }
-
-            val head = git.fetch.setProgressMonitor(monitor).call.getAdvertisedRef("HEAD")
+            // TODO: Add progress monitor
+            // val monitor = new ProgressMonitor {
+            //     def beginTask(title: String, totalWorks: Int) {
+            //         println("[pm] beginTask: %s, %d".format(title, totalWorks))
+            //     }
+            // 
+            //     def endTask {
+            //         println("[pm] endTask")
+            //     }
+            // 
+            //     def start(totalTasks: Int) {
+            //         println("[pm] start: %d".format(totalTasks))
+            //     }
+            // 
+            //     def update(completed: Int) {
+            //         println("[pm] update: %d".format(completed))
+            //     }
+            // 
+            //     def isCancelled = false
+            // }
+            // 
+            // val head = git.fetch.setProgressMonitor(monitor).call.getAdvertisedRef("HEAD")
+            
+            val head = git.fetch.call.getAdvertisedRef("HEAD")
             git.merge.include(head).call
         } catch {
             case e: JGitInternalException =>
