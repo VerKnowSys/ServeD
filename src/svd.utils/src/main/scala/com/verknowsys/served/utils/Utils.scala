@@ -88,59 +88,6 @@ trait Utils {
      * logger.info ( sizeof ( new Date ( ) ))
      *
      */
-    def sizeof(any: Any) = {
-        ObjectProfiler.sizeof(any)
-    }
-
-
-    // def pathsToSearchForExecutables = Array(
-    //  new File("/opt/local/bin/"), // XXX: hardcoded paths
-    //  new File("/bin/"),
-    //  new File("/usr/bin/"),
-    //  new File("/usr/local/bin/"),
-    //  new File("/sw/bin/"),
-    //  new File(System.getProperty("user.home") + "/bin"),
-    //  new File(System.getProperty("user.home") + "/Bin")
-    // )
-    //
-    // def requirements = Array(
-    //  ("git", "gitExecutable"), // XXX: hardcoded executables
-    //  ("jarsigner", "jarSignerExecutable"),
-    //  ("jar", "jarExecutable")
-    // )
-
-    // def autoDetectRequirements = {
-    //  for (i <- 0 until requirements.size)
-    //    if (!(new File(props(requirements(i)._2) getOrElse mainConfigFile).exists)) {
-    //      val al = new ArrayList[File]()
-    //      if (System.getProperty("os.name").contains("Linux") ||
-    //        System.getProperty("os.name").contains("Mac")) {
-    //        for (path <- pathsToSearchForExecutables) {
-    //          if (path.exists) {
-    //            findFile( path, new P {
-    //              override
-    //              def accept(t: String): Boolean = {
-    //                val fileRegex = ".*" + requirements(i)._1 + "$"
-    //                val pattern = Pattern.compile(fileRegex)
-    //                val mat = pattern.matcher(t)
-    //                if ( mat.find ) return true
-    //                return false
-    //              }
-    //            }, al)
-    //          }
-    //        }
-    //        try {
-    //             // props("", value) = Some(requirements(i)._2, al.toArray.first.toString)
-    //        } catch {
-    //          case x: NoSuchElementException => {
-    //            logger.error(requirements(i)._1 + " executable not found")
-    //          }
-    //        }
-    //      } else {
-    //        logger.error("Windows hosts wont be supported")
-    //        exit(1)
-    //      }
-    //    }
-    // }
+    def sizeof(any: Any) = ObjectProfiler.sizeof(any)
 
 }

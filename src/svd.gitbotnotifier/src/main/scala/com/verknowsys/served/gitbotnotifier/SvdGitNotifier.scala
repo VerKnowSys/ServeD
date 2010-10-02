@@ -98,10 +98,6 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
 
         def closeConnection = connection.disconnect
 
-
-        // XXX: This doesnt work for bare repos.
-        // in bare there is refs/heads/master file instead of .git/logs/HEAD
-        // change this to FileEvents.watchFile(repo.headPath) { ... }
         val watchHEAD = FileEvents.watchFile(repo.headPath) {
             logger.debug("HEAD changed in repo: %s".format(repo.dir))
 
@@ -145,43 +141,3 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
     }
 
 }
-
-// XXX: Remove this
- // addShutdownHook {
- //   XMPPActor ! Quit
- //    ODBServerActor ! Quit
- //  IRCActor ! Quit
- //   SvdBot ! Quit
- //   logger.info("Done\n")
- // }
-//
-//   // NOTE: when in standalone mode:
-//  def main(args: Array[String]) {
-//    setLoggerLevelDebug(if (props.bool("debug") getOrElse true) Level.TRACE else Level.INFO)
-//    logger.info("User home dir: " + System.getProperty("user.home"))
-//    logger.debug("Params: " + args + ". Params size: " + args.length)
-//    this.start
-//  }
-//
-//  override def act = {
-//     // ODBServerActor.start
-//     // ODBServerActor ! Init
-//    XMPPActor.start
-//    XMPPActor ! Init
-// //   IRCActor.start
-//
-//    react {
-//      case MainLoop => {
-//        Actor.loop {
-//          Thread sleep 500 // 500 ms for each check. That's enough even for very often updated repository
-//          XMPPActor ! ProcessMessages
-//        }
-//      }
-//      case Quit => {
-//        exit
-//      }
-//    }
-//    logger.info("Ready to serve. waiting for orders.")
-//  }
-//
-// }
