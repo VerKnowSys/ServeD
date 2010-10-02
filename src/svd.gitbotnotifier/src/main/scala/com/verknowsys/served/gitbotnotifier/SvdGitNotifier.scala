@@ -40,27 +40,26 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
             }
         }
     }
+
+    val config = new ConnectionConfiguration("verknowsys.com", 65222) // XXX: hardcode
+    val connection = new XMPPConnection(config)
+    val presence = new Presence(Presence.Type.available)
+    val login = "git-bot" // XXX: hardcode
+    val password = "git-bot-666" // XXX: hardcode
+    val resource = "served-bot-resource" // XXX: hardcode
+    val chat = ListBuffer[Chat]()
         
     
     def act {
 
-        val config = new ConnectionConfiguration("verknowsys.com", 65222) // XXX: hardcode
-        val connection = new XMPPConnection(config)
-        val presence = new Presence(Presence.Type.available)
-        val login = "git-bot" // XXX: hardcode
-        val password = "git-bot-666" // XXX: hardcode
-        val resource = "served-bot-resource" // XXX: hardcode
-        val chat = ListBuffer[Chat]()
-        
-        
         def initConnection = {
             // XMPPConnection.DEBUG_ENABLED = true
             config.setCompressionEnabled(true)
             config.setSASLAuthenticationEnabled(true)
             connection.connect
-            logger.debug("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
             try {
                 connection.login(login, password, resource)
+                logger.debug("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
             } catch {
                 case x: Throwable =>
                     logger.error("Error while connecting to XMPP server. Please check login / password.")
@@ -121,9 +120,9 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                     logger.info("Git Notifier ready")
                     
                 case Quit =>
-                    logger.info("Quitting Git Notifier")
                     closeConnection
-                    exit
+                    logger.info("Quitting Git Notifier")
+                    // exit
                     
                 case x: AnyRef =>
                     logger.warn("Command not recognized. GitNotifier will ignore signal: " + x.toString)

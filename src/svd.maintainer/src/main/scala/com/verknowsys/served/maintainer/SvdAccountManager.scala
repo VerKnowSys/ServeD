@@ -91,13 +91,13 @@ object SvdAccountManager extends Actor with Utils {
                     logger.debug("Initialized watch for " + Config.etcPath)
                     logger.debug("WatchEtc: " + watchEtc)
                     gitNotifier.start
-                    gitNotifier !! Init
-                    logger.debug("GitNotifier initialized…")
+                    gitNotifier ! Init
+                    logger.info("GitNotifier initialized…")
                 case Quit =>
                     logger.info("Quitting AccountManager…")
                     watchEtc.stop
-                    gitNotifier !! Quit
-                    exit
+                    gitNotifier ! Quit
+                    // exit
                 case GetUsers =>
                     logger.debug("Sending Users… ")
                     SvdMaintainer ! GetUsers(getUsers)

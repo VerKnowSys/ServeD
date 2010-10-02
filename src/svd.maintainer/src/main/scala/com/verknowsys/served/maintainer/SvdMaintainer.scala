@@ -42,7 +42,6 @@ object SvdMaintainer extends Actor with Utils {
 
                 case Quit =>
                     logger.info("Quitting Maintainer…")
-                    exit
 
                 case GetUsers(x) =>
                     val content = x.map {a => "userName: " + a.userName + ", pass: " + a.pass + ", uid: " + a.uid + ", gid: " + a.gid + ", homeDir: " + a.homeDir + ", shell: " + a.shell + ", information: " + a.information + "\n"}
@@ -67,24 +66,23 @@ object SvdMaintainer extends Actor with Utils {
 
 
         addShutdownHook {
-            SvdAccountManager !! Quit
-            SvdMaintainer !! Quit
+            SvdAccountManager ! Quit
+            SvdMaintainer ! Quit
         }
 
         logger.info("Maintainer is loading…")
-        SvdMaintainer !! Init
+        SvdMaintainer ! Init
         logger.info("AccountManager is loading…")
-        SvdAccountManager !! Init
+        SvdAccountManager ! Init
 
         logger.info("Entering main loop…")
-        while (true) {
+        // while (true) {
             // debug {
             // System.out.print("…")
             // }
             // SvdMaintainer ! MainLoop
-            Thread sleep Config.checkInterval
-        }
-
+            // Thread sleep Config.checkInterval
+        // }
     }
 
 
