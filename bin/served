@@ -8,6 +8,6 @@ args=""
 bin/installAll
 
 cd src/svd.maintainer/
-mvn -T 2C -e exec:java -Dexec.args=$args $@
+mvn -T 8C -e exec:java -Dexec.args=$args $@
 
 exit 0
