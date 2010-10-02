@@ -17,7 +17,7 @@ object Config {
     
     final val mainPropertiesFile = "svd.properties"
     
-    final val loggermainPropertiesFile = "logger.properties"
+    final val loggerPropertiesFile = "logger.properties"
 
     final val homePath = System.getProperty("user.home") + "/"
 
@@ -25,7 +25,7 @@ object Config {
     
     final val mainConfigFile = homePath + vendorDir + mainPropertiesFile
 
-    final val mainLoggerFile = homePath + vendorDir + loggermainPropertiesFile
+    final val mainLoggerFile = homePath + vendorDir + loggerPropertiesFile
 
     final val props = new Properties(mainConfigFile)
     

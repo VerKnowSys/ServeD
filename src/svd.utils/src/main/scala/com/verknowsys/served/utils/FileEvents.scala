@@ -39,6 +39,12 @@ object FileEvents {
             override def deleted(name: String) = f(name)
         }
 
+    def watchFile(directory: String, filename: String)(f: => Unit) =
+        new FileWatcher(directory, false, what = JNotify.FILE_ANY) {
+            override def created(name: String) = if(name == filename) f
+            override def modified(name: String) = if(name == filename) f
+            override def deleted(name: String) = if(name == filename) f
+        }
 }
 
 // new FileWatcher("dir", what = JNotify.FILE_MODIFIED){

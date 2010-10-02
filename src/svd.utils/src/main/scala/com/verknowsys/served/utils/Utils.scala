@@ -33,7 +33,10 @@ trait Utils {
     
     lazy val logger = {
         BasicConfigurator.resetConfiguration
-        PropertyConfigurator.configureAndWatch(Config.mainLoggerFile, Config.checkInterval)
+        val watch = FileEvents.watchFile(Config.homePath + Config.vendorDir, Config.loggerPropertiesFile) {
+            PropertyConfigurator.configure(Config.mainLoggerFile)
+        }
+        addShutdownHook { watch.stop }
         Logger.getLogger(this.getClass)
     }
     
