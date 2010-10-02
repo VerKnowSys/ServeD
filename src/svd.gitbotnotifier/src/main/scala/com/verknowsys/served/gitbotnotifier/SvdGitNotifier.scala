@@ -48,6 +48,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
     val password = "git-bot-666" // XXX: hardcode
     val resource = "served-bot-resource" // XXX: hardcode
     val chat = ListBuffer[Chat]()
+    var oldHEAD = repo.head // XXX: var :(
         
     
     def act {
@@ -87,25 +88,27 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
         
         val watchHEAD = FileEvents.watch(repo.dir + "/.git/logs") { name => name match {
             case "HEAD" =>
-                val headSha = Source.fromFile(repo.dir + "/.git/refs/heads/master").mkString.trim // XXX: hardcoded
-                logger.debug("HEAD: %s changed in repo: %s".format(headSha, repo.dir))
-                val commit = repo.history("f182450863da40028f75a2166d1b9c9934b1c7cc", headSha).map{ e => e.message }.mkString(", ") // XXX: hardcoded
-                logger.trace("Commit: " + commit)
-                chat.foreach { chatRecipient =>
-                    try {
-                        if (commit != null) {
+                logger.debug("HEAD changed in repo: %s".format(repo.dir))
+                
+                repo.history(oldHEAD).foreach { commit =>
+                    logger.trace("Commit: " + commit)
+                    val message = "%s %s\n%s".format(commit.date, commit.author.nameAndEmail, commit.message)
+                    
+                    chat.foreach { chatRecipient =>
+                        try {
                             logger.debug("Trying to send messages, to User: " + chatRecipient.getParticipant)
-                            chatRecipient.sendMessage(commit)
-                            logger.trace("Sent message: " + commit + " length: " + commit.length)
-                        } else {
-                            chatRecipient.sendMessage("Emptiness")
+                            chatRecipient.sendMessage(message)
+                            logger.trace("Sent message: " + message + " length: " + message.length)
+                        } catch {
+                            case e: Throwable =>
+                                logger.info("### Error " + e + "\nTrying to put commit onto list cause errors.")
+                                // DbAddCommit.writeCommitToDataBase(new Commit(commitSha))
                         }
-                    } catch {
-                        case e: Throwable =>
-                            logger.info("### Error " + e + "\nTrying to put commit onto list cause errors.")
-                            // DbAddCommit.writeCommitToDataBase(new Commit(commitSha))
                     }
                 }
+                
+                oldHEAD = repo.head
+
                 
             case x: AnyRef =>
                 logger.warn("Command not recognized. GitNotifier will ignore You: " + x.toString)
