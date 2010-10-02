@@ -28,7 +28,7 @@ class Commit(val origin: RevCommit) {
      *
      * @author teamon
      */
-    def date = new Date(origin.getCommitTime)
+    def date = new Date(origin.getCommitTime.toLong * 1000)
 
     /**
      * Returns commit`s SHA1

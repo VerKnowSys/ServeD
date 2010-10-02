@@ -7,21 +7,17 @@ import com.verknowsys.served.git._
 import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
-
-// import com.verknowsys.served.utils.signals.{ProcessMessages, MainLoop, Init, Quit}
-// import java.io.OutputStreamWriter
-// import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import scala.actors._
 import scala.io._
+import scala.collection.mutable.ListBuffer
+import scala.collection.JavaConversions._
+import java.text.SimpleDateFormat
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
-import scala.collection.mutable.ListBuffer
-import scala.collection.JavaConversions._
 
 
 class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener with Utils {
-
 
     def processMessage(chat: Chat, message: Message) {
         logger.debug("Received message: " + message)
@@ -92,7 +88,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                 
                 repo.history(oldHEAD).foreach { commit =>
                     logger.trace("Commit: " + commit)
-                    val message = "%s %s\n%s".format(commit.date, commit.author.nameAndEmail, commit.message)
+                    val message = "%s\n%s %s\n%s".format(commit.sha, new SimpleDateFormat("yyyy-MM-dd HH:mm").format(commit.date), commit.author.nameAndEmail, commit.message)
                     
                     chat.foreach { chatRecipient =>
                         try {
