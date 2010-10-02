@@ -100,6 +100,9 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
         def closeConnection = connection.disconnect
 
 
+        // XXX: This doesnt work for bare repos.
+        // in bare there is refs/heads/master file instead of .git/logs/HEAD
+        // change this to FileEvents.watchFile(repo.headPath) { ... }
         val watchHEAD = FileEvents.watch(repo.dir + "/.git/logs") { name => name match {
             case "HEAD" =>
                 logger.debug("HEAD changed in repo: %s".format(repo.dir))
