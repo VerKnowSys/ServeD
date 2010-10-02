@@ -12,6 +12,7 @@ import com.verknowsys.served.utils.signals._
 // import java.io.OutputStreamWriter
 // import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 import scala.actors._
+import scala.io._
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
@@ -24,20 +25,20 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
 
     def processMessage(chat: Chat, message: Message) {
         logger.debug("Received message: " + message)
-    //     logger.debug("*** Received message: " + message + " (\"" + message.getBody + "\")")
-    //     if (message.getFrom.contains("verknowsys.com")) {   // XXX: hardcoded value
-    //         logger.debug("Message contains dmilith: " + message.getFrom)
-    //         message.getBody match {
-    //             case "last" =>
-    //                 chat.sendMessage("Requested last commit.\nNYI")
-    //             case "last5" =>
-    //                 chat.sendMessage("Requested last 5 commits.\nNYI")
-    //             case "last10" =>
-    //                 chat.sendMessage("Requested last 10 commits.\nNYI")
-    //             case "help" =>
-    //                 chat.sendMessage("No help for noobs")
-    //         }
-    //     }
+        logger.debug("*** Received message: " + message + " (\"" + message.getBody + "\")")
+        if (message.getFrom.contains("verknowsys.com")) {   // XXX: hardcoded value
+            logger.debug("Message contains verknowsys: " + message.getFrom)
+            message.getBody match {
+                case "last" =>
+                    chat.sendMessage("Requested last commit.\nNYI")
+                case "last5" =>
+                    chat.sendMessage("Requested last 5 commits.\nNYI")
+                case "last10" =>
+                    chat.sendMessage("Requested last 10 commits.\nNYI")
+                case "help" =>
+                    chat.sendMessage("No help for noobs")
+            }
+        }
     }
         
     
@@ -46,18 +47,16 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
         val config = new ConnectionConfiguration("verknowsys.com", 65222) // XXX: hardcode
         val connection = new XMPPConnection(config)
         val presence = new Presence(Presence.Type.available)
-        val login = "git-bot"
-        val password = "git-bot-666"
-        val resource = "served-bot-resource"
+        val login = "git-bot" // XXX: hardcode
+        val password = "git-bot-666" // XXX: hardcode
+        val resource = "served-bot-resource" // XXX: hardcode
         val chat = ListBuffer[Chat]()
         
         
         def initConnection = {
-            debug {
-                XMPPConnection.DEBUG_ENABLED = true
-            }
+            // XMPPConnection.DEBUG_ENABLED = true
             config.setCompressionEnabled(true)
-            config.setSASLAuthenticationEnabled(false)
+            config.setSASLAuthenticationEnabled(true)
             connection.connect
             logger.debug("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
             try {
@@ -90,8 +89,9 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
         
         val watchHEAD = FileEvents.watch(repo.dir + "/.git/logs") { name => name match {
             case "HEAD" =>
-                logger.debug("HEAD changed in repo: " + repo.dir)
-                val commit = repo.history("f182450863da40028f75a2166d1b9c9934b1c7cc", "76c3ac1756ec33f218324f8ecd70bd3071a53f74").map{ e => e.message }.mkString(", ") // XXX: hardcoded
+                val headSha = Source.fromFile(repo.dir + "/.git/refs/heads/master").mkString.trim // XXX: hardcoded
+                logger.debug("HEAD: %s changed in repo: %s".format(headSha, repo.dir))
+                val commit = repo.history("f182450863da40028f75a2166d1b9c9934b1c7cc", headSha).map{ e => e.message }.mkString(", ") // XXX: hardcoded
                 logger.debug("Commit: " + commit)
                 chat.foreach { chatRecipient =>
                     try {
@@ -109,7 +109,8 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                     }
                 }
                 
-            case _ =>
+            case x: AnyRef =>
+                logger.warn("Command not recognized. GitNotifier will ignore You: " + x.toString)
         }}
         
         
@@ -124,7 +125,9 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                     closeConnection
                     exit
                     
-                case _ =>
+                case x: AnyRef =>
+                    logger.warn("Command not recognized. GitNotifier will ignore signal: " + x.toString)
+                
             }
         }
     }
