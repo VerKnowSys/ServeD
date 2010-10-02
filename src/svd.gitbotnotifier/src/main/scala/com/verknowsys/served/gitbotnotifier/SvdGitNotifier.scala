@@ -55,15 +55,14 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
         }
     }
 
-    val config = new ConnectionConfiguration("verknowsys.com", 65222) // XXX: hardcode
+    val config = new ConnectionConfiguration(props("xmpp.host") getOrElse "localhost", props.int("xmpp.port") getOrElse 0)
     val connection = new XMPPConnection(config)
     val presence = new Presence(Presence.Type.available)
-    val login = "git-bot" // XXX: hardcode
-    val password = "git-bot-666" // XXX: hardcode
-    val resource = "served-bot-resource" // XXX: hardcode
+    val login = props("xmpp.login") getOrElse "gitbot"
+    val password = props("xmpp.password") getOrElse "pass"
+    val resource = props("xmpp.resource") getOrElse "served-bot-resource"
     val chat = ListBuffer[Chat]()
     var oldHEAD = repo.head // XXX: var :(
-
 
     def act {
 
