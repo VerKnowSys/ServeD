@@ -1,6 +1,6 @@
 package com.verknowsys.served
 
-import org.eclipse.jgit.lib.{ObjectId, PersonIdent}
+import org.eclipse.jgit.lib.{ObjectId, PersonIdent, Ref}
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.transport.URIish
 
@@ -15,6 +15,8 @@ package object git {
     implicit def PersonIdentToAuthor(c: PersonIdent) = new Author(c)
 
     implicit def StringToObjectId(s: String) = ObjectId.fromString(s)
+
+    implicit def RefToObjectId(r: Ref) = r.getObjectId
 
     implicit def StringToURIish(s: String) = new URIish(s)
 }

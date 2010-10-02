@@ -91,24 +91,10 @@ object GitRepository {
 
     // XXX Remove this
     // Run with $ mvn scala:run -DmainClass=com.verknowsys.served.git.GitRepository
-    def main(args: Array[String]): Unit = {
-        //         val repo = new GitRepository("/Users/teamon/Desktop/jgittest/deploy")
-        //         // val repo = new GitRepository("/Users/teamon/code/verknowsys/ServeD")
-        // println("\nRepo history:")
-        // repo.history.take(10).foreach { c =>
-        //  println(c.sha)
-        //  println(c.author.nameAndEmail)
-        //  println(c.message)
-        //  println()
-        // }
-        // 
-        // repo.pull
-
-        val repo = GitRepository.create("/Users/teamon/Desktop/jgittest/tsst")
-        repo.addRemote("origin", "/Users/teamon/Desktop/jgittest/org.git")
-        repo.pull
-
-    }
+    // def main(args: Array[String]): Unit = {
+    //     val repo = new GitRepository("/Users/teamon/code/verknowsys/ServeD")
+    //     println(repo.history("23ec4881666527bfd60537fdb83ef3e9b841dd65").toList.size)
+    // }
 }
 
 /**
@@ -133,6 +119,13 @@ class GitRepository(val dir: String) {
      * @author teamon
      */
     def history = git.log.call
+    
+    /**
+     * Returns commit history (all commits)
+     *
+     * @author teamon
+     */
+    def head = gitRepo.getRef("HEAD")
 
     /**
      * Returns commit history for specified range
@@ -146,7 +139,8 @@ class GitRepository(val dir: String) {
      *
      * @author teamon
      */
-    def history(from: AnyObjectId, to: AnyObjectId) = git.log.addRange(from, to).call
+    def history(from: AnyObjectId, to: AnyObjectId = head) = git.log.addRange(from, to).call
+    
 
     /**
      * Returns map of authors: (Author`s name and email -> number of commits)
