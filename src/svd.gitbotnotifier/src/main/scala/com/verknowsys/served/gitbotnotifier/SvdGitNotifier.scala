@@ -16,9 +16,27 @@ import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
 
-
+/**
+ *   Git repository XMPP notifier
+ *
+ *   @author dmilith, teamon
+ *
+ *   @example
+ *       import com.verknowsys.served.gitbotnotifier._
+ *       import com.verknowsys.served.git._
+ *       import com.verknowsys.serverd.utils.signals._
+ *
+ *       val gitNotifier = new SvdGitNotifier("/path/to/repository"))
+ *       gitNotifier.start
+ *       gitNotifier ! Init
+ *
+ */
 class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener with Utils {
 
+    /**
+     *   Handles incomming messages
+     *   @author dmilith
+     */
     def processMessage(chat: Chat, message: Message) {
         logger.debug("Received message: " + message)
         logger.debug("*** Received message: " + message + " (\"" + message.getBody + "\")")
@@ -45,8 +63,8 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
     val resource = "served-bot-resource" // XXX: hardcode
     val chat = ListBuffer[Chat]()
     var oldHEAD = repo.head // XXX: var :(
-        
-    
+
+
     def act {
 
         def initConnection = {
@@ -63,7 +81,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                     logger.debug( x.printStackTrace )
             }
             val chatmanager = connection.getChatManager
-            
+
             ("dmilith@verknowsys.com" :: "i@teamon.eu" :: Nil).foreach { user =>
                 try {
                     chat += chatmanager.createChat(user, this)
@@ -77,19 +95,19 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
             presence.setMode(Presence.Mode.dnd)
             connection.sendPacket(presence)
         }
-        
+
 
         def closeConnection = connection.disconnect
 
-        
+
         val watchHEAD = FileEvents.watch(repo.dir + "/.git/logs") { name => name match {
             case "HEAD" =>
                 logger.debug("HEAD changed in repo: %s".format(repo.dir))
-                
+
                 repo.history(oldHEAD).foreach { commit =>
                     logger.trace("Commit: " + commit)
                     val message = "%s\n%s %s\n%s".format(commit.sha, new SimpleDateFormat("yyyy-MM-dd HH:mm").format(commit.date), commit.author.nameAndEmail, commit.message)
-                    
+
                     chat.foreach { chatRecipient =>
                         try {
                             logger.debug("Trying to send messages, to User: " + chatRecipient.getParticipant)
@@ -102,36 +120,36 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                         }
                     }
                 }
-                
+
                 oldHEAD = repo.head
 
-                
+
             case x: AnyRef =>
                 logger.warn("Command not recognized. GitNotifier will ignore You: " + x.toString)
         }}
-        
-        
+
+
         Actor.loop {
             receive {
                 case Init =>
                     initConnection
                     logger.info("Git Notifier ready")
-                    
+
                 case Quit =>
                     closeConnection
                     logger.info("Quitting Git Notifier")
                     // exit
-                    
+
                 case x: AnyRef =>
                     logger.warn("Command not recognized. GitNotifier will ignore signal: " + x.toString)
-                
+
             }
         }
     }
-    
+
 }
 
-
+// XXX: Remove this
  // addShutdownHook {
  //   XMPPActor ! Quit
  //    ODBServerActor ! Quit
@@ -139,7 +157,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
  //   SvdBot ! Quit
  //   logger.info("Done\n")
  // }
-// 
+//
 //   // NOTE: when in standalone mode:
 //  def main(args: Array[String]) {
 //    setLoggerLevelDebug(if (props.bool("debug") getOrElse true) Level.TRACE else Level.INFO)
@@ -147,14 +165,14 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
 //    logger.debug("Params: " + args + ". Params size: " + args.length)
 //    this.start
 //  }
-//  
+//
 //  override def act = {
 //     // ODBServerActor.start
 //     // ODBServerActor ! Init
 //    XMPPActor.start
 //    XMPPActor ! Init
 // //   IRCActor.start
-//    
+//
 //    react {
 //      case MainLoop => {
 //        Actor.loop {
@@ -168,5 +186,5 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
 //    }
 //    logger.info("Ready to serve. waiting for orders.")
 //  }
-//  
+//
 // }

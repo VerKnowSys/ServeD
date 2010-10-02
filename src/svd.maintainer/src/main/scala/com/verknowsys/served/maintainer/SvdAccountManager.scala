@@ -63,7 +63,7 @@ object SvdAccountManager extends Actor with Utils {
                 logger.debug("Nothing")
         }
         
-        val gitNotifier = new SvdGitNotifier(new GitRepository("/Users/teamon/Desktop/jgittest/noti")) // XXX: hardcoded
+        val gitNotifier = new SvdGitNotifier("/Users/teamon/Desktop/jgittest/noti") // XXX: hardcoded
 
         val watchEtc = new FileWatcher(Config.etcPath, recursive = false) {
             override def created(name: String) {
