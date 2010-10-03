@@ -9,7 +9,6 @@
 	<inceptionYear>2009</inceptionYear>
 	<properties>
 		<neodatis.version>1.9.21.670</neodatis.version>
-		<build.platform>mac</build.platform> <!--> XXX: Hack!!! -->
 	</properties>
 
 	<repositories>
