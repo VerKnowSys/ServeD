@@ -63,7 +63,7 @@ object SvdAccountManager extends Actor with Utils {
                 logger.debug("Nothing")
         }
         
-        val gitNotifier = new SvdGitNotifier("/Users/teamon/Desktop/jgittest/org.git") // XXX: hardcoded
+        val gitNotifier = new SvdGitNotifier("/git/ServeD.git") // XXX: hardcoded
 
         val watchEtc = new FileWatcher(Config.etcPath, recursive = false) {
             override def created(name: String) {
@@ -74,8 +74,6 @@ object SvdAccountManager extends Actor with Utils {
             override def modified(name: String) {
                 logger.debug("File modified: " + name)
                 matchIt(name)
-
-                // Thread sleep Config.checkInterval
                 // SvdMaintainer ! Message("Modified file: " + name)
             }
 

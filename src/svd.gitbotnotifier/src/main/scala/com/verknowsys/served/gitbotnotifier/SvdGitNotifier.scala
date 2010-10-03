@@ -95,7 +95,8 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
 
 
         def closeConnection = connection.disconnect
-
+        logger.trace("Git head path: " + repo.headPath)
+        
         val watchHEAD = FileEvents.watchFile(repo.headPath) {
             logger.debug("HEAD changed in repo: %s".format(repo.dir))
 
@@ -111,7 +112,6 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                     } catch {
                         case e: Throwable =>
                             logger.info("### Error " + e + "\nTrying to put commit onto list cause errors.")
-                            // DbAddCommit.writeCommitToDataBase(new Commit(commitSha))
                     }
                 }
             }
@@ -129,7 +129,6 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                 case Quit =>
                     closeConnection
                     logger.info("Quitting Git Notifier")
-                    // exit
 
                 case x: AnyRef =>
                     logger.warn("Command not recognized. GitNotifier will ignore signal: " + x.toString)
