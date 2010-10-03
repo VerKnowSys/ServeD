@@ -33,13 +33,15 @@ trait Utils {
     
     lazy val logger = {
         BasicConfigurator.resetConfiguration
-        PropertyConfigurator.configure(Config.mainLoggerFile)
-        
-        val watch = FileEvents.watchFile(Config.mainLoggerFile) {
-            PropertyConfigurator.configure(Config.mainLoggerFile)
-        }
+        reloadLoggerConfiguration
+        val watch = FileEvents.watchFile(Config.mainLoggerFile) { reloadLoggerConfiguration }
         addShutdownHook { watch.stop }
         Logger.getLogger(this.getClass)
+    }
+    
+    def reloadLoggerConfiguration {
+        try { PropertyConfigurator.configure(Config.mainLoggerFile) } 
+        catch { case _ => logger.error("Couldn`t load file %s".format(Config.mainLoggerFile)) }
     }
     
 

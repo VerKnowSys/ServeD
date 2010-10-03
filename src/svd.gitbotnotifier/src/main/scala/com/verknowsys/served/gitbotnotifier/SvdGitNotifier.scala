@@ -4,11 +4,9 @@
 package com.verknowsys.served.gitbotnotifier
 
 import com.verknowsys.served.git._
-import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 import scala.actors._
-import scala.io._
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
 import java.text.SimpleDateFormat
