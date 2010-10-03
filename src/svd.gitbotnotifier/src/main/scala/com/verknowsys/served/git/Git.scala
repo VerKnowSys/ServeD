@@ -98,9 +98,14 @@ object GitRepository {
 class GitRepository(val dir: String) extends Utils {
     lazy val (gitRepo, isBare) = {
         val file = new File(dir, ".git")
-        logger.trace("Binding git repository of dir: %s, file: %s".format(dir, file))
-        if(file.exists) (new FileRepository(file), false)
-            else (new FileRepository(dir), true)
+        logger.trace("Git repository watch. Dir: %s, File: %s".format(dir, file))
+        if(file.exists) {
+            logger.trace("File exists. Loading normal repository")
+            (new FileRepository(file), false)
+        } else {
+            logger.trace("File not exists. Loading bare repository")
+            (new FileRepository(dir), true)
+        }
     }
     
     lazy val git = new Git(gitRepo)
