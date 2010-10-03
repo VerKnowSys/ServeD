@@ -65,6 +65,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
     def act {
 
         def initConnection = {
+            logger.debug("Initiating GitNotifier connection")
             // XMPPConnection.DEBUG_ENABLED = true
             config.setCompressionEnabled(true)
             config.setSASLAuthenticationEnabled(true)
