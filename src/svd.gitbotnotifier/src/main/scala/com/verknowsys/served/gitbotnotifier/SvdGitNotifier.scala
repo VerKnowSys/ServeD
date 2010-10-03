@@ -37,10 +37,9 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
      *   @author dmilith
      */
     def processMessage(chat: Chat, message: Message) {
-        logger.debug("Received message: " + message)
-        logger.debug("*** Received message: " + message + " (\"" + message.getBody + "\")")
+        logger.trace("Received message: " + message + " (\"" + message.getBody + "\")")
         if (message.getFrom.contains("verknowsys.com")) {   // XXX: hardcoded value
-            logger.debug("Message contains verknowsys: " + message.getFrom)
+            logger.trace("Message contains verknowsys: " + message.getFrom)
             message.getBody match {
                 case "last" =>
                     chat.sendMessage("Requested last commit.\nNYI")
