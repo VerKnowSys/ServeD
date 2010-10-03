@@ -1,5 +1,8 @@
 package com.verknowsys.served.git
 
+
+import com.verknowsys.served.utils._
+
 import scala.collection.mutable.Map
 import scala.collection.JavaConversions._
 import org.eclipse.jgit.api._
@@ -92,11 +95,12 @@ object GitRepository {
  *
  * @author teamon
  */
-class GitRepository(val dir: String) {
+class GitRepository(val dir: String) extends Utils {
     lazy val (gitRepo, isBare) = {
         val file = new File(dir, ".git")
+        logger.trace("Binding git repository of dir: %s, file: %s".format(dir, file))
         if(file.exists) (new FileRepository(file), false)
-        else (new FileRepository(new File(dir)), true)
+            else (new FileRepository(dir), true)
     }
     
     lazy val git = new Git(gitRepo)
