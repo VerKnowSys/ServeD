@@ -53,32 +53,32 @@ case class Account(
 
 object SvdAccountManager extends Actor with Utils {
     def act {
-        logger.debug("Java Library Path Property: " + System.getProperty("java.library.path"))
+        logger.trace("Java Library Path Property: " + System.getProperty("java.library.path"))
 
         def matchIt(name: String) = name match {
             case Config.passwdFileName =>
                 SvdMaintainer ! Message("Modified or Created system password file: " + Config.passwdFileName)
 
             case _ =>
-                logger.debug("Nothing")
+                logger.trace("Nothing")
         }
         
         val gitNotifier = new SvdGitNotifier("/git/ServeD.git") // XXX: hardcoded
 
         val watchEtc = new FileWatcher(Config.etcPath, recursive = false) {
             override def created(name: String) {
-                logger.debug("File created: " + name)
+                logger.trace("File created: " + name)
                 matchIt(name)
             }
 
             override def modified(name: String) {
-                logger.debug("File modified: " + name)
+                logger.trace("File modified: " + name)
                 matchIt(name)
                 // SvdMaintainer ! Message("Modified file: " + name)
             }
 
             override def deleted(name: String) {
-                logger.debug("File deleted: " + name)
+                logger.trace("File deleted: " + name)
             }
         }
 
@@ -87,7 +87,7 @@ object SvdAccountManager extends Actor with Utils {
                 case Init =>
                     logger.debug("AccountManager ready for tasks")
                     logger.debug("Initialized watch for " + Config.etcPath)
-                    logger.debug("WatchEtc: " + watchEtc)
+                    logger.trace("WatchEtc: " + watchEtc)
                     gitNotifier.start
                     gitNotifier ! Init
                     logger.info("GitNotifier initialized…")
@@ -97,7 +97,7 @@ object SvdAccountManager extends Actor with Utils {
                     gitNotifier ! Quit
                     // exit
                 case GetUsers =>
-                    logger.debug("Sending Users… ")
+                    logger.trace("Sending Users… ")
                     SvdMaintainer ! GetUsers(getUsers)
                 // getAccountSize("_carddav") // XXX: hardcoded for test
                 // getAccountSize("nonExistantOne") // XXX: hardcoded for test
