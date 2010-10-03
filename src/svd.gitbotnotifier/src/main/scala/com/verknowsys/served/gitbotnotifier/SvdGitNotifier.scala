@@ -116,9 +116,9 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                 }
             }
 
-            logger.trace("OldHead sha: %s".format(oldHead))
+            logger.trace("OldHead sha: %s".format(oldHEAD))
             oldHEAD = repo.head
-            logger.trace("Assigned new sha: %s to oldHead".format(oldHead))
+            logger.trace("Assigned new sha: %s to oldHead".format(oldHEAD))
         }
 
 
