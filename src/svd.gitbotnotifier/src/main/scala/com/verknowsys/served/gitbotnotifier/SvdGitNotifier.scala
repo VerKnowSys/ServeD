@@ -98,7 +98,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
         logger.trace("Git head path: " + repo.headPath)
         
         val watchHEAD = FileEvents.watchFile(repo.headPath) {
-            logger.debug("HEAD changed in repo: %s".format(repo.dir))
+            logger.trace("HEAD changed in repo: %s".format(repo.dir))
 
             repo.history(oldHEAD).foreach { commit =>
                 logger.trace("Commit: " + commit)
@@ -116,7 +116,9 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                 }
             }
 
+            logger.trace("OldHead sha: %s".format(oldHead))
             oldHEAD = repo.head
+            logger.trace("Assigned new sha: %s to oldHead".format(oldHead))
         }
 
 
