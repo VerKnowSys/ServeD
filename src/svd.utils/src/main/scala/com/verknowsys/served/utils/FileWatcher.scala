@@ -2,11 +2,13 @@ package com.verknowsys.served.utils
 
 import net.contentobjects.jnotify._
 
+
 class FileWatcher(directory: String, recursive: Boolean = false, what: Int = JNotify.FILE_ANY) {
     
-    logger.debug("Watching directory: %s".format(directory))
-    
     val watchID = JNotify.addWatch(directory, what, recursive, new JNotifyListener {
+        
+        // logger.debug("Watching directory: %s".format(directory))
+        
         def fileRenamed(wd: Int, rootPath: String, oldName: String, newName: String) = renamed(oldName, newName)
 
         def fileModified(wd: Int, rootPath: String, name: String) = modified(name)
