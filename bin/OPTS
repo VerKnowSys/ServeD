@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Multithreaded, 2 Cores for process:
-#alias mvn='mvn -T 2C'
-
-
 if [ `uname` == "Linux" ]; then
     platform="linux";
 elif [ `uname` == "Darwin" ]; then

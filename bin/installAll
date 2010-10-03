@@ -7,6 +7,5 @@ cd src/
 . ../bin/OPTS
 
 $MVN_EXEC $MVN_PARAMS install $@
-#echo "Hit Enter to perform tests, SIGINT to terminate"
-#read
-#mvn test
+
+exit 0
