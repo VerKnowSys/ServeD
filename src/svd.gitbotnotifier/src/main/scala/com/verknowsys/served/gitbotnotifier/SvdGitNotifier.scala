@@ -3,6 +3,7 @@
 
 package com.verknowsys.served.gitbotnotifier
 
+import com.verknowsys.served._
 import com.verknowsys.served.git._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
@@ -53,12 +54,12 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
         }
     }
 
-    val config = new ConnectionConfiguration(props("xmpp.host") getOrElse "localhost", props.int("xmpp.port") getOrElse 0)
+    val config = new ConnectionConfiguration(Config.xmppHost, Config.xmppPort)
     val connection = new XMPPConnection(config)
     val presence = new Presence(Presence.Type.available)
-    val login = props("xmpp.login") getOrElse "gitbot"
-    val password = props("xmpp.password") getOrElse "pass"
-    val resource = props("xmpp.resource") getOrElse "served-bot-resource"
+    val login = Config.xmppLogin
+    val password = Config.xmppPassword
+    val resource = Config.xmppResource
     val chat = ListBuffer[Chat]()
     var oldHEAD = repo.head // XXX: var :(
 

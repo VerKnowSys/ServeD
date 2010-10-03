@@ -60,10 +60,10 @@ object SvdAccountManager extends Actor with Utils {
                 SvdMaintainer ! Message("Modified or Created system password file: " + Config.passwdFileName)
 
             case _ =>
-                logger.trace("Nothing")
+                logger.trace("No trigger on file")
         }
         
-        val gitNotifier = new SvdGitNotifier("/git/ServeD.git") // XXX: hardcoded
+        val gitNotifier = new SvdGitNotifier(Config.defaultGitRepoToWatch)
 
         val watchEtc = new FileWatcher(Config.etcPath, recursive = false) {
             override def created(name: String) {
@@ -91,16 +91,18 @@ object SvdAccountManager extends Actor with Utils {
                     gitNotifier.start
                     gitNotifier ! Init
                     logger.info("GitNotifier initialized…")
+                    
                 case Quit =>
                     logger.info("Quitting AccountManager…")
                     watchEtc.stop
                     gitNotifier ! Quit
-                    // exit
+                    
                 case GetUsers =>
                     logger.trace("Sending Users… ")
                     SvdMaintainer ! GetUsers(getUsers)
                 // getAccountSize("_carddav") // XXX: hardcoded for test
                 // getAccountSize("nonExistantOne") // XXX: hardcoded for test
+                
                 case x: AnyRef =>
                     logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)
             }

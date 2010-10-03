@@ -42,7 +42,7 @@ object FileEvents {
     def watchFile(path: String)(f: => Unit) = {
         val parts = path.splitAt(path.lastIndexOf("/"))
         val filename = parts._2.splitAt(1)._2 // XXX: This is VERY ugly
-        print("Watching filename: %s of given path: %s".format(filename, path))
+        // print("Watching filename: %s of given path: %s".format(filename, path))
 
         new FileWatcher(parts._1, false, what = JNotify.FILE_ANY) {
             

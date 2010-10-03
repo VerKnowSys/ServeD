@@ -7,7 +7,7 @@ class FileWatcher(directory: String, recursive: Boolean = false, what: Int = JNo
     
     val watchID = JNotify.addWatch(directory, what, recursive, new JNotifyListener {
         
-        print("Watching directory: %s".format(directory))
+        // print("Watching directory: %s".format(directory))
         
         def fileRenamed(wd: Int, rootPath: String, oldName: String, newName: String) = renamed(oldName, newName)
 
