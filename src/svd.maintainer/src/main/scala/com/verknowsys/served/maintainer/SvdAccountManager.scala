@@ -74,8 +74,6 @@ object SvdAccountManager extends Actor with Utils {
             override def modified(name: String) {
                 logger.debug("File modified: " + name)
                 matchIt(name)
-
-                // Thread sleep Config.checkInterval
                 // SvdMaintainer ! Message("Modified file: " + name)
             }
 
