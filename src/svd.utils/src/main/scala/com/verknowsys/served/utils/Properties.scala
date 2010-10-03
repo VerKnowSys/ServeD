@@ -28,7 +28,11 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
-    def apply(key: String) = data.flatMap(_ get key)
+    def apply(key: String) = {
+        val value = data.flatMap(_ get key)
+        logger.trace("Setting props(%s) with value %s".format(key,value))
+        value
+    }
 
     /**
      * 	Get value as Int
