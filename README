@@ -1,4 +1,3 @@
-
 /**
 * ServeD Repository - Readme
 * © Copyright 2009-2010 Daniel Dettlaff and Tymon Tobolski. ® All Rights Reserved.
@@ -6,18 +5,17 @@
 */
 
 
-
 0. Requirements:
 	0.1 - Java 1.6.0_20 at least
 	0.2 - Maven 3.x
 	0.3 - POSIX compatible system
 
-
 	
 1. Instalation
 	1.1 - mvn install
 	1.2 - You may do symbolic links (or just copy) executable files located in project directory to /usr/local/bin/ for example. Do as You wish
-	
+
+
 2. Testing
   2.1 Use scala-specs
   2.2 Run all with mvn -q test
@@ -33,7 +31,10 @@ Questions?
 	- #scala.pl, #scala at irc.freenode.net
 	- dmilith@verknowsys.com on jabber/mail
 	- dmilith@gmail.com on google sucking asses jabber/mail
-
+	
+	And I'm as "teamon" on:
+	- #scala.pl, #scala at irc.freenode.net
+	- i@teamon.eu on jabber/mail
 
 
 
