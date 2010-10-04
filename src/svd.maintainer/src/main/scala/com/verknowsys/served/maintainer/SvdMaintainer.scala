@@ -30,10 +30,6 @@ object SvdMaintainer extends Actor with Utils {
     def act {
         Actor.loop {
             receive {
-                // case MainLoop =>
-                // Send messages to actors
-                // SvdAccountManager ! GetUsers
-
                 case Message(x) =>
                     logger.debug("Received message: " + x)
 
