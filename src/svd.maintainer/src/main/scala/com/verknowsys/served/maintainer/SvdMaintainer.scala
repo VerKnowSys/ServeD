@@ -48,7 +48,7 @@ object SvdMaintainer extends Actor with Utils {
                     logger.debug("Content:\n" + content)
 
                 case x: AnyRef =>
-                    logger.warn("Command not recognized. Maintainer will ignore signal: " + x.toString)
+                    logger.trace("Command not recognized. Maintainer will ignore signal: " + x.toString)
 
             }
         }

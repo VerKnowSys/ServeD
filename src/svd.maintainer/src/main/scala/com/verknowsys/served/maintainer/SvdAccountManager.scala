@@ -104,7 +104,7 @@ object SvdAccountManager extends Actor with Utils {
                 // getAccountSize("nonExistantOne") // XXX: hardcoded for test
                 
                 case x: AnyRef =>
-                    logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)
+                    logger.trace("Command not recognized. AccountManager will ignore You: " + x.toString)
             }
         }
     }

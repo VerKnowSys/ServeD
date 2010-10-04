@@ -136,7 +136,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                     logger.info("Quitting Git Notifier")
 
                 case x: AnyRef =>
-                    logger.warn("Command not recognized. GitNotifier will ignore signal: " + x.toString)
+                    logger.trace("Command not recognized. GitNotifier will ignore signal: " + x.toString)
 
             }
         }
