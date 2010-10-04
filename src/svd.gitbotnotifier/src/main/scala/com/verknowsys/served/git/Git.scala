@@ -110,7 +110,8 @@ class GitRepository(val dir: String) extends Utils {
     
     lazy val git = new Git(gitRepo)
 
-    lazy val headPath = if(isBare) dir + "/refs/heads/master" else dir + "/.git/logs/HEAD"
+    lazy val (headPath, headFile) = if(isBare) (dir + "/refs/heads", "master") else (dir + "/.git/logs", "HEAD")
+    
 
     /**
      * Returns current branch name
