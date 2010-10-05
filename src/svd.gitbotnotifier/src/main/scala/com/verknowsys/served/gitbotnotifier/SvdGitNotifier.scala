@@ -105,7 +105,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
             override def renamed(o_name: String, n_name: String) = { logger.debug("RENAMED: %s -> %s".format(o_name, n_name)) ; xxx }
             
             def xxx {
-                Thread.sleep(1000); 
+                // Thread.sleep(1000); 
                 
                 logger.trace("OldHead sha: %s".format(oldHEAD))
                 oldHEAD = repo.head
