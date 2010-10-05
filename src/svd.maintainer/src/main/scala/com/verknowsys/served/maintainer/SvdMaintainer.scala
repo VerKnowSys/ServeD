@@ -22,6 +22,10 @@ import org.apache.log4j.{Level, Logger}
  */
 
 object SvdMaintainer extends Actor with Utils {
+    
+    start
+
+    
     def act {
         Actor.loop {
             receive {
@@ -53,16 +57,13 @@ object SvdMaintainer extends Actor with Utils {
     */
     def main(args: Array[String]) {
 
-        SvdMaintainer.start
-        SvdAccountManager.start
-
         logger.debug("Mainainer object size: " + sizeof(SvdMaintainer))
         logger.debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
         logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
 
         addShutdownHook {
-            SvdAccountManager ! Quit
             SvdSystemManager ! Quit
+            SvdAccountManager ! Quit
             SvdMaintainer ! Quit
         }
 

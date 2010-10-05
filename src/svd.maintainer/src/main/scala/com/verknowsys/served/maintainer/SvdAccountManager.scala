@@ -53,6 +53,9 @@ case class Account(
 
 object SvdAccountManager extends Actor with Utils {
     
+    start
+    
+    
     def act {
         logger.trace("Java Library Path Property: " + System.getProperty("java.library.path"))
 

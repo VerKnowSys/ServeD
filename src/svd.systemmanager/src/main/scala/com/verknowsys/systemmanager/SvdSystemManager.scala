@@ -19,6 +19,9 @@ import com.sun.jna.Native
 *   SystemManager - responsible for System Managment and Monitoring
 */
 object SvdSystemManager extends Actor with Utils {
+    
+    start
+
 
     def act {
         Actor.loop {
