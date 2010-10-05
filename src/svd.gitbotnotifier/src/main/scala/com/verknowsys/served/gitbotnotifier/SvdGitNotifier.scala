@@ -102,7 +102,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
             if(newFileName.contains(repo.headFile)){
                 logger.trace("HEAD changed in repo: %s".format(repo.dir))
         
-                repo.history(oldHEAD).foreach { commit =>
+                repo.history(oldHEAD).toList.reverse.foreach { commit =>
                     logger.trace("Commit: " + commit)
                     val message = "%s\n%s %s\n%s".format(commit.sha, new SimpleDateFormat("yyyy-MM-dd HH:mm").format(commit.date), commit.author.nameAndEmail, commit.message)
         
