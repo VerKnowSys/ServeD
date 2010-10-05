@@ -222,7 +222,7 @@ class GitRepository(val dir: String) extends Utils {
             case e: JGitInternalException =>
                 /// XXX Handle exception
                 /// Caused by: org.eclipse.jgit.errors.TransportException: ssh://tunemates@git.verknowsys.com/git/ServeD.git: Auth fail
-                println(e.getCause)
+                logger.error(e.getCause)
         }
     }
 }
