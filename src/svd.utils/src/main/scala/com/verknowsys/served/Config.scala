@@ -13,6 +13,8 @@ object Config {
     *
     */
 
+    final val etcPath = "/etc/"
+    final val passwdFileName = "passwd"
     final val vendorDir = ".svd/"
     final val mainPropertiesFile = "svd.properties"
     final val loggerPropertiesFile = "logger.properties"
@@ -28,8 +30,6 @@ object Config {
     *   More dynamic settings from main properties file
     */
 
-    val etcPath = props("etcPath") getOrElse defaultS("etcPath", "/etc/")
-    val passwdFileName = props("passwdFileName") getOrElse defaultS("passwdFileName", "posswd")
     val checkInterval = props.int("checkInterval") getOrElse defaultI("checkInterval", 1500)
     val sizeMultiplier = props.int("sizeMultiplier") getOrElse defaultI("sizeMultiplier", 1024)
     val defaultGitRepoToWatch = props("defaultGitRepoToWatch") getOrElse defaultS("defaultGitRepoToWatch", "/git/ServeD.git")
