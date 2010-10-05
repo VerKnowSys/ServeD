@@ -38,6 +38,7 @@ case class Account(
         val shell: String = "/bin/bash",
         val gitRepositories: ListBuffer[String] = ListBuffer[String]()
         ) {
+            
     def this(a: List[String]) = this (
         userName = a(0),
         pass = a(1),
@@ -61,7 +62,8 @@ object SvdAccountManager extends Actor with Utils {
 
         def matchIt(name: String) = name match {
             case Config.passwdFileName =>
-                SvdMaintainer ! Message("Modified or Created system password file: " + Config.passwdFileName)
+                logger.trace("Triggered (modified/created) system password file: %s".format(Config.passwdFileName))
+                SvdMaintainer ! Message("Modified or Created system passwd file")
 
             case _ =>
                 logger.trace("No trigger on file")
@@ -102,13 +104,14 @@ object SvdAccountManager extends Actor with Utils {
                     gitNotifier ! Quit
                     
                 case GetUsers =>
-                    logger.trace("Sending Users… ")
+                    logger.debug("Sending Users… ")
                     SvdMaintainer ! GetUsers(getUsers)
                 // getAccountSize("_carddav") // XXX: hardcoded for test
                 // getAccountSize("nonExistantOne") // XXX: hardcoded for test
                 
                 case x: AnyRef =>
                     logger.trace("Command not recognized. AccountManager will ignore You: " + x.toString)
+                    
             }
         }
     }

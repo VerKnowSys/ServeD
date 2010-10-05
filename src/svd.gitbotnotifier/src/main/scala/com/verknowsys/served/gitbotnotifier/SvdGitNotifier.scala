@@ -88,7 +88,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
                         logger.info("Error: " + x )
                 }
             }
-            logger.trace("Number of users: " + chat.length)
+            logger.trace("Number of users bound to be notified with repository changes: %s".format(chat.length))
             presence.setStatus("ServeD Git Bot Notifier")
             presence.setMode(Presence.Mode.dnd)
             connection.sendPacket(presence)
@@ -101,9 +101,10 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
         val watchHEAD = FileEvents.watchRenamed(repo.headPath){ (oldFileName, newFileName) =>
             if(newFileName.contains(repo.headFile)){
                 logger.trace("HEAD changed in repo: %s".format(repo.dir))
-        
+                
                 repo.history(oldHEAD).toList.reverse.foreach { commit =>
                     logger.trace("Commit: " + commit)
+                    presence.setStatus("ServeD Git Bot Notifier (last: %s)".format(commit.sha))
                     val message = "%s\n%s %s\n%s".format(commit.sha, new SimpleDateFormat("yyyy-MM-dd HH:mm").format(commit.date), commit.author.nameAndEmail, commit.message)
         
                     chat.foreach { chatRecipient =>
