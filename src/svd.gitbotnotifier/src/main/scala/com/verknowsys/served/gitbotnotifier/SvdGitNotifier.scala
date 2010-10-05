@@ -98,7 +98,7 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
         def closeConnection = connection.disconnect
         logger.trace("Git head path: " + repo.headPath)
         
-        val debugWatch = new FileWatcher(repo.dir, true) with Utils {
+        val debugWatch = new FileWatcher(repo.headPath) with Utils {
             override def created(name: String) = logger.debug("CREATED: %s".format(name))
             override def modified(name: String) = logger.debug("MODIFIED: %s".format(name))
             override def deleted(name: String) = logger.debug("DELETED: %s".format(name))
