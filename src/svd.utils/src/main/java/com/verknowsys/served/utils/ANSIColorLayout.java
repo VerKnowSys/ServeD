@@ -42,6 +42,7 @@ public class ANSIColorLayout extends PatternLayout {
 
     public static final String DEFAULT_COLOR_ALL = "\u001B[1;37m";
     public static final String DEFAULT_COLOR_FATAL = "\u001B[0;31m";
+    public static final String DEFAULT_COLOR_TRACE = "\u001B[0;35m";
     public static final String DEFAULT_COLOR_ERROR = "\u001B[0;31m";
     public static final String DEFAULT_COLOR_WARN = "\u001B[1;33m";
     public static final String DEFAULT_COLOR_INFO = "\u001B[0;37m";
@@ -68,6 +69,7 @@ public class ANSIColorLayout extends PatternLayout {
      */
     public void setDefaultColors() {
         all = DEFAULT_COLOR_ALL;
+        trace = DEFAULT_COLOR_TRACE;
         fatal = DEFAULT_COLOR_FATAL;
         error = DEFAULT_COLOR_ERROR;
         warn = DEFAULT_COLOR_WARN;
@@ -156,6 +158,20 @@ public class ANSIColorLayout extends PatternLayout {
     }
 
     /**
+     * Trace - color string for trace events.
+     */
+    private String trace;
+
+    public String getTrace() {
+        return trace;
+    }
+
+    public void setTrace(String inp) {
+        trace = inp;
+    }
+
+
+    /**
      * stacktrace - color string for stacktrace events.  Default is red.
      */
     private String stacktrace;
@@ -200,6 +216,9 @@ public class ANSIColorLayout extends PatternLayout {
             case Level.INFO_INT:
                 oBuffer.append(info);
                 break;
+            case Level.TRACE_INT:
+                oBuffer.append(trace);
+                break;    
             case Level.DEBUG_INT:
                 oBuffer.append(debug);
                 break;
