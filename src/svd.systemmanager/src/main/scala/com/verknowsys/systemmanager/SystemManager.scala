@@ -15,8 +15,8 @@ import com.sun.jna.Native
 import java.nio.charset.Charset
 
 
-object SignalsPOSIX extends Enumeration {
-    type SignalsPOSIX = Value
+object POSIXSignals extends Enumeration {
+    type POSIXSignals = Value
     val SIGKILL, SIGHUP, SIGTERM, SIGINT, SIGABRT, SIGCONT, SIGSTOP = Value
 }
 
@@ -54,15 +54,15 @@ object SystemManager extends Utils {
         posix.rename("/tmp/newdir", "/tmp/renamedir")
         posix.touch("/tmp/renamedir/file1")
         posix.chmod("/tmp/renamedir/file1", 0755)
-        sendSignalToPid(SignalsPOSIX.SIGHUP, 1234)
+        sendSignalToPid(POSIXSignals.SIGHUP, 1234)
     }
     
     
-    def sendSignalToPid(signal: SignalsPOSIX.Value, pid: Int) =
+    def sendSignalToPid(signal: POSIXSignals.Value, pid: Int) =
         signal match {
-            case SignalsPOSIX.SIGHUP =>
+            case POSIXSignals.SIGHUP =>
                 logger.trace("SigHUP sent to process pid: %s")
-            case SignalsPOSIX.SIGSTOP =>
+            case POSIXSignals.SIGSTOP =>
                 logger.trace("SigHUP sent to process pid: %s")
         }
 
