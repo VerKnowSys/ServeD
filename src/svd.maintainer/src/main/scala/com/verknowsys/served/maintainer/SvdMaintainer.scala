@@ -12,12 +12,6 @@ import scala.collection.JavaConversions._
 import actors.Actor
 import org.apache.log4j.{Level, Logger}
 
-/**
- * User: dmilith
- * Date: Dec 6, 2009
- * Time: 2:51:47 AM
- */
-
 
 /**
  * @author dmilith
