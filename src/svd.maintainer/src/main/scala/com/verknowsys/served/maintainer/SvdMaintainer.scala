@@ -7,6 +7,7 @@ package com.verknowsys.served.maintainer
 import com.verknowsys.served.Config
 import com.verknowsys.served.utils.Utils
 import com.verknowsys.served.utils.signals.{ProcessMessages, MainLoop, Quit, Init}
+import com.verknowsys.served.systemmanager._
 
 import scala.collection.JavaConversions._
 import actors.Actor
@@ -25,10 +26,10 @@ object SvdMaintainer extends Actor with Utils {
         Actor.loop {
             receive {
                 case Message(x) =>
-                    logger.debug("Received message: " + x)
+                    logger.trace("Received message: " + x)
 
                 case Init =>
-                    logger.debug("Maintainer ready for tasks")
+                    logger.info("Maintainer ready")
 
                 case Quit =>
                     logger.info("Quitting Maintainer…")
@@ -59,25 +60,21 @@ object SvdMaintainer extends Actor with Utils {
         logger.debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
         logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
 
-
         addShutdownHook {
             SvdAccountManager ! Quit
+            SvdSystemManager ! Quit
             SvdMaintainer ! Quit
         }
 
         logger.info("Maintainer is loading…")
         SvdMaintainer ! Init
+        
         logger.info("AccountManager is loading…")
         SvdAccountManager ! Init
+        
+        logger.info("SystemManager is loading…")
+        SvdSystemManager ! Init
 
-        // logger.info("Entering main loop…")
-        // while (true) {
-            // debug {
-                // System.out.print("…")
-            // }
-            // SvdMaintainer ! MainLoop
-            // Thread sleep Config.checkInterval
-        // }
     }
 
 

@@ -7,7 +7,7 @@ import org.specs._
 import java.io._
 
 
-class SystemManagerTest extends SpecificationWithJUnit {
+class SvdSystemManagerTest extends SpecificationWithJUnit {
 
     "SystemManager object" should {
         
@@ -22,14 +22,14 @@ class SystemManagerTest extends SpecificationWithJUnit {
         
         
         "make usage of posix functions well" in {
-            SystemManager.posix.mkdir("/tmp/newdir", 0777)
+            SvdSystemManager.posix.mkdir("/tmp/newdir", 0777)
             (new File("/tmp/newdir")).exists must_== true
             (new File("/tmp/newdir")).isDirectory must_== true
-            SystemManager.posix.rename("/tmp/newdir", "/tmp/renamedir")
+            SvdSystemManager.posix.rename("/tmp/newdir", "/tmp/renamedir")
             (new File("/tmp/newdir")).exists must_== false
             (new File("/tmp/renamedir")).exists must_== true
             (new File("/tmp/renamedir")).isDirectory must_== true
-            SystemManager.posix.chmod("/tmp/renamedir/file1", 0755)
+            SvdSystemManager.posix.chmod("/tmp/renamedir/file1", 0755)
         }
     }
             

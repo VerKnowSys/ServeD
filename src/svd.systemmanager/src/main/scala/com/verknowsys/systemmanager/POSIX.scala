@@ -10,14 +10,6 @@ import com.sun.jna.Library
 /**
 *   @author dmilith
 *   
-*   Case classes which depends on POSIXSignals
-*/
-case case SendSignal(val signal: POSIXSignals, val pid: Int)
-
-
-/**
-*   @author dmilith
-*   
 *   POSIXSignals enum definition
 */
 object POSIXSignals extends Enumeration(initial = 1) {
@@ -55,6 +47,15 @@ object POSIXSignals extends Enumeration(initial = 1) {
         SIGPWR,
         SIGSYS = Value
 }
+
+
+/**
+*   @author dmilith
+*   
+*   Case classes which depends on POSIXSignals
+*/
+import POSIXSignals._
+case class SendSignal(val signal: POSIXSignals = SIGINT, val pid: Int)
 
 
 /**

@@ -91,7 +91,7 @@ object SvdAccountManager extends Actor with Utils {
                     logger.trace("WatchEtc: " + watchEtc)
                     gitNotifier.start
                     gitNotifier ! Init
-                    logger.info("GitNotifier initialized…")
+                    logger.info("GitNotifier ready")
                     
                 case Quit =>
                     logger.info("Quitting AccountManager…")
