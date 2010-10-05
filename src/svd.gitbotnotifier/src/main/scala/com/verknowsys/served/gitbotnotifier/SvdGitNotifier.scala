@@ -99,10 +99,18 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with MessageListener wit
         logger.trace("Git head path: " + repo.headPath)
         
         val debugWatch = new FileWatcher(repo.headPath) with Utils {
-            override def created(name: String) = { Thread.sleep(1000); logger.debug("CREATED: %s".format(name)) }
-            override def modified(name: String) = { Thread.sleep(1000); logger.debug("MODIFIED: %s".format(name)) }
-            override def deleted(name: String) = { Thread.sleep(1000); logger.debug("DELETED: %s".format(name)) }
-            override def renamed(o_name: String, n_name: String) = { Thread.sleep(1000); logger.debug("RENAMED: %s -> %s".format(o_name, n_name)) }
+            override def created(name: String) = { logger.debug("CREATED: %s".format(name)); xxx }
+            override def modified(name: String) = { logger.debug("MODIFIED: %s".format(name)); xxx }
+            override def deleted(name: String) = { logger.debug("DELETED: %s".format(name)); xxx }
+            override def renamed(o_name: String, n_name: String) = { logger.debug("RENAMED: %s -> %s".format(o_name, n_name)) ; xxx }
+            
+            def xxx {
+                Thread.sleep(1000); 
+                
+                logger.trace("OldHead sha: %s".format(oldHEAD))
+                oldHEAD = repo.head
+                logger.trace("Assigned new sha: %s to oldHead".format(oldHEAD))
+            }
         }
         
         // val watchHEAD = FileEvents.watch(repo.headPath){ fileName =>
