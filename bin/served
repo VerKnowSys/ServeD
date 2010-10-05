@@ -5,13 +5,7 @@
 
 args=""
 
-bin/installAll
-
-if [ "$?" == "0" ]; then
-
-  cd src/svd.maintainer/
-  $MVN_EXEC $MVN_PARAMS exec:java -Dexec.args=$args $@
-  
-fi
+cd src/svd.maintainer/
+$MVN_EXEC $MVN_PARAMS exec:java -Dexec.args=$args $@
 
 exit 0

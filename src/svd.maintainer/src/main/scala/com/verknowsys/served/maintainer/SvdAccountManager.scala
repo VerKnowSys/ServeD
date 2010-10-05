@@ -118,8 +118,8 @@ object SvdAccountManager extends Actor with Utils {
      */
     def parseUsers(users: List[String]): List[Account] =
         for (line <- users if !line.startsWith("#"))
-        yield
-            new Account(line.split(":").toList)
+            yield
+                new Account(line.split(":").toList)
 
 
     /**
