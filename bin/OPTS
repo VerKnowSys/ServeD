@@ -2,8 +2,10 @@
 
 if [ `uname` == "Linux" ]; then
     platform="linux";
+    libs="*.so"
 elif [ `uname` == "Darwin" ]; then
     platform="mac";
+    libs="*.dylib"
 fi
 
 export MVN_EXEC="/usr/bin/mvn"

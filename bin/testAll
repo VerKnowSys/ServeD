@@ -5,12 +5,7 @@
 
 . bin/OPTS
 
-echo "Running tests on platform: $platform"
-if [ $platform == "mac" ]; then
-  libs="*.dylib"
-else
-  libs="*.so"
-fi
+echo "Running tests on platform: $platform, libs: $libs"
 
 for i in {"svd.gitbotnotifier","svd.maintainer","svd.systemmanager","svd.utils"}; do
   cp -v lib/$libs src/$i/
