@@ -34,6 +34,11 @@ object SvdSystemManager extends Actor with Utils {
     def posix = Native.loadLibrary("c", classOf[POSIX]).asInstanceOf[POSIX]
 
 
+    /**
+    *   @author dmilith  
+    *   
+    *   This function will send given signal (first param), to given pid (second param)
+    */
     def sendSignalToPid(signal: POSIXSignals.Value, pid: Int) =
         signal match {
             case POSIXSignals.SIGHUP =>

@@ -7,6 +7,19 @@ package com.verknowsys.served.systemmanager
 import com.sun.jna.Library
 
 
+/**
+*   @author dmilith
+*   
+*   Case classes which depends on POSIXSignals
+*/
+case case SendSignal(val signal: POSIXSignals, val pid: Int)
+
+
+/**
+*   @author dmilith
+*   
+*   POSIXSignals enum definition
+*/
 object POSIXSignals extends Enumeration(initial = 1) {
     type POSIXSignals = Value
     val SIGHUP, // 2010-10-05 15:03:27 - dmilith - NOTE: should have value 1
@@ -44,6 +57,11 @@ object POSIXSignals extends Enumeration(initial = 1) {
 }
 
 
+/**
+*   @author dmilith
+*   
+*   POSIX trait with basic glibc functions (JNA)
+*/
 trait POSIX extends Library {
     
     def chmod(filename: String, mode: Int)

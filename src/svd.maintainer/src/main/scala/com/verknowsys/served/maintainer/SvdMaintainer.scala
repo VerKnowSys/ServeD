@@ -45,6 +45,11 @@ object SvdMaintainer extends Actor with Utils {
     }
 
 
+    /**
+    *   @author dmilith  
+    *   
+    *   ServeD Maintainer Core
+    */
     def main(args: Array[String]) {
 
         SvdMaintainer.start
