@@ -1,38 +1,29 @@
 #!/bin/bash
 # This Software is a close code project. You may not redistribute this code without permission of author.
+# @author: dmilith
+
 
 . bin/OPTS
 
+echo "Running tests on platform: $platform"
+if [ $platform == "mac" ]; then
+  libs="*.dylib"
+else
+  libs="*.so"
+fi
 
-# 2010-09-30 00:06:07 - dmilith - HACK: copy dylib or so files to utils
-cp lib/*.dylib src/svd.utils/ #2&> /dev/null
-cp lib/*.so src/svd.utils/ #2&> /dev/null
-
-cp lib/*.dylib src/svd.maintainer/ #2&> /dev/null
-cp lib/*.so src/svd.maintainer/ #2&> /dev/null
-
-cp lib/*.dylib src/svd.gitbotnotifier/ #2&> /dev/null
-cp lib/*.so src/svd.gitbotnotifier/ #2&> /dev/null
-
-cp lib/*.dylib src/svd.systemmanager/ #2&> /dev/null
-cp lib/*.so src/svd.systemmanager/ #2&> /dev/null
+for i in {"svd.gitbotnotifier","svd.maintainer","svd.systemmanager","svd.utils"}; do
+  cp -v lib/$libs src/$i/
+done
 
 
 cd src/
 $MVN_EXEC $MVN_TEST_PARAMS test
 
 
-rm -rf src/svd.utils/*.dylib
-rm -rf src/svd.utils/*.so
-
-rm -rf src/svd.maintainer/*.dylib
-rm -rf src/svd.maintainer/*.so
-
-rm -rf src/svd.gitbotnotifier/*.dylib
-rm -rf src/svd.gitbotnotifier/*.so
-
-rm -rf src/svd.systemmanager/*.dylib
-rm -rf src/svd.systemmanager/*.so
+for i in {"svd.gitbotnotifier","svd.maintainer","svd.systemmanager","svd.utils"}; do
+  rm -rf $i/$libs
+done
 
 
 exit 0
