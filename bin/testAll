@@ -7,7 +7,14 @@
 
 echo "Running tests on platform: $platform, libs: $libs"
 
-for i in {"svd.gitbotnotifier","svd.maintainer","svd.systemmanager","svd.utils"}; do
+dirList=(
+svd.gitbotnotifier
+svd.maintainer
+svd.systemmanager
+svd.utils
+)
+
+for i in ${dirList[@]}; do
   cp -v lib/$libs src/$i/
 done
 
@@ -16,7 +23,7 @@ cd src/
 $MVN_EXEC $MVN_TEST_PARAMS test
 
 
-for i in {"svd.gitbotnotifier","svd.maintainer","svd.systemmanager","svd.utils"}; do
+for i in ${dirList[@]}; do
   rm -rf $i/$libs
 done
 
