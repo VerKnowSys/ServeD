@@ -3,9 +3,7 @@
 
 package com.verknowsys.served.utils
 
-
 import com.verknowsys.served._
-
 import java.io.{PrintWriter, File, OutputStreamWriter}
 import java.util.ArrayList
 import java.util.regex.Pattern
@@ -20,10 +18,9 @@ import clime.messadmin.providers.sizeof.ObjectProfiler
 
 trait Utils {
     
-    
     checkOrCreateVendorDir
     
-    
+        
     /**
     * @author dmilith
     *   
@@ -34,10 +31,14 @@ trait Utils {
     lazy val logger = {
         BasicConfigurator.resetConfiguration
         reloadLoggerConfiguration
-        val watch = FileEvents.watchFile(Config.mainLoggerFile) { reloadLoggerConfiguration }
-        addShutdownHook { watch.stop }
         Logger.getLogger(this.getClass)
     }
+    
+    val loggerPropertiesFileWatch = FileEvents.watchFile(Config.mainLoggerFile) { 
+        logger.trace("Logger properties file changed: " + Config.mainLoggerFile)
+        reloadLoggerConfiguration 
+    }
+    addShutdownHook { loggerPropertiesFileWatch.stop }
     
     def reloadLoggerConfiguration {
         try { PropertyConfigurator.configure(Config.mainLoggerFile) } 
