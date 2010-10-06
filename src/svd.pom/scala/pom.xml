@@ -4,9 +4,9 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>svd</groupId>
 	<artifactId>svd.pom.scala</artifactId>
-	<packaging>pom</packaging>
-	<version>0.0.1-SNAPSHOT</version>
  	<name>ServeD Scala support</name>
+	<version>0.1.0</version>
+	<packaging>pom</packaging>
 	
 	<!-- 2009-10-19 03:07:45 ; karolrvn ;  this POM intentionally does not support java-to-scala deps ; because it compiles about 3 times longer -->
 	<!-- check ../scala_from_java if you want -->
@@ -14,7 +14,7 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent> <!-- 2009-10-19 01:37:59 ; karolrvn ; pom inheritance -->
 		<groupId>svd</groupId>
 		<artifactId>svd.pom.scala_base</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.1.0</version>
 		<relativePath>../scala_base</relativePath>
 	</parent>
 	

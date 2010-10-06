@@ -1,4 +1,4 @@
-package com.verknowsys.served.git
+package com.verknowsys.served.utils.git
 
 
 import com.verknowsys.served.utils._

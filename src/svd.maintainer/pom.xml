@@ -1,18 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<packaging>jar</packaging>
-	<name>ServeD Maintainer</name>
 	<groupId>svd</groupId>
 	<artifactId>svd.maintainer</artifactId>
-	<version>1.0</version>
+	<name>ServeD Maintainer</name>
+	<version>0.1.0</version>
 	<inceptionYear>2009</inceptionYear>
+	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>svd</groupId>
 		<artifactId>svd.common</artifactId>
-		<version>1.0</version>
-		<relativePath>../svd.common</relativePath>
+		<version>0.1.0</version>
+		<relativePath>../svd.common/pom.xml</relativePath>	
 	</parent>
 
 	<repositories>
@@ -21,6 +21,7 @@
 			<id>java.net-maven2-repository</id>
 			<url>http://download.java.net/maven/2/</url>
 		</repository>
+		
 		<repository>
 			<id>maven.verknowsys.com</id>
 			<name>Verknowsys Maven repository</name>
@@ -32,19 +33,19 @@
 		<dependency>
 			<groupId>svd</groupId>
 			<artifactId>svd.utils</artifactId>
-			<version>1.2</version>
+			<version>0.1.0</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>svd</groupId>
 			<artifactId>svd.gitbotnotifier</artifactId>
-			<version>1.0</version>
+			<version>0.1.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>svd</groupId>
 			<artifactId>svd.systemmanager</artifactId>
-			<version>1.0</version>
+			<version>0.1.0</version>
 		</dependency>
 	</dependencies>
 </project>

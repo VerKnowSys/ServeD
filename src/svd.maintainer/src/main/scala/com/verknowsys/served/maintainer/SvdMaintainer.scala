@@ -10,7 +10,7 @@ import com.verknowsys.served.utils.signals.{ProcessMessages, MainLoop, Quit, Ini
 import com.verknowsys.served.systemmanager._
 
 import scala.collection.JavaConversions._
-import actors.Actor
+import scala.actors.Actor
 import org.apache.log4j.{Level, Logger}
 
 

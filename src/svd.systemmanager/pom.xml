@@ -1,25 +1,21 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>svd</groupId>
   <artifactId>svd.systemmanager</artifactId>
   <name>ServeD SystemManager</name>
-  <version>1.0</version>
+  <version>0.1.0</version>
   <inceptionYear>2010</inceptionYear>
 
 	<parent>
 		<groupId>svd</groupId>
 		<artifactId>svd.common</artifactId>
-		<version>1.0</version>
+		<version>0.1.0</version>
 		<relativePath>../svd.common/pom.xml</relativePath>
 	</parent>
 
   
-  <repositories>
-    <repository>
-      <id>jgit-repository</id>
-      <url>http://download.eclipse.org/jgit/maven</url>
-    </repository>
-    
+  <repositories>    
     <repository>
       <id>java.net</id>
       <url>http://download.java.net/maven/2</url>
@@ -28,21 +24,17 @@
 
 
   <dependencies>
-	<dependency>
-		<groupId>net.java.dev.jna</groupId>
-		<artifactId>jna</artifactId>
-		<version>3.2.5</version>
-	</dependency>
-	<dependency>
-		<groupId>svd</groupId>
-		<artifactId>svd.utils</artifactId>
-		<version>1.2</version>
-	</dependency>
-	<dependency>
-      	<groupId>org.eclipse.jgit</groupId>
-      	<artifactId>org.eclipse.jgit</artifactId>
-		<version>0.8.4</version>
-	</dependency>
+  	<dependency>
+  		<groupId>net.java.dev.jna</groupId>
+  		<artifactId>jna</artifactId>
+  		<version>3.2.5</version>
+  	</dependency>
+  	
+  	<dependency>
+  		<groupId>svd</groupId>
+  		<artifactId>svd.utils</artifactId>
+  		<version>0.1.0</version>
+  	</dependency>
   </dependencies>
 
   <build>

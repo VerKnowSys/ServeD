@@ -10,16 +10,16 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>svd</groupId>
 	<artifactId>svd.pom.scala_base</artifactId>
-	<packaging>pom</packaging>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>ServeD Scala base</name>
+	<version>0.1.0</version>
+	<packaging>pom</packaging>
 	
 	<!-- no execution goals here -->
 	
 	<parent>
 		<groupId>svd</groupId>
 		<artifactId>svd</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.1.0</version>
 		<relativePath>../..</relativePath>
 	</parent>
 	

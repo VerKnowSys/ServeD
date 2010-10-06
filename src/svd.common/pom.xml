@@ -5,14 +5,13 @@
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd
-http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>svd</groupId>
 	<artifactId>svd.common</artifactId>
-	<packaging>pom</packaging>
-	<version>1.0</version>
 	<name>ServeD Common</name>
+	<version>0.1.0</version>
+	<packaging>pom</packaging>
 	<properties>
 		<neodatis.version>1.9.21.670</neodatis.version>
 	</properties>
@@ -20,7 +19,7 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
 		<groupId>svd</groupId>
 		<artifactId>svd.pom.scala</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.1.0</version>
 		<relativePath>../svd.pom/scala</relativePath>
 	</parent>
 
@@ -38,22 +37,26 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 			<artifactId>log4j</artifactId>
 			<version>1.2.14</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>1.4</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.5</version>
 			<scope>test</scope>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.neodatis</groupId>
 			<artifactId>neodatis-odb</artifactId>
 			<version>${neodatis.version}</version>
 		</dependency>
+		
 		<dependency>
       <groupId>org.scala-tools.testing</groupId>
       <artifactId>specs</artifactId>

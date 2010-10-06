@@ -1,4 +1,4 @@
-package com.verknowsys.served
+package com.verknowsys.served.utils
 
 import org.eclipse.jgit.lib.{ObjectId, PersonIdent, Ref}
 import org.eclipse.jgit.revwalk.RevCommit

@@ -11,9 +11,9 @@ package com.verknowsys.served.maintainer
 
 import com.verknowsys.served._
 import com.verknowsys.served.utils._
+import com.verknowsys.served.utils.git._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.gitbotnotifier._
-import com.verknowsys.served.git._
 
 import scala.collection.mutable.ListBuffer
 import scala.actors.Actor
