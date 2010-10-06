@@ -15,10 +15,9 @@ import org.apache.log4j.{Level, Logger}
 
 
 /**
- * @author dmilith
+ *  @author dmilith
  *
- * Main Maintainer loader.
- *
+ *  Main Maintainer loader.
  */
 
 object SvdMaintainer extends Actor with Utils {
