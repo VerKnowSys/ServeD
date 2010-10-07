@@ -12,9 +12,9 @@
         <module>svd.pom/scala_base</module>
         <module>svd.pom/scala_from_java</module>
         <module>svd.common</module>
-        <module>svd.utils</module>
+		<module>svd.utils</module>
+		<module>svd.systemmanager</module>
         <module>svd.gitbotnotifier</module>
-        <module>svd.systemmanager</module>
         <module>svd.maintainer</module>
     </modules>
     
