@@ -5,13 +5,17 @@ import POSIXSignals._
 
 import org.specs._
 import java.io._
+import com.jezhumble.javasysmon._
+import com.verknowsys.served.systemmanager._
 
 
 class SvdSystemManagerTest extends SpecificationWithJUnit {
 
     "SystemManager object" should {
         
-        // doBefore {doSomething}
+        doBefore {
+            SvdSystemManager
+        }
         
         "signals defined should have proper integer value" in {
             SIGHUP.id must_== 1
@@ -31,6 +35,13 @@ class SvdSystemManagerTest extends SpecificationWithJUnit {
             (new File("/tmp/renamedir")).isDirectory must_== true
             SvdSystemManager.posix.chmod("/tmp/renamedir/file1", 0755)
         }
+        
+        
+        "it must be able to check list of pids of running system and also match for name" in {
+            println("UID of process: %d".format(SvdSystemManager.posix.geteuid))
+            // println("Sysmon OS name: %s".format(SvdSystemManager.sysmon.osName))
+        }
+        
     }
             
 }

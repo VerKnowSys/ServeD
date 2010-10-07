@@ -74,5 +74,6 @@ trait POSIX extends Library {
     def mkdir(path: String, mode: Int): Int
     def execl(comm: String): Int
     def rmdir(path: String): Int
+    def geteuid: Int
     
 }
