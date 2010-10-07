@@ -3,7 +3,7 @@
 
 package com.verknowsys.served.maintainer
 
-
+import com.verknowsys.served.api._
 import com.verknowsys.served.Config
 import com.verknowsys.served.utils.Utils
 import com.verknowsys.served.utils.signals.{ProcessMessages, MainLoop, Quit, Init}
@@ -11,6 +11,10 @@ import com.verknowsys.served.systemmanager._
 
 import scala.collection.JavaConversions._
 import scala.actors.Actor
+import scala.actors.Actor._
+import scala.actors.remote.RemoteActor
+import scala.actors.remote.RemoteActor._
+import scala.actors.remote.Node
 import org.apache.log4j.{Level, Logger}
 
 
@@ -19,6 +23,31 @@ import org.apache.log4j.{Level, Logger}
  *
  *  Main Maintainer loader.
  */
+
+object ApiServerActor extends Actor with Utils {
+    final val port = 5555 // XXX: Hardcoded port number
+    
+    start
+    
+    def act {
+        Actor.loop {
+            receive {
+                case Init =>
+                    RemoteActor.classLoader = getClass().getClassLoader()
+                    alive(port)
+                    register('ServeD, self)
+                    
+                case CreateGitRepository(name) => 
+                    logger.trace("Created git repository: " + name)
+                    sender ! Success("Repository %s created".format(name))
+                
+                case RemoveGitRepository(name) =>
+                    logger.trace("Removed git repository: " + name)
+                    sender ! Error("Couldn`t remove repository %s".format(name))
+            }
+        }
+    }
+}
 
 object SvdMaintainer extends Actor with Utils {
     
@@ -74,7 +103,9 @@ object SvdMaintainer extends Actor with Utils {
         
         logger.info("SystemManager is loading…")
         SvdSystemManager ! Init
-
+        
+        logger.info("ApiServerActor is loading…")
+        ApiServerActor ! Init
     }
 
 

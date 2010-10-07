@@ -47,5 +47,11 @@
 			<artifactId>svd.systemmanager</artifactId>
 			<version>0.1.0</version>
 		</dependency>
+		
+		<dependency>
+  		<groupId>svd</groupId>
+  		<artifactId>svd.api</artifactId>
+  		<version>0.1.0</version>
+  	</dependency>
 	</dependencies>
 </project>
