@@ -85,7 +85,7 @@ class FileEventsTest extends SpecificationWithJUnit {
             FileUtils.forceDelete(DIR + "/subdir/and/one/more/d_file001.txt")
             FileUtils.forceDelete(DIR + "/subdir/and/one/more/d_file002.txt")
 
-            Thread.sleep(5000)
+            Thread.sleep(1000)
 
             watchAll.createdList must contain("c_file001.txt")
             watchAll.createdList must contain("c_file002.txt")
