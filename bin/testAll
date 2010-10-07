@@ -14,16 +14,27 @@ svd.systemmanager
 svd.utils
 )
 
+# *.jnilib
+toBeDeletedLibs=(
+*.dylib
+*.so
+)
+
+
+echo "Copying libraries…"
 for i in ${dirList[@]}; do
-  cp -v lib/$libs src/$i/
+  cp -v ${libs} src/$i/
 done
 
 
 $COMMAND test
 
 
+echo "Cleaning up…"
 for i in ${dirList[@]}; do
-  rm -rf $i/$libs
+  for j in ${toBeDeletedLibs[@]}; do
+    rm -rfv src/$i/$j
+  done
 done
 
 
