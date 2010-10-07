@@ -20,15 +20,16 @@ help                Display help
 exit                Quit interactive console 
 
 """
+    val peer = Node(host, port)
 
     start
     
     def act {
         RemoteActor.classLoader = getClass().getClassLoader()
-        val svd = select(Node(host, port), 'ServeD)
+        val svd = select(peer, 'ServeD)
         link(svd)
-        
-       if(args.isEmpty){
+
+        if(args.isEmpty){
             println("ServeD 0.1.0 interactive shell. Welcome!")
             while(true){
                 val msg = System.console.readLine(">>> ")
@@ -39,7 +40,7 @@ exit                Quit interactive console
         } else {
             process(args)
         }
-        
+       
         def process(params: List[String]) {
             val res = params match {
                 case "git" :: "create" :: name :: Nil =>
@@ -48,22 +49,23 @@ exit                Quit interactive console
                 case "git" :: "remove" :: name :: Nil =>
                     svd !! RemoveGitRepository(name)
                     
-                case "git" :: "list" :: "all" :: Nil => println("List all")
-
-                case "help" :: args => println(HELP)
-
-                case _ => println("Type 'help' for help.")
+                case "git" :: "list" :: "all" :: Nil => 
+                    svd !! RemoveGitRepository("name")
+       
+                case "help" :: Nil => () => println(HELP)
+       
+                case _ => () => Error("Type 'help' for help.")
             }
             
-            println(res)
+            res()
         }
-
+       
         def error { println("[ERROR] Command not found. Type 'help' for help") }
     }
 }
 
 
-object CLI {
+object Runner {
     def main(args: Array[String]): Unit = {
         new ApiClientActor("127.0.0.1", 5555, args.toList.filterNot { _.startsWith("-") }) // XXX: Hardcoded host and port
     }

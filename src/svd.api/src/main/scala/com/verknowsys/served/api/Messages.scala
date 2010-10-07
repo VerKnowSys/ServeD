@@ -1,6 +1,6 @@
 package com.verknowsys.served.api
 
-case class Success(msg: String)
-case class Error(msg: String)
-case class CreateGitRepository(name: String)
-case class RemoveGitRepository(name: String)
+case class Success(val msg: String)
+case class Error(val msg: String)
+case class CreateGitRepository(val name: String)
+case class RemoveGitRepository(val name: String)

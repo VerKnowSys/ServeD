@@ -26,17 +26,17 @@ import org.apache.log4j.{Level, Logger}
 
 object ApiServerActor extends Actor with Utils {
     final val port = 5555 // XXX: Hardcoded port number
-    
+
+    RemoteActor.classLoader = getClass().getClassLoader()
+
     start
     
     def act {
+        alive(port)
+        register('ServeD, self)
+        
         Actor.loop {
             receive {
-                case Init =>
-                    RemoteActor.classLoader = getClass().getClassLoader()
-                    alive(port)
-                    register('ServeD, self)
-                    
                 case CreateGitRepository(name) => 
                     logger.trace("Created git repository: " + name)
                     sender ! Success("Repository %s created".format(name))
