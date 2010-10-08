@@ -7,7 +7,10 @@ import scala.actors.remote.RemoteActor._
 import scala.actors.remote.Node
 
 class ApiClientActor(host: String, port: Int, args: List[String]) extends Actor {
-    final val HELP = """
+    // make use of http://github.com/rtomayko/ronn
+    // 
+    final val HELP = Map(
+        "" -> """
 svd command line tool help
 
 == git ==
@@ -17,9 +20,14 @@ git list all        List all repositories
 
 == other ==
 help                Display help
+help [command]      Display help for command, e.g. 'help git create'
 exit                Quit interactive console 
 
-"""
+""",
+        "git create" -> "Help for git create"
+    )
+
+
     val peer = Node(host, port)
 
     start
@@ -43,24 +51,26 @@ exit                Quit interactive console
        
         def process(params: List[String]) {
             val res = params match {
-                case "git" :: "create" :: name :: Nil =>
-                    svd !! CreateGitRepository(name)
-                    
-                case "git" :: "remove" :: name :: Nil =>
-                    svd !! RemoveGitRepository(name)
-                    
-                case "git" :: "list" :: "all" :: Nil => 
-                    svd !! RemoveGitRepository("name")
-       
-                case "help" :: Nil => () => println(HELP)
-       
-                case _ => () => Error("Type 'help' for help.")
+                case "git" :: "create" :: name :: Nil => svd !! CreateGitRepository(name)
+                case "git" :: "remove" :: name :: Nil => svd !! RemoveGitRepository(name)
+                case "git" :: "list" :: "all" :: Nil =>  svd !! RemoveGitRepository("name")
+              
+                case "help" :: commands => 
+                    HELP.get(commands.mkString(" ")) match {
+                        case Some(help) => () => Notice(help)
+                        case None => () => Error("Help not found")
+                    }
+            
+                case _ => () => Error("Command not found. Type 'help' for help.")
             }
             
-            println(res())
+            res() match {
+                case Success(msg) => println("[OK] " + msg)
+                case Notice(msg) => println(msg)
+                case Error(msg) => println("[ERROR] " + msg)
+                case _ => println("*** WRONG!! ***")
+            }
         }
-       
-        def error { println("[ERROR] Command not found. Type 'help' for help") }
     }
 }
 
