@@ -8,7 +8,7 @@ import scala.actors.remote.Node
 
 class ApiClientActor(host: String, port: Int, args: List[String]) extends Actor {
     // make use of http://github.com/rtomayko/ronn
-    // 
+
     final val HELP = Map(
         "" -> """
 svd command line tool help
@@ -27,14 +27,11 @@ exit                Quit interactive console
         "git create" -> "Help for git create"
     )
 
-
-    val peer = Node(host, port)
-
     start
     
     def act {
         RemoteActor.classLoader = getClass().getClassLoader()
-        val svd = select(peer, 'ServeD)
+        val svd = select(Node(host, port), 'ServeD)
         link(svd)
 
         if(args.isEmpty){
@@ -48,27 +45,44 @@ exit                Quit interactive console
         } else {
             process(args)
         }
+        
+        def success(name: String){
+            // TODO: Colorize
+            println("[OK] " + name)
+        }
+        
+        def error(name: String){
+            // TODO: Colorize
+            println("[ERROR] " + name)
+        }
        
         def process(params: List[String]) {
-            val res = params match {
-                case "git" :: "create" :: name :: Nil => svd !! CreateGitRepository(name)
-                case "git" :: "remove" :: name :: Nil => svd !! RemoveGitRepository(name)
-                case "git" :: "list" :: "all" :: Nil =>  svd !! RemoveGitRepository("name")
-              
-                case "help" :: commands => 
-                    HELP.get(commands.mkString(" ")) match {
-                        case Some(help) => () => Notice(help)
-                        case None => () => Error("Help not found")
-                    }
-            
-                case _ => () => Error("Command not found. Type 'help' for help.")
-            }
-            
-            res() match {
-                case Success(msg) => println("[OK] " + msg)
-                case Notice(msg) => println(msg)
-                case Error(msg) => println("[ERROR] " + msg)
-                case _ => println("*** WRONG!! ***")
+            params match {
+                case "git" :: tail => tail match {
+                    
+                    case "create" :: name :: Nil =>
+                        svd !? Git.CreateRepository(name) match {
+                            case Success => success("Git repository %s created successfully.".format(name))
+                            case Git.RepositoryExistsError => error("Git repository %s already exists".format(name))
+                        }
+                        
+                    case "remove" :: name :: Nil =>
+                        svd !? Git.RemoveRepository(name) match {
+                            case Success => success("Git repository %s removed successfully".format(name))
+                        }
+                        
+                    case "list" :: Nil =>
+                        svd !? Git.ListRepositories match {
+                            case Git.Repositories(list) =>
+                                list.foreach { repo =>
+                                    println(repo)
+                                }
+                        }
+                        
+                    case _ => println("TODO: git help")
+                }
+                
+                case "help" :: Nil => println(HELP)
             }
         }
     }

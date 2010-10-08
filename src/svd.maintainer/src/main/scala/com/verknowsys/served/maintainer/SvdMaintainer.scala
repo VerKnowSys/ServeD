@@ -37,13 +37,20 @@ object ApiServerActor extends Actor with Utils {
         
         Actor.loop {
             receive {
-                case CreateGitRepository(name) => 
+                case Git.CreateRepository(name) => 
                     logger.trace("Created git repository: " + name)
-                    sender ! Success("Repository %s created".format(name))
+                    sender ! Git.RepositoryExistsError
                 
-                case RemoveGitRepository(name) =>
+                case Git.RemoveRepository(name) =>
                     logger.trace("Removed git repository: " + name)
-                    sender ! Error("Couldn`t remove repository %s".format(name))
+                    sender ! Success
+                    
+                case Git.ListRepositories =>
+                    logger.trace("List repositories")
+                    sender ! Git.Repositories(List(
+                        Git.Repository("first"),
+                        Git.Repository("second")
+                    ))
             }
         }
     }
