@@ -57,7 +57,7 @@ exit                Quit interactive console
                 case _ => () => Error("Type 'help' for help.")
             }
             
-            res()
+            println(res())
         }
        
         def error { println("[ERROR] Command not found. Type 'help' for help") }
