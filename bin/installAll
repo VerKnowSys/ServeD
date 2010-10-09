@@ -4,6 +4,8 @@
 
 . bin/OPTS
 
+bin/prepareLibs
+
 $COMMAND install
 
 exit 0

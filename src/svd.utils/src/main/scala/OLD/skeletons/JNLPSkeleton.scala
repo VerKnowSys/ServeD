@@ -91,5 +91,5 @@ class JNLPSkeleton(var mainClass: String,
             </application-desc>
         </jnlp>;
 
-    def saveJNLP(file: String) = XML.saveFull(file, getJNLP, "UTF-8", true, null)
+    def saveJNLP(file: String) = XML.save(file, getJNLP, "UTF-8", true, null)
 }
