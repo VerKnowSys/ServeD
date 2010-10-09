@@ -77,3 +77,10 @@ trait POSIX extends Library {
     def geteuid: Int
     
 }
+
+
+trait PSTREE extends Library {
+    
+    def printchar(a: Char): Int
+    
+}

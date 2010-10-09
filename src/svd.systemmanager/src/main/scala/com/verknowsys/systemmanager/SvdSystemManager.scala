@@ -28,6 +28,7 @@ object SvdSystemManager extends Actor with Utils {
             receive {
                 case Init =>
                     logger.info("SystemManager ready")
+                    logger.trace("PS: %s".format(ps.printchar('d')))
                     
                 case Quit =>
                     logger.info("Quitting SystemManager…")
@@ -50,6 +51,14 @@ object SvdSystemManager extends Actor with Utils {
     *   This function is a bridge to low level libc functions
     */
     def posix = Native.loadLibrary("c", classOf[POSIX]).asInstanceOf[POSIX]
+
+
+    /**
+    *   @author dmilith
+    *   
+    *   This function is a bridge to low level pstree implementation
+    */
+    def ps = Native.loadLibrary("pstree", classOf[PSTREE]).asInstanceOf[PSTREE]
 
 
     /**
