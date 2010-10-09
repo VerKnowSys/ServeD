@@ -13,6 +13,6 @@ export MVN_PARAMS="-T C2 -e -Dmaven.test.skip.exec=true -Dmaven.test.skip=true"
 export MVN_TEST_PARAMS="-T C2 -e"
 
 export JAVA_OPTS="-d32 -Xms32m -XX:NewRatio=1 -Xmx512m -Dfile.encoding=UTF-8 -XX:+UseFastAccessorMethods"
-export MAVEN_OPTS="$JAVA_OPTS -Dbuild.platform=$platform -Djava.library.path=../../lib/ -Dactors.corePoolSize=8"
+export MAVEN_OPTS="$JAVA_OPTS -Dbuild.platform=$platform -Djava.library.path=../../lib/ -Dactors.corePoolSize=8 -Djna.library.path=../../lib/"
 
 export COMMAND="bin/runner $@"
