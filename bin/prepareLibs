@@ -7,7 +7,7 @@
 cd lib/pstree/
 ./configure.sh --use-kvm # use kvm lib by default
 rm Makefile # removing auto generated Makefile with prepared one
-cp Makefile.osx Makefile
+cp Makefile.$platform Makefile
 make
 make distclean
 
