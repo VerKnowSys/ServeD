@@ -12,6 +12,7 @@ cp Makefile.$platform Makefile
 make
 
 cd test
+rm -rfv test
 gcc main.c -o test ../card.o ../ptree.o ../version.o                                                                                                                      
 ./test
 cd ../

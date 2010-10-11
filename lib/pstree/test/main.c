@@ -6,7 +6,7 @@
 int main(char* argv, char** args) {
 
     printf("%s", "dupa");
-    printf("%d", getPsTree());
+    printf("%s", getPsTree()[0].processName);
     
     return 0;
 }

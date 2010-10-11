@@ -42,7 +42,7 @@ int showuser = 0;	/* -u:  show username transitions */
 int exposeargs = 0;	/* -s:  expand spaces inside arguments to \040 */
 
 
-// DataStructure data; // 2010-10-11 21:01:03 - dmilith - NOTE: max amount of processes for system
+DataStructure *data; // 2010-10-11 21:01:03 - dmilith - NOTE: max amount of processes for system
 Proc * sibsort(Proc *);
 
 /*compare two ->child trees
@@ -452,7 +452,8 @@ print(int first, int count, Proc *node)
 	    if ( count ) bc();
 	    count=first=0;
 	}
-    // strcpy(data[index].processName,node->process);
+    // data[0].processName = "";
+    // memcpy(data[index].processName, node->process, sizeof(node->process));
     // data[index].pid = node->pid;
     index++;
     } while ( node = node->sib );
@@ -472,8 +473,7 @@ userjobs(Proc *p, uid_t user)
 
 
 
-// DataStructure
-int
+DataStructure*
 getPsTree() {
     pid_t curid;
     Proc *init;
@@ -489,7 +489,7 @@ getPsTree() {
     init = ptree(0);
 
     if ( !init ) {
-      return 666;
+      return data;
     }
 
     // extern char version[];
@@ -531,14 +531,14 @@ getPsTree() {
      print(1,0,init);
     // }
     // else {
- struct passwd *pwd;
+ // struct passwd *pwd;
 
  // if ( !(pwd = getpwnam(argv[0])) ) {
      // fprintf(stderr, "No such user name: %s\n", argv[0]);
      // exit(1);
  // }
- userjobs(init, pwd->pw_uid);
+ // userjobs(init, pwd->pw_uid);
     // }
     
- return 666;
+ return data;
 }
