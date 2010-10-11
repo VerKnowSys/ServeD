@@ -1,0 +1,2 @@
+gcc main.c -o test ../card.o ../ptree.o ../version.o
+./test
