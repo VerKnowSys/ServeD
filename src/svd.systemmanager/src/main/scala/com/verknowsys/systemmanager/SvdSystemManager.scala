@@ -24,11 +24,12 @@ object SvdSystemManager extends Actor with Utils {
 
 
     def act {
+        Native.setProtected(true) // 2010-10-11 23:43:21 - dmilith - set JVM protection (in case of JNA code fail it should only throw an exception)
         Actor.loop {
             receive {
                 case Init =>
                     logger.info("SystemManager ready")
-                    logger.trace("PS: %s".format(ps.printchar('d')))
+                    logger.trace("PS: %s".format(ps.getPsTree.toString))
                     
                 case Quit =>
                     logger.info("Quitting SystemManager…")

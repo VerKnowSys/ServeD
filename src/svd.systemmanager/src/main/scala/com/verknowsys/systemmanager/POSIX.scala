@@ -4,7 +4,7 @@
 package com.verknowsys.served.systemmanager
 
 
-import com.sun.jna.Library
+import com.sun.jna.{Library, Structure}
 
 
 /**
@@ -79,8 +79,20 @@ trait POSIX extends Library {
 }
 
 
+class DataStructure extends Structure {
+    
+    val processName = Array[Byte](32); // name of the process ("id")
+    val processInfo = Array[Byte](8); // flags
+    val pid: Int = 0
+
+    allocateMemory
+}
+
+class Proc extends Structure.ByReference{}
+
+
 trait PSTREE extends Library {
     
-    def printchar(a: Char): Int
+    def getPsTree: DataStructure
     
 }
