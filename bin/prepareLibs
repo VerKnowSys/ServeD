@@ -5,11 +5,17 @@
 
 
 cd lib/pstree/
-make distclean
+#make distclean
 ./configure.sh --use-kvm # use kvm lib by default
 rm Makefile # removing auto generated Makefile with prepared one
 cp Makefile.$platform Makefile
 make
-#make distclean
+
+cd test
+gcc main.c -o test ../card.o ../ptree.o ../version.o                                                                                                                      
+./test
+cd ../
+
+make distclean
 
 exit 0
