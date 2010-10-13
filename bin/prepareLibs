@@ -15,6 +15,7 @@ cd test
 rm -rfv test
 gcc main.c -o test ../card.o ../ptree.o ../version.o                                                                                                                      
 ./test
+rm *.o test
 cd ../
 
 make distclean
