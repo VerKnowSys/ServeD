@@ -6,7 +6,7 @@ import scala.actors.remote.RemoteActor
 import scala.actors.remote.RemoteActor._
 import scala.actors.remote.Node
 
-class ApiClientActor(host: String, port: Int, args: List[String]) extends Actor {
+class ApiClientActor(host: String, port: Int) extends Actor {
     // make use of http://github.com/rtomayko/ronn
 
     final val HELP = Map(
@@ -34,16 +34,12 @@ exit                Quit interactive console
         val svd = select(Node(host, port), 'ServeD)
         link(svd)
 
-        if(args.isEmpty){
-            println("ServeD 0.1.0 interactive shell. Welcome!")
-            while(true){
-                val msg = System.console.readLine(">>> ")
-                if(msg == "exit") System.exit(0)
-                val ar = msg.split(" ").toList
-                if(!ar.isEmpty) process(ar)
-            }
-        } else {
-            process(args)
+        println("ServeD 0.1.0 interactive shell. Welcome!")
+        while(true){
+            val msg = System.console.readLine(">>> ")
+            if(msg == "exit") System.exit(0)
+            val args = msg.split(" ").toList
+            if(!args.isEmpty) process(args)
         }
         
         def success(name: String){
