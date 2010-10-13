@@ -364,6 +364,7 @@ printjob(int first, int count, Proc *p)
     }
     else
 	tind += printcard("%s", p->process);
+	data = addProcessToDataStructure(data, p->process, p->pid);
 
     if ( showpid )
 	tind += po() + printcard("%d", p->pid);
@@ -475,7 +476,6 @@ print(int first, int count, Proc *node)
 	    if ( count ) bc();
 	    count=first=0;
 	}
-    data = addProcessToDataStructure(data, "dupa jasio", 666);
     index++;
     } while ( node = node->sib );
     pop();
