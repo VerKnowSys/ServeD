@@ -8,7 +8,6 @@ import java.io.File
 
 
 class AccountTest extends SpecificationWithJUnit {
-    
     "Account" should {
         val account = Account(userName = "teamon", homeDir = "/tmp/svd/home/teamon/")
         try { FileUtils.forceDelete(new File("/tmp/svd/home/teamon/")) } catch { case _ => }
@@ -19,10 +18,20 @@ class AccountTest extends SpecificationWithJUnit {
         }
         
         "Create new git repository" in {
-            account.createRepository("testrepo")
-            "/tmp/svd/home/teamon/git/testrepo.git" must beAnExistingPath
+            account.createRepository("testrepo1")
+            "/tmp/svd/home/teamon/git/testrepo1.git" must beAnExistingPath
             account.repositories.size must beEqual(1)
+            
+            account.createRepository("testrepo2")
+            "/tmp/svd/home/teamon/git/testrepo2.git" must beAnExistingPath
+            account.repositories.size must beEqual(2)
+            
+            // TODO: Catch exception
+            // account.createRepository("testrepo2")
+            // account.repositories.size must beEqual(2)
         }
+        
+        
     }
 
 }
