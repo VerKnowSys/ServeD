@@ -29,7 +29,7 @@ object SvdSystemManager extends Actor with Utils {
             receive {
                 case Init =>
                     logger.info("SystemManager ready")
-                    logger.trace("PS: %s".format(ps.getPsTree.toString))
+                    // logger.trace("PS: %s".format(ps.getPsTree.toString))
                     
                 case Quit =>
                     logger.info("Quitting SystemManager…")

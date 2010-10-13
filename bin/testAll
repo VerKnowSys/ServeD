@@ -8,7 +8,7 @@
 echo "Running tests on platform: $platform, libs: $libs"
 
 dirList=(
-svd.gitbotnotifier
+svd.notifications
 svd.maintainer
 svd.systemmanager
 svd.utils

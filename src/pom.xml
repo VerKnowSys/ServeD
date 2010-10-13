@@ -16,7 +16,7 @@
     		<module>svd.cli</module>
     		<module>svd.utils</module>
     		<module>svd.systemmanager</module>
-        <module>svd.gitbotnotifier</module>
+        <module>svd.notifications</module>
         <module>svd.maintainer</module>
     </modules>
     

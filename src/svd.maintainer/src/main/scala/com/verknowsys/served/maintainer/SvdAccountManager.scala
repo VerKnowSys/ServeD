@@ -13,7 +13,7 @@ import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.git._
 import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.gitbotnotifier._
+import com.verknowsys.served.notifications._
 
 import scala.collection.mutable.ListBuffer
 import scala.actors.Actor
@@ -96,7 +96,7 @@ object SvdAccountManager extends Actor with Utils {
                     logger.trace("WatchEtc: " + watchEtc)
                     gitNotifier.start
                     gitNotifier ! Init
-                    logger.info("GitNotifier ready")
+                    logger.info("AccountManager ready")
                     
                 case Quit =>
                     logger.info("Quitting AccountManager…")

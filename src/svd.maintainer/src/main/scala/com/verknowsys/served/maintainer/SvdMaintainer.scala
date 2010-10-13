@@ -17,6 +17,8 @@ import scala.actors.remote.RemoteActor._
 import scala.actors.remote.Node
 import org.apache.log4j.{Level, Logger}
 
+import com.verknowsys.served.notifications._
+
 
 /**
  *  @author dmilith
@@ -99,11 +101,15 @@ object SvdMaintainer extends Actor with Utils {
         addShutdownHook {
             SvdSystemManager ! Quit
             SvdAccountManager ! Quit
+            NotificationCenter ! Quit
             SvdMaintainer ! Quit
         }
 
         logger.info("Maintainer is loading…")
         SvdMaintainer ! Init
+        
+        logger.info("NotificationCenter is loading…")
+        NotificationCenter ! Init
         
         logger.info("AccountManager is loading…")
         SvdAccountManager ! Init

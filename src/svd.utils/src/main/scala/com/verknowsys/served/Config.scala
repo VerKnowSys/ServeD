@@ -33,11 +33,4 @@ object Config {
     val checkInterval = props.int("checkInterval", 1500)
     val sizeMultiplier = props.int("sizeMultiplier", 1024)
     val defaultGitRepoToWatch = props("defaultGitRepoToWatch", "/git/ServeD.git")
-
-    val xmppHost = props("xmpp.host", "localhost")
-    val xmppPort = props.int("xmpp.port", 5222)
-    val xmppLogin = props("xmpp.login", "gitbot")
-    val xmppPassword = props("xmpp.password", "git-bot-666")
-    val xmppResource = props("xmpp.resource", "served-bot-resource")
-
 }
