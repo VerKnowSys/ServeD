@@ -24,36 +24,84 @@ class Properties(filename: String) extends Utils {
     lazy val data = load
 
     /**
-     * 	Get value as String
+     * 	Get value as Option[String]
      *
      * @author teamon
      */
-    def apply(key: String) = {
+    def apply(key: String): Option[String] = {
         val value = data.flatMap(_ get key)
         logger.trace("Setting props(%s) with value %s".format(key,value))
         value
     }
+    
+    /**
+     * 	Get value as String
+     *  
+     *   If key doesnt exist it saves the default value
+     *  
+     * @author teamon
+     */
+    def apply(key: String, default: String): String = apply(key) getOrElse {
+        update(key, default)
+        default    
+    }
 
     /**
-     * 	Get value as Int
+     * 	Get value as Option[Int]
      *
      * @author teamon
      */
-    def int(key: String): Option[Int] = apply(key).flatMap { s => try {Some(s.toInt)} catch {case _ => None} }
-
+    def int(key: String): Option[Int] = apply(key).flatMap { s => try { Some(s.toInt) } catch { case _ => None } }
+    
     /**
-     * 	Get value as Double
+     * Get value as Int
+     *  
+     *   If key doesnt exist it saves the default value
      *
      * @author teamon
      */
-    def double(key: String): Option[Double] = apply(key).flatMap { s => try {Some(s.toDouble)} catch {case _ => None} }
+    def int(key: String, default: Int): Int = int(key) getOrElse { 
+        update(key, default)
+        default 
+    }
 
     /**
-     * 	Get value as Boolean
+     * 	Get value as Option[Double]
      *
      * @author teamon
      */
-    def bool(key: String): Option[Boolean] = apply(key).flatMap { s => try {Some(s.toBoolean)} catch {case _ => None} }
+    def double(key: String): Option[Double] = apply(key).flatMap { s => try { Some(s.toDouble) } catch { case _ => None } }
+
+    /**
+     * Get value as Double
+     *  
+     *   If key doesnt exist it saves the default value
+     *
+     * @author teamon
+     */
+    def double(key: String, default: Double): Double = double(key) getOrElse { 
+        update(key, default)
+        default 
+    }
+
+    /**
+     * 	Get value as Option[Boolean]
+     *
+     * @author teamon
+     */
+    def bool(key: String): Option[Boolean] = apply(key).flatMap { s => try { Some(s.toBoolean) } catch { case _ => None } }
+
+    /**
+     * Get value as Boolean
+     *  
+     *   If key doesnt exist it saves the default value
+     *
+     * @author teamon
+     */
+    def bool(key: String, default: Boolean): Boolean = bool(key) getOrElse { 
+        update(key, default)
+        default 
+    }
 
     /**
      * 	Update value with String

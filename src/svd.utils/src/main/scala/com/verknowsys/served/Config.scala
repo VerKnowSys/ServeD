@@ -30,28 +30,14 @@ object Config {
     *   More dynamic settings from main properties file
     */
 
-    val checkInterval = props.int("checkInterval") getOrElse defaultI("checkInterval", 1500)
-    val sizeMultiplier = props.int("sizeMultiplier") getOrElse defaultI("sizeMultiplier", 1024)
-    val defaultGitRepoToWatch = props("defaultGitRepoToWatch") getOrElse defaultS("defaultGitRepoToWatch", "/git/ServeD.git")
+    val checkInterval = props.int("checkInterval", 1500)
+    val sizeMultiplier = props.int("sizeMultiplier", 1024)
+    val defaultGitRepoToWatch = props("defaultGitRepoToWatch", "/git/ServeD.git")
 
-    val xmppHost = props("xmpp.host") getOrElse defaultS("xmpp.host", "localhost")
-    val xmppPort = props.int("xmpp.port") getOrElse defaultI("xmpp.port", 5222)
-    val xmppLogin = props("xmpp.login") getOrElse defaultS("xmpp.login", "gitbot")
-    val xmppPassword = props("xmpp.password") getOrElse defaultS("xmpp.password", "git-bot-666")
-    val xmppResource = props("xmpp.resource") getOrElse defaultS("xmpp.resource", "served-bot-resource")
-
-    /**
-    *   @author dmilith
-    *   Shortcuts for setting default values and storing them in config
-    */
-    def defaultS(key: String, value: String) = {
-        props(key) = value
-        value
-    }
-
-    def defaultI(key: String, value: Int) = {
-        props(key) = value
-        value
-    }
+    val xmppHost = props("xmpp.host", "localhost")
+    val xmppPort = props.int("xmpp.port", 5222)
+    val xmppLogin = props("xmpp.login", "gitbot")
+    val xmppPassword = props("xmpp.password", "git-bot-666")
+    val xmppResource = props("xmpp.resource", "served-bot-resource")
 
 }
