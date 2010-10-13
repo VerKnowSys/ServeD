@@ -26,38 +26,6 @@ import com.verknowsys.served.notifications._
  *  Main Maintainer loader.
  */
 
-object ApiServerActor extends Actor with Utils {
-    final val port = 5555 // XXX: Hardcoded port number
-
-    RemoteActor.classLoader = getClass().getClassLoader()
-
-    start
-    
-    def act {
-        alive(port)
-        register('ServeD, self)
-        
-        Actor.loop {
-            receive {
-                case Git.CreateRepository(name) => 
-                    logger.trace("Created git repository: " + name)
-                    sender ! Git.RepositoryExistsError
-                
-                case Git.RemoveRepository(name) =>
-                    logger.trace("Removed git repository: " + name)
-                    sender ! Success
-                    
-                case Git.ListRepositories =>
-                    logger.trace("List repositories")
-                    sender ! Git.Repositories(List(
-                        Git.Repository("first"),
-                        Git.Repository("second")
-                    ))
-            }
-        }
-    }
-}
-
 object SvdMaintainer extends Actor with Utils {
     
     start
