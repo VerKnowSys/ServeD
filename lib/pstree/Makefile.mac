@@ -1,4 +1,4 @@
-CC=/usr/bin/gcc
+CC=/usr/bin/clang
 CFLAGS=-w -arch i386 -arch x86_64 -I/System/Library/Frameworks/JavaVM.framework/Headers -O0 -g3 -Wall -c -fmessage-length=0 -fPIC
 BINDIR=/usr/local/bin
 MANDIR=/usr/local/man

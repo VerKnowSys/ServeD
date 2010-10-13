@@ -6,18 +6,22 @@
 
 cd lib/pstree/
 #make distclean
-./configure.sh --use-kvm # use kvm lib by default
+
+ulimit -c 0 # don't throw core file on segfault
+
+if [ ! -e 'config.h' ]; then
+    ./configure.sh --use-kvm # use kvm lib by default
+fi
+
 rm Makefile # removing auto generated Makefile with prepared one
 cp Makefile.$platform Makefile
 make
 
-cd test
-rm -rfv test
-gcc main.c -o test ../card.o ../ptree.o ../version.o                                                                                                                      
-./test
-rm *.o test
-cd ../
-
-make distclean
+if [ "$?" -eq "0" ]; then
+    cd test
+    rm -rfv test
+    gcc main.c -o test ../card.o ../ptree.o ../version.o ../pstree.o
+    ./test
+fi
 
 exit 0
