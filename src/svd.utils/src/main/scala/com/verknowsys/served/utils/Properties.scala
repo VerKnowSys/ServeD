@@ -39,30 +39,21 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
-    def int(key: String): Option[Int] = apply(key).flatMap {
-        s =>
-            try {Some(s.toInt)} catch {case _ => None}
-    }
+    def int(key: String): Option[Int] = apply(key).flatMap { s => try {Some(s.toInt)} catch {case _ => None} }
 
     /**
      * 	Get value as Double
      *
      * @author teamon
      */
-    def double(key: String): Option[Double] = apply(key).flatMap {
-        s =>
-            try {Some(s.toDouble)} catch {case _ => None}
-    }
+    def double(key: String): Option[Double] = apply(key).flatMap { s => try {Some(s.toDouble)} catch {case _ => None} }
 
     /**
      * 	Get value as Boolean
      *
      * @author teamon
      */
-    def bool(key: String): Option[Boolean] = apply(key).flatMap {
-        s =>
-            try {Some(s.toBoolean)} catch {case _ => None}
-    }
+    def bool(key: String): Option[Boolean] = apply(key).flatMap { s => try {Some(s.toBoolean)} catch {case _ => None} }
 
     /**
      * 	Update value with String
@@ -79,21 +70,21 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
-    def update(key: String, value: Int) {update(key, value.toString)}
+    def update(key: String, value: Int) { update(key, value.toString) }
 
     /**
      * 	Update value with Double
      *
      * @author teamon
      */
-    def update(key: String, value: Double) {update(key, value.toString)}
+    def update(key: String, value: Double) { update(key, value.toString) }
 
     /**
      * 	Update value with Boolean
      *
      * @author teamon
      */
-    def update(key: String, value: Boolean) {update(key, value.toString)}
+    def update(key: String, value: Boolean) { update(key, value.toString) }
 
     /**
      * 	Loads properties file and returns Map
