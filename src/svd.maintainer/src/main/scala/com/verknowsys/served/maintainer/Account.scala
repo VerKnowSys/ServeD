@@ -42,8 +42,8 @@ case class Account(
     
     
     // Git related stuff
-    
-    lazy val repositories = {
+
+    def repositories = {
         val list = new File(gitDir).list
         if(list == null) List()
         else list.toList
