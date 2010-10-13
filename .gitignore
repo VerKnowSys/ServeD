@@ -24,3 +24,7 @@ tmtags
 *.dylib
 *.so
 *.jar
+*test
+*.patch
+*.orig
+*.rej
