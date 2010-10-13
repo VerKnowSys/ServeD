@@ -1,8 +1,12 @@
+#ifndef __svd_h__
+#define __svd_h__
 
 typedef struct svdDataStructure {
     
-    char processName[80]; // name of the process ("id")
-    char processInfo[8]; // flags
-    int pid;
+    char *processName;
+    unsigned int pid;
+    struct svdDataStructure* next; // next element in dynamic array
     
 } DataStructure;
+
+#endif

@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../pstree.c"
+
+#include "../svd.h"
+
+
+extern DataStructure* getPsTree();
 
 
 int main(char* argv, char** args) {
 
-    printf("%s", "dupa");
+    printf("%s\n", "Processes:");
     printf("%s", getPsTree()[0].processName);
     
     return 0;

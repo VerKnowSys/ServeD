@@ -42,7 +42,30 @@ int showuser = 0;	/* -u:  show username transitions */
 int exposeargs = 0;	/* -s:  expand spaces inside arguments to \040 */
 
 
-DataStructure *data; // 2010-10-11 21:01:03 - dmilith - NOTE: max amount of processes for system
+DataStructure * data;
+
+// 2010-10-13 23:45:51 - dmilith - NOTE: helper to create dynamic data structure
+DataStructure* createDataStructure(char* processName, unsigned int pid) {
+    DataStructure* aProcess = malloc(sizeof(DataStructure));
+    if (NULL != aProcess){
+        aProcess->processName = processName;
+        aProcess->pid = pid;
+        aProcess->next = NULL;
+    }
+    return aProcess;
+}
+
+
+// 2010-10-13 23:45:51 - dmilith - NOTE: helper to add process to dynamic data structure
+DataStructure* addProcessToDataStructure(DataStructure *data, char* processName, unsigned int pid) {
+    DataStructure* newProcess = createDataStructure(processName, pid);
+    if (NULL != newProcess) {
+        newProcess->next = data;
+    }
+    return newProcess;
+}
+
+
 Proc * sibsort(Proc *);
 
 /*compare two ->child trees
@@ -452,9 +475,7 @@ print(int first, int count, Proc *node)
 	    if ( count ) bc();
 	    count=first=0;
 	}
-    // data[0].processName = "";
-    // memcpy(data[index].processName, node->process, sizeof(node->process));
-    // data[index].pid = node->pid;
+    data = addProcessToDataStructure(data, "dupa jasio", 666);
     index++;
     } while ( node = node->sib );
     pop();
@@ -472,19 +493,13 @@ userjobs(Proc *p, uid_t user)
 }
 
 
-
 DataStructure*
 getPsTree() {
-    pid_t curid;
     Proc *init;
-    // Proc *newest;
-    int opt;
-    char *e;
 
     showpid  = 1; 
     showuser = 1;
     exposeargs = 0;
-    // strcpy(data.processName,"DUPA");
 
     init = ptree(0);
 
@@ -492,10 +507,6 @@ getPsTree() {
       return data;
     }
 
-    // extern char version[];
-    // argv[0] = basename(argv[0]);
-    // opterr = 1;
-    // while ( (opt = getopt(argc, argv, "aclnpsuV")) != EOF )
  // switch (opt) {
  // case 'a':   showargs = 1; break;
  // case 'c':   compress = 0; break;
@@ -508,37 +519,7 @@ getPsTree() {
  // case 'V':   printf("%s (ps-etc) %s\n", argv[0], version); exit(0);
  // default :   exit(1);
  // }
-
- // perror(argv[0]);
- // exit(1);
-    // }
-
-    // if ( clipping )
- // cardwidth();
-
-    // argc -= optind;
-    // argv += optind;
-
-    // if ( argc < 1 ) {
- // print(1,0,init);
- // exit(0);
-    // }
-
-    // curid = strtol(argv[0], &e, 10);
-
-    // if ( *e == 0 ) {
- // if ( init = pfind(curid) )
-     print(1,0,init);
-    // }
-    // else {
- // struct passwd *pwd;
-
- // if ( !(pwd = getpwnam(argv[0])) ) {
-     // fprintf(stderr, "No such user name: %s\n", argv[0]);
-     // exit(1);
- // }
- // userjobs(init, pwd->pw_uid);
-    // }
+    print(1,0,init);
     
- return data;
+    return data;
 }
