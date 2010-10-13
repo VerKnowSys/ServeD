@@ -10,7 +10,13 @@ extern DataStructure* getPsTree();
 int main(char* argv, char** args) {
 
     printf("%s\n", "Processes:");
-    printf("%s", getPsTree()[0].processName);
+    int i = 0;
+    DataStructure* data = getPsTree();
+    
+    DataStructure* iter;
+    for (iter = data; NULL != iter; iter = iter->next) {
+        printf("%s - %d\n", iter->processName, iter->pid);
+    }
     
     return 0;
 }
