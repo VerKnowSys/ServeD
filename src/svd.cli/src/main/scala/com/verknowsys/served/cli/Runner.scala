@@ -91,6 +91,7 @@ exit                Quit interactive console
 
 object Runner {
     def main(args: Array[String]): Unit = {
-        new ApiClientActor("127.0.0.1", 5555, args.toList.filterNot { _.startsWith("-") }) // XXX: Hardcoded host and port
+        if(args.length == 2) new ApiClientActor(args(0), args(1).toInt)
+        else { println("Usage: com.verknowsys.served.cli.Runner HOST PORT")}
     }
 }
