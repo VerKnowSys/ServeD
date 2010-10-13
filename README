@@ -9,17 +9,16 @@
 	0.1 - Java 1.6.0_20 at least
 	0.2 - Maven 3.x
 	0.3 - POSIX compatible system
+	0.4 - Scala 2.8.0
 
 	
 1. Instalation
-	1.1 - mvn install
-	1.2 - You may do symbolic links (or just copy) executable files located in project directory to /usr/local/bin/ for example. Do as You wish
+	1.1 - bin/installAll
 
 
 2. Testing
-  2.1 Use scala-specs
-  2.2 Run all with mvn -q test
-  2.3 Run one test class with mvn -q -Dtest=com.verknowsys.served.MyTestClass test
+  2.1 Use bin/testAll
+
 	
 That's all folks
 
@@ -31,6 +30,7 @@ Questions?
 	- #scala.pl, #scala at irc.freenode.net
 	- dmilith@verknowsys.com on jabber/mail
 	- dmilith@gmail.com on google sucking asses jabber/mail
+	- dmilith on Skype
 	
 	And I'm as "teamon" on:
 	- #scala.pl, #scala at irc.freenode.net
