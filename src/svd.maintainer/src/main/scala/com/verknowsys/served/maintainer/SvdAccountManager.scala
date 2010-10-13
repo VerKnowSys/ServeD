@@ -35,11 +35,10 @@ case class Account(
         val gid: String = "1000",
         val information: String = "No information",
         val homeDir: String = "/home/",
-        val shell: String = "/bin/bash",
-        val gitRepositories: ListBuffer[String] = ListBuffer[String]()
-        ) {
+        val shell: String = "/bin/bash"
+        ) extends Utils {
             
-    def this(a: List[String]) = this (
+    def this(a: List[String]) = this(
         userName = a(0),
         pass = a(1),
         uid = a(2),
@@ -47,7 +46,27 @@ case class Account(
         information = a(4),
         homeDir = a(5),
         shell = a(6)
-        )
+    )
+    
+    lazy val repositories = loadRepositories
+    
+    // def this(a: List[String]) = this(a(0), a(1), a(2), a(3), a(4), a(5), a(6))
+
+    def size = {
+        try {
+            val elementsSize = FileUtils.sizeOfDirectory(new File(homeDir))
+            logger.debug("getAccountSize of " + homeDir + " folder: " + (elementsSize))
+            Some(elementsSize)
+        } catch {
+            case x: Exception =>
+                logger.error("Error: " + x)
+                None
+        }
+    }
+    
+    protected def loadRepositories = {
+        List(1,2)
+    }
 
 }
 
@@ -56,6 +75,8 @@ object SvdAccountManager extends Actor with Utils {
     
     start
     
+    lazy val accounts = loadAccounts
+    
     
     def act {
         logger.trace("Java Library Path Property: " + System.getProperty("java.library.path"))
@@ -63,7 +84,7 @@ object SvdAccountManager extends Actor with Utils {
         def matchIt(name: String) = name match {
             case Config.passwdFileName =>
                 logger.trace("Triggered (modified/created) system password file: %s".format(Config.passwdFileName))
-                SvdMaintainer ! Message("Modified or Created system passwd file")
+                SvdMaintainer ! Message("Modified or Created system passwd file") // XXX: Sending Message(msg) doesnt make any sense -> use custom case class
 
             case _ =>
                 logger.trace("No trigger on file")
@@ -103,30 +124,21 @@ object SvdAccountManager extends Actor with Utils {
                     watchEtc.stop
                     gitNotifier ! Quit
                     
-                case GetUsers =>
-                    logger.debug("Sending Users… ")
-                    SvdMaintainer ! GetUsers(getUsers)
+                // case GetUsers =>
+                    // logger.debug("Sending Users… ")
+                    // SvdMaintainer ! GetUsers(getUsers)
                 // getAccountSize("_carddav") // XXX: hardcoded for test
                 // getAccountSize("nonExistantOne") // XXX: hardcoded for test
                 
                 case x: AnyRef =>
-                    logger.trace("Command not recognized. AccountManager will ignore You: " + x.toString)
+                    logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)
                     
             }
         }
     }
 
 
-    /**
-     * @author dmilith
-     *
-     * Parse users conversion tool from List[String] to List[Account]
-     *
-     */
-    def parseUsers(users: List[String]): List[Account] =
-        for (line <- users if !line.startsWith("#"))
-            yield
-                new Account(line.split(":").toList)
+
 
 
     /**
@@ -135,33 +147,11 @@ object SvdAccountManager extends Actor with Utils {
      * Function to parse and convert List[String] of passwd file entries to List[Account]
      *
      */
-    def getUsers: List[Account] =
-        parseUsers(Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList) // XXX: hardcode
-
-
-    /**
-     * @author dmilith
-     *
-     * Returns size of account data
-     *
-     */
-    def getAccountSize(userName: String): Option[Long] = {
-        getUsers.find(_.userName == userName) match {
-            case Some(x) =>
-                try {
-                    val elementsSize = FileUtils.sizeOfDirectory(new File(x.homeDir))
-                    logger.debug("getAccountSize of " + x.homeDir + " folder: " + (elementsSize / Config.sizeMultiplier))
-                    Some(elementsSize)
-                } catch {
-                    case x: Exception =>
-                        logger.error("Error: " + x)
-                        None
-                }
-            case None =>
-                logger.debug("getAccountSize: None. No such user?")
-                None
-        }
-
+    def loadAccounts: List[Account] = {
+        val rawData = Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList
+        for(line <- rawData if !line.startsWith("#")) // XXX: hardcode
+            yield
+                new Account(line.split(":").toList)
     }
 
 }
