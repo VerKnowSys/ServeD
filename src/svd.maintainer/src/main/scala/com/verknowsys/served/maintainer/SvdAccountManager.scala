@@ -92,12 +92,12 @@ object SvdAccountManager extends Actor with Utils {
                 new Account(line.split(":").toList)
     }
     
-    def main(args: Array[String]): Unit = {
-        accounts.find (_.userName == "teamon") map { a =>
-            println(a.repositories.toList)
-            a.createRepository("xxx")
-        }
-    }
+    // def main(args: Array[String]): Unit = {
+    //     accounts.find (_.userName == "teamon") map { a =>
+    //         println(a.repositories.toList)
+    //         a.createRepository("xxx")
+    //     }
+    // }
 
 
 }

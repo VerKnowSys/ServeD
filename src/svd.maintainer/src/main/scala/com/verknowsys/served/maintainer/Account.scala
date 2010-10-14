@@ -43,18 +43,6 @@ case class Account(
     
     // Git related stuff
 
-    def repositories = {
-        val list = new File(gitDir).list
-        if(list == null) List()
-        else list.toList
-    }
-    
-    protected lazy val gitDir = homeDir + "git/"
-    
-    def createRepository(name: String) = {
-        logger.trace("Creating new git repository %s for account %s".format(name, userName))
-        GitRepository.create(gitDir + name + ".git", bare = true)
-    }
     
     // TODO def setupGitWatchers
 
