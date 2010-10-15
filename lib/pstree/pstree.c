@@ -44,6 +44,8 @@ int exposeargs = 0;	/* -s:  expand spaces inside arguments to \040 */
 
 DataStructure * data;
 
+// typedef void (*CALL)(char* processName, int pid);
+
 // 2010-10-13 23:45:51 - dmilith - NOTE: helper to create dynamic data structure
 DataStructure* createDataStructure(char* processName, unsigned int pid) {
     DataStructure* aProcess = malloc(sizeof(DataStructure));
@@ -494,7 +496,7 @@ userjobs(Proc *p, uid_t user)
 
 
 DataStructure*
-getPsTree() {
+processes() {
     Proc *init;
 
     showpid  = 1; 

@@ -4,14 +4,14 @@
 #include "../svd.h"
 
 
-extern DataStructure* getPsTree();
+extern DataStructure* processes();
 
 
 int main(char* argv, char** args) {
 
     printf("%s\n", "Processes:");
-    int i = 0;
-    DataStructure* data = getPsTree();
+
+    DataStructure* data = processes();
     
     DataStructure* iter;
     for (iter = data; NULL != iter; iter = iter->next) {

@@ -79,20 +79,17 @@ trait POSIX extends Library {
 }
 
 
-class DataStructure extends Structure {
-    
-    val processName = Array[Byte](32); // name of the process ("id")
-    val processInfo = Array[Byte](8); // flags
-    val pid: Int = 0
-
-    allocateMemory
+trait DataStructure extends Structure.ByValue {
+    val processName: String
+    val pid: Int
+    val next: DataStructure
 }
 
-class Proc extends Structure.ByReference{}
+// class Proc extends Structure.ByReference{}
 
 
 trait PSTREE extends Library {
     
-    def getPsTree: DataStructure
+    def processes: DataStructure
     
 }

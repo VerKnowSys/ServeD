@@ -29,7 +29,8 @@ object SvdSystemManager extends Actor with Utils {
             receive {
                 case Init =>
                     logger.info("SystemManager ready")
-                    // logger.trace("PS: %s".format(ps.getPsTree.toString))
+                    val processes: DataStructure = ps.processes.next
+                    logger.trace("PS: %s".format(processes.processName))
                     
                 case Quit =>
                     logger.info("Quitting SystemManager…")
