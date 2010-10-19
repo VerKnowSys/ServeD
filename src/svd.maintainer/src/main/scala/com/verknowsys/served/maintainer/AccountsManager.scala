@@ -11,8 +11,7 @@ import com.verknowsys.served.notifications.SvdGitNotifier
 case class GetUsers(val list: List[Account])
 case class Message(val value: String)
 
-object SvdAccountManager extends Actor with Utils {
-    
+object AccountsManager extends Actor with Utils {
     start
     
     lazy val accounts = loadAccounts
@@ -30,8 +29,6 @@ object SvdAccountManager extends Actor with Utils {
                 logger.trace("No trigger on file")
         }
         
-        val gitNotifier = new SvdGitNotifier(Config.defaultGitRepoToWatch)
-
         val watchEtc = new FileWatcher(Config.etcPath, recursive = false) {
             override def created(name: String) {
                 logger.trace("File created: " + name)
@@ -49,14 +46,12 @@ object SvdAccountManager extends Actor with Utils {
             }
         }
 
-        Actor.loop {
+        loop {
             receive {
                 case Init =>
                     logger.debug("AccountManager ready for tasks")
                     logger.debug("Initialized watch for " + Config.etcPath)
                     logger.trace("WatchEtc: " + watchEtc)
-                    gitNotifier.start
-                    gitNotifier ! Init
                     logger.info("AccountManager ready")
                     
                 case Quit =>
