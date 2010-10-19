@@ -20,7 +20,7 @@ object ApiServerActor extends Actor with Utils {
         alive(port)
         register('ServeD, self)
         
-        Actor.loop {
+        loop {
             receive {
                 case Git.CreateRepository(name) => 
                     logger.trace("Created git repository: " + name)

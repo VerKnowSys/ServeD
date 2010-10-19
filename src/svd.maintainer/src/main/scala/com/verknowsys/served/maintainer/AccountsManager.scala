@@ -21,7 +21,6 @@ object AccountsManager extends Actor with Utils {
         def matchIt(name: String) = name match {
             case Config.passwdFileName =>
                 logger.trace("Triggered (modified/created) system password file: %s".format(Config.passwdFileName))
-                SvdMaintainer ! Message("Modified or Created system passwd file") // XXX: Sending Message(msg) doesnt make any sense -> use custom case class
 
             case _ =>
                 logger.trace("No trigger on file")
