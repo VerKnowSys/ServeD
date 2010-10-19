@@ -4,6 +4,7 @@ import com.verknowsys.served.utils.Utils
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.maintainer.Account
 import com.verknowsys.served.utils.git.GitRepository
+import com.verknowsys.served.api._
 import com.verknowsys.served.api.Git._
 
 import java.io.File
@@ -22,15 +23,19 @@ class GitManager(owner: AccountManager) extends Manager(owner) {
                 case CreateRepository(name) => 
                     logger.trace("Creating new git repository %s for account %s".format(name, account.userName))
                     GitRepository.create(gitDir + name, bare = true)
+                    sender ! Success
                     
                 case RemoveRepository(name) =>
                     logger.warn("Unimplemented yet!")
+                    sender ! NotImplementedError
                 
                 case ListRepositories =>
                     logger.warn("Unimplemented yet!")
+                    sender ! NotImplementedError
                 
                 case ShowRepository(name) =>
                     logger.warn("Unimplemented yet!")
+                    sender ! NotImplementedError
                 
                 case Init =>
                     logger.info("GitManager ready for tasks")

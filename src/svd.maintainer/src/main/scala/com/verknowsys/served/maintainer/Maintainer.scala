@@ -82,8 +82,8 @@ object Maintainer extends Actor with Utils {
         logger.info("SystemManager is loading…")
         SvdSystemManager ! Init
         
-        logger.info("ApiServerActor is loading…")
-        ApiServerActor ! Init
+        // logger.info("ApiServerActor is loading…")
+        // ApiServerActor ! Init
     }
 
 
