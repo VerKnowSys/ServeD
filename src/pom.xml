@@ -85,7 +85,7 @@
   				<value>../../../lib/</value>
               </systemProperty>
             </systemProperties> -->
-			<mainClass>com.verknowsys.served.maintainer.SvdMaintainer</mainClass>
+			<mainClass>com.verknowsys.served.maintainer.Maintainer</mainClass>
         </configuration>
       </plugin>
     </plugins>
