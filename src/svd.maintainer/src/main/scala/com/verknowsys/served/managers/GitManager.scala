@@ -1,42 +1,36 @@
 package com.verknowsys.served.managers
 
-import scala.actors.Actor
 import com.verknowsys.served.utils.Utils
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.maintainer.Account
 import com.verknowsys.served.utils.git.GitRepository
+import com.verknowsys.served.api.Git._
 
 import java.io.File
 
-case class CreateRepository(account: Account, name: String)
-case class RemoveRepository(account: Account, name: String)
-case class ListRepositories(account: Account)
-case class ShowRepository(account: Account, name: String)
 
-
-class GitManager(account: Account) extends Utils {
-    def repositories = {
-        val list = new File(gitDir).list
-        if(list == null) List()
-        else list.toList
-    }
-
-    protected lazy val gitDir = account.homeDir + "git/"
-
-    def createRepository(name: String) = {
-        logger.trace("Creating new git repository %s for account %s".format(name, account.userName))
-        GitRepository.create(gitDir + name + ".git", bare = true)
-    }
-}
-
-object GitManager extends Actor with Utils {
-    start
-    
+/**
+ * Git Manager
+ * 
+ * @author teamon
+ */
+class GitManager(owner: AccountManager) extends Manager(owner) {
     def act {
         loop {
             receive {
-                case CreateRepository(account, name) => new GitManager(account).createRepository(name)
+                // Creates new bare git repository under HOME/git/REPO_NAME
+                case CreateRepository(name) => 
+                    logger.trace("Creating new git repository %s for account %s".format(name, account.userName))
+                    GitRepository.create(gitDir + name, bare = true)
+                    
+                case RemoveRepository(name) =>
+                    logger.warn("Unimplemented yet!")
                 
+                case ListRepositories =>
+                    logger.warn("Unimplemented yet!")
+                
+                case ShowRepository(name) =>
+                    logger.warn("Unimplemented yet!")
                 
                 case Init =>
                     logger.info("GitManager ready for tasks")
@@ -49,4 +43,18 @@ object GitManager extends Actor with Utils {
             }
         }
     }
+    
+    
+    /**
+     * Returns list of git repositories
+     * 
+     * @author teamon
+     */
+    def repositories = {
+        val list = new File(gitDir).list
+        if(list == null) List()
+        else list.toList
+    }
+    
+    protected lazy val gitDir = account.homeDir + "git/"
 }

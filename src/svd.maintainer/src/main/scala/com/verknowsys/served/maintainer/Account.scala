@@ -5,6 +5,13 @@ import com.verknowsys.served.utils.git.GitRepository
 import java.io.File
 import org.apache.commons.io.FileUtils
 
+/**
+ * Account data storage
+ * 
+ * @author dmilith
+ * @author teamon
+ * 
+ */
 case class Account(
         val userName: String = "guest",
         val pass: String = "x",
@@ -15,6 +22,7 @@ case class Account(
         val shell: String = "/bin/bash"
         ) extends Utils {
             
+    // TODO: Handle list size
     def this(a: List[String]) = this(
         userName = a(0),
         pass = a(1),
@@ -27,7 +35,8 @@ case class Account(
     
     
     // def this(a: List[String]) = this(a(0), a(1), a(2), a(3), a(4), a(5), a(6))
-
+    
+    // XXX: Remove me!
     def size = {
         try {
             val elementsSize = FileUtils.sizeOfDirectory(new File(homeDir))
@@ -39,11 +48,4 @@ case class Account(
                 None
         }
     }
-    
-    
-    // Git related stuff
-
-    
-    // TODO def setupGitWatchers
-
 }
