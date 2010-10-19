@@ -6,17 +6,15 @@ import scala.io.Source
 import com.verknowsys.served.Config
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.notifications.SvdGitNotifier
+import com.verknowsys.served.managers.AccountManager
 
-case class GetUsers(val list: List[Account])
-case class Message(val value: String)
+// case class GetUsers(val list: List[Account])
 
 object AccountsManager extends Actor with Utils {
     start
     
     lazy val accounts = loadAccounts
-    
-    
+        
     def act {
         logger.trace("Java Library Path Property: " + System.getProperty("java.library.path"))
 
@@ -57,7 +55,6 @@ object AccountsManager extends Actor with Utils {
                 case Quit =>
                     logger.info("Quitting AccountManager…")
                     watchEtc.stop
-                    gitNotifier ! Quit
                     
                 // case GetUsers =>
                     // logger.debug("Sending Users… ")
@@ -80,11 +77,11 @@ object AccountsManager extends Actor with Utils {
      * Function to parse and convert List[String] of passwd file entries to List[Account]
      *
      */
-    def loadAccounts: List[Account] = {
+    def loadAccounts = {
         val rawData = Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList
         for(line <- rawData if !line.startsWith("#")) // XXX: hardcode
             yield
-                new Account(line.split(":").toList)
+                new AccountManager(new Account(line.split(":").toList))
     }
     
     // def main(args: Array[String]): Unit = {
