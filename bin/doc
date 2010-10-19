@@ -1,0 +1,9 @@
+#!/bin/bash
+# This Software is a close code project. You may not redistribute this code without permission of author.
+
+
+. bin/OPTS
+
+$COMMAND scala:doc
+
+exit 0
