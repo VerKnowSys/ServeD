@@ -26,26 +26,23 @@ import com.verknowsys.served.notifications._
  *  Main Maintainer loader.
  */
 
-object SvdMaintainer extends Actor with Utils {
+object Maintainer extends Actor with Utils {
     
     start
 
     
     def act {
-        Actor.loop {
+        loop {
             receive {
-                case Message(x) =>
-                    logger.trace("Received message: " + x)
-
                 case Init =>
                     logger.info("Maintainer ready")
 
                 case Quit =>
                     logger.info("Quitting Maintainer…")
 
-                case GetUsers(x) =>
-                    val content = x.map {a => "userName: " + a.userName + ", pass: " + a.pass + ", uid: " + a.uid + ", gid: " + a.gid + ", homeDir: " + a.homeDir + ", shell: " + a.shell + ", information: " + a.information + "\n"}
-                    logger.debug("Content:\n" + content)
+                // case GetUsers(x) =>
+                //     val content = x.map {a => "userName: " + a.userName + ", pass: " + a.pass + ", uid: " + a.uid + ", gid: " + a.gid + ", homeDir: " + a.homeDir + ", shell: " + a.shell + ", information: " + a.information + "\n"}
+                //     logger.debug("Content:\n" + content)
 
                 case x: AnyRef =>
                     logger.trace("Command not recognized. Maintainer will ignore signal: " + x.toString)
@@ -62,25 +59,25 @@ object SvdMaintainer extends Actor with Utils {
     */
     def main(args: Array[String]) {
 
-        logger.debug("Mainainer object size: " + sizeof(SvdMaintainer))
+        logger.debug("Mainainer object size: " + sizeof(Maintainer))
         logger.debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
         logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
 
         addShutdownHook {
             SvdSystemManager ! Quit
-            SvdAccountManager ! Quit
+            AccountsManager ! Quit
             NotificationCenter ! Quit
-            SvdMaintainer ! Quit
+            Maintainer ! Quit
         }
 
         logger.info("Maintainer is loading…")
-        SvdMaintainer ! Init
+        Maintainer ! Init
         
         logger.info("NotificationCenter is loading…")
         NotificationCenter ! Init
         
         logger.info("AccountManager is loading…")
-        SvdAccountManager ! Init
+        AccountsManager ! Init
         
         logger.info("SystemManager is loading…")
         SvdSystemManager ! Init
