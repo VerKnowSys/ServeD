@@ -495,7 +495,45 @@ userjobs(Proc *p, uid_t user)
 }
 
 
-DataStructure*
+/*
+ * @author dmilith
+ * Converts DataStructure to char*
+ */
+char*
+extractString(DataStructure* given) {
+    DataStructure* iter;
+    char buffer[5+1]; // word
+    char* breakp = ",";
+    char* endp = "/";
+    char* result = malloc(strlen("/") + 1);
+    strcpy(result, "/");
+    
+    for (iter = given; NULL != iter; iter = iter->next) {
+        const char * concat = malloc(
+            strlen((char*)iter->processName) + 
+            strlen(breakp) + 
+            sizeof(buffer) +
+            strlen(endp) +
+            1);
+        if (concat) {
+            strcpy(concat, iter->processName);
+            strcat(concat, breakp);
+            sprintf(buffer, "%d", (unsigned int)iter->pid);
+            strcat(concat, buffer);
+            strcat(concat, endp);
+            
+            result = realloc(result, strlen(result) + strlen(concat) + 1);
+            if (result) {
+                strcat(result, concat);
+            }
+        }
+        free(concat);
+    }
+    return result;
+}
+
+
+char*
 processes() {
     Proc *init;
 
@@ -506,7 +544,7 @@ processes() {
     init = ptree(0);
 
     if ( !init ) {
-      return data;
+      return "NONE";
     }
 
  // switch (opt) {
@@ -523,5 +561,5 @@ processes() {
  // }
     print(1,0,init);
     
-    return data;
+    return extractString(data);
 }
