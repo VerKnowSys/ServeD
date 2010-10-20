@@ -8,7 +8,7 @@ import com.verknowsys.served.utils.Utils
  * 
  * @author teamon
  */
-abstract class Manager(owner: AccountManager) extends Actor with Utils {
+abstract class Manager(owner: AccountManager) extends Actor with Utils with MonitoredActor {
     start
     
     protected def account = owner.account
