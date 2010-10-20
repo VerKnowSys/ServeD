@@ -11,6 +11,15 @@ import com.verknowsys.served.systemmanager._
 import scala.actors.Actor
 import com.sun.jna.{Native, Library}
 
+
+class SystemProcess(
+    val processName: String = "ROOT",
+    val pid: String = "0"
+) {
+    override def toString = "PNAME: %s, PID: %s.  ".format(processName, pid)
+}
+
+
 /**
 *   @author dmilith
 *   
@@ -27,7 +36,7 @@ object SvdSystemManager extends Actor with Utils {
             receive {
                 case Init =>
                     logger.info("SystemManager ready")
-                    logger.trace(ps.processes(1,0)) // show user threads, don't sort
+                    logger.trace("Process list: %s".format(processes.mkString)) // show user threads, don't sort
                     
                 case Quit =>
                     logger.info("Quitting SystemManager…")
@@ -83,5 +92,19 @@ object SvdSystemManager extends Actor with Utils {
                 logger.trace("Command not recognized. sendSignalToPid will ignore You: %s".format(x))
                 
         }
+
+
+    /**
+    *   @author dmilith
+    *   
+    *   THis function returns List[SystemProcess] from given process list in String
+    */
+    def processes: List[SystemProcess] =
+        for(process <- ps.processes(1,1).split("/").toList.tail) // tail cause we drop first empty element
+            yield
+                new SystemProcess(
+                    processName = process.split(",").head,
+                    pid = process.split(",").last
+                )
 
 }
