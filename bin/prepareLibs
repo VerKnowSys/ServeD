@@ -7,6 +7,7 @@
 cd lib/pstree/
 #make distclean
 
+make clean
 ulimit -c 0 # don't throw core file on segfault
 
 if [ ! -e 'config.h' ]; then

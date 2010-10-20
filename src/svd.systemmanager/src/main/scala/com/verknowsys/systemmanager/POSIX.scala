@@ -4,7 +4,7 @@
 package com.verknowsys.served.systemmanager
 
 
-import com.sun.jna.{Library, Structure}
+import com.sun.jna.Library
 
 
 /**
@@ -79,17 +79,13 @@ trait POSIX extends Library {
 }
 
 
-trait DataStructure extends Structure.ByValue {
-    val processName: String
-    val pid: Int
-    val next: DataStructure
-}
-
-// class Proc extends Structure.ByReference{}
-
-
+/**
+*   @author dmilith
+*   
+*   PSTREE - ServeD native library (JNA)
+*/
 trait PSTREE extends Library {
     
-    def processes: DataStructure
+    def processes: String
     
 }

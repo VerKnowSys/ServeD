@@ -24,7 +24,7 @@ class XMPPGate(host: String, port: Int, login: String, password: String, resourc
         
         try {
             connection.login(login, password, resource)
-            logger.trace("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
+            logger.debug("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
         } catch {
             case x: Throwable =>
                 logger.error("Error while connecting to XMPP server. Please check login / password.")

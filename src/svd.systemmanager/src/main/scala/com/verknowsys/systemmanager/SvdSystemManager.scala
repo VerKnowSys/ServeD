@@ -4,14 +4,12 @@
 package com.verknowsys.served.systemmanager
 
 
-import com.verknowsys.served.systemmanager._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.systemmanager._
 
 import scala.actors.Actor
-import com.sun.jna.Library
-import com.sun.jna.Native
-
+import com.sun.jna.{Native, Library}
 
 /**
 *   @author dmilith
@@ -21,16 +19,15 @@ import com.sun.jna.Native
 object SvdSystemManager extends Actor with Utils {
     
     start
-
-
+    
+    
     def act {
         Native.setProtected(true) // 2010-10-11 23:43:21 - dmilith - set JVM protection (in case of JNA code fail it should only throw an exception)
         Actor.loop {
             receive {
                 case Init =>
                     logger.info("SystemManager ready")
-                    val processes: DataStructure = ps.processes.next
-                    logger.trace("PS: %s".format(processes.processName))
+                    logger.trace(ps.processes)
                     
                 case Quit =>
                     logger.info("Quitting SystemManager…")
