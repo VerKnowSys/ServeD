@@ -3,6 +3,17 @@ package com.verknowsys.served.utils.monitor
 import scala.actors.Actor
 import scala.collection.mutable.ListBuffer
 
+/**
+ * Monitores registered actors state
+ * 
+ * @example
+ *      class MyActor extends MonitoredActor
+ *      ActorsMonitor.start
+ *      val a = new MyActor
+ *      a.start // and it's already registered for watching
+ * 
+ */
+
 object ActorsMonitor extends Actor {
     val actors = ListBuffer[MonitoredActor]()
     
