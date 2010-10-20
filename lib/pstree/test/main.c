@@ -4,19 +4,20 @@
 #include "../svd.h"
 
 
-extern DataStructure* processes();
+extern char* processes();
 
 
-int main(char* argv, char** args) {
+int main(int argv, char** args) {
 
     printf("%s\n", "Processes:");
 
-    DataStructure* data = processes();
+    char* data = processes();
+    printf("%s", data);
     
-    DataStructure* iter;
-    for (iter = data; NULL != iter; iter = iter->next) {
-        printf("%s - %d\n", iter->processName, iter->pid);
-    }
+    // DataStructure* iter;
+    //     for (iter = data; NULL != iter; iter = iter->next) {
+    //         printf("%s - %d\n", iter->processName, iter->pid);
+    //     }
     
     return 0;
 }
