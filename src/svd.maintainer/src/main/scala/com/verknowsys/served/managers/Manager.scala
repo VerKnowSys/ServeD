@@ -2,6 +2,7 @@ package com.verknowsys.served.managers
 
 import scala.actors.Actor
 import com.verknowsys.served.utils.Utils
+import com.verknowsys.served.utils.monitor._
 
 /**
  * Base class for all managers
