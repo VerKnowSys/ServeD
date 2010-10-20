@@ -1,7 +1,7 @@
 package com.verknowsys.served.utils.monitor
 
 import scala.collection.mutable.Map
-import scala.swing._
+import swing._
 import javax.swing.table.AbstractTableModel
 import java.io._
 

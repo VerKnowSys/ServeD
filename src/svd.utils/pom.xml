@@ -33,6 +33,12 @@
 	
 	<dependencies>
 		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-swing</artifactId>
+			<version>${scala.version}</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>net.sourceforge.messadmin</groupId>
 			<artifactId>MessAdmin-Core</artifactId>
 			<version>4.0</version>
