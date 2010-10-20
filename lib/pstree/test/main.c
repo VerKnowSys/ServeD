@@ -4,14 +4,14 @@
 #include "../svd.h"
 
 
-extern char* processes();
+extern char* processes(int compress, int sort);
 
 
 int main(int argv, char** args) {
 
     printf("%s\n", "Processes:");
 
-    char* data = processes();
+    char* data = processes(1,1);
     printf("%s", data);
     
     // DataStructure* iter;

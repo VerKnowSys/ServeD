@@ -6,6 +6,8 @@ import scala.collection.mutable.ListBuffer
 /**
  * Monitores registered actors state
  * 
+ * @author teamon
+ *  
  * @example
  *      class MyActor extends MonitoredActor
  *      ActorsMonitor.start

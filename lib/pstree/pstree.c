@@ -534,12 +534,20 @@ extractString(DataStructure* given) {
 
 
 char*
-processes() {
+processes(int comp__, int sort__) {
     Proc *init;
 
     showpid  = 1; 
     showuser = 1;
-    exposeargs = 0;
+    exposeargs = 1;
+    sortme = sort__; // sort processes by name
+    showuser = 1;
+    if (comp__ == 0) {
+        compress = 1; // don't show userland threads
+    } else {
+        compress = 0; // show userland threads
+    }
+    
 
     init = ptree(0);
 
@@ -547,18 +555,6 @@ processes() {
       return "NONE";
     }
 
- // switch (opt) {
- // case 'a':   showargs = 1; break;
- // case 'c':   compress = 0; break;
- // case 'l':   clipping = 0; break;
- // case 'n':   sortme = compress = 0; break;
- // case 'p':   
- //break;
- // case 's':   exposeargs = 1; break;
- // case 'u':   showuser = 1; break;
- // case 'V':   printf("%s (ps-etc) %s\n", argv[0], version); exit(0);
- // default :   exit(1);
- // }
     print(1,0,init);
     
     return extractString(data);

@@ -86,6 +86,16 @@ trait POSIX extends Library {
 */
 trait PSTREE extends Library {
     
-    def processes: String
+    /**
+    *   @author dmilith
+    *   
+    *   Return list of processes as char*
+    *   
+    *   Arguments: 
+    *       show: 0/1, 1 would show user processes threads
+    *       sort: 0/1, 0 would give unsorted list of processes
+    *   
+    */   
+    def processes(show: Int, sort: Int): String
     
 }

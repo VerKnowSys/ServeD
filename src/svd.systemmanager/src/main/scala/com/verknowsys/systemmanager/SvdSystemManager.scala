@@ -27,7 +27,7 @@ object SvdSystemManager extends Actor with Utils {
             receive {
                 case Init =>
                     logger.info("SystemManager ready")
-                    logger.trace(ps.processes)
+                    logger.trace(ps.processes(1,0)) // show user threads, don't sort
                     
                 case Quit =>
                     logger.info("Quitting SystemManager…")
