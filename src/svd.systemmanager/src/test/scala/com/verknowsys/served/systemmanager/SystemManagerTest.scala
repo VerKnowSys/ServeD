@@ -1,11 +1,10 @@
 package com.verknowsys.served.systemmanager
 
-
+import com.verknowsys.served.utils._
 import POSIXSignals._
 
 import org.specs._
 import java.io._
-import com.jezhumble.javasysmon._
 import com.verknowsys.served.systemmanager._
 
 
@@ -38,8 +37,14 @@ class SvdSystemManagerTest extends SpecificationWithJUnit {
         
         
         "it must be able to check list of pids of running system and also match for name" in {
-            println("UID of process: %d".format(SvdSystemManager.posix.geteuid))
-            // println("Sysmon OS name: %s".format(SvdSystemManager.sysmon.osName))
+            val pss = SvdSystemManager.ps.processes(1,1)
+            println("User processes: %s".format(pss))
+            if (System.getProperty("os.name") == "Mac OS X")
+                pss.mkString must be matching("launchd")
+            else
+                pss.mkString must be matching("init")
+            
+            // pss.size must 0
         }
         
     }
