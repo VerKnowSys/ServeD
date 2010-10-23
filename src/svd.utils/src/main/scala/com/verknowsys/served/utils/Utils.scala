@@ -93,4 +93,27 @@ trait Utils {
      */
     def sizeof(any: Any) = ObjectProfiler.sizeof(any)
 
+
+    /**
+    *   @author dmilith
+    *   
+    *   Small helper
+    *   
+    */   
+    def isLinux = {
+        System.getProperty("os.name") == "Linux"
+    }
+    
+    
+    /**
+    *   @author dmilith
+    *   
+    *   Small helper
+    *   
+    */
+    def isMac = {
+        System.getProperty("os.name") == "Mac OS X"
+    }
+    
+    
 }
