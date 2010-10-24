@@ -13,7 +13,7 @@ extern char* processes(int compress, int sort);
 int main(int argv, char** args) {
 
     int debug = 0;
-    int indexBase = 10; // How much loops
+    int indexBase = 25; // How much loops
     int outerIndex;
     
     
@@ -33,24 +33,27 @@ int main(int argv, char** args) {
 
             preset = processes(1, 1);
             if (debug) {
+                printf("\n\n\n\tTEST: index: %d", index);
                 printf("\n\n\n\tTEST: Processes sorted with Threads: \n%s\n\n", preset);
             }
 
             preset = processes(0, 0);
             if (debug) {
+                printf("\n\n\n\tTEST: index: %d", index);
                 printf("\n\n\n\tTEST: Processes unsorted without Threads: \n%s\n\n", preset);
             }
 
             preset = processes(1, 0);
             if (debug) {
+                printf("\n\n\n\tTEST: index: %d", index);
                 printf("\n\n\n\tTEST: Processes unsorted with Threads: \n%s\n\n", preset);
             }
             
         }
         gettimeofday(&endTime, NULL);
 
-        printf("TEST TIME RESULT (for %d loops): %dms\n", indexBase,  (
-            ((endTime.tv_usec) - (startTime.tv_usec))/1000));
+        printf("TEST TIME RESULT. For (4 * %d) => %d calls): %dms\n", indexBase, (indexBase * 4),
+            ((endTime.tv_usec - startTime.tv_usec)/1000));
     }
 
     
