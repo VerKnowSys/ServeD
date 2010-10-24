@@ -6,23 +6,37 @@
 
 
 0. Requirements:
-	0.1 - Java 1.6.0_20 at least
-	0.2 - Maven 3.x
-	0.3 - POSIX compatible system
-	0.4 - Scala 2.8.0
+
+	0.1 - Java
+	    >= Latest 1.6, 32-bit
+
+	0.2 - Maven
+	    >= 3.x
+
+	0.3 - Scala
+	    >= 2.8.0
+
+	0.4 - List of currently supported platforms:
+	    Mac OSX (100% features, development),
+	    Free BSD (100% features, production),
+	    Linux Debian (100% features, production)
+
+
+
+1. Instalation
+	1.1 - Use bin/install
+
+
+
+2. Testing
+    2.1 - Use bin/test
+
+
+
+2. Testing
+  2.1 Use bin/test
 
 	
-1. Instalation
-	1.1 - Use bin/installAll
-
-
-2. Testing
-    2.1 - Use bin/testAll
-
-
-2. Testing
-  2.1 Use bin/testAll
-
 	
 That's all folks
 
@@ -35,6 +49,7 @@ Questions?
 	- dmilith@verknowsys.com on jabber/mail
 	- dmilith@gmail.com on google sucking asses jabber/mail
 	- dmilith on Skype
+	
 	
 	And I'm as "teamon" on:
 	- #scala.pl, #scala at irc.freenode.net
