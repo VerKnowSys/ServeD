@@ -52,7 +52,7 @@ class SvdSystemManagerTest extends SpecificationWithJUnit with UtilsCommon {
         }
         
         
-        "it must pass basic efficiency benchmark to be usefull (it's native so it should be blazing fast right?)" in {
+        "it must be able to get process list from system right away" in {
             
             @specialized var index = 100
 
@@ -64,12 +64,16 @@ class SvdSystemManagerTest extends SpecificationWithJUnit with UtilsCommon {
                 val d = processList(false, false).head
                 
                 for (i <- a :: b :: c :: d :: Nil) {
-                    
                     i must notBeNull
-                    // i.pid must beGreaterThan(-1) // 2010-10-24 06:40:21 - dmilith - NOTE: (root,0)
+                    i.pid.toInt must beGreaterThanOrEqualTo(0)
                     i.processName must be matching("[a-zA-Z0-9]*")
-                    
                 }
+
+                val all = processList(true, true)
+                println("Whole processList size: %d, element count: %d".format(sizeof(all), all.size))
+                println("Single value size: %d of class %s".format(sizeof(a), a.getClass))
+                a.getClass.toString must be matching("SystemProcess")
+                all.head.getClass.toString must be matching("SystemProcess")
                 
                 index -= 1
             }
