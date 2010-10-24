@@ -7,7 +7,7 @@ export MAVEN_OPTS="$MAVEN_OPTS -Xshare:off -agentpath:/Applications/YourKit_Java
 
 args=""
 
-bin/installAll
+bin/install
 
 cd src/svd.maintainer/
 $MVN_EXEC $MVN_PARAMS exec:java -Dexec.args=$args $@
