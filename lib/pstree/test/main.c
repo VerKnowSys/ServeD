@@ -30,8 +30,9 @@ int main(int argc, char** argv) {
                     printf("\n\tTEST: argv[%d] = %s\n", count, argv[count]);                    
                 }
                 
-                int indx = 50, baseindx = 50;
+                int indx = 100, baseindx = 100;
                 gettimeofday(&startTime, NULL);
+                printf("TEST TIME RESULT FOR SINGLE RUN:\n");
                 while (indx > 0) {
                     gettimeofday(&startTime2, NULL);
                     char* preset = malloc((sizeof processes(1, 1)) + BUFFER);
@@ -45,7 +46,7 @@ int main(int argc, char** argv) {
                     seconds2  = endTime2.tv_sec  - startTime2.tv_sec;
                     useconds2 = endTime2.tv_usec - startTime2.tv_usec;
                     mtime = ((seconds2) * 1000 + useconds2/1000.0) + 0.5;
-                    printf("TEST TIME RESULT FOR SINGLE RUN: %ldms\n", mtime);
+                    printf("%ldms.. ", mtime);
 
                     indx--;
                 }
@@ -54,7 +55,7 @@ int main(int argc, char** argv) {
                 seconds  = endTime.tv_sec  - startTime.tv_sec;
                 useconds = endTime.tv_usec - startTime.tv_usec;
                 mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
-                printf("TEST TIME RESULT FOR %d RUNS: %ldms\n", baseindx, mtime);
+                printf("\nTEST TIME RESULT FOR %d RUNS: %ldms\n", baseindx, mtime);
                 
                 exit(0);
                 
