@@ -293,43 +293,41 @@ peek()
  * towards the end of the line, so when dle() prints it it resets it
  * to ' '
  */
-void
-dle()
-{
-    int dx, xp, dsp;
-    char c;
-
-    for ( xp = dsp = 0; dsp < tsp; dsp++ ) {
-	dx = T(stack)[dsp].column - xp;
-	printcard("%*s%c", dx, "", T(stack)[dsp].active);
-	xp = T(stack)[dsp].column;
-	if ( T(stack)[dsp].active == '`' )
-	    T(stack)[dsp].active = ' ';
-    }
-}
+// void
+// dle()
+// {
+    // int dx, xp, dsp;
+    // char c;
+    // for ( xp = dsp = 0; dsp < tsp; dsp++ ) {
+    // dx = T(stack)[dsp].column - xp;
+    // printcard("%*s%c", dx, "", T(stack)[dsp].active);
+    // xp = T(stack)[dsp].column;
+    // if ( T(stack)[dsp].active == '`' )
+        // T(stack)[dsp].active = ' ';
+    // }
+// }
 
 
 int
 printchar(char c)
 {
-    if ( c == 0 )
-	return putcard(' ');
-    else if ( c == ' ' && exposeargs )
-	return printcard("\\\%03o", c);
-    else if ( c < ' ' || !isprint(c) )
-	return printcard("\\\%03o", c);
-    else
-	return putcard(c);
+    //     if ( c == 0 )
+    // return putcard(' ');
+    //     else if ( c == ' ' && exposeargs )
+    // return printcard("\\\%03o", c);
+    //     else if ( c < ' ' || !isprint(c) )
+    // return printcard("\\\%03o", c);
+    //     else
+    // return putcard(c);
 }
 
 
 int
 printargv0(char *p)
 {
-    int ret = 0;
-
-    while ( *p )
-	ret += printchar(*p++);
+    // int ret = 0;
+    // while ( *p )
+    // ret += printchar(*p++);
 }
 
 
@@ -340,56 +338,54 @@ printargv0(char *p)
 int
 printjob(int first, int count, Proc *p)
 {
-    int tind = 0;
-
-    if ( showargs || !first ) dle();
-
-    if ( count )
-	tind = printcard("-%d*[", 1+count);
-    else if ( tsp )
-	tind = putcard('-');
-
-    if ( showargs ) {
-	if ( T(p->cmdline) ) {
-	    unsigned int i;
-
-	    tind += printargv0( (clipping && !p->renamed) ? basename(T(p->cmdline)) : T(p->cmdline) );
-		
-	    for (i=0; i < S(p->cmdline) && T(p->cmdline)[i]; i++)
-		;
+    // int tind = 0;
+    // if ( showargs || !first ) dle();
+    // if ( count )
+    // tind = printcard("-%d*[", 1+count);
+    // else if ( tsp )
+    // tind = putcard('-');
+    //     if ( showargs ) {
+    // if ( T(p->cmdline) ) {
+    //     unsigned int i;
+    // 
+    //         // tind += printargv0( (clipping && !p->renamed) ? basename(T(p->cmdline)) : T(p->cmdline) );
+    //  
+    //     for (i=0; i < S(p->cmdline) && T(p->cmdline)[i]; i++)
+    //  ;
+    //     
+    //         // for (; i < S(p->cmdline); i++)
+    //         // printchar(T(p->cmdline)[i]);
+    // }
+    if (! p->renamed ) {
+        if ((strcmp(p->process, "launchd") == 0) || (strcmp(p->process, "init") == 0)) { // 2010-10-24 02:44:37 - dmilith -  NOTE: TODO: HACK: XXX: read README about supported platforms. This hardcode is a security solution. (not yet tested)
+        } else {
+            data = addProcessToDataStructure(data, p->process, p->pid);
+        }
 	    
-	    for (; i < S(p->cmdline); i++)
-		printchar(T(p->cmdline)[i]);
-	}
-	if ( p->renamed )
-	    po() + printcard("%s", p->process) + pc();
     }
-    else
-	tind += printcard("%s", p->process);
-	data = addProcessToDataStructure(data, p->process, p->pid);
+    //     po() + printcard("%s", p->process) + pc();
+    //     }
+    //     else
+    // tind += printcard("%s", p->process);
 
-    if ( showpid )
-	tind += po() + printcard("%d", p->pid);
-
-    if ( showuser && p->parent && (p->uid != p->parent->uid) ) {
-	struct passwd *pw = getpwuid(p->uid);
-
-	tind += po();
-	if ( pw )
-	    tind += printcard("%s", pw->pw_name);
-	else
-	    tind += printcard("#%d", p->uid);
-    }
-
-    tind += pc();
-
-    if ( showargs )
-	eol();
-    else if ( p->child ) {
-	putcard('-');
-	tind++;
-    }
-    return tind;
+    //     if ( showpid )
+    // tind += po() + printcard("%d", p->pid);
+    // if ( showuser && p->parent && (p->uid != p->parent->uid) ) {
+    // struct passwd *pw = getpwuid(p->uid);
+    // tind += po();
+    // if ( pw )
+    //     tind += printcard("%s", pw->pw_name);
+    // else
+    //     tind += printcard("#%d", p->uid);
+    //     }
+    // tind += pc();
+    //     if ( showargs )
+    // eol();
+    //     else if ( p->child ) {
+    // putcard('-');
+    // tind++;
+    //     }
+    // return 1;
 }
 
 
@@ -505,8 +501,7 @@ extractString(DataStructure* given) {
     char buffer[5+1]; // word
     char* breakp = ",";
     char* endp = "/";
-    char* result = malloc(strlen("/") + 1);
-    strcpy(result, "/");
+    char* result = malloc(strlen("") + 1);
     
     for (iter = given; NULL != iter; iter = iter->next) {
         const char * concat = malloc(
@@ -535,6 +530,7 @@ extractString(DataStructure* given) {
 
 char*
 processes(int comp__, int sort__) {
+
     Proc *init;
 
     showpid  = 1; 
@@ -542,13 +538,13 @@ processes(int comp__, int sort__) {
     exposeargs = 1;
     sortme = sort__; // sort processes by name
     showuser = 1;
+
     if (comp__ == 0) {
         compress = 1; // don't show userland threads
     } else {
         compress = 0; // show userland threads
     }
     
-
     init = ptree(0);
 
     if ( !init ) {

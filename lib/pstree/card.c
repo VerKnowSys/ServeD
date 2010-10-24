@@ -41,10 +41,10 @@ printcard(char *fmt, ...)
 int
 putcard(char c)
 {
-    if ( !T(line) )
-	putchar(c);
-    else if ( S(line) < line.alloc )
-	EXPAND(line) = c;
+    //     if ( !T(line) )
+    //     putchar(c);
+    //     else if ( S(line) < line.alloc )
+    // EXPAND(line) = c;
 
     return 1;
 }
@@ -60,7 +60,7 @@ ejectcard()
 	fwrite(T(line), len, 1, stdout);
 	S(line) = 0;
     }
-    putchar('\n');
+    // putchar('\n');
 }
 
 
