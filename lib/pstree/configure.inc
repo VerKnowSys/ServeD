@@ -639,7 +639,7 @@ AC_INIT () {
     rm -f $__config_files
     __cwd=`pwd`
     exec 5>&1 1>$__cwd/config.log 2>&1
-    AC_CONFIGURE_FOR=__AC_`echo $1 | sed -e 's/\..$//' | tr 'a-z' 'A-Z' | tr ' ' '_'`_D
+    AC_CONFIGURE_FOR=__AC_CONFIG_H #`echo $1 | sed -e 's/\..$//' | tr 'a-z' 'A-Z' | tr ' ' '_'`_D
 
     # check to see whether to use echo -n or echo ...\c
     #
