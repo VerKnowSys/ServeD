@@ -106,7 +106,7 @@ class SvdSystemManagerTest extends SpecificationWithJUnit with UtilsCommon {
                     @specialized val current2 = processCount(true, false)
                     @specialized val current3 = processCount(false, false)
                     @specialized val current4 = processCount(false, true)
-                    amountWithThreadsAndSorted must beCloseTo(current, 10) // 2010-10-24 07:24:31 - dmilith - NOTE: error delta +-10
+                    amountNoThreadsAndSorted must beCloseTo(current4, 2) // 2010-10-24 07:24:31 - dmilith - NOTE: error delta +-10
                     index -= 1
                 }
                 @specialized val stop = (new java.util.Date).getTime
