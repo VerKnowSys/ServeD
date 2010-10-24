@@ -10,21 +10,24 @@ import java.util.regex.Pattern
 import org.apache.log4j._
 import clime.messadmin.providers.sizeof.ObjectProfiler
 
-/**
- * User: dmilith
- * Date: Jul 10, 2009
- * Time: 4:28:05 PM
- */
 
-trait Utils {
+
+/**
+*   @author dmilith
+*   
+*   Utils trait should be used by every Actor in ServeD
+*   
+*/
+trait Utils extends UtilsCommon {
     
     checkOrCreateVendorDir
     
         
     /**
-    * @author dmilith
+    *   @author dmilith
     *   
-    * Get and spread props for all believers..
+    *   Get and spread props for all believers..
+    *   
     */   
     lazy val props = Config.props
     
@@ -47,9 +50,9 @@ trait Utils {
     
 
     /**
-     * @author dmilith
+     *  @author dmilith
      *
-     * Checks and creates (if missing) config property file for application
+     *  Checks and creates (if missing) config property file for application
      *
      */
     def checkOrCreateVendorDir = {
@@ -64,36 +67,53 @@ trait Utils {
     }
 
 
+}
+
+
+
+
+/**
+*   @author dmilith
+*   
+*   UtilsCommon trait is higher level of abstraction (to be usable in tests).
+*   Utils trait will always include UtilsCommon
+*   
+*/
+trait UtilsCommon {
+
+
     /**
-     * @author dmilith
+     *  @author dmilith
      *
-     * Adds a hook for SIGINT/ SIGTERM signals to gracefully close the app
+     *  Adds a hook for SIGINT/ SIGTERM signals to gracefully close the app
      *
-     * @example
-     * addShutdownHook {
+     *  @example
+     *  addShutdownHook {
      *     closeMySockets
      *     logger.info("Dying!")
-     * }
+     *  }
      *
      */
     def addShutdownHook(block: => Unit) =
-        Runtime.getRuntime.addShutdownHook(new Thread {
-            override def run = block
-        })
+        Runtime.getRuntime.addShutdownHook(
+            new Thread {
+                override def run = block
+            }
+        )
 
 
     /**
-     * @author dmilith
+     *  @author dmilith
      *
-     * Returns size (in bytes) of given object in JVM memory
+     *  Returns size (in bytes) of given object in JVM memory
      *
-     * @example
-     * logger.info ( sizeof ( new Date ( ) ))
+     *  @example
+     *  logger.info ( sizeof ( new Date ( ) ))
      *
      */
     def sizeof(any: Any) = ObjectProfiler.sizeof(any)
-
-
+    
+    
     /**
     *   @author dmilith
     *   
