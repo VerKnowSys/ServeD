@@ -100,8 +100,8 @@ object SvdSystemManager extends Actor with Utils {
     *
     */
     def processList(showThreads: Boolean = true, sort: Boolean = true): List[SystemProcess] = {
-        @specialized val st = if (showThreads) 1 else 0
-        @specialized val so = if (sort) 1 else 0
+        @specialized lazy val st = if (showThreads) 1 else 0
+        @specialized lazy val so = if (sort) 1 else 0
         lazy val sourceList = pstreelib.processes(st, so).split("/").toList.filter{
             a =>
                 lazy val tmp: String = a.split(",").head
