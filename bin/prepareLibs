@@ -6,8 +6,10 @@
 
 cd lib/pstree/
 
+
 # 2010-10-24 06:22:29 - dmilith - NOTE: a little hack to be able to distclean without need of running "bin/clean" script
-if [ "$@" == "c" ]; then 
+if [ "$1" == "c" ]
+then
     make distclean
 else
     make clean
@@ -20,7 +22,7 @@ if [ ! -e 'config.h' ]; then
     ./configure.sh --use-kvm # use kvm lib by default
 fi
 
-rm Makefile # removing auto generated Makefile with prepared one
+rm Makefile # replacing auto generated Makefile with prepared one
 cp Makefile.$platform Makefile
 make
 
@@ -28,7 +30,7 @@ if [ "$?" -eq "0" ]; then
     cd test
     rm -rfv test
     gcc main.c $CFLAGS -o test ../*.o
-    ./test
+    ./test quick $@
 fi
 
 exit 0
