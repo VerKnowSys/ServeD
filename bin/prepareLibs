@@ -30,7 +30,7 @@ if [ "$?" -eq "0" ]; then
     cd test
     rm -rfv test
     gcc main.c $CFLAGS -o test ../*.o
-    ./test quick $@
+    ./test $@
 fi
 
 exit 0
