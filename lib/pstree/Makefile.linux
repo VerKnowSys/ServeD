@@ -1,7 +1,5 @@
 CC=/usr/bin/gcc
-CFLAGS=-w -O0 -g3 -Wall -fmessage-length=0 -fPIC -m32
-BINDIR=/usr/local/bin
-MANDIR=/usr/local/man
+CFLAGS=-O3 -Wall -fmessage-length=0 -fPIC -m32 -minline-all-stringops -fgcse -fdefer-pop -march=pentium4 -ffast-math -Werror -funroll-loops -foptimize-sibling-calls -shared
 
 OBJS=pstree.o ptree.o version.o card.o
 PGM=libpstree.so
@@ -9,7 +7,7 @@ PGM=libpstree.so
 all: $(PGM)
 
 libpstree.so: $(OBJS)
-	$(CC) $(CFLAGS) -shared -m32 -o ../libpstree.so $(OBJS)
+	$(CC) $(CFLAGS) -o ../libpstree.so $(OBJS)
 
 version.o: VERSION
 	echo 'char version[] = VERSION;' > version.c
