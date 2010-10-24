@@ -1,32 +1,31 @@
 /*
  * pstree: display a process heirarchy.
  */
+
 #include "config.h"
+#include "ptree.h"
+#include "svd.h"
 
 #include <stdio.h>
 #include <pwd.h>
 #include <sys/types.h>
-
 #include <unistd.h>
+
 #if HAVE_LIBGEN_H
 # include <libgen.h>
 #endif
 
-#include "ptree.h"
-
-#include "svd.h"
-
 #if !HAVE_BASENAME
 #include <string.h>
 
-char *
-basename(char *p)
-{
+char*
+basename(char *p) {
     char *ret = strrchr(p, '/');
-
     return ret ? ret+1 : p;
 }
+
 #endif
+
 
 
 extern int  printcard(char *,...);
@@ -38,13 +37,11 @@ int compress = 1;	/* !-c: compact duplicate subtrees */
 int clipping = 1;	/* !-l: clip output to screenwidth */
 int sortme   = 1;	/* !-n: sort output */
 int showpid  = 0;	/* -p:  show process ids */
-int showuser = 0;	/* -u:  show username transitions */
+int showuser = 1;	/* -u:  show username transitions */
 int exposeargs = 0;	/* -s:  expand spaces inside arguments to \040 */
 
 
 DataStructure * data;
-
-// typedef void (*CALL)(char* processName, int pid);
 
 // 2010-10-13 23:45:51 - dmilith - NOTE: helper to create dynamic data structure
 DataStructure* createDataStructure(char* processName, unsigned int pid) {
@@ -190,21 +187,21 @@ static int _paren = 0;
 int
 po()
 {
-    if (_paren)
-	return putcard(',');
-    _paren = 1;
-    return putcard(' ') + putcard('(');
+    // if (_paren)
+    // return putcard(',');
+    // _paren = 1;
+    // return putcard(' ') + putcard('(');
 }
 
 
 int
 pc()
 {
-    if (_paren) {
-	_paren = 0;
-	return putcard(')');
-    }
-    return 0;
+    //     if (_paren) {
+    // _paren = 0;
+    // return putcard(')');
+    //     }
+    //     return 0;
 }
 
 
@@ -213,23 +210,23 @@ static int _bracket = 0;
 void
 bo()
 {
-    _bracket++;
+    // _bracket++;
 }
 
 void
 bc()
 {
-    if (_bracket) --_bracket;
+    // if (_bracket) --_bracket;
 }
 
 void
 eol()
 {
-    int i;
+    // int i;
 
-    for (i=0; i < _bracket; i++)
-	putcard(']');
-    ejectcard();
+    //     for (i=0; i < _bracket; i++)
+    // putcard(']');
+    //     ejectcard();
 }
 
 
@@ -348,7 +345,7 @@ printjob(int first, int count, Proc *p)
     // if ( T(p->cmdline) ) {
     //     unsigned int i;
     // 
-    //         // tind += printargv0( (clipping && !p->renamed) ? basename(T(p->cmdline)) : T(p->cmdline) );
+    //      tind += printargv0( (clipping && !p->renamed) ? basename(T(p->cmdline)) : T(p->cmdline) );
     //  
     //     for (i=0; i < S(p->cmdline) && T(p->cmdline)[i]; i++)
     //  ;
@@ -356,18 +353,18 @@ printjob(int first, int count, Proc *p)
     //         // for (; i < S(p->cmdline); i++)
     //         // printchar(T(p->cmdline)[i]);
     // }
-    if (! p->renamed ) {
-        if ((strcmp(p->process, "launchd") == 0) || (strcmp(p->process, "init") == 0)) { // 2010-10-24 02:44:37 - dmilith -  NOTE: TODO: HACK: XXX: read README about supported platforms. This hardcode is a security solution. (not yet tested)
-        } else {
+
+    // if (! p->renamed ) {
+        // if ((strcmp(p->process, "launchd") == 0) || (strcmp(p->process, "init") == 0) || (strcmp(p->process, "root"))) { // 2010-10-24 02:44:37 - dmilith -  NOTE: TODO: HACK: XXX: read README about supported platforms. This hardcode is a security solution. (not yet tested)
+        // } else {
             data = addProcessToDataStructure(data, p->process, p->pid);
-        }
-	    
-    }
+        // }
+         
+    // }
     //     po() + printcard("%s", p->process) + pc();
     //     }
     //     else
     // tind += printcard("%s", p->process);
-
     //     if ( showpid )
     // tind += po() + printcard("%d", p->pid);
     // if ( showuser && p->parent && (p->uid != p->parent->uid) ) {
@@ -385,7 +382,7 @@ printjob(int first, int count, Proc *p)
     // putcard('-');
     // tind++;
     //     }
-    // return 1;
+    // return ;
 }
 
 
@@ -497,17 +494,17 @@ userjobs(Proc *p, uid_t user)
  */
 char*
 extractString(DataStructure* given) {
-    DataStructure* iter;
+    DataStructure* iter = NULL;
     char buffer[5+1]; // word
     char* breakp = ",";
     char* endp = "/";
-    char* result = malloc(strlen("") + 1);
+    char* result = malloc(strlen("\0") + 1);
     
     for (iter = given; NULL != iter; iter = iter->next) {
-        const char * concat = malloc(
+        char * concat = malloc(
             strlen((char*)iter->processName) + 
             strlen(breakp) + 
-            sizeof(buffer) +
+            (sizeof buffer) +
             strlen(endp) +
             1);
         if (concat) {
@@ -517,13 +514,14 @@ extractString(DataStructure* given) {
             strcat(concat, buffer);
             strcat(concat, endp);
             
-            result = realloc(result, strlen(result) + strlen(concat) + 1);
+            result = realloc(result, strlen(result) + strlen(concat) + 1 + 2);
             if (result) {
                 strcat(result, concat);
             }
         }
         free(concat);
     }
+    
     return result;
 }
 
@@ -532,12 +530,16 @@ char*
 processes(int comp__, int sort__) {
 
     Proc *init;
-
+    
+        
     showpid  = 1; 
     showuser = 1;
     exposeargs = 1;
     sortme = sort__; // sort processes by name
     showuser = 1;
+
+    data = createDataStructure("root", 0);
+
 
     if (comp__ == 0) {
         compress = 1; // don't show userland threads
