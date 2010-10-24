@@ -111,7 +111,8 @@ trait UtilsCommon {
      *  logger.info ( sizeof ( new Date ( ) ))
      *
      */
-    def sizeof(any: Any) = ObjectProfiler.sizeof(any)
+    def sizeof(any: Any) =
+        ObjectProfiler.sizeof(any)
     
     
     /**
@@ -120,9 +121,8 @@ trait UtilsCommon {
     *   Small helper
     *   
     */   
-    def isLinux = {
+    def isLinux =
         System.getProperty("os.name") == "Linux"
-    }
     
     
     /**
@@ -131,9 +131,8 @@ trait UtilsCommon {
     *   Small helper
     *   
     */
-    def isMac = {
+    def isMac =
         System.getProperty("os.name") == "Mac OS X"
-    }
     
     
 }

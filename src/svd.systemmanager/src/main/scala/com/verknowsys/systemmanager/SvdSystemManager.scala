@@ -67,7 +67,7 @@ object SvdSystemManager extends Actor with Utils {
     *   
     *   This function will send given signal (first param), to given pid (second param)
     */
-    def sendSignalToPid(signal: POSIXSignals.Value, pid: Int) =
+    def sendSignalToPid(signal: POSIXSignals.Value, @specialized pid: Int) =
         signal match {
             case POSIXSignals.SIGHUP =>
                 logger.trace("SigHUP sent to process pid: %s".format(pid))
@@ -100,9 +100,14 @@ object SvdSystemManager extends Actor with Utils {
     *
     */
     def processList(showThreads: Boolean = true, sort: Boolean = true): List[SystemProcess] = {
-        val st = if (showThreads) 1 else 0
-        val so = if (sort) 1 else 0
-        for(process <- pstreelib.processes(st, so).split("/").toList.tail) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
+        @specialized val st = if (showThreads) 1 else 0
+        @specialized val so = if (sort) 1 else 0
+        lazy val sourceList = pstreelib.processes(st, so).split("/").toList.filter{
+            a =>
+                lazy val tmp: String = a.split(",").head
+                (tmp != "root" && tmp != "init" && tmp != "launchd" && tmp != "") // 2010-10-24 13:59:33 - dmilith - XXX: hardcoded
+        }
+        for (process <- sourceList) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
             yield
                 new SystemProcess(
                     processName = process.split(",").head,
@@ -117,7 +122,7 @@ object SvdSystemManager extends Actor with Utils {
     *   
     *   Returns System Process count.
     */
-    def processCount(showThreads: Boolean = true, sort: Boolean = true) = processList(showThreads, sort).size
+    @specialized def processCount(@specialized showThreads: Boolean = true, @specialized sort: Boolean = true) = processList(showThreads, sort).size
     
     
 }

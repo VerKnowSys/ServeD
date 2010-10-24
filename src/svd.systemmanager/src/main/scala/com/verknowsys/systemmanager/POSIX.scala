@@ -14,10 +14,10 @@ import com.sun.jna.Library
 *   Class which describe any system process
 */
 class SystemProcess(
-    val processName: String = "ROOT",
+    val processName: String = "root",
     val pid: String = "0"
 ) {
-    override def toString = "PNAME: %s, PID: %s.  ".format(processName, pid)
+    override def toString = "PNAME: %s, PID: %s. ".format(processName, pid)
 }
 
 
