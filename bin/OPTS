@@ -16,4 +16,8 @@ export MVN_PARAMS="-e -Dmaven.test.skip.exec=true -Dmaven.test.skip=true"
 export JAVA_OPTS="-d32 -Xms32m -XX:NewRatio=1 -Xmx512m -Dfile.encoding=UTF-8 -XX:+UseFastAccessorMethods"
 export MAVEN_OPTS="$JAVA_OPTS -Dbuild.platform=$platform -Djava.library.path=../../lib/ -Dactors.corePoolSize=8 -Djna.library.path=../../lib/"
 
+
+export CFLAGS="-Wall -arch i386 -arch x86_64 -O3 -fmessage-length=0 -fPIC -march=pentium4 -ffast-math"
+
+
 export COMMAND="bin/runner $@"

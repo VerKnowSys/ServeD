@@ -28,7 +28,7 @@ make
 if [ "$?" -eq "0" ]; then
     cd test
     rm -rfv test
-    gcc main.c -o test ../card.o ../ptree.o ../version.o ../pstree.o
+    gcc main.c $CFLAGS -o test ../card.o ../ptree.o ../version.o ../pstree.o
     ./test
 fi
 
