@@ -12,13 +12,6 @@ import scala.actors.Actor
 import com.sun.jna.{Native, Library}
 
 
-class SystemProcess(
-    val processName: String = "ROOT",
-    val pid: String = "0"
-) {
-    override def toString = "PNAME: %s, PID: %s.  ".format(processName, pid)
-}
-
 
 /**
 *   @author dmilith
@@ -36,7 +29,7 @@ object SvdSystemManager extends Actor with Utils {
             receive {
                 case Init =>
                     logger.info("SystemManager ready")
-                    logger.trace("Process list: %s".format(processes.mkString)) // show user threads, don't sort
+                    logger.trace("Process list: %s".format(processList().mkString)) // no args == show user threads and sort output
                     
                 case Quit =>
                     logger.info("Quitting SystemManager…")
@@ -58,7 +51,7 @@ object SvdSystemManager extends Actor with Utils {
     *   
     *   This function is a bridge to low level libc functions
     */
-    def posix = Native.loadLibrary("c", classOf[POSIX]).asInstanceOf[POSIX]
+    def posixlib = Native.loadLibrary("c", classOf[POSIX]).asInstanceOf[POSIX]
 
 
     /**
@@ -66,7 +59,7 @@ object SvdSystemManager extends Actor with Utils {
     *   
     *   This function is a bridge to low level pstree implementation
     */
-    def ps = Native.loadLibrary("pstree", classOf[PSTREE]).asInstanceOf[PSTREE]
+    def pstreelib = Native.loadLibrary("pstree", classOf[PSTREE]).asInstanceOf[PSTREE]
 
 
     /**
@@ -97,14 +90,34 @@ object SvdSystemManager extends Actor with Utils {
     /**
     *   @author dmilith
     *   
-    *   THis function returns List[SystemProcess] from given process list in String
+    *   Converts processes as String to List of SystemProcess'es.
+    *   
+    *   Arguments: 
+    *       show: Boolean. Default: true. 
+    *           If true then it will return user processes with listed every thread of every process.
+    *       sort: Boolean. Default: true.
+    *           If true then it will return sorted alphabetically list of processes.
+    *
     */
-    def processes: List[SystemProcess] =
-        for(process <- ps.processes(1,1).split("/").toList.tail) // tail cause we drop first empty element
+    def processList(showThreads: Boolean = true, sort: Boolean = true): List[SystemProcess] = {
+        val st = if (showThreads) 1 else 0
+        val so = if (sort) 1 else 0
+        for(process <- pstreelib.processes(st, so).split("/").toList.tail) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
             yield
                 new SystemProcess(
                     processName = process.split(",").head,
                     pid = process.split(",").last
                 )
-
+                
+    }
+    
+    
+    /**
+    *   @author dmilith
+    *   
+    *   Returns System Process count.
+    */
+    def processCount(showThreads: Boolean = true, sort: Boolean = true) = processList(showThreads, sort).size
+    
+    
 }

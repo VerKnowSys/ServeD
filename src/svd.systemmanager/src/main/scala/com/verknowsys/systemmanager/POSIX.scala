@@ -7,6 +7,20 @@ package com.verknowsys.served.systemmanager
 import com.sun.jna.Library
 
 
+
+/**
+*   @author dmilith
+*   
+*   Class which describe any system process
+*/
+class SystemProcess(
+    val processName: String = "ROOT",
+    val pid: String = "0"
+) {
+    override def toString = "PNAME: %s, PID: %s.  ".format(processName, pid)
+}
+
+
 /**
 *   @author dmilith
 *   
@@ -14,7 +28,7 @@ import com.sun.jna.Library
 */
 object POSIXSignals extends Enumeration(initial = 1) {
     type POSIXSignals = Value
-    val SIGHUP, // 2010-10-05 15:03:27 - dmilith - NOTE: should have value 1
+    @specialized val SIGHUP, // 2010-10-05 15:03:27 - dmilith - NOTE: should have value 1
         SIGINT,
         SIGQUIT,
         SIGILL,
@@ -55,7 +69,7 @@ object POSIXSignals extends Enumeration(initial = 1) {
 *   Case classes which depends on POSIXSignals
 */
 import POSIXSignals._
-case class SendSignal(val signal: POSIXSignals = SIGINT, val pid: Int)
+case class SendSignal(val signal: POSIXSignals = SIGINT, @specialized val pid: Int)
 
 
 /**
@@ -65,16 +79,16 @@ case class SendSignal(val signal: POSIXSignals = SIGINT, val pid: Int)
 */
 trait POSIX extends Library {
     
-    def chmod(filename: String, mode: Int)
-    def chown(filename: String, user: Int, group: Int)
-    def touch(filename: String)
-    def rename(oldpath: String, newpath: String)
-    def kill(pid: Int, signal: Int): Int
-    def symlink(oldpath: String, newpath: String): Int
-    def mkdir(path: String, mode: Int): Int
-    def execl(comm: String): Int
-    def rmdir(path: String): Int
-    def geteuid: Int
+    @specialized def chmod(filename: String, @specialized mode: Int)
+    @specialized def chown(filename: String, @specialized user: Int, @specialized group: Int)
+    @specialized def touch(filename: String)
+    @specialized def rename(oldpath: String, newpath: String)
+    @specialized def kill(@specialized pid: Int, @specialized signal: Int): Int
+    @specialized def symlink(oldpath: String, newpath: String): Int
+    @specialized def mkdir(path: String, @specialized mode: Int): Int
+    @specialized def execl(comm: String): Int
+    @specialized def rmdir(path: String): Int
+    @specialized def geteuid: Int
     
 }
 
@@ -96,6 +110,6 @@ trait PSTREE extends Library {
     *       sort: 0/1, 0 would give unsorted list of processes
     *   
     */   
-    def processes(show: Int, sort: Int): String
+    @specialized def processes(@specialized show: Int, @specialized sort: Int): String
     
 }
