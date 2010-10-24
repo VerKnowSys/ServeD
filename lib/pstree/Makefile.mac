@@ -1,13 +1,12 @@
-CC=/usr/bin/clang
-CFLAGS=-Wall -arch i386 -arch x86_64 -O3 -fmessage-length=0 -fPIC -march=pentium4 -ffast-math -I/System/Library/Frameworks/JavaVM.framework/Headers
-
+CC=/usr/bin/gcc
+CFLAGS=-Wall -Werror -arch i386 -arch x86_64 -O3 -fPIC -pedantic -march=pentium4 -ffast-math -mmacosx-version-min=10.6
 OBJS=pstree.o ptree.o version.o card.o
 PGM=libpstree.dylib
 
 all: $(PGM)
 
 libpstree.dylib: $(OBJS)
-	$(CC) $(CFLAGS) -dynamiclib -o ../libpstree.dylib $(OBJS) -mmacosx-version-min=10.6
+	$(CC) $(CFLAGS) -dynamiclib -o ../libpstree.dylib $(OBJS)
 
 version.o: VERSION
 	echo 'char version[] = VERSION;' > version.c
