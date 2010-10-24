@@ -5,7 +5,7 @@ typedef struct svdDataStructure {
     
     char *processName;
     unsigned int pid;
-    struct svdDataStructure* next; // next element in dynamic array
+    struct svdDataStructure* next;
     
 } DataStructure;
 

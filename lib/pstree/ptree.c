@@ -32,7 +32,7 @@
 static STRING(Proc) unsort = { 0 };
 
 static int
-compar(void *c1, void *c2)
+compar(const void *c1, const void *c2)
 {
     Proc *a = (Proc*)c1;
     Proc *b = (Proc*)c2;
@@ -47,12 +47,11 @@ static Proc*
 another(char process[])
 {
     Proc *t = &EXPAND(unsort);
-    
     if ( t ) {
-	bzero(t, sizeof *t);
-	t->parent = (Proc*)-1;
-	t->children = -1;
-	strncpy(t->process, process, sizeof t->process);
+    	bzero(t, sizeof *t);
+    	t->parent = (Proc*)-1;
+    	t->children = -1;
+    	strncpy(t->process, process, sizeof t->process);
     }
     return t;
 }
@@ -72,45 +71,44 @@ ingest(struct dirent *de, int flags)
     struct stat st;
 
     for (p = de->d_name; *p; ++p)
-	if (!isdigit(*p))
-	    return 0;
+    	if (!isdigit(*p))
+    	    return 0;
 
     if (chdir(de->d_name) == 0) {
-	if ( (stat(".", &st) != 0) || !(f = fopen(STATFILE, "r")) ) {
-	    chdir("..");
-	    return 0;
-	}
-	ct = STATSCANF(f, &pid, &ppid, name, &status);
-	fclose(f);
+    	if ( (stat(".", &st) != 0) || !(f = fopen(STATFILE, "r")) ) {
+    	    chdir("..");
+    	    return 0;
+    	}
+    	ct = STATSCANF(f, &pid, &ppid, name, &status);
+    	fclose(f);
 
-#ifdef OS_LINUX
-	if ( strlen(name) && (name[strlen(name)-1] == ')') )
-	    name[strlen(name)-1] = 0;
-#endif
+    #ifdef OS_LINUX
+    	if ( strlen(name) && (name[strlen(name)-1] == ')') )
+    	    name[strlen(name)-1] = 0;
+    #endif
 
-	if ( ct == STATSCANFOK ) {
+    	if ( ct == STATSCANFOK ) {
+    	    if ( !(t = another(name)) ) return 0;
 
-	    if ( !(t = another(name)) ) return 0;
+    	    t->pid = pid;
+    	    t->ppid = ppid;
+    	    t->uid = st.st_uid;
+    	    t->gid = st.st_gid;
+    	    t->ctime = st.st_ctime;
+    	    t->status = status;
 
-	    t->pid = pid;
-	    t->ppid = ppid;
-	    t->uid = st.st_uid;
-	    t->gid = st.st_gid;
-	    t->ctime = st.st_ctime;
-	    t->status = status;
-
-	    if ( (flags & PTREE_ARGS) && (f = fopen("cmdline", "r")) ) {
-		CREATE(t->cmdline);
-		while ( (c = getc(f)) != EOF ) {
-		    if ( c || S(t->cmdline) )
-			EXPAND(t->cmdline) = c;
-		}
-		t->renamed = strcmp(basename(T(t->cmdline)), name);
-		fclose(f);
-	    }
-	}
-	chdir("..");
-	return S(unsort);
+    	    if ( (flags & PTREE_ARGS) && (f = fopen("cmdline", "r")) ) {
+        		CREATE(t->cmdline);
+        		while ( (c = getc(f)) != EOF ) {
+        		    if ( c || S(t->cmdline) )
+        			EXPAND(t->cmdline) = c;
+    		    }
+        		t->renamed = strcmp(basename(T(t->cmdline)), name);
+        		fclose(f);
+    	    }
+    	}
+    	chdir("..");
+    	return S(unsort);
     }
     return 0;
 }
@@ -126,23 +124,23 @@ getprocesses(int flags)
     size_t jsize;
     int njobs;
     Proc *tj;
-    int i, rc = 0;
+    int i;
 
     if ( sysctl(mib, 4, NULL, &jsize, NULL, 0) != 0 )
-	return 0;
+    	return 0;
 
     if ( !(job = malloc(jsize)) )
-	return 0;
+    	return 0;
 
     if ( sysctl(mib, 4, job, &jsize, NULL, 0) != 0 ) {
-	free(job);
-	return 0;
+    	free(job);
+    	return 0;
     }
     
     njobs = jsize / sizeof job[0];
 
     for (i=0; i < njobs ; i++) {
-	if ( tj = another(job[i].kp_proc.p_comm) ) {
+	if ( (tj = another(job[i].kp_proc.p_comm)) ) {
 	    tj->pid = job[i].kp_proc.p_pid;
 	    tj->ppid = job[i].kp_eproc.e_ppid;
 	    tj->uid = job[i].kp_eproc.e_pcred.p_ruid;
@@ -199,11 +197,11 @@ getprocesses(int flags)
     char **av, *p, *q;
 
     if ( !(k = kvm_openfiles(NULL, NULL, NULL, O_RDONLY, NULL)) )
-	return 0;
+    	return 0;
 
     if ( !(job = kvm_getprocs(k, KERN_PROC_ALL, 0, &njobs)) ) {
-	kvm_close(k);
-	return 0;
+    	kvm_close(k);
+    	return 0;
     }
 
     for (i=0; i < njobs; i++)
@@ -292,7 +290,7 @@ children(Proc *p, int countsibs)
     count += children(p->child, 1);
 
     if ( countsibs )
-	while ( p = p->sib )
+	while ( (p = p->sib) != NULL )
 	    count += children(p->child, 1);
 
     return count;
@@ -307,29 +305,28 @@ shuffle()
     Proc *p, *my;
 
     while (todo > 0)
-	for (i=0; i < S(unsort); i++) {
-	    my = &T(unsort)[i];
-	    if (my->parent == (Proc*)-1) {
-		--todo;
-		if ( (my->pid != my->ppid) && (p = pfind(my->ppid)) ) {
-		    my->parent = p;
+	    for (i=0; i < S(unsort); i++) {
+    	    my = &T(unsort)[i];
+    	    if (my->parent == (Proc*)-1) {
+    		--todo;
+    		if ( (my->pid != my->ppid) && (p = pfind(my->ppid)) ) {
+    		    my->parent = p;
 
-		    if (p->child) {
-			Proc *nc;
-			for (nc = p->child; nc->sib; nc = nc->sib)
-			    ;
-			nc->sib = my;
-		    }
-		    else
-			p->child = my;
-		}
-		else
-		    my->parent = 0;
-	    }
-	}
+    		    if (p->child) {
+        			Proc *nc;
+        			for (nc = p->child; nc->sib; nc = nc->sib)
+        			    ;
+        			nc->sib = my;
+    		    } else
+        			p->child = my;
+    		}
+    		else
+    		    my->parent = 0;
+    	    }
+    	}
 
     for (i=0; i < S(unsort); i++)
-	T(unsort)[i].children = children(&T(unsort)[i], 0);
+    	T(unsort)[i].children = children(&T(unsort)[i], 0);
 }
 
 
@@ -339,7 +336,7 @@ ptree(int flags)
     S(unsort) = 0;
 
     if ( getprocesses(flags) == 0 )
-	return 0;
+    	return 0;
 
     qsort(T(unsort), S(unsort), sizeof T(unsort)[0], compar);
 

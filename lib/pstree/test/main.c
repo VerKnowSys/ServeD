@@ -11,57 +11,65 @@ extern char* processes(int compress, int sort);
 
 
 int main(int argv, char** args) {
-
-    int debug = 0;
-    int indexBase = 25; // How much loops
-    int outerIndex;
     
+    int debug = 1;
+    int indexBase = 25, outerIndex = 25;
+    /* int i; */
     
-    for (outerIndex = indexBase; outerIndex > 0; --outerIndex) {
-        int index;
-        struct timeval startTime, endTime;
-        
-        gettimeofday(&startTime, NULL);
-    
-        for (index = indexBase; index > 0; --index) {
-            char* preset = NULL;
-            preset = processes(1, 0);
-            if (debug) {
-                printf("\n\n\n\tTEST: index: %d", index);
-                printf("\n\n\n\tTEST: Processes sorted without Threads: \n%s\n\n", preset);
-            }
+    /* for (i = 0; i < 1; i++) - test loop for instrumentation */
+        for (outerIndex = indexBase; outerIndex > 0; --outerIndex) {
+            int index = 0;
+            struct timeval startTime, endTime;
 
-            preset = processes(1, 1);
-            if (debug) {
-                printf("\n\n\n\tTEST: index: %d", index);
-                printf("\n\n\n\tTEST: Processes sorted with Threads: \n%s\n\n", preset);
-            }
+            gettimeofday(&startTime, NULL);
+            for (index = indexBase; index > 0; --index) {
+                char* preset = malloc(12000);
+                preset = processes(0, 1);
+                if (debug) {
+                    printf("\n\n\n\tTEST: index: %d", index);
+                    printf("\n\n\n\tTEST: Processes sorted without Threads: \n%s\n\n", preset);
+                }
+                free(preset);
 
-            preset = processes(0, 0);
-            if (debug) {
-                printf("\n\n\n\tTEST: index: %d", index);
-                printf("\n\n\n\tTEST: Processes unsorted without Threads: \n%s\n\n", preset);
-            }
+                preset = malloc(12000);
+                preset = processes(1, 1);
+                if (debug) {
+                    printf("\n\n\n\tTEST: index: %d", index);
+                    printf("\n\n\n\tTEST: Processes sorted with Threads: \n%s\n\n", preset);
+                }
+                free(preset);
 
-            preset = processes(1, 0);
-            if (debug) {
-                printf("\n\n\n\tTEST: index: %d", index);
-                printf("\n\n\n\tTEST: Processes unsorted with Threads: \n%s\n\n", preset);
+                preset = malloc(12000);
+                preset = processes(0, 0);
+                if (debug) {
+                    printf("\n\n\n\tTEST: index: %d", index);
+                    printf("\n\n\n\tTEST: Processes unsorted without Threads: \n%s\n\n", preset);
+                }
+                free(preset);
+
+                preset = malloc(12000);
+                preset = processes(1, 0);
+                if (debug) {
+                    printf("\n\n\n\tTEST: index: %d", index);
+                    printf("\n\n\n\tTEST: Processes unsorted with Threads: \n%s\n\n", preset);
+                }
+                free(preset);
+
             }
-            
+            gettimeofday(&endTime, NULL);
+            printf("TEST TIME RESULT. For (4 * %d) => %d calls): %dms\n", indexBase, (indexBase * 4),
+                ((endTime.tv_usec - startTime.tv_usec)/1000));
         }
-        gettimeofday(&endTime, NULL);
+        
 
-        printf("TEST TIME RESULT. For (4 * %d) => %d calls): %dms\n", indexBase, (indexBase * 4),
-            ((endTime.tv_usec - startTime.tv_usec)/1000));
-    }
-
+    /*
+    2010-10-24 02:11:52 - dmilith - NOTE: to be remembered as example of iteration on dynamic structure in ANSI C:
     
-    // 2010-10-24 02:11:52 - dmilith - NOTE: to be remembered as example of iteration on dynamic structure in ANSI C:
-    // DataStructure* iter;
-    //     for (iter = data; NULL != iter; iter = iter->next) {
-    //         printf("%s - %d\n", iter->processName, iter->pid);
-    //     }
+    DataStructure* iter;
+        for (iter = data; NULL != iter; iter = iter->next) {
+            printf("%s - %d\n", iter->processName, iter->pid);
+        }
+    */
     
     return 0;
 }
