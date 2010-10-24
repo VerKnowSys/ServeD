@@ -28,3 +28,4 @@ tmtags
 *.patch
 *.orig
 *.rej
+*.o
