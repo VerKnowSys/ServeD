@@ -1,6 +1,6 @@
 CC=/usr/bin/gcc
-CFLAGS=-Wall -Werror -arch i386 -arch x86_64 -O3 -fPIC -pedantic -march=pentium4 -ffast-math -mmacosx-version-min=10.6
-OBJS=pstree.o ptree.o version.o card.o
+CFLAGS=-fmessage-length=65 -Wall -Werror -arch i386 -arch x86_64 -O3 -fPIC -pedantic -march=pentium4 -ffast-math -mmacosx-version-min=10.6
+OBJS=pstree.o ptree.o version.o
 PGM=libpstree.dylib
 
 all: $(PGM)
@@ -21,4 +21,3 @@ distclean spotless: clean
 
 pstree.o: pstree.c config.h ptree.h cstring.h
 ptree.o: ptree.c config.h ptree.h cstring.h
-card.o: card.c config.h

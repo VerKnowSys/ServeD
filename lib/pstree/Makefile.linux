@@ -1,7 +1,7 @@
 CC=/usr/bin/gcc
-CFLAGS=-O3 -Wall -fmessage-length=0 -fPIC -m32 -minline-all-stringops -fgcse -fdefer-pop -march=pentium4 -ffast-math -Werror -funroll-loops -foptimize-sibling-calls -shared
+CFLAGS=-fmessage-length=65 -Werror -O3 -fPIC -pedantic -ffast-math -minline-all-stringops -fgcse -fdefer-pop -march=pentium4 -ffast-math -funroll-loops -foptimize-sibling-calls -shared
 
-OBJS=pstree.o ptree.o version.o card.o
+OBJS=pstree.o ptree.o version.o
 PGM=libpstree.so
 
 all: $(PGM)
@@ -22,4 +22,3 @@ distclean spotless: clean
 
 pstree.o: pstree.c config.h ptree.h cstring.h
 ptree.o: ptree.c config.h ptree.h cstring.h
-card.o: card.c config.h

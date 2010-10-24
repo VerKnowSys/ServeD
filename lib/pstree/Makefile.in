@@ -1,20 +1,10 @@
 CC=/usr/bin/gcc
 CFLAGS=-m32
-BINDIR=@exedir@
-MANDIR=@mandir@
 
 OBJS=pstree.o ptree.o version.o card.o
 PGM=pstree.dylib
 
 all: $(PGM)
-
-#install: $(PGM)
-#	@INSTALL_PROGRAM@ $(PGM) $(BINDIR)
-#	@MKSUID@ $(BINDIR)/$(PGM)
-
-#install.man:
-#	@INSTALL_DIR@ $(MANDIR)/man1
-#	@INSTALL_DATA@ pstree.1 $(MANDIR)/man1
 
 pstree.dylib: $(OBJS)
 	$(CC) $(CFLAGS) -shared -m32 -o pstree.dylib $(OBJS) @LIBS@
