@@ -29,7 +29,7 @@ make
 if [ "$?" -eq "0" ]; then
     cd test
     rm -rfv test
-    gcc main.c $CFLAGS -o test ../*.o
+    $CC main.c $CFLAGS -o test ../*.o
     ./test $@
 fi
 
