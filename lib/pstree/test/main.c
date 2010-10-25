@@ -30,7 +30,8 @@ int main(int argc, char** argv) {
                     printf("\n\tTEST: argv[%d] = %s\n", count, argv[count]);                    
                 }
                 
-                int indx = 100, baseindx = 100;
+                int indx = 100;
+                int baseindx = 100;
                 gettimeofday(&startTime, NULL);
                 printf("TEST TIME RESULT FOR SINGLE RUN:\n");
                 while (indx > 0) {
