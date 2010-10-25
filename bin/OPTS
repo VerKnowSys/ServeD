@@ -17,7 +17,7 @@ export JAVA_OPTS="-d32 -Xms32m -XX:NewRatio=1 -Xmx512m -Dfile.encoding=UTF-8 -XX
 export MAVEN_OPTS="$JAVA_OPTS -Dbuild.platform=$platform -Djava.library.path=../../lib/ -Dactors.corePoolSize=8 -Djna.library.path=../../lib/"
 
 
-export CFLAGS="-Werror -arch i386 -arch x86_64 -O3 -fPIC -pedantic -march=pentium4 -ffast-math -fmessage-length=65"
+export CFLAGS="-Werror -arch i386 -O3 -fPIC -pedantic -march=pentium4 -ffast-math -fmessage-length=65"
 
 
 export COMMAND="bin/runner $@"
