@@ -4,6 +4,6 @@
 
 . bin/OPTS
 
-$COMMAND compile
+$COMMAND compile $*
 
 exit 0

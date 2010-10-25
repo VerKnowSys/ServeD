@@ -6,6 +6,6 @@
 
 bin/prepareLibs
 
-$COMMAND install
+$COMMAND install $*
 
 exit 0

@@ -4,7 +4,7 @@
 
 . bin/OPTS
 
-$COMMAND clean
+$COMMAND clean $*
 
 # also clean up native libs
 cd lib/pstree

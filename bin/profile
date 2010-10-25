@@ -10,6 +10,6 @@ args=""
 bin/install
 
 cd src/svd.maintainer/
-$MVN_EXEC $MVN_PARAMS exec:java -Dexec.args=$args $@
+$MVN_EXEC $MVN_PARAMS exec:java -Dexec.args=$args $*
 
 exit 0
