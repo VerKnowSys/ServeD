@@ -10,7 +10,7 @@ class FileEventsTest extends SpecificationWithJUnit {
     final val DIR = "/tmp/served/file_events_test/"
 
     "FileWatcher" should {
-        doBefore {setup}
+        doBefore { setup }
 
         // this is run in one singe example due to necessary waiting
         // sleeping for at least 2-3 seconds in each example 
@@ -54,14 +54,12 @@ class FileEventsTest extends SpecificationWithJUnit {
 
             val watchCreatedList = ListBuffer[String]()
             val watchCreated = FileEvents.watchCreated(DIR) {
-                name =>
-                    watchCreatedList += name
+                name => watchCreatedList += name
             }
 
             val watchModifiedList = ListBuffer[String]()
             val watchModified = FileEvents.watchModified(DIR) {
-                name =>
-                    watchModifiedList += name
+                name => watchModifiedList += name
             }
 
             val watchDeletedList = ListBuffer[String]()
