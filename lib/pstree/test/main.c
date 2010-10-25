@@ -18,6 +18,8 @@ int main(int argc, char** argv) {
     int debug = 0;
     int indexBase = 25, outerIndex = 25;
     char count = 0;
+    int indx;
+    int baseindx;
     struct timeval startTime, endTime, startTime2, endTime2;
     long mtime, seconds, useconds, seconds2, useconds2;
     /* int i; */
@@ -30,8 +32,8 @@ int main(int argc, char** argv) {
                     printf("\n\tTEST: argv[%d] = %s\n", count, argv[count]);                    
                 }
                 
-                int indx = 100;
-                int baseindx = 100;
+                indx = 100;
+                baseindx = 100;
                 gettimeofday(&startTime, NULL);
                 printf("TEST TIME RESULT FOR SINGLE RUN:\n");
                 while (indx > 0) {
