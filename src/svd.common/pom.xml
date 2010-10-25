@@ -72,6 +72,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.6</version>
 				<configuration>
+					<forkMode>pertest</forkMode>
+					<argLine>-d32</argLine>
 					<useFile>false</useFile> <!-- It's for putting compilation errors to console not file -->
 				</configuration>
 			</plugin>
