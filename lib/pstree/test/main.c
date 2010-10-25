@@ -18,8 +18,8 @@ int main(int argc, char** argv) {
     int debug = 0;
     int indexBase = 25, outerIndex = 25;
     char count = 0;
-    int indx;
-    int baseindx;
+    char *preset, *tmp;
+    int indx, index, baseindx;
     struct timeval startTime, endTime, startTime2, endTime2;
     long mtime, seconds, useconds, seconds2, useconds2;
     /* int i; */
@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
                 printf("TEST TIME RESULT FOR SINGLE RUN:\n");
                 while (indx > 0) {
                     gettimeofday(&startTime2, NULL);
-                    char* preset = malloc((sizeof processes(1, 1)) + BUFFER);
+                    preset = malloc((sizeof processes(1, 1)) + BUFFER);
                     preset = processes(1, 1);
                     gettimeofday(&endTime2, NULL);
                     free(preset);
@@ -74,13 +74,13 @@ int main(int argc, char** argv) {
     
     /* for (i = 0; i < 1; i++) - test loop for instrumentation */
         for (outerIndex = indexBase; outerIndex > 0; --outerIndex) {
-            int index = 0;
+            index = 0;
             
             gettimeofday(&startTime, NULL);
             for (index = indexBase; index > 0; --index) {
                 
-                char* tmp = processes(1, 0); /* if 1(showThreads), 0(sort) => object should be biggest of all */
-                char* preset = malloc((sizeof tmp) + BUFFER);
+                tmp = processes(1, 0); /* if 1(showThreads), 0(sort) => object should be biggest of all */
+                preset = malloc((sizeof tmp) + BUFFER);
                 preset = processes(0, 1);
                 if (debug && operation) {
                     printf("\n\tTEST: index: %d", index);
