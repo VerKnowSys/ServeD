@@ -6,5 +6,6 @@ rm -rf $HOME/.m2/repository/svd/
 git pull
 bin/clean
 bin/install
+bin/test
 
 exit 0
