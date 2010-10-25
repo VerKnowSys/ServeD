@@ -1,23 +1,23 @@
-package com.verknowsys.served.maintainer
-
-import com.verknowsys.served._
-import org.specs._
-
-
-class AccountTest extends SpecificationWithJUnit {
-    "Account" should {
-        "correctly process params list" in {
-            val data = "teamon" :: "pass" :: "myUid" :: "myGid" :: "info" :: "/path/to/home" :: "/path/to/shell" :: Nil
-            val account = Account(data)
-        
-            account.userName must beEqual("teamon")
-            account.pass must beEqual("pass")
-            account.uid must beEqual("myUid")
-            account.gid must beEqual("myGid")
-            account.information must beEqual("info")
-            account.homeDir must beEqual("/path/to/home")
-            account.shell must beEqual("/path/to/shell")        
-        }
-    }
-
-}
+// package com.verknowsys.served.maintainer
+// 
+// import com.verknowsys.served._
+// import org.specs._
+// 
+// 
+// class AccountTest extends SpecificationWithJUnit {
+//     "Account" should {
+//         "correctly process params list" in {
+//             val data = "teamon" :: "pass" :: "myUid" :: "myGid" :: "info" :: "/path/to/home" :: "/path/to/shell" :: Nil
+//             val account = Account(data)
+//         
+//             account.userName must beEqual("teamon")
+//             account.pass must beEqual("pass")
+//             account.uid must beEqual("myUid")
+//             account.gid must beEqual("myGid")
+//             account.information must beEqual("info")
+//             account.homeDir must beEqual("/path/to/home")
+//             account.shell must beEqual("/path/to/shell")        
+//         }
+//     }
+// 
+// }
