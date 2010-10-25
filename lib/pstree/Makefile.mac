@@ -1,4 +1,4 @@
-CC=/usr/bin/gcc
+CC=/usr/bin/clang
 CFLAGS=-fmessage-length=65 -Wall -Werror -arch i386 -arch x86_64 -O3 -fPIC -pedantic -march=pentium4 -ffast-math -mmacosx-version-min=10.6
 OBJS=pstree.o ptree.o version.o
 PGM=libpstree.dylib
