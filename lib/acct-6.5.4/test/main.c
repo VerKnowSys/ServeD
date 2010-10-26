@@ -6,8 +6,8 @@
 /* unsigned int BUFFER = 512; 2010-10-24 14:52:09 - dmilith - NOTE: HACK: additional buffer bytes, for process list. Should be enough, but it's still a hack */
 /* #define operation (index % 10) */
 
-extern char* sa_svd(int argc, char *argv[]);
-
+extern char* sa_svd(int argc, char** argv);
+extern char* sa_svd2(int argc, char** argv);
 
 int main(int argc, char** argv) {
     
@@ -73,8 +73,11 @@ int main(int argc, char** argv) {
 
         {    
             gettimeofday(&startTime, NULL);
-            char* z = sa_svd(1, NULL);
-            printf("O: %s\n", z);
+            // char* z = sa_svd(2, (char**)"NULL");
+            char* x[] = {"-P /var/account/acct"};
+            char* z2 = sa_svd2(1, x);
+            
+            printf("O: %s\n", z2);
             
             gettimeofday(&endTime, NULL);
             

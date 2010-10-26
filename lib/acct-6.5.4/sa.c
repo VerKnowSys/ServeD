@@ -290,7 +290,9 @@ char* sa_svd2(int argc, char *argv[])
 
   static unsigned int hzval;
   program_name = argv[0];
-
+  
+  printf("\n%s\n", program_name);
+  
   /* Cache the page size of the machine for the PAGES_TO_KB macro */
   system_page_size = (double) getpagesize () / 1024.0;
 
