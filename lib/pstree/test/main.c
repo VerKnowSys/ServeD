@@ -10,13 +10,13 @@ extern char* processes(int compress, int sort);
 
 
 unsigned int BUFFER = 512; /* 2010-10-24 14:52:09 - dmilith - NOTE: HACK: additional buffer bytes, for process list. Should be enough, but it's still a hack */
-#define operation (index % 25)
+#define operation (index % 10)
 
 
 int main(int argc, char** argv) {
     
     int debug = 0;
-    int indexBase = 25, outerIndex = 25;
+    int indexBase = 10, outerIndex = 10;
     char count = 0;
     char *preset, *tmp;
     int indx, index, baseindx;
