@@ -51,16 +51,17 @@
 			<scope>test</scope>
 		</dependency>
 		
-		<dependency>
+		<!--<dependency>
 			<groupId>org.neodatis</groupId>
 			<artifactId>neodatis-odb</artifactId>
 			<version>${neodatis.version}</version>
-		</dependency>
+		</dependency>-->
 		
 		<dependency>
       <groupId>org.scala-tools.testing</groupId>
       <artifactId>specs</artifactId>
       <version>1.6.1-2.8.0.Beta1-RC6</version> <!-- specify the version here -->
+			<scope>test</scope>
     </dependency>
 	     
 	</dependencies>
