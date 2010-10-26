@@ -17,7 +17,7 @@ export MAVEN_OPTS_ADDITIONAL="-e -Dmaven.test.skip.exec=true -Dmaven.test.skip=t
 export MAVEN_OPTS="-Dbuild.platform=$platform -Djava.library.path=../../lib/ -Dactors.corePoolSize=8 -Djna.library.path=../../lib/"
 
 export CC="/usr/bin/clang"
-export CFLAGS="-Werror -arch i386 -O3 -fPIC -pedantic -march=pentium4 -ffast-math -fmessage-length=65"
+export CFLAGS="-Wdeprecated-declarations -arch i386 -O3 -fPIC -march=pentium4 -ffast-math -fmessage-length=65" # -pedantic -Werror
 
 
 export COMMAND="bin/runner $@"

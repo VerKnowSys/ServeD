@@ -1,30 +1,29 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/time.h>
-
-#include "../svd.h"
-
-
-extern char* processes(int compress, int sort);
+// #include "../acct_served.c"
 
 
-unsigned int BUFFER = 512; /* 2010-10-24 14:52:09 - dmilith - NOTE: HACK: additional buffer bytes, for process list. Should be enough, but it's still a hack */
-#define operation (index % 10)
+/* unsigned int BUFFER = 512; 2010-10-24 14:52:09 - dmilith - NOTE: HACK: additional buffer bytes, for process list. Should be enough, but it's still a hack */
+/* #define operation (index % 10) */
+
+extern char* sa_svd(int argc, char *argv[]);
 
 
 int main(int argc, char** argv) {
     
-    int debug = 0;
+    int indexBase = 10, outerIndex = 10;
+    long mtime, seconds, useconds;
+    struct timeval startTime, endTime;
+    
+    /*int debug = 0;
     int indexBase = 10, outerIndex = 10;
     char count = 0;
     char *preset, *tmp;
     int indx, index, baseindx;
-    struct timeval startTime, endTime, startTime2, endTime2;
-    long mtime, seconds, useconds, seconds2, useconds2;
+    long mtime, seconds, useconds, seconds2, useconds2;*/
     /* int i; */
         
-    if (argc >= 2) {
+    /*if (argc >= 2) {
         for (count = 1; count < argc; count++) {
             if (strcmp(argv[count], "quick") == 0) {
                 if (debug) {
@@ -70,49 +69,13 @@ int main(int argc, char** argv) {
             printf("\n\tTEST: argv[%d] = %s\n", count, argv[count]);                    
         }
     }
+    */
 
-    
-    /* for (i = 0; i < 1; i++) - test loop for instrumentation */
-        for (outerIndex = indexBase; outerIndex > 0; --outerIndex) {
-            index = 0;
-            
+        {    
             gettimeofday(&startTime, NULL);
-            for (index = indexBase; index > 0; --index) {
-                
-                tmp = processes(1, 0); /* if 1(showThreads), 0(sort) => object should be biggest of all */
-                preset = malloc((sizeof tmp) + BUFFER);
-                preset = processes(0, 1);
-                if (debug && operation) {
-                    printf("\n\tTEST: index: %d", index);
-                    printf("\n\tTEST: Processes sorted without Threads: \n%s\n", preset);
-                }
-                free(preset);
-
-                preset = malloc((sizeof tmp) + BUFFER);
-                preset = processes(1, 1);
-                if (debug && operation) {
-                    printf("\n\tTEST: index: %d", index);
-                    printf("\n\tTEST: Processes sorted with Threads: \n%s\n", preset);
-                }
-                free(preset);
-
-                preset = malloc((sizeof tmp) + BUFFER);
-                preset = processes(0, 0);
-                if (debug && operation) {
-                    printf("\n\nTEST: index: %d", index);
-                    printf("\n\nTEST: Processes unsorted without Threads: \n%s\n", preset);
-                }
-                free(preset);
-
-                preset = malloc((sizeof tmp) + BUFFER);
-                preset = processes(1, 0);
-                if (debug && operation) {
-                    printf("\n\tTEST: index: %d", index);
-                    printf("\n\tTEST: Processes unsorted with Threads: \n%s\n", preset);
-                }
-                free(preset);
-
-            }
+            char* z = sa_svd(1, NULL);
+            printf("O: %s\n", z);
+            
             gettimeofday(&endTime, NULL);
             
             seconds  = endTime.tv_sec  - startTime.tv_sec;
