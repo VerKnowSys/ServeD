@@ -16837,9 +16837,9 @@ else
 #        define ACCT_FILE "/var/adm/pacct"
 #      else
 #        if defined(sgi) || defined(SVR4) || defined(M_XENIX)
-#          define ACCT_FILE "/usr/adm/pacct"
+#          define ACCT_FILE "/var/account/acct"
 #        else
-#          define ACCT_FILE "/usr/adm/acct"
+#          define ACCT_FILE "/var/account/acct"
 #        endif
 #      endif
 #    endif

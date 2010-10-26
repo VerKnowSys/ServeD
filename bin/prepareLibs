@@ -11,8 +11,8 @@ cd lib/pstree/
 if [ "$1" == "c" ]
 then
     make distclean
-else
-    make clean
+# else
+    # make clean
 fi
 
 ulimit -c 0 # don't throw core file on segfault
@@ -48,7 +48,7 @@ then
     rm -fr sa.o
     rm -fr test/test
 else
-    make clean
+    # make clean
     rm -fr sa.o
     rm -fr test/test
 fi
