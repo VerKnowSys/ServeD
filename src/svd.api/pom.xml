@@ -7,6 +7,13 @@
 	<version>0.1.0</version>
 	<inceptionYear>2009</inceptionYear>
 	<packaging>jar</packaging>
+	
+	<parent>
+		<groupId>svd</groupId>
+		<artifactId>svd.pom.scala</artifactId>
+		<version>0.1.0</version>
+		<relativePath>../svd.pom/scala</relativePath>
+	</parent>
 
 	<repositories>
 		<repository>
@@ -15,17 +22,5 @@
 			<url>http://maven.verknowsys.com/</url>
 		</repository>
 	</repositories>
-	
-	<parent>
-		<groupId>svd</groupId>
-		<artifactId>svd.common</artifactId>
-		<version>0.1.0</version>
-		<relativePath>../svd.common/pom.xml</relativePath>
-	</parent>
-	
-	<dependencies>
-
-	</dependencies>
-
 	
 </project>

@@ -12,8 +12,8 @@
     <module>svd.pom/scala_base</module>
     <module>svd.pom/scala_from_java</module>
     <module>svd.common</module>
-    <module>svd.utils</module>
     <module>svd.api</module>
+    <module>svd.utils</module>
     <module>svd.cli</module>
     <module>svd.systemmanager</module>
     <module>svd.notifications</module>
@@ -53,6 +53,7 @@
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
+      
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <version>2.2</version>
@@ -60,6 +61,7 @@
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
+      
       <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>
@@ -70,6 +72,7 @@
           </args>
         </configuration>
       </plugin>
+            
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>

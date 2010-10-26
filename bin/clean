@@ -6,6 +6,8 @@
 
 $COMMAND clean $*
 
+rm -r target
+
 # also clean up native libs
 cd lib/pstree
 make distclean
