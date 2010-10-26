@@ -28,3 +28,8 @@ tmtags
 *.orig
 *.rej
 *.o
+*.Po
+*.Plo
+*.a
+*.lo
+Makefile

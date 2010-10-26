@@ -49,8 +49,7 @@ fi
 # patch -p1 < 
 
 if [ "$?" -eq "0" ]; then
-    echo ""
-    #make
+    make
 fi
 
 # compile library…
