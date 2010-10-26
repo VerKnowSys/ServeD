@@ -10,5 +10,11 @@ $COMMAND clean $*
 cd lib/pstree
 make distclean
 rm test/test
+cd ../../
+
+cd lib/acct-6.5.4
+make distclean
+rm test/test
+cd ../../
 
 exit 0

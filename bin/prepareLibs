@@ -42,28 +42,54 @@ echo "Done preparing PSTREE"
 echo "Preparing LIBACCT library"
 cd lib/acct-6.5.4
 
+if [ "$1" == "c" ]
+then
+    make distclean
+    rm -fr sa.o
+    rm -fr test/test
+else
+    make clean
+    rm -fr sa.o
+    rm -fr test/test
+fi
+
 if [ ! -e 'config.h' ]; then
-    CC=$CC CFLAGS=-m32 ./configure
+    CC=$CC CFLAGS="-m32" ./configure
 fi
 
-# patch -p1 < 
 
 if [ "$?" -eq "0" ]; then
+
+    # compile library…
+    echo "Compilation…"
+
+    cd lib
     make
-fi
+    cd ..
 
-# compile library…
-echo "Compilation…"
-$CC $CFLAGS sa.c -L. -I./lib/ -c -o sa.o common.o hashtab.o pacct_rd.o uid_hash.o file_rd.o
+srcList=(
+common
+hashtab
+uid_hash
+pacct_rd
+file_rd
+sa
+)
 
-echo "Linking library…"
-$CC -fmessage-length=65 -Wall -arch i386 -O3 -fPIC -march=pentium4 -ffast-math -mmacosx-version-min=10.6 -I./lib/ -dynamiclib -o ../libsa.dylib common.o hashtab.o pacct_rd.o uid_hash.o file_rd.o sa.o lib/*.o
+    for i in ${srcList[@]}; do
+      $CC $CFLAGS $i.c -I./lib/ -c -o $i.o
+    done
 
-if [ "$?" -eq "0" ]; then
-    cd test
-    rm -rfv test
-    $CC main.c $CFLAGS -o test ../common.o ../hashtab.o ../pacct_rd.o ../uid_hash.o ../file_rd.o ../lib/*.o ../sa.o
-    ./test $@
+    echo "Linking library…"
+    $CC -fmessage-length=65 -Wall -arch i386 -O3 -fPIC -march=pentium4 -ffast-math -mmacosx-version-min=10.6 -I./lib/ -dynamiclib -o ../libsa.dylib common.o hashtab.o pacct_rd.o uid_hash.o file_rd.o sa.o lib/*.o
+
+    if [ "$?" -eq "0" ]; then
+        cd test
+        rm -rfv test
+        $CC main.c $CFLAGS -o test ../common.o ../hashtab.o ../pacct_rd.o ../uid_hash.o ../file_rd.o ../lib/*.o ../sa.o
+        ./test $@
+    fi
+
 fi
 
 echo "Done preparing LIBACCT"
