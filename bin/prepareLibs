@@ -4,8 +4,8 @@
 . bin/OPTS
 
 
+echo "Preparing PSTREE library.."
 cd lib/pstree/
-
 
 # 2010-10-24 06:22:29 - dmilith - NOTE: a little hack to be able to distclean without need of running "bin/clean" script
 if [ "$1" == "c" ]
@@ -14,7 +14,6 @@ then
 else
     make clean
 fi
-
 
 ulimit -c 0 # don't throw core file on segfault
 
@@ -32,5 +31,42 @@ if [ "$?" -eq "0" ]; then
     $CC main.c $CFLAGS -o test ../*.o
     ./test $@
 fi
+
+cd ../../../
+echo "Done preparing PSTREE"
+
+
+
+
+
+echo "Preparing LIBACCT library"
+cd lib/acct-6.5.4
+
+if [ ! -e 'config.h' ]; then
+    CC=$CC CFLAGS=-m32 ./configure
+fi
+
+# patch -p1 < 
+
+if [ "$?" -eq "0" ]; then
+    echo ""
+    #make
+fi
+
+# compile library…
+echo "Compilation…"
+$CC $CFLAGS sa.c -L. -I./lib/ -c -o sa.o common.o hashtab.o pacct_rd.o uid_hash.o file_rd.o
+
+echo "Linking library…"
+$CC -fmessage-length=65 -Wall -arch i386 -O3 -fPIC -march=pentium4 -ffast-math -mmacosx-version-min=10.6 -I./lib/ -dynamiclib -o ../libsa.dylib common.o hashtab.o pacct_rd.o uid_hash.o file_rd.o sa.o lib/*.o
+
+if [ "$?" -eq "0" ]; then
+    cd test
+    rm -rfv test
+    $CC main.c $CFLAGS -o test ../common.o ../hashtab.o ../pacct_rd.o ../uid_hash.o ../file_rd.o ../lib/*.o ../sa.o
+    ./test $@
+fi
+
+echo "Done preparing LIBACCT"
 
 exit 0
