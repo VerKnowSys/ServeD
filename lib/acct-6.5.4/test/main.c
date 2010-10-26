@@ -74,8 +74,8 @@ int main(int argc, char** argv) {
         {    
             gettimeofday(&startTime, NULL);
             // char* z = sa_svd(2, (char**)"NULL");
-            char* x[] = {"-P /var/account/acct"};
-            char* z2 = sa_svd2(1, x);
+            char* x[] = {"-P", "/var/account/acct", "-m"};
+            char* z2 = sa_svd2(3, x);
             
             printf("O: %s\n", z2);
             
