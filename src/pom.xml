@@ -11,7 +11,7 @@
     <module>svd.pom/scala</module>
     <module>svd.pom/scala_base</module>
     <module>svd.pom/scala_from_java</module>
-    <module>svd.common</module>
+    <module>svd.core</module>
     <module>svd.api</module>
     <module>svd.utils</module>
     <module>svd.cli</module>

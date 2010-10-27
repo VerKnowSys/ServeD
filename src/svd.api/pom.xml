@@ -10,17 +10,9 @@
 	
 	<parent>
 		<groupId>svd</groupId>
-		<artifactId>svd.pom.scala</artifactId>
+		<artifactId>svd.core</artifactId>
 		<version>0.1.0</version>
-		<relativePath>../svd.pom/scala</relativePath>
+		<relativePath>../svd.core</relativePath>
 	</parent>
 
-	<repositories>
-		<repository>
-			<id>maven.verknowsys.com</id>
-			<name>Verknowsys Maven repository</name>
-			<url>http://maven.verknowsys.com/</url>
-		</repository>
-	</repositories>
-	
 </project>

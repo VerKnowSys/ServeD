@@ -7,17 +7,8 @@
 	<version>0.1.0</version>
 	<inceptionYear>2009</inceptionYear>
 	<packaging>jar</packaging>
-	<properties>
-		<neodatis.version>1.9.21.670</neodatis.version>
-	</properties>
 
 	<repositories>
-		<repository>
-			<id>maven.verknowsys.com</id>
-			<name>Verknowsys Maven repository</name>
-			<url>http://maven.verknowsys.com/</url>
-		</repository>
-		
     <repository>
       <id>jgit-repository</id>
       <url>http://download.eclipse.org/jgit/maven</url>
@@ -26,18 +17,24 @@
 	
 	<parent>
 		<groupId>svd</groupId>
-		<artifactId>svd.common</artifactId>
+		<artifactId>svd.core</artifactId>
 		<version>0.1.0</version>
-		<relativePath>../svd.common/pom.xml</relativePath>
+		<relativePath>../svd.core</relativePath>
 	</parent>
 	
 	<dependencies>
 	  <dependency>
-			<groupId>svd</groupId>
-			<artifactId>svd.api</artifactId>
-			<version>0.1.0</version>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+		</dependency>		
+		
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.4</version>
 		</dependency>
-	  
+		
 		<dependency>
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-swing</artifactId>
