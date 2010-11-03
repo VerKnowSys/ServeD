@@ -6,6 +6,31 @@ import scala.actors.remote.RemoteActor
 import scala.actors.remote.RemoteActor._
 import scala.actors.remote.Node
 
+object Timeout {
+    final private val time = 20 * 1000 // 20 seconds
+    private var thread: Option[Thread] = None
+        
+    def start {
+        thread = Some(new Thread {
+            override def run {
+                Thread.sleep(time)
+                println("== Timeout ==")
+                System.exit(1)
+            }
+        })
+        thread.foreach(_.start)
+    }
+    
+    def stop {
+        thread.foreach(_.stop)
+    }
+    
+    def reset {
+        stop
+        start
+    }
+}
+
 class ApiClientActor(host: String, port: Int) extends Actor {
     // make use of http://github.com/rtomayko/ronn
 
@@ -35,8 +60,10 @@ exit                Quit interactive console
         link(svd)
 
         println("ServeD 0.1.0 interactive shell. Welcome!")
+        Timeout.start
         while(true){
             val msg = System.console.readLine(">>> ")
+            Timeout.reset
             if(msg == "exit") System.exit(0)
             val args = msg.split(" ").toList
             if(!args.isEmpty) process(args)
@@ -55,18 +82,18 @@ exit                Quit interactive console
         def process(params: List[String]) {
             params match {
                 case "git" :: tail => tail match {
-                    
+                
                     case "create" :: name :: Nil =>
                         svd !? Git.CreateRepository(name) match {
                             case Success => success("Git repository %s created successfully.".format(name))
                             case Git.RepositoryExistsError => error("Git repository %s already exists".format(name))
                         }
-                        
+                    
                     case "remove" :: name :: Nil =>
                         svd !? Git.RemoveRepository(name) match {
                             case Success => success("Git repository %s removed successfully".format(name))
                         }
-                        
+                    
                     case "list" :: Nil =>
                         svd !? Git.ListRepositories match {
                             case Git.Repositories(list) =>
@@ -74,11 +101,13 @@ exit                Quit interactive console
                                     println(repo)
                                 }
                         }
-                        
+                    
                     case _ => println("TODO: git help")
                 }
-                
+            
                 case "help" :: Nil => println(HELP)
+                
+                case _ => println(HELP)
             }
         }
     }
