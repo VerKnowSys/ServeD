@@ -137,7 +137,7 @@ class FileEventsTest extends SpecificationWithJUnit {
 
 
     private def setup {
-        FileUtils.forceDelete(DIR)
+        try { FileUtils.forceDelete(DIR) } catch { case _ => }
         FileUtils.forceMkdir(DIR + "/subdir/and/one/more")
         FileUtils.writeStringToFile(DIR + "/m_file001.txt", "xxx")
         FileUtils.writeStringToFile(DIR + "/m_file002.txt", "xxx")
