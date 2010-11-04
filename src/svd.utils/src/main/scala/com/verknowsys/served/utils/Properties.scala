@@ -1,10 +1,9 @@
 package com.verknowsys.served.utils
 
-
-import com.verknowsys.served._
-
 import scala.collection.mutable.Map
 import scala.collection.JavaConversions._
+import java.io.{FileInputStream, FileOutputStream}
+import java.util.{Properties => JProperties}
 
 /**
  * 	Class for handling Java Properties
@@ -141,8 +140,8 @@ class Properties(filename: String) extends Utils {
      */
     protected def load = {
         try {
-            val jprops = new java.util.Properties
-            jprops.load(new java.io.FileInputStream(filename))
+            val jprops = new JProperties
+            jprops.load(new FileInputStream(filename))
 
             logger.debug("Loaded file: " + filename)
             Some(jprops.entrySet.iterator.foldLeft(Map[String, String]()) {
@@ -165,8 +164,8 @@ class Properties(filename: String) extends Utils {
      */
     protected def save {
         // try {
-            val jprops = new java.util.Properties
-            val file = new java.io.FileOutputStream(filename)
+            val jprops = new JProperties
+            val file = new FileOutputStream(filename)
             try {
                 data foreach {_.foreach(a => jprops.put(a._1, a._2))} 
             } catch {
