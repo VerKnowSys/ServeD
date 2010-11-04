@@ -29,7 +29,7 @@ object ActorsMonitor extends Actor {
     }
 }
 
-trait MonitoredActor extends Actor {
+abstract class MonitoredActor extends Actor {    
     override def start = {
         ActorsMonitor.register(this)
         super.start

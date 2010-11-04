@@ -33,6 +33,13 @@ case class Account(
         shell = a(6)
     )
     
+    /**
+     * Checks if account is for normal user
+     * @author teamon
+     */
+    def isUser = homeDir.startsWith("/home")
+    
+    def equals(that: Account) = this.userName == that.userName && this.uid == that.uid
     
     // def this(a: List[String]) = this(a(0), a(1), a(2), a(3), a(4), a(5), a(6))
     
