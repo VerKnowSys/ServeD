@@ -81,11 +81,25 @@ class Author(val origin: PersonIdent) {
 }
 
 object GitRepository {
+    /**
+     * Create git repository for specified directory
+     * @author teamon
+    */
     def create(dir: String, bare: Boolean = false): GitRepository = {
         // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
         val repo = new GitRepository(dir)
         repo.gitRepo.create(bare)
         repo
+    }
+    
+    /**
+     * List git repositories for specified directory
+     * @author teamon
+     */
+    def list(dir: String): List[GitRepository] = {
+        val list = new File(dir).list
+        if(list == null) List()
+        else list.toList.map { new GitRepository(_) }
     }
 
 }
@@ -112,6 +126,8 @@ class GitRepository(val dir: String) extends Utils {
 
     lazy val (headPath, headFile) = if(isBare) (dir + "/refs/heads", "master") else (dir + "/.git/logs", "HEAD")
     
+    
+    def name = new File(dir).getName
 
     /**
      * Returns current branch name

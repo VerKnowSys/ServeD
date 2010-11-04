@@ -26,15 +26,14 @@ class GitManager(owner: AccountManager) extends Manager(owner) {
                     sender ! Success
                     
                 case RemoveRepository(name) =>
-                    logger.warn("Unimplemented yet!")
+                    logger.warn("Unimplemented yet!") // TODO
                     sender ! NotImplementedError
                 
                 case ListRepositories =>
-                    logger.warn("Unimplemented yet!")
-                    sender ! NotImplementedError
+                    sender ! Repositories(GitRepository.list(gitDir).map { r => Repository(r.name) })
                 
                 case ShowRepository(name) =>
-                    logger.warn("Unimplemented yet!")
+                    logger.warn("Unimplemented yet!") // TODO
                     sender ! NotImplementedError
                 
                 case Init =>
@@ -47,18 +46,6 @@ class GitManager(owner: AccountManager) extends Manager(owner) {
                     logger.warn("Command not recognized. GitManager will ignore it: " + x.toString)
             }
         }
-    }
-    
-    
-    /**
-     * Returns list of git repositories
-     * 
-     * @author teamon
-     */
-    def repositories = {
-        val list = new File(gitDir).list
-        if(list == null) List()
-        else list.toList
     }
     
     protected lazy val gitDir = account.homeDir + "git/"
