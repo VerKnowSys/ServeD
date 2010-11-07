@@ -8,7 +8,7 @@ elif [ `uname` == "Darwin" ]; then
     libs="lib/*.dylib"  #" lib/*.jnilib"
 fi
 
-export MVN_EXEC="/usr/bin/mvn"
+export MVN_EXEC="/usr/bin/env mvn"
 # export MVN_PARAMS="-T C2 -e -Dmaven.test.skip.exec=true -Dmaven.test.skip=true"
 # export MVN_TEST_PARAMS="-T C2 -e"
 
