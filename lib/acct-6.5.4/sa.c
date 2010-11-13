@@ -186,7 +186,7 @@ char *usracct_file_name = default_usracct_file;
 
 int print_seconds = 0;		/* print seconds instead of minutes */
 int dont_read_summary_files = 0;
-int print_users = 0;
+int print_users = 1;
 int percentages = 0;		/* include percentages in printout */
 int user_summary_flag = 0;	/* are we printing a user summary? */
 int ahz = AHZ;			/* for viewing logs from another system */
@@ -278,11 +278,6 @@ char* sa_svd2(int argc, char *argv[]);
 
 /* code */
 
-/* int main(int argc, char *argv[]) */
-char* sa_svd(int argc, char *argv[])
-{
-    return "DUPA";
-}
 
 char* sa_svd2(int argc, char *argv[])
 {
@@ -292,7 +287,7 @@ char* sa_svd2(int argc, char *argv[])
   
   program_name = "sa";
   
-  printf("\n%s, %s, %s\n", argv[0], argv[1], argv[2]);
+  // printf("\n%s, %s, %s\n", argv[0], argv[1], argv[2]);
   
   /* Cache the page size of the machine for the PAGES_TO_KB macro */
   system_page_size = (double) getpagesize () / 1024.0;
@@ -588,7 +583,7 @@ char* sa_svd2(int argc, char *argv[])
   if (optind == (argc - 1))
     {
       /* if we get here, we're expecting a filename */
-      acct_file_name = argv[optind++];
+        acct_file_name = argv[optind++];
     }
   else if (optind < argc)
     {

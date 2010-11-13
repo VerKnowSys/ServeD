@@ -77,11 +77,11 @@ sa
 )
 
     for i in ${srcList[@]}; do
-      $CC $CFLAGS $i.c -I./lib/ -c -o $i.o
+      $CC $CFLAGS $i.c -I./lib/ -c -m32 -o $i.o
     done
 
     echo "Linking library…"
-    $CC -fmessage-length=65 -Wall -arch i386 -O3 -fPIC -march=pentium4 -ffast-math -mmacosx-version-min=10.6 -I./lib/ -dynamiclib -o ../libsa.dylib common.o hashtab.o pacct_rd.o uid_hash.o file_rd.o sa.o lib/*.o
+    $CC $CFLAGS -I./lib/ -dynamiclib -o ../libsa.dylib common.o hashtab.o pacct_rd.o uid_hash.o file_rd.o sa.o lib/*.o
 
     if [ "$?" -eq "0" ]; then
         cd test
