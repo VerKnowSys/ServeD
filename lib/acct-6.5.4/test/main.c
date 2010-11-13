@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
             gettimeofday(&startTime, NULL);
             // char* z = sa_svd(2, (char**)"NULL");
             
-            char* x[] = {"-m"};
+            char* x[] = {"-m", "-a", "-p"};
             int elemNum = sizeof(x) / sizeof(x[0]);
             printf("NUM: %d, Params: %s\n", elemNum, *x);
             char* z2 = sa_svd2(elemNum, x);
