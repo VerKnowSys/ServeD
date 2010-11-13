@@ -33,3 +33,15 @@ tmtags
 *.a
 *.lo
 Makefile
+lib/acct-6.5.4/config.h
+lib/acct-6.5.4/config.status
+lib/acct-6.5.4/files.h
+lib/acct-6.5.4/libtool
+lib/acct-6.5.4/stamp-h1
+lib/acct-6.5.4/version.h
+lib/pstree/config.cmd
+lib/pstree/config.h
+lib/pstree/config.mak
+lib/pstree/config.md
+lib/pstree/config.sub
+lib/pstree/test/test
