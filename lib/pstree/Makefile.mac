@@ -1,5 +1,5 @@
 CC=/usr/bin/clang
-CFLAGS=-fmessage-length=65 -Wall -Werror -arch i386 -O3 -fPIC -pedantic -march=pentium4 -ffast-math -mmacosx-version-min=10.6
+CFLAGS=-fmessage-length=65 -Wall -arch i386 -O3 -fPIC -march=pentium4 -ffast-math -mmacosx-version-min=10.6
 OBJS=pstree.o ptree.o version.o
 PGM=libpstree.dylib
 
