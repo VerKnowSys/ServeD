@@ -1,5 +1,5 @@
 CC=/usr/bin/gcc
-CFLAGS=-fmessage-length=65 -Werror -O3 -fPIC -pedantic -ffast-math -minline-all-stringops -fgcse -fdefer-pop -march=pentium4 -ffast-math -funroll-loops -foptimize-sibling-calls -shared
+CFLAGS=-fmessage-length=65 -O3 -fPIC -ffast-math -minline-all-stringops -fgcse -fdefer-pop -march=pentium4 -ffast-math -funroll-loops -foptimize-sibling-calls -shared -m32
 
 OBJS=pstree.o ptree.o version.o
 PGM=libpstree.so
