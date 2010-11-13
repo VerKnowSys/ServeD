@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
             useconds = endTime.tv_usec - startTime.tv_usec;
             mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
             
-            fprintf(stdout, "TEST TIME RESULT. For (4 * %d) => %d calls): %ldms\n", indexBase, (indexBase * 4), mtime);
+            fprintf(stderr, "TEST TIME RESULT. For (4 * %d) => %d calls): %ldms\n", indexBase, (indexBase * 4), mtime);
                 
         
 
