@@ -45,3 +45,14 @@ lib/pstree/config.mak
 lib/pstree/config.md
 lib/pstree/config.sub
 lib/pstree/test/test
+lib/acct-6.5.4/test/test
+lib/acct-6.5.4/lib/unistd.h
+lib/acct-6.5.4/lib/time.h
+lib/acct-6.5.4/lib/sys/stat.h
+lib/acct-6.5.4/lib/string.h
+lib/acct-6.5.4/lib/stdlib.h
+lib/acct-6.5.4/lib/stdio.h
+lib/acct-6.5.4/lib/stdbool.h
+lib/acct-6.5.4/lib/getopt.h
+lib/acct-6.5.4/lib/alloca.h
+*.la
