@@ -15,11 +15,14 @@
 
 	0.3 - Scala
 	    >= 2.8.1
+	    
+	0.4 - System libraries in 32bit architecture:
+	    - libc6-dev-i386 package (on Debian), or equivalent.
 
-	0.4 - List of currently supported platforms:
+	0.5 - List of currently supported platforms:
 	    Mac OSX (100% features, development),
-	    Free BSD (100% features, production),
 	    Linux Debian (100% features, production)
+	    Free BSD (100% features, production),
 
 
 
