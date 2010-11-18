@@ -1,14 +1,14 @@
 #!/bin/bash
 # This Software is a close code project. You may not redistribute this code without permission of author.
 
-. bin/OPTS
 
+. bin/OPTS
 
 echo "Preparing PSTREE library.."
 cd lib/pstree/
 
 # 2010-10-24 06:22:29 - dmilith - NOTE: a little hack to be able to distclean without need of running "bin/clean" script
-if [ "$1" == "c" ]
+if [ "$1" = "c" ]
 then
     make distclean
 # else
@@ -28,7 +28,11 @@ make
 if [ "$?" -eq "0" ]; then
     cd test
     rm -rfv test
-    $CC main.c $CFLAGS -o test ../*.o
+    if [ "$platform" = "freebsd" ]; then
+        $CC main.c $CFLAGS -o test ../*.o -lkvm
+    else
+        $CC main.c $CFLAGS -o test ../*.o
+    fi
     ./test $@
 fi
 
@@ -56,7 +60,6 @@ fi
 if [ ! -e 'config.h' ]; then
     CC=$CC ./configure
 fi
-
 
 if [ "$?" -eq "0" ]; then
 
@@ -94,4 +97,4 @@ fi
 
 echo "Done preparing LIBACCT"
 
-exit 0
+
