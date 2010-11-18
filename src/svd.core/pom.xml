@@ -52,7 +52,8 @@
 				<version>2.6</version>
 				<configuration>
 					<forkMode>pertest</forkMode>
-					<argLine>-d32 -XX:NewRatio=1 -XX:+UseFastAccessorMethods</argLine>
+					<argLine>-XX:NewRatio=1 -XX:+UseFastAccessorMethods</argLine>
+					<!-- <argLine>-d32 -XX:NewRatio=1 -XX:+UseFastAccessorMethods</argLine> -->
 					<useFile>false</useFile> <!-- It's for putting compilation errors to console not file -->
 				</configuration>
 			</plugin>

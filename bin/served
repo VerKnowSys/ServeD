@@ -6,6 +6,6 @@
 args=""
 
 cd src/svd.maintainer/
-MAVEN_OPTS="$MAVEN_OPTS -d32" $MVN_EXEC $MVN_PARAMS exec:java -Dexec.args=$args $@
+MAVEN_OPTS="$MAVEN_OPTS" $MVN_EXEC $MVN_PARAMS exec:java -Dexec.args=$args $@
 
 exit 0

@@ -39,7 +39,7 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
             <jvmArg>-Xms128m</jvmArg>
             <jvmArg>-Xmx128m</jvmArg>
 						<jvmArg>-Dfsc=true</jvmArg>
-						<jvmArg>-d32</jvmArg>
+						<!-- <jvmArg>-d32</jvmArg> -->
 						<jvmArg>-XX:NewRatio=1</jvmArg>
 						<jvmArg>-Dfile.encoding=UTF-8</jvmArg>
           </jvmArgs>
