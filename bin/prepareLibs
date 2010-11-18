@@ -54,7 +54,7 @@ else
 fi
 
 if [ ! -e 'config.h' ]; then
-    CC=$CC CFLAGS="-m32" ./configure
+    CC=$CC ./configure
 fi
 
 
@@ -77,7 +77,7 @@ sa
 )
 
     for i in ${srcList[@]}; do
-      $CC $CFLAGS $i.c -I./lib/ -c -m32 -o $i.o
+      $CC $CFLAGS $i.c -I./lib/ -c -o $i.o
     done
 
     echo "Linking library…"

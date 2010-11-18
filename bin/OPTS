@@ -4,19 +4,24 @@ if [ `uname` == "Linux" ]; then
     platform="linux";
     libs="*.so"
     export CC="/usr/bin/gcc"
-    export CFLAGS="-Wdeprecated-declarations -m32 -O3 -fPIC -march=pentium4 -ffast-math -fmessage-length=65" # -pedantic -Werror
+    export CFLAGS="-Wdeprecated-declarations -O3 -fPIC -march=pentium4 -ffast-math -fmessage-length=65" # -pedantic -Werror
 elif [ `uname` == "Darwin" ]; then
     platform="mac";
-    libs="lib/*.dylib"  #" lib/*.jnilib"
+    libs="lib/*.dylib"
     export CC="/usr/bin/clang"
-    export CFLAGS="-Wdeprecated-declarations -arch i386 -O3 -fPIC -march=pentium4 -ffast-math -fmessage-length=65" # -pedantic -Werror
+    export CFLAGS="-Wdeprecated-declarations -arch x86_64 -O3 -fPIC -march=pentium4 -ffast-math -fmessage-length=65" # -pedantic -Werror
+elif [ `uname` == "FreeBSD"]; then
+    platform="freebsd";
+    libs="lib/*.so"
+    export CC="/usr/bin/gcc"
+    export CFLAGS="-Wdeprecated-declarations -O3 -DPIC -fPIC -march=pentium4 -ffast-math -fmessage-length=65" # -pedantic -Werror
 fi
 
 export MVN_EXEC="/usr/bin/env mvn"
 # export MVN_PARAMS="-T C2 -e -Dmaven.test.skip.exec=true -Dmaven.test.skip=true"
 # export MVN_TEST_PARAMS="-T C2 -e"
 
-export JAVA_OPTS="-d32 -Xms32m -XX:NewRatio=1 -Xmx512m -Dfile.encoding=UTF-8 -XX:+UseFastAccessorMethods"
+export JAVA_OPTS="-Xms32m -XX:NewRatio=1 -Xmx512m -Dfile.encoding=UTF-8 -XX:+UseFastAccessorMethods"
 export MAVEN_OPTS_ADDITIONAL="-e -Dmaven.test.skip.exec=true -Dmaven.test.skip=true"
 export MAVEN_OPTS="-Dbuild.platform=$platform -Djava.library.path=../../lib/ -Dactors.corePoolSize=8 -Djna.library.path=../../lib/"
 

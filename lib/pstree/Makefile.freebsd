@@ -1,12 +1,13 @@
-CC=/usr/bin/clang
-CFLAGS=-fmessage-length=65 -Wall -arch x86_64 -O3 -fPIC -march=pentium4 -ffast-math -mmacosx-version-min=10.6
+CC=/usr/bin/gcc
+CFLAGS=-fmessage-length=65 -O3 -DPIC -fPIC -ffast-math -minline-all-stringops -fgcse -fdefer-pop -ffast-math -funroll-loops -foptimize-sibling-calls -shared
+
 OBJS=pstree.o ptree.o version.o
-PGM=libpstree.dylib
+PGM=libpstree.so
 
 all: $(PGM)
 
-libpstree.dylib: $(OBJS)
-	$(CC) $(CFLAGS) -dynamiclib -o ../libpstree.dylib $(OBJS)
+libpstree.so: $(OBJS)
+	$(CC) $(CFLAGS) -o ../libpstree.so $(OBJS)
 
 version.o: VERSION
 	echo 'char version[] = VERSION;' > version.c
