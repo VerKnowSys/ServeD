@@ -2,8 +2,8 @@
 #include "kqueue.h"
 
 int main(int argc, char ** args){
-	kevent_t * watch;
-	kevent_t * event;
+	struct kevent * watch;
+	struct kevent * event;
 	
 	kqueue_init();
 	

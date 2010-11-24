@@ -19,11 +19,11 @@ void kqueue_close(){
 	close(kq);
 }
 
-kevent_t * kqueue_check(kevent_t * change){
+struct kevent * kqueue_check(struct kevent * change){
 	int nev;
-	kevent_t * event;
+	struct kevent * event;
 	
-	event = (kevent_t *)malloc(sizeof(kevent_t));
+	event = (struct kevent *)malloc(sizeof(struct kevent));
 	nev = kevent(kq, change, 1, event, 1, NULL);
 	
 	if(nev > 0){
@@ -35,10 +35,10 @@ kevent_t * kqueue_check(kevent_t * change){
 	}
 }
 
-kevent_t * kqueue_watch(char * path){
+struct kevent * kqueue_watch(char * path){
 	int f;
-	kevent_t * change;
-	change = (kevent_t *)malloc(sizeof(kevent_t));
+	struct kevent * change;
+	change = (struct kevent *)malloc(sizeof(struct kevent));
 		
 	f = open(path, O_RDONLY);
 	if(f == -1){

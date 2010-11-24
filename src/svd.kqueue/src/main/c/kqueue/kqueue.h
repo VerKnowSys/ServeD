@@ -3,11 +3,9 @@
 
 #include <sys/event.h>
 
-typedef struct kevent kevent_t;
-
 int kqueue_init();
 void kqueue_close();
-kevent_t * kqueue_check(kevent_t * change);
-kevent_t * kqueue_watch(char * path);
+struct kevent * kqueue_check(struct kevent * change);
+struct kevent * kqueue_watch(char * path);
 
 #endif
