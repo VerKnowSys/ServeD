@@ -20,6 +20,7 @@ void kqueue_close(){
 }
 
 struct kevent * kqueue_check(struct kevent * change){
+	printf("[C] check change: %d\n", change);
 	int nev;
 	struct kevent * event;
 	
@@ -44,12 +45,14 @@ struct kevent * kqueue_watch(char * path){
 	if(f == -1){
 		// No such file or directory!
 		perror("open");
-		free(kevent);
+		free(change);
 		return NULL;
 	}
 	
 	// Set event
 	EV_SET(change, f, EVFILT_VNODE, EV_ADD | EV_ENABLE | EV_ONESHOT, 
 		NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE, 0, 0);
+	
+	printf("[C] watch change: %d\n", change);
 	return change;
 }
