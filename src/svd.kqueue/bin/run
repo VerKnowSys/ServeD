@@ -3,4 +3,3 @@
 mvn clean
 bin/compile
 mvn compile exec:java -Dexec.mainClass=com.verknowsys.served.kqueue.Kqueue -Djna.library.path="target/lib"
-

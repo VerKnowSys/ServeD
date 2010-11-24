@@ -1,5 +1,5 @@
 #!/bin/bash
 
 mkdir -p target/lib
-gcc -m32 -c src/main/c/kqueue/kqueue.c -o target/lib/kqueue.o
-gcc -m32 -dynamiclib -o target/lib/libkqueue.dylib target/lib/kqueue.o
+gcc -c src/main/c/kqueue/kqueue.c -o target/lib/kqueue.o
+gcc -dynamiclib -o target/lib/libkqueue.dylib target/lib/kqueue.o
