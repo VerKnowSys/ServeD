@@ -120,6 +120,7 @@ public class Kqueue extends Thread {
 			int nev = clib.kevent(kq, event, 1, null, 0, null);
 			if(nev == -1){
 				// TODO: Handle error
+				return;
 			}
 			
 			files.put(ident, new KqueueFile(path, event, listener));
