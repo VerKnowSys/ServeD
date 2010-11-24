@@ -1,5 +1,0 @@
-#!/bin/bash
-
-mkdir -p target/lib
-clang -c src/main/c/kqueue/kqueue.c -o target/lib/kqueue.o
-clang -dynamiclib -o target/lib/libkqueue.dylib target/lib/kqueue.o
