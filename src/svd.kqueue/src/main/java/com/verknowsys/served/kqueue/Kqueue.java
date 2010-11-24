@@ -9,17 +9,14 @@ import com.sun.jna.Platform;
  
 public class Kqueue {
     public interface KqueueLib extends Library {
-        public KqueueLib instance = (KqueueLib) Native.loadLibrary("c", KqueueLib.class);
-        public void printf(String format, Object... args);
+        public KqueueLib instance = (KqueueLib) Native.loadLibrary("kqueue", KqueueLib.class);
+        public int dupa();
     }
+
+	protected static KqueueLib kqueue = KqueueLib.instance;
  
     public static void main(String[] args) {
-		KqueueLib kqueue = KqueueLib.instance;
-	
-		args = new String[]{"1", "2", "3", "4"};
-        kqueue.printf("Hello, World\n");
-        for (int i = 0; i < args.length; i++) {
-            kqueue.printf("Argument %d: %s\n", i, args[i]);
-        }
+		System.out.println("jna.librabry.path = " + System.getProperty("jna.library.path"));
+		System.out.println(kqueue.dupa());
     }
 }
