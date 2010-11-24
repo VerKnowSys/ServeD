@@ -1,0 +1,7 @@
+#!/bin/bash
+
+mkdir -p target/lib
+clang -c src/main/c/kqueue/kqueue.c -o target/lib/kqueue.o
+clang -c src/main/c/kqueue/test.c -o target/lib/test.o
+clang -o target/lib/test target/lib/kqueue.o target/lib/test.o
+target/lib/test
