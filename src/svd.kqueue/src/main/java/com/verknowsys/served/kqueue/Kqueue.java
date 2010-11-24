@@ -1,19 +1,21 @@
 package com.verknowsys.served.kqueue;
 
 import com.sun.jna.*;
+import java.util.*;
 
 
 
 
-public class Kqueue {
+public class Kqueue extends Thread {
     protected interface CLibrary extends Library {
 		
         public CLibrary instance = (CLibrary) Native.loadLibrary("c", CLibrary.class);
        	// see <sys/event.h>
 		public int kqueue();
-		public int kevent(int kq, kevent changelist, int nchanges, kevent eventlist, int nevents, timespec timeout);
+		public int kevent(int kq, kevent change, int nchanges, kevent event, int nevents, timespec timeout);
 		public void perror(String label);
 		public int open(String filename, int flags);
+		public void close(int fd);
 		
 		public static final int EVFILT_READ		= -1;
 		public static final int EVFILT_WRITE	= -2;
@@ -67,57 +69,130 @@ public class Kqueue {
 	}
 
 	protected static CLibrary clib = CLibrary.instance;
+	
+	public static final int	E_DELETE = clib.NOTE_DELETE;		/* vnode was removed */
+	public static final int	E_WRITE	 = clib.NOTE_WRITE;		/* data contents changed */
+	public static final int	E_EXTEND = clib.NOTE_EXTEND;		/* size increased */
+	public static final int	E_ATTRIB = clib.NOTE_ATTRIB;		/* attributes changed */
+	public static final int	E_LINK	 = clib.NOTE_LINK;		/* link count changed */
+	public static final int	E_RENAME = clib.NOTE_RENAME;		/* vnode was renamed */
+	public static final int	E_REVOKE = clib.NOTE_REVOKE;		/* vnode access was revoked */
+	public static final int E_NONE	 = clib.NOTE_NONE;		/* No specific vnode event: to test for EVFILT_READ */
+	
 
-    public static void main(String[] args) {
-		System.out.println("jna.librabry.path = " + System.getProperty("jna.library.path"));
+	
+	protected int kq;
+	protected boolean keep = false;
+	
+	protected Map<NativeLong, KqueueFile> files;
+	
+	public Kqueue(){
+		files = new HashMap<NativeLong, KqueueFile>();
 		
-		int kq = clib.kqueue();
-		if(kq == -1){
-			clib.perror("kqueue");
+		kq = clib.kqueue();
+		if(kq == -1) {
+			// TODO: Handle error
+		}
+	}
+	
+	protected KqueueFile findFile(String path, int flags){
+		for(KqueueFile file : files.values()){
+			if(file.event.fflags == flags && file.path.equals(path)) return file;
 		}
 		
-		int f = clib.open("/tmp/xx", CLibrary.O_RDONLY);
-		if(f == -1){
-			clib.perror("open");
-		}
-		
-		// #define EV_SET(kevp, a, b, c, d, e, f) do {	\
-		// 	struct kevent *__kevp__ = (kevp);	\
-		// 	__kevp__->ident = (a);			\
-		// 	__kevp__->filter = (b);			\
-		// 	__kevp__->flags = (c);			\
-		// 	__kevp__->fflags = (d);			\
-		// 	__kevp__->data = (e);			\
-		// 	__kevp__->udata = (f);			\
-		// } while(0)
-		// EV_SET(&change, f, EVFILT_VNODE,
-		// 	          EV_ADD | EV_ENABLE | EV_ONESHOT,
-		// 	          NOTE_DELETE | NOTE_EXTEND | NOTE_WRITE | NOTE_ATTRIB,
-		// 	          0, 0);
-		
-		kevent change = new kevent(new NativeLong(f), 
-					(short)clib.EVFILT_VNODE,
-					(short)(clib.EV_ADD | clib.EV_ENABLE | clib.EV_ONESHOT),
-					clib.NOTE_DELETE | clib.NOTE_EXTEND | clib.NOTE_WRITE | clib.NOTE_ATTRIB,
-					new NativeLong(), Pointer.NULL);
-		
+		return null;
+	}
+	
+	public void registerEvent(String path, int flags, KqueueListener listener){
+		// check for existing events
+		KqueueFile file = findFile(path, flags);
+		if(file == null){
+			int f = clib.open(path, clib.O_RDONLY);
+			if(f == -1){
+				// TODO: Handle error (File Not Found)
+			}
+
+			NativeLong ident = new NativeLong(f);
+
+			kevent event = new kevent(ident, (short)clib.EVFILT_VNODE, (short)(clib.EV_ADD | clib.EV_ENABLE | clib.EV_CLEAR), 
+						flags, new NativeLong(), null); // EV_SET
+
+			int nev = clib.kevent(kq, event, 1, null, 0, null);
+			if(nev == -1){
+				// TODO: Handle error
+			}
+			
+			files.put(ident, new KqueueFile(path, event, listener));
+			System.out.println("Registered first listener for: " + path);
+		} else {
+			file.addListener(listener);
+			System.out.println("Registered next listener for: " + path);
+		}		
+	}
+	
+	public void run(){
+		int nev;
 		kevent event = new kevent();
 		
-		while(true){
-			int nev = clib.kevent(kq, change, 1, event, 1, null);
+		keep = true;
+		while(keep){
+			nev = clib.kevent(kq, null, 0, event, 1, null);
 			if(nev == -1){
-				clib.perror("kevent");
-			} else if(nev > 0) {
-				if ((event.fflags & clib.NOTE_DELETE) != 0) {
-	               System.out.println("File deleted");
-	               break;
-	           }
-	           if ((event.fflags & clib.NOTE_EXTEND) != 0 || (event.fflags & clib.NOTE_WRITE) != 0)
-	               System.out.println("File modified");
-	           if ((event.fflags & clib.NOTE_ATTRIB) != 0)
-	               System.out.println("File attributes modified");
+				// TODO: Handle error
+			} else if(nev > 0){
+				System.out.println("->kevent");
+				files.get(event.ident).call();
 			}
 		}
+		
+		clib.close(kq);
+	}
+	
+	public void kill(){
+		keep = false;
+	}
+	
+
+    public static void main(String[] args) {
+		Kqueue kq = new Kqueue();
+		kq.start();
+		System.out.println("Kqueue started");
+		
+		kq.registerEvent("/tmp/aa", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
+			public void handle(){
+				System.out.println("Modified aa 1");
+			}
+		});
+		
+		kq.registerEvent("/tmp/aa", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
+			public void handle(){
+				System.out.println("Modified aa 2");
+			}
+		});
+		
+		kq.registerEvent("/tmp/bb", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
+			public void handle(){
+				System.out.println("Modified bb");
+			}
+		});
+	
+		
+		// 
+		// while(true){
+		// 	int nev = clib.kevent(kq, change, 1, event, 1, null);
+		// 	if(nev == -1){
+		// 		clib.perror("kevent");
+		// 	} else if(nev > 0) {
+		// 		if ((event.fflags & clib.NOTE_DELETE) != 0) {
+		// 	               System.out.println("File deleted");
+		// 	               break;
+		// 	           }
+		// 	           if ((event.fflags & clib.NOTE_EXTEND) != 0 || (event.fflags & clib.NOTE_WRITE) != 0)
+		// 	               System.out.println("File modified");
+		// 	           if ((event.fflags & clib.NOTE_ATTRIB) != 0)
+		// 	               System.out.println("File attributes modified");
+		// 	}
+		// }
 		
 		
 		// public kevent(NativeLong ident, short filter, short flags, int fflags, NativeLong data, Pointer udata) {

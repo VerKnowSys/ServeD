@@ -20,16 +20,18 @@ public class kevent extends Structure {
 	 * C type : void*
 	 */
 	public Pointer udata;
+	
 	public kevent() {
 		super();
 	}
+	
 	/**
-	 * @param ident identifier for this event<br>
-	 * @param filter filter for event<br>
-	 * @param flags general flags<br>
-	 * @param fflags filter-specific flags<br>
-	 * @param data filter-specific data<br>
-	 * @param udata opaque user data identifier<br>
+	 * @param ident identifier for this event
+	 * @param filter filter for event
+	 * @param flags general flags
+	 * @param fflags filter-specific flags
+	 * @param data filter-specific data
+	 * @param udata opaque user data identifier
 	 * C type : void*
 	 */
 	public kevent(NativeLong ident, short filter, short flags, int fflags, NativeLong data, Pointer udata) {
