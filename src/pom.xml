@@ -73,7 +73,7 @@
         </configuration>
       </plugin>
             
-      <plugin>
+      <!-- <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.2</version>
@@ -85,18 +85,18 @@
           </execution>
         </executions>
         <configuration>
-          <!-- <arguments>
+          <arguments>
    	              <argument>-Djava.library.path=../../lib/</argument>
-   	            </arguments> -->
-          <!-- <systemProperties>
+   	            </arguments>
+          <systemProperties>
               <systemProperty>
                 <key>java.library.path</key>
   				<value>../../../lib/</value>
               </systemProperty>
-            </systemProperties> -->
-          <mainClass>com.verknowsys.served.maintainer.Maintainer</mainClass>
+            </systemProperties>
+         <mainClass>com.verknowsys.served.maintainer.Maintainer</mainClass>
         </configuration>
-      </plugin>
+      </plugin> -->
     </plugins>
   </build>
 </project>
