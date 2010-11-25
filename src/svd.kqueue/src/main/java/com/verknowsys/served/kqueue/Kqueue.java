@@ -2,11 +2,12 @@ package com.verknowsys.served.kqueue;
 
 import com.sun.jna.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 
 
-public class Kqueue extends Thread {
+public class Kqueue {
     protected interface CLibrary extends Library {
 		
         public CLibrary instance = (CLibrary) Native.loadLibrary("c", CLibrary.class);
@@ -85,14 +86,50 @@ public class Kqueue extends Thread {
 	protected boolean keep = false;
 	
 	protected Map<NativeLong, KqueueFile> files;
+	protected Queue<kevent> events;
+	
+	protected Thread keventThread;
+	protected Thread eventsThread;
 	
 	public Kqueue(){
 		files = new HashMap<NativeLong, KqueueFile>();
+		events = new ConcurrentLinkedQueue<kevent>();
 		
 		kq = clib.kqueue();
 		if(kq == -1) {
 			// TODO: Handle error
 		}
+		
+		keventThread = new Thread(){
+			public void run(){
+				int nev;
+				while(keep){
+					kevent event = new kevent();
+					nev = clib.kevent(kq, null, 0, event, 1, null);
+					if(nev == -1){
+						// TODO: Handle error
+					} else if(nev > 0){
+						if(!events.add(event)){
+							System.err.println("Can`t add event to queue");
+						}
+					}
+				}
+
+				clib.close(kq);
+			}
+		};
+		
+		eventsThread = new Thread(){
+			public void run(){
+				while(keep){
+					while(events.isEmpty());
+					kevent event = events.poll();
+					System.out.println("->kevent");
+					KqueueFile file = files.get(event.ident);
+					if(file != null) file.call();
+				}
+			}
+		};
 	}
 	
 	protected KqueueFile findFile(String path, int flags){
@@ -131,22 +168,10 @@ public class Kqueue extends Thread {
 		}		
 	}
 	
-	public void run(){
-		int nev;
-		kevent event = new kevent();
-		
+	public void start(){
 		keep = true;
-		while(keep){
-			nev = clib.kevent(kq, null, 0, event, 1, null);
-			if(nev == -1){
-				// TODO: Handle error
-			} else if(nev > 0){
-				System.out.println("->kevent");
-				files.get(event.ident).call();
-			}
-		}
-		
-		clib.close(kq);
+		keventThread.start();
+		eventsThread.start();
 	}
 	
 	public void kill(){
@@ -160,20 +185,30 @@ public class Kqueue extends Thread {
 		System.out.println("Kqueue started");
 		
 		kq.registerEvent("/tmp/aa", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
+			int aa = 0;
+			
 			public void handle(){
-				System.out.println("Modified aa 1");
+				aa++;
+				try { Thread.sleep(120); } catch(InterruptedException e) {} // just wait a bit
+				System.out.println(aa);
 			}
 		});
 		
 		kq.registerEvent("/tmp/aa", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
+			int aa = 0;
+			
 			public void handle(){
-				System.out.println("Modified aa 2");
+				aa++;
+				System.out.println(aa);
 			}
 		});
 		
 		kq.registerEvent("/tmp/bb", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
+			int bb = 0;
+			
 			public void handle(){
-				System.out.println("Modified bb");
+				bb++;
+				System.out.println(bb);
 			}
 		});
 	
