@@ -18,6 +18,14 @@ public class KqueueFile {
 		this.listeners.add(listener);
 	}
 	
+	public void removeListener(KqueueListener listener){
+	    this.listeners.remove(listener);
+	}
+	
+	public boolean hasListeners(){
+	    return !this.listeners.isEmpty();
+	}
+	
 	public void call(){
 		for(KqueueListener listener : listeners){
 			listener.handle(); // TODO: Add some parameters

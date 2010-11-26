@@ -5,8 +5,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-
-
 public class Kqueue {
     protected interface CLibrary extends Library {
 		
@@ -129,14 +127,14 @@ public class Kqueue {
 		return null;
 	}
 	
-	public void registerEvent(String path, int flags, KqueueListener listener){
+	public KqueueWatch registerEvent(String path, int flags, KqueueListener listener){
 		// check for existing events
 		KqueueFile file = findFile(path, flags);
 		if(file == null){
 			int f = clib.open(path, clib.O_RDONLY);
 			if(f == -1){
 				System.out.println("FileNotFound");
-				return;
+				return null;
 				// TODO: Handle error (File Not Found)
 			}
 
@@ -149,15 +147,24 @@ public class Kqueue {
 			int nev = clib.kevent(kq, event, 1, null, 0, null);
 			if(nev == -1){
 				// TODO: Handle error
-				return;
+				return null;
 			}
 			
-			files.put(ident, new KqueueFile(path, event, listener));
+			file = new KqueueFile(path, event, listener);
+			files.put(ident, file);
 			System.out.println("Registered first listener for: " + path);
 		} else {
 			file.addListener(listener);
 			System.out.println("Registered next listener for: " + path);
-		}		
+		}
+		
+		return new KqueueWatch(this, file, listener);
+	}
+	
+	public void removeFile(KqueueFile file){
+        files.remove(file.event.ident);
+	    clib.close(file.event.ident.intValue()); // kevent automatically removed when file descriptor is closed
+		System.out.println("Remove last listener for: " + file.path);
 	}
 	
 	public void start(){
@@ -172,20 +179,38 @@ public class Kqueue {
 	
 
     public static void main(String[] args) {
-		// Kqueue kq = new Kqueue();
-		// kq.start();
-		// System.out.println("Kqueue started");
-		// 
-		// kq.registerEvent("/tmp/aa", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
-		// 	int aa = 0;
-		// 	
-		// 	public void handle(){
-		// 		aa++;
-		// 		try { Thread.sleep(120); } catch(InterruptedException e) {} // just wait a bit
-		// 		System.out.println(aa);
-		// 	}
-		// });
-		// 
+        Kqueue kq = new Kqueue();
+        kq.start();
+        System.out.println("Kqueue started");
+        
+        KqueueWatch watch1 = kq.registerEvent("/tmp/aa", CLibrary.NOTE_DELETE | CLibrary.NOTE_EXTEND | CLibrary.NOTE_WRITE | CLibrary.NOTE_ATTRIB, new KqueueListener(){
+            int aa = 0;
+            
+            public void handle(){
+                aa++;
+                System.out.println("Changed1: " + aa);
+            }
+        });
+        
+        KqueueWatch watch2 = kq.registerEvent("/tmp/aa", CLibrary.NOTE_DELETE | CLibrary.NOTE_EXTEND | CLibrary.NOTE_WRITE | CLibrary.NOTE_ATTRIB, new KqueueListener(){
+            int aa = 0;
+            
+            public void handle(){
+                aa++;
+                System.out.println("Changed2: " + aa);
+            }
+        });
+        
+        try { Thread.sleep(5000); } catch (InterruptedException e){}
+        watch1.stop();
+        System.out.println("watch 1 removed");
+        
+        try { Thread.sleep(5000); } catch (InterruptedException e){}
+        watch2.stop();
+        System.out.println("watch 2 removed");
+        
+        
+        
 		// kq.registerEvent("/tmp/aa", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
 		// 	int aa = 0;
 		// 	
