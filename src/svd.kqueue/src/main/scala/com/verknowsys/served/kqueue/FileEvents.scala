@@ -26,13 +26,16 @@ object FileEvents {
 	 * 	- modified
      *  - deleted
      *  - renamed
+     * 
      *  - attributes changed
 	 *
 	 * @author teamon 
 	 * @example
-	 *     FileEvents.watch("/tmp/xx", modified = true){
-	 *         println("File modified")
-	 *     }
+	 *      val watch = FileEvents.watch("/tmp/xx", modified = true){
+	 *          println("File modified")
+     *      }
+     *      // ...
+     *      watch.stop
 	 * 
 	 */
 	def watch(path: String, modified: Boolean = false, 
@@ -65,7 +68,7 @@ object FileEvents {
 	}
 	
 	def main(args: Array[String]): Unit = {
-		FileEvents.watch("/tmp/aa", modified = true){
+		val watch = FileEvents.watch("/tmp/aa", modified = true){
 			println("MODIFIED")
 		}
 		
@@ -80,5 +83,9 @@ object FileEvents {
 		FileEvents.watch("/tmp/aa", attributes = true){
 			println("ATTRIBUTES")
 		}
+		
+		Thread.sleep(5000)
+		
+		watch.stop
 	}
 }
