@@ -24,7 +24,9 @@ object FileEvents {
 	 *
 	 * Possible events:
 	 * 	- modified
-	 * 	- deleted
+     *  - deleted
+     *  - renamed
+     *  - attributes changed
 	 *
 	 * @author teamon 
 	 * @example
