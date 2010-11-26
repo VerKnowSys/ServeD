@@ -13,7 +13,7 @@ public class Kqueue {
         public CLibrary instance = (CLibrary) Native.loadLibrary("c", CLibrary.class);
        	// see <sys/event.h>
 		public int kqueue();
-		public int kevent(int kq, kevent change, int nchanges, kevent event, int nevents, timespec timeout);
+		public int kevent(int kq, kevent change, int nchanges, kevent event, int nevents, Pointer timeout);
 		public void perror(String label);
 		public int open(String filename, int flags);
 		public void close(int fd);
@@ -70,17 +70,6 @@ public class Kqueue {
 	}
 
 	protected static CLibrary clib = CLibrary.instance;
-	
-	public static final int	E_DELETE = clib.NOTE_DELETE;		/* vnode was removed */
-	public static final int	E_WRITE	 = clib.NOTE_WRITE;		/* data contents changed */
-	public static final int	E_EXTEND = clib.NOTE_EXTEND;		/* size increased */
-	public static final int	E_ATTRIB = clib.NOTE_ATTRIB;		/* attributes changed */
-	public static final int	E_LINK	 = clib.NOTE_LINK;		/* link count changed */
-	public static final int	E_RENAME = clib.NOTE_RENAME;		/* vnode was renamed */
-	public static final int	E_REVOKE = clib.NOTE_REVOKE;		/* vnode access was revoked */
-	public static final int E_NONE	 = clib.NOTE_NONE;		/* No specific vnode event: to test for EVFILT_READ */
-	
-
 	
 	protected int kq;
 	protected boolean keep = false;
@@ -146,13 +135,16 @@ public class Kqueue {
 		if(file == null){
 			int f = clib.open(path, clib.O_RDONLY);
 			if(f == -1){
+				System.out.println("FileNotFound");
+				return;
 				// TODO: Handle error (File Not Found)
 			}
 
 			NativeLong ident = new NativeLong(f);
 
-			kevent event = new kevent(ident, (short)clib.EVFILT_VNODE, (short)(clib.EV_ADD | clib.EV_ENABLE | clib.EV_CLEAR), 
-						flags, new NativeLong(), null); // EV_SET
+			kevent event = new kevent(ident, (short)clib.EVFILT_VNODE, 
+									(short)(clib.EV_ADD | clib.EV_ENABLE | clib.EV_CLEAR), 
+									flags, new NativeLong(), null); // EV_SET
 
 			int nev = clib.kevent(kq, event, 1, null, 0, null);
 			if(nev == -1){
@@ -180,37 +172,37 @@ public class Kqueue {
 	
 
     public static void main(String[] args) {
-		Kqueue kq = new Kqueue();
-		kq.start();
-		System.out.println("Kqueue started");
-		
-		kq.registerEvent("/tmp/aa", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
-			int aa = 0;
-			
-			public void handle(){
-				aa++;
-				try { Thread.sleep(120); } catch(InterruptedException e) {} // just wait a bit
-				System.out.println(aa);
-			}
-		});
-		
-		kq.registerEvent("/tmp/aa", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
-			int aa = 0;
-			
-			public void handle(){
-				aa++;
-				System.out.println(aa);
-			}
-		});
-		
-		kq.registerEvent("/tmp/bb", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
-			int bb = 0;
-			
-			public void handle(){
-				bb++;
-				System.out.println(bb);
-			}
-		});
+		// Kqueue kq = new Kqueue();
+		// kq.start();
+		// System.out.println("Kqueue started");
+		// 
+		// kq.registerEvent("/tmp/aa", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
+		// 	int aa = 0;
+		// 	
+		// 	public void handle(){
+		// 		aa++;
+		// 		try { Thread.sleep(120); } catch(InterruptedException e) {} // just wait a bit
+		// 		System.out.println(aa);
+		// 	}
+		// });
+		// 
+		// kq.registerEvent("/tmp/aa", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
+		// 	int aa = 0;
+		// 	
+		// 	public void handle(){
+		// 		aa++;
+		// 		System.out.println(aa);
+		// 	}
+		// });
+		// 
+		// kq.registerEvent("/tmp/bb", E_DELETE | E_EXTEND | E_WRITE | E_ATTRIB, new KqueueListener(){
+		// 	int bb = 0;
+		// 	
+		// 	public void handle(){
+		// 		bb++;
+		// 		System.out.println(bb);
+		// 	}
+		// });
 	
 		
 		// 

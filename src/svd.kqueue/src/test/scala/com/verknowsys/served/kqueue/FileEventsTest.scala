@@ -3,6 +3,7 @@ package com.verknowsys.served.kqueue
 import org.specs._
 import java.io._
 import org.apache.commons.io.FileUtils
+import scala.collection.mutable.ListBuffer
 
 object Impl {
 	implicit def StringToFile(s: String) = new File(s)
@@ -12,45 +13,35 @@ import Impl._
 
 class FileEventsTest extends SpecificationWithJUnit {
     final val DIR = "/tmp/served/file_events_test"
+	final val num = 10
 
     "FileEvents" should {
         doBefore { setup }
 
         "notify ..." in {
-			var modCount1 = 0
-			var modCount2 = 0
+			var cnt = new ListBuffer[Int]
 			
-			FileEvents.watch(DIR + "/m_file001.txt", modify = true){
-				modCount1 += 1
+			1 to num foreach { i =>
+				FileEvents.watch(DIR + "/m_file" + i + ".txt", modify = true){
+					cnt += i
+				}
+			}
+
+			1 to num foreach { i =>
+				FileUtils.writeStringToFile(DIR + "/m_file" + i + ".txt", "xxx")
 			}
 			
-			FileEvents.watch(DIR + "/m_file002.txt", modify = true){
-				modCount2 += 1
-			}
-			
-			Thread.sleep(2000)
+			println(cnt.toList.sortWith(_<_))
 
-            FileUtils.writeStringToFile(DIR + "/m_file001.txt", "a")
-            FileUtils.writeStringToFile(DIR + "/m_file001.txt", "b")
-            FileUtils.writeStringToFile(DIR + "/m_file001.txt", "c")
-
-            FileUtils.writeStringToFile(DIR + "/m_file002.txt", "a")
-            FileUtils.writeStringToFile(DIR + "/m_file002.txt", "b")
-            FileUtils.writeStringToFile(DIR + "/m_file002.txt", "c")
-            FileUtils.writeStringToFile(DIR + "/m_file002.txt", "d")
-            FileUtils.writeStringToFile(DIR + "/m_file002.txt", "e")
-
-			Thread.sleep(4000)
-
-			modCount1 must beEqual(3)
-			modCount1 must beEqual(5)
+			cnt.length must beEqual(100)
         }
     }
 
 
     private def setup {
         try { FileUtils.forceDelete(DIR) } catch { case _ => }
-        FileUtils.writeStringToFile(DIR + "/m_file001.txt", "xxx")
-        FileUtils.writeStringToFile(DIR + "/m_file002.txt", "xxx")
+		1 to num foreach { i =>
+			FileUtils.writeStringToFile(DIR + "/m_file" + i + ".txt", "x")
+		}
     }
 }
