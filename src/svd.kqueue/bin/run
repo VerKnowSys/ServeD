@@ -1,3 +1,0 @@
-#!/bin/bash
-
-mvn -e clean compile exec:java -Dexec.mainClass=com.verknowsys.served.kqueue.Kqueue
