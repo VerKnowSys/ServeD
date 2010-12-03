@@ -6,8 +6,7 @@ import scala.collection.mutable.{Map, ListBuffer}
 
 case class FileEvent(val evflags: Int)
 
-
-class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => Unit) extends Actor {
+protected class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => Unit) extends Actor {
     case object StopWatching
 
     var keep = true
@@ -20,7 +19,7 @@ class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => 
             receive {
                 case FileEvent(evflags) if((flags & evflags) > 0) => f
 
-                case Stop => 
+                case StopWatching => 
                     kqueue.remove(this)
                     keep = false 
             }
@@ -32,8 +31,9 @@ class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => 
     }
 }
 
-class Kqueue extends Actor {
+protected class Kqueue extends Actor {
     val kq = Kqueue.clib.kqueue()
+    println("new Kqueue: " + kq)
     if(kq == -1) {
         // TODO: Handle error
         println("kqueue() error")
@@ -106,50 +106,36 @@ class Kqueue extends Actor {
 
 }
 
+/**
+ *
+ * touch /tmp/aa        -> attributes
+ * echo "x" > /tmp/aa   -> modified & attributes
+ * echo "a" >> tmp/aa   -> modified
+ * mv /tmp/aa /tmp/bb   -> renamed
+ * rm /tmp/bb           -> deleted 
+ *
+ */
 object Kqueue {
     val clib = CLibrary.instance
-    
-        // def watch(path: String, modified: Boolean = false, 
-        //                         deleted: Boolean = false,
-        //                         renamed: Boolean = false,
-        //                         attributes: Boolean = false)(f: => Unit) = {
-        // 
-        //     import CLibrary._
-        // 
-        //     var flags = 0
-        // 
-        //     if(modified)    flags |= NOTE_WRITE | NOTE_EXTEND
-        //     if(deleted)     flags |= NOTE_DELETE
-        //     if(attributes)  flags |= NOTE_ATTRIB
-        //     if(renamed)     flags |= NOTE_RENAME
-        // 
-        //     /**
-        //      *
-        //      * touch /tmp/aa        -> attributes
-        //      * echo "x" > /tmp/aa   -> modified & attributes
-        //      * echo "a" >> tmp/aa   -> modified
-        //      * mv /tmp/aa /tmp/bb   -> renamed
-        //      * rm /tmp/bb           -> deleted 
-        //      *
-        //      */
-        //      
-        //      watch(path, flags, f _)
-        // }
+    val kq = new Kqueue
 
+    def watch(path: String, modified: Boolean = false, 
+                            deleted: Boolean = false,
+                            renamed: Boolean = false,
+                            attributes: Boolean = false)(f: => Unit): KqueueWatcher = {
 
-    def main(args: Array[String]): Unit = {
-        val kq = new Kqueue
-        
-        var n = 0;
-        
-        (1 to 200).foreach { i => 
+        import CLibrary._
 
-            val watch = new KqueueWatcher(kq, "/tmp/a" + i, CLibrary.NOTE_ATTRIB | CLibrary.NOTE_WRITE | CLibrary.NOTE_EXTEND)({
-                n+=1
-                println(n)
-            })
-        
-        }
-        
+        var flags = 0
+
+        if(modified)    flags |= NOTE_WRITE | NOTE_EXTEND
+        if(deleted)     flags |= NOTE_DELETE
+        if(attributes)  flags |= NOTE_ATTRIB
+        if(renamed)     flags |= NOTE_RENAME
+
+        watch(path, flags)(f)
     }
+
+    def watch(path: String, flags: Int)(f: => Unit): KqueueWatcher = new KqueueWatcher(kq, path, flags)(f)
+
 }

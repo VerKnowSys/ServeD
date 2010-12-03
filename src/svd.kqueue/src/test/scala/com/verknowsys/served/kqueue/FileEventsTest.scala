@@ -12,13 +12,12 @@ object Impl {
 import Impl._
 
 class FileEventsTest extends SpecificationWithJUnit {
-    final val DIR = "/tmp/served/file_events_test"
+    final val DIR = "/tmp/served/kqueue_test"
 
-    "KqueueWatcher" should {
+    "Kqueue" should {
         doBefore { setup }
 
         "catch 200 touched files" in {
-            val kq = new Kqueue
             var n = 0
 
             1 to 200 foreach { i =>
@@ -26,9 +25,9 @@ class FileEventsTest extends SpecificationWithJUnit {
             }
 
             1 to 200 foreach { i =>
-                new KqueueWatcher(kq, DIR + "/touch_me_" + i + ".txt", CLibrary.NOTE_ATTRIB)({
+                Kqueue.watch(DIR + "/touch_me_" + i + ".txt", attributes = true){
                     n += 1
-                })
+                }
             }
 
             1 to 200 foreach { i =>
