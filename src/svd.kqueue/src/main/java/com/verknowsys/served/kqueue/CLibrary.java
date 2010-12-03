@@ -34,7 +34,7 @@ public interface CLibrary extends Library {
     public static final int EVFILT_TIMER    = -7;   /* timers */
     public static final int EVFILT_MACHPORT = -8;   /* Mach portsets */
     public static final int EVFILT_FS       = -9;   /* Filesystem events */
-    public static final int EVFILT_USER     = -10;   /* User events */
+    public static final int EVFILT_USER     = -10;  /* User events */
     public static final int EVFILT_SESSION  = -11;  /* Audit session events */
 
     /* actions */

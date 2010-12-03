@@ -5,24 +5,20 @@ import scala.actors.Actor
 import scala.collection.mutable.{Map, ListBuffer}
 
 case class FileEvent(val evflags: Int)
-case object Stop
+
 
 class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => Unit) extends Actor {
+    case object StopWatching
+
     var keep = true
 
-    println("new KqueueWatcher")
     kqueue.register(this)
-    
     start
 
     def act {
         while(keep) {
             receive {
-                // case FileEvent(evflags) if((flags & evflags) > 0) => f
-                
-                case FileEvent(evflags) =>
-                    println("FileEvent, flags " + evflags)
-                    f
+                case FileEvent(evflags) if((flags & evflags) > 0) => f
 
                 case Stop => 
                     kqueue.remove(this)
@@ -30,9 +26,9 @@ class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => 
             }
         }
     }
-    
+
     def stop {
-        this ! Stop
+        this ! StopWatching
     }
 }
 
@@ -56,31 +52,18 @@ class Kqueue extends Actor {
                 // TODO: Handle error
                 println("kevent() error")
             } else if(nev > 0){
-                println("new kevent, ident: " + event.ident.intValue)
-                println(idents.get(event.ident.intValue))
-                idents.get(event.ident.intValue).foreach(_._2.foreach { e =>
-                    println(e)
-                    e ! FileEvent(event.fflags)
-                    
-                })
+                idents.get(event.ident.intValue).foreach(_._2.foreach(_ ! FileEvent(event.fflags)))
             }
         }
     }
 
-
     def register(watcher: KqueueWatcher){
-        println("Watcher registered")
         // check for path
         idents.find { case(ident, (path, watchers)) => path == watcher.path } match {
             case Some((ident, (path, list))) => 
-            
-                    println("  Add watcher")
-            
                 list += watcher // use existing file descriptor
 
             case None =>
-            
-                println("  new watcher")
                 // open new file descriptor
                 val ident = Kqueue.clib.open(watcher.path, CLibrary.O_RDONLY)
                 if(ident == -1){
@@ -108,8 +91,6 @@ class Kqueue extends Actor {
     }
 
     def remove(watcher: KqueueWatcher){
-        println("Watcher removed")
-        
         idents.find { case(ident, (path, watchers)) => path == watcher.path } match {
             case Some((ident, (path, list))) => 
                 list -= watcher
@@ -158,7 +139,6 @@ object Kqueue {
 
     def main(args: Array[String]): Unit = {
         val kq = new Kqueue
-        println("Kqueue started")
         
         var n = 0;
         

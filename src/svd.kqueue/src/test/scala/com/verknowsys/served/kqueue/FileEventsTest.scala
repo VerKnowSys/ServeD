@@ -13,35 +13,36 @@ import Impl._
 
 class FileEventsTest extends SpecificationWithJUnit {
     final val DIR = "/tmp/served/file_events_test"
-	final val num = 10
 
-    "FileEvents" should {
+    "KqueueWatcher" should {
         doBefore { setup }
 
-        "notify ..." in {
-			var cnt = new ListBuffer[Int]
-			
-			1 to num foreach { i =>
-				FileEvents.watch(DIR + "/m_file" + i + ".txt", modify = true){
-					cnt += i
-				}
-			}
+        "catch 200 touched files" in {
+            val kq = new Kqueue
+            var n = 0
 
-			1 to num foreach { i =>
-				FileUtils.writeStringToFile(DIR + "/m_file" + i + ".txt", "xxx")
-			}
-			
-			println(cnt.toList.sortWith(_<_))
+            1 to 200 foreach { i =>
+                FileUtils.touch(DIR + "/touch_me_" + i + ".txt")
+            }
 
-			cnt.length must beEqual(100)
+            1 to 200 foreach { i =>
+                new KqueueWatcher(kq, DIR + "/touch_me_" + i + ".txt", CLibrary.NOTE_ATTRIB)({
+                    n += 1
+                })
+            }
+
+            1 to 200 foreach { i =>
+                FileUtils.touch(DIR + "/touch_me_" + i + ".txt")
+            }
+
+            Thread.sleep(1000)
+
+            n must beEqual(200)
         }
     }
 
 
     private def setup {
         try { FileUtils.forceDelete(DIR) } catch { case _ => }
-		1 to num foreach { i =>
-			FileUtils.writeStringToFile(DIR + "/m_file" + i + ".txt", "x")
-		}
     }
 }
