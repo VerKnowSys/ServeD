@@ -6,16 +6,9 @@
 
 $COMMAND clean $*
 
-rm -r target
-
 # also clean up native libs
 cd lib/pstree
-make distclean
-rm test/test
-cd ../../
-
-cd lib/acct-6.5.4
-make distclean
+# make clean
 rm test/test
 cd ../../
 
