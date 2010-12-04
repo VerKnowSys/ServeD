@@ -1,6 +1,7 @@
 package com.verknowsys.served.systemmanager
 
-import com.sun.jna.Library
+import com.sun.jna.{Native, Library}
+
 
 /**
  * Class which describe any system process
@@ -83,6 +84,10 @@ trait POSIX extends Library {
     @specialized def rmdir(path: String): Int
     @specialized def geteuid: Int
     
+}
+
+object POSIX {
+    lazy val instance = Native.loadLibrary("c", classOf[POSIX]).asInstanceOf[POSIX]
 }
 
 

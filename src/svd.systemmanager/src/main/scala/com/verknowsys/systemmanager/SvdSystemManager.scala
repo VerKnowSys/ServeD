@@ -51,7 +51,7 @@ object SvdSystemManager extends Actor with Utils {
     *   
     *   This function is a bridge to low level libc functions
     */
-    def posixlib = Native.loadLibrary("c", classOf[POSIX]).asInstanceOf[POSIX]
+    lazy val posixlib = POSIX.instance
 
 
     /**
