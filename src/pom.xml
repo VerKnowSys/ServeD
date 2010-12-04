@@ -13,9 +13,9 @@
     <module>svd.pom/scala_from_java</module>
     <module>svd.core</module>
     <module>svd.api</module>
+    <module>svd.cli</module>
     <module>svd.kqueue</module>
     <module>svd.utils</module>
-    <module>svd.cli</module>
     <module>svd.systemmanager</module>
     <module>svd.notifications</module>
     <module>svd.maintainer</module>

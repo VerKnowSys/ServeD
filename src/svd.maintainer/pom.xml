@@ -32,12 +32,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>svd</groupId>
-			<artifactId>svd.utils</artifactId>
-			<version>0.1.0</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>svd</groupId>
 			<artifactId>svd.notifications</artifactId>
 			<version>0.1.0</version>
 		</dependency>
