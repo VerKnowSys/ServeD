@@ -1,18 +1,12 @@
-// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
-// This Software is a close code project. You may not redistribute this code without permission of author.
-
 package com.verknowsys.served.systemmanager
-
 
 import com.sun.jna.Library
 
-
-
 /**
-*   @author dmilith
-*   
-*   Class which describe any system process
-*/
+ * Class which describe any system process
+ * 
+ * @author dmilith
+ */
 class SystemProcess(
     val processName: String = "root",
     val pid: String = "0"
@@ -20,12 +14,11 @@ class SystemProcess(
     override def toString = "PNAME: %s, PID: %s. ".format(processName, pid)
 }
 
-
 /**
-*   @author dmilith
-*   
-*   POSIXSignals enum definition
-*/
+ *   POSIXSignals enum definition
+ * 
+ * @author dmilith
+ */
 object POSIXSignals extends Enumeration(initial = 1) {
     type POSIXSignals = Value
     @specialized val SIGHUP, // 2010-10-05 15:03:27 - dmilith - NOTE: should have value 1
@@ -64,19 +57,19 @@ object POSIXSignals extends Enumeration(initial = 1) {
 
 
 /**
-*   @author dmilith
-*   
-*   Case classes which depends on POSIXSignals
-*/
+ * Case classes which depends on POSIXSignals
+ * 
+ * @author dmilith
+ */
 import POSIXSignals._
 case class SendSignal(val signal: POSIXSignals = SIGINT, @specialized val pid: Int)
 
 
 /**
-*   @author dmilith
-*   
-*   POSIX trait with basic glibc functions (JNA)
-*/
+ * POSIX trait with basic glibc functions (JNA)
+ * 
+ * @author dmilith
+ */
 trait POSIX extends Library {
     
     @specialized def chmod(filename: String, @specialized mode: Int)
@@ -94,10 +87,10 @@ trait POSIX extends Library {
 
 
 /**
-*   @author dmilith
-*   
-*   PSTREE - ServeD native library (JNA)
-*/
+ * PSTREE - ServeD native library (JNA)
+ * 
+ * @author dmilith
+ */
 trait PSTREE extends Library {
     
     /**
