@@ -22,7 +22,7 @@ class KqueueTest extends SpecificationWithJUnit {
     def timeout {
         (1 to N/50).reverse foreach { i => 
             println("Timeout: " + i + " left")
-            Thread.sleep(1000)
+            Thread.sleep(50)
         }
     }
     
