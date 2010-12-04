@@ -6,7 +6,7 @@
   <name>ServeD Agregate</name>
   <version>0.1.0</version>
   <packaging>pom</packaging>
-  <url>http://maven.apache.org</url>
+
   <modules>
     <module>svd.pom/scala</module>
     <module>svd.pom/scala_base</module>
@@ -20,6 +20,7 @@
     <module>svd.notifications</module>
     <module>svd.maintainer</module>
   </modules>
+
   <reporting>
     <plugins>
       <plugin>

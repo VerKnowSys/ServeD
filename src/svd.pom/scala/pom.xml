@@ -1,17 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd
-http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>svd</groupId>
 	<artifactId>svd.pom.scala</artifactId>
- 	<name>ServeD Scala support</name>
-	<version>0.1.0</version>
+	<name>ServeD Scala support</name>
 	<packaging>pom</packaging>
-	
 	<!-- 2009-10-19 03:07:45 ; karolrvn ;  this POM intentionally does not support java-to-scala deps ; because it compiles about 3 times longer -->
 	<!-- check ../scala_from_java if you want -->
-
-	<parent> <!-- 2009-10-19 01:37:59 ; karolrvn ; pom inheritance -->
+	<parent>
+		<!-- 2009-10-19 01:37:59 ; karolrvn ; pom inheritance -->
 		<groupId>svd</groupId>
 		<artifactId>svd.pom.scala_base</artifactId>
 		<version>0.1.0</version>
@@ -35,18 +31,17 @@ http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 				<configuration>
 					<useFsc>true</useFsc>
 					<displayCmd>false</displayCmd>
-          <jvmArgs>
-            <jvmArg>-Xms128m</jvmArg>
-            <jvmArg>-Xmx128m</jvmArg>
+					<jvmArgs>
+						<jvmArg>-Xms128m</jvmArg>
+						<jvmArg>-Xmx128m</jvmArg>
 						<jvmArg>-Dfsc=true</jvmArg>
 						<!-- <jvmArg>-d32</jvmArg> -->
 						<jvmArg>-XX:NewRatio=1</jvmArg>
 						<jvmArg>-Dfile.encoding=UTF-8</jvmArg>
-          </jvmArgs>
+					</jvmArgs>
 					<useRuntimeClasspath>true</useRuntimeClasspath>
-        </configuration>
-			</plugin>			
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
-		
 </project>
