@@ -11,7 +11,7 @@ object Impl {
 
 import Impl._
 
-class FileEventsTest extends SpecificationWithJUnit {
+class KqueueTest extends SpecificationWithJUnit {
     final val DIR = "/tmp/served/kqueue_test"
     final val N = 300
 
