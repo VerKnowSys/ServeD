@@ -11,6 +11,7 @@ import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.git._
 import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.kqueue.Kqueue
 
 import java.text.SimpleDateFormat
 
@@ -38,17 +39,18 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with Utils {
         }
 
         // different git bahaviour on Linux and Mac
-        val watchHEAD =  if(isLinux) {
-            FileEvents.watchRenamed(repo.headPath){ (oldFileName, newFileName) => 
-                if(newFileName.contains(repo.headFile)) notifyAboutNewHead 
-            }
-        } else if(isMac) {
-            FileEvents.watchModified(repo.headPath){ (fileName) => 
-                if(fileName.contains(repo.headFile)) notifyAboutNewHead 
-            }
-        } else {
-            logger.error("OS Not supported!")
-        }
+        // TODO: Fix this, need to check git`s bahaviour
+        // val watchHEAD =  if(isLinux) {
+        //     FileEvents.watchRenamed(repo.headPath){ (oldFileName, newFileName) => 
+        //         if(newFileName.contains(repo.headFile)) notifyAboutNewHead 
+        //     }
+        // } else if(isMac) {
+        //     FileEvents.watchModified(repo.headPath){ (fileName) => 
+        //         if(fileName.contains(repo.headFile)) notifyAboutNewHead 
+        //     }
+        // } else {
+        //     logger.error("OS Not supported!")
+        // }
         
 
         loop {

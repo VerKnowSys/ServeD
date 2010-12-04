@@ -9,9 +9,9 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.monitor.MonitoredActor
 import com.verknowsys.served.managers.AccountManager
+import com.verknowsys.served.kqueue.Kqueue
 
 // case class GetUsers(val list: List[Account])
-
 
 
 
@@ -25,7 +25,8 @@ object AccountsManager extends MonitoredActor with Utils {
     def act {
         logger.trace("Java Library Path Property: " + System.getProperty("java.library.path"))
         
-        val watchPasswordFile = FileEvents.watchFile(Config.passwdFileName) {
+        // TODO: FIX ME KURWA!!
+        val watchPasswordFile = Kqueue.watch(Config.passwdFileName, modified = true) {
             logger.trace("Triggered (modified/created) system password file: %s".format(Config.passwdFileName))
         }    
         logger.debug("Initialized watch for " + Config.passwdFileName)
@@ -39,7 +40,7 @@ object AccountsManager extends MonitoredActor with Utils {
                     
                 case Quit =>
                     logger.info("Quitting AccountManager…")
-                    watchPasswordFile.stop
+                    // watchPasswordFile.stop FIXXX
                     
                 case ReloadUsers =>
                     // How does it work

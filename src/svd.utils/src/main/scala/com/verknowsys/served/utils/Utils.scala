@@ -4,6 +4,7 @@
 package com.verknowsys.served.utils
 
 import com.verknowsys.served._
+import com.verknowsys.served.kqueue.Kqueue
 import java.io.{PrintWriter, File, OutputStreamWriter}
 import java.util.ArrayList
 import java.util.regex.Pattern
@@ -37,7 +38,7 @@ trait Utils extends UtilsCommon {
         Logger.getLogger(this.getClass)
     }
     
-    val loggerPropertiesFileWatch = FileEvents.watchFile(Config.mainLoggerFile) { 
+    val loggerPropertiesFileWatch = Kqueue.watch(Config.mainLoggerFile, modified = true) { 
         logger.trace("Logger properties file changed: " + Config.mainLoggerFile)
         reloadLoggerConfiguration 
     }
