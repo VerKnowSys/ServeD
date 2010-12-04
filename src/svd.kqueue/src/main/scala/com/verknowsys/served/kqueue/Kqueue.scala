@@ -16,12 +16,9 @@ protected class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: I
 
     def act {
         while(keep) {
-            receive {
+            react {
                 case FileEvent(evflags) if((flags & evflags) > 0) => f
-
-                case StopWatching => 
-                    kqueue.remove(this)
-                    keep = false 
+                case StopWatching => doStop
             }
         }
     }
@@ -29,13 +26,18 @@ protected class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: I
     def stop {
         this ! StopWatching
     }
+    
+    def doStop {
+        kqueue.remove(this)
+        keep = false
+    }
 }
 
 protected class Kqueue extends Actor {
     val kq = Kqueue.clib.kqueue()
-    println("new Kqueue: " + kq)
     if(kq == -1) {
         // TODO: Handle error
+        throw new Exception("kqueue() error")
         println("kqueue() error")
     }
 
@@ -50,9 +52,10 @@ protected class Kqueue extends Actor {
             val nev = Kqueue.clib.kevent(kq, null, 0, event, 1, null)
             if(nev == -1){
                 // TODO: Handle error
+                throw new Exception("kevent() read error")
                 println("kevent() error")
             } else if(nev > 0){
-                idents.get(event.ident.intValue).foreach(_._2.foreach(_ ! FileEvent(event.fflags)))
+                idents.get(event.ident.intValue).foreach { _._2 foreach { _ ! FileEvent(event.fflags) } }
             }
         }
     }
@@ -68,6 +71,7 @@ protected class Kqueue extends Actor {
                 val ident = Kqueue.clib.open(watcher.path, CLibrary.O_RDONLY)
                 if(ident == -1){
                     // TODO: Handle error
+                    throw new Exception("open() error")
                     return
                 }
 
@@ -81,6 +85,7 @@ protected class Kqueue extends Actor {
                 val nev = Kqueue.clib.kevent(kq, event, 1, null, 0, null)
                 if(nev == -1){
                     // TODO: Handle error
+                    throw new Exception("kevent() register error")
                     return
                 }
 

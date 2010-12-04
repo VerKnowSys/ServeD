@@ -13,30 +13,87 @@ import Impl._
 
 class FileEventsTest extends SpecificationWithJUnit {
     final val DIR = "/tmp/served/kqueue_test"
+    final val N = 300
 
+    val range = (1 to N)
+        
+    def files(name: String) = range map { DIR + "/" + name + _ + ".txt" }
+
+    def timeout {
+        Thread.sleep(N*20)
+    }
+    
     "Kqueue" should {
         doBefore { setup }
-
-        "catch 200 touched files" in {
+        
+        "catch " + N + " watches for one file" in {
             var n = 0
-
-            1 to 200 foreach { i =>
-                FileUtils.touch(DIR + "/touch_me_" + i + ".txt")
-            }
-
-            1 to 200 foreach { i =>
-                Kqueue.watch(DIR + "/touch_me_" + i + ".txt", attributes = true){
+            val filename = DIR + "/oneshot"
+            
+            FileUtils.touch(filename)
+            
+            val watchers = range map { i =>
+                Kqueue.watch(filename, attributes = true){
                     n += 1
                 }
             }
+                        
+            FileUtils.touch(filename)
+            timeout
+            
+            n must beEqual(N)
+            
+            watchers foreach { _.stop }
+        }
 
-            1 to 200 foreach { i =>
-                FileUtils.touch(DIR + "/touch_me_" + i + ".txt")
+        "catch " + N + " touched files" in {
+            var n = 0
+            val all = files("touch_me")
+        
+            all foreach { FileUtils.touch(_) }
+            
+            val watchers = all map {
+                Kqueue.watch(_, attributes = true){
+                    n += 1
+                }
             }
-
-            Thread.sleep(1000)
-
-            n must beEqual(200)
+                        
+            all foreach { FileUtils.touch(_) }
+            timeout
+        
+            n must beEqual(N)
+            
+            watchers foreach { _.stop }
+        }
+        
+        
+        "catch " + N + " edited files" in {
+            var n = 0
+            var k = 0
+            val all = files("mod_me")
+        
+            all foreach { FileUtils.writeStringToFile(_, "x") }
+        
+            val editWatchers = all map { s =>
+                Kqueue.watch(s, modified = true){
+                    n += 1
+                }
+            }
+            
+            val attribWatchers = all map { s =>
+                Kqueue.watch(s, attributes = true){
+                    k += 1
+                }
+            }
+        
+            all foreach { FileUtils.writeStringToFile(_, "y") }
+            timeout
+        
+            n must beEqual(N)
+            k must beEqual(0)
+            
+            editWatchers foreach { _.stop }
+            attribWatchers foreach { _.stop }
         }
     }
 
