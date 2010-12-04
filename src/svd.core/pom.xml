@@ -1,18 +1,12 @@
-
-<!--
-  ~ This is closed code project. You may not redistibute it without permission of author.
-  ~ Copyright © 2oo9/2o1o by Daniel (dmilith) Dettlaff. All Rights Reserved.
-  -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>svd</groupId>
 	<artifactId>svd.core</artifactId>
 	<name>ServeD Core</name>
 	<version>0.1.0</version>
 	<packaging>pom</packaging>
-
+	
 	<parent>
 		<groupId>svd</groupId>
 		<artifactId>svd.pom.scala</artifactId>
@@ -37,13 +31,13 @@
 		</dependency>
 		
 		<dependency>
-      <groupId>org.scala-tools.testing</groupId>
-      <artifactId>specs</artifactId>
-      <version>1.6.1-2.8.0.Beta1-RC6</version> <!-- specify the version here -->
+			<groupId>org.scala-tools.testing</groupId>
+			<artifactId>specs</artifactId>
+			<version>1.6.1-2.8.0.Beta1-RC6</version>
 			<scope>test</scope>
-    </dependency>
+		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -54,10 +48,10 @@
 					<forkMode>pertest</forkMode>
 					<argLine>-XX:NewRatio=1 -XX:+UseFastAccessorMethods</argLine>
 					<!-- <argLine>-d32 -XX:NewRatio=1 -XX:+UseFastAccessorMethods</argLine> -->
-					<useFile>false</useFile> <!-- It's for putting compilation errors to console not file -->
+					<useFile>false</useFile>
+					<!-- It's for putting compilation errors to console not file -->
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-	
 </project>
