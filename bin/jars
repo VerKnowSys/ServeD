@@ -12,7 +12,7 @@ cd src/svd.cli
 mvn assembly:assembly
 cd ../..
 
-export MAVEN_OPTS="-Dbuild.platform=$platform -Djava.library.path=../../../../lib/ -Djna.library.path=../../../../lib/"
+export MAVEN_OPTS="-Djava.library.path=../../../../lib/ -Djna.library.path=../../../../lib/"
 
 # svd maintainer
 cd src/svd.maintainer
