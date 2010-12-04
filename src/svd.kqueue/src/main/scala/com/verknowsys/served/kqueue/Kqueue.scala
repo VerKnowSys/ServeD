@@ -4,6 +4,9 @@ import com.sun.jna._
 import scala.actors.Actor
 import scala.collection.mutable.{Map, ListBuffer}
 
+// TODO: throw custom exception, (or java.io something) instead of just Exception
+// TODO: Handle removed files
+
 case class FileEvent(val evflags: Int)
 
 protected class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => Unit) extends Actor {
@@ -18,18 +21,15 @@ protected class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: I
         while(keep) {
             react {
                 case FileEvent(evflags) if((flags & evflags) > 0) => f
-                case StopWatching => doStop
+                case StopWatching =>
+                    kqueue.remove(this)
+                    keep = false
             }
         }
     }
 
     def stop {
         this ! StopWatching
-    }
-    
-    def doStop {
-        kqueue.remove(this)
-        keep = false
     }
 }
 

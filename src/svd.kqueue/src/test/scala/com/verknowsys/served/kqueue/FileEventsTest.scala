@@ -20,7 +20,10 @@ class FileEventsTest extends SpecificationWithJUnit {
     def files(name: String) = range map { DIR + "/" + name + _ + ".txt" }
 
     def timeout {
-        Thread.sleep(N*20)
+        (1 to N/50).reverse foreach { i => 
+            println("Timeout: " + i + " left")
+            Thread.sleep(1000)
+        }
     }
     
     "Kqueue" should {
@@ -92,6 +95,44 @@ class FileEventsTest extends SpecificationWithJUnit {
             n must beEqual(N)
             k must beEqual(0)
             
+            editWatchers foreach { _.stop }
+            attribWatchers foreach { _.stop }
+        }
+        
+        "catch " + N + " renamed files" in {
+            var n = 0
+            var k = 0
+            var m = 0
+            val all = files("rename_me")
+        
+            all foreach { FileUtils.touch(_) }
+        
+            val moveWatchers = all map { s =>
+                Kqueue.watch(s, renamed = true){
+                    n += 1
+                }
+            }
+            
+            val editWatchers = all map { s =>
+                Kqueue.watch(s, modified = true){
+                    k += 1
+                }
+            }
+            
+            val attribWatchers = all map { s =>
+                Kqueue.watch(s, attributes = true){
+                    m += 1
+                }
+            }
+        
+            all foreach { s => FileUtils.moveFile(s, s + ".moved") }
+            timeout
+        
+            n must beEqual(N)
+            k must beEqual(0)
+            m must beEqual(0)
+            
+            moveWatchers foreach { _.stop }
             editWatchers foreach { _.stop }
             attribWatchers foreach { _.stop }
         }
