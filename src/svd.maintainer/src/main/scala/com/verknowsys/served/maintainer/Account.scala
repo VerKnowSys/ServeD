@@ -12,7 +12,7 @@ import org.apache.commons.io.FileUtils
  * @author teamon
  * 
  */
-case class Account(
+class Account (
         val userName: String = "guest",
         val pass: String = "x",
         val uid: String = "1000",
@@ -21,17 +21,7 @@ case class Account(
         val homeDir: String = "/home/",
         val shell: String = "/bin/bash"
         ) extends Utils {
-            
-    // TODO: Handle list size
-    def this(a: List[String]) = this(
-        userName = a(0),
-        pass = a(1),
-        uid = a(2),
-        gid = a(3),
-        information = a(4),
-        homeDir = a(5),
-        shell = a(6)
-    )
+
     
     /**
      * Checks if account is for normal user
@@ -39,10 +29,13 @@ case class Account(
      */
     def isUser = homeDir.startsWith("/home")
     
-    def equals(that: Account) = this.userName == that.userName && this.uid == that.uid
+    override def equals(that: Any) = that match {
+        case a: Account => this.userName == a.userName && this.uid == a.uid
+        case _ => false
+    } 
     
-    // def this(a: List[String]) = this(a(0), a(1), a(2), a(3), a(4), a(5), a(6))
-    
+    override def hashCode = (31*userName.hashCode)*31 + uid.hashCode
+        
     // XXX: Remove me!
     def size = {
         try {
@@ -54,5 +47,24 @@ case class Account(
                 logger.error("Error: " + x)
                 None
         }
+    }
+}
+
+object Account {
+    def apply(a: String, b: String, c: String, d: String, e: String, f: String, g: String) = new Account(a, b, c, d, e, f, g) 
+
+    def unapply(line: String) = {
+        if(line.startsWith("#")) None
+        else {
+            line.split(":") match {
+                case Array(a, b, c, d, e, f, g) => Some(Account(a, b, c, d, e, f, g))
+                case _ => None
+            }
+        }
+    }
+    
+    def unapply(s: AnyRef) = s match {
+        case a:Account => Some((a.userName, a.pass, a.uid, a.gid, a.information, a.homeDir, a.shell))
+        case _ => None
     }
 }

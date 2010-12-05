@@ -1,0 +1,6 @@
+#!/bin/sh
+
+
+cd "src/svd.$1"
+
+mvn clean compile install | ../../bin/color

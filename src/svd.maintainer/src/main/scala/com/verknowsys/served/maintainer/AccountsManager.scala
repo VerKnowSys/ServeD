@@ -26,6 +26,7 @@ object AccountsManager extends MonitoredActor with Utils {
         // TODO: Catch java.io.FileNotFoundException and exit. ServeD can`t run withour passwd file
         val watchPasswordFile = Kqueue.watch(Config.systemPasswdFile, modified = true) {
             logger.trace("Triggered (modified/created) system password file: %s".format(Config.systemPasswdFile))
+            this ! ReloadUsers
         }    
         
         logger.debug("Initialized watch for " + Config.systemPasswdFile)
@@ -42,6 +43,7 @@ object AccountsManager extends MonitoredActor with Utils {
                     // watchPasswordFile.stop FIXXX
                     
                 case ReloadUsers =>
+                    logger.trace("Reloading users list")
                     // How does it work
                     //
                     // <managers> = ListBuffer[AccountManager]
@@ -63,18 +65,20 @@ object AccountsManager extends MonitoredActor with Utils {
                     
                     val accounts = userAccounts
                     
-                    accounts.foreach { a =>
-                        if(!managers.exists(_.account.equals(a))){
-                            managers += new AccountManager(a)
-                        }
-                    }
+                    logger.trace(userAccounts)
                     
-                    managers.foreach { m =>
-                        if(!accounts.exists(_.equals(m.account))){
-                            m ! Quit
-                            managers -= m
-                        }
-                    }
+                    // accounts.foreach { a =>
+                    //     if(!managers.exists(_.account.equals(a))){
+                    //         managers += new AccountManager(a)
+                    //     }
+                    // }
+                    // 
+                    // managers.foreach { m =>
+                    //     if(!accounts.exists(_.equals(m.account))){
+                    //         m ! Quit
+                    //         managers -= m
+                    //     }
+                    // }
                 
                 case x: AnyRef =>
                     logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)
@@ -89,12 +93,22 @@ object AccountsManager extends MonitoredActor with Utils {
      * Function to parse and convert List[String] of passwd file entries to List[Account]
      * @author dmilith
      */
+    // protected def allAccounts = {
+    //     val rawData = Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList
+    //     for(line <- rawData if !line.startsWith("#")) // XXX: hardcode
+    //         yield
+    //             new Account(line.split(":").toList)
+    // }
+    
+    /**
+     * Function to parse and convert List[String] of passwd file entries to List[Account]
+     * @author teamon
+     */
     protected def allAccounts = {
         val rawData = Source.fromFile(Config.systemPasswdFile, "utf-8").getLines.toList
-        for(line <- rawData if !line.startsWith("#")) // XXX: hardcode
-            yield
-                new Account(line.split(":").toList)
+        for(Account(account) <-rawData) yield account
     }
+
     
     /**
      * Returns only normal users' accounts
