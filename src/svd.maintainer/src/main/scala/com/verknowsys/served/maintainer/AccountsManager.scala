@@ -23,11 +23,10 @@ object AccountsManager extends MonitoredActor with Utils {
     val managers = new ListBuffer[AccountManager]()
         
     def act {
-        logger.trace("Java Library Path Property: " + System.getProperty("java.library.path"))
-        
         val watchPasswordFile = Kqueue.watch(Config.passwdFileName, modified = true) {
             logger.trace("Triggered (modified/created) system password file: %s".format(Config.passwdFileName))
         }    
+        
         logger.debug("Initialized watch for " + Config.passwdFileName)
         logger.trace("watchPasswordFile: " + watchPasswordFile)
         
