@@ -38,15 +38,15 @@ trait Utils extends UtilsCommon {
         Logger.getLogger(this.getClass)
     }
     
-    val loggerPropertiesFileWatch = Kqueue.watch(Config.mainLoggerFile, modified = true) { 
-        logger.trace("Logger properties file changed: " + Config.mainLoggerFile)
+    val loggerPropertiesFileWatch = Kqueue.watch(Config.loggerConfigFile, modified = true) { 
+        logger.trace("Logger properties file changed: " + Config.loggerConfigFile)
         reloadLoggerConfiguration 
     }
     addShutdownHook { loggerPropertiesFileWatch.stop }
     
     def reloadLoggerConfiguration {
-        try { PropertyConfigurator.configure(Config.mainLoggerFile) } 
-        catch { case _ => logger.error("Couldn`t load file %s".format(Config.mainLoggerFile)) }
+        try { PropertyConfigurator.configure(Config.loggerConfigFile) } 
+        catch { case _ => logger.error("Couldn`t load file %s".format(Config.loggerConfigFile)) }
     }
     
 
@@ -59,9 +59,9 @@ trait Utils extends UtilsCommon {
     def checkOrCreateVendorDir = {
         val vendorPath = Config.homePath + Config.vendorDir
         if (new File(vendorPath).exists) {
-            logger.debug("Making sure that vendor directory exists…")
+            logger.debug("Making sure that vendor directory exists")
         } else {
-            logger.debug("No vendor directory available! Creating empty vendor directory…")
+            logger.debug("No vendor directory available! Creating empty vendor directory")
             new File(vendorPath).mkdir
         }
         vendorPath

@@ -23,11 +23,12 @@ object AccountsManager extends MonitoredActor with Utils {
     val managers = new ListBuffer[AccountManager]()
         
     def act {
-        val watchPasswordFile = Kqueue.watch(Config.passwdFileName, modified = true) {
-            logger.trace("Triggered (modified/created) system password file: %s".format(Config.passwdFileName))
+        // TODO: Catch java.io.FileNotFoundException and exit. ServeD can`t run withour passwd file
+        val watchPasswordFile = Kqueue.watch(Config.systemPasswdFile, modified = true) {
+            logger.trace("Triggered (modified/created) system password file: %s".format(Config.systemPasswdFile))
         }    
         
-        logger.debug("Initialized watch for " + Config.passwdFileName)
+        logger.debug("Initialized watch for " + Config.systemPasswdFile)
         logger.trace("watchPasswordFile: " + watchPasswordFile)
         
         loop {
