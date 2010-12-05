@@ -2,6 +2,11 @@ package com.verknowsys.served.kqueue;
 
 import com.sun.jna.*;
 
+/**
+ * C struct kevent * mapping
+ *
+ * @author teamon 
+ */
 public class kevent extends Structure {
     public NativeLong ident; // identifier for this event
     public short filter;    // filter for event

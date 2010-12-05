@@ -9,8 +9,15 @@ import scala.collection.mutable.{Map, ListBuffer}
 
 case class FileEvent(val evflags: Int)
 
+/**
+ * File watcher class. Holds file path, watch flags and event function
+ *
+ * @author teamon 
+ */
 protected class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => Unit) extends Actor {
     case object StopWatching
+    
+    if(!(new java.io.File(path)).exists()) throw new java.io.FileNotFoundException(path)
 
     var keep = true
 
@@ -33,12 +40,19 @@ protected class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: I
     }
 }
 
-protected class Kqueue extends Actor {
+/**
+ * Kqueue handler
+ *
+ * @author Author 
+ */
+class Kqueue extends Actor {    
+    class KqueueException extends Exception
+    class KeventException extends Exception
+    class OpenException extends Exception
+
     val kq = Kqueue.clib.kqueue()
     if(kq == -1) {
-        // TODO: Handle error
-        throw new Exception("kqueue() error")
-        println("kqueue() error")
+        throw new KqueueException
     }
 
     // Map(ident, (path, watchers))
@@ -51,9 +65,7 @@ protected class Kqueue extends Actor {
             val event = new kevent
             val nev = Kqueue.clib.kevent(kq, null, 0, event, 1, null)
             if(nev == -1){
-                // TODO: Handle error
-                throw new Exception("kevent() read error")
-                println("kevent() error")
+                throw new KeventException
             } else if(nev > 0){
                 idents.get(event.ident.intValue).foreach { _._2 foreach { _ ! FileEvent(event.fflags) } }
             }
@@ -70,9 +82,7 @@ protected class Kqueue extends Actor {
                 // open new file descriptor
                 val ident = Kqueue.clib.open(watcher.path, CLibrary.O_RDONLY)
                 if(ident == -1){
-                    // TODO: Handle error
-                    throw new Exception("open() error")
-                    return
+                    throw new OpenException
                 }
 
                 val event = new kevent(new NativeLong(ident),
@@ -84,9 +94,7 @@ protected class Kqueue extends Actor {
 
                 val nev = Kqueue.clib.kevent(kq, event, 1, null, 0, null)
                 if(nev == -1){
-                    // TODO: Handle error
-                    throw new Exception("kevent() register error")
-                    return
+                    throw new KeventException
                 }
 
                 val list = new ListBuffer[KqueueWatcher]()
@@ -111,19 +119,24 @@ protected class Kqueue extends Actor {
 
 }
 
+
 /**
+ * Kqueue main object
+ * 
+ * @example
+ *     val watch = Kqueue.watch("/path/to/file", modified = true) { println("File modified") }
  *
- * touch /tmp/aa        -> attributes
- * echo "x" > /tmp/aa   -> modified & attributes
- * echo "a" >> tmp/aa   -> modified
- * mv /tmp/aa /tmp/bb   -> renamed
- * rm /tmp/bb           -> deleted 
- *
+ * @author teamon 
  */
 object Kqueue {
-    val clib = CLibrary.instance
-    val kq = new Kqueue
+    protected val clib = CLibrary.instance
+    protected val kq = new Kqueue
 
+    /**
+     * Setup watcher for specified path
+     * 
+     * @author teamon 
+     */
     def watch(path: String, modified: Boolean = false, 
                             deleted: Boolean = false,
                             renamed: Boolean = false,

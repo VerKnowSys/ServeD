@@ -2,9 +2,14 @@ package com.verknowsys.served.kqueue;
 
 import com.sun.jna.*;
 
+/**
+ * clib wrapper for kqueue
+ *
+ * @author teamon 
+ */
 public interface CLibrary extends Library {
     public CLibrary instance = (CLibrary) Native.loadLibrary("c", CLibrary.class);
-    // see <sys/event.h>
+    // see sys/event.h header file
     public int kqueue();
     public int kevent(int kq, kevent change, int nchanges, kevent event, int nevents, Pointer timeout);
     public void perror(String label);
