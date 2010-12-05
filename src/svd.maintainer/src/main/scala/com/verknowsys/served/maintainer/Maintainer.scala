@@ -73,14 +73,14 @@ object Maintainer extends Actor with Utils {
         logger.info("Maintainer is loading…")
         Maintainer ! Init
         
-        logger.info("NotificationCenter is loading…")
-        NotificationCenter ! Init
+        // logger.info("NotificationCenter is loading…")
+        // NotificationCenter ! Init
         
         logger.info("AccountManager is loading…")
         AccountsManager ! Init
         
-        logger.info("SystemManager is loading…")
-        SvdSystemManager ! Init
+        // logger.info("SystemManager is loading…")
+        // SvdSystemManager ! Init
         
         // logger.info("ApiServerActor is loading…")
         // ApiServerActor ! Init
