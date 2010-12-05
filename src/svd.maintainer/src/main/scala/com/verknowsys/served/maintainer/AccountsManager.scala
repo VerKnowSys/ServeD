@@ -24,13 +24,13 @@ object AccountsManager extends MonitoredActor with Utils {
         
     def act {
         // TODO: Catch java.io.FileNotFoundException and exit. ServeD can`t run withour passwd file
-        val watchPasswordFile = Kqueue.watch(Config.systemPasswdFile, modified = true) {
+        val watchPasswdFile = Kqueue.watch(Config.systemPasswdFile, modified = true) {
             logger.trace("Triggered (modified/created) system password file: %s".format(Config.systemPasswdFile))
             this ! ReloadUsers
         }    
         
         logger.debug("Initialized watch for " + Config.systemPasswdFile)
-        logger.trace("watchPasswordFile: " + watchPasswordFile)
+        logger.trace("watchPasswordFile: " + watchPasswdFile)
         
         loop {
             receive {
@@ -40,7 +40,7 @@ object AccountsManager extends MonitoredActor with Utils {
                     
                 case Quit =>
                     logger.info("Quitting AccountManager")
-                    // watchPasswordFile.stop FIXXX
+                    // watchPasswdFile.stop
                     
                 case ReloadUsers =>
                     logger.trace("Reloading users list")
@@ -65,20 +65,20 @@ object AccountsManager extends MonitoredActor with Utils {
                     
                     val accounts = userAccounts
                     
-                    logger.trace(userAccounts)
+                    logger.trace("accounts: " + accounts)
+                                        
+                    accounts foreach { a =>
+                        if(!managers.exists(_.account == a)) managers += new AccountManager(a)
+                    }
                     
-                    // accounts.foreach { a =>
-                    //     if(!managers.exists(_.account.equals(a))){
-                    //         managers += new AccountManager(a)
-                    //     }
-                    // }
-                    // 
-                    // managers.foreach { m =>
-                    //     if(!accounts.exists(_.equals(m.account))){
-                    //         m ! Quit
-                    //         managers -= m
-                    //     }
-                    // }
+                    managers.foreach { m =>
+                        if(!accounts.exists(_ == m.account)){
+                            m ! Quit
+                            managers -= m
+                        }
+                    }
+                    
+                    logger.debug(watchPasswdFile + " " + watchPasswdFile.getState)
                 
                 case x: AnyRef =>
                     logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)
@@ -115,5 +115,10 @@ object AccountsManager extends MonitoredActor with Utils {
      * @author teamon
      */
     protected def userAccounts = allAccounts.filter(_.isUser)
+    
+    /**
+     * @author teamon
+     */
+    override def toString = "!AccountsManager!"
 
 }

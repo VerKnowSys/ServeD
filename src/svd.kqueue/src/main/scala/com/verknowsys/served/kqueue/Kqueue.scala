@@ -25,14 +25,18 @@ protected class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: I
     start
 
     def act {
-        while(keep) {
+        loop {
+            println("kqueue loop")
             react {
                 case FileEvent(evflags) if((flags & evflags) > 0) => f
-                case StopWatching =>
-                    kqueue.remove(this)
-                    keep = false
+                // case StopWatching =>
+                //     kqueue.remove(this)
+                //     keep = false
+                case _ => 
             }
         }
+        
+        println("KqueueWatczer killed")
     }
 
     def stop {

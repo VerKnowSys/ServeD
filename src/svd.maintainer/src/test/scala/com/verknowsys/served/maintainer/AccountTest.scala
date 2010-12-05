@@ -41,17 +41,15 @@ class AccountTest extends SpecificationWithJUnit {
         }
         
         "correctly parse passwd line" in {
-            // val account = Account.upapply()
-            "teamon:pass:myUid:myGid:info:/path/to/home:/path/to/shell" match {
-                case Account(account) => 
-                    account.userName must beEqual("teamon")
-                    account.pass must beEqual("pass")
-                    account.uid must beEqual("myUid")
-                    account.gid must beEqual("myGid")
-                    account.information must beEqual("info")
-                    account.homeDir must beEqual("/path/to/home")
-                    account.shell must beEqual("/path/to/shell")
-            }
+            val Account(account) = "teamon:pass:myUid:myGid:info:/path/to/home:/path/to/shell"
+            
+            account.userName must beEqual("teamon")
+            account.pass must beEqual("pass")
+            account.uid must beEqual("myUid")
+            account.gid must beEqual("myGid")
+            account.information must beEqual("info")
+            account.homeDir must beEqual("/path/to/home")
+            account.shell must beEqual("/path/to/shell")
         }
         
     }

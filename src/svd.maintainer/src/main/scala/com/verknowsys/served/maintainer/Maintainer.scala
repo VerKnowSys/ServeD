@@ -50,6 +50,11 @@ object Maintainer extends Actor with Utils {
             }
         }
     }
+    
+    /**
+     * @author teamon
+     */
+    override def toString = "!Maintainer!"
 
 
     /**
@@ -64,9 +69,9 @@ object Maintainer extends Actor with Utils {
         logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
 
         addShutdownHook {
-            SvdSystemManager ! Quit
+            // SvdSystemManager ! Quit
             AccountsManager ! Quit
-            NotificationCenter ! Quit
+            // NotificationCenter ! Quit
             Maintainer ! Quit
         }
 

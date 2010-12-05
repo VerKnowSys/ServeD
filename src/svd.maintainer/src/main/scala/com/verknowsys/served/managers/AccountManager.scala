@@ -14,22 +14,28 @@ import com.verknowsys.served.api._
 class AccountManager(val account: Account) extends Actor with Utils {
     start
     
-    val gitManager = new GitManager(this)
+    // val gitManager = new GitManager(this)
     
     def act {
         loop {
             receive {
-                case msg: Git.Base => sender ! (gitManager !! msg)
+                // case msg: Git.Base => sender ! (gitManager !! msg)
                 
                 case Init =>
                     logger.info("AccountManager ready")
                     
                 case Quit =>
-                    logger.info("Quitting AccountManager")
+                    logger.info("Quitting AccountManager(" + account.userName + ")")
+                    // exit
                 
                 case x: AnyRef =>
                     logger.warn("Command not recognized. AccountManager will ignore it: " + x.toString)
             }
         }
     }
+    
+    /**
+     * @author teamon
+     */
+    override def toString = "!AccountManager(" + account.userName + ")!"
 }
