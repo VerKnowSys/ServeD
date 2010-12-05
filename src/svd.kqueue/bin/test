@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/bin/sh
 
 mvn -e clean test -Dtest=com.verknowsys.served.kqueue.KqueueTest | ../../bin/color
