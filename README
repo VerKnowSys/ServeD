@@ -21,7 +21,6 @@
 
 	0.5 - List of currently supported platforms:
 	    Mac OSX (100% features, development),
-	    Linux Debian (100% features, production)
 	    Free BSD (100% features, production),
 
 
@@ -34,13 +33,6 @@
 2. Testing
     2.1 - Use bin/test
 
-
-
-2. Testing
-  2.1 Use bin/test
-
-	
-	
 That's all folks
 
 
