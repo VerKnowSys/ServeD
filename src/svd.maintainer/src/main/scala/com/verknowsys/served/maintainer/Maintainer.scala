@@ -38,7 +38,7 @@ object Maintainer extends Actor with Utils {
                     logger.info("Maintainer ready")
 
                 case Quit =>
-                    logger.info("Quitting Maintainer…")
+                    logger.info("Quitting Maintainer")
 
                 // case GetUsers(x) =>
                 //     val content = x.map {a => "userName: " + a.userName + ", pass: " + a.pass + ", uid: " + a.uid + ", gid: " + a.gid + ", homeDir: " + a.homeDir + ", shell: " + a.shell + ", information: " + a.information + "\n"}
@@ -70,19 +70,19 @@ object Maintainer extends Actor with Utils {
             Maintainer ! Quit
         }
 
-        logger.info("Maintainer is loading…")
+        logger.info("Maintainer is loading")
         Maintainer ! Init
         
-        // logger.info("NotificationCenter is loading…")
+        // logger.info("NotificationCenter is loading")
         // NotificationCenter ! Init
         
-        logger.info("AccountManager is loading…")
+        logger.info("AccountManager is loading")
         AccountsManager ! Init
         
-        // logger.info("SystemManager is loading…")
+        // logger.info("SystemManager is loading")
         // SvdSystemManager ! Init
         
-        // logger.info("ApiServerActor is loading…")
+        // logger.info("ApiServerActor is loading")
         // ApiServerActor ! Init
     }
 

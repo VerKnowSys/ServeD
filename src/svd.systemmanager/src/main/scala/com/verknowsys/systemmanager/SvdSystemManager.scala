@@ -32,7 +32,7 @@ object SvdSystemManager extends Actor with Utils {
                     logger.trace("Process list: %s".format(processList().mkString)) // no args == show user threads and sort output
                     
                 case Quit =>
-                    logger.info("Quitting SystemManager…")
+                    logger.info("Quitting SystemManager")
                 
                 case SendSignal(signal, pid) =>
                     sendSignalToPid(signal, pid)

@@ -37,10 +37,10 @@ class GitManager(owner: AccountManager) extends Manager(owner) {
                     sender ! NotImplementedError
                 
                 case Init =>
-                    logger.info("GitManager ready for tasks")
+                    logger.info("GitManager ready")
                     
                 case Quit =>
-                    logger.info("Quitting GitManager...")
+                    logger.info("Quitting GitManager")
                 
                 case x: AnyRef =>
                     logger.warn("Command not recognized. GitManager will ignore it: " + x.toString)

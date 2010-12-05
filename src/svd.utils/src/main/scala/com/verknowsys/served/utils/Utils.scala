@@ -21,7 +21,9 @@ import clime.messadmin.providers.sizeof.ObjectProfiler
 */
 trait Utils extends UtilsCommon {
     
-    checkOrCreateVendorDir
+    // checkOrCreateVendorDir 
+    // XXX: This makes unnecessary logger and I/O bloat.
+    //      No need to run this for every class using Utils trait. Should be moved somewhere else
     
         
     /**

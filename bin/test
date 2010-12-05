@@ -21,7 +21,7 @@ toBeDeletedLibs=(
 )
 
 
-echo "Copying libraries…"
+echo "Copying libraries"
 for i in ${dirList[@]}; do
   cp -v ${libs} src/$i/
 done
@@ -30,7 +30,7 @@ done
 $COMMAND test $*
 
 
-echo "Cleaning up…"
+echo "Cleaning up"
 for i in ${dirList[@]}; do
   for j in ${toBeDeletedLibs[@]}; do
     rm -rfv src/$i/$j

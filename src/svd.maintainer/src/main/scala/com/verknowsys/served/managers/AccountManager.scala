@@ -22,10 +22,10 @@ class AccountManager(val account: Account) extends Actor with Utils {
                 case msg: Git.Base => sender ! (gitManager !! msg)
                 
                 case Init =>
-                    logger.info("AccountManager ready for tasks")
+                    logger.info("AccountManager ready")
                     
                 case Quit =>
-                    logger.info("Quitting AccountManager...")
+                    logger.info("Quitting AccountManager")
                 
                 case x: AnyRef =>
                     logger.warn("Command not recognized. AccountManager will ignore it: " + x.toString)

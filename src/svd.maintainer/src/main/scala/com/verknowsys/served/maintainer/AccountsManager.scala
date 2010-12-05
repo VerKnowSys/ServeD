@@ -35,10 +35,10 @@ object AccountsManager extends MonitoredActor with Utils {
             receive {
                 case Init =>
                     this ! ReloadUsers            
-                    logger.info("AccountManager ready for tasks")
+                    logger.info("AccountManager ready")
                     
                 case Quit =>
-                    logger.info("Quitting AccountManager…")
+                    logger.info("Quitting AccountManager")
                     // watchPasswordFile.stop FIXXX
                     
                 case ReloadUsers =>
