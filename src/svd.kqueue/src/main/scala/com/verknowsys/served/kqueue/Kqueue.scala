@@ -19,24 +19,21 @@ protected class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: I
     
     if(!(new java.io.File(path)).exists()) throw new java.io.FileNotFoundException(path)
 
-    var keep = true
+    private var keep = true
 
     kqueue.register(this)
     start
 
     def act {
-        loop {
-            println("kqueue loop")
+        loopWhile(keep) {
             react {
                 case FileEvent(evflags) if((flags & evflags) > 0) => f
-                // case StopWatching =>
-                //     kqueue.remove(this)
-                //     keep = false
+                case StopWatching =>
+                    kqueue.remove(this)
+                    keep = false
                 case _ => 
             }
         }
-        
-        println("KqueueWatczer killed")
     }
 
     def stop {

@@ -13,8 +13,6 @@ import com.verknowsys.served.kqueue.Kqueue
 
 // case class GetUsers(val list: List[Account])
 
-
-
 object AccountsManager extends MonitoredActor with Utils {
     case object ReloadUsers
     
@@ -29,7 +27,7 @@ object AccountsManager extends MonitoredActor with Utils {
             this ! ReloadUsers
         }    
         
-        logger.debug("Initialized watch for " + Config.systemPasswdFile)
+        logger.trace("Initialized watch for " + Config.systemPasswdFile)
         logger.trace("watchPasswordFile: " + watchPasswdFile)
         
         loop {
@@ -40,7 +38,7 @@ object AccountsManager extends MonitoredActor with Utils {
                     
                 case Quit =>
                     logger.info("Quitting AccountManager")
-                    // watchPasswdFile.stop
+                    watchPasswdFile.stop
                     
                 case ReloadUsers =>
                     logger.trace("Reloading users list")
@@ -64,9 +62,7 @@ object AccountsManager extends MonitoredActor with Utils {
                     // TODO: Update user`s shell path
                     
                     val accounts = userAccounts
-                    
-                    logger.trace("accounts: " + accounts)
-                                        
+                                                            
                     accounts foreach { a =>
                         if(!managers.exists(_.account == a)) managers += new AccountManager(a)
                     }
@@ -77,8 +73,6 @@ object AccountsManager extends MonitoredActor with Utils {
                             managers -= m
                         }
                     }
-                    
-                    logger.debug(watchPasswdFile + " " + watchPasswdFile.getState)
                 
                 case x: AnyRef =>
                     logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)
