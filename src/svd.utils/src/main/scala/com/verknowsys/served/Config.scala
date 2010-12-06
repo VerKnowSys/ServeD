@@ -29,7 +29,7 @@ object Config {
      *   More dynamic settings from main properties file
      */
 
-    def systemPasswdFile = props("systemPasswdFile", "/etc/passwd")
+    def systemPasswdFile = props("systemPasswdFile", homePath + vendorDir + "etc/passwd")
     def checkInterval = props.int("checkInterval", 1500)
     def sizeMultiplier = props.int("sizeMultiplier", 1024)
 
