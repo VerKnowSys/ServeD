@@ -28,7 +28,7 @@ class AccountManager(val account: Account) extends Actor with Utils {
                 case Quit =>
                     logger.info("Quitting AccountManager(" + account.userName + ")")
                     reply(Ready)
-                    // exit
+                    exit
                 
                 case x: AnyRef =>
                     logger.warn("Command not recognized. AccountManager will ignore it: " + x.toString)

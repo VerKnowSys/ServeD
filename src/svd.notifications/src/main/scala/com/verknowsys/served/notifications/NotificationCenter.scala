@@ -38,6 +38,7 @@ object NotificationCenter extends Actor with Utils {
                     logger.info("Quitting NotificationCenter")
                     gates.foreach { _.disconnect }
                     reply(Ready)
+                    exit
             
                 case Status(status) => 
                     logger.info("NotificationCenter ! Status(%s)".format(status))

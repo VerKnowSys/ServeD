@@ -40,6 +40,7 @@ object Maintainer extends Actor with Utils {
                 case Quit =>
                     logger.info("Quitting Maintainer")
                     reply(Ready)
+                    exit
 
                 // case GetUsers(x) =>
                 //     val content = x.map {a => "userName: " + a.userName + ", pass: " + a.pass + ", uid: " + a.uid + ", gid: " + a.gid + ", homeDir: " + a.homeDir + ", shell: " + a.shell + ", information: " + a.information + "\n"}

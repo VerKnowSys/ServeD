@@ -19,19 +19,19 @@ class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => 
     
     if(!(new java.io.File(path)).exists()) throw new java.io.FileNotFoundException(path)
 
-    private var keep = true
-
     kqueue.register(this)
     start
 
     def act {
-        loopWhile(keep) {
+        loop {
             react {
                 case FileEvent(evflags) if((flags & evflags) > 0) => f
+                case FileEvent(evflags) => // dont care about that
                 case StopWatching =>
-                    keep = false
                     kqueue.remove(this)
-                case _ => 
+                    exit
+                    
+                case x:AnyRef => println("[ERROR] wtf? " + x.toString)
             }
         }
     }

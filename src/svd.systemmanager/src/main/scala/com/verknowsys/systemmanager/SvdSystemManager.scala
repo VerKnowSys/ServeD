@@ -35,6 +35,7 @@ object SvdSystemManager extends Actor with Utils {
                 case Quit =>
                     logger.info("Quitting SystemManager")
                     reply(Ready)
+                    exit
                 
                 case SendSignal(signal, pid) =>
                     sendSignalToPid(signal, pid)

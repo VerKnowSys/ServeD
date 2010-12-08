@@ -43,6 +43,7 @@ class GitManager(owner: AccountManager) extends Manager(owner) {
                 case Quit =>
                     logger.info("Quitting GitManager")
                     reply(Ready)
+                    exit
                 
                 case x: AnyRef =>
                     logger.warn("Command not recognized. GitManager will ignore it: " + x.toString)
