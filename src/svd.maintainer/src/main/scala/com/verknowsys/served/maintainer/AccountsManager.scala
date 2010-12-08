@@ -34,11 +34,13 @@ object AccountsManager extends MonitoredActor with Utils {
             receive {
                 case Init =>
                     this ! ReloadUsers            
-                    logger.info("AccountManager ready")
+                    logger.info("AccountsManager ready")
+                    reply(Ready)
                     
                 case Quit =>
-                    logger.info("Quitting AccountManager")
+                    logger.info("Quitting AccountsManager")
                     watchPasswdFile.stop
+                    reply(Ready)
                     
                 case ReloadUsers =>
                     logger.trace("Reloading users list")
@@ -75,7 +77,7 @@ object AccountsManager extends MonitoredActor with Utils {
                     }
                 
                 case x: AnyRef =>
-                    logger.warn("Command not recognized. AccountManager will ignore You: " + x.toString)
+                    logger.warn("Command not recognized. AccountsManager will ignore You: " + x.toString)
                     
             }
         }

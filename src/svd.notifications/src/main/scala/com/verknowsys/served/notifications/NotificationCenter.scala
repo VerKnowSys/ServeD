@@ -32,10 +32,12 @@ object NotificationCenter extends Actor with Utils {
                     logger.info("NotificationCenter connecting gates")
                     gates.foreach { _.connect }                                    
                     logger.info("NotificationCenter ready")
+                    reply(Ready)
                     
                 case Quit =>
                     logger.info("Quitting NotificationCenter")
                     gates.foreach { _.disconnect }
+                    reply(Ready)
             
                 case Status(status) => 
                     logger.info("NotificationCenter ! Status(%s)".format(status))

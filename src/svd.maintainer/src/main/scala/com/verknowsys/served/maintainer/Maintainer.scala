@@ -6,7 +6,7 @@ package com.verknowsys.served.maintainer
 import com.verknowsys.served.api._
 import com.verknowsys.served.Config
 import com.verknowsys.served.utils.Utils
-import com.verknowsys.served.utils.signals.{ProcessMessages, MainLoop, Quit, Init}
+import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.systemmanager._
 
 import scala.collection.JavaConversions._
@@ -27,7 +27,6 @@ import com.verknowsys.served.notifications._
  */
 
 object Maintainer extends Actor with Utils {
-    
     start
 
     
@@ -36,9 +35,11 @@ object Maintainer extends Actor with Utils {
             receive {
                 case Init =>
                     logger.info("Maintainer ready")
+                    reply(Ready)
 
                 case Quit =>
                     logger.info("Quitting Maintainer")
+                    reply(Ready)
 
                 // case GetUsers(x) =>
                 //     val content = x.map {a => "userName: " + a.userName + ", pass: " + a.pass + ", uid: " + a.uid + ", gid: " + a.gid + ", homeDir: " + a.homeDir + ", shell: " + a.shell + ", information: " + a.information + "\n"}
@@ -69,26 +70,26 @@ object Maintainer extends Actor with Utils {
         logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
 
         addShutdownHook {
-            // SvdSystemManager ! Quit
-            AccountsManager ! Quit
-            // NotificationCenter ! Quit
-            Maintainer ! Quit
+            // SvdSystemManager !? Quit
+            AccountsManager !? Quit
+            // NotificationCenter !? Quit
+            Maintainer !? Quit
         }
 
         logger.info("Maintainer is loading")
-        Maintainer ! Init
+        Maintainer !? Init
         
         // logger.info("NotificationCenter is loading")
-        // NotificationCenter ! Init
+        // NotificationCenter !? Init
         
         logger.info("AccountManager is loading")
-        AccountsManager ! Init
+        AccountsManager !? Init
         
         // logger.info("SystemManager is loading")
-        // SvdSystemManager ! Init
+        // SvdSystemManager !? Init
         
         // logger.info("ApiServerActor is loading")
-        // ApiServerActor ! Init
+        // ApiServerActor !? Init
     }
 
 

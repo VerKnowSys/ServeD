@@ -55,9 +55,13 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with Utils {
 
         loop {
             receive {
-                case Init => logger.info("Git Notifier ready")
+                case Init => 
+                    logger.info("Git Notifier ready")
+                    reply(Ready)
 
-                case Quit => logger.info("Quitting Git Notifier")
+                case Quit => 
+                    logger.info("Quitting Git Notifier")
+                    reply(Ready)
 
                 case x: AnyRef => logger.warn("Command not recognized. GitNotifier will ignore signal: " + x.toString)
             }

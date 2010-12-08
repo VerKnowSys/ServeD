@@ -23,9 +23,11 @@ class AccountManager(val account: Account) extends Actor with Utils {
                 
                 case Init =>
                     logger.info("AccountManager ready")
+                    reply(Ready)
                     
                 case Quit =>
                     logger.info("Quitting AccountManager(" + account.userName + ")")
+                    reply(Ready)
                     // exit
                 
                 case x: AnyRef =>

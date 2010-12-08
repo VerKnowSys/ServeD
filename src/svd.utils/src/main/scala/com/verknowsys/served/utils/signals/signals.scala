@@ -10,6 +10,7 @@ package com.verknowsys.served.utils.signals
  */
 
 case object Init
+case object Ready
 case object MainLoop
 case object ProcessMessages
 case object Quit
