@@ -18,7 +18,7 @@ class KqueueTest extends SpecificationWithJUnit {
     def timeout {
         // (1 to N/50).reverse foreach { i => 
             // println("Timeout: " + i + " left")
-            Thread.sleep(50)
+            Thread.sleep(150)
         // }
     }
     
@@ -39,7 +39,6 @@ class KqueueTest extends SpecificationWithJUnit {
                                     
             touch(filename)
             timeout
-            
             waitWhileRunning(watchers, cnt)
                         
             cnt.data must containAll(range)
