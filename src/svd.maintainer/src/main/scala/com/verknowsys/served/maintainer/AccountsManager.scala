@@ -24,7 +24,7 @@ object AccountsManager extends MonitoredActor with Utils {
         // TODO: Catch java.io.FileNotFoundException and exit. ServeD can`t run withour passwd file
         val watchPasswdFile = Kqueue.watch(Config.systemPasswdFile, modified = true) {
             logger.trace("Triggered (modified/created) system password file: %s".format(Config.systemPasswdFile))
-            this ! ReloadUsers
+            AccountsManager ! ReloadUsers
         }    
         
         logger.trace("Initialized watch for " + Config.systemPasswdFile)
@@ -33,7 +33,7 @@ object AccountsManager extends MonitoredActor with Utils {
         loop {
             receive {
                 case Init =>
-                    this ! ReloadUsers            
+                    AccountsManager ! ReloadUsers            
                     logger.info("AccountsManager ready")
                     reply(Ready)
                     
@@ -41,6 +41,7 @@ object AccountsManager extends MonitoredActor with Utils {
                     logger.info("Quitting AccountsManager")
                     watchPasswdFile.stop
                     reply(Ready)
+                    exit
                     
                 case ReloadUsers =>
                     logger.trace("Reloading users list")
