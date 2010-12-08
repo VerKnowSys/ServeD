@@ -1,7 +1,7 @@
 package com.verknowsys.served.maintainer
 
 import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.utils.SpecHelpers._
+import com.verknowsys.served.SpecHelpers._
 import com.verknowsys.served.Config
 import org.specs._
 import scala.actors.Actor
@@ -17,20 +17,19 @@ class AccountsManagerTest extends SpecificationWithJUnit {
             
             def waitForKqueue = waitFor(500) 
             
-            AccountsManager ! Init
-            waitFor(AccountsManager)
+            AccountsManager !? Init
             
             // No accounts
             changePasswdPath("emptyPasswd")
             waitForKqueue
-            waitFor(AccountsManager)
+            waitWhileRunning(AccountsManager)
             
             AccountsManager.managers must beEmpty
             
             // One account
             changePasswdPath("standardPasswd")
             waitForKqueue
-            waitFor(AccountsManager)
+            waitWhileRunning(AccountsManager)
             
             val res1 = AccountsManager.managers
             res1 must haveSize(1)
@@ -46,14 +45,15 @@ class AccountsManagerTest extends SpecificationWithJUnit {
             
             changePasswdPath("fivePasswd")
             waitForKqueue
-            waitFor(AccountsManager)
+            waitWhileRunning(AccountsManager)
             val res2 = AccountsManager.managers
             val users = res2.map(_.account.userName)
             users must haveSize(5)
             users must containAll("teamon" :: "dmilith" :: "foo" :: "bar" :: "baz" :: Nil)
             
 
-            AccountsManager ! Quit
+            AccountsManager !? Quit
+            // waitForDeath(AccountsManager)
         }
     }
     
