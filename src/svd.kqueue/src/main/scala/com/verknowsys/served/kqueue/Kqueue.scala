@@ -14,7 +14,7 @@ case class FileEvent(val evflags: Int)
  *
  * @author teamon 
  */
-protected class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => Unit) extends Actor {
+class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => Unit) extends Actor {
     case object StopWatching
     
     if(!(new java.io.File(path)).exists()) throw new java.io.FileNotFoundException(path)
@@ -29,8 +29,8 @@ protected class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: I
             react {
                 case FileEvent(evflags) if((flags & evflags) > 0) => f
                 case StopWatching =>
-                    kqueue.remove(this)
                     keep = false
+                    kqueue.remove(this)
                 case _ => 
             }
         }

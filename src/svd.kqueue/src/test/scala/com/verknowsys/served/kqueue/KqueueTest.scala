@@ -1,140 +1,150 @@
 package com.verknowsys.served.kqueue
 
+import com.verknowsys.served.SpecHelpers._
 import org.specs._
 import java.io._
 import org.apache.commons.io.FileUtils
 import scala.collection.mutable.ListBuffer
-
-object Impl {
-	implicit def StringToFile(s: String) = new File(s)
-}
-
-import Impl._
+import scala.actors.Actor
 
 class KqueueTest extends SpecificationWithJUnit {
     final val DIR = "/tmp/served/kqueue_test"
-    final val N = 300
+    final val N = 500
 
     val range = (1 to N)
         
     def files(name: String) = range map { DIR + "/" + name + _ + ".txt" }
 
     def timeout {
-        (1 to N/50).reverse foreach { i => 
-            println("Timeout: " + i + " left")
+        // (1 to N/50).reverse foreach { i => 
+            // println("Timeout: " + i + " left")
             Thread.sleep(50)
-        }
+        // }
     }
     
     "Kqueue" should {
         doBefore { setup }
         
         "catch " + N + " watches for one file" in {
-            var n = 0
+            var cnt = new Counter
             val filename = DIR + "/oneshot"
             
             FileUtils.touch(filename)
             
             val watchers = range map { i =>
                 Kqueue.watch(filename, attributes = true){
-                    n += 1
+                    cnt ! i
                 }
             }
-                        
-            FileUtils.touch(filename)
+                                    
+            touch(filename)
             timeout
             
-            n must beEqual(N)
+            waitWhileRunning(watchers, cnt)
+                        
+            cnt.data must containAll(range)
             
             watchers foreach { _.stop }
+            cnt.stop
+            waitForDeath(watchers, cnt)  
         }
 
         "catch " + N + " touched files" in {
-            var n = 0
+            var cnt = new Counter
             val all = files("touch_me")
         
-            all foreach { FileUtils.touch(_) }
+            all foreach { touch(_) }
             
-            val watchers = all map {
-                Kqueue.watch(_, attributes = true){
-                    n += 1
+            val watchers = all map { name =>
+                Kqueue.watch(name, attributes = true){
+                    cnt ! name
                 }
             }
                         
-            all foreach { FileUtils.touch(_) }
+            all foreach { touch(_) }
             timeout
+            waitWhileRunning(watchers, cnt)
         
-            n must beEqual(N)
-            
+            cnt.data must containAll(all)
+        
             watchers foreach { _.stop }
+            cnt.stop
+            waitForDeath(watchers, cnt)
         }
         
         
         "catch " + N + " edited files" in {
-            var n = 0
-            var k = 0
+            var n = new Counter
+            var k = new Counter
+            
             val all = files("mod_me")
         
             all foreach { FileUtils.writeStringToFile(_, "x") }
         
             val editWatchers = all map { s =>
                 Kqueue.watch(s, modified = true){
-                    n += 1
+                    n ! s
                 }
             }
             
             val attribWatchers = all map { s =>
                 Kqueue.watch(s, attributes = true){
-                    k += 1
+                    k ! s
                 }
             }
         
             all foreach { FileUtils.writeStringToFile(_, "y") }
             timeout
+            waitWhileRunning(editWatchers, attribWatchers, n, k)
         
-            n must beEqual(N)
-            k must beEqual(0)
+            n.data must containAll(all)
+            k.data must haveSize(0)
             
-            editWatchers foreach { _.stop }
-            attribWatchers foreach { _.stop }
+            (editWatchers ++ attribWatchers) foreach { _.stop }
+            n.stop
+            k.stop
+            waitForDeath(editWatchers, attribWatchers, n, k)
         }
         
         "catch " + N + " renamed files" in {
-            var n = 0
-            var k = 0
-            var m = 0
+            var n = new Counter
+            var k = new Counter
+            var m = new Counter
             val all = files("rename_me")
         
             all foreach { FileUtils.touch(_) }
         
             val moveWatchers = all map { s =>
                 Kqueue.watch(s, renamed = true){
-                    n += 1
+                    n ! s
                 }
             }
             
             val editWatchers = all map { s =>
                 Kqueue.watch(s, modified = true){
-                    k += 1
+                    k ! s
                 }
             }
             
             val attribWatchers = all map { s =>
                 Kqueue.watch(s, attributes = true){
-                    m += 1
+                    m ! s
                 }
             }
         
             all foreach { s => FileUtils.moveFile(s, s + ".moved") }
             timeout
+            waitWhileRunning(moveWatchers, editWatchers, attribWatchers, n, k, m)
         
-            n must beEqual(N)
-            k must beEqual(0)
-            m must beEqual(0)
+            n.data must containAll(all)
+            k.data must haveSize(0)
+            m.data must haveSize(0)
             
-            moveWatchers foreach { _.stop }
-            editWatchers foreach { _.stop }
-            attribWatchers foreach { _.stop }
+            (moveWatchers ++ editWatchers ++ attribWatchers) foreach { _.stop }
+            n.stop
+            k.stop
+            m.stop
+            waitForDeath(moveWatchers, editWatchers, attribWatchers, n, k, m)
         }
     }
 
