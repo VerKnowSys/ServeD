@@ -6,6 +6,7 @@ package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.utils.monitor.Monitored
 import com.verknowsys.served.systemmanager._
 
 import scala.actors.Actor
@@ -18,7 +19,7 @@ import com.sun.jna.{Native, Library}
 *   
 *   SystemManager - responsible for System Managment and Monitoring
 */
-object SvdSystemManager extends Actor with Utils {
+object SvdSystemManager extends Actor with Monitored with Utils {
     
     start
     

@@ -7,13 +7,13 @@ import scala.collection.mutable.ListBuffer
 import com.verknowsys.served.Config
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.utils.monitor.MonitoredActor
+import com.verknowsys.served.utils.monitor.Monitored
 import com.verknowsys.served.managers.AccountManager
 import com.verknowsys.served.kqueue.Kqueue
 
-// case class GetUsers(val list: List[Account])
+import scala.actors.Actor
 
-object AccountsManager extends MonitoredActor with Utils {
+object AccountsManager extends Actor with Monitored with Utils {
     case object ReloadUsers
     
     start
@@ -31,7 +31,7 @@ object AccountsManager extends MonitoredActor with Utils {
         logger.trace("watchPasswordFile: " + watchPasswdFile)
         
         loop {
-            receive {
+            react {
                 case Init =>
                     AccountsManager ! ReloadUsers            
                     logger.info("AccountsManager ready")
