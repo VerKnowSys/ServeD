@@ -1,11 +1,6 @@
 #!/bin/sh
 
-if [ `uname` = "Linux" ]; then
-    platform="linux";
-    libs="*.so"
-    export CC="/usr/bin/gcc"
-    export CFLAGS="-Wdeprecated-declarations -O3 -fPIC -march=pentium4 -ffast-math -fmessage-length=65" # -pedantic -Werror
-elif [ `uname` = "Darwin" ]; then
+if [ `uname` = "Darwin" ]; then
     platform="mac";
     libs="lib/*.dylib"
     export CC="/usr/bin/clang"

@@ -81,7 +81,7 @@ object Maintainer extends Actor with Monitored with Utils {
         logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
 
         addShutdownHook {
-            // SvdSystemManager !? Quit
+            SvdSystemManager !? Quit
             AccountsManager !? Quit
             // NotificationCenter !? Quit
             Maintainer !? Quit
@@ -96,8 +96,8 @@ object Maintainer extends Actor with Monitored with Utils {
         logger.info("AccountManager is loading")
         AccountsManager ! Init
         
-        // logger.info("SystemManager is loading")
-        // SvdSystemManager !? Init
+        logger.info("SystemManager is loading")
+        SvdSystemManager !? Init
         
         // logger.info("ApiServerActor is loading")
         // ApiServerActor !? Init
