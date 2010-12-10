@@ -7,7 +7,11 @@ package com.verknowsys.served.systemmanager
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.systemmanager._
+import com.verknowsys.served.kqueue._
 
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.RandomAccessFile
 import scala.actors.Actor
 import com.sun.jna.{Native, Library}
 
@@ -30,6 +34,7 @@ object SvdSystemManager extends Actor with Utils {
                 case Init =>
                     logger.info("SystemManager ready")
                     logger.trace("Process list: %s".format(processList().mkString)) // no args == show user threads and sort output
+                    watchLogs
                     reply(Ready)
                     
                 case Quit =>
@@ -126,6 +131,23 @@ object SvdSystemManager extends Actor with Utils {
     *   Returns System Process count.
     */
     @specialized def processCount(@specialized showThreads: Boolean = true, @specialized sort: Boolean = true) = processList(showThreads, sort).size
+    
+    
+    
+    /**
+    *   @author dmilith
+    *   XXX, TESTING, DIRTY, HACK
+    *   
+    */
+    def watchLogs {
+        val watchedFile = "/var/log/kernel.log"
+        Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
+            val raf = new RandomAccessFile(watchedFile, "r")
+            raf.seek(raf.length - 1024)
+            logger.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
+        }
+    }
+    
     
     
 }
