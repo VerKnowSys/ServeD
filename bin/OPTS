@@ -1,23 +1,21 @@
 #!/usr/bin/env zsh
 
 if [ `uname` = "Darwin" ]; then
-    platform="mac";
-    libs="lib/*.dylib"
+    export platform="mac"
     export CC="/usr/bin/clang"
-    export CFLAGS="-Wdeprecated-declarations -arch x86_64 -O3 -fPIC -march=pentium4 -ffast-math -fmessage-length=65" # -pedantic -Werror
+    export CFLAGS="-arch x86_64 -Os -fPIC -march=pentium4 -ffast-math -fmessage-length=65" # -pedantic -Werror
 elif [ `uname` = "FreeBSD" ]; then
-    platform="freebsd";
-    libs="lib/*.so"
+    export platform="freebsd"
     export CC="/usr/local/bin/clang"
-    export CFLAGS="-Wdeprecated-declarations -O3 -fPIC -ffast-math -fmessage-length=65" # -pedantic -Werror
+    export CFLAGS="-Os -fPIC -ffast-math -fmessage-length=65" # -pedantic -Werror
 fi
 
-export MVN_EXEC="/usr/bin/env mvn"
+export MVN_EXEC="`which mvn`"
 # export MVN_PARAMS="-T C2 -e -Dmaven.test.skip.exec=true -Dmaven.test.skip=true"
 # export MVN_TEST_PARAMS="-T C2 -e"
 
 export JAVA_OPTS="-Xms32m -XX:NewRatio=1 -Xmx512m -Dfile.encoding=UTF-8 -XX:+UseFastAccessorMethods"
 export MAVEN_OPTS_ADDITIONAL="-e -Dmaven.test.skip.exec=true -Dmaven.test.skip=true"
-export MAVEN_OPTS="-Djava.library.path=../../lib/ -Dactors.corePoolSize=8 -Djna.library.path=../../lib/"
+export MAVEN_OPTS="-Dactors.corePoolSize=8" #" -Djava.library.path=../../lib/ -Djna.library.path=../../lib/"
 
-export COMMAND="bin/runner $@"
+export COMMAND="`pwd`/bin/runner" $@

@@ -5,8 +5,6 @@
 
 . bin/OPTS
 
-cd src/
-
 if [ "$1" = "test" ]; then
     export MAVEN_OPTS_ADDITIONAL="-e"
 fi
@@ -14,4 +12,5 @@ echo "Runner params given: $@"
 echo "Maven opts: $MAVEN_OPTS"
 echo "Additional opts: $MAVEN_OPTS_ADDITIONAL"
 
+cd src
 $MVN_EXEC $MAVEN_OPTS $MAVEN_OPTS_ADDITIONAL $* | ../bin/color
