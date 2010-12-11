@@ -1028,7 +1028,7 @@ AC_OUTPUT () {
 	rm -f config.cmd
 	Q=\'
 	cat - > config.cmd << EOF
-#! /bin/sh
+#! /usr/bin/env zsh
 ${CC:+CC=${Q}${CC}${Q}} ${CFLAGS:+CFLAGS=${Q}${CFLAGS}${Q}} $ac_progname $ac_configure_command
 EOF
 	chmod +x config.cmd
@@ -1247,7 +1247,7 @@ AC_PROG_INSTALL () {
 
     __config_files="$__config_files config.md"
     AC_SUB 'INSTALL_DIR' "$__cwd/config.md"
-    echo "#! /bin/sh"                                   > $__cwd/config.md
+    echo "#! /usr/bin/env zsh"                                   > $__cwd/config.md
     echo "# script generated" `date` "by configure.sh" >> $__cwd/config.md
     echo                                               >> $__cwd/config.md
     if [ "$__mkdir" ]; then

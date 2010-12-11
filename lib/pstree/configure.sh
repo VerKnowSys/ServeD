@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /usr/bin/env zsh
 
 # local options:  ac_help is the help message that describes them
 # and LOCAL_AC_OPTIONS is the script that interprets them.  LOCAL_AC_OPTIONS
