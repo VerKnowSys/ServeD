@@ -7,7 +7,7 @@
 
 cd src/
 
-if [ "$1" == "test" ]; then
+if [ "$1" = "test" ]; then
     export MAVEN_OPTS_ADDITIONAL="-e"
 fi
 echo "Runner params given: $@"
