@@ -3,7 +3,7 @@
 
 
 rm -rf $HOME/.m2/repository/svd/
-git pull
+git pull origin master # 2010-12-11 17:12:32 - dmilith - NOTE: master is production branch
 bin/clean
 bin/install
 bin/test
