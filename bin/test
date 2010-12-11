@@ -7,17 +7,17 @@
 
 echo "Running tests on platform: $platform, libs: $libs, args: $*"
 
-dirList=(
-svd.notifications
-svd.maintainer
-svd.systemmanager
-svd.utils
+dirList=( \
+svd.notifications \
+svd.maintainer \
+svd.systemmanager \
+svd.utils \
 )
 
 # *.jnilib
 toBeDeletedLibs=(
-*.dylib
-*.so
+*.dylib \
+*.so \
 )
 
 
