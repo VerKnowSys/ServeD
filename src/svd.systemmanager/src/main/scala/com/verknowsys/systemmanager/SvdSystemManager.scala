@@ -14,6 +14,7 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.RandomAccessFile
 import scala.actors.Actor
+import scala.actors.Actor._
 import com.sun.jna.{Native, Library}
 
 
@@ -30,8 +31,8 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     
     def act {
         Native.setProtected(true) // 2010-10-11 23:43:21 - dmilith - set JVM protection (in case of JNA code fail it should only throw an exception)
-        Actor.loop {
-            receive {
+        loop {
+            react {
                 case Init =>
                     logger.info("SystemManager ready")
                     logger.trace("Process list: %s".format(processList().mkString)) // no args == show user threads and sort output
@@ -149,6 +150,8 @@ object SvdSystemManager extends Actor with Monitored with Utils {
         }
     }
     
+    
+    override def toString = "SvdSystemManager"
     
     
 }

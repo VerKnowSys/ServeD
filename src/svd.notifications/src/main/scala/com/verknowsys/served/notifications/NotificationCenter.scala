@@ -27,7 +27,7 @@ object NotificationCenter extends Actor with Utils {
 
     def act {
         loop {
-            receive {
+            react {
                 case Init =>                        
                     logger.info("NotificationCenter connecting gates")
                     gates.foreach { _.connect }                                    
@@ -52,6 +52,8 @@ object NotificationCenter extends Actor with Utils {
             }
         }
     }
+    
+    override def toString = "NotificationCenter"
 }  
 
 trait Gate {

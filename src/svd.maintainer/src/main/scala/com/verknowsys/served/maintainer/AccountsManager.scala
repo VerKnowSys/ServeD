@@ -116,6 +116,6 @@ object AccountsManager extends Actor with Monitored with Utils {
     /**
      * @author teamon
      */
-    override def toString = "!AccountsManager!"
+    override def toString = "AccountsManager"
 
 }

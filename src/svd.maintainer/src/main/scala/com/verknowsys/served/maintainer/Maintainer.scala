@@ -57,7 +57,7 @@ object Maintainer extends Actor with Monitored with Utils {
     /**
      * @author teamon
      */
-    override def toString = "!Maintainer!"
+    override def toString = "Maintainer"
 
 
     /**
@@ -83,12 +83,12 @@ object Maintainer extends Actor with Monitored with Utils {
         addShutdownHook {
             SvdSystemManager !? Quit
             AccountsManager !? Quit
-            // NotificationCenter !? Quit
+            NotificationCenter !? Quit
             Maintainer !? Quit
         }
 
-        // logger.info("Maintainer is loading")
-        // Maintainer !? Init
+        logger.info("Maintainer is loading")
+        Maintainer !? Init
         
         // logger.info("NotificationCenter is loading")
         // NotificationCenter !? Init
