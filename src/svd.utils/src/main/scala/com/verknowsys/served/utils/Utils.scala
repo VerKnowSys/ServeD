@@ -68,6 +68,11 @@ trait Utils extends UtilsCommon {
         }
         vendorPath
     }
+    
+    
+    def messageNotRecognized(x: Any) {
+        logger.warn("Message not recognized: " + x.toString)
+    }
 
 
 }

@@ -45,8 +45,7 @@ class GitManager(owner: AccountManager) extends Manager(owner) {
                     reply(Ready)
                     exit
                 
-                case x: AnyRef =>
-                    logger.warn("Command not recognized. GitManager will ignore it: " + x.toString)
+                case _ => messageNotRecognized(_)
             }
         }
     }

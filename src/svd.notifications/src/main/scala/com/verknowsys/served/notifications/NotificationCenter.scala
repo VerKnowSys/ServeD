@@ -27,17 +27,15 @@ object NotificationCenter extends Actor with Utils {
 
     def act {
         loop {
-            react {
+            receive {
                 case Init =>                        
                     logger.info("NotificationCenter connecting gates")
                     gates.foreach { _.connect }                                    
                     logger.info("NotificationCenter ready")
-                    reply(Ready)
                     
                 case Quit =>
                     logger.info("Quitting NotificationCenter")
                     gates.foreach { _.disconnect }
-                    reply(Ready)
                     exit
             
                 case Status(status) => 
@@ -48,7 +46,7 @@ object NotificationCenter extends Actor with Utils {
                     logger.info("NotificationCenter ! Message(%s)".format(msg))
                     gates.foreach { _ send msg }
                 
-                case x: AnyRef => logger.warn("Command not recognized. NotificationCenter will ignore signal: " + x.toString)
+                case _ => messageNotRecognized(_)
             }
         }
     }

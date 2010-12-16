@@ -31,16 +31,14 @@ object AccountsManager extends Actor with Monitored with Utils {
         logger.trace("watchPasswordFile: " + watchPasswdFile)
         
         loop {
-            react {
+            receive {
                 case Init =>
                     AccountsManager ! ReloadUsers            
                     logger.info("AccountsManager ready")
-                    reply(Ready)
                     
                 case Quit =>
                     logger.info("Quitting AccountsManager")
                     watchPasswdFile.stop
-                    reply(Ready)
                     exit
                     
                 case ReloadUsers =>
@@ -77,8 +75,7 @@ object AccountsManager extends Actor with Monitored with Utils {
                         }
                     }
                 
-                case x: AnyRef =>
-                    logger.warn("Command not recognized. AccountsManager will ignore You: " + x.toString)
+                case _ => messageNotRecognized(_)
                     
             }
         }

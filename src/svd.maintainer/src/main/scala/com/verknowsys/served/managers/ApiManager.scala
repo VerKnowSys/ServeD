@@ -21,7 +21,7 @@ class ApiManager(owner: AccountManager) extends Manager(owner) {
             receive {
                 case msg: ApiMessage => sender ! (owner !! msg) 
                 
-                case msg: Any => logger.warn("Command not recognized. ApiManager will ignore it: " + msg.toString)
+                case _ => messageNotRecognized(_)
             }
         }
     }

@@ -36,19 +36,16 @@ object Maintainer extends Actor with Monitored with Utils {
             receive {
                 case Init =>
                     logger.info("Maintainer ready")
-                    reply(Ready)
 
                 case Quit =>
                     logger.info("Quitting Maintainer")
-                    reply(Ready)
                     exit
 
                 // case GetUsers(x) =>
                 //     val content = x.map {a => "userName: " + a.userName + ", pass: " + a.pass + ", uid: " + a.uid + ", gid: " + a.gid + ", homeDir: " + a.homeDir + ", shell: " + a.shell + ", information: " + a.information + "\n"}
                 //     logger.debug("Content:\n" + content)
 
-                case x: AnyRef =>
-                    logger.trace("Command not recognized. Maintainer will ignore signal: " + x.toString)
+                case _ => messageNotRecognized(_)
 
             }
         }
@@ -66,41 +63,41 @@ object Maintainer extends Actor with Monitored with Utils {
     *   ServeD Maintainer Core
     */
     def main(args: Array[String]) {
+        logger.debug("Mainainer object size: " + sizeof(Maintainer))
+        logger.debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
+        logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         
         args foreach { _ match {
             case "--monitor" => 
                 Monitor.start
              
-            case x => 
+            case x: Any => 
                 logger.error("Unknow argument: " + x)
                 System.exit(1);
         }}
 
-        logger.debug("Mainainer object size: " + sizeof(Maintainer))
-        logger.debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
-        logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
-
+        
         addShutdownHook {
-            SvdSystemManager !? Quit
-            AccountsManager !? Quit
-            NotificationCenter !? Quit
-            Maintainer !? Quit
+            SvdSystemManager ! Quit
+            AccountsManager ! Quit
+            NotificationCenter ! Quit
+            Maintainer ! Quit
         }
 
         logger.info("Maintainer is loading")
-        Maintainer !? Init
+        Maintainer ! Init
         
         logger.info("NotificationCenter is loading")
-        NotificationCenter !? Init
+        NotificationCenter ! Init
         
         logger.info("AccountManager is loading")
         AccountsManager ! Init
         
         logger.info("SystemManager is loading")
-        SvdSystemManager !? Init
+        SvdSystemManager ! Init
         
         // logger.info("ApiServerActor is loading")
-        // ApiServerActor !? Init
+        // ApiServerActor ! Init
     }
 
 

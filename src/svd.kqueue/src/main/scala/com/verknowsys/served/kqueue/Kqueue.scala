@@ -31,7 +31,7 @@ class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => 
                     kqueue.remove(this)
                     exit
                     
-                case x:AnyRef => println("[ERROR] wtf? " + x.toString)
+                case x: Any => println("[ERROR] ??? " + x.toString)
             }
         }
     }

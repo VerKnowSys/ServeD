@@ -30,8 +30,7 @@ class AccountManager(val account: Account) extends Actor with Utils {
                     reply(Ready)
                     exit
                 
-                case x: AnyRef =>
-                    logger.warn("Command not recognized. AccountManager will ignore it: " + x.toString)
+                case _ => messageNotRecognized(_)
             }
         }
     }
