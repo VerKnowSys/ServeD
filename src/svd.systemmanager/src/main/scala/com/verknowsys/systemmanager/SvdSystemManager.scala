@@ -32,7 +32,7 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     def act {
         Native.setProtected(true) // 2010-10-11 23:43:21 - dmilith - set JVM protection (in case of JNA code fail it should only throw an exception)
         loop {
-            react {
+            receive {
                 case Init =>
                     logger.info("SystemManager ready")
                     logger.trace("Process list: %s".format(processList().mkString)) // no args == show user threads and sort output
@@ -48,8 +48,7 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                     sendSignalToPid(signal, pid)
                     logger.trace("Send Signal Request, received with signal %s, for pid: %s".format(signal, pid))
                 
-                case x: AnyRef =>
-                    logger.trace("Command not recognized. SystemManager will ignore You: %s".format(x))
+                case _ => messageNotRecognized(_)
                     
             }
         }
@@ -91,9 +90,7 @@ object SvdSystemManager extends Actor with Monitored with Utils {
             case POSIXSignals.SIGKILL =>
                 logger.trace("SigKILL sent to process pid: %s".format(pid))
             
-            case x: AnyRef =>
-                logger.trace("Command not recognized. sendSignalToPid will ignore You: %s".format(x))
-                
+            case _ => messageNotRecognized(_)                
         }
 
 
@@ -110,11 +107,10 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     *
     */
     def processList(showThreads: Boolean = true, sort: Boolean = true): List[SystemProcess] = {
-        @specialized lazy val st = if (showThreads) 1 else 0
-        @specialized lazy val so = if (sort) 1 else 0
-        lazy val sourceList = pstreelib.processes(st, so).split("/").toList.filter{
-            a =>
-                lazy val tmp: String = a.split(",").head
+        val st = if (showThreads) 1 else 0
+        val so = if (sort) 1 else 0
+        val sourceList = pstreelib.processes(st, so).split("/").toList.filter { a =>
+                val tmp = a.split(",").head
                 (tmp != "root" && tmp != "init" && tmp != "launchd" && tmp != "") // 2010-10-24 13:59:33 - dmilith - XXX: hardcoded
         }
         for (process <- sourceList) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
