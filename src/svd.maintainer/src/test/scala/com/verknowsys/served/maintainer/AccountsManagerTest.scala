@@ -6,10 +6,14 @@ import com.verknowsys.served.Config
 import org.specs._
 import scala.actors.Actor
 
+import com.verknowsys.served.utils.monitor.Monitor
+
 
 class AccountsManagerTest extends SpecificationWithJUnit {
     "AccountsManager" should {
-        "create manager for each account" in {   
+        "create manager for each account" in {
+            Monitor.start
+            
             def changePasswdPath(path: String) {
                 val passwd = readFile(System.getProperty("user.dir") + "/src/test/resources/etc/" + path)
                 writeFile(Config.systemPasswdFile, passwd)
@@ -17,7 +21,7 @@ class AccountsManagerTest extends SpecificationWithJUnit {
             
             def waitForKqueue = waitFor(500) 
             
-            AccountsManager !? Init
+            AccountsManager ! Init
             
             // No accounts
             changePasswdPath("emptyPasswd")
@@ -52,8 +56,8 @@ class AccountsManagerTest extends SpecificationWithJUnit {
             users must containAll("teamon" :: "dmilith" :: "foo" :: "bar" :: "baz" :: Nil)
             
 
-            AccountsManager !? Quit
-            // waitForDeath(AccountsManager)
+            AccountsManager ! Quit
+            waitForDeath(AccountsManager)
         }
     }
     
