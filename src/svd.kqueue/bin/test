@@ -1,3 +1,0 @@
-#!/usr/bin/env zsh
-
-mvn -e clean test -Dtest=com.verknowsys.served.kqueue.KqueueTest | ../../bin/color

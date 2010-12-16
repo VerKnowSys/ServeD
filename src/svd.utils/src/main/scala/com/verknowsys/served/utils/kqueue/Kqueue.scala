@@ -1,4 +1,4 @@
-package com.verknowsys.served.kqueue
+package com.verknowsys.served.utils.kqueue
 
 import com.sun.jna._
 import scala.actors.Actor

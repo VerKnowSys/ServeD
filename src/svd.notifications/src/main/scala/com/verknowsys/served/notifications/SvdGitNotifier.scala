@@ -11,7 +11,7 @@ import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.git._
 import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.kqueue.Kqueue
+import com.verknowsys.served.utils.kqueue.Kqueue
 
 import java.text.SimpleDateFormat
 

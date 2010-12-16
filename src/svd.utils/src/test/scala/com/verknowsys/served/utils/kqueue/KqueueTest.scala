@@ -1,4 +1,4 @@
-package com.verknowsys.served.kqueue
+package com.verknowsys.served.utils.kqueue
 
 import com.verknowsys.served.SpecHelpers._
 import org.specs._

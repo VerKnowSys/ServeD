@@ -8,8 +8,8 @@ import com.verknowsys.served.Config
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.monitor.Monitored
+import com.verknowsys.served.utils.kqueue.Kqueue
 import com.verknowsys.served.managers.AccountManager
-import com.verknowsys.served.kqueue.Kqueue
 
 import scala.actors.Actor
 

@@ -6,9 +6,9 @@ package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.utils.kqueue._
 import com.verknowsys.served.utils.monitor.Monitored
 import com.verknowsys.served.systemmanager._
-import com.verknowsys.served.kqueue._
 
 import java.io.FileNotFoundException
 import java.io.IOException

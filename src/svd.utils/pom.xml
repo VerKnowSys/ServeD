@@ -9,6 +9,11 @@
 			<id>jgit-repository</id>
 			<url>http://download.eclipse.org/jgit/maven</url>
 		</repository>
+		
+		<repository>
+			<id>java.net</id>
+			<url>http://download.java.net/maven/2</url>
+		</repository>
 	</repositories>
 	
 	<parent>
@@ -18,13 +23,7 @@
 		<relativePath>../svd.core</relativePath>
 	</parent>
 	
-	<dependencies>
-		<dependency>
-			<groupId>svd</groupId>
-			<artifactId>svd.kqueue</artifactId>
-			<version>0.1.0</version>
-		</dependency>
-		
+	<dependencies>		
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -83,6 +82,20 @@
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
 			<version>0.10.0-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>3.2.5</version>
+		</dependency>
+		
+		
+		<dependency>
+			<groupId>svd</groupId>
+			<artifactId>svd.spechelpers</artifactId>
+			<version>0.1.0</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

@@ -4,7 +4,7 @@
 package com.verknowsys.served.utils
 
 import com.verknowsys.served._
-import com.verknowsys.served.kqueue.Kqueue
+import com.verknowsys.served.utils.kqueue.Kqueue
 import java.io.{PrintWriter, File, OutputStreamWriter}
 import java.util.ArrayList
 import java.util.regex.Pattern

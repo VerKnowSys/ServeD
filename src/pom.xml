@@ -15,7 +15,6 @@
     <module>svd.core</module>
     <module>svd.api</module>
     <module>svd.cli</module>
-    <module>svd.kqueue</module>
     <module>svd.utils</module>
     <module>svd.systemmanager</module>
     <module>svd.notifications</module>
