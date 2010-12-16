@@ -35,8 +35,9 @@ object SvdSystemManager extends Actor with Monitored with Utils {
             receive {
                 case Init =>
                     logger.info("SystemManager ready")
-                    logger.trace("Process list: %s".format(processList().mkString)) // no args == show user threads and sort output
                     watchLogs
+                    
+                    logger.trace("Process list: %s".format(processList().mkString)) // no args == show user threads and sort output
                     reply(Ready)
                     
                 case Quit =>
@@ -137,14 +138,15 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     *   XXX, TESTING, DIRTY, HACK
     *   
     */
-    def watchLogs {
-        val watchedFile = "/var/log/kernel.log"
-        Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
-            val raf = new RandomAccessFile(watchedFile, "r")
-            raf.seek(raf.length - 1024)
-            logger.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
+    def watchLogs = {
+            val watchedFile = "/var/log/kernel.log"
+            Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
+                val raf = new RandomAccessFile(watchedFile, "r")
+                raf.seek(raf.length - 1024)
+                logger.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
+            }
         }
-    }
+    
     
     
     override def toString = "SvdSystemManager"
