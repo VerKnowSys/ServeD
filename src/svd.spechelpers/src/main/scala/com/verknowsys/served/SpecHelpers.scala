@@ -18,7 +18,8 @@ object SpecHelpers {
     def waitWhileRunning(actors: Seq[Actor]*) {
         actors.flatten foreach { a =>
             while(a.getState != Actor.State.Blocked && a.getState != Actor.State.Suspended) { 
-                if(a.getState != Actor.State.Terminated) println("[WARNING !!!] Actor Terminated - was supposed to be running - " + a)
+                println("Actor state: " + a.getState)
+                // if(a.getState == Actor.State.Terminated) println("[WARNING !!!] Actor Terminated - was supposed to be running - " + a)
                 waitFor(50)
             }
         }
