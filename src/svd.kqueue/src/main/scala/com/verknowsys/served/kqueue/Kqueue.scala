@@ -46,10 +46,12 @@ class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => 
  *
  * @author Author 
  */
-class Kqueue extends Actor {    
+class Kqueue extends Thread {
     class KqueueException extends Exception
     class KeventException extends Exception
     class OpenException extends Exception
+    
+    setName("Kqueue")
 
     val kq = Kqueue.clib.kqueue()
     if(kq == -1) {
@@ -61,8 +63,8 @@ class Kqueue extends Actor {
 
     start
 
-    def act {
-        loop {
+    override def run {
+        while(true) {
             val event = new kevent
             val nev = Kqueue.clib.kevent(kq, null, 0, event, 1, null)
             if(nev == -1){
