@@ -29,7 +29,8 @@
 
 
 1. Instalation
-	1.1 - Use bin/install
+	1.1 - sudo bin/installNativeLibraries
+	1.2 - bin/deploy
 
 
 
