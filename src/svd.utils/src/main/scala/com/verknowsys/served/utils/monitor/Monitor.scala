@@ -24,12 +24,12 @@ import scala.collection.mutable.ListBuffer
 @serializable case class MonitoredData(val time: Long, val list: Map[String, Actor.State.Value])
 @serializable case object GetMonitoredData
 
-object Monitor extends Actor {
+object Monitor extends Actor with MonitoredLike {
     final val port = 8888
     val startTime = System.currentTimeMillis
-    val monitored = new ListBuffer[Monitored]
+    val monitored = new ListBuffer[MonitoredLike]
     
-    def registerMonitored(monitor: Monitored){ monitored += monitor }
+    def registerMonitored(monitor: MonitoredLike){ monitored += monitor }
     
     RemoteActor.classLoader = getClass().getClassLoader()
     
@@ -37,6 +37,7 @@ object Monitor extends Actor {
         alive(port)
         register('SvdMonitor, self)
         
+        registerMonitored(this)
         println("Monitor started")
                 
         loop {
@@ -48,12 +49,18 @@ object Monitor extends Actor {
             }
         }
     }
+    
+    override def toString = "Monitor"
 }
 
-trait Monitored {
+trait MonitoredLike {
+    self: Actor =>
+    
+    def state = getState
+}
+
+trait Monitored extends MonitoredLike {
     self: Actor =>
     
     Monitor.registerMonitored(this)
-    
-    def state = getState
 }

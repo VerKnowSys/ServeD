@@ -123,7 +123,7 @@ class Reader(host: String, port: Int, repaintFun: () => Unit) extends Actor {
                     }
 
                     repaintFun()
-                    Thread.sleep(100)
+                    Thread.sleep(10)
                     println("got something...")
 
                 case _ => 
