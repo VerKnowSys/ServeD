@@ -4,55 +4,143 @@ import scala.actors.Actor
 import scala.actors.remote.RemoteActor
 import scala.actors.remote.RemoteActor._
 import scala.actors.remote.Node
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, Map}
 import scala.swing._
 
 import java.awt.{Font, Color}
-import java.awt.geom.AffineTransform
-// import javax.swing._ 
+// import java.awt.geom.AffineTransform
+import javax.swing.table._
 
-class Graph(host: String, port: Int) extends Panel with Actor {  
-    import Actor.State._
+
+
+
+
     
-    val data = new ListBuffer[(Long, Map[String, Actor.State.Value])] // List[(time, Map[name, state])]
-    val runnables = new ListBuffer[String]
+
     
-    // val data = Map[String, Map[Long, Actor.State.Value]]() // Map[name, Map[time, state]]
-    // var startTime = 0L
+    
+    // final val SIZE = new Dimension(1200, 300)
+    // final val OFFSET_LEFT = 100
+    // final val OFFSET_RIGHT = 10
+    // 
+    // final val COLOR = Map(
+    //     New -> Color.GRAY,
+    //     Runnable -> Color.GREEN,
+    //     Suspended -> Color.YELLOW,
+    //     TimedSuspended -> Color.RED,
+    //     Blocked -> Color.ORANGE,
+    //     TimedBlocked -> Color.BLUE,
+    //     Terminated -> Color.BLACK
+    // )
+    // 
+    // preferredSize = SIZE
+    
+    // start
+    
+    // override def paint(g: Graphics2D){        
+    //     g.setColor(Color.WHITE)
+    //     g.clearRect(0, 0, peer.getWidth, peer.getHeight)
+    //     g.setFont(new Font("Monaco", Font.PLAIN, 12))   
+    //             
+    //     // val maxTime = data.map(_._2.keys.max).max - startTime
+    //     
+    //     g.setPaint(Color.BLACK)
+    //     
+    //     runnables.zipWithIndex.foreach { case(name, i) => 
+    //         g.drawString(name, 10, 30+i*20)
+    //     }
+    //     
+    //     val fieldWidth = peer.getWidth - OFFSET_LEFT - OFFSET_RIGHT
+    //     val n =  fieldWidth / 10
+    //     val width = n * 10
+    //             
+    //     val fontAT = new AffineTransform
+    //     fontAT.rotate(Math.toRadians(270))
+    //     g.setFont(new Font("Monaco", Font.PLAIN, 8).deriveFont(fontAT))
+    //     
+    //     data.takeRight(n).zipWithIndex.foreach { case((time, map), t) => 
+    //         val x = OFFSET_LEFT + width*t/n
+    //         
+    //         map.zipWithIndex.foreach { case((name, state), i) => 
+    //             g.setPaint(COLOR(state))
+    //             g.fillRect(x, 15+i*20, 8, 18)
+    //         }
+    //            
+    //         if(t%5 == 0){
+    //             g.setPaint(Color.BLACK)     
+    //             g.drawString(time.toString, x+5, 40+map.size*20)
+    //         }
+    //     }
+    //     
+    //     g.setFont(new Font("Monaco", Font.PLAIN, 12))   
+    //             
+    //     COLOR.zipWithIndex.foreach { case((state, color), i) => 
+    //         g.setPaint(Color.BLACK)     
+    //         g.drawString(state.toString, 10, 60+(i+runnables.size)*20)
+    //         g.setPaint(color)
+    //         g.fillRect(100, 45+(i+runnables.size)*20, 20, 18)
+    //     }
+    //     
+    //     // data.zipWithIndex.foreach { case ((name, states), i) =>   
+    //     //     g.setPaint(Color.BLACK)
+    //     //     g.drawString(name, 10, 30+i*20)
+    //     //     
+    //     //     
+    //     //     states.zipWithIndex.foreach { case ((time, state), j) => 
+    //     //         g.setPaint(COLOR(state))
+    //     //         val x = (time - startTime)/50
+    //     //         
+    //     //         g.fillRect(OFFSET_LEFT+x.toInt, 15+i*20, 1, 18)
+    //     //     }
+    //     // }
+    //     
+    //     
+    //     // g.drawString("dupa", 50, 50);
+    // }
+// }
+
+class Reader(host: String, port: Int, repaintFun: () => Unit) extends Actor { 
+    val data = Map[String, List[Actor.State.Value]]()
+
+    start
 
     def act {
         RemoteActor.classLoader = getClass().getClassLoader()
         val monitor = select(Node(host, port), 'SvdMonitor)
         link(monitor)
-        
+
         println("Started")
-        
+
         loop {
             monitor ! GetMonitoredData
-            
-            
+
+
             receiveWithin(500) {
                 case MonitoredData(time, map) => 
-                    data += ((time, map))  
-                    map foreach { case(name, state) => if(!runnables.contains(name)) runnables += name }
-                
-                    repaint
-                    Thread.sleep(10)
-                
+                    map.foreach { case(name, state) => 
+                        if(!data.contains(name)) data(name) = List(state)
+                        else data(name) = data(name) ++ List(state)
+                    }
+
+                    repaintFun()
+                    Thread.sleep(100)
+                    println("got something...")
+
                 case _ => 
-                    println("WTF?")
-                    // startTime = 0
+                    println("nothing...")
                     // TODO: Clear (served resterted)
             }
         }
-
     }
+
+}
+
+
+
+object MonitorDisplay extends SimpleSwingApplication {
+    import scala.actors.Actor.State._
     
-    final val SIZE = new Dimension(1200, 300)
-    final val OFFSET_LEFT = 100
-    final val OFFSET_RIGHT = 10
-    
-    final val COLOR = Map(
+    final val COLORS = Map(
         New -> Color.GRAY,
         Runnable -> Color.GREEN,
         Suspended -> Color.YELLOW,
@@ -62,80 +150,23 @@ class Graph(host: String, port: Int) extends Panel with Actor {
         Terminated -> Color.BLACK
     )
     
-    preferredSize = SIZE
+    val reader = new Reader("localhost", 8888, update _)
     
-    start
+    val table = new SplitTable("ID", "State", reader.data, (g: Graphics2D, data: List[Actor.State.Value]) => {
+        data.zipWithIndex.foreach { case (state, i) =>
+           g.setPaint(COLORS(state))
+           g.fillRect(i*10, 0, 8, 20)
+        }
+        
+        data.size * 10
+    })
     
-    override def paint(g: Graphics2D){
-        val metrics = g.getFontMetrics
-        
-        g.setColor(Color.WHITE)
-        g.clearRect(0, 0, peer.getWidth, peer.getHeight)
-        g.setFont(new Font("Monaco", Font.PLAIN, 12))   
-                
-        // val maxTime = data.map(_._2.keys.max).max - startTime
-        
-        g.setPaint(Color.BLACK)
-        
-        runnables.zipWithIndex.foreach { case(name, i) => 
-            g.drawString(name, 10, 30+i*20)
-        }
-        
-        val fieldWidth = peer.getWidth - OFFSET_LEFT - OFFSET_RIGHT
-        val n =  fieldWidth / 10
-        val width = n * 10
-        
-        val fontAT = new AffineTransform
-        fontAT.rotate(Math.toRadians(270))
-        g.setFont(new Font("Monaco", Font.PLAIN, 8).deriveFont(fontAT))
-        
-        data.takeRight(n).zipWithIndex.foreach { case((time, map), t) => 
-            val x = OFFSET_LEFT + width*t/n
-            
-            map.zipWithIndex.foreach { case((name, state), i) => 
-                g.setPaint(COLOR(state))
-                g.fillRect(x, 15+i*20, 8, 18)
-            }
-               
-            if(t%5 == 0){
-                g.setPaint(Color.BLACK)     
-                g.drawString(time.toString, x+5, 40+map.size*20)
-            }
-        }
-        
-        g.setFont(new Font("Monaco", Font.PLAIN, 12))   
-                
-        COLOR.zipWithIndex.foreach { case((state, color), i) => 
-            g.setPaint(Color.BLACK)     
-            g.drawString(state.toString, 10, 60+(i+runnables.size)*20)
-            g.setPaint(color)
-            g.fillRect(100, 45+(i+runnables.size)*20, 20, 18)
-        }
-        
-        // data.zipWithIndex.foreach { case ((name, states), i) =>   
-        //     g.setPaint(Color.BLACK)
-        //     g.drawString(name, 10, 30+i*20)
-        //     
-        //     
-        //     states.zipWithIndex.foreach { case ((time, state), j) => 
-        //         g.setPaint(COLOR(state))
-        //         val x = (time - startTime)/50
-        //         
-        //         g.fillRect(OFFSET_LEFT+x.toInt, 15+i*20, 1, 18)
-        //     }
-        // }
-        
-        
-        // g.drawString("dupa", 50, 50);
-    }
-}
-
-object MonitorDisplay extends SimpleSwingApplication {    
-    val graph = new Graph("localhost", 8888)
+    def update { table.repaint }
     
     def top = new MainFrame {
         title = "ServeD Actors Monitor"
-        contents = graph
+        location = new Point(100, 100)
+        contents = table
     }
 }
 

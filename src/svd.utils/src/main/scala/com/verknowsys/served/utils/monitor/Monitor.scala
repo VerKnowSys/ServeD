@@ -1,6 +1,6 @@
 package com.verknowsys.served.utils.monitor
 
-import com.verknowsys.served.utils.Utils
+// import com.verknowsys.served.utils.Utils
 
 import scala.actors._
 import scala.actors.Actor._
@@ -21,10 +21,10 @@ import scala.collection.mutable.ListBuffer
  * 
  */
 
-case class MonitoredData(val time: Long, val list: Map[String, Actor.State.Value])
-case object GetMonitoredData
+@serializable case class MonitoredData(val time: Long, val list: Map[String, Actor.State.Value])
+@serializable case object GetMonitoredData
 
-object Monitor extends Actor with Utils {
+object Monitor extends Actor {
     final val port = 8888
     val startTime = System.currentTimeMillis
     val monitored = new ListBuffer[Monitored]
@@ -37,14 +37,14 @@ object Monitor extends Actor with Utils {
         alive(port)
         register('SvdMonitor, self)
         
-        logger.info("Monitor started")
+        println("Monitor started")
                 
         loop {
-            receive {
+            react {
                 case GetMonitoredData =>
-                    sender ! MonitoredData(System.currentTimeMillis-startTime, monitored.foldLeft(Map[String, Actor.State.Value]()){ (m, e) => m + (e.toString -> e.state) })
+                    if(!monitored.isEmpty) sender ! MonitoredData(System.currentTimeMillis-startTime, monitored.foldLeft(Map[String, Actor.State.Value]()){ (m, e) => m + (e.toString -> e.state) })
                 
-                case _ => messageNotRecognized(_)
+                case _ => //messageNotRecognized(_)
             }
         }
     }
