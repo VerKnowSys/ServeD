@@ -3,6 +3,7 @@ package com.verknowsys.served.utils.kqueue
 import com.sun.jna._
 import scala.actors.Actor
 import scala.collection.mutable.{Map, ListBuffer}
+import com.verknowsys.served.utils.monitor.Monitored
 
 // TODO: throw custom exception, (or java.io something) instead of just Exception
 // TODO: Handle removed files
@@ -14,7 +15,7 @@ case class FileEvent(val evflags: Int)
  *
  * @author teamon 
  */
-class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => Unit) extends Actor {
+class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => Unit) extends Actor with Monitored {
     case object StopWatching
     
     if(!(new java.io.File(path)).exists()) throw new java.io.FileNotFoundException(path)
@@ -39,6 +40,8 @@ class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => 
     def stop {
         this ! StopWatching
     }
+    
+    override def toString = "KqueueWatcher(" + path + ")"
 }
 
 /**
@@ -75,7 +78,7 @@ class Kqueue extends Thread {
         }
     }
 
-    def register(watcher: KqueueWatcher){
+    def register(watcher: KqueueWatcher) = synchronized {
         // check for path
         idents.find { case(ident, (path, watchers)) => path == watcher.path } match {
             case Some((ident, (path, list))) => 
@@ -106,7 +109,7 @@ class Kqueue extends Thread {
         }
     }
 
-    def remove(watcher: KqueueWatcher){
+    def remove(watcher: KqueueWatcher) = synchronized {
         idents.find { case(ident, (path, watchers)) => path == watcher.path } match {
             case Some((ident, (path, list))) => 
                 list -= watcher

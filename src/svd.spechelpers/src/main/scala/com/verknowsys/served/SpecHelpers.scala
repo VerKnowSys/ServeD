@@ -35,6 +35,11 @@ object SpecHelpers {
     
     def waitFor(time: Int) = Thread.sleep(time)
     
+    // def waitForEnter {
+    //     println("Press enter to continue...")
+    //     System.in.read
+    // }
+    
     class Counter extends Actor {
         case object Stop
         

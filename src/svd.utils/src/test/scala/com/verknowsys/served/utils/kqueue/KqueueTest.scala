@@ -1,6 +1,7 @@
 package com.verknowsys.served.utils.kqueue
 
 import com.verknowsys.served.SpecHelpers._
+import com.verknowsys.served.utils.monitor.Monitor
 import org.specs._
 import java.io._
 import org.apache.commons.io.FileUtils
@@ -9,7 +10,7 @@ import scala.actors.Actor
 
 class KqueueTest extends SpecificationWithJUnit {
     final val DIR = "/tmp/served/kqueue_test"
-    final val N = 500
+    final val N = 50
 
     val range = (1 to N)
         
@@ -149,6 +150,9 @@ class KqueueTest extends SpecificationWithJUnit {
 
 
     private def setup {
+        Monitor.start
+        // waitForEnter
+        
         try { FileUtils.forceDelete(DIR) } catch { case _ => }
     }
 }
