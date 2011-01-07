@@ -141,12 +141,12 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     *   
     */
     def watchLogs = {
-            val watchedFile = "/var/log/kernel.log"
-            Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
-                val raf = new RandomAccessFile(watchedFile, "r")
-                raf.seek(raf.length - 1024)
-                logger.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
-            }
+            // val watchedFile = "/var/log/kernel.log"
+            // Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
+            //                 val raf = new RandomAccessFile(watchedFile, "r")
+            //                 raf.seek(raf.length - 1024)
+            //                 logger.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
+            //             }
         }
     
     
