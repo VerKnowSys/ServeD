@@ -5,10 +5,10 @@ import org.specs._
 
 
 class GitManagerTest extends SpecificationWithJUnit {
-    "GitManager" should {
-        "correctly list repositories" in {
-
-        }
-    }
+    // "GitManager" should {
+    //     "correctly list repositories" in {
+    // 
+    //     }
+    // }
 
 }

@@ -15,7 +15,7 @@ class AccountsManagerTest extends SpecificationWithJUnit {
             Monitor.start
             
             def changePasswdPath(path: String) {
-                val passwd = readFile(System.getProperty("user.dir") + "/src/test/resources/etc/" + path)
+                val passwd = readFile(System.getProperty("user.dir") + "/svd.maintainer/src/test/resources/etc/" + path)
                 writeFile(Config.systemPasswdFile, passwd)
             }      
             

@@ -3,8 +3,8 @@ package com.verknowsys.served.git
 import org.specs._
 
 class GitTest extends SpecificationWithJUnit {
-    "GitRepository" should {
-        "return history" in {
+    // "GitRepository" should {
+        // "return history" in {
 
             // XXX: Write tests
             // val repo = new GitRepository("/Users/teamon/code/verknowsys/ServeD")
@@ -26,6 +26,6 @@ class GitTest extends SpecificationWithJUnit {
             // 	println()
             // }
 
-        }
-    }
+        // }
+    // }
 }
