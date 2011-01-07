@@ -14,7 +14,7 @@ backups
 .swp
 target
 target-eclipse
-build
+# build
 .idea/
 *.iml
 *.iws
