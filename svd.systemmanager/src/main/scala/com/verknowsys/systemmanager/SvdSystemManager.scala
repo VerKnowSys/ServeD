@@ -38,9 +38,6 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                     logger.info("SystemManager ready")
                     watchLogs
                     
-                    val internalShell = new Sigar
-                    val psAll = internalShell.getProcList
-                    logger.trace("Process list: %s".format(psAll.mkString(", "))) // no args == show user threads and sort output
                     reply(Ready)
                     
                 case Quit =>
