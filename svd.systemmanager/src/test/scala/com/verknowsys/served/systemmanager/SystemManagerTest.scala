@@ -10,7 +10,7 @@ import org.specs._
 import java.io._
 
 
-class SvdSystemManagerTest extends SpecificationWithJUnit with UtilsCommon {
+class SvdSystemManagerTest extends Specification with UtilsCommon {
 
 
     "SystemManager object" should {

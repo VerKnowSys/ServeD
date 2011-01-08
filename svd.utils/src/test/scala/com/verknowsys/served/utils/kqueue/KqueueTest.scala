@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils
 import scala.collection.mutable.ListBuffer
 import scala.actors.Actor
 
-class KqueueTest extends SpecificationWithJUnit {
+class KqueueTest extends Specification {
     final val DIR = "/tmp/served/kqueue_test"
     final val N = 50
 

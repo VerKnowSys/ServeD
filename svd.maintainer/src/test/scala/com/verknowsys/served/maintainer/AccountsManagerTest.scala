@@ -9,7 +9,7 @@ import scala.actors.Actor
 import com.verknowsys.served.utils.monitor.Monitor
 
 
-class AccountsManagerTest extends SpecificationWithJUnit {
+class AccountsManagerTest extends Specification {
     "AccountsManager" should {
         "create manager for each account" in {
             Monitor.start

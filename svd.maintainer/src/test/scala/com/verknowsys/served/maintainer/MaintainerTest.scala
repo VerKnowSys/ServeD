@@ -2,7 +2,7 @@ package com.verknowsys.served.maintainer
 
 import org.specs._
 
-class MaintainerTest extends SpecificationWithJUnit {
+class MaintainerTest extends Specification {
     // 
     // "Maintainer" should {
     //     // "Be efficient with counting folder size" in {
