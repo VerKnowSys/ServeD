@@ -4,7 +4,7 @@ import com.verknowsys.served._
 import org.specs._
 
 
-class GitManagerTest extends SpecificationWithJUnit {
+class GitManagerTest extends Specification {
     // "GitManager" should {
     //     "correctly list repositories" in {
     // 

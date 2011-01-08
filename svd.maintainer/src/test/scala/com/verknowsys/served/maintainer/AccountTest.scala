@@ -2,7 +2,7 @@ package com.verknowsys.served.maintainer
 
 import org.specs._
 
-class AccountTest extends SpecificationWithJUnit {
+class AccountTest extends Specification {
     "Account" should {
         
         "be equal" in {

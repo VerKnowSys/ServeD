@@ -2,7 +2,7 @@ package com.verknowsys.served.git
 
 import org.specs._
 
-class GitTest extends SpecificationWithJUnit {
+class GitTest extends Specification {
     // "GitRepository" should {
         // "return history" in {
 

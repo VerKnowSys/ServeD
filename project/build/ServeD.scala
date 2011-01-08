@@ -18,7 +18,6 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         override def parallelExecution = true
         
         val specs     = "org.scala-tools.testing" %% "specs" % "1.6.6"
-        val junit     = "junit" % "junit" % "4.5"
         def commonsio = "commons-io" % "commons-io" % "1.4"
     }
     
@@ -59,6 +58,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdMaintainer(info: ProjectInfo) extends SvdProject(info){
         val dispatch = "net.databinder" %% "dispatch-http" % "0.7.8"
+
+        lazy val served = task { None } dependsOn(run(Array("--monitor")))
         
         override def mainClass = Some("com.verknowsys.served.maintainer.Maintainer")
     }

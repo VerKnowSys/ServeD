@@ -3,7 +3,7 @@ package com.verknowsys.served.utils
 import org.specs._
 import java.io._
 
-class PropertiesTest extends SpecificationWithJUnit {
+class PropertiesTest extends Specification {
     final val configFilename = "/tmp/config.properties"
 
     "Properties object" should {
