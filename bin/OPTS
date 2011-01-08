@@ -1,5 +1,0 @@
-#!/usr/bin/env zsh
-
-export JAVA_OPTS="-Xms32m -XX:NewRatio=1 -Xmx512m -Dfile.encoding=UTF-8 -XX:+UseFastAccessorMethods -Dactors.corePoolSize=8"
-
-export COMMAND="`which sbt`" $@
