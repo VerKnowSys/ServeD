@@ -37,9 +37,7 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                 case Init =>
                     logger.info("SystemManager ready")
                     watchLogs
-                    val internalShell = new Sigar
-                    val psAll = internalShell.getProcList
-                    logger.trace("Process list: %s".format(psAll.mkString)) // no args == show user threads and sort output
+                    
                     reply(Ready)
                     
                 case Quit =>
@@ -64,14 +62,6 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     *   This function is a bridge to low level libc functions
     */
     lazy val posixlib = POSIX.instance
-
-
-    /**
-    *   @author dmilith
-    *   
-    *   This function is a bridge to low level pstree implementation
-    */
-    def pstreelib = Native.loadLibrary("pstree", classOf[PSTREE]).asInstanceOf[PSTREE]
 
 
     /**
@@ -112,17 +102,17 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     def processList(showThreads: Boolean = true, sort: Boolean = true): List[SystemProcess] = {
         val st = if (showThreads) 1 else 0
         val so = if (sort) 1 else 0
-        val sourceList = pstreelib.processes(st, so).split("/").toList.filter { a =>
-                val tmp = a.split(",").head
-                (tmp != "root" && tmp != "init" && tmp != "launchd" && tmp != "") // 2010-10-24 13:59:33 - dmilith - XXX: hardcoded
-        }
-        for (process <- sourceList) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
-            yield
-                new SystemProcess(
-                    processName = process.split(",").head,
-                    pid = process.split(",").last
-                )
-                
+        // val sourceList = pstreelib.processes(st, so).split("/").toList.filter { a =>
+        //                 val tmp = a.split(",").head
+        //                 (tmp != "root" && tmp != "init" && tmp != "launchd" && tmp != "") // 2010-10-24 13:59:33 - dmilith - XXX: hardcoded
+        //         }
+        //         for (process <- sourceList) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
+        //             yield
+        //                 new SystemProcess(
+        //                     processName = process.split(",").head,
+        //                     pid = process.split(",").last
+        //                 )
+        Nil        
     }
     
     

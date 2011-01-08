@@ -1,21 +1,5 @@
 #!/usr/bin/env zsh
 
-if [ `uname` = "Darwin" ]; then
-    export platform="mac"
-    export CC="/usr/bin/clang"
-    export CFLAGS="-arch x86_64 -O2 -fPIC -march=pentium4 -ffast-math -fmessage-length=65" # -pedantic -Werror
-elif [ `uname` = "FreeBSD" ]; then
-    export platform="freebsd"
-    export CC="/usr/local/bin/clang"
-    export CFLAGS="-O2 -fPIC -ffast-math -fmessage-length=65" # -pedantic -Werror
-fi
+export JAVA_OPTS="-Xms32m -XX:NewRatio=1 -Xmx512m -Dfile.encoding=UTF-8 -XX:+UseFastAccessorMethods -Dactors.corePoolSize=8"
 
-export MVN_EXEC="`which mvn`"
-# export MVN_PARAMS="-T C2 -e -Dmaven.test.skip.exec=true -Dmaven.test.skip=true"
-# export MVN_TEST_PARAMS="-T C2 -e"
-
-export JAVA_OPTS="-Xms32m -XX:NewRatio=1 -Xmx512m -Dfile.encoding=UTF-8 -XX:+UseFastAccessorMethods"
-export MAVEN_OPTS_ADDITIONAL="-e -Dmaven.test.skip.exec=true -Dmaven.test.skip=true"
-export MAVEN_OPTS="-Dactors.corePoolSize=8" #" -Djava.library.path=../../lib/ -Djna.library.path=../../lib/"
-
-export COMMAND="`pwd`/bin/runner" $@
+export COMMAND="`which sbt`" $@

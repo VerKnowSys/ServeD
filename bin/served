@@ -5,7 +5,7 @@
 
 args=""
 
-cd src/svd.maintainer/
-MAVEN_OPTS="$MAVEN_OPTS" $MVN_EXEC $MVN_PARAMS exec:java -Dexec.mainClass=com.verknowsys.served.maintainer.Maintainer -Dexec.args=$args $@
+
+$COMMAND "project ServeD Maintainer" run
 
 exit 0

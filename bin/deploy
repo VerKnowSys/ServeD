@@ -2,10 +2,12 @@
 # This Software is a close code project. You may not redistribute this code without permission of author.
 
 
-rm -rf $HOME/.m2/repository/svd/
-git pull origin master # 2010-12-11 17:12:32 - dmilith - NOTE: master is production branch
+. bin/OPTS
+
+
 bin/clean
-bin/install
+bin/compile
 bin/test
+$COMMAND package
 
 exit 0
