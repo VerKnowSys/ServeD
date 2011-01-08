@@ -57,6 +57,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdMaintainer(info: ProjectInfo) extends SvdProject(info){
         val dispatch = "net.databinder" %% "dispatch-http" % "0.7.8"
+
+        lazy val served = task { None } dependsOn(run(Array("--monitor")))
         
         override def mainClass = Some("com.verknowsys.served.maintainer.Maintainer")
     }
