@@ -14,15 +14,16 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
 
     // Dependencies
     class SvdProject(info: ProjectInfo) extends DefaultProject(info){
-        override def compileOptions = Unchecked :: Deprecation :: Nil
+        override def compileOptions = Nil // 2011-01-08 16:12:44 - dmilith - NOTE: don't ignore such things!      Unchecked :: Deprecation :: 
         override def parallelExecution = true
         
-        val specs     = "org.scala-tools.testing" %% "specs" % "1.6.6"// % "test"
-        val junit     = "junit" % "junit" % "4.5"// % "test"
+        val specs     = "org.scala-tools.testing" %% "specs" % "1.6.6"
+        val junit     = "junit" % "junit" % "4.5"
         def commonsio = "commons-io" % "commons-io" % "1.4"
     }
     
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
+    
     class SvdCli(info: ProjectInfo) extends SvdProject(info) {
         lazy val cli = task { None; } dependsOn(run(Array("127.0.0.1", "5555")))
         
@@ -30,6 +31,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
     
     class SvdSystemManager(info: ProjectInfo) extends SvdProject(info)
+    
     class SvdNotifications(info: ProjectInfo) extends SvdProject(info)
     
     class SvdSpecHelpers(info: ProjectInfo) extends SvdProject(info){
