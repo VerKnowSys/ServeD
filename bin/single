@@ -1,6 +1,0 @@
-#!/usr/bin/env zsh
-
-
-cd "src/svd.$1"
-
-mvn clean compile install | ../../bin/color
