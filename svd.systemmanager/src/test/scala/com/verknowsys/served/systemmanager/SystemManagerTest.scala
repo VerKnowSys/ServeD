@@ -68,7 +68,7 @@ class SvdSystemManagerTest extends SpecificationWithJUnit with UtilsCommon {
                     a -= 1
                 }
                 val stop = (new java.util.Date).getTime
-                println("%d invokes took: %d miliseconds to finish".format(a, (stop-start)))    
+                println("%d invokes took: %d miliseconds to finish".format(100, (stop-start)))    
                 println("ps: %s".format(ps.mkString(", ")))
             }
             
@@ -82,7 +82,7 @@ class SvdSystemManagerTest extends SpecificationWithJUnit with UtilsCommon {
                     a -= 1
                 }
                 val stop = (new java.util.Date).getTime
-                println("%d invokes took: %d miliseconds to finish".format(a, (stop-start)))    
+                println("%d invokes took: %d miliseconds to finish".format(100, (stop-start)))    
                 println("psDmilith: %s".format(psDmilith.mkString(", ")))
             }
             val cred2 = internalShell.getProcCred(pid)
