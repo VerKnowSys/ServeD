@@ -6,10 +6,4 @@
 
 $COMMAND clean $*
 
-# also clean up native libs
-cd lib/pstree
-# make clean
-rm test/test
-cd ../../
-
 exit 0

@@ -6,6 +6,6 @@
 args=""
 
 
-sbt "project ServeD Maintainer" run
+$COMMAND "project ServeD Maintainer" run
 
 exit 0
