@@ -10,6 +10,7 @@ import com.verknowsys.served.utils.kqueue._
 import com.verknowsys.served.utils.monitor.Monitored
 import com.verknowsys.served.systemmanager._
 
+import org.hyperic.sigar._
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -36,8 +37,9 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                 case Init =>
                     logger.info("SystemManager ready")
                     watchLogs
-                    
-                    logger.trace("Process list: %s".format(processList().mkString)) // no args == show user threads and sort output
+                    val internalShell = new Sigar
+                    val psAll = internalShell.getProcList
+                    logger.trace("Process list: %s".format(psAll.mkString)) // no args == show user threads and sort output
                     reply(Ready)
                     
                 case Quit =>
@@ -139,12 +141,12 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     *   
     */
     def watchLogs = {
-            val watchedFile = "/var/log/kernel.log"
-            Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
-                val raf = new RandomAccessFile(watchedFile, "r")
-                raf.seek(raf.length - 1024)
-                logger.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
-            }
+            // val watchedFile = "/var/log/kernel.log"
+            // Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
+            //                 val raf = new RandomAccessFile(watchedFile, "r")
+            //                 raf.seek(raf.length - 1024)
+            //                 logger.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
+            //             }
         }
     
     

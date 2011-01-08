@@ -39,6 +39,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     class SvdUtils(info: ProjectInfo) extends SvdProject(info){
         val jgitRepository = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
         val javaNet        = "java.net" at "http://download.java.net/maven/2"
+        val sigarSource = "org.hyperic" at "http://repository.jboss.org/maven2"
         
         val commons     = commonsio
         val log4j       = "log4j" % "log4j" % "1.2.14"
@@ -51,6 +52,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val jgit        = "org.eclipse.jgit" % "org.eclipse.jgit" % "0.10.0-SNAPSHOT"
         val jna         = "net.java.dev.jna" % "jna" % "3.2.5"
         val swing       = "org.scala-lang" % "scala-swing" % "2.8.1"
+        val sigar       = "org.hyperic" % "sigar" % "1.6.3.82"
     }
     
     class SvdMaintainer(info: ProjectInfo) extends SvdProject(info){
