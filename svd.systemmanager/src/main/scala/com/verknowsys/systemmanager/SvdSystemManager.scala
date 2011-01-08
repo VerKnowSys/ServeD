@@ -10,6 +10,7 @@ import com.verknowsys.served.utils.kqueue._
 import com.verknowsys.served.utils.monitor.Monitored
 import com.verknowsys.served.systemmanager._
 
+import org.hyperic.sigar._
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -37,7 +38,6 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                     logger.info("SystemManager ready")
                     watchLogs
                     
-                    logger.trace("Process list: %s".format(processList().mkString)) // no args == show user threads and sort output
                     reply(Ready)
                     
                 case Quit =>
@@ -62,14 +62,6 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     *   This function is a bridge to low level libc functions
     */
     lazy val posixlib = POSIX.instance
-
-
-    /**
-    *   @author dmilith
-    *   
-    *   This function is a bridge to low level pstree implementation
-    */
-    def pstreelib = Native.loadLibrary("pstree", classOf[PSTREE]).asInstanceOf[PSTREE]
 
 
     /**
@@ -110,17 +102,17 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     def processList(showThreads: Boolean = true, sort: Boolean = true): List[SystemProcess] = {
         val st = if (showThreads) 1 else 0
         val so = if (sort) 1 else 0
-        val sourceList = pstreelib.processes(st, so).split("/").toList.filter { a =>
-                val tmp = a.split(",").head
-                (tmp != "root" && tmp != "init" && tmp != "launchd" && tmp != "") // 2010-10-24 13:59:33 - dmilith - XXX: hardcoded
-        }
-        for (process <- sourceList) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
-            yield
-                new SystemProcess(
-                    processName = process.split(",").head,
-                    pid = process.split(",").last
-                )
-                
+        // val sourceList = pstreelib.processes(st, so).split("/").toList.filter { a =>
+        //                 val tmp = a.split(",").head
+        //                 (tmp != "root" && tmp != "init" && tmp != "launchd" && tmp != "") // 2010-10-24 13:59:33 - dmilith - XXX: hardcoded
+        //         }
+        //         for (process <- sourceList) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
+        //             yield
+        //                 new SystemProcess(
+        //                     processName = process.split(",").head,
+        //                     pid = process.split(",").last
+        //                 )
+        Nil        
     }
     
     
@@ -139,12 +131,12 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     *   
     */
     def watchLogs = {
-            val watchedFile = "/var/log/kernel.log"
-            Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
-                val raf = new RandomAccessFile(watchedFile, "r")
-                raf.seek(raf.length - 1024)
-                logger.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
-            }
+            // val watchedFile = "/var/log/kernel.log"
+            // Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
+            //                 val raf = new RandomAccessFile(watchedFile, "r")
+            //                 raf.seek(raf.length - 1024)
+            //                 logger.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
+            //             }
         }
     
     

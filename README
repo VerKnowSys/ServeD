@@ -8,21 +8,27 @@
 0. Requirements:
 
 	0.1 - Java
-	    >= Latest 1.6, 32-bit
+	    >= Latest 1.6, 32/ 64-bit
 
-	0.2 - Maven
-	    >= 3.x
+	0.2 - Simple Build Tool (sbt)
+	    >= 0.7.4
 
-	0.3 - Scala
+	0.3 - Scala (will be downloaded by sbt)
 	    >= 2.8.1
 	    
     0.4 - ZSH Shell
         >= 4.3.10
     
-	0.5 - System libraries in 32bit architecture:
-	    - libc6-dev-i386 package (on Debian), or equivalent.
+	0.5 - Sigar library
+	    >= 1.6.3.82
+	    
+	0.6 - Smack library (for XMPP Notifications)
+	    >= 3.0.4
 
-	0.6 - List of currently supported platforms:
+    0.7 - pIRCbot library (for IRC Notifications)
+        >= 1.4.2
+        
+	0.8 - List of currently supported platforms:
 	    Mac OSX (100% features, development),
 	    Free BSD (100% features, production),
 
@@ -30,12 +36,12 @@
 
 1. Instalation
 	1.1 - sudo bin/installNativeLibraries
-	1.2 - bin/deploy
+	1.2 - sbt "project ServeD Maintainer" run
 
 
 
 2. Testing
-    2.1 - Use bin/test
+    2.1 - Use sbt test
 
 That's all folks
 

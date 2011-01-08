@@ -5,7 +5,7 @@
 
 args=""
 
-cd src/svd.utils/
-MAVEN_OPTS="$MAVEN_OPTS" $MVN_EXEC $MVN_PARAMS exec:java -Dexec.mainClass=com.verknowsys.served.utils.monitor.MonitorDisplay -Dexec.args="$args $@"
+
+$COMMAND "project ServeD Utils" run
 
 exit 0

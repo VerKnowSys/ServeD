@@ -4,6 +4,7 @@
 
 . bin/OPTS
 
-$COMMAND scala:doc
+
+$COMMAND doc
 
 exit 0
