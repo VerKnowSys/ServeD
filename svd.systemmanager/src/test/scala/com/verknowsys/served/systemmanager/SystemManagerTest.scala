@@ -51,39 +51,38 @@ class SvdSystemManagerTest extends SpecificationWithJUnit with UtilsCommon {
             
             val pid = internalShell.getPid
             val procExec = internalShell.getProcExe(pid)
+            println("CWD of PID: %s, Name of executable: %s".format(procExec.getCwd, procExec.getName))
+            
             val procStat = internalShell.getProcState(pid)
             println("Proc name: %s, Parent pid: %d, Threads no: %d @ TTY: %s, Priority: %d, Nice: %d".format(procStat.getName, procStat.getPpid, procStat.getThreads, procStat.getTty, procStat.getPriority, procStat.getNice))
-            println("CWD of PID: %s, Name of executable: %s".format(procExec.getCwd, procExec.getName))
             
             val cred = internalShell.getProcCredName(pid)
             println("Creds: %s".format(cred.toString))
             
             for (i <- 0 to 5) {
                 var a = 100
-                var ps: List[Long] = Nil
 
                 val start = (new java.util.Date).getTime
                 while (a > 1) {
-                    ps = internalShell.getProcList.toList
+                    internalShell.getProcList
                     a -= 1
                 }
                 val stop = (new java.util.Date).getTime
                 println("%d invokes took: %d miliseconds to finish".format(100, (stop-start)))    
-                println("ps: %s".format(ps.mkString(", ")))
+                // println("ps: %s".format(ps.mkString(", ")))
             }
             
             for (i <- 0 to 5) {
                 var a = 100
-                var psDmilith: List[Long] = Nil
 
                 val start = (new java.util.Date).getTime
                 while (a > 1) {
-                    psDmilith = internalShell.getProcList.filter{ x => internalShell.getProcCredName(x).getUser != "dmilith" }.toList
+                    internalShell.getProcList.filter{ x => internalShell.getProcCredName(x).getUser != "dmilith" }
                     a -= 1
                 }
                 val stop = (new java.util.Date).getTime
-                println("%d invokes took: %d miliseconds to finish".format(100, (stop-start)))    
-                println("psDmilith: %s".format(psDmilith.mkString(", ")))
+                println("%d invokes of dmilith processes took: %d miliseconds to finish".format(100, (stop-start)))    
+                // println("psDmilith: %s".format(psDmilith.mkString(", ")))
             }
             val cred2 = internalShell.getProcCred(pid)
             println("Creds: %s".format(cred2.toString))
