@@ -46,17 +46,17 @@ class SvdSystemManagerTest extends SpecificationWithJUnit with UtilsCommon {
         
         "it must be able to get a bunch of system info/ data" in {
             
-            val internalShell = new Sigar            
-            val psAll = internalShell.getProcList
+            val sigarCore = new Sigar            
+            val psAll = sigarCore.getProcList
             
-            val pid = internalShell.getPid
-            val procExec = internalShell.getProcExe(pid)
+            val pid = sigarCore.getPid
+            val procExec = sigarCore.getProcExe(pid)
             println("CWD of PID: %s, Name of executable: %s".format(procExec.getCwd, procExec.getName))
             
-            val procStat = internalShell.getProcState(pid)
+            val procStat = sigarCore.getProcState(pid)
             println("Proc name: %s, Parent pid: %d, Threads no: %d @ TTY: %s, Priority: %d, Nice: %d".format(procStat.getName, procStat.getPpid, procStat.getThreads, procStat.getTty, procStat.getPriority, procStat.getNice))
             
-            val cred = internalShell.getProcCredName(pid)
+            val cred = sigarCore.getProcCredName(pid)
             println("Creds: %s".format(cred.toString))
             
             for (i <- 0 to 5) {
@@ -64,7 +64,7 @@ class SvdSystemManagerTest extends SpecificationWithJUnit with UtilsCommon {
 
                 val start = (new java.util.Date).getTime
                 while (a > 1) {
-                    internalShell.getProcList
+                    sigarCore.getProcList
                     a -= 1
                 }
                 val stop = (new java.util.Date).getTime
@@ -77,36 +77,47 @@ class SvdSystemManagerTest extends SpecificationWithJUnit with UtilsCommon {
 
                 val start = (new java.util.Date).getTime
                 while (a > 1) {
-                    internalShell.getProcList.filter{ x => internalShell.getProcCredName(x).getUser != "dmilith" }
+                    sigarCore.getProcList.filter{ x => sigarCore.getProcCredName(x).getUser != "dmilith" }
                     a -= 1
                 }
                 val stop = (new java.util.Date).getTime
                 println("%d invokes of dmilith processes took: %d miliseconds to finish".format(100, (stop-start)))    
                 // println("psDmilith: %s".format(psDmilith.mkString(", ")))
             }
-            val cred2 = internalShell.getProcCred(pid)
+            val cred2 = sigarCore.getProcCred(pid)
             println("Creds: %s".format(cred2.toString))
             
-            val gath: Double = internalShell.getUptime.getUptime
+            val gath: Double = sigarCore.getUptime.getUptime
             println("Uptime: %s".format(gath.toString))
             
-            val mem = internalShell.getMem
+            val mem = sigarCore.getMem
             println("Memory: %s Free, %s Used, %s Total".format(mem.getFree, mem.getUsed, mem.getTotal))
             
-            val load = internalShell.getLoadAverage
+            val load = sigarCore.getLoadAverage
             println("Load Average: %s / %s / %s".format(load(0), load(1), load(2)))
             
-            val disk = internalShell.getDiskUsage("/dev/disk0s2")
+            val disk = sigarCore.getDiskUsage("/dev/disk0s2")
             println("Disk usages: %s ".format(disk))
             
-            val sysStat = internalShell.getProcStat
+            val sysStat = sigarCore.getProcStat
             println("Total processes in system: %s".format(sysStat.getTotal))
             println("Process list: %s".format(psAll.mkString(", "))) // no args == show user threads and sort output
             
+            SigarAPI.initSigar
             for (i <- psAll) {
-                val procStat2 = internalShell.getProcState(i)
-                println("Proc name: %s, Parent pid: %d, Threads no: %d @ TTY: %s, Priority: %d, Nice: %d".format(procStat2.getName, procStat2.getPpid, procStat2.getThreads, procStat2.getTty, procStat2.getPriority, procStat2.getNice))
-                
+                val procStat2 = SigarAPI.getProcStat(pid)
+                println("Proc name: %s, Parent pid: %d, Threads no: %d @ TTY: %s, Priority: %d, Nice: %d".format(
+                    procStat2.getName,
+                    procStat2.getPpid,
+                    procStat2.getThreads,
+                    procStat2.getTty,
+                    procStat2.getPriority,
+                    procStat2.getNice))
+            }
+            
+            for (i <- psAll.toList.sort{ sigarCore.getProcState(_).getName < sigarCore.getProcState(_).getName}) {
+                val procstat3 = sigarCore.getProcState(i)
+                println("PS alphabetic: %s".format(procstat3))
             }
             
             psAll.size must beGreaterThan(10)
