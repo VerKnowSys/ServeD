@@ -37,6 +37,9 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                 case Init =>
                     logger.info("SystemManager ready")
                     watchLogs
+                    val core = new Sigar
+                    logger.debug(new NativeSystemProcess(core.getPid))
+                    
                     reply(Ready)
                     
                 case Quit =>
