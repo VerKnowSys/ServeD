@@ -41,12 +41,12 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                     logger.debug(new NativeSystemProcess(core.getPid))
                     val psAll = core.getProcList.toList
                     logger.debug("psAll: %s".format(psAll.mkString(", ")))
+                    logger.warn(new NativeSystemResources)
                     psAll.foreach {
                         p =>
                         	logger.info(new NativeSystemProcess(p))
                             
                     }
-                    
                     reply(Ready)
                     
                 case Quit =>
