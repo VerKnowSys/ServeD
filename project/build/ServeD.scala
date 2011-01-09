@@ -1,4 +1,7 @@
 import sbt._
+import growl._
+import extract._
+
 
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
     // Projects
@@ -13,12 +16,14 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     override def parallelExecution = true
 
     // Dependencies
-    class SvdProject(info: ProjectInfo) extends DefaultProject(info){
-        override def compileOptions = Nil // 2011-01-08 16:12:44 - dmilith - NOTE: don't ignore such things!      Unchecked :: Deprecation :: 
+    class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject {
+        override def compileOptions =  Unchecked :: Deprecation :: Nil
         override def parallelExecution = true
+        override def installActions = "update" :: "run" :: Nil
         
         val specs     = "org.scala-tools.testing" %% "specs" % "1.6.6"
         def commonsio = "commons-io" % "commons-io" % "1.4"
+        
     }
     
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
@@ -33,7 +38,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdNotifications(info: ProjectInfo) extends SvdProject(info)
     
-    class SvdSpecHelpers(info: ProjectInfo) extends SvdProject(info){
+    class SvdSpecHelpers(info: ProjectInfo) extends SvdProject(info) {
         val commons = commonsio
     }
     
