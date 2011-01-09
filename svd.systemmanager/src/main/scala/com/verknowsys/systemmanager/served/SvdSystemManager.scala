@@ -37,7 +37,6 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                 case Init =>
                     logger.info("SystemManager ready")
                     watchLogs
-                    
                     reply(Ready)
                     
                 case Quit =>
@@ -45,23 +44,16 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                     reply(Ready)
                     exit
                 
-                case SendSignal(signal, pid) =>
-                    sendSignalToPid(signal, pid)
-                    logger.trace("Send Signal Request, received with signal %s, for pid: %s".format(signal, pid))
-                
-                case _ => messageNotRecognized(_)
+                // case SendSignal(signal, pid) =>
+                    // logger.trace("Send Signal Request, received with signal %s, for pid: %s".format(signal, pid))
+                    // reply(Ready)
                     
+                case _ =>
+                    messageNotRecognized(_)
+                    reply(Ready)
             }
         }
     }
-
-
-    /**
-    *   @author dmilith
-    *   
-    *   This function is a bridge to low level libc functions
-    */
-    lazy val posixlib = POSIX.instance
 
 
     /**
@@ -69,18 +61,18 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     *   
     *   This function will send given signal (first param), to given pid (second param)
     */
-    def sendSignalToPid(signal: POSIXSignals.Value, @specialized pid: Int) =
+    def sendSignalToPid(signal: POSIX.Value, @specialized pid: Int) =
         signal match {
-            case POSIXSignals.SIGHUP =>
+            case POSIX.SIGHUP =>
                 logger.trace("SigHUP sent to process pid: %s".format(pid))
                 
-            case POSIXSignals.SIGINT =>
+            case POSIX.SIGINT =>
                 logger.trace("SigINT sent to process pid: %s".format(pid))
                 
-            case POSIXSignals.SIGQUIT =>
+            case POSIX.SIGQUIT =>
                 logger.trace("SigQUIT sent to process pid: %s".format(pid))
                 
-            case POSIXSignals.SIGKILL =>
+            case POSIX.SIGKILL =>
                 logger.trace("SigKILL sent to process pid: %s".format(pid))
             
             case _ => messageNotRecognized(_)                
@@ -99,9 +91,9 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     *           If true then it will return sorted alphabetically list of processes.
     *
     */
-    def processList(showThreads: Boolean = true, sort: Boolean = true): List[SystemProcess] = {
-        val st = if (showThreads) 1 else 0
-        val so = if (sort) 1 else 0
+    // def processList(showThreads: Boolean = true, sort: Boolean = true): List[SystemProcess] = {
+        // val st = if (showThreads) 1 else 0
+        // val so = if (sort) 1 else 0
         // val sourceList = pstreelib.processes(st, so).split("/").toList.filter { a =>
         //                 val tmp = a.split(",").head
         //                 (tmp != "root" && tmp != "init" && tmp != "launchd" && tmp != "") // 2010-10-24 13:59:33 - dmilith - XXX: hardcoded
@@ -109,11 +101,11 @@ object SvdSystemManager extends Actor with Monitored with Utils {
         //         for (process <- sourceList) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
         //             yield
         //                 new SystemProcess(
-        //                     processName = process.split(",").head,
+        //                     name = process.split(",").head,
         //                     pid = process.split(",").last
         //                 )
-        Nil        
-    }
+        // Nil        
+    // }
     
     
     /**
@@ -121,7 +113,7 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     *   
     *   Returns System Process count.
     */
-    @specialized def processCount(@specialized showThreads: Boolean = true, @specialized sort: Boolean = true) = processList(showThreads, sort).size
+    // @specialized def processCount(@specialized showThreads: Boolean = true, @specialized sort: Boolean = true) = processList(showThreads, sort).size
     
     
     
