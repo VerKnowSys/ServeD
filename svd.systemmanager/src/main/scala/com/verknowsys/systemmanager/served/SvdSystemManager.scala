@@ -43,18 +43,7 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                     logger.debug("psAll: %s".format(psAll.mkString(", ")))
                     psAll.foreach {
                         p =>
-                            
-                            try {
-                            	logger.info(new NativeSystemProcess(p))}
-                            catch { 
-                              case e: SigarFileNotFoundException =>
-                                logger.warn("SigarFileNotFoundException thrown.. Ignored (%s)".format(e.getMessage))
-                              case f: SigarException =>
-                                logger.warn("SigarException thrown.. Ignored (%s)".format(f.getMessage))
-                              case _ => 
-                            } finally {
-                              
-                            }
+                        	logger.info(new NativeSystemProcess(p))
                             
                     }
                     
