@@ -38,6 +38,6 @@ class NativeSystemProcess(val pid: Long) {
     val sharedMem: Long = mem.getShare
     
     
-    override def toString = "N: %s, RES: %d, SHR: %d PID: %d, PPID: %d, THR: %d, PRIO: %d, NI: %d, PARAMS: [%s], CWD: [%s], TIME_START: %d, TIME_KERNEL: %d, TIME_TOTAL: %d, TIME_USER: %d, ENV: [%s] ".format(name, residentMem, sharedMem, pid, ppid, thr, prio, nice, params, cwd, timeStart, timeKernel, timeTotal, timeUser, env.mkString("#\n"))
+    override def toString = "N: %s, RES: %d, SHR: %d PID: %d, PPID: %d, THR: %d, PRIO: %d, NI: %d, PARAMS: [%s], CWD: [%s], TIME_START: %d, TIME_KERNEL: %d, TIME_TOTAL: %d, TIME_USER: %d, ENV: [%s] ".format(name, residentMem, sharedMem, pid, ppid, thr, prio, nice, params.mkString(" "), cwd, timeStart, timeKernel, timeTotal, timeUser, env.mkString("#\n"))
     
 }
