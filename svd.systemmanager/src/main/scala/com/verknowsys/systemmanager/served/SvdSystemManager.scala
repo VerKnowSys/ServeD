@@ -17,7 +17,7 @@ import java.io.RandomAccessFile
 import scala.actors.Actor
 import scala.actors.Actor._
 import com.sun.jna.{Native, Library}
-
+import scala.collection.JavaConversions._
 
 
 /**
@@ -39,6 +39,21 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                     watchLogs
                     val core = new Sigar
                     logger.debug(new NativeSystemProcess(core.getPid))
+                    val psAll = core.getProcList.toList
+                    logger.debug("psAll: %s".format(psAll.mkString(", ")))
+                    psAll.foreach {
+                        p =>
+                            
+                            try {
+                            	logger.info(new NativeSystemProcess(p))}
+                            catch { 
+                              case e: Throwable => e.printStackTrace();
+                              case _ => 
+                            } finally {
+                              
+                            }
+                            
+                    }
                     
                     reply(Ready)
                     

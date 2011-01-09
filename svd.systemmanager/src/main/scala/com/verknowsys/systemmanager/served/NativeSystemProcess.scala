@@ -11,7 +11,6 @@ import scala.collection.JavaConversions._
  */
 class NativeSystemProcess(val pid: Long) {
     
-    
     private val core = new Sigar
     private val stat = core.getProcState(pid)
     private val cpu = core.getProcCpu(pid)
@@ -31,12 +30,19 @@ class NativeSystemProcess(val pid: Long) {
     val timeTotal: Long = cpu.getTotal
     val timeUser: Long = cpu.getUser
     
-    val env = core.getProcEnv(pid).toMap
+    val env = try {
+    	core.getProcEnv(pid).toMap }
+    catch { 
+      case e: Throwable =>
+          e.printStackTrace
+          null
+    }
+    
     val residentMem: Long = mem.getResident
     val sharedMem: Long = mem.getShare
 
     val openFiles: Long = -1
     
-    override def toString = "N: %s, RES: %d, SHR: %d PID: %d, PPID: %d, THR: %d, PRIO: %d, NI: %d, PARAMS: [%s], TIME_START: %d, TIME_KERNEL: %d, TIME_TOTAL: %d, TIME_USER: %d, ENV: [%s], OPEN_FILES: %d ".format(name, residentMem, sharedMem, pid, ppid, thr, prio, nice, params.mkString(" "), timeStart, timeKernel, timeTotal, timeUser, env.mkString("\n"), openFiles)
+    override def toString = "N: %s, RES: %d, SHR: %d PID: %d, PPID: %d, THR: %d, PRIO: %d, NI: %d, PARAMS: [%s], TIME_START: %d, TIME_KERNEL: %d, TIME_TOTAL: %d, TIME_USER: %d, ENV: [%s], OPEN_FILES: %d\n\n".format(name, residentMem, sharedMem, pid, ppid, thr, prio, nice, params.mkString(" "), timeStart, timeKernel, timeTotal, timeUser, Some(env.mkString("\n")) getOrElse Nil.mkString("\n"), openFiles)
     
 }
