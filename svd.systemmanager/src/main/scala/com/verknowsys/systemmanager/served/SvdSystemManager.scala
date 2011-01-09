@@ -47,7 +47,10 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                             try {
                             	logger.info(new NativeSystemProcess(p))}
                             catch { 
-                              case e: Throwable => e.printStackTrace();
+                              case e: SigarFileNotFoundException =>
+                                logger.warn("SigarFileNotFoundException thrown.. Ignored (%s)".format(e.getMessage))
+                              case f: SigarException =>
+                                logger.warn("SigarException thrown.. Ignored (%s)".format(f.getMessage))
                               case _ => 
                             } finally {
                               
