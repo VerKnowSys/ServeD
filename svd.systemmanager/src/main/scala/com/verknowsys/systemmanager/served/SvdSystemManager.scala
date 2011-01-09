@@ -36,7 +36,6 @@ object SvdSystemManager extends Actor with Monitored with Utils {
             receive {
                 case Init =>
                     logger.info("SystemManager ready")
-                    watchLogs
                     val core = new Sigar
                     logger.debug(new NativeSystemProcess(core.getPid))
                     val psAll = core.getProcList.toList
@@ -44,7 +43,7 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                     logger.warn(new NativeSystemResources)
                     psAll.foreach {
                         p =>
-                        	logger.info(new NativeSystemProcess(p))
+                        	logger.trace(new NativeSystemProcess(p))
                             
                     }
                     reply(Ready)

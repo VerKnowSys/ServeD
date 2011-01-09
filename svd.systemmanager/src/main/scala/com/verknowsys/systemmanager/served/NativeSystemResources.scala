@@ -28,6 +28,6 @@ class NativeSystemResources {
     val memTotal = mem.getTotal
     val memUsagePercentage = mem.getUsedPercent
     
-    override def toString = "MEM_USED:[%d]. MEM_FREE:[%d], MEM_TOTAL[%d], MEM_USAGE_PERC[%f], SWAP_USED:[%d], SWAP_FREE:[%d], SWAP_TOTAL:[%d], TCP_CONN_OPEN:[%d], TCP_FAILED_ATT:[%d], TCP_IN_ERROR:[%d], ".format(memUsed, memFree, memTotal, memUsagePercentage, swapUsed, swapFree, swapTotal, tcpConnections, tcpFailedAttempts, tcpInError)
+    override def toString = "# MEM_USED:[%d],\nMEM_FREE:[%d],\nMEM_TOTAL[%d],\nMEM_USAGE_PERC[%f],\nSWAP_USED:[%d],\nSWAP_FREE:[%d],\nSWAP_TOTAL:[%d],\nTCP_CONN_OPEN:[%d],\nTCP_FAILED_ATT:[%d],\nTCP_IN_ERROR:[%d]\n".format(memUsed, memFree, memTotal, memUsagePercentage, swapUsed, swapFree, swapTotal, tcpConnections, tcpFailedAttempts, tcpInError)
     
 }

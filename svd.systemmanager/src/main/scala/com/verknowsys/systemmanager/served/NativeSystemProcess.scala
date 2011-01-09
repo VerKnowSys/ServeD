@@ -16,26 +16,26 @@ class NativeSystemProcess(val pid: Long) {
     private val mem = core.getProcMem(pid)
     
     
-    val name: String = stat.getName
-    val user: String = core.getProcCredName(pid).getUser
-    val ppid: Long = stat.getPpid
-    val thr: Long = stat.getThreads
-    val prio: Long = stat.getPriority
-    val nice: Long = stat.getNice
+    val name = stat.getName
+    val user = core.getProcCredName(pid).getUser
+    val ppid = stat.getPpid
+    val thr = stat.getThreads
+    val prio = stat.getPriority
+    val nice = stat.getNice
     val params: Array[String] = core.getProcArgs(pid)
     
-    val timeStart: Long = cpu.getStartTime
-    val timeKernel: Long = cpu.getSys
-    val timeTotal: Long = cpu.getTotal
-    val timeUser: Long = cpu.getUser
+    val timeStart = cpu.getStartTime
+    val timeKernel = cpu.getSys
+    val timeTotal = cpu.getTotal
+    val timeUser = cpu.getUser
     
     // val env = core.getProcEnv(pid).toMap
     
-    val rss: Long = mem.getResident
-    val shr: Long = mem.getShare
+    val rss = mem.getResident
+    val shr = mem.getShare
     
     val openFiles: Long = -1
     
-    override def toString = "NAME:[%s], USER:[%s] RES:[%d], SHR:[%d], PID:[%d], PPID:[%d], THREADS:[%d], PRIO:[%d], NICE:[%d], PARAMS:[%s], TIME_START:[%d], TIME_KERNEL:[%d], TIME_TOTAL:[%d], TIME_USER:[%d], OPEN_FILES:[%d]\n\n".format(name, user, rss, shr, pid, ppid, thr, prio, nice, params.mkString(" "), timeStart, timeKernel, timeTotal, timeUser, openFiles)
+    override def toString = "#\nPNAME:[%s],\nUSER:[%s],\nRES:[%d],\nSHR:[%d],\nPID:[%d],\nPPID:[%d],\nTHREADS:[%d],\nPRIO:[%d],\nNICE:[%d],\nPARAMS:[%s],\nTIME_START:[%d],\nTIME_KERNEL:[%d], TIME_TOTAL:[%d],\nTIME_USER:[%d],\nOPEN_FILES:[%d]\n".format(name, user, rss, shr, pid, ppid, thr, prio, nice, params.mkString(" "), timeStart, timeKernel, timeTotal, timeUser, openFiles)
     
 }
