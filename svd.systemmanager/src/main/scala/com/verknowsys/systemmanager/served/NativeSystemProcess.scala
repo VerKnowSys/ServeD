@@ -36,6 +36,6 @@ class NativeSystemProcess(val pid: Long) {
     
     val openFiles: Long = -1
     
-    override def toString = "NAME:[%s], RES:[%d], SHR:[%d], PID:[%d], PPID:[%d], THREADS:[%d], PRIO:[%d], NICE:[%d], PARAMS:[%s], TIME_START:[%d], TIME_KERNEL:[%d], TIME_TOTAL:[%d], TIME_USER:[%d], OPEN_FILES:[%d]\n\n".format(name, rss, shr, pid, ppid, thr, prio, nice, params.mkString(" "), timeStart, timeKernel, timeTotal, timeUser, openFiles)
+    override def toString = "NAME:[%s], USER:[%s] RES:[%d], SHR:[%d], PID:[%d], PPID:[%d], THREADS:[%d], PRIO:[%d], NICE:[%d], PARAMS:[%s], TIME_START:[%d], TIME_KERNEL:[%d], TIME_TOTAL:[%d], TIME_USER:[%d], OPEN_FILES:[%d]\n\n".format(name, user, rss, shr, pid, ppid, thr, prio, nice, params.mkString(" "), timeStart, timeKernel, timeTotal, timeUser, openFiles)
     
 }
