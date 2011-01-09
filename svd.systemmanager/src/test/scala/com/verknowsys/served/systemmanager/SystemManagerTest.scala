@@ -1,7 +1,7 @@
 package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served.utils._
-import POSIXSignals._
+import POSIX._
 import com.verknowsys.served.systemmanager._
 import com.verknowsys.served.systemmanager.SvdSystemManager._
 
@@ -26,20 +26,6 @@ class SvdSystemManagerTest extends Specification with UtilsCommon {
             SIGINT.id must_== 2
             SIGQUIT.id must_== 3
             SIGKILL.id must_== 9
-
-        }
-        
-        
-        "make usage of posixlib functions well" in {
-
-            posixlib.mkdir("/tmp/newdir", 0777)
-            (new File("/tmp/newdir")).exists must_== true
-            (new File("/tmp/newdir")).isDirectory must_== true
-            posixlib.rename("/tmp/newdir", "/tmp/renamedir")
-            (new File("/tmp/newdir")).exists must_== false
-            (new File("/tmp/renamedir")).exists must_== true
-            (new File("/tmp/renamedir")).isDirectory must_== true
-            posixlib.chmod("/tmp/renamedir/file1", 0755)
 
         }
         
@@ -102,18 +88,6 @@ class SvdSystemManagerTest extends Specification with UtilsCommon {
             val sysStat = sigarCore.getProcStat
             println("Total processes in system: %s".format(sysStat.getTotal))
             println("Process list: %s".format(psAll.mkString(", "))) // no args == show user threads and sort output
-            
-            SigarAPI.initSigar
-            for (i <- psAll) {
-                val procStat2 = SigarAPI.getProcStat(pid)
-                println("Proc name: %s, Parent pid: %d, Threads no: %d @ TTY: %s, Priority: %d, Nice: %d".format(
-                    procStat2.getName,
-                    procStat2.getPpid,
-                    procStat2.getThreads,
-                    procStat2.getTty,
-                    procStat2.getPriority,
-                    procStat2.getNice))
-            }
             
             for (i <- psAll.toList.sort{ sigarCore.getProcState(_).getName < sigarCore.getProcState(_).getName}) {
                 val procstat3 = sigarCore.getProcState(i)
