@@ -4,7 +4,7 @@ import org.hyperic.sigar._
 import scala.collection.JavaConversions._
 
 /**
- * Class which describe any system process
+ * Class which describes any system process
  * 
  * @author dmilith
  */
@@ -37,7 +37,7 @@ class NativeSystemProcess(val pid: Long) {
     val openFiles = -1L
     
     override def toString =
-        ("\n" +
+        (
         "PNAME:[%s],\n" +
         "USER:[%s],\n" +
         "RES:[%s],\n" +

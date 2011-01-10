@@ -17,6 +17,7 @@ import java.io.RandomAccessFile
 import scala.actors.Actor
 import scala.actors.Actor._
 import com.sun.jna.{Native, Library}
+import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
 
 
@@ -27,9 +28,10 @@ import scala.collection.JavaConversions._
 */
 object SvdSystemManager extends Actor with Monitored with Utils {
     
-    start
+    private val core = new Sigar
+    private val processes = ListBuffer[SvdSystemProcess]()
     
-    var prs: SvdSystemProcess = null
+    start
     
     
     def act {
@@ -37,29 +39,37 @@ object SvdSystemManager extends Actor with Monitored with Utils {
         loop {
             receive {
                 case Init =>
+                    val nrs = new NativeSystemResources
+                    val nsp = new NativeSystemProcess(core.getPid)
+                    
                     logger.info("SystemManager ready")
-            
-                    val core = new Sigar
-                    logger.debug(new NativeSystemProcess(core.getPid))
-            
+                    logger.info("System Resources Availability:\n%s".format(nrs))
+                    logger.info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
+                    
+                    // 2011-01-11 00:45:18 - dmilith - NOTE: TODO: here will go call after boot of clean system (no rc)
+
+                    reply((nrs, nsp))
+                    
+                case Command(cmd) =>
+                    logger.info("Running Native Command: %s".format(cmd))
+                    val sysManProcess = new SvdSystemProcess(cmd)
+                    sysManProcess ! Init // 2011-01-10 23:53:22 - dmilith - NOTE: WAIT FOR PROCESS until end
+                    processes.add(sysManProcess)
+                    reply()
+                    
+                case GetAllProcesses =>
                     val psAll = core.getProcList.toList
-                    logger.debug("psAll: %s".format(psAll.mkString(", ")))
-                    logger.warn(new NativeSystemResources)
+                    logger.debug("All process IDs: %s".format(psAll.mkString(", ")))
                     psAll.foreach {
                         p =>
                         	logger.trace(new NativeSystemProcess(p))
                     }
-
-                    
-                    val out = Exec.noBlockCommand("/bin/ls -la")
-                    println("Command: %s, Exit Code: %d".format(out._1, out._2))
-                    
-                    // val out2 = Exec.blockCommand("/usr/bin/top -a")
-                    // println("Command: %s, Exit Code: %d".format(out._1, out._2))
-
-                    
-                    
                     reply(Ready)
+                    
+                case GetRunningProcesses =>
+                    logger.debug("Processes running by ServeD: %s".format(processes.mkString(", ")))
+                    reply(processes)
+            
                     
                 case Quit =>
                     logger.info("Quitting SystemManager")

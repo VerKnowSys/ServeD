@@ -31,7 +31,7 @@ class NativeSystemResources {
     val memUsagePercentage = mem.getUsedPercent
     
     override def toString =
-        ("\n" +
+        (
         "MEM_USED:[%d],\n" +
         "MEM_FREE:[%d],\n" +
         "MEM_TOTAL[%d],\n" +
