@@ -7,51 +7,39 @@ package com.verknowsys.served.utils
 import java.io._
 
 
-object Exec {
-    
-    
-    def blockCommand(cmdLine: String) = {
-        var output = ""
-        var code = 0
-        try {
-            val p = Runtime.getRuntime.exec(cmdLine.split(' '))
-            val input = new BufferedReader(new InputStreamReader(p.getInputStream))
-            var line = ""
-            while (line != null) {
-                output += (line + '\n')
-                line = input.readLine
-            }
-            p.waitFor
-            code = p.exitValue
-            input.close
-        } catch {
-            case ex: Throwable => {
-                ex.printStackTrace
-            }
-        }
-    }
-    
-    
-    def noBlockCommand(cmdLine: String): (String, Long) = {
-        var output = ""
-        var code = 0
-        try {
-            val p = Runtime.getRuntime.exec(cmdLine.split(' '))
-            val input = new BufferedReader(new InputStreamReader(p.getInputStream))
-            var line = ""
-            while (line != null) {
-                output += (line + '\n')
-                line = input.readLine
-            }
-            p.waitFor
-            code = p.exitValue
-            input.close
-        } catch {
-            case ex: Throwable => {
-                ex.printStackTrace
-            }
-        }
-        (output, code)
-    }
+class Exec extends Utils {
 
+    
+    /**
+      * Executes process and blocks thread
+      * @author dmilith
+      *
+      * @result (output: String, exitCode: Int)
+      *
+      */
+    def process(command: String, user: String = "nobody", workDir: String = "/tmp/"): (String, Int) = {
+        // 2011-01-10 23:33:11 - dmilith - TODO: implement params validation.
+        val cmd = "/bin/su -l %s -c %s".format(user, command).split(' ')
+        var output = ""
+        try {
+            val process = Runtime.getRuntime.exec(cmd)
+            val input = new BufferedReader(new InputStreamReader(process.getInputStream))
+            var line = ""
+            while (line != null) {
+                output += line + "\n"
+                line = input.readLine
+            }
+            process.waitFor
+            input.close
+            (output, process.exitValue)
+            
+        } catch {
+            case ex: Throwable => {
+                logger.error("Process exception: %s".format(ex.getMessage))
+                ("", -1)
+            }
+        }
+    }
+    
+    
 }
