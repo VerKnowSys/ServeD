@@ -34,8 +34,25 @@ class NativeSystemProcess(val pid: Long) {
     val rss = mem.getResident
     val shr = mem.getShare
     
-    val openFiles: Long = -1
+    val openFiles = -1L
     
-    override def toString = "#\nPNAME:[%s],\nUSER:[%s],\nRES:[%d],\nSHR:[%d],\nPID:[%d],\nPPID:[%d],\nTHREADS:[%d],\nPRIO:[%d],\nNICE:[%d],\nPARAMS:[%s],\nTIME_START:[%d],\nTIME_KERNEL:[%d], TIME_TOTAL:[%d],\nTIME_USER:[%d],\nOPEN_FILES:[%d]\n".format(name, user, rss, shr, pid, ppid, thr, prio, nice, params.mkString(" "), timeStart, timeKernel, timeTotal, timeUser, openFiles)
+    override def toString =
+        ("\n" +
+        "PNAME:[%s],\n" +
+        "USER:[%s],\n" +
+        "RES:[%s],\n" +
+        "SHR:[%s],\n" +
+        "PID:[%s],\n" +
+        "PPID:[%s],\n" +
+        "THREADS:[%s],\n" +
+        "PRIO:[%s],\n" +
+        "NICE:[%s],\n" +
+        "COMMAND:[%s],\n" +
+        "TIME_START:[%s],\n" +
+        "TIME_KERNEL:[%s],\n" +
+        "TIME_TOTAL:[%s],\n" +
+        "TIME_USER:[%s],\n" +
+        "OPEN_FILES:[%s]\n")
+            .format(name, user, rss, shr, pid, ppid, thr, prio, nice, params.mkString(" "), timeStart, timeKernel, timeTotal, timeUser, openFiles)
     
 }

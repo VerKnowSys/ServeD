@@ -10,7 +10,7 @@ import com.sun.jna.{Native, Library}
  */
 object POSIX extends Enumeration(initial = 1) {
     type POSIX = Value
-    @specialized val SIGHUP, // 2010-10-05 15:03:27 - dmilith - NOTE: should have value 1
+    val SIGHUP, // 2010-10-05 15:03:27 - dmilith - NOTE: should have value 1
         SIGINT,
         SIGQUIT,
         SIGILL,

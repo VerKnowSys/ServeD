@@ -29,6 +29,8 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     
     start
     
+    var prs: SvdSystemProcess = null
+    
     
     def act {
         Native.setProtected(true) // 2010-10-11 23:43:21 - dmilith - set JVM protection (in case of JNA code fail it should only throw an exception)
@@ -36,16 +38,27 @@ object SvdSystemManager extends Actor with Monitored with Utils {
             receive {
                 case Init =>
                     logger.info("SystemManager ready")
+            
                     val core = new Sigar
                     logger.debug(new NativeSystemProcess(core.getPid))
+            
                     val psAll = core.getProcList.toList
                     logger.debug("psAll: %s".format(psAll.mkString(", ")))
                     logger.warn(new NativeSystemResources)
                     psAll.foreach {
                         p =>
                         	logger.trace(new NativeSystemProcess(p))
-                            
                     }
+
+                    
+                    val out = Exec.noBlockCommand("/bin/ls -la")
+                    println("Command: %s, Exit Code: %d".format(out._1, out._2))
+                    
+                    // val out2 = Exec.blockCommand("/usr/bin/top -a")
+                    // println("Command: %s, Exit Code: %d".format(out._1, out._2))
+
+                    
+                    
                     reply(Ready)
                     
                 case Quit =>
@@ -131,14 +144,14 @@ object SvdSystemManager extends Actor with Monitored with Utils {
     *   XXX, TESTING, DIRTY, HACK
     *   
     */
-    def watchLogs = {
+    // def watchLogs = {
             // val watchedFile = "/var/log/kernel.log"
             // Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
             //                 val raf = new RandomAccessFile(watchedFile, "r")
             //                 raf.seek(raf.length - 1024)
             //                 logger.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
             //             }
-        }
+        // }
     
     
     

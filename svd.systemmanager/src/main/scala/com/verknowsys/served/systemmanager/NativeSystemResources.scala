@@ -3,6 +3,7 @@ package com.verknowsys.served.systemmanager
 import org.hyperic.sigar._
 import scala.collection.JavaConversions._
 
+
 /**
  * Class which describe any system process
  * 
@@ -14,7 +15,8 @@ class NativeSystemResources {
     private val mem = core.getMem
     private val swp = core.getSwap
     private val tcp = core.getTcp
-    
+
+   
     val swapUsed = swp.getUsed
     val swapFree = swp.getFree
     val swapTotal = swp.getTotal
@@ -28,6 +30,18 @@ class NativeSystemResources {
     val memTotal = mem.getTotal
     val memUsagePercentage = mem.getUsedPercent
     
-    override def toString = "# MEM_USED:[%d],\nMEM_FREE:[%d],\nMEM_TOTAL[%d],\nMEM_USAGE_PERC[%f],\nSWAP_USED:[%d],\nSWAP_FREE:[%d],\nSWAP_TOTAL:[%d],\nTCP_CONN_OPEN:[%d],\nTCP_FAILED_ATT:[%d],\nTCP_IN_ERROR:[%d]\n".format(memUsed, memFree, memTotal, memUsagePercentage, swapUsed, swapFree, swapTotal, tcpConnections, tcpFailedAttempts, tcpInError)
+    override def toString =
+        ("\n" +
+        "MEM_USED:[%d],\n" +
+        "MEM_FREE:[%d],\n" +
+        "MEM_TOTAL[%d],\n" +
+        "MEM_USAGE_PERC[%f],\n" +
+        "SWAP_USED:[%d],\n" +
+        "SWAP_FREE:[%d],\n" +
+        "SWAP_TOTAL:[%d],\n" +
+        "TCP_CONN_OPEN:[%d],\n" +
+        "TCP_FAILED_ATT:[%d],\n" +
+        "TCP_IN_ERROR:[%d]\n")
+            .format(memUsed, memFree, memTotal, memUsagePercentage, swapUsed, swapFree, swapTotal, tcpConnections, tcpFailedAttempts, tcpInError)
     
 }
