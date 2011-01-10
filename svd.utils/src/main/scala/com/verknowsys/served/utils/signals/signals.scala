@@ -10,9 +10,15 @@ package com.verknowsys.served.utils.signals
  */
 
 case object Init
+case object Quit
 case object Ready
 case object MainLoop
 case object ProcessMessages
-case object Quit
 case object RemoteBackupDone
 case object RevertBackup
+
+// SvdSystemManager
+case object GetAllProcesses
+case object GetRunningProcesses
+
+case class Command(cmd: String)
