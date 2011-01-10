@@ -73,7 +73,7 @@ object Maintainer extends Actor with Monitored with Utils {
              
             case x: Any => 
                 logger.error("Unknow argument: " + x)
-                System.exit(1);
+                System.exit(1)
         }}
 
         
