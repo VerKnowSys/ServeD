@@ -10,6 +10,7 @@ package com.verknowsys.served.utils.signals
  */
 
 case object Init
+case object Run
 case object Quit
 case object Ready
 case object MainLoop
@@ -22,3 +23,4 @@ case object GetAllProcesses
 case object GetRunningProcesses
 
 case class Command(cmd: String)
+case class Kill(what: String)

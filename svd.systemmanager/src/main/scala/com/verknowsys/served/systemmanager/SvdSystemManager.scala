@@ -47,16 +47,19 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                     logger.info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
                     
                     // 2011-01-11 00:45:18 - dmilith - NOTE: TODO: here will go call after boot of clean system (no rc)
-
                     reply((nrs, nsp))
                     
                 case Command(cmd) =>
                     logger.info("Running Native Command: %s".format(cmd))
                     val sysManProcess = new SvdSystemProcess(cmd)
-                    sysManProcess ! Init // 2011-01-10 23:53:22 - dmilith - NOTE: WAIT FOR PROCESS until end
+                    val result = sysManProcess !? Run // 2011-01-10 23:53:22 - dmilith - NOTE: WAIT FOR PROCESS until end
                     processes.add(sysManProcess)
-                    reply()
+                    reply(result)
                     
+                case Kill(cmd) =>
+                    logger.info("Killing Native Command: %s".format(cmd))
+                    reply(Ready)
+                
                 case GetAllProcesses =>
                     val psAll = core.getProcList.toList
                     logger.debug("All process IDs: %s".format(psAll.mkString(", ")))

@@ -19,8 +19,6 @@ import java.io._
 
 
 class SvdSystemProcess(val commandInput: String = "") extends Actor with Monitored with Utils {
-    import SvdSystemConstants._
-    
     
     private var process: Process = null
     private var output = ""
@@ -58,7 +56,7 @@ class SvdSystemProcess(val commandInput: String = "") extends Actor with Monitor
       */
     def process(command: String, user: String = "nobody", workDir: String = "/tmp/"): (String, Int) = {
         // 2011-01-10 23:33:11 - dmilith - TODO: implement params validation.
-        val cmd = "%s -l %s -c '%s'".format(SU_BIN, user, command).split(' ')
+        val cmd = "%s -l %s -c '%s'".format("/usr/bin/su", user, command).split(' ') // 2011-01-11 01:36:29 - dmilith - XXX: hardcode
         logger.trace("CMD: %s".format(cmd.mkString(" ")))
         try {
             process = Runtime.getRuntime.exec(cmd)
