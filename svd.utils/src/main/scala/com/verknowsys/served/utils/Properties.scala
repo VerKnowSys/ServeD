@@ -5,6 +5,22 @@ import scala.collection.JavaConversions._
 import java.io.{FileInputStream, FileOutputStream}
 import java.util.{Properties => JProperties}
 
+abstract class PropertyConverter[T] {
+    def apply(s: String): T
+}
+
+class Property[T](parent: Properties, key: String){
+    lazy val value = parent.data.flatMap(_ get key)
+    
+    def or[T](default: T)(implicit conv: PropertyConverter[T]):T = value match {
+        case Some(s) => conv(s)
+        case None =>
+            parent(key) = default.toString
+            default
+    }
+}
+
+
 /**
  * 	Class for handling Java Properties
  * @example
@@ -32,6 +48,9 @@ class Properties(filename: String) extends Utils {
         logger.trace("Setting props(%s) with value %s".format(key,value))
         value
     }
+    
+    
+    def get(key: String) = new Property(this, key)
     
     /**
      * 	Get value as String

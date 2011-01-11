@@ -1,10 +1,24 @@
 package com.verknowsys.served.utils
 
+
 import org.specs._
 import java.io._
 
 class PropertiesTest extends Specification {
     final val configFilename = "/tmp/config.properties"
+    
+    "Properties" should {
+        doBefore { setupConfigFile }
+        
+        "correct value to correct type" in {
+            val props = new Properties(configFilename)
+            
+            val a1 = props.get("some.nice.integer") or 4
+            a1 must_== 259
+            
+            // val a2 = 
+        }
+    }
 
     "Properties object" should {
         doBefore {setupConfigFile}
