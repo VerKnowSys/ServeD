@@ -3,11 +3,13 @@ package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.utils.monitor._
 
 import com.sun.jna.{Native, Library}
-import scala.actors.Actor
+import scala.actors._
 import scala.actors.Actor._
-
+import scala.collection.JavaConversions._
+import java.io._
 
 /**
   * This class defines mechanism which system commands will be executed through (and hopefully monitored)
@@ -15,37 +17,68 @@ import scala.actors.Actor._
   * @author dmilith
   */
 
-// object SvdSystemProcessState extends Enumeration(initial = 0) {
-//     
-//     type SvdSystemProcessState = Value
-//     val IDLE, RUNNING, WAITING = Value
-//     
-// }
 
-
-class SvdSystemProcess(val commandInput: String = "") extends Actor with Utils {
-    // import SvdSystemProcessState._
+class SvdSystemProcess(val commandInput: String = "") extends Actor with Monitored with Utils {
+    import SvdSystemConstants._
     
+    
+    private var process: Process = null
+    private var output = ""
+    
+
     start
-    Native.setProtected(true)
-    
+
+
     def act {
+        Native.setProtected(true)
         loop {
-            react {
-                case Init =>
+            receive {
+                case Run =>
                     logger.debug("new SystemProcess(%s)".format(commandInput))
-                    val results = Exec.noBlockCommand(commandInput)
-                    logger.debug("new SystemProcess(%s) results: %s %d".format(commandInput, results._1, results._2))
-                    act
-                
-                case Quit =>
-                    logger.info("SystemProcess(%s) ended.".format(commandInput))
-                    act
+                    val results = process(commandInput) // may be blocking call
+                    logger.debug("new SystemProcess(%s) results: '%s' '%d'".format(commandInput, results._1, results._2))
+                    reply(results)
+                    
                 case x: Any =>
                     logger.info("Request for unsupported signal of SystemProcess: %s".format(x.toString))
-                    act
+                    reply(Ready)
+                    
             }
         }
     }
+
+    
+    
+    /**
+      * Executes process and blocks thread
+      * @author dmilith
+      *
+      * @result (output: String, exitCode: Int)
+      *
+      */
+    def process(command: String, user: String = "nobody", workDir: String = "/tmp/"): (String, Int) = {
+        // 2011-01-10 23:33:11 - dmilith - TODO: implement params validation.
+        val cmd = "%s -l %s -c '%s'".format(SU_BIN, user, command).split(' ')
+        logger.trace("CMD: %s".format(cmd.mkString(" ")))
+        try {
+            process = Runtime.getRuntime.exec(cmd)
+            val input = new BufferedReader(new InputStreamReader(process.getInputStream))
+            var line = ""
+            while (line != null) {
+                output += line + "\n"
+                line = input.readLine
+            }
+            process.waitFor
+            input.close
+            (output, process.exitValue)
+
+        } catch {
+            case ex: Throwable => {
+                logger.error("Process exception: %s".format(ex.getMessage))
+                ("", -1)
+            }
+        }
+    }
+            
     
 }
