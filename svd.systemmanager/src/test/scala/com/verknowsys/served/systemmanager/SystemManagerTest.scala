@@ -50,8 +50,8 @@ class SvdSystemManagerTest extends Specification with UtilsCommon {
             val psAll = sigarCore.getProcList
             
             val pid = sigarCore.getPid
-            val procExec = sigarCore.getProcExe(pid)
-            println("CWD of PID: %s, Name of executable: %s".format(procExec.getCwd, procExec.getName))
+            // val procExec = sigarCore.getProcExe(pid)
+            // println("CWD of PID: %s, Name of executable: %s".format(procExec.getCwd, procExec.getName))
             
             val procStat = sigarCore.getProcState(pid)
             println("Proc name: %s, Parent pid: %d, Threads no: %d @ TTY: %s, Priority: %d, Nice: %d".format(procStat.getName, procStat.getPpid, procStat.getThreads, procStat.getTty, procStat.getPriority, procStat.getNice))
@@ -103,7 +103,7 @@ class SvdSystemManagerTest extends Specification with UtilsCommon {
             println("Total processes in system: %s".format(sysStat.getTotal))
             println("Process list: %s".format(psAll.mkString(", "))) // no args == show user threads and sort output
             
-            for (i <- psAll.toList.sort{ sigarCore.getProcState(_).getName < sigarCore.getProcState(_).getName}) {
+            for (i <- psAll.toList.sortWith{ sigarCore.getProcState(_).getName < sigarCore.getProcState(_).getName}) {
                 val procstat3 = sigarCore.getProcState(i)
                 println("PS alphabetic: %s".format(procstat3))
             }
