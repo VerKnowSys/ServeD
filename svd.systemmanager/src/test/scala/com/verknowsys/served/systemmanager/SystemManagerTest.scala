@@ -1,6 +1,7 @@
 package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served.utils._
+import com.verknowsys.served.utils.signals._
 import POSIX._
 import com.verknowsys.served.systemmanager._
 import com.verknowsys.served.systemmanager.SvdSystemManager._
@@ -8,6 +9,7 @@ import com.verknowsys.served.systemmanager.SvdSystemManager._
 import org.hyperic.sigar._
 import org.specs._
 import java.io._
+import java.lang._
 
 
 class SvdSystemManagerTest extends Specification with UtilsCommon {
@@ -19,6 +21,18 @@ class SvdSystemManagerTest extends Specification with UtilsCommon {
         doBefore {
         }
 
+        
+        "SvdSystemProcess should reply properly to actions and be controllable." in {
+
+            val ps = new SvdSystemProcess("/bin/ls -la")
+            val res = ps !? Run // 2011-01-11 01:00:02 - dmilith - NOTE: how to ask, asynchronously waiting for reply
+            res must haveClass[Tuple2[String, Integer]]
+            val res2 = ps !? "Unrecognized garbage!"
+            res2 must beEqual(Ready)
+
+        }
+
+// 2011-01-11 01:11:01 - dmilith - TODO: take care of BLOCKING processes        
         
         "signals defined should have proper integer value" in {
 
