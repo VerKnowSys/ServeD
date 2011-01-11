@@ -96,7 +96,7 @@ class SvdSystemManagerTest extends Specification with UtilsCommon {
             val load = sigarCore.getLoadAverage
             println("Load Average: %s / %s / %s".format(load(0), load(1), load(2)))
             
-            val disk = sigarCore.getDiskUsage("/dev/disk0s2")
+            val disk = sigarCore.getDiskUsage("/")
             println("Disk usages: %s ".format(disk))
             
             val sysStat = sigarCore.getProcStat
