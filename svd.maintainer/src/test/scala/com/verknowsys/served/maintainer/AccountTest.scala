@@ -5,6 +5,18 @@ import org.specs._
 class AccountTest extends Specification {
     "Account" should {
         
+        "provide default parameters" in {
+            val a = new Account()
+            
+            a.userName must beEqual("guest")
+            a.pass must beEqual("x")
+            a.uid must beEqual("1000")
+            a.gid must beEqual("1000")
+            a.information must beEqual("No information")
+            a.homeDir must beEqual("/home/")
+            a.shell must beEqual("/bin/bash")
+        }
+        
         "be equal" in {
             val a1 = Account("aa", "xx", "1000", "2000", "foo bar", "/home/aa", "/path/to/bash")
             val a2 = Account("aa", "yy", "1000", "2000", "foo foo", "/home/aax", "/path/to/zsh")
