@@ -85,6 +85,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
+    @deprecated
     def int(key: String): Option[Int] = apply(key).flatMap { s => try { Some(s.toInt) } catch { case _ => None } }
     
     /**
@@ -94,6 +95,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
+    @deprecated
     def int(key: String, default: Int): Int = int(key) getOrElse { 
         update(key, default)
         default 
@@ -104,6 +106,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
+    @deprecated
     def double(key: String): Option[Double] = apply(key).flatMap { s => try { Some(s.toDouble) } catch { case _ => None } }
 
     /**
@@ -113,6 +116,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
+    @deprecated
     def double(key: String, default: Double): Double = double(key) getOrElse { 
         update(key, default)
         default 
@@ -123,6 +127,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
+    @deprecated
     def bool(key: String): Option[Boolean] = apply(key).flatMap { s => try { Some(s.toBoolean) } catch { case _ => None } }
 
     /**
@@ -132,6 +137,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
+    @deprecated
     def bool(key: String, default: Boolean): Boolean = bool(key) getOrElse { 
         update(key, default)
         default 
@@ -142,6 +148,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
+    @deprecated
     def update(key: String, value: String) {
         data.foreach(_(key) = value)
         save
@@ -152,6 +159,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
+    @deprecated
     def update(key: String, value: Int) { update(key, value.toString) }
 
     /**
@@ -159,6 +167,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
+    @deprecated
     def update(key: String, value: Double) { update(key, value.toString) }
 
     /**
@@ -166,6 +175,7 @@ class Properties(filename: String) extends Utils {
      *
      * @author teamon
      */
+    @deprecated
     def update(key: String, value: Boolean) { update(key, value.toString) }
 
     /**
