@@ -2,10 +2,9 @@ package com.verknowsys.served.utils
 
 
 import org.specs._
-import org.specs.specification.PendingUntilFixed
 import java.io._
 
-class PropertiesTest extends Specification with PendingUntilFixed {
+class PropertiesTest extends Specification {
     final val configFilename = "/tmp/config.properties"
     
     "Properties" should {
@@ -31,8 +30,8 @@ class PropertiesTest extends Specification with PendingUntilFixed {
             val b1 = props("some.nice.true") or false
             val b2 = props("some.nice.false") or true
             val b3 = props("some.bad.boolean") or false
-            val b4 = props("some.bad.boolean") or true
-            
+            val b4 = props("some.bad.boolean2") or true
+                        
             i1 must_== 259
             i2 must_== 42
             d1 must_== 34.56
@@ -40,7 +39,7 @@ class PropertiesTest extends Specification with PendingUntilFixed {
             b1 must_== true
             b2 must_== false
             b3 must_== false
-            pendingUntilFixed { b4 must_== true }
+            b4 must_== true
         }
         
         "update properties file" in {
@@ -126,50 +125,6 @@ class PropertiesTest extends Specification with PendingUntilFixed {
         }
     }
 
-    // "Properties object" should {
-    //     doBefore {setupConfigFile}
-    //     "read from file" in {
-    //         val props = new Properties(configFilename)
-    //         props("app.existing.config.one") must_== Some("foo bar baz")
-    //         props("app.existing.other.config.two") must_== Some("foo bar baz bar blah")
-    //         props("app.not.existing.something") must_== None
-    //     }
-    // 
-    //     "convert value to correct type" in {
-    //         val props = new Properties(configFilename)
-    //         props.int("some.nice.integer") must_== Some(259)
-    //         props.int("some.bad.integer") must_== None
-    //         props.double("some.nice.double") must_== Some(34.56)
-    //         props.double("some.bad.double") must_== None
-    //         props.bool("some.nice.true") must_== Some(true)
-    //         props.bool("some.nice.false") must_== Some(false)
-    //         props.bool("some.bad.boolean") must_== None
-    //     }
-    // 
-    //     "update properties file" in {
-    //         val props = new Properties(configFilename)
-    //         props("app.new.property.foo") = "very new"
-    //         props("app.new.property.foo") must_== Some("very new")
-    // 
-    //         val new_props = new Properties(configFilename)
-    //         new_props("app.existing.config.one") must_== Some("foo bar baz")
-    //         new_props("app.existing.other.config.two") must_== Some("foo bar baz bar blah")
-    //         new_props("app.not.existing.something") must_== None
-    //         new_props("app.new.property.foo") must_== Some("very new")
-    //     }
-    // 
-    //     "convert back to string" in {
-    //         val props = new Properties(configFilename)
-    //         props("some.bad.integer") = 4001
-    //         props("some.bad.double") = 99.999
-    //         props("some.bad.boolean") = true
-    // 
-    //         val new_props = new Properties(configFilename)
-    //         new_props.int("some.bad.integer") must_== Some(4001)
-    //         new_props.double("some.bad.double") must_== Some(99.999)
-    //         new_props.bool("some.bad.boolean") must_== Some(true)
-    //     }
-    // }
 
     private def setupConfigFile {
         val content = "app.existing.config.one = foo bar baz" ::
@@ -181,6 +136,7 @@ class PropertiesTest extends Specification with PendingUntilFixed {
                 "some.nice.true = true" ::
                 "some.nice.false = false" ::
                 "some.bad.boolean = ifj4rf" ::
+                "some.bad.boolean2 = ifj4rf" ::
                 Nil mkString "\n"
 
         val file = new File(configFilename)

@@ -121,7 +121,7 @@ class Properties(filename: String) extends Utils {
             
         } catch {
             case e: Exception =>
-                logger.error("Couldn/bin/bash: t: command not foundt save file %s, cause of exception: %s".format(filename, e))
+                logger.error("Could not save file %s, cause of exception: %s".format(filename, e))
                 None
         }
     }
