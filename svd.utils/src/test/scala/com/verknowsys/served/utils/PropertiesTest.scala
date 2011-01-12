@@ -13,8 +13,10 @@ class PropertiesTest extends Specification {
         "correct value to correct type" in {
             val props = new Properties(configFilename)
             
-            val a1 = props.get("some.nice.integer") or 4
+            val a1 = props.get("some.nice.integer") or 0
             a1 must_== 259
+            
+            
             
             // val a2 = 
         }

@@ -5,19 +5,35 @@ import scala.collection.JavaConversions._
 import java.io.{FileInputStream, FileOutputStream}
 import java.util.{Properties => JProperties}
 
-abstract class PropertyConverter[T] {
-    def apply(s: String): T
+abstract class PropertyConverter[T, Property] {
+    def apply(s: String): Option[T]
 }
 
-class Property[T](parent: Properties, key: String){
+object Property {
+    implicit object StringPropertyConverter extends PropertyConverter[String, Property] {
+        def apply(s: String) = Some(s)
+    }
+
+    implicit object IntPropertyConverter extends PropertyConverter[Int, Property] {
+        def apply(s: String) = try { Some(s.toInt) } catch { case e:java.lang.NumberFormatException => None }
+    }
+
+    implicit object DoublePropertyConverter extends PropertyConverter[Double, Property] {
+        def apply(s: String) = try { Some(s.toDouble) } catch { case e:java.lang.NumberFormatException => None }
+    }
+
+    implicit object BooleanPropertyConverter extends PropertyConverter[Boolean, Property] {
+        def apply(s: String) = try { Some(s.toBoolean) } catch { case e:java.lang.NumberFormatException => None }
+    }
+}
+
+class Property(parent: Properties, key: String){
     lazy val value = parent.data.flatMap(_ get key)
     
-    def or[T](default: T)(implicit conv: PropertyConverter[T]):T = value match {
-        case Some(s) => conv(s)
-        case None =>
-            parent(key) = default.toString
-            default
-    }
+    def or[T](default: T)(implicit conv: PropertyConverter[T, Property]):T = value.flatMap(conv(_)) getOrElse {
+        parent(key) = default.toString
+        default
+    }    
 }
 
 
