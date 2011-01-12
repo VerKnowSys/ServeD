@@ -76,52 +76,100 @@ class PropertiesTest extends Specification with PendingUntilFixed {
             d1 must_== 99.999
             b1 must_== true
         }
+        
+        
+    }
+    
+    "PropertyConverter" should {
+        "StringPropertyConverter" in {
+            Property.StringPropertyConverter("foo") must_== Some("foo")
+            Property.StringPropertyConverter("bar") must_== Some("bar")
+            Property.StringPropertyConverter("") must_== Some("")
+            
+            Property.StringPropertyConverter.toString("foo") must_== "foo"
+            Property.StringPropertyConverter.toString("bar") must_== "bar"
+            Property.StringPropertyConverter.toString("") must_== ""
+        }
+        
+        "IntPropertyConverter" in {
+            Property.IntPropertyConverter("1") must_== Some(1)
+            Property.IntPropertyConverter("123") must_== Some(123)
+            Property.IntPropertyConverter("-68") must_== Some(-68)
+            Property.IntPropertyConverter("42.634") must_== None
+            Property.IntPropertyConverter("") must_== None
+            Property.IntPropertyConverter("foo") must_== None
+            
+            Property.IntPropertyConverter.toString(1) must_== "1"
+            Property.IntPropertyConverter.toString(-6) must_== "-6"
+        }
+        
+        "DoublePropertyConverter" in {
+            Property.DoublePropertyConverter("1.0") must_== Some(1.0)
+            Property.DoublePropertyConverter("123.456") must_== Some(123.456)
+            Property.DoublePropertyConverter("-68") must_== Some(-68.0)
+            Property.DoublePropertyConverter("") must_== None
+            Property.DoublePropertyConverter("foo") must_== None
+            
+            Property.DoublePropertyConverter.toString(1.0) must_== "1.0"
+            Property.DoublePropertyConverter.toString(-6.5) must_== "-6.5"
+        }
+        
+        "DoublePropertyConverter" in {
+            Property.BooleanPropertyConverter("true") must_== Some(true)
+            Property.BooleanPropertyConverter("false") must_== Some(false)
+            Property.BooleanPropertyConverter("-68") must_== None
+            Property.BooleanPropertyConverter("") must_== None
+            Property.BooleanPropertyConverter("foo") must_== None
+            
+            Property.BooleanPropertyConverter.toString(true) must_== "true"
+            Property.BooleanPropertyConverter.toString(false) must_== "false"
+        }
     }
 
-    "Properties object" should {
-        doBefore {setupConfigFile}
-        "read from file" in {
-            val props = new Properties(configFilename)
-            props("app.existing.config.one") must_== Some("foo bar baz")
-            props("app.existing.other.config.two") must_== Some("foo bar baz bar blah")
-            props("app.not.existing.something") must_== None
-        }
-
-        "convert value to correct type" in {
-            val props = new Properties(configFilename)
-            props.int("some.nice.integer") must_== Some(259)
-            props.int("some.bad.integer") must_== None
-            props.double("some.nice.double") must_== Some(34.56)
-            props.double("some.bad.double") must_== None
-            props.bool("some.nice.true") must_== Some(true)
-            props.bool("some.nice.false") must_== Some(false)
-            props.bool("some.bad.boolean") must_== None
-        }
-
-        "update properties file" in {
-            val props = new Properties(configFilename)
-            props("app.new.property.foo") = "very new"
-            props("app.new.property.foo") must_== Some("very new")
-
-            val new_props = new Properties(configFilename)
-            new_props("app.existing.config.one") must_== Some("foo bar baz")
-            new_props("app.existing.other.config.two") must_== Some("foo bar baz bar blah")
-            new_props("app.not.existing.something") must_== None
-            new_props("app.new.property.foo") must_== Some("very new")
-        }
-
-        "convert back to string" in {
-            val props = new Properties(configFilename)
-            props("some.bad.integer") = 4001
-            props("some.bad.double") = 99.999
-            props("some.bad.boolean") = true
-
-            val new_props = new Properties(configFilename)
-            new_props.int("some.bad.integer") must_== Some(4001)
-            new_props.double("some.bad.double") must_== Some(99.999)
-            new_props.bool("some.bad.boolean") must_== Some(true)
-        }
-    }
+    // "Properties object" should {
+    //     doBefore {setupConfigFile}
+    //     "read from file" in {
+    //         val props = new Properties(configFilename)
+    //         props("app.existing.config.one") must_== Some("foo bar baz")
+    //         props("app.existing.other.config.two") must_== Some("foo bar baz bar blah")
+    //         props("app.not.existing.something") must_== None
+    //     }
+    // 
+    //     "convert value to correct type" in {
+    //         val props = new Properties(configFilename)
+    //         props.int("some.nice.integer") must_== Some(259)
+    //         props.int("some.bad.integer") must_== None
+    //         props.double("some.nice.double") must_== Some(34.56)
+    //         props.double("some.bad.double") must_== None
+    //         props.bool("some.nice.true") must_== Some(true)
+    //         props.bool("some.nice.false") must_== Some(false)
+    //         props.bool("some.bad.boolean") must_== None
+    //     }
+    // 
+    //     "update properties file" in {
+    //         val props = new Properties(configFilename)
+    //         props("app.new.property.foo") = "very new"
+    //         props("app.new.property.foo") must_== Some("very new")
+    // 
+    //         val new_props = new Properties(configFilename)
+    //         new_props("app.existing.config.one") must_== Some("foo bar baz")
+    //         new_props("app.existing.other.config.two") must_== Some("foo bar baz bar blah")
+    //         new_props("app.not.existing.something") must_== None
+    //         new_props("app.new.property.foo") must_== Some("very new")
+    //     }
+    // 
+    //     "convert back to string" in {
+    //         val props = new Properties(configFilename)
+    //         props("some.bad.integer") = 4001
+    //         props("some.bad.double") = 99.999
+    //         props("some.bad.boolean") = true
+    // 
+    //         val new_props = new Properties(configFilename)
+    //         new_props.int("some.bad.integer") must_== Some(4001)
+    //         new_props.double("some.bad.double") must_== Some(99.999)
+    //         new_props.bool("some.bad.boolean") must_== Some(true)
+    //     }
+    // }
 
     private def setupConfigFile {
         val content = "app.existing.config.one = foo bar baz" ::
