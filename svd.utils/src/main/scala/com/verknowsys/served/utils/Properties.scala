@@ -7,23 +7,28 @@ import java.util.{Properties => JProperties}
 
 abstract class PropertyConverter[T, Property] {
     def apply(s: String): Option[T]
+    def toString(a: T): String
 }
 
 object Property {
     implicit object StringPropertyConverter extends PropertyConverter[String, Property] {
         def apply(s: String) = Some(s)
+        def toString(s: String) = s
     }
 
     implicit object IntPropertyConverter extends PropertyConverter[Int, Property] {
         def apply(s: String) = try { Some(s.toInt) } catch { case e:java.lang.NumberFormatException => None }
+        def toString(i: Int) = i.toString
     }
 
     implicit object DoublePropertyConverter extends PropertyConverter[Double, Property] {
         def apply(s: String) = try { Some(s.toDouble) } catch { case e:java.lang.NumberFormatException => None }
+        def toString(d: Double) = d.toString
     }
 
     implicit object BooleanPropertyConverter extends PropertyConverter[Boolean, Property] {
         def apply(s: String) = try { Some(s.toBoolean) } catch { case e:java.lang.NumberFormatException => None }
+        def toString(b: Boolean) = b.toString
     }
 }
 
@@ -65,8 +70,17 @@ class Properties(filename: String) extends Utils {
         value
     }
     
+
+    // == New API
     
     def get(key: String) = new Property(this, key)
+    
+    def update[T](key: String, value: T)(implicit conv: PropertyConverter[T, Property]){
+        data.foreach(_(key) = conv.toString(value))
+        save
+    }
+    
+    // == end
     
     /**
      * 	Get value as String
