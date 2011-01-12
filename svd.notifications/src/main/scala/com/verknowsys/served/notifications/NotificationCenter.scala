@@ -17,11 +17,11 @@ object NotificationCenter extends Actor with Utils {
     
     // XXX: Hardcoded gate
     val gates = new XMPPGate(
-        props.get("xmpp.host") or "localhost", 
-        props.get("xmpp.port") or 5222,
-        props.get("xmpp.login") or "gitbot",
-        props.get("xmpp.password") or "git-bot-666",
-        props.get("xmpp.resource") or "served-bot-resource"
+        props("xmpp.host") or "localhost", 
+        props("xmpp.port") or 5222,
+        props("xmpp.login") or "gitbot",
+        props("xmpp.password") or "git-bot-666",
+        props("xmpp.resource") or "served-bot-resource"
     ) :: Nil
     
 

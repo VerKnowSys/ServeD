@@ -73,7 +73,7 @@ class Properties(filename: String) extends Utils {
 
     // == New API
     
-    def get(key: String) = new Property(this, key)
+    def apply(key: String) = new Property(this, key)
     
     def update[T](key: String, value: T)(implicit conv: PropertyConverter[T, Property]){
         data.foreach(_(key) = conv.toString(value))

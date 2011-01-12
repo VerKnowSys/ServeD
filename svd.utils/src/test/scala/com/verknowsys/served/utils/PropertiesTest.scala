@@ -13,9 +13,9 @@ class PropertiesTest extends Specification with PendingUntilFixed {
 
         "read from file" in {
             val props = new Properties(configFilename)
-            val a1 = props.get("app.existing.config.one") or ""
-            val a2 = props.get("app.existing.other.config.two") or ""
-            val a3 = props.get("app.not.existing.something") or "my default"
+            val a1 = props("app.existing.config.one") or ""
+            val a2 = props("app.existing.other.config.two") or ""
+            val a3 = props("app.not.existing.something") or "my default"
             a1 must_== "foo bar baz"
             a2 must_== "foo bar baz bar blah"
             a3 must_== "my default"
@@ -24,14 +24,14 @@ class PropertiesTest extends Specification with PendingUntilFixed {
         "convert value to correct type" in {
             val props = new Properties(configFilename)
             
-            val i1 = props.get("some.nice.integer") or 0
-            val i2 = props.get("some.bad.integer") or 42
-            val d1 = props.get("some.nice.double") or 0.0
-            val d2 = props.get("some.bad.double") or 0.123
-            val b1 = props.get("some.nice.true") or false
-            val b2 = props.get("some.nice.false") or true
-            val b3 = props.get("some.bad.boolean") or false
-            val b4 = props.get("some.bad.boolean") or true
+            val i1 = props("some.nice.integer") or 0
+            val i2 = props("some.bad.integer") or 42
+            val d1 = props("some.nice.double") or 0.0
+            val d2 = props("some.bad.double") or 0.123
+            val b1 = props("some.nice.true") or false
+            val b2 = props("some.nice.false") or true
+            val b3 = props("some.bad.boolean") or false
+            val b4 = props("some.bad.boolean") or true
             
             i1 must_== 259
             i2 must_== 42
@@ -46,14 +46,14 @@ class PropertiesTest extends Specification with PendingUntilFixed {
         "update properties file" in {
             val props = new Properties(configFilename)
             props("app.new.property.foo") = "very new"
-            val s = props.get("app.new.property.foo") or ""
+            val s = props("app.new.property.foo") or ""
             s must_== "very new"
 
             val new_props = new Properties(configFilename)
-            val s1 = new_props.get("app.existing.config.one") or "nothing!"
-            val s2 = new_props.get("app.existing.other.config.two") or "nothing!"
-            val s3 = new_props.get("app.not.existing.something") or "nothing!"
-            val s4 = new_props.get("app.new.property.foo") or "nothing!"
+            val s1 = new_props("app.existing.config.one") or "nothing!"
+            val s2 = new_props("app.existing.other.config.two") or "nothing!"
+            val s3 = new_props("app.not.existing.something") or "nothing!"
+            val s4 = new_props("app.new.property.foo") or "nothing!"
             
             s1 must_== "foo bar baz"
             s2 must_== "foo bar baz bar blah"
@@ -68,9 +68,9 @@ class PropertiesTest extends Specification with PendingUntilFixed {
             props("some.bad.boolean") = true
 
             val new_props = new Properties(configFilename)
-            val i1 = new_props.get("some.bad.integer") or 0
-            val d1 = new_props.get("some.bad.double") or 0.0
-            val b1 = new_props.get("some.bad.boolean") or false
+            val i1 = new_props("some.bad.integer") or 0
+            val d1 = new_props("some.bad.double") or 0.0
+            val b1 = new_props("some.bad.boolean") or false
             
             i1 must_== 4001
             d1 must_== 99.999
