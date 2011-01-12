@@ -29,9 +29,9 @@ object Config {
      *   More dynamic settings from main properties file
      */
 
-    def systemPasswdFile = props("systemPasswdFile", homePath + vendorDir + "etc/passwd")
-    def checkInterval = props.int("checkInterval", 1500)
-    def sizeMultiplier = props.int("sizeMultiplier", 1024)
+    def systemPasswdFile = props.get("systemPasswdFile") or homePath + vendorDir + "etc/passwd"
+    def checkInterval = props.get("checkInterval") or 1500
+    def sizeMultiplier = props.get("sizeMultiplier") or 1024
 
-    def defaultGitRepoToWatch = props("defaultGitRepoToWatch", "/git/ServeD.git") // XXX: Remove this
+    def defaultGitRepoToWatch = props.get("defaultGitRepoToWatch") or "/git/ServeD.git" // XXX: Remove this
 }
