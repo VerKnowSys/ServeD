@@ -1,6 +1,9 @@
 package com.verknowsys.served.utils
 
 import scala.actors.Actor
+import com.verknowsys.served.utils.kqueue.Kqueue
+import com.verknowsys.served.Config
+
 
 /** 
  * Logger output class interface 
@@ -15,9 +18,7 @@ abstract trait LoggerOutput {
  * Default logger output implementation 
  *
  * {{{
- * Logger.output = new ConsoleLoggerOutput("%{l} [%{c}]: %{m}") // set console output with custom format
- * 
- * #format parameters:
+ * format parameters:
  *    %{c} - caller class name
  *    %{l} - message level
  *    %{m} - message content
@@ -25,19 +26,35 @@ abstract trait LoggerOutput {
  * 
  * @author teamon
  */
-class ConsoleLoggerOutput(format: String) extends LoggerOutput {
+class ConsoleLoggerOutput extends LoggerOutput {
     import ConsoleLoggerOutput._
-
-    
-    def this() = this(ConsoleLoggerOutput.DefaultFormat)
     
     def log(className: String, msg: String, level: Logger.Level.Value){
         val fmsg = format % ("l" -> level.toString, "c" -> className, "m" -> msg)
         println(Colors(level) + fmsg + DefaultColor)
     }
+    
+    private var format = DefaultFormat // XXX: Var
+        
+    val propertiesFileWatch = Kqueue.watch(Config.loggerConfigFile, modified = true) { 
+        reloadConfiguration
+    }
+    
+    addShutdownHook { propertiesFileWatch.stop }
+    
+    reloadConfiguration
+    
+    private def reloadConfiguration {
+        println("=== Modified logger.properties")
+        
+        synchronized {
+            val props = new Properties(Config.loggerConfigFile)
+            format = props("logger.console.format") or DefaultFormat
+        }
+    }
 }
 
-object ConsoleLoggerOutput {
+object ConsoleLoggerOutput extends UtilsCommon {
     import Logger.Level._
     
     final val Colors = Map(
@@ -47,6 +64,7 @@ object ConsoleLoggerOutput {
         Warn -> "\u001B[1;33m",
         Error -> "\u001B[0;31m"
     )
+
     final val DefaultColor = "\u001B[0;39m"
     final val DefaultFormat = "%{l} [%{c}]: %{m}"
 }
@@ -60,7 +78,7 @@ object ConsoleLoggerOutput {
  * 
  * @author teamon
  */
-object Logger extends Actor {
+object Logger extends Actor with UtilsCommon {
     object Level extends Enumeration {
         val Trace,
             Debug,
@@ -71,19 +89,54 @@ object Logger extends Actor {
     
     case class Log(owner: AnyRef, msg: String, level: Level.Value)
     
-    var level = Level.Trace
-    var output: LoggerOutput = new ConsoleLoggerOutput
+    @volatile private var _level = Level.Trace
+    @volatile private var _output: LoggerOutput = new ConsoleLoggerOutput
+    
+    def level = _level
+    
+    def level_=(lvl: Level.Value) = synchronized {
+        _level = lvl
+    }
+    
+    def output = _output
+    
+    def output_=(out: LoggerOutput) = synchronized {
+        _output = out
+    }
 
     start
         
     def act {
         loop {
             react {
-                case Log(owner, msg, level) => output.log(owner.getClass.getName, msg, level)
+                case Log(owner, msg, level) => output.log(owner.getClass.getName, msg, level) // NOTE: Make use of sender?
                 case _ =>
             }
         }
     }
+    
+    val propertiesFileWatch = Kqueue.watch(Config.loggerConfigFile, modified = true) { 
+        reloadConfiguration
+    }
+    
+    addShutdownHook { propertiesFileWatch.stop }
+    
+    reloadConfiguration
+    
+    private def reloadConfiguration {
+        println("=== Modified logger.properties")
+        val props = new Properties(Config.loggerConfigFile)
+        level = findLevel(props("logger.level") or "trace") getOrElse Level.Trace
+    }
+        
+    private def findLevel(s: String) = Map(
+        "trace" -> Level.Trace,
+        "debug" -> Level.Debug,
+        "info" -> Level.Info,
+        "warn" -> Level.Warn,
+        "error" -> Level.Error
+    ).get(s.toLowerCase)
+        
 }
 
 class Logger(owner: AnyRef){
