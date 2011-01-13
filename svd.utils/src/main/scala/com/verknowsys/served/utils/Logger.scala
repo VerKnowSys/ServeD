@@ -63,6 +63,12 @@ class SvdLogger(owner: AnyRef){
     def info(msg:  => String) = if(SvdLogger.level <= Info)  SvdLogger ! Log(owner, msg, Info)
     def warn(msg:  => String) = if(SvdLogger.level <= Warn)  SvdLogger ! Log(owner, msg, Warn)
     def error(msg: => String) = if(SvdLogger.level <= Error) SvdLogger ! Log(owner, msg, Error)
+    
+    def trace(x: Any): Unit = trace(x.toString)
+    def debug(x: Any): Unit = debug(x.toString)
+    def info(x: Any): Unit = info(x.toString)
+    def warn(x: Any): Unit = warn(x.toString)
+    def error(x: Any): Unit = error(x.toString)
 }
 
 
