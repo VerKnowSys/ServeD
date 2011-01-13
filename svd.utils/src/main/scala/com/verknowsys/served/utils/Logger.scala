@@ -25,14 +25,14 @@ object SvdLogger extends Actor {
     
     var level = Level.Debug
     var output: LoggerOutput = new ConsoleLoggerOutput
-    var format = "[%s] %s"
+    var format = "[%{c}] %{m}"
 
     start
         
     def act {
         loop {
             react {
-                case Log(owner, msg, level) => output.log(format.format(owner, msg), level)
+                case Log(owner, msg, level) => output.log(format % ("c" -> owner.getClass.getName, "m" -> msg), level)
                 case _ =>
             }
         }
@@ -43,14 +43,11 @@ class SvdLogger(owner: AnyRef){
     import SvdLogger.Log
     import SvdLogger.Level._
     
-    // def trace(msg: => String) = if(SvdLogger.level <= Trace) SvdLogger ! Log(owner, msg, Trace)
+    def trace(msg: => String) = if(SvdLogger.level <= Trace) SvdLogger ! Log(owner, msg, Trace)
     def debug(msg: => String) = if(SvdLogger.level <= Debug) SvdLogger ! Log(owner, msg, Debug)
     def info(msg:  => String) = if(SvdLogger.level <= Info)  SvdLogger ! Log(owner, msg, Info)
     def warn(msg:  => String) = if(SvdLogger.level <= Warn)  SvdLogger ! Log(owner, msg, Warn)
     def error(msg: => String) = if(SvdLogger.level <= Error) SvdLogger ! Log(owner, msg, Error)
-    
-    
-    def trace(msg: => String, args: Any*) = if(SvdLogger.level <= Trace) SvdLogger ! Log(owner, msg.format(args:_*), Trace)
 }
 
 trait SvdLogged {
