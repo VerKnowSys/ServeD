@@ -26,6 +26,6 @@ package object utils {
      * @author teamon
      */
     implicit def repl4str(s: String) = new {
-        def %(pairs: (String, String)*) = (s /: pairs){ case (s, (k, v)) => s.replaceAll("%\\{" + k + "\\}", v) }
+        def %(pairs: (String, String)*) = (s /: pairs){ case (s, (k, v)) => s.replace("%{" + k + "}", v) }
     }
 }
