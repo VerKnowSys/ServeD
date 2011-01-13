@@ -8,7 +8,7 @@ import scala.actors.Actor
  * @author teamon
  */
 abstract trait LoggerOutput {
-    def log(msg: String, level: SvdLogger.Level.Value): Unit
+    def log(msg: String, level: Logger.Level.Value): Unit
 }
 
 /** 
@@ -17,7 +17,7 @@ abstract trait LoggerOutput {
  * @author teamon
  */
 class ConsoleLoggerOutput extends LoggerOutput {
-    def log(msg: String, level: SvdLogger.Level.Value){
+    def log(msg: String, level: Logger.Level.Value){
         println(msg)
     }
 }
@@ -27,7 +27,7 @@ class ConsoleLoggerOutput extends LoggerOutput {
  * 
  * @author teamon
  */
-object SvdLogger extends Actor {
+object Logger extends Actor {
     object Level extends Enumeration {
         val Trace,
             Debug,
@@ -47,22 +47,24 @@ object SvdLogger extends Actor {
     def act {
         loop {
             react {
-                case Log(owner, msg, level) => output.log(format % ("c" -> owner.getClass.getName, "m" -> msg), level)
+                case Log(owner, msg, level) => 
+                    println("LOGGING: " + ("c" -> owner.getClass.getName, "m" -> msg))
+                    output.log(format % ("c" -> owner.getClass.getName, "m" -> msg), level)
                 case _ =>
             }
         }
     }
 }
 
-class SvdLogger(owner: AnyRef){
-    import SvdLogger.Log
-    import SvdLogger.Level._
+class Logger(owner: AnyRef){
+    import Logger.Log
+    import Logger.Level._
     
-    def trace(msg: => String) = if(SvdLogger.level <= Trace) SvdLogger ! Log(owner, msg, Trace)
-    def debug(msg: => String) = if(SvdLogger.level <= Debug) SvdLogger ! Log(owner, msg, Debug)
-    def info(msg:  => String) = if(SvdLogger.level <= Info)  SvdLogger ! Log(owner, msg, Info)
-    def warn(msg:  => String) = if(SvdLogger.level <= Warn)  SvdLogger ! Log(owner, msg, Warn)
-    def error(msg: => String) = if(SvdLogger.level <= Error) SvdLogger ! Log(owner, msg, Error)
+    def trace(msg: => String) = if(Logger.level <= Trace) Logger ! Log(owner, msg, Trace)
+    def debug(msg: => String) = if(Logger.level <= Debug) Logger ! Log(owner, msg, Debug)
+    def info(msg:  => String) = if(Logger.level <= Info)  Logger ! Log(owner, msg, Info)
+    def warn(msg:  => String) = if(Logger.level <= Warn)  Logger ! Log(owner, msg, Warn)
+    def error(msg: => String) = if(Logger.level <= Error) Logger ! Log(owner, msg, Error)
     
     def trace(x: Any): Unit = trace(x.toString)
     def debug(x: Any): Unit = debug(x.toString)
@@ -83,6 +85,6 @@ class SvdLogger(owner: AnyRef){
  * 
  * @author teamon
  */
-trait SvdLogged {
-    lazy val logger = new SvdLogger(this)
+trait Logged {
+    lazy val logger = new Logger(this)
 }

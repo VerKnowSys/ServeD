@@ -5,16 +5,16 @@ import org.specs._
 import scala.collection.mutable.ListBuffer
 
 class TestLoggerOutput extends LoggerOutput {
-    val logged = new ListBuffer[(String, SvdLogger.Level.Value)]
+    val logged = new ListBuffer[(String, Logger.Level.Value)]
     
     def loggedStrings = logged.map(_._1)
     
-    def log(msg: String, level: SvdLogger.Level.Value){
+    def log(msg: String, level: Logger.Level.Value){
         logged += ((msg, level))
     }
 }
 
-class TestLogged extends SvdLogged {
+class TestLogged extends Logged {
     def logAll {
         logger.trace("trace msg")
         logger.debug("debug msg")
@@ -34,54 +34,54 @@ class LoggerTest extends Specification {
     "Logger" should {
         doBefore {
             output = new TestLoggerOutput
-            SvdLogger.output = output
+            Logger.output = output
         }
         
         "log Trace messages" in {
-            SvdLogger.level = SvdLogger.Level.Trace
+            Logger.level = Logger.Level.Trace
             tester.logAll
-            waitWhileRunning(SvdLogger)
+            waitWhileRunning(Logger)
             output.logged must haveSize(5)
         }
         
         "log Debug messages" in {
-            SvdLogger.level = SvdLogger.Level.Debug
+            Logger.level = Logger.Level.Debug
             tester.logAll
-            waitWhileRunning(SvdLogger)
+            waitWhileRunning(Logger)
             output.logged must haveSize(4)
         }
         
         "log Info messages" in {
-            SvdLogger.level = SvdLogger.Level.Info
+            Logger.level = Logger.Level.Info
             tester.logAll
-            waitWhileRunning(SvdLogger)
+            waitWhileRunning(Logger)
             output.logged must haveSize(3)
         }
         
         "log Warn messages" in {
-            SvdLogger.level = SvdLogger.Level.Warn
+            Logger.level = Logger.Level.Warn
             tester.logAll
-            waitWhileRunning(SvdLogger)
+            waitWhileRunning(Logger)
             output.logged must haveSize(2)
         }
         
         "log Error messages" in {
-            SvdLogger.level = SvdLogger.Level.Error
+            Logger.level = Logger.Level.Error
             tester.logAll
-            waitWhileRunning(SvdLogger)
+            waitWhileRunning(Logger)
             output.logged must haveSize(1)
         }
         
         "make use of format" in {
-            SvdLogger.level = SvdLogger.Level.Trace
-            SvdLogger.format = "<%{c}> %{m}"
+            Logger.level = Logger.Level.Trace
+            Logger.format = "<%{c}> %{m}"
             tester.logTrace("some message")
-            waitWhileRunning(SvdLogger)
+            waitWhileRunning(Logger)
             output.loggedStrings must contain("<com.verknowsys.served.utils.TestLogged> some message")
             
-            SvdLogger.format = "%{m} (logged by %{c})"
+            Logger.format = "%{m} (logged by %{c})"
             tester.logTrace("Hello logger!")
-            waitWhileRunning(SvdLogger)
+            waitWhileRunning(Logger)
             output.loggedStrings must contain("Hello logger! (logged by com.verknowsys.served.utils.TestLogged)")
         }
     }

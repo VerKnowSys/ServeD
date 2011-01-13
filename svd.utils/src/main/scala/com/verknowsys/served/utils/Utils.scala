@@ -19,7 +19,7 @@ import clime.messadmin.providers.sizeof.ObjectProfiler
 *   Utils trait should be used by every Actor in ServeD
 *   
 */
-trait Utils extends UtilsCommon with SvdLogged {
+trait Utils extends UtilsCommon with Logged {
     
     // checkOrCreateVendorDir 
     // XXX: This makes unnecessary logger and I/O bloat.
