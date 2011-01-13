@@ -8,22 +8,50 @@ import scala.actors.Actor
  * @author teamon
  */
 abstract trait LoggerOutput {
-    def log(msg: String, level: Logger.Level.Value): Unit
+    def log(className: String, msg: String, level: Logger.Level.Value): Unit
 }
 
 /** 
  * Default logger output implementation 
+ *
+ * {{{
+ * Logger.output = new ConsoleLoggerOutput("%{l} [%{c}]: %{m}") // set console output with custom format
+ * 
+ * #format parameters:
+ *    %{c} - caller class name
+ *    %{l} - message level
+ *    %{m} - message content
+ * }}}
  * 
  * @author teamon
  */
-class ConsoleLoggerOutput extends LoggerOutput {
-    def log(msg: String, level: Logger.Level.Value){
-        println(msg)
+class ConsoleLoggerOutput(format: String) extends LoggerOutput {
+    import Logger.Level._
+    
+    final val Colors = Map(
+        Trace -> "\u001B[0;35m",
+        Debug -> "\u001B[0;36m",
+        Info -> "\u001B[0;37m",
+        Warn -> "\u001B[1;33m",
+        Error -> "\u001B[0;31m"
+    )
+
+    final val DefaultColor = "\u001B[0;39m"
+    
+    def this() = this("%{l} [%{c}]: %{m}")
+    
+    def log(className: String, msg: String, level: Logger.Level.Value){
+        val fmsg = format % ("l" -> level.toString, "c" -> className, "m" -> msg)
+        println(Colors(level) + fmsg + DefaultColor)
     }
 }
 
 /** 
  * Global logger 
+ * 
+ * {{{
+ * Logger.level = Debug                 // set logger level
+ * }}}
  * 
  * @author teamon
  */
@@ -38,18 +66,15 @@ object Logger extends Actor {
     
     case class Log(owner: AnyRef, msg: String, level: Level.Value)
     
-    var level = Level.Debug
+    var level = Level.Trace
     var output: LoggerOutput = new ConsoleLoggerOutput
-    var format = "[%{c}] %{m}"
 
     start
         
     def act {
         loop {
             react {
-                case Log(owner, msg, level) => 
-                    println("LOGGING: " + ("c" -> owner.getClass.getName, "m" -> msg))
-                    output.log(format % ("c" -> owner.getClass.getName, "m" -> msg), level)
+                case Log(owner, msg, level) => output.log(owner.getClass.getName, msg, level)
                 case _ =>
             }
         }
