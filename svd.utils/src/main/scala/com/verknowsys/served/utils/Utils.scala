@@ -8,7 +8,7 @@ import com.verknowsys.served.utils.kqueue.Kqueue
 import java.io.{PrintWriter, File, OutputStreamWriter}
 import java.util.ArrayList
 import java.util.regex.Pattern
-import org.apache.log4j._
+// import org.apache.log4j._
 import clime.messadmin.providers.sizeof.ObjectProfiler
 
 
@@ -19,7 +19,7 @@ import clime.messadmin.providers.sizeof.ObjectProfiler
 *   Utils trait should be used by every Actor in ServeD
 *   
 */
-trait Utils extends UtilsCommon {
+trait Utils extends UtilsCommon with SvdLogged {
     
     // checkOrCreateVendorDir 
     // XXX: This makes unnecessary logger and I/O bloat.
@@ -34,22 +34,22 @@ trait Utils extends UtilsCommon {
     */   
     lazy val props = Config.props
     
-    lazy val logger = {
-        BasicConfigurator.resetConfiguration
-        reloadLoggerConfiguration
-        Logger.getLogger(this.getClass)
-    }
+    // lazy val logger = {
+    //     BasicConfigurator.resetConfiguration
+    //     reloadLoggerConfiguration
+    //     Logger.getLogger(this.getClass)
+    // }
     
-    val loggerPropertiesFileWatch = Kqueue.watch(Config.loggerConfigFile, modified = true) { 
-        logger.debug("Logger properties file changed: " + Config.loggerConfigFile)
-        reloadLoggerConfiguration 
-    }
-    addShutdownHook { loggerPropertiesFileWatch.stop }
+    // val loggerPropertiesFileWatch = Kqueue.watch(Config.loggerConfigFile, modified = true) { 
+    //     logger.debug("Logger properties file changed: " + Config.loggerConfigFile)
+    //     reloadLoggerConfiguration 
+    // }
+    // addShutdownHook { loggerPropertiesFileWatch.stop }
     
-    def reloadLoggerConfiguration {
-        try { PropertyConfigurator.configure(Config.loggerConfigFile) } 
-        catch { case _ => logger.error("Couldn`t load file %s".format(Config.loggerConfigFile)) }
-    }
+    // def reloadLoggerConfiguration {
+    //     try { PropertyConfigurator.configure(Config.loggerConfigFile) } 
+    //     catch { case _ => logger.error("Couldn`t load file %s".format(Config.loggerConfigFile)) }
+    // }
     
 
     /**
