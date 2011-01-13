@@ -46,6 +46,11 @@ object SvdSystemManager extends Actor with Monitored with Utils {
                     logger.info("System Resources Availability:\n%s".format(nrs))
                     logger.info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
                     
+                    throw new Exception("DUPA1")
+                    throw new Exception("DUPA2")
+                    throw new Exception
+                    
+                    logger.info("after exceptions")
                     // 2011-01-11 00:45:18 - dmilith - NOTE: TODO: here will go call after boot of clean system (no rc)
                     reply((nrs, nsp))
                     
