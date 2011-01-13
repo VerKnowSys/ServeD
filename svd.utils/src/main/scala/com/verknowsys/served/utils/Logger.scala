@@ -2,16 +2,31 @@ package com.verknowsys.served.utils
 
 import scala.actors.Actor
 
+/** 
+ * Logger output class interface 
+ * 
+ * @author teamon
+ */
 abstract trait LoggerOutput {
     def log(msg: String, level: SvdLogger.Level.Value): Unit
 }
 
+/** 
+ * Default logger output implementation 
+ * 
+ * @author teamon
+ */
 class ConsoleLoggerOutput extends LoggerOutput {
     def log(msg: String, level: SvdLogger.Level.Value){
         println(msg)
     }
 }
 
+/** 
+ * Global logger 
+ * 
+ * @author teamon
+ */
 object SvdLogger extends Actor {
     object Level extends Enumeration {
         val Trace,
@@ -50,6 +65,18 @@ class SvdLogger(owner: AnyRef){
     def error(msg: => String) = if(SvdLogger.level <= Error) SvdLogger ! Log(owner, msg, Error)
 }
 
+
+/** 
+ * Logger trait. Include it in you class to use logger 
+ *
+ * {{{
+ * class A extends Logged {
+ *     logger.debug("Debug message")
+ * }
+ * }}}
+ * 
+ * @author teamon
+ */
 trait SvdLogged {
     lazy val logger = new SvdLogger(this)
 }
