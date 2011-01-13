@@ -1,5 +1,6 @@
 package com.verknowsys.served.utils
 
+import com.verknowsys.served.SpecHelpers._
 import org.specs._
 import scala.collection.mutable.ListBuffer
 
@@ -35,30 +36,35 @@ class LoggerTest extends Specification {
         "log Trace messages" in {
             SvdLogger.level = SvdLogger.Level.Trace
             tester.logAll
+            waitWhileRunning(SvdLogger)
             output.logged must haveSize(5)
         }
         
         "log Debug messages" in {
             SvdLogger.level = SvdLogger.Level.Debug
             tester.logAll
+            waitWhileRunning(SvdLogger)
             output.logged must haveSize(4)
         }
         
         "log Info messages" in {
             SvdLogger.level = SvdLogger.Level.Info
             tester.logAll
+            waitWhileRunning(SvdLogger)
             output.logged must haveSize(3)
         }
         
         "log Warn messages" in {
             SvdLogger.level = SvdLogger.Level.Warn
             tester.logAll
+            waitWhileRunning(SvdLogger)
             output.logged must haveSize(2)
         }
         
         "log Error messages" in {
             SvdLogger.level = SvdLogger.Level.Error
             tester.logAll
+            waitWhileRunning(SvdLogger)
             output.logged must haveSize(1)
         }
         
