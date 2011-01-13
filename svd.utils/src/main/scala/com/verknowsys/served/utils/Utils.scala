@@ -41,7 +41,7 @@ trait Utils extends UtilsCommon {
     }
     
     val loggerPropertiesFileWatch = Kqueue.watch(Config.loggerConfigFile, modified = true) { 
-        logger.trace("Logger properties file changed: " + Config.loggerConfigFile)
+        logger.debug("Logger properties file changed: " + Config.loggerConfigFile)
         reloadLoggerConfiguration 
     }
     addShutdownHook { loggerPropertiesFileWatch.stop }
@@ -75,6 +75,8 @@ trait Utils extends UtilsCommon {
     }
 
 
+    def getAllLT =
+        logger.trace("Live threads list:\n%s".format(Thread.getAllStackTraces.toList.map{ th => "%s - %s\n".format(th._1, th._2.toList.map{ elem => "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(elem.getFileName, elem.getClassName, elem.getMethodName, elem.getLineNumber, elem.isNativeMethod)})}))
 }
 
 
