@@ -26,6 +26,18 @@ abstract trait LoggerOutput {
  * @author teamon
  */
 class ConsoleLoggerOutput(format: String) extends LoggerOutput {
+    import ConsoleLoggerOutput._
+
+    
+    def this() = this(ConsoleLoggerOutput.DefaultFormat)
+    
+    def log(className: String, msg: String, level: Logger.Level.Value){
+        val fmsg = format % ("l" -> level.toString, "c" -> className, "m" -> msg)
+        println(Colors(level) + fmsg + DefaultColor)
+    }
+}
+
+object ConsoleLoggerOutput {
     import Logger.Level._
     
     final val Colors = Map(
@@ -35,15 +47,8 @@ class ConsoleLoggerOutput(format: String) extends LoggerOutput {
         Warn -> "\u001B[1;33m",
         Error -> "\u001B[0;31m"
     )
-
     final val DefaultColor = "\u001B[0;39m"
-    
-    def this() = this("%{l} [%{c}]: %{m}")
-    
-    def log(className: String, msg: String, level: Logger.Level.Value){
-        val fmsg = format % ("l" -> level.toString, "c" -> className, "m" -> msg)
-        println(Colors(level) + fmsg + DefaultColor)
-    }
+    final val DefaultFormat = "%{l} [%{c}]: %{m}"
 }
 
 /** 
