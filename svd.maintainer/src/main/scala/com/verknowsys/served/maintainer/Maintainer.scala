@@ -96,6 +96,7 @@ object Maintainer extends Actor with Monitored with Utils {
         logger.info("SystemManager is loading")
         SvdSystemManager ! Init
         
+        getAllLT
         // logger.info("ApiServerActor is loading")
         // ApiServerActor ! Init
     }
