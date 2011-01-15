@@ -25,7 +25,7 @@
 //  * Time: 3:15:04 PM
 //  */
 // 
-// object SSHCommand extends Utils {
+// object SSHCommand extends UtilsCommon {
 // 
 //     // val buildTextFile = "build.text" // XXX hardcoded but probably it will stay hardcoded anyway ;}
 //     val host = props("sshHost") getOrElse "127.0.0.1"

@@ -23,7 +23,7 @@
 // 
 // abstract class CddsVersion(
 //    val configFile: String
-//    ) extends Utils {
+//    ) extends UtilsCommon {
 // 
 //  lazy val debug = props("debug") getOrElse "true"
 //  lazy val repositoryDir = props("gitRepositoryProjectDir") getOrElse "/git/MyRepo.git"

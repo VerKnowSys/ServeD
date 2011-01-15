@@ -91,7 +91,7 @@
 // }
 // 
 // 
-// object DeployerGUI extends Utils {
+// object DeployerGUI extends UtilsCommon {
 // 
 //  override
 //  def logger = Logger.getLogger(DeployerGUI.getClass)

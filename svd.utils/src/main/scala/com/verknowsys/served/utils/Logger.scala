@@ -45,7 +45,7 @@ class ConsoleLoggerOutput extends LoggerOutput {
         reloadConfiguration
     }
     
-    addShutdownHook { propertiesFileWatch.stop }
+    Utils.addShutdownHook { propertiesFileWatch.stop }
     
     reloadConfiguration
     
@@ -59,7 +59,7 @@ class ConsoleLoggerOutput extends LoggerOutput {
     }
 }
 
-object ConsoleLoggerOutput extends UtilsCommon {
+object ConsoleLoggerOutput {
     import Logger.Level._
     
     final val Colors = Map(
@@ -83,7 +83,7 @@ object ConsoleLoggerOutput extends UtilsCommon {
  * 
  * @author teamon
  */
-object Logger extends Actor with UtilsCommon {
+object Logger extends Actor {
     object Level extends Enumeration {
         val Trace,
             Debug,
@@ -124,7 +124,7 @@ object Logger extends Actor with UtilsCommon {
         reloadConfiguration
     }
     
-    addShutdownHook { propertiesFileWatch.stop }
+    Utils.addShutdownHook { propertiesFileWatch.stop }
     
     reloadConfiguration
     

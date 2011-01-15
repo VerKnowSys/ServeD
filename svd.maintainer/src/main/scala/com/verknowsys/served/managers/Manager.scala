@@ -1,7 +1,7 @@
 package com.verknowsys.served.managers
 
 import scala.actors.Actor
-import com.verknowsys.served.utils.Utils
+import com.verknowsys.served.utils.CommonActor
 import com.verknowsys.served.utils.monitor.Monitored
 
 /**
@@ -9,7 +9,7 @@ import com.verknowsys.served.utils.monitor.Monitored
  * 
  * @author teamon
  */
-abstract class Manager(owner: AccountManager) extends Actor with Monitored with Utils {
+abstract class Manager(owner: AccountManager) extends CommonActor with Monitored {
     start
     
     protected def account = owner.account

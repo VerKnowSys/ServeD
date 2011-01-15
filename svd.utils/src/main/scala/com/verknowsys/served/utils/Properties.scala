@@ -83,7 +83,7 @@ class Property(parent: Properties, key: String){
  *
  * @author teamon
  */
-class Properties(filename: String) extends Utils {
+class Properties(filename: String) extends Logged {
     lazy val data = load
 
     /**

@@ -1,6 +1,5 @@
 package com.verknowsys.served.utils.git
 
-
 import com.verknowsys.served.utils._
 
 import scala.collection.mutable.Map
@@ -109,7 +108,7 @@ object GitRepository {
  *
  * @author teamon
  */
-class GitRepository(val dir: String) extends Utils {
+class GitRepository(val dir: String) extends Logged {
     lazy val (gitRepo, isBare) = {
         val file = new File(dir, ".git")
         logger.trace("Git repository watch. Dir: %s, File: %s".format(dir, file))

@@ -3,13 +3,13 @@ package com.verknowsys.served.notifications
 import scala.actors._
 import scala.collection.mutable.ListBuffer
 
-import com.verknowsys.served.utils.Utils
+import com.verknowsys.served.utils.Logged
     
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
 
-class XMPPGate(host: String, port: Int, login: String, password: String, resource: String) extends Gate with MessageListener with Utils {
+class XMPPGate(host: String, port: Int, login: String, password: String, resource: String) extends Gate with MessageListener with Logged {
     val config = new ConnectionConfiguration(host, port)
     val connection = new XMPPConnection(config)
     val presence = new Presence(Presence.Type.available)

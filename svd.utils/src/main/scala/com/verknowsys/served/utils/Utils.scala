@@ -1,6 +1,3 @@
-// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
-// This Software is a close code project. You may not redistribute this code without permission of author.
-
 package com.verknowsys.served.utils
 
 import com.verknowsys.served._
@@ -8,18 +5,17 @@ import com.verknowsys.served.utils.kqueue.Kqueue
 import java.io.{PrintWriter, File, OutputStreamWriter}
 import java.util.ArrayList
 import java.util.regex.Pattern
-// import org.apache.log4j._
 import clime.messadmin.providers.sizeof.ObjectProfiler
 import scala.collection.JavaConversions._
 
 
 /**
-*   @author dmilith
-*   
-*   Utils trait should be used by every Actor in ServeD
-*   
-*/
-trait Utils extends UtilsCommon with Logged {
+ * Utils object containing common functions
+ * 
+ * @author dmilith
+ *   
+ */
+object Utils extends Logged {
     
     // checkOrCreateVendorDir 
     // XXX: This makes unnecessary logger and I/O bloat.
@@ -69,29 +65,19 @@ trait Utils extends UtilsCommon with Logged {
         vendorPath
     }
     
-    
-    def messageNotRecognized(x: Any) {
-        logger.warn("Message not recognized: " + x.toString)
-    }
-
-
     def getAllLT = logger.trace("Live threads list:\n%s".format(Thread.getAllStackTraces.toList.map{ th => "%s - %s\n".format(th._1, th._2.toList.map{ elem => "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(elem.getFileName, elem.getClassName, elem.getMethodName, elem.getLineNumber, elem.isNativeMethod)})}))
         
-}
-
-
-
-
-/**
-*   @author dmilith
-*   
-*   UtilsCommon trait is higher level of abstraction (to be usable in tests).
-*   Utils trait will always include UtilsCommon
-*   
-*/
-trait UtilsCommon {
-
-
+    /**
+     *  @author dmilith
+     *
+     *  Returns size (in bytes) of given object in JVM memory
+     *
+     *  @example
+     *  logger.info ( sizeof ( new Date ( ) ))
+     *
+     */
+    def sizeof(any: Any) = ObjectProfiler.sizeof(any)
+    
     /**
      *  @author dmilith
      *
@@ -110,19 +96,5 @@ trait UtilsCommon {
                 override def run = block
             }
         )
-
-
-    /**
-     *  @author dmilith
-     *
-     *  Returns size (in bytes) of given object in JVM memory
-     *
-     *  @example
-     *  logger.info ( sizeof ( new Date ( ) ))
-     *
-     */
-    def sizeof(any: Any) = ObjectProfiler.sizeof(any)
-
-    
-    
 }
+

@@ -12,7 +12,7 @@
 // import xml.{Node, XML}
 // 
 // 
-// class Preferences(configFileNameInput: String) extends Utils {
+// class Preferences(configFileNameInput: String) extends UtilsCommon {
 // 
 //  def this() = this("served.xml") // additional Constructor
 // 

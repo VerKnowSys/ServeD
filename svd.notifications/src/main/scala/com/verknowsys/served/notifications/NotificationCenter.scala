@@ -9,7 +9,7 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.git._
 import com.verknowsys.served.utils.signals._
 
-object NotificationCenter extends Actor with Utils {
+object NotificationCenter extends CommonActor {
     case class Message(message: String)
     case class Status(status: String)
     
@@ -17,11 +17,11 @@ object NotificationCenter extends Actor with Utils {
     
     // XXX: Hardcoded gate
     val gates = new XMPPGate(
-        props("xmpp.host") or "localhost", 
-        props("xmpp.port") or 5222,
-        props("xmpp.login") or "gitbot",
-        props("xmpp.password") or "git-bot-666",
-        props("xmpp.resource") or "served-bot-resource"
+        Config("xmpp.host") or "localhost", 
+        Config("xmpp.port") or 5222,
+        Config("xmpp.login") or "gitbot",
+        Config("xmpp.password") or "git-bot-666",
+        Config("xmpp.resource") or "served-bot-resource"
     ) :: Nil
     
 

@@ -1,6 +1,6 @@
 package com.verknowsys.served.utils
 
-
+import scala.actors.Actor
 
 /** 
  * Abstract class. To be used as base for most of actors 

@@ -5,7 +5,7 @@ package com.verknowsys.served.maintainer
 
 import com.verknowsys.served.api._
 import com.verknowsys.served.Config
-import com.verknowsys.served.utils.Utils
+import com.verknowsys.served.utils.{CommonActor, Utils}
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.monitor._
 import com.verknowsys.served.systemmanager._
@@ -27,7 +27,7 @@ import com.verknowsys.served.notifications._
  *  Main Maintainer loader.
  */
 
-object Maintainer extends Actor with Monitored with Utils {
+object Maintainer extends CommonActor with Monitored {
     start
 
     
@@ -63,7 +63,7 @@ object Maintainer extends Actor with Monitored with Utils {
     *   ServeD Maintainer Core
     */
     def main(args: Array[String]) {
-        logger.debug("Mainainer object size: " + sizeof(Maintainer))
+        logger.debug("Mainainer object size: " + Utils.sizeof(Maintainer))
         logger.debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
         logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         
@@ -77,7 +77,7 @@ object Maintainer extends Actor with Monitored with Utils {
         }}
 
         
-        addShutdownHook {
+        Utils.addShutdownHook {
             SvdSystemManager ! Quit
             AccountsManager ! Quit
             NotificationCenter ! Quit
@@ -96,7 +96,7 @@ object Maintainer extends Actor with Monitored with Utils {
         logger.info("SystemManager is loading")
         SvdSystemManager ! Init
         
-        getAllLT
+        Utils.getAllLT
         // logger.info("ApiServerActor is loading")
         // ApiServerActor ! Init
     }

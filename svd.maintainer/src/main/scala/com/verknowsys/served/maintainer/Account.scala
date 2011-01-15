@@ -1,6 +1,6 @@
 package com.verknowsys.served.maintainer
 
-import com.verknowsys.served.utils.Utils
+import com.verknowsys.served.utils.Logged
 import com.verknowsys.served.utils.git.GitRepository
 import java.io.File
 import org.apache.commons.io.FileUtils
@@ -20,7 +20,7 @@ class Account (
         val information: String = "No information",
         val homeDir: String = "/home/",
         val shell: String = "/bin/bash"
-        ) extends Utils {
+        ) extends Logged {
 
     
     /**

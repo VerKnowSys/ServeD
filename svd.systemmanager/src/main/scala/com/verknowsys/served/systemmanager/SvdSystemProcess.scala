@@ -18,7 +18,7 @@ import java.io._
   */
 
 
-class SvdSystemProcess(val commandInput: String = "") extends Actor with Monitored with Utils {
+class SvdSystemProcess(val commandInput: String = "") extends CommonActor with Monitored {
     
     private var process: Process = null
     private var output = ""

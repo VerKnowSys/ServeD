@@ -26,7 +26,7 @@ import scala.collection.JavaConversions._
 *   
 *   SystemManager - responsible for System Managment and Monitoring
 */
-object SvdSystemManager extends Actor with Monitored with Utils {
+object SvdSystemManager extends CommonActor with Monitored {
     
     private val core = new Sigar
     private val processes = ListBuffer[SvdSystemProcess]()

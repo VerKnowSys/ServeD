@@ -26,7 +26,7 @@
 //  */
 // 
 // 
-// object Deployer extends Utils {
+// object Deployer extends UtilsCommon {
 // 
 //  val uuid = UUID.randomUUID.toString
 //  Logger.getLogger("com.sshtools").setLevel(Level.WARN) // should quiet too verbose messages of sshtools

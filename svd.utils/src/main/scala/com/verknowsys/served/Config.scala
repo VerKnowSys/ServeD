@@ -23,6 +23,8 @@ object Config {
 
     final val props = new Properties(mainConfigFile)
     
+    def apply(key: String) = props(key)
+    
 
     /**
      *   @author dmilith, teamon

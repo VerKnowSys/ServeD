@@ -1,7 +1,7 @@
 package com.verknowsys.served.managers
 
 import scala.actors.Actor
-import com.verknowsys.served.utils.Utils
+import com.verknowsys.served.utils.CommonActor
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.maintainer.Account
 import com.verknowsys.served.api._
@@ -11,7 +11,7 @@ import com.verknowsys.served.api._
  * 
  * @author teamon
  */
-class AccountManager(val account: Account) extends Actor with Utils {
+class AccountManager(val account: Account) extends CommonActor {
     start
     
     // val gitManager = new GitManager(this)

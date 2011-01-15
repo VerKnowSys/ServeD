@@ -15,7 +15,7 @@ import com.verknowsys.served.utils.kqueue.Kqueue
 
 import java.text.SimpleDateFormat
 
-class SvdGitNotifier(repo: GitRepository) extends Actor with Utils {
+class SvdGitNotifier(repo: GitRepository) extends CommonActor {
     import NotificationCenter._
 
     var oldHEAD = repo.head // XXX: var :(
