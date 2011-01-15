@@ -12,7 +12,7 @@ import java.io._
 import java.lang._
 
 
-class SvdSystemManagerTest extends Specification with UtilsCommon {
+class SvdSystemManagerTest extends Specification {
 
 
     "SystemManager object" should {
