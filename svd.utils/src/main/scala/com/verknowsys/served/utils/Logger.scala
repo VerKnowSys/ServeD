@@ -30,11 +30,16 @@ class ConsoleLoggerOutput extends LoggerOutput {
     import ConsoleLoggerOutput._
     
     def log(sender: AnyRef, msg: Logger.Message){
-        val fmsg = format % ("l" -> msg.level.toString, "c" -> msg.caller.toString, "m" -> msg.content)
+        val fmsg = format % (
+            "l" -> msg.level.toString, 
+            "c" -> msg.caller.toString, 
+            "s" -> sender.toString, 
+            "m" -> msg.content
+        )
         println(Colors(msg.level) + fmsg + DefaultColor)
     }
     
-    private var format = DefaultFormat // XXX: Var
+    private var format = DefaultFormat
         
     val propertiesFileWatch = Kqueue.watch(Config.loggerConfigFile, modified = true) { 
         reloadConfiguration
@@ -66,7 +71,7 @@ object ConsoleLoggerOutput extends UtilsCommon {
     )
 
     final val DefaultColor = "\u001B[0;39m"
-    final val DefaultFormat = "%{l} [%{c}]: %{m}"
+    final val DefaultFormat = "%{l} [%{s} | %{c}]: %{m}"
 }
 
 /** 
