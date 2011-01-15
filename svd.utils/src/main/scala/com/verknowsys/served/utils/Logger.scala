@@ -11,7 +11,7 @@ import com.verknowsys.served.Config
  * @author teamon
  */
 abstract trait LoggerOutput {
-    def log(className: String, msg: String, level: Logger.Level.Value): Unit
+    def log(sender: AnyRef, msg: Logger.Message): Unit
 }
 
 /** 
@@ -29,9 +29,9 @@ abstract trait LoggerOutput {
 class ConsoleLoggerOutput extends LoggerOutput {
     import ConsoleLoggerOutput._
     
-    def log(className: String, msg: String, level: Logger.Level.Value){
-        val fmsg = format % ("l" -> level.toString, "c" -> className, "m" -> msg)
-        println(Colors(level) + fmsg + DefaultColor)
+    def log(sender: AnyRef, msg: Logger.Message){
+        val fmsg = format % ("l" -> msg.level.toString, "c" -> msg.caller.toString, "m" -> msg.content)
+        println(Colors(msg.level) + fmsg + DefaultColor)
     }
     
     private var format = DefaultFormat // XXX: Var
@@ -87,7 +87,7 @@ object Logger extends Actor with UtilsCommon {
             Error = Value
     }
     
-    case class Log(owner: AnyRef, msg: String, level: Level.Value)
+    case class Message(caller: AnyRef, content: String, level: Level.Value)
     
     @volatile private var _level = Level.Trace
     @volatile private var _output: LoggerOutput = new ConsoleLoggerOutput
@@ -109,7 +109,7 @@ object Logger extends Actor with UtilsCommon {
     def act {
         loop {
             react {
-                case Log(owner, msg, level) => output.log(owner.getClass.getName, msg, level) // NOTE: Make use of sender?
+                case msg @ Message(owner, content, level) => output.log(sender, msg)
                 case _ =>
             }
         }
@@ -139,23 +139,6 @@ object Logger extends Actor with UtilsCommon {
         
 }
 
-class Logger(owner: AnyRef){
-    import Logger.Log
-    import Logger.Level._
-    
-    def trace(msg: => String) = if(Logger.level <= Trace) Logger ! Log(owner, msg, Trace)
-    def debug(msg: => String) = if(Logger.level <= Debug) Logger ! Log(owner, msg, Debug)
-    def info(msg:  => String) = if(Logger.level <= Info)  Logger ! Log(owner, msg, Info)
-    def warn(msg:  => String) = if(Logger.level <= Warn)  Logger ! Log(owner, msg, Warn)
-    def error(msg: => String) = if(Logger.level <= Error) Logger ! Log(owner, msg, Error)
-    
-    def trace(x: Any): Unit = trace(x.toString)
-    def debug(x: Any): Unit = debug(x.toString)
-    def info(x: Any): Unit = info(x.toString)
-    def warn(x: Any): Unit = warn(x.toString)
-    def error(x: Any): Unit = error(x.toString)
-}
-
 
 /** 
  * Logger trait. Include it in you class to use logger 
@@ -169,5 +152,21 @@ class Logger(owner: AnyRef){
  * @author teamon
  */
 trait Logged {
-    lazy val logger = new Logger(this)
+    @deprecated("Use just 'trace' instead of 'logger.trace' (and other methods as well)")
+    lazy val logger = this
+    
+    import Logger.Message
+    import Logger.Level._
+    
+    def trace(msg: => String) = if(Logger.level <= Trace) Logger ! Message(this, msg, Trace)
+    def debug(msg: => String) = if(Logger.level <= Debug) Logger ! Message(this, msg, Debug)
+    def info(msg:  => String) = if(Logger.level <= Info)  Logger ! Message(this, msg, Info)
+    def warn(msg:  => String) = if(Logger.level <= Warn)  Logger ! Message(this, msg, Warn)
+    def error(msg: => String) = if(Logger.level <= Error) Logger ! Message(this, msg, Error)
+    
+    def trace(x: Any): Unit = trace(x.toString)
+    def debug(x: Any): Unit = debug(x.toString)
+    def info(x: Any): Unit = info(x.toString)
+    def warn(x: Any): Unit = warn(x.toString)
+    def error(x: Any): Unit = error(x.toString)
 }

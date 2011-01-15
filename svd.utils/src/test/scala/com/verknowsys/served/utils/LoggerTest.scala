@@ -7,21 +7,21 @@ import scala.collection.mutable.ListBuffer
 class TestLoggerOutput extends LoggerOutput {
     val logged = new ListBuffer[String]
     
-    def log(className: String, msg: String, level: Logger.Level.Value){
-        logged += msg
+    def log(sender: AnyRef, msg: Logger.Message){
+        logged += msg.content
     }
 }
 
 class TestLogged extends Logged {
     def logAll {
-        logger.trace("test trace msg")
-        logger.debug("test debug msg")
-        logger.info("test info msg")
-        logger.warn("test warn msg")
-        logger.error("test error msg")
+        trace("test trace msg")
+        debug("test debug msg")
+        info("test info msg")
+        warn("test warn msg")
+        error("test error msg")
     }
     
-    def logTrace(msg: String) = logger.trace(msg)
+    def logTrace(msg: String) = trace(msg)
 }
 
 
