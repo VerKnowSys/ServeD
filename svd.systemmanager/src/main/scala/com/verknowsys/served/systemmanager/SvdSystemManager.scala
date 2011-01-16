@@ -42,50 +42,50 @@ object SvdSystemManager extends CommonActor with Monitored {
                     val nrs = new NativeSystemResources
                     val nsp = new NativeSystemProcess(core.getPid)
                     
-                    logger.info("SystemManager ready")
-                    logger.info("System Resources Availability:\n%s".format(nrs))
-                    logger.info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
+                    info("SystemManager ready")
+                    info("System Resources Availability:\n%s".format(nrs))
+                    info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
                     
                     throw new Exception("DUPA1")
                     throw new Exception("DUPA2")
                     throw new Exception
                     
-                    logger.info("after exceptions")
+                    info("after exceptions")
                     // 2011-01-11 00:45:18 - dmilith - NOTE: TODO: here will go call after boot of clean system (no rc)
                     reply((nrs, nsp))
                     
                 case Command(cmd) =>
-                    logger.info("Running Native Command: %s".format(cmd))
+                    info("Running Native Command: %s".format(cmd))
                     val sysManProcess = new SvdSystemProcess(cmd)
                     val result = sysManProcess !? Run // 2011-01-10 23:53:22 - dmilith - NOTE: WAIT FOR PROCESS until end
                     processes.add(sysManProcess)
                     reply(result)
                     
                 case Kill(cmd) =>
-                    logger.info("Killing Native Command: %s".format(cmd))
+                    info("Killing Native Command: %s".format(cmd))
                     reply(Ready)
                 
                 case GetAllProcesses =>
                     val psAll = core.getProcList.toList
-                    logger.debug("All process IDs: %s".format(psAll.mkString(", ")))
+                    debug("All process IDs: %s".format(psAll.mkString(", ")))
                     psAll.foreach {
                         p =>
-                        	logger.trace(new NativeSystemProcess(p))
+                        	trace(new NativeSystemProcess(p))
                     }
                     reply(Ready)
                     
                 case GetRunningProcesses =>
-                    logger.debug("Processes running by ServeD: %s".format(processes.mkString(", ")))
+                    debug("Processes running by ServeD: %s".format(processes.mkString(", ")))
                     reply(processes)
             
                     
                 case Quit =>
-                    logger.info("Quitting SystemManager")
+                    info("Quitting SystemManager")
                     reply(Ready)
                     exit
                 
                 // case SendSignal(signal, pid) =>
-                    // logger.trace("Send Signal Request, received with signal %s, for pid: %s".format(signal, pid))
+                    // trace("Send Signal Request, received with signal %s, for pid: %s".format(signal, pid))
                     // reply(Ready)
                     
                 case _ =>
@@ -104,16 +104,16 @@ object SvdSystemManager extends CommonActor with Monitored {
     def sendSignalToPid(signal: POSIX.Value, @specialized pid: Int) =
         signal match {
             case POSIX.SIGHUP =>
-                logger.trace("SigHUP sent to process pid: %s".format(pid))
+                trace("SigHUP sent to process pid: %s".format(pid))
                 
             case POSIX.SIGINT =>
-                logger.trace("SigINT sent to process pid: %s".format(pid))
+                trace("SigINT sent to process pid: %s".format(pid))
                 
             case POSIX.SIGQUIT =>
-                logger.trace("SigQUIT sent to process pid: %s".format(pid))
+                trace("SigQUIT sent to process pid: %s".format(pid))
                 
             case POSIX.SIGKILL =>
-                logger.trace("SigKILL sent to process pid: %s".format(pid))
+                trace("SigKILL sent to process pid: %s".format(pid))
             
             case _ => messageNotRecognized(_)                
         }
@@ -167,7 +167,7 @@ object SvdSystemManager extends CommonActor with Monitored {
             // Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
             //                 val raf = new RandomAccessFile(watchedFile, "r")
             //                 raf.seek(raf.length - 1024)
-            //                 logger.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
+            //                 info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
             //             }
         // }
     

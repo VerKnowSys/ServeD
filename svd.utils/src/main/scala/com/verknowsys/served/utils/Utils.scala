@@ -37,14 +37,14 @@ object Utils extends Logged {
     // }
     
     // val loggerPropertiesFileWatch = Kqueue.watch(Config.loggerConfigFile, modified = true) { 
-    //     logger.debug("Logger properties file changed: " + Config.loggerConfigFile)
+    //     debug("Logger properties file changed: " + Config.loggerConfigFile)
     //     reloadLoggerConfiguration 
     // }
     // addShutdownHook { loggerPropertiesFileWatch.stop }
     
     // def reloadLoggerConfiguration {
     //     try { PropertyConfigurator.configure(Config.loggerConfigFile) } 
-    //     catch { case _ => logger.error("Couldn`t load file %s".format(Config.loggerConfigFile)) }
+    //     catch { case _ => error("Couldn`t load file %s".format(Config.loggerConfigFile)) }
     // }
     
 
@@ -57,15 +57,15 @@ object Utils extends Logged {
     def checkOrCreateVendorDir = {
         val vendorPath = Config.homePath + Config.vendorDir
         if (new File(vendorPath).exists) {
-            logger.debug("Making sure that vendor directory exists")
+            debug("Making sure that vendor directory exists")
         } else {
-            logger.debug("No vendor directory available! Creating empty vendor directory")
+            debug("No vendor directory available! Creating empty vendor directory")
             new File(vendorPath).mkdir
         }
         vendorPath
     }
     
-    def getAllLT = logger.trace("Live threads list:\n%s".format(Thread.getAllStackTraces.toList.map{ th => "%s - %s\n".format(th._1, th._2.toList.map{ elem => "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(elem.getFileName, elem.getClassName, elem.getMethodName, elem.getLineNumber, elem.isNativeMethod)})}))
+    def getAllLT = trace("Live threads list:\n%s".format(Thread.getAllStackTraces.toList.map{ th => "%s - %s\n".format(th._1, th._2.toList.map{ elem => "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(elem.getFileName, elem.getClassName, elem.getMethodName, elem.getLineNumber, elem.isNativeMethod)})}))
         
     /**
      *  @author dmilith
@@ -73,7 +73,7 @@ object Utils extends Logged {
      *  Returns size (in bytes) of given object in JVM memory
      *
      *  @example
-     *  logger.info ( sizeof ( new Date ( ) ))
+     *  info ( sizeof ( new Date ( ) ))
      *
      */
     def sizeof(any: Any) = ObjectProfiler.sizeof(any)
@@ -86,7 +86,7 @@ object Utils extends Logged {
      *  @example
      *  addShutdownHook {
      *     closeMySockets
-     *     logger.info("Dying!")
+     *     info("Dying!")
      *  }
      *
      */

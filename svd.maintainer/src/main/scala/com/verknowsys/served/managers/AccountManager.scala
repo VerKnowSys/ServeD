@@ -22,11 +22,11 @@ class AccountManager(val account: Account) extends CommonActor {
                 // case msg: Git.Base => sender ! (gitManager !! msg)
                 
                 case Init =>
-                    logger.info("AccountManager ready")
+                    info("AccountManager ready")
                     reply(Ready)
                     
                 case Quit =>
-                    logger.info("Quitting AccountManager(" + account.userName + ")")
+                    info("Quitting AccountManager(" + account.userName + ")")
                     reply(Ready)
                     exit
                 

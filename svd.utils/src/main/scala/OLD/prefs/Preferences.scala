@@ -275,7 +275,7 @@
 //      map
 //    } catch {
 //      case x: Exception => {
-//        logger.error("Exception while taking value from file!: " + x)
+//        error("Exception while taking value from file!: " + x)
 //        map
 //      }
 //    }
@@ -309,14 +309,14 @@
 //  try { // read values from config or generate new stub
 //    value = fromXML(XML.loadFile(configFileName))
 //    validateValues
-//    logger.info("Config file used (" + configFileName + ")")
+//    info("Config file used (" + configFileName + ")")
 //  } catch {
 //    case x: RuntimeException => {
-//      logger.error("Bad Value in config file found:\n " + x)
+//      error("Bad Value in config file found:\n " + x)
 //      System.exit(1)
 //    }
 //    case x: Exception => {
-//      logger.warn("*** Config file " + configFileName + " doesn't exists! Creating new one")
+//      warn("*** Config file " + configFileName + " doesn't exists! Creating new one")
 //      savePreferences
 //    }
 //  }

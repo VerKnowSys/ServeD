@@ -10,7 +10,7 @@ import scala.actors.Actor
 abstract class CommonActor extends ExceptionHandlingActor with Logged {
     
     def messageNotRecognized(x: Any) {
-        logger.warn("Message not recognized: " + x.toString)
+        warn("Message not recognized: " + x.toString)
     }
 }
 

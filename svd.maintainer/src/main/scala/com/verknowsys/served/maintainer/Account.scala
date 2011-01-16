@@ -51,11 +51,11 @@ class Account (
     def size = {
         try {
             val elementsSize = FileUtils.sizeOfDirectory(new File(homeDir))
-            logger.debug("getAccountSize of " + homeDir + " folder: " + elementsSize)
+            debug("getAccountSize of " + homeDir + " folder: " + elementsSize)
             Some(elementsSize)
         } catch {
             case x: Exception =>
-                logger.error("Error: " + x)
+                error("Error: " + x)
                 None
         }
     }

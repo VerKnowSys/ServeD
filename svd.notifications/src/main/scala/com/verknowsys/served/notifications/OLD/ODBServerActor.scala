@@ -31,8 +31,8 @@
 //      server.startServer(false) //start server in current thread
 //    } catch {
 //      case x: Throwable => {
-//        logger.info("### Error: exception occured in ODBServerActor!")
-//        logger.debug( x.printStackTrace )
+//        info("### Error: exception occured in ODBServerActor!")
+//        debug( x.printStackTrace )
 //      }
 //    } finally {
 //      if (server != null) {
@@ -49,7 +49,7 @@
 //          act
 //        }
 //        case Quit => {
-//          logger.debug("*** ODBServer received Quit command.")
+//          debug("*** ODBServer received Quit command.")
 //          if (server != null) server.close
 //          exit
 //        }

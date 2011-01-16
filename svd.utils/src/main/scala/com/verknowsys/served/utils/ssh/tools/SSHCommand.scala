@@ -40,7 +40,7 @@
 //     //  val backupDate = (new Date).toString.replaceAll(" |:", "_")
 //     //  val source = props("remoteWebStartDeployDir")
 //     //  val destination = props("remoteWebStartDeployDir") + "../OLD/" + backupDate
-//     //  logger.info("Copying " + source + " to " + destination)
+//     //  info("Copying " + source + " to " + destination)
 //     //  clientForRemoteCommand.executeCommand("cp -r " + source + " " + destination)
 //     //  clientForRemoteCommand.close
 //     // }
@@ -73,28 +73,28 @@
 //     //
 //     //    var out = List[String]() // XXX: variable
 //     //    output.split(",").foreach{ a => out ++= List[String](a) }
-//     //    logger.debug("1: " + out)
-//     //    logger.debug("2: " + listOfCRCLocalFile)
-//     //    logger.debug("result: " + (listOfCRCLocalFile -- out))
+//     //    debug("1: " + out)
+//     //    debug("2: " + listOfCRCLocalFile)
+//     //    debug("result: " + (listOfCRCLocalFile -- out))
 //     //    if ((out -- listOfCRCLocalFile) == List()) {
-//     //      logger.info("FILE IDENTICAL: " + localFile.split("/").last)
+//     //      info("FILE IDENTICAL: " + localFile.split("/").last)
 //     //    } else {
-//     //      logger.warn("FILE DIFFERENT: " + localFile.split("/").last)
-//     //      logger.info("Uploading " + localFile.split("/").last)
+//     //      warn("FILE DIFFERENT: " + localFile.split("/").last)
+//     //      info("Uploading " + localFile.split("/").last)
 //     //      putLocalFileToRemoteHost(localFile, remoteDeployDir + localFile.split("/").last)
 //     //    }
 //     //    clientForRemoteCommand.close
 //     //  }
-//     //  logger.info("Deploying")
+//     //  info("Deploying")
 //     //  listOfSignedFiles foreach {
 //     //    actionBlock(_)
 //     //  }
-//     //  logger.info("Verifying deploy")
+//     //  info("Verifying deploy")
 //     //  listOfSignedFiles foreach {
 //     //    actionBlock(_)
 //     //  }
 //     //  // deploying jnlp file
-//     //  logger.info("Generating JNLP file")
+//     //  info("Generating JNLP file")
 //     //  var arguments = "" // XXX: variable
 //     //  for( i <- props("webstartArgumentsJVM")) { // XXX: maybe switch to normal String instead of List[String]
 //     //    arguments += i + " "
@@ -112,19 +112,19 @@
 //     //    props("jnlpDescription") getOrElse "My App Description"
 //     //    )
 //     //  val tempJnlpFileName = "/tmp/launch-" + Deployer.uuid + ".jnlp"
-//     //  logger.debug("Temporary jnlp filename: " + tempJnlpFileName)
+//     //  debug("Temporary jnlp filename: " + tempJnlpFileName)
 //     //  jnlp.saveJNLP(tempJnlpFileName)
-//     //  logger.warn("Putting JNLP file to remote server")
+//     //  warn("Putting JNLP file to remote server")
 //     //  putLocalFileToRemoteHost(tempJnlpFileName, props("remoteWebStartDeployDir") + props("jnlpFileName") )
 //     // }
 // 
 // 
 //     def putLocalFileToRemoteHost(source: String, destination: String) = {
 //         val client = ssh.openSftpClient
-//         logger.debug("Source: " + source + " to destination: " + destination + " on connection: " + client)
+//         debug("Source: " + source + " to destination: " + destination + " on connection: " + client)
 //         client.put(source, destination)
 //         client.quit
-//         logger.debug("File sent to remote host")
+//         debug("File sent to remote host")
 //     }
 // 
 // 
@@ -134,18 +134,18 @@
 //         passwordAuthenticationClient.setPassword(password)
 //         val result = ssh.authenticate(passwordAuthenticationClient)
 //         if (result != AuthenticationProtocolState.COMPLETE) {
-//             logger.error("Login to " + host + ":" + port + " " + userName + "/" + password + " failed");
+//             error("Login to " + host + ":" + port + " " + userName + "/" + password + " failed");
 //         }
 //     }
 // 
 // 
 //     def connect =
 //         try {
-//             logger.info("Connecting to host " + host + ":" + port)
+//             info("Connecting to host " + host + ":" + port)
 //             ssh.connect(host, port.toInt)
 //         } catch {
 //             case x: UnknownHostException =>
-//                 logger.error("Couldn't connect to remote host: " + host + " at port " + port)
+//                 error("Couldn't connect to remote host: " + host + " at port " + port)
 //                 exit
 //         }
 // 

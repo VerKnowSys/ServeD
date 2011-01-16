@@ -39,12 +39,12 @@
 //    lazy val pathToMaven2Repo = System.getProperty("user.home") + "/.m2/repository/"
 // 
 //    addShutdownHook {
-//      logger.debug("Into shutdown hook")
-//      logger.info("Finished.")
+//      debug("Into shutdown hook")
+//      info("Finished.")
 //    }
 // 
 //    if (args.size == 0) {
-//      logger.error("Missing argument: (config filename)")
+//      error("Missing argument: (config filename)")
 //      exit
 //    }
 // 
@@ -60,24 +60,24 @@
 //    var macAppDeploy = false
 //    var basicOnly_? = props("deployOnlyBasicFiles")
 // 
-//    logger.info("Starting Deployer.. v1.1")
-//    logger.info("Deployer mode: " + (if (debug) "DEBUG" else "NORMAL"))
-//    logger.info("Deployer home dir: " + System.getProperty("user.home") + "/.svd/")
-//    logger.info("Maven 2 Repository dir: " + pathToMaven2Repo)
-//    logger.info("Deploy tmp dir: " + deployTmpDir)
-//    logger.info("Will deploy files to remote host to: " + props("remoteWebStartDeployDir"))
-//    logger.info("Given arguments: " + args.map{ a => if (a == args.last) a + ". " else a + ", " }.mkString)
+//    info("Starting Deployer.. v1.1")
+//    info("Deployer mode: " + (if (debug) "DEBUG" else "NORMAL"))
+//    info("Deployer home dir: " + System.getProperty("user.home") + "/.svd/")
+//    info("Maven 2 Repository dir: " + pathToMaven2Repo)
+//    info("Deploy tmp dir: " + deployTmpDir)
+//    info("Will deploy files to remote host to: " + props("remoteWebStartDeployDir"))
+//    info("Given arguments: " + args.map{ a => if (a == args.last) a + ". " else a + ", " }.mkString)
 // 
 //    def remoteSSHDeploy = {
 //      SSHCommand.auth
-//      logger.debug("Performing tasks with given list of files: " + filesToBeDeployed.toArray.map {a => deployTmpDir + a.toString.split("/").last})
-//      logger.debug("Remote dir containing jars: " + props("remoteWebStartDeployDir") + "lib/")
+//      debug("Performing tasks with given list of files: " + filesToBeDeployed.toArray.map {a => deployTmpDir + a.toString.split("/").last})
+//      debug("Remote dir containing jars: " + props("remoteWebStartDeployDir") + "lib/")
 //      SSHCommand.deploy(filesToBeDeployed, deployTmpDir)
 //    }
 // 
 //    // check given arguments
 //    if (args.size == 1) {
-//      logger.warn("Requested to perform remote deploy")
+//      warn("Requested to perform remote deploy")
 //      // normal deploy based on config values
 //      SSHCommand.connect
 //      getFilesFromMavenRepositoryAndSignThem
@@ -86,7 +86,7 @@
 //      if (args.size == 2) {
 //        args(1) match {
 //          case "mac-app" => {
-//            logger.warn("Requested to perform Mac Application deploy")
+//            warn("Requested to perform Mac Application deploy")
 //            basicOnly_? = false
 //            macAppDeploy = true
 //            getFilesFromMavenRepositoryAndSignThem
@@ -95,27 +95,27 @@
 //            // TODO: implement Mac Application deploy support
 //          }
 //          case "windows-app" => {
-//            logger.warn("Requested to perform Windows Application deploy")
+//            warn("Requested to perform Windows Application deploy")
 //            basicOnly_? = false
-//            logger.error("Not yet implemented!")
+//            error("Not yet implemented!")
 //            // TODO: implement deployment of windows application
 //          }
 //          case "linux-app" => {
-//            logger.warn("Requested to perform Linux Application deploy")
+//            warn("Requested to perform Linux Application deploy")
 //            basicOnly_? = false
-//            logger.error("Not yet implemented!")
+//            error("Not yet implemented!")
 //            // TODO: implement deployment of linux application
 //          }
 //          case "local-full" => {
 //            // local full deploy without ssh actor
-//            logger.warn("Requested to perform FULL local deploy")
+//            warn("Requested to perform FULL local deploy")
 //            basicOnly_? = false
 //            getFilesFromMavenRepositoryAndSignThem
 //            deployLocal
 //          }
 //          case "full" => {
 //            // remote full deploy without ssh actor
-//            logger.warn("Requested to perform FULL remote deploy")
+//            warn("Requested to perform FULL remote deploy")
 //            basicOnly_? = false
 //            SSHCommand.connect
 //            getFilesFromMavenRepositoryAndSignThem
@@ -123,7 +123,7 @@
 //          }
 //          case "local" => {
 //            // local deploy without ssh actor
-//            logger.warn("Requested to perform local deploy")
+//            warn("Requested to perform local deploy")
 //            getFilesFromMavenRepositoryAndSignThem
 //            deployLocal
 //          }
@@ -134,11 +134,11 @@
 //    }
 // 
 //    def getFilesFromMavenRepositoryAndSignThem = {
-//      logger.info("Searching for jars in Maven repository..")
+//      info("Searching for jars in Maven repository..")
 //      (basic_jar_names ++ (if (!basicOnly_?) dependency_jar_names else Nil)).foreach {
 //        file =>
-//            logger.debug("FileName: *" + file + "*" + " <- " + basic_jar_names)
-//            logger.debug("Basic Jar names contains given file? " + basic_jar_names.contains(file))
+//            debug("FileName: *" + file + "*" + " <- " + basic_jar_names)
+//            debug("Basic Jar names contains given file? " + basic_jar_names.contains(file))
 //            findFile(new File(pathToMaven2Repo + (if (basic_jar_names.contains(file)) props("projectGroupId") else "")), new P { // NOTE: 2009-10-19 03:04:00 - dmilith - projectGroupId gives huge boost in deployment time
 //              override
 //              def accept(t: String): Boolean = {
@@ -149,7 +149,7 @@
 //                  if (!macAppDeploy)
 //                    signJar(t)
 //                  else { // don't sign jars when it's mac-app deploy
-//                    logger.info("Copying jar: " + t.split("/").last)
+//                    info("Copying jar: " + t.split("/").last)
 //                    FileUtils.copyFileToDirectory(new File(t), new File(deployTmpDir)) // copy files to temporary dir
 //                  }
 //                  return true
@@ -163,13 +163,13 @@
 // 
 //    def signJar(fileToBeSigned: String) = {
 //      new File(deployTmpDir).mkdir // make temporary place for jars before signinig
-//      logger.info("Signing and copying jar: " + fileToBeSigned.split("/").last)
+//      info("Signing and copying jar: " + fileToBeSigned.split("/").last)
 //      FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployTmpDir)) // copy files to temporary dir
 //      val signCommand = Array(
 //        props("jarSignerExecutable"), "-storepass", props("jarSignerPassword"),
 //        deployTmpDir + fileToBeSigned.split("/").last, props("jarSignerKeyName")
 //        )
-//      logger.debug(CommandExec.cmdExec(signCommand).trim)
+//      debug(CommandExec.cmdExec(signCommand).trim)
 //    }
 // 
 // 
@@ -179,29 +179,29 @@
 //      val localDeployDir = new File(codebaseLocalDir)
 //      backupDir.mkdir
 //      localDeployDir.mkdir
-//      logger.info("Copying files from " + localDeployDir + " to " + backupDir)
+//      info("Copying files from " + localDeployDir + " to " + backupDir)
 //      FileUtils.copyDirectory(localDeployDir, backupDir)
 //    }
 // 
 // 
 //    def deployLocal = {
 //      backupLocal
-//      logger.debug("Files to be deployed: " + filesToBeDeployed.toArray.map{ a => a + ", " }.mkString)
+//      debug("Files to be deployed: " + filesToBeDeployed.toArray.map{ a => a + ", " }.mkString)
 //      filesToBeDeployed.toArray foreach {
 //        localFile => {
 //          val comparator = new JarEntryComparator
 //          comparator.load(deployTmpDir + localFile.toString.split("/").last, codebaseLocalDir + "lib/" + localFile.toString.split("/").last)
-//          logger.debug("COMPARATOR: " + comparator + ", -- diff?: " + comparator.diff_?)
+//          debug("COMPARATOR: " + comparator + ", -- diff?: " + comparator.diff_?)
 //          if (comparator.diff_?) {
-//            logger.warn("File DIFFERENT: " + localFile.toString.split("/").last)
+//            warn("File DIFFERENT: " + localFile.toString.split("/").last)
 //            FileUtils.copyFileToDirectory(new File(deployTmpDir + localFile.toString.split("/").last), new File(codebaseLocalDir + "lib/"))
 //          } else {
-//            logger.info("File IDENTICAL: " + localFile.toString.split("/").last)
+//            info("File IDENTICAL: " + localFile.toString.split("/").last)
 //          }
 //        }
 //      }
 //      if (!macAppDeploy) {
-//        logger.warn("Generating JNLP file")
+//        warn("Generating JNLP file")
 //        val arguments = props("webstartArgumentsJVM").map{ a => a + " " }.mkString
 //        val jnlp = new JNLPSkeleton(
 //          props("jnlpMainClass"),
@@ -217,24 +217,24 @@
 //          )
 //        val tempJnlpFileName = "/tmp/" + props("jnlpFileName")
 //        jnlp.saveJNLP(tempJnlpFileName)
-//        logger.info("Putting JNLP file to local deploy dir")
+//        info("Putting JNLP file to local deploy dir")
 //        FileUtils.copyFileToDirectory(new File(tempJnlpFileName), new File(codebaseLocalDir))
 //      }
 //    }
 // 
 // 
 //    def copyAndInstallMacApp = {
-//      logger.info("Copying jars to temporary mac app")
+//      info("Copying jars to temporary mac app")
 //      FileUtils.copyDirectory(new File(deployTmpDir), new File(codebaseLocalDir + "../Coviob.app/lib")) // XXX: hardcoded Coviob.app name
 //      // XXX: application skeleton must be uploaded to ~/.svd before deploy
-//      logger.info("Copying Application to /Applications")
+//      info("Copying Application to /Applications")
 //      FileUtils.copyDirectory(new File(codebaseLocalDir + "../Coviob.app"), new File("/Applications/Coviob.app"))
-//      logger.info("Making executable of app starting script..")
+//      info("Making executable of app starting script..")
 //      CommandExec.cmdExec(Array("chmod", "777", "/Applications/Coviob.app/Contents/MacOS/coviob2")) // XXX: why the fuck copying files will result changing permissions to files?!
 //    }
 // 
 // 
-//    def deployerHelp = logger.warn("\n\nDeployer quick help:\nValid params:\n" +
+//    def deployerHelp = warn("\n\nDeployer quick help:\nValid params:\n" +
 //        "\tlocal -> for basic local deploy\n" +
 //        "\tlocal-full -> for full local deploy\n" +
 //        "\twindows-app -> for Windows application deploy\n" +

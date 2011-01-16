@@ -113,7 +113,7 @@ class Properties(filename: String) extends Logged {
             val jprops = new JProperties
             jprops.load(new FileInputStream(filename))
 
-            logger.debug("Loaded file: " + filename)
+            debug("Loaded file: " + filename)
             Some(jprops.entrySet.iterator.foldLeft(Map[String, String]()) {
                 case (map, item) =>
                     map += (item.getKey.toString -> item.getValue.toString)
@@ -121,7 +121,7 @@ class Properties(filename: String) extends Logged {
             
         } catch {
             case e: Exception =>
-                logger.error("Could not save file %s, cause of exception: %s".format(filename, e))
+                error("Could not save file %s, cause of exception: %s".format(filename, e))
                 None
         }
     }
@@ -142,9 +142,9 @@ class Properties(filename: String) extends Logged {
             }
             jprops.store(file, "ServeD Properties: " + filename)
             file.close
-            logger.debug("Saved file: " + filename)
+            debug("Saved file: " + filename)
         // } catch {
-            // case e: Exception => logger.error("Couldn`t save file %s, cause of exception: %s".format(filename, e))
+            // case e: Exception => error("Couldn`t save file %s, cause of exception: %s".format(filename, e))
         // }
     }
     

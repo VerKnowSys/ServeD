@@ -16,7 +16,7 @@ class XMPPGate(host: String, port: Int, login: String, password: String, resourc
     val chats = ListBuffer[Chat]()
     
     def connect {
-        logger.debug("Initiating XMPPGate connection")
+        debug("Initiating XMPPGate connection")
         // XMPPConnection.DEBUG_ENABLED = true
         config.setCompressionEnabled(true)
         config.setSASLAuthenticationEnabled(true)
@@ -24,11 +24,11 @@ class XMPPGate(host: String, port: Int, login: String, password: String, resourc
         
         try {
             connection.login(login, password, resource)
-            logger.debug("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
+            debug("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
         } catch {
             case x: Throwable =>
-                logger.error("Error while connecting to XMPP server. Please check login / password.")
-                logger.debug( x.printStackTrace )
+                error("Error while connecting to XMPP server. Please check login / password.")
+                debug( x.printStackTrace )
         }
         
         val chatmanager = connection.getChatManager
@@ -37,11 +37,11 @@ class XMPPGate(host: String, port: Int, login: String, password: String, resourc
             try {
                 chats += chatmanager.createChat(user, this)
             } catch {
-                case x: Throwable => logger.info("Error: " + x )
+                case x: Throwable => info("Error: " + x )
             }
         }
         
-        logger.trace("Number of users bound to be notified with repository changes: %s".format(chats.length))
+        trace("Number of users bound to be notified with repository changes: %s".format(chats.length))
         presence.setStatus("ServeD Git Bot Notifier | NC")
         presence.setMode(Presence.Mode.dnd)
         connection.sendPacket(presence)
@@ -56,20 +56,20 @@ class XMPPGate(host: String, port: Int, login: String, password: String, resourc
     def send(message: String) {
         chats.foreach { chatRecipient =>
             try {
-                logger.debug("Trying to send messages, to User: " + chatRecipient.getParticipant)
+                debug("Trying to send messages, to User: " + chatRecipient.getParticipant)
                 chatRecipient.sendMessage(message)
-                logger.trace("Sent message: " + message + " length: " + message.length)
+                trace("Sent message: " + message + " length: " + message.length)
             } catch {
                 case e: Throwable =>
-                    logger.info("### Error " + e + "\nTrying to put commit onto list cause errors.")
+                    info("### Error " + e + "\nTrying to put commit onto list cause errors.")
             }
         }
     }
     
     def processMessage(chat: Chat, message: Message) {
-        logger.trace("Received message: " + message + " (\"" + message.getBody + "\")")
+        trace("Received message: " + message + " (\"" + message.getBody + "\")")
         // if (message.getFrom.contains("verknowsys.com")) {   // XXX: hardcoded value
-        //     logger.trace("Message contains verknowsys: " + message.getFrom)
+        //     trace("Message contains verknowsys: " + message.getFrom)
         //     message.getBody match {
         //         case "last" =>
         //             chat.sendMessage("Requested last commit.\nNYI")

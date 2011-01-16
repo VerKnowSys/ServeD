@@ -21,21 +21,21 @@ class SvdGitNotifier(repo: GitRepository) extends CommonActor {
     var oldHEAD = repo.head // XXX: var :(
 
     def act {
-        logger.trace("Git head path: " + repo.headPath)
+        trace("Git head path: " + repo.headPath)
         
         def notifyAboutNewHead {
-            logger.trace("HEAD changed in repo: %s".format(repo.dir))
+            trace("HEAD changed in repo: %s".format(repo.dir))
             
             repo.history(oldHEAD).toList.reverse.foreach { commit =>
-                logger.trace("Commit: " + commit)
+                trace("Commit: " + commit)
                 val message = "%s\n%s %s\n%s".format(commit.sha, new SimpleDateFormat("yyyy-MM-dd HH:mm").format(commit.date), commit.author.nameAndEmail, commit.message)
                 NotificationCenter ! Status("ServeD Git Bot Notifier (last: %s)".format(commit.sha))
                 NotificationCenter ! Message(message)
             }
     
-            logger.trace("OldHead sha: %s".format(oldHEAD))
+            trace("OldHead sha: %s".format(oldHEAD))
             oldHEAD = repo.head
-            logger.trace("Assigned new sha: %s to oldHead".format(oldHEAD))
+            trace("Assigned new sha: %s to oldHead".format(oldHEAD))
         }
 
         // different git bahaviour on Linux and Mac
@@ -49,17 +49,17 @@ class SvdGitNotifier(repo: GitRepository) extends CommonActor {
         //         if(fileName.contains(repo.headFile)) notifyAboutNewHead 
         //     }
         // } else {
-        //     logger.error("OS Not supported!")
+        //     error("OS Not supported!")
         // }
         
 
         loop {
             receive {
                 case Init => 
-                    logger.info("Git Notifier ready")
+                    info("Git Notifier ready")
                 
                 case Quit => 
-                    logger.info("Quitting Git Notifier")
+                    info("Quitting Git Notifier")
                     exit
 
                 case _ => messageNotRecognized(_)
