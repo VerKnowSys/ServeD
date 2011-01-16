@@ -7,38 +7,13 @@ import scala.actors.Actor
  * 
  * @author teamon
  */
-abstract class CommonActor extends ExceptionHandlingActor with Logged {
+abstract class CommonActor extends Actor with Logged {
     
     def messageNotRecognized(x: Any) {
         warn("Message not recognized: " + x.toString)
     }
-}
-
-/** 
- * Handle exceptions thrown by actor 
- * 
- * @author teamon
- */
-abstract class ExceptionHandlingActor extends Actor {
     
-    override def react(handler: PartialFunction[Any, Unit]) = super.react(handleExceptions(handler))
-    
-    override def reactWithin(msec: Long)(handler: PartialFunction[Any, Unit]) = super.reactWithin(msec)(handleExceptions(handler))
-    
-    override def receive[R](f: PartialFunction[Any, R]) = super.receive(handleExceptions(f))
-    
-    override def receiveWithin[R](msec: Long)(f: PartialFunction[Any, R]) = super.receiveWithin(msec)(handleExceptions(f))
-    
-    private def handleExceptions[R](handler: PartialFunction[Any, R]): PartialFunction[Any, R] = {
-        case x =>
-            try {
-                handler(x)
-            } catch {
-                case e:scala.util.control.ControlThrowable => 
-                    throw e
-                case e => 
-                    println(this + " got exception " + e)
-            }
-            null.asInstanceOf[R] // HACK: Just for TypeChecker
+    override def exceptionHandler: PartialFunction[Exception, Unit] = {
+        case e => println(this + " got exception " + e) // Logger ! Exception(this, e)
     }
 }
