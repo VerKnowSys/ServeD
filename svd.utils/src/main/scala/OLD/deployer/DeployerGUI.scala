@@ -101,21 +101,21 @@
 // 
 // 
 //  def main(args: Array[String]) {
-//    logger.info("Starting DeployerGUI with ")
+//    info("Starting DeployerGUI with ")
 // 
 //    QApplication.initialize(args)
 // 
-//    logger.debug("Initialized")
+//    debug("Initialized")
 //    val gui = new GUI
 // //   gui.start
 // //   gui ! 0
-//    logger.debug("Created Window")
+//    debug("Created Window")
 // 
 //    props = new Preferences(args(0))
 //    if (props("debug")) {
 //      setLoggerLevelDebug(Level.TRACE)
 //    }
-//    logger.debug("Finished")
+//    debug("Finished")
 // 
 //    QApplication.exec
 //  }
@@ -124,7 +124,7 @@
 // 
 // // def top = new MainFrame {
 // //   addShutdownHook {
-// //     logger.warn("Done")
+// //     warn("Done")
 // //   }
 // //   title = "Deployer GUI"
 // //   size = (600,750)
@@ -134,8 +134,8 @@
 // 
 // // def prepare = {
 // //   autoDetectRequirements(props)
-// //   logger.warn(props("gitExecutable"))
-// //   logger.warn(props("jarSignerExecutable"))
+// //   warn(props("gitExecutable"))
+// //   warn(props("jarSignerExecutable"))
 // // }
 // 
 // 

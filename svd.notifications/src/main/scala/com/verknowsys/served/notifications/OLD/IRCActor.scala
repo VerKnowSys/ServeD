@@ -56,8 +56,8 @@
 //        }
 //    } catch {
 //      case x: Throwable => {
-//        logger.info("### Error in getLinks: " + x)
-//        logger.info(x.printStackTrace)
+//        info("### Error in getLinks: " + x)
+//        info(x.printStackTrace)
 //      }
 //    } finally {
 //      if (odb != null) { 
@@ -75,7 +75,7 @@
 //      odb.commit
 //    } catch {
 //      case x: Throwable => {
-//        logger.info("### Error: There were problems while connecting to ODB server.")
+//        info("### Error: There were problems while connecting to ODB server.")
 //      }
 //    } finally {
 //      if (odb != null) { 
@@ -119,7 +119,7 @@
 //      settings
 //    } catch {
 //      case x: Throwable => {
-//        logger.info("### Disconnected and cannot connect again! I'll keep trying.. " + x.getMessage)
+//        info("### Disconnected and cannot connect again! I'll keep trying.. " + x.getMessage)
 //        settings
 //      }
 //    }

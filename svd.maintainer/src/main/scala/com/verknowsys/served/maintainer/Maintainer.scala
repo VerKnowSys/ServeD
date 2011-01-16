@@ -35,15 +35,15 @@ object Maintainer extends CommonActor with Monitored {
         loop {
             receive {
                 case Init =>
-                    logger.info("Maintainer ready")
+                    info("Maintainer ready")
 
                 case Quit =>
-                    logger.info("Quitting Maintainer")
+                    info("Quitting Maintainer")
                     exit
 
                 // case GetUsers(x) =>
                 //     val content = x.map {a => "userName: " + a.userName + ", pass: " + a.pass + ", uid: " + a.uid + ", gid: " + a.gid + ", homeDir: " + a.homeDir + ", shell: " + a.shell + ", information: " + a.information + "\n"}
-                //     logger.debug("Content:\n" + content)
+                //     debug("Content:\n" + content)
 
                 case _ => messageNotRecognized(_)
 
@@ -63,16 +63,16 @@ object Maintainer extends CommonActor with Monitored {
     *   ServeD Maintainer Core
     */
     def main(args: Array[String]) {
-        logger.debug("Mainainer object size: " + Utils.sizeof(Maintainer))
-        logger.debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
-        logger.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
+        debug("Mainainer object size: " + Utils.sizeof(Maintainer))
+        debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
+        debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         
         args foreach { _ match {
             case "--monitor" => 
                 Monitor.start
              
             case x: Any => 
-                logger.error("Unknow argument: " + x)
+                error("Unknow argument: " + x)
                 System.exit(1);
         }}
 
@@ -84,20 +84,20 @@ object Maintainer extends CommonActor with Monitored {
             Maintainer ! Quit
         }
 
-        logger.info("Maintainer is loading")
+        info("Maintainer is loading")
         Maintainer ! Init
         
-        logger.info("NotificationCenter is loading")
+        info("NotificationCenter is loading")
         NotificationCenter ! Init
         
-        logger.info("AccountManager is loading")
+        info("AccountManager is loading")
         AccountsManager ! Init
         
-        logger.info("SystemManager is loading")
+        info("SystemManager is loading")
         SvdSystemManager ! Init
         
         Utils.getAllLT
-        // logger.info("ApiServerActor is loading")
+        // info("ApiServerActor is loading")
         // ApiServerActor ! Init
     }
 

@@ -40,44 +40,44 @@
 //    config.setCompressionEnabled(true)
 //    config.setSASLAuthenticationEnabled(false)
 //    connection.connect()
-//    logger.debug("*** l:"+login + " p:" + password + " r:" + resource)
+//    debug("*** l:"+login + " p:" + password + " r:" + resource)
 //    try {
 //      connection.login(login, password, resource)
 //    } catch {
 //      case x: Throwable => {
-//        logger.error("### Error while connecting to XMPP server. Please check login / password.")
-//        logger.debug( x.printStackTrace )
+//        error("### Error while connecting to XMPP server. Please check login / password.")
+//        debug( x.printStackTrace )
 //                 exit
 //      }
 //    }
 //    chatmanager = connection.getChatManager
-//    logger.debug("*** num of users: " + chat.length)
+//    debug("*** num of users: " + chat.length)
 //    propsh("users").foreach { x =>
 //      try {
 //        chat ::= chatmanager.createChat(x("user"), this)
 //      } catch {
 //        case x: Throwable => {
 //          if (debug) {
-//            logger.info("### Error: " + x )
+//            info("### Error: " + x )
 //          }
 //        }
 //      }
 //    }
-//    logger.debug("*** num of users: " + chat.length)
+//    debug("*** num of users: " + chat.length)
 //    presence.setStatus(props("xmppStatusDescription"))
 //    presence.setMode(Presence.Mode.dnd)
 //    connection.sendPacket(presence)
-//    logger.debug("*** Connected as: " + login + "\nReady to enter main loop")
+//    debug("*** Connected as: " + login + "\nReady to enter main loop")
 //    SvdBot ! MainLoop
 //  }
 // 
 //  def processMessage(chat: Chat, message: Message) {
-//    logger.debug("*** Received message: " + message + " (\"" + message.getBody + "\")")
+//    debug("*** Received message: " + message + " (\"" + message.getBody + "\")")
 // //   propsh("users").foreach { x =>
 // //     x("user")
 // //   }
 //    if (message.getFrom.contains("dmilith") || message.getFrom.contains("vara")) {   // XXX: hardcoded value
-//      logger.info("Message contains dmilith: " + message.getFrom)
+//      info("Message contains dmilith: " + message.getFrom)
 //      message.getBody match {
 //        case "last" => {
 //          chat.sendMessage("Requested last commit.\nNYI")
@@ -114,13 +114,13 @@
 //            comm.toRead = false
 //            odb.store(comm)
 //            if (debug)
-//              logger.info("*** Found in database: " + comm.commitSha1)
+//              info("*** Found in database: " + comm.commitSha1)
 //            list = list ::: List(comm.commitSha1)
 //        }
 //    } catch {
 //      case x: Throwable => {
-//        logger.info("### Error in XMPPActor: " + x)
-//        logger.debug(x.printStackTrace)
+//        info("### Error in XMPPActor: " + x)
+//        debug(x.printStackTrace)
 //      }
 //    } finally {
 //      if (odb != null) { 
@@ -137,7 +137,7 @@
 //        try {
 //          if (commitSha.length > 0) {
 //            if (debug) {
-//              logger.info("*** Trying to send messages, to User: " + element.getParticipant)
+//              info("*** Trying to send messages, to User: " + element.getParticipant)
 //            }
 //            var currentUserPreferences: String = ""
 //            propsh("users").foreach{
@@ -148,12 +148,12 @@
 //            val showCommand = List(git, "--git-dir=" + gitRepositoryProjectDir, "show") ++ currentUserPreferences.split(' ') ++ List(commitSha)
 //            val output = CommandExec.cmdExec(showCommand.toArray)
 //            if (debug)
-//              logger.info("*** sent message length: " + output.length)
+//              info("*** sent message length: " + output.length)
 //            element.sendMessage(output)
 //          }
 //        } catch {
 //          case e: Throwable => {
-//            logger.info("### Error " + e + "\nTrying to put commit onto list cause errors.")
+//            info("### Error " + e + "\nTrying to put commit onto list cause errors.")
 //            DbAddCommit.writeCommitToDataBase(new Commit(commitSha))
 //          }
 //        }
@@ -169,7 +169,7 @@
 //          act
 //        }
 //        case Quit => {
-//          logger.debug("*** received Quit command, closing connection with XMPP server.")
+//          debug("*** received Quit command, closing connection with XMPP server.")
 //          closeConnection
 //          exit
 //        }
@@ -178,7 +178,7 @@
 //          act
 //        }
 //        case _ => {
-//          logger.debug("*** received Unknown command.")
+//          debug("*** received Unknown command.")
 //          act
 //        }
 //      }

@@ -32,13 +32,13 @@ class SvdSystemProcess(val commandInput: String = "") extends CommonActor with M
         loop {
             receive {
                 case Run =>
-                    logger.debug("new SystemProcess(%s)".format(commandInput))
+                    debug("new SystemProcess(%s)".format(commandInput))
                     val results = process(commandInput) // may be blocking call
-                    logger.debug("new SystemProcess(%s) results: '%s' '%d'".format(commandInput, results._1, results._2))
+                    debug("new SystemProcess(%s) results: '%s' '%d'".format(commandInput, results._1, results._2))
                     reply(results)
                     
                 case x: Any =>
-                    logger.info("Request for unsupported signal of SystemProcess: %s".format(x.toString))
+                    info("Request for unsupported signal of SystemProcess: %s".format(x.toString))
                     reply(Ready)
                     
             }
@@ -57,7 +57,7 @@ class SvdSystemProcess(val commandInput: String = "") extends CommonActor with M
     def process(command: String, user: String = "nobody", workDir: String = "/tmp/"): (String, Int) = {
         // 2011-01-10 23:33:11 - dmilith - TODO: implement params validation.
         val cmd = "%s -l %s -c '%s'".format("/usr/bin/su", user, command).split(' ') // 2011-01-11 01:36:29 - dmilith - XXX: hardcode
-        logger.trace("CMD: %s".format(cmd.mkString(" ")))
+        trace("CMD: %s".format(cmd.mkString(" ")))
         try {
             process = Runtime.getRuntime.exec(cmd)
             val input = new BufferedReader(new InputStreamReader(process.getInputStream))
@@ -72,7 +72,7 @@ class SvdSystemProcess(val commandInput: String = "") extends CommonActor with M
 
         } catch {
             case ex: Throwable => {
-                logger.error("Process exception: %s".format(ex.getMessage))
+                error("Process exception: %s".format(ex.getMessage))
                 ("", -1)
             }
         }

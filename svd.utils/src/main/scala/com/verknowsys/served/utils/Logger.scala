@@ -148,7 +148,7 @@ object Logger extends Actor {
  *
  * {{{
  * class A extends Logged {
- *     logger.debug("Debug message")
+ *     debug("Debug message")
  * }
  * }}}
  * 

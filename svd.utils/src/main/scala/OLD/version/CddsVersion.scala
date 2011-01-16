@@ -56,7 +56,7 @@
 //      JarAccess.readLineFromJARFile("/svd/" + buildTextFile)
 //    } catch {
 //      case x: NullPointerException =>
-//        logger.warn("File: build.text doesn't exists! " + x)
+//        warn("File: build.text doesn't exists! " + x)
 //        "dev##1##dev##dev" // XXX: workaround to prevent ArrayOutOfBoundsException  
 //      case x: Throwable =>
 //        throw new UnsupportedOperationException("Unsupported error in CddsVersion: " + x)
@@ -72,7 +72,7 @@
 //  //    lazy val createJarCommand = Array(
 //  //      props("jarExecutable"), "cf", "project-version.jar", "/tmp/" + buildTextFile
 //  //      )
-//  //    logger.warn(CommandExec.cmdExec(createJarCommand).trim)
+//  //    warn(CommandExec.cmdExec(createJarCommand).trim)
 //  //    downloadVersion
 //  //  }
 // 
@@ -90,15 +90,15 @@
 // 
 //  //  def loadAndUpdateVersion = {
 //  //    try {
-//  //      logger.warn("Build file located in: " + resourceBuildFile)
+//  //      warn("Build file located in: " + resourceBuildFile)
 //  //      for (line <- Source.fromURL(resourceBuildFile).getLines) {
-//  //        logger.warn("Old version: " + getVersionFromJar)
-//  //        logger.warn("Current build number: " + (buildNumber + 1))
+//  //        warn("Old version: " + getVersionFromJar)
+//  //        warn("Current build number: " + (buildNumber + 1))
 //  //        writeNewContentToBuildFile(buildNumber + 1)
 //  //      }
 //  //    } catch {
 //  //      case x: Throwable => {
-//  //        logger.warn("Error occured in intialization: Cannot open " + buildTextFile + " file. Generating new one")
+//  //        warn("Error occured in intialization: Cannot open " + buildTextFile + " file. Generating new one")
 //  //        writeNewContentToBuildFile(buildNumber + 1)
 //  //      }
 //  //    }

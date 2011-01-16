@@ -21,27 +21,27 @@ class GitManager(owner: AccountManager) extends Manager(owner) {
             receive {
                 // Creates new bare git repository under HOME/git/REPO_NAME
                 case CreateRepository(name) => 
-                    logger.trace("Creating new git repository %s for account %s".format(name, account.userName))
+                    trace("Creating new git repository %s for account %s".format(name, account.userName))
                     GitRepository.create(gitDir + name, bare = true)
                     sender ! Success
                     
                 case RemoveRepository(name) =>
-                    logger.warn("Unimplemented yet!") // TODO
+                    warn("Unimplemented yet!") // TODO
                     sender ! NotImplementedError
                 
                 case ListRepositories =>
                     sender ! Repositories(GitRepository.list(gitDir).map { r => Repository(r.name) })
                 
                 case ShowRepository(name) =>
-                    logger.warn("Unimplemented yet!") // TODO
+                    warn("Unimplemented yet!") // TODO
                     sender ! NotImplementedError
                 
                 case Init =>
-                    logger.info("GitManager ready")
+                    info("GitManager ready")
                     reply(Ready)
                     
                 case Quit =>
-                    logger.info("Quitting GitManager")
+                    info("Quitting GitManager")
                     reply(Ready)
                     exit
                 

@@ -111,12 +111,12 @@ object GitRepository {
 class GitRepository(val dir: String) extends Logged {
     lazy val (gitRepo, isBare) = {
         val file = new File(dir, ".git")
-        logger.trace("Git repository watch. Dir: %s, File: %s".format(dir, file))
+        trace("Git repository watch. Dir: %s, File: %s".format(dir, file))
         if(file.exists) {
-            logger.trace("File exists. Loading normal repository")
+            trace("File exists. Loading normal repository")
             (new FileRepository(file), false)
         } else {
-            logger.trace("File not exists. Loading bare repository")
+            trace("File not exists. Loading bare repository")
             (new FileRepository(dir), true)
         }
     }
@@ -237,7 +237,7 @@ class GitRepository(val dir: String) extends Logged {
             case e: JGitInternalException =>
                 /// XXX Handle exception
                 /// Caused by: org.eclipse.jgit.errors.TransportException: ssh://tunemates@git.verknowsys.com/git/ServeD.git: Auth fail
-                logger.error(e.getCause)
+                error(e.getCause)
         }
     }
 }

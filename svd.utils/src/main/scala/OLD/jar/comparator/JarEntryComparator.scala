@@ -72,7 +72,7 @@
 //                         if (!ne.isDirectory) {
 //                             ignoreList.foreach(element =>
 //                                 if (ne.getName.contains(element)) {
-//                                     //                                       logger.info("Ignoring " + element)
+//                                     //                                       info("Ignoring " + element)
 //                                 } else {
 //                                     add(new JarFileFields(ne.getName, ne.getCrc))
 //                                 }
@@ -87,7 +87,7 @@
 //                         if (!ne.isDirectory) {
 //                             ignoreList.foreach(element =>
 //                                 if (ne.getName.contains(element)) {
-//                                     //                                       logger.info("Ignoring " + element)
+//                                     //                                       info("Ignoring " + element)
 //                                 } else {
 //                                     add2(new JarFileFields(ne.getName, ne.getCrc))
 //                                 }

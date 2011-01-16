@@ -29,21 +29,21 @@ object NotificationCenter extends CommonActor {
         loop {
             receive {
                 case Init =>                        
-                    logger.info("NotificationCenter connecting gates")
+                    info("NotificationCenter connecting gates")
                     gates.foreach { _.connect }                                    
-                    logger.info("NotificationCenter ready")
+                    info("NotificationCenter ready")
                     
                 case Quit =>
-                    logger.info("Quitting NotificationCenter")
+                    info("Quitting NotificationCenter")
                     gates.foreach { _.disconnect }
                     exit
             
                 case Status(status) => 
-                    logger.info("NotificationCenter ! Status(%s)".format(status))
+                    info("NotificationCenter ! Status(%s)".format(status))
                     gates.foreach { _ setStatus status }
                 
                 case Message(msg) => 
-                    logger.info("NotificationCenter ! Message(%s)".format(msg))
+                    info("NotificationCenter ! Message(%s)".format(msg))
                     gates.foreach { _ send msg }
                 
                 case _ => messageNotRecognized(_)

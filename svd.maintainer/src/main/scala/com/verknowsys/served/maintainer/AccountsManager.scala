@@ -23,26 +23,26 @@ object AccountsManager extends CommonActor with Monitored {
     def act {
         // TODO: Catch java.io.FileNotFoundException and exit. ServeD can`t run withour passwd file
         val watchPasswdFile = Kqueue.watch(Config.systemPasswdFile, modified = true) {
-            logger.trace("Triggered (modified/created) system password file: %s".format(Config.systemPasswdFile))
+            trace("Triggered (modified/created) system password file: %s".format(Config.systemPasswdFile))
             AccountsManager ! ReloadUsers
         }    
         
-        logger.trace("Initialized watch for " + Config.systemPasswdFile)
-        logger.trace("watchPasswordFile: " + watchPasswdFile)
+        trace("Initialized watch for " + Config.systemPasswdFile)
+        trace("watchPasswordFile: " + watchPasswdFile)
         
         loop {
             receive {
                 case Init =>
                     AccountsManager ! ReloadUsers            
-                    logger.info("AccountsManager ready")
+                    info("AccountsManager ready")
                     
                 case Quit =>
-                    logger.info("Quitting AccountsManager")
+                    info("Quitting AccountsManager")
                     watchPasswdFile.stop
                     exit
                     
                 case ReloadUsers =>
-                    logger.trace("Reloading users list")
+                    trace("Reloading users list")
                     // How does it work
                     //
                     // <managers> = ListBuffer[AccountManager]
