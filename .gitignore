@@ -60,3 +60,10 @@ lib/acct-6.5.4/lib/stdbool.h
 lib/acct-6.5.4/lib/getopt.h
 lib/acct-6.5.4/lib/alloca.h
 *.la
+
+/svd.torturemachine/src/posix_signals/a.out
+/svd.torturemachine/src/posix_signals/signal_gen.c.out
+/svd.torturemachine/src/posix_signals/Testsegv
+/svd.torturemachine/src/posix_signals/Testsegv.dSYM/
+/svd.torturemachine/src/posix_signals/Testsignal_gen
+/svd.torturemachine/src/posix_signals/Testsignal_gen.dSYM/
