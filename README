@@ -47,7 +47,6 @@ That's all folks
 
 
 
-
 Questions?
 	I'm as "dmilith" on:
 	- #scala.pl, #scala at irc.freenode.net
@@ -65,6 +64,11 @@ Questions?
 Rules for colab-team:
 	- Every var should contain "XXX" mark in code comments
 	- FP is the main rule here for coding
+	
+	
+== Must read ==
+http://www.scala-lang.org/docu/files/actors-api/actors_api_guide.html#
+http://www.scala-lang.org/docu/files/collections-api/collections.html
 
 
 
