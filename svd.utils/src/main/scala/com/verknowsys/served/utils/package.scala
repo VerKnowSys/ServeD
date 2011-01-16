@@ -26,6 +26,10 @@ package object utils {
      * @author teamon
      */
     implicit def repl4str(s: String) = new {
-        def %(pairs: (String, String)*) = (s /: pairs){ case (s, (k, v)) => s.replace("%{" + k + "}", v) }
+        def %(args: Any*) = args.foldLeft(s){ case (s, a) => a match {
+            case (key, value) => s.replace("%{" + key + "}", value.toString) 
+            case value => s.replaceFirst("%", value.toString)
+        } }
     }
+    
 }
