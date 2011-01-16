@@ -12,6 +12,7 @@ import com.verknowsys.served.Config
  */
 abstract trait LoggerOutput {
     def log(sender: AnyRef, msg: Logger.Message): Unit
+    def reloadConfiguration {}
 }
 
 /** 
@@ -40,17 +41,11 @@ class ConsoleLoggerOutput extends LoggerOutput {
     }
     
     private var format = DefaultFormat
-        
-    val propertiesFileWatch = Kqueue.watch(Config.loggerConfigFile, modified = true) { 
-        reloadConfiguration
-    }
-    
-    Utils.addShutdownHook { propertiesFileWatch.stop }
     
     reloadConfiguration
     
-    private def reloadConfiguration {
-        println("=== Modified logger.properties")
+    override def reloadConfiguration {
+        println("=== Modified logger.properties (ConsoleLoggerOutput)")
         
         synchronized {
             val props = new Properties(Config.loggerConfigFile)
@@ -93,6 +88,7 @@ object Logger extends Actor {
     }
     
     case class Message(caller: AnyRef, content: String, level: Level.Value)
+    case object ReloadConfiguration
     
     @volatile private var _level = Level.Trace
     @volatile private var _output: LoggerOutput = new ConsoleLoggerOutput
@@ -115,24 +111,25 @@ object Logger extends Actor {
         loop {
             react {
                 case msg @ Message(owner, content, level) => output.log(sender, msg)
+                
+                case ReloadConfiguration =>
+                    println("=== Modified logger.properties (Logger)")
+                    val props = new Properties(Config.loggerConfigFile)
+                    level = findLevel(props("logger.level") or "trace") getOrElse Level.Trace
+                    output.reloadConfiguration
+                    
                 case _ =>
             }
         }
     }
     
     val propertiesFileWatch = Kqueue.watch(Config.loggerConfigFile, modified = true) { 
-        reloadConfiguration
+        this ! ReloadConfiguration
     }
     
     Utils.addShutdownHook { propertiesFileWatch.stop }
     
-    reloadConfiguration
-    
-    private def reloadConfiguration {
-        println("=== Modified logger.properties")
-        val props = new Properties(Config.loggerConfigFile)
-        level = findLevel(props("logger.level") or "trace") getOrElse Level.Trace
-    }
+    this ! ReloadConfiguration
         
     private def findLevel(s: String) = Map(
         "trace" -> Level.Trace,
@@ -175,3 +172,4 @@ trait Logged {
     def warn(x: Any): Unit = warn(x.toString)
     def error(x: Any): Unit = error(x.toString)
 }
+

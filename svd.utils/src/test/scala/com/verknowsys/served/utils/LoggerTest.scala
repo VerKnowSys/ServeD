@@ -1,5 +1,6 @@
 package com.verknowsys.served.utils
 
+import com.verknowsys.served.Config
 import com.verknowsys.served.SpecHelpers._
 import org.specs._
 import scala.collection.mutable.ListBuffer
@@ -27,8 +28,10 @@ class TestLogged extends Logged {
 
 class LoggerTest extends Specification {
     var output = new TestLoggerOutput
-    val tester = new TestLogged
+    val tester = new TestLogged    
     
+    def timeout = Thread.sleep(150)
+        
     "Logger" should {
         doBefore {
             output = new TestLoggerOutput
@@ -81,6 +84,7 @@ class LoggerTest extends Specification {
         
         "log Error messages" in {
             Logger.level = Logger.Level.Error
+            waitWhileRunning(Logger)
             tester.logAll
             waitWhileRunning(Logger)
             output.logged must not contain("test trace msg")
@@ -88,6 +92,36 @@ class LoggerTest extends Specification {
             output.logged must not contain("test info msg")
             output.logged must not contain("test warn msg")
             output.logged must contain("test error msg")
+        }
+        
+        "respond to properties file change (logger level to trace)" in {
+            restoreFile(Config.loggerConfigFile){
+                writeFile(Config.loggerConfigFile, "logger.level=trace")
+                timeout
+                waitWhileRunning(Logger)
+                tester.logAll
+                waitWhileRunning(Logger)
+                output.logged must contain("test trace msg")
+                output.logged must contain("test debug msg")
+                output.logged must contain("test info msg")
+                output.logged must contain("test warn msg")
+                output.logged must contain("test error msg")
+            }
+        }
+        
+        "repond to properties file change (logger level to error)" in {
+            restoreFile(Config.loggerConfigFile){
+                writeFile(Config.loggerConfigFile, "logger.level=error")
+                timeout
+                waitWhileRunning(Logger)
+                tester.logAll
+                waitWhileRunning(Logger)
+                output.logged must not contain("test trace msg")
+                output.logged must not contain("test debug msg")
+                output.logged must not contain("test info msg")
+                output.logged must not contain("test warn msg")
+                output.logged must contain("test error msg")
+            }
         }
         
         // "make use of format" in {
