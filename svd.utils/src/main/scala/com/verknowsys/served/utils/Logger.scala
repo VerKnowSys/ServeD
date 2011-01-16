@@ -31,16 +31,17 @@ class ConsoleLoggerOutput extends LoggerOutput {
     import ConsoleLoggerOutput._
     
     def log(sender: AnyRef, msg: Logger.Message){
-        val fmsg = format % (
-            "l" -> msg.level.toString, 
-            "c" -> msg.caller.toString, 
-            "s" -> sender.toString, 
-            "m" -> msg.content
-        )
-        println(Colors(msg.level) + fmsg + DefaultColor)
+        println(Colors(msg.level) + formatMessage(sender, msg) + DefaultColor)
     }
     
     private var format = DefaultFormat
+    
+    def formatMessage(sender: AnyRef, msg: Logger.Message) = format % (
+        "l" -> msg.level.toString, 
+        "c" -> msg.caller.toString, 
+        "s" -> sender.toString, 
+        "m" -> msg.content
+    )
     
     reloadConfiguration
     

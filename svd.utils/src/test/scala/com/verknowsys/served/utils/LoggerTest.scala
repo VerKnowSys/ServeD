@@ -13,6 +13,13 @@ class TestLoggerOutput extends LoggerOutput {
     }
 }
 
+object TestCaller {
+    override def toString = "TestCaller"
+}
+object TestSender {
+    override def toString = "TestSender"
+}
+
 class TestLogged extends Logged {
     def logAll {
         trace("test trace msg")
@@ -30,7 +37,7 @@ class LoggerTest extends Specification {
     var output = new TestLoggerOutput
     val tester = new TestLogged    
     
-    def timeout = Thread.sleep(150)
+    def timeout = Thread.sleep(250)
         
     "Logger" should {
         doBefore {
@@ -138,4 +145,31 @@ class LoggerTest extends Specification {
         // }
     }
 
+    val formatedOutput = new ConsoleLoggerOutput
+
+    "LoggerConsoleOutput" should {
+        doBefore {
+            Logger.output = formatedOutput
+        }
+        
+        "change formatting (default)" in {
+            restoreFile(Config.loggerConfigFile){
+                writeFile(Config.loggerConfigFile, "logger.console.format=%{l} [%{s} | %{c}]: %{m}")
+                timeout
+                waitWhileRunning(Logger)
+                formatedOutput.formatMessage(TestSender, Logger.Message(TestCaller, "some message", Logger.Level.Trace)) must beEqual("Trace [TestSender | TestCaller]: some message")
+                formatedOutput.formatMessage(TestSender, Logger.Message(TestCaller, "other data", Logger.Level.Warn)) must beEqual("Warn [TestSender | TestCaller]: other data")
+            }
+        }
+        
+        "change formatting (mixed)" in {
+            restoreFile(Config.loggerConfigFile){
+                writeFile(Config.loggerConfigFile, "logger.console.format=(%{l}) %{m} sent by %{c}")
+                timeout
+                waitWhileRunning(Logger)
+                formatedOutput.formatMessage(TestSender, Logger.Message(TestCaller, "some message", Logger.Level.Trace)) must beEqual("(Trace) some message sent by TestCaller")
+                formatedOutput.formatMessage(TestSender, Logger.Message(TestCaller, "other data", Logger.Level.Warn)) must beEqual("(Warn) other data sent by TestCaller")
+            }
+        }
+    }
 }

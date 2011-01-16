@@ -13,7 +13,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     lazy val notifications = project("svd.notifications", "ServeD Notifications", new SvdNotifications(_), utils)
     lazy val maintainer    = project("svd.maintainer", "ServeD Maintainer", new SvdMaintainer(_), notifications, systemmanager, api, spechelpers)
     
-    override def parallelExecution = true
+    override def parallelExecution = false
 
     // Dependencies
     class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject {
