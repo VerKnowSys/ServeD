@@ -33,14 +33,12 @@ abstract class ExceptionHandlingActor extends Actor {
         case x =>
             try {
                 handler(x)
-                null.asInstanceOf[R] // HACK: Just for TypeChecker                
             } catch {
                 case e:scala.util.control.ControlThrowable => 
                     throw e
-                    null.asInstanceOf[R] // HACK: Just for TypeChecker
                 case e => 
                     println(this + " got exception " + e)
-                    null.asInstanceOf[R] // HACK: Just for TypeChecker
             }
+            null.asInstanceOf[R] // HACK: Just for TypeChecker
     }
 }
