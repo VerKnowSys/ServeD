@@ -15,6 +15,12 @@ object SpecHelpers {
 
     def writeFile(path: String, data: String) = FileUtils.writeStringToFile(path, data)
     
+    def restoreFile(path: String)(f: => Unit){
+        val content = readFile(path)
+        f
+        writeFile(path, content)
+    }
+    
     def waitWhileRunning(actors: Seq[Actor]*) {
         actors.flatten foreach { a =>
             while(a.getState != Actor.State.Blocked && a.getState != Actor.State.Suspended) { 

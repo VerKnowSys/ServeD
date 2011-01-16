@@ -1,8 +1,7 @@
 package com.verknowsys.served.utils
 
-
 import org.specs._
-import java.io._
+import com.verknowsys.served.SpecHelpers._
 
 class PropertiesTest extends Specification {
     final val configFilename = "/tmp/config.properties"
@@ -138,10 +137,7 @@ class PropertiesTest extends Specification {
                 "some.bad.boolean = ifj4rf" ::
                 "some.bad.boolean2 = ifj4rf" ::
                 Nil mkString "\n"
-
-        val file = new File(configFilename)
-        val fw = new FileWriter(file)
-        try {fw.write(content)}
-        finally {fw.close}
+                
+        writeFile(configFilename, content)
     }
 }
