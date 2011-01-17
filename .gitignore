@@ -67,3 +67,5 @@ lib/acct-6.5.4/lib/alloca.h
 /svd.torturemachine/src/posix_signals/Testsegv.dSYM/
 /svd.torturemachine/src/posix_signals/Testsignal_gen
 /svd.torturemachine/src/posix_signals/Testsignal_gen.dSYM/
+svd.torturemachine/src/posix_signals/cpu_load_gen
+svd.torturemachine/src/posix_signals/disk_load_gen

@@ -39,12 +39,12 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         import Process._
         
         lazy val stress = task {
-            
-            val compiler = "/usr/bin/clang" 
+
+            val compiler = "/usr/bin/clang"
             val tasks = "cpu_load_gen" :: "disk_load_gen" :: Nil
             val currDir = System.getProperty("user.dir")
             println("Current User Dir: %s".format(currDir))
-            
+
             tasks.foreach { tsk =>
                 val t = new Thread {
                     override def run = {
