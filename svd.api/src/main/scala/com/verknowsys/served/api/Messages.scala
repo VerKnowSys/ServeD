@@ -1,6 +1,7 @@
 package com.verknowsys.served.api
 
 sealed abstract class ApiMessage
+
 // ServeD -> Client messages
 // common responses
 case object Success
@@ -9,6 +10,9 @@ case class Error(val message: String)
 // General errors
 case object NotImplementedError
 
+
+case object Connect extends ApiMessage
+case object Disconnect extends ApiMessage
 
 object Git {
     sealed abstract class Base extends ApiMessage

@@ -38,5 +38,5 @@ class AccountManager(val account: Account) extends CommonActor {
     /**
      * @author teamon
      */
-    override def toString = "!AccountManager(" + account.userName + ")!"
+    override def toString = "AccountManager(" + account.userName + ")"
 }

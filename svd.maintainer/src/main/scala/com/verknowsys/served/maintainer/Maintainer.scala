@@ -87,18 +87,19 @@ object Maintainer extends CommonActor with Monitored {
         info("Maintainer is loading")
         Maintainer ! Init
         
-        info("NotificationCenter is loading")
-        NotificationCenter ! Init
+        // info("NotificationCenter is loading")
+        // NotificationCenter ! Init
         
         info("AccountManager is loading")
         AccountsManager ! Init
         
-        info("SystemManager is loading")
-        SvdSystemManager ! Init
+        // info("SystemManager is loading")
+        // SvdSystemManager ! Init
         
-        Utils.getAllLT
-        // info("ApiServerActor is loading")
-        // ApiServerActor ! Init
+        info("ApiServer is loading")
+        ApiServer ! Init
+        
+        // Utils.getAllLT
     }
 
 

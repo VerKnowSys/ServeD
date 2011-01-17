@@ -18,7 +18,7 @@ object AccountsManager extends CommonActor with Monitored {
     
     start
 
-    val managers = new ListBuffer[AccountManager]()
+    val managers = new ListBuffer[AccountManager]
         
     def act {
         // TODO: Catch java.io.FileNotFoundException and exit. ServeD can`t run withour passwd file

@@ -1,71 +1,78 @@
 package com.verknowsys.served.cli
 
 import com.verknowsys.served.api._
-import scala.actors.Actor
+import scala.actors.{Actor, TIMEOUT}
 import scala.actors.remote.RemoteActor
 import scala.actors.remote.RemoteActor._
 import scala.actors.remote.Node
 
-object Timeout {
-    final private val time = 20 * 1000 // 20 seconds
-    private var thread: Option[Thread] = None
-        
-    def start {
-        thread = Some(new Thread {
-            override def run {
-                Thread.sleep(time)
-                println("== Timeout ==")
-                System.exit(1)
-            }
-        })
-        thread.foreach(_.start)
-    }
-    
-    def stop {
-        thread.foreach(_.stop)
-    }
-    
-    def reset {
-        stop
-        start
-    }
-}
+// object Timeout {
+//     class TimeoutThread extends Thread {
+//         var keep = true
+//         var left = time
+//         override def run {
+//             while(keep && left > 0){
+//                 Thread.sleep(100)
+//                 left -= 100
+//             }
+//             
+//             if(keep){
+//                println("== Timeout ==")
+//                 System.exit(1)   
+//             }
+//         }
+//         def kill { keep = false }
+//     }
+//     
+//     final private val time = 20 * 1000 // 20 seconds
+//     private var thread: Option[TimeoutThread] = None
+//         
+//     def start {
+//         thread = Some(new TimeoutThread)
+//         thread.foreach(_.start)
+//     }
+//     
+//     def stop {
+//         thread.foreach(_.kill)
+//     }
+//     
+//     def reset {
+//         stop
+//         start
+//     }
+// }
 
 class ApiClientActor(host: String, port: Int) extends Actor {
-    // make use of http://github.com/rtomayko/ronn
-
-    final val HELP = Map(
-        "" -> """
-svd command line tool help
-
-== git ==
-git create [name]   Create repository
-git remove [name]   Remove repository
-git list all        List all repositories   
-
-== other ==
-help                Display help
-help [command]      Display help for command, e.g. 'help git create'
-exit                Quit interactive console 
-
-""",
-        "git create" -> "Help for git create"
-    )
+    // make use of http://github.com/rtomayko/ronn for man()
 
     start
-    
+        
     def act {
         RemoteActor.classLoader = getClass().getClassLoader()
         val svd = select(Node(host, port), 'ServeD)
         link(svd)
-
+        
+        println("Checking connection...")
+        
+        svd ! Connect
+        receiveWithin(3000) {
+            case Success => success("Connected")
+            case Error => 
+                error("Connection error")
+                exit
+            case TIMEOUT =>
+                error("Connection timeout")
+                exit
+        }
+        
         println("ServeD 0.1.0 interactive shell. Welcome!")
-        Timeout.start
+        // Timeout.start
         while(true){
-            val msg = System.console.readLine(">>> ")
-            Timeout.reset
+            val msg = Console.readLine(">>> ")
+            // Timeout.reset
             if(msg == "exit") System.exit(0)
             val args = msg.split(" ").toList
+            println(args)
             if(!args.isEmpty) process(args)
         }
         
@@ -95,20 +102,45 @@ exit                Quit interactive console
                         }
                     
                     case "list" :: Nil =>
-                        svd !? Git.ListRepositories match {
-                            case Git.Repositories(list) =>
-                                list.foreach { repo =>
-                                    println(repo)
-                                }
+                        // svd ! Git.ListRepositories match {
+                            // case Git.Repositories(list) =>
+                                // list.foreach { repo =>
+                                    // println(repo)
+                                // }
+                        // }
+                        
+                        (svd !! Git.ListRepositories).inputChannel.receiveWithin(4000) {
+                            case Git.Repositories(list) => println(list)
+                            case TIMEOUT => println("sorry, timeout")
                         }
+                        
                     
                     case _ => println("TODO: git help")
                 }
             
-                case "help" :: Nil => println(HELP)
+                case "help" :: Nil => help
                 
-                case _ => println(HELP)
+                case _ => help
             }
+        }
+        
+        def help {
+println("""
+svd command line tool help
+
+== git ==
+git create [name]   Create repository
+git remove [name]   Remove repository
+git list all        List all repositories   
+
+== other ==
+help                Display help
+help [command]      Display help for command, e.g. 'help git create'
+exit                Quit interactive console 
+
+""")
+
+// TODO: Read this from file
         }
     }
 }

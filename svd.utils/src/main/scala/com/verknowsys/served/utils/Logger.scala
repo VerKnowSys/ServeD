@@ -59,14 +59,14 @@ object ConsoleLoggerOutput {
     import Logger.Level._
     
     final val Colors = Map(
-        Trace -> "\u001B[0;35m",
-        Debug -> "\u001B[0;36m",
-        Info -> "\u001B[0;37m",
-        Warn -> "\u001B[1;33m",
-        Error -> "\u001B[0;31m"
+        Trace -> Console.MAGENTA,
+        Debug -> Console.CYAN,
+        Info -> Console.WHITE,
+        Warn -> Console.YELLOW,
+        Error -> Console.RED
     )
 
-    final val DefaultColor = "\u001B[0;39m"
+    final val DefaultColor = Console.RESET
     final val DefaultFormat = "%{l} [%{s} | %{c}]: %{m}"
 }
 
