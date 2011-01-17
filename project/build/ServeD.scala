@@ -36,6 +36,32 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     class SvdSystemManager(info: ProjectInfo) extends SvdProject(info) {
         val sigarSource = "org.hyperic" at "http://repository.jboss.org/maven2"
         val sigar       = "org.hyperic" % "sigar" % "1.6.3.82"
+        import Process._
+        
+        lazy val stress = task {
+            
+            val compiler = "/usr/bin/clang" 
+            val tasks = "cpu_load_gen" :: "disk_load_gen" :: Nil
+            val currDir = System.getProperty("user.dir")
+            println("Current User Dir: %s".format(currDir))
+            
+            tasks.foreach { tsk =>
+                val t = new Thread {
+                    override def run = {
+                        val a = "%s -o %s/svd.torturemachine/src/posix_signals/%s %s/svd.torturemachine/src/posix_signals/%s.c".format(compiler, currDir, tsk, currDir, tsk) !
+
+                        val b = "%s/svd.torturemachine/src/posix_signals/%s".format(currDir, tsk) !
+
+                        None
+                    }
+                }
+                t.join
+                t.start
+                None
+            }
+            None
+        }
+        
     }
     
     class SvdNotifications(info: ProjectInfo) extends SvdProject(info)
