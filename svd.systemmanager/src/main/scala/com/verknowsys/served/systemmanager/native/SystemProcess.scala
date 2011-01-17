@@ -1,4 +1,4 @@
-package com.verknowsys.served.systemmanager
+package com.verknowsys.served.systemmanager.native
 
 import org.hyperic.sigar._
 import scala.collection.JavaConversions._
@@ -8,13 +8,12 @@ import scala.collection.JavaConversions._
  * 
  * @author dmilith
  */
-class NativeSystemProcess(val pid: Long) {
+class SystemProcess(val pid: Long) {
     
     private val core = new Sigar
     private val stat = core.getProcState(pid)
     private val cpu = core.getProcCpu(pid)
     private val mem = core.getProcMem(pid)
-    
     
     val name = stat.getName
     val user = core.getProcCredName(pid).getUser

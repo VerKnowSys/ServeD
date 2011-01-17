@@ -22,9 +22,9 @@ class SvdSystemManagerTest extends Specification {
         }
 
         
-        "SvdSystemProcess should reply properly to actions and be controllable." in {
+        "SvdProcess should reply properly to actions and be controllable." in {
 
-            val ps = new SvdSystemProcess("/bin/ls -la")
+            val ps = new SvdProcess("/bin/ls -la")
             val res = ps !? Run // 2011-01-11 01:00:02 - dmilith - NOTE: how to ask, asynchronously waiting for reply
             res must haveClass[Tuple2[String, Integer]]
             val res2 = ps !? "Unrecognized garbage!"

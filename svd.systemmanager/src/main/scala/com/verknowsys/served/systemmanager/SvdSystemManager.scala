@@ -8,7 +8,7 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.kqueue._
 import com.verknowsys.served.utils.monitor.Monitored
-import com.verknowsys.served.systemmanager._
+import com.verknowsys.served.systemmanager.native._
 
 import org.hyperic.sigar._
 import java.io.FileNotFoundException
@@ -29,7 +29,7 @@ import scala.collection.JavaConversions._
 object SvdSystemManager extends CommonActor with Monitored {
     
     private val core = new Sigar
-    private val processes = ListBuffer[SvdSystemProcess]()
+    private val processes = ListBuffer[SvdProcess]()
     
     start
     
@@ -39,8 +39,8 @@ object SvdSystemManager extends CommonActor with Monitored {
         loop {
             receive {
                 case Init =>
-                    val nrs = new NativeSystemResources
-                    val nsp = new NativeSystemProcess(core.getPid)
+                    val nrs = new SystemResources
+                    val nsp = new SystemProcess(core.getPid)
                     
                     info("SystemManager ready")
                     info("System Resources Availability:\n%s".format(nrs))
@@ -56,7 +56,7 @@ object SvdSystemManager extends CommonActor with Monitored {
                     
                 case Command(cmd) =>
                     info("Running Native Command: %s".format(cmd))
-                    val sysManProcess = new SvdSystemProcess(cmd)
+                    val sysManProcess = new SvdProcess(cmd)
                     val result = sysManProcess !? Run // 2011-01-10 23:53:22 - dmilith - NOTE: WAIT FOR PROCESS until end
                     processes.add(sysManProcess)
                     reply(result)
@@ -70,7 +70,7 @@ object SvdSystemManager extends CommonActor with Monitored {
                     debug("All process IDs: %s".format(psAll.mkString(", ")))
                     psAll.foreach {
                         p =>
-                        	trace(new NativeSystemProcess(p))
+                        	trace(new SystemProcess(p))
                     }
                     reply(Ready)
                     
