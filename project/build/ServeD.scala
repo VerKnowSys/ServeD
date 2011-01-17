@@ -14,6 +14,10 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     lazy val maintainer    = project("svd.maintainer", "ServeD Maintainer", new SvdMaintainer(_), notifications, systemmanager, api, spechelpers)
     
     override def parallelExecution = false
+    
+    trait SvdAkkaProject extends AkkaProject {
+        val akkaRemote = akkaModule("remote")
+    }
 
     // Dependencies
     class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject {
@@ -61,7 +65,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val swing       = "org.scala-lang" % "scala-swing" % "2.8.1"
     }
     
-    class SvdMaintainer(info: ProjectInfo) extends SvdProject(info){
+    class SvdMaintainer(info: ProjectInfo) extends SvdProject(info) with SvdAkkaProject {
         val dispatch = "net.databinder" %% "dispatch-http" % "0.7.8"
 
         lazy val served = task { None } dependsOn(run(Array("--monitor")))
