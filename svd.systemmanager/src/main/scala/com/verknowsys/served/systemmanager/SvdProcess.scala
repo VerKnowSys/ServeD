@@ -101,7 +101,8 @@ class SvdProcess(
                     case "exitcode" =>
                         exitCode = if (hasExited) f.get(proc).asInstanceOf[Int] else -1 // throw -1 when process is still running
                         debug("ExitCode: %s (of %s)".format(if (exitCode == -1) "still RUNNING" else exitCode, command))
-                    
+                        if (exitCode > 0)
+                            throw new Exception("'%s' exited abnormally.".format(command))
                     case _ =>
                 
                 }
