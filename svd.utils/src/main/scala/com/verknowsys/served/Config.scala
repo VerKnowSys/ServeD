@@ -25,6 +25,7 @@ object Config {
     
     final val env = Array(
         "TERM=xterm",
+        "TMPDIR=/tmp/",
         "LC_CTYPE=UTF-8",
         "PWD=%s".format(homePath + vendorDir),
         "COMMAND_MODE=unix2003",

@@ -53,7 +53,7 @@ object SvdSystemManager extends CommonActor with Monitored {
                     
                     new SvdProcess(command = "df -h", user = "dmilith") ! Run
                     
-                    new SvdProcess(command = "df -h", user = "dmilith", useShell = false) ! Run
+                    new SvdProcess(command = "df -h", user = "dmilith", useShell = false) ! Run // with shell it will just work fine
                     
                     new SvdProcess(command = "dff -h", user = "dmilith", outputRedirectDestination = "/tmp/df2") ! Run
                     
