@@ -23,7 +23,8 @@ class SvdProcess(
     val command: String = "",
     val user: String = "nobody",
     val workDir: String = "/tmp/",
-    val outputRedirectDestination: String = "/tmp/served_redirXXX")
+    val outputRedirectDestination: String = "/tmp/served_redirXXX",
+    val useShell: Boolean = true)
         extends CommonActor with Monitored {
     
     
@@ -66,13 +67,16 @@ class SvdProcess(
     def process {
         // 2011-01-10 23:33:11 - dmilith - TODO: implement params validation.
         try {
-            val cmd = "%s -u %s %s > %s 2>&1".format("/usr/bin/sudo", user, command, outputRedirectDestination).split(" ")
+            val cmdFormats = if (useShell) "%s -u %s -s %s > %s 2>&1" else "%s -u %s %s > %s 2>&1"
+            val cmd =  cmdFormats.format(Config.globalSudoExec, user, command, outputRedirectDestination).split(" ")
             trace("CMD: %s".format(cmd.mkString(" ")))
             val rt = Runtime.getRuntime
             rt.traceMethodCalls(false)
-            
+        
             val env = Config.env
             val proc = rt.exec(cmd, env)
+
+            Thread.sleep(100) // 2011-01-18 15:44:11 - dmilith - XXX: wait for shell.. this sucks a bit right?            
             
             // 2011-01-18 14:32:02 - dmilith - NOTE: HACK: XXX: matching for required fields twice, cause of unfavorable fields order (from reflection)
             proc.getClass.getDeclaredFields.foreach{ f =>
@@ -81,31 +85,29 @@ class SvdProcess(
                     case "pid" =>
                         pid = f.get(proc).asInstanceOf[Int]
                         debug("Pid: %s (of %s)".format(pid, command))
-                        
+                    
                     case "hasExited" =>
                         hasExited = f.get(proc).asInstanceOf[Boolean]
                         debug("HasExited: %s (of %s)".format(hasExited, command))
-                        
-                    case _ =>
                     
+                    case _ =>
+                
                 }
-                trace(f.getName+"="+f.get(proc))
             }
-            
             // 2011-01-18 14:32:02 - dmilith - NOTE: HACK: XXX: matching for required fields twice, cause of unfavorable fields order (from reflection)
             proc.getClass.getDeclaredFields.foreach{ f =>
                 f.setAccessible(true)
                 f.getName match {
                     case "exitcode" =>
                         exitCode = if (hasExited) f.get(proc).asInstanceOf[Int] else -1 // throw -1 when process is still running
-                        debug("ExitCode: %s (of %s)".format(exitCode, command))
-                        
-                    case _ =>
+                        debug("ExitCode: %s (of %s)".format(if (exitCode == -1) "still RUNNING" else exitCode, command))
                     
+                    case _ =>
+                
                 }
+                trace(f.getName+"="+f.get(proc))
             }
-            trace("Process: (%s) spawned".format(command))
-            
+            debug("Process: (%s) spawned in background".format(command))
         } catch {
             case ex: Throwable =>
                 error("Process exception: %s".format(ex.getMessage))
