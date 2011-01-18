@@ -5,6 +5,7 @@ import scala.collection.mutable.{Map, ListBuffer}
 import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.actorOf
 import com.verknowsys.served.utils.kqueue.{CLibrary, kevent}
+import com.verknowsys.served.utils._
 
 
 case class KqueueFileEvent(ident: Int, flags: Int)
@@ -18,18 +19,20 @@ class KeventException extends Exception
 class FileOpenException extends Exception
 
 
-class FileWatcher(val owner: ActorRef, val path: String, val flags: Int) extends Actor {
+class FileWatcher(val owner: ActorRef, val path: String, val flags: Int) extends Actor with Logged {
+    trace("Starting new FileWatcher for % with % and %" % (owner, path, flags))
+    
     def receive = {
         case BareFileEvent(path, evflags) if ((evflags & flags) > 0) => owner ! FileEvent(path, evflags) 
         // TODO: Create some case classes and send FileModified, FileCreated, FileDeleted etc
     }
 }
 
-trait FileEventReactor {
+trait FileEventsReactor {
     self: Actor =>
     
     def registerFileEventFor(path: String, flags: Int){
-        Actor.registry.actorsFor[FileEventsManager].foreach { _ ! RegisterFileEvent("/path/to/file", flags) }
+        Actor.registry.actorsFor[FileEventsManager].foreach { _ ! RegisterFileEvent(path, flags) }
     }
 }
 
@@ -49,9 +52,9 @@ trait FileEventReactor {
  * }
  * }}}
  * 
- * or by mixing in FileEventReactor trait
+ * or by mixing in FileEventsReactor trait
  * {{{
- * class A extends Actor with FileEventReactor {
+ * class A extends Actor with FileEventsReactor {
  *     registerFileEventFor("/path/to/file", flags)
  * 
  *     def receive = {
@@ -62,7 +65,9 @@ trait FileEventReactor {
  * 
  * @author teamon
  */
-class FileEventsManager extends Actor {
+class FileEventsManager extends Actor with Logged {
+    trace("Starting FileEventsManager")
+    
     protected val clib = CLibrary.instance
     protected val kq = clib.kqueue() // NOTE: C call
     
