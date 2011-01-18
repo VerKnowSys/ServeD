@@ -18,11 +18,16 @@ import java.io._
   */
 
 
-class SvdProcess(val commandInput: String = "") extends CommonActor with Monitored {
+class SvdProcess(
+    val command: String = "",
+    val user: String = "nobody",
+    val workDir: String = "/tmp/",
+    val outputRedirectDestination: String = "/tmp/served_redirXXX")
+        extends CommonActor with Monitored {
     
-    private var process: Process = null
-    private var output = ""
     
+    // private var proc: Process = null
+    // private var pid = -1
 
     start
 
@@ -32,13 +37,20 @@ class SvdProcess(val commandInput: String = "") extends CommonActor with Monitor
         loop {
             receive {
                 case Run =>
-                    debug("new SystemProcess(%s)".format(commandInput))
-                    val results = process(commandInput) // may be blocking call
-                    debug("new SystemProcess(%s) results: '%s' '%d'".format(commandInput, results._1, results._2))
+                    trace("SystemProcess(%s)".format(command))
+                    val results = process // may be blocking call
+                    trace("SystemProcess(%s) exit code: %d".format(command, results))
+                    this ! Quit
                     reply(results)
+                
+                case Quit =>
+                    trace("Done process: %s".format(command))
+                    exit
+                    
+                case Ready =>
                     
                 case x: Any =>
-                    info("Request for unsupported signal of SystemProcess: %s".format(x.toString))
+                    error("Request for unsupported signal of SystemProcess: %s".format(x.toString))
                     reply(Ready)
                     
             }
@@ -54,27 +66,23 @@ class SvdProcess(val commandInput: String = "") extends CommonActor with Monitor
       * @result (output: String, exitCode: Int)
       *
       */
-    def process(command: String, user: String = "nobody", workDir: String = "/tmp/"): (String, Int) = {
+    def process: Int = {
         // 2011-01-10 23:33:11 - dmilith - TODO: implement params validation.
-        val cmd = "%s -l %s -c '%s'".format("/usr/bin/su", user, command).split(' ') // 2011-01-11 01:36:29 - dmilith - XXX: hardcode
+        // 2011-01-18 01:55:17 - dmilith - TODO: implement workDir usage.
+        val cmd = "%s -l %s -c %s > %s 2>&1".format("/usr/bin/su", user, command, outputRedirectDestination).split(" ")
         trace("CMD: %s".format(cmd.mkString(" ")))
         try {
-            process = Runtime.getRuntime.exec(cmd)
-            val input = new BufferedReader(new InputStreamReader(process.getInputStream))
-            var line = ""
-            while (line != null) {
-                output += line + "\n"
-                line = input.readLine
-            }
-            process.waitFor
-            input.close
-            (output, process.exitValue)
-
+            val proc = Runtime.getRuntime.exec(cmd)
+            trace("Process: (%s) spawned.".format(command))
+            proc.waitFor
+            val exitValue = proc.exitValue
+            trace("Process: (%s) return value: %d".format(command, exitValue))
+            exitValue
+            
         } catch {
-            case ex: Throwable => {
+            case ex: Throwable =>
                 error("Process exception: %s".format(ex.getMessage))
-                ("", -1)
-            }
+                -1
         }
     }
             
