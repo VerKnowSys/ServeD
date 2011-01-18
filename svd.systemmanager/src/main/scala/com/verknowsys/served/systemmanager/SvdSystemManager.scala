@@ -34,6 +34,8 @@ object SvdSystemManager extends CommonActor with Monitored {
     start
     
     
+    // 2011-01-18 02:25:23 - dmilith - TODO: implement ENV. Set PATH
+    
     def act {
         Native.setProtected(true) // 2010-10-11 23:43:21 - dmilith - set JVM protection (in case of JNA code fail it should only throw an exception)
         loop {
@@ -45,6 +47,14 @@ object SvdSystemManager extends CommonActor with Monitored {
                     info("SystemManager ready")
                     info("System Resources Availability:\n%s".format(nrs))
                     info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
+                    
+                    val pres = new SvdProcess(command = "echo \"dupa\" > /tmp/dupa", user = "root") !? Run
+                    
+                    val pres2 = new SvdProcess(command = "/bin/ls -la /", user = "root") !? Run
+                    
+                    val pres3 = new SvdProcess(command = "/bin/df -h", user = "root", outputRedirectDestination = "/tmp/df") !? Run
+                    
+                    val pres4 = new SvdProcess(command = "/bin/dff -h", user = "root", outputRedirectDestination = "/tmp/df2") !? Run
                     
                     throw new Exception("DUPA1")
                     throw new Exception("DUPA2")
@@ -63,6 +73,7 @@ object SvdSystemManager extends CommonActor with Monitored {
                     
                 case Kill(cmd) =>
                     info("Killing Native Command: %s".format(cmd))
+                    // 2011-01-18 00:50:31 - dmilith - TODO: implement 'kill'
                     reply(Ready)
                 
                 case GetAllProcesses =>
