@@ -46,15 +46,16 @@ object SvdSystemManager extends CommonActor with Monitored {
                     info("System Resources Availability:\n%s".format(nrs))
                     info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
                     
-                    // val pres = new SvdProcess(command = "echo \"dupa\" > /tmp/dupa", user = "root") !? Run
+
+                    new SvdProcess(command = "memcached", user = "dmilith") ! Run
                     
-                    new SvdProcess(command = "/usr/local/bin/memcached", user = "dmilith") ! Run
+                    new SvdProcess(command = "cat /dev/urandom", user = "dmilith") ! Run
                     
-                    // new SvdProcess(command = "cat /dev/urandom", user = "dmilith") ! Run
+                    new SvdProcess(command = "df -h", user = "dmilith") ! Run
                     
-                    new SvdProcess(command = "/bin/df -h", user = "root", outputRedirectDestination = "/tmp/df") ! Run
+                    new SvdProcess(command = "df -h", user = "dmilith", useShell = false) ! Run
                     
-                    new SvdProcess(command = "/bin/dff -h", user = "root", outputRedirectDestination = "/tmp/df2") ! Run
+                    new SvdProcess(command = "dff -h", user = "dmilith", outputRedirectDestination = "/tmp/df2") ! Run
                     
                     
                     throw new Exception("DUPA1")
