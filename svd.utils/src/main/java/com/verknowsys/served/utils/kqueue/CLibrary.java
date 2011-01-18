@@ -8,7 +8,8 @@ import com.sun.jna.*;
  * @author teamon 
  */
 public interface CLibrary extends Library {
-    public CLibrary instance = (CLibrary) Native.loadLibrary("c", CLibrary.class);
+    public static final CLibrary instance = (CLibrary) Native.loadLibrary("c", CLibrary.class);
+    
     // see sys/event.h header file
     public int kqueue();
     public int kevent(int kq, kevent change, int nchanges, kevent event, int nevents, Pointer timeout);

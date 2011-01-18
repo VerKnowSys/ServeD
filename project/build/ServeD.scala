@@ -48,7 +48,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val commons = commonsio
     }
     
-    class SvdUtils(info: ProjectInfo) extends SvdProject(info){
+    class SvdUtils(info: ProjectInfo) extends SvdProject(info) with SvdAkkaProject {
         val jgitRepository = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
         val javaNet        = "java.net" at "http://download.java.net/maven/2"
         
