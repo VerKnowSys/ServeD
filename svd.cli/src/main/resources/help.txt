@@ -1,0 +1,11 @@
+svd command line tool help
+
+== git ==
+git create [name]   Create repository
+git remove [name]   Remove repository
+git list all        List all repositories   
+
+== other ==
+help                Display help
+help [command]      Display help for command, e.g. 'help git create'
+exit                Quit interactive console

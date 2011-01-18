@@ -31,7 +31,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
     
-    class SvdCli(info: ProjectInfo) extends SvdProject(info) {
+    class SvdCli(info: ProjectInfo) extends SvdProject(info) with SvdAkkaProject {
         lazy val cli = task { None; } dependsOn(run(Array("127.0.0.1", "5555")))
         
         override def mainClass = Some("com.verknowsys.served.cli.Runner")

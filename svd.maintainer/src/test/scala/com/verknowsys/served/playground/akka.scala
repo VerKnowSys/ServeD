@@ -1,42 +1,65 @@
 package com.verknowsys.served.playground
 
-import akka.actor.Actor
+import akka.actor._
 import akka.actor.Actor._
+import akka.config.Supervision._
 import akka.util.Logging
+import com.verknowsys.served.utils.Logged
 
-sealed trait Event
-case class Connect(username: String) extends Event
-case class Disconnect(username: String) extends Event
-
-
-class Session extends Actor {
-    def receive = {
-        case "hello" => self reply "world"
-        case _ => self reply "wtf?"
-    }
-}
+class Foo extends Exception
 
 
-object Client extends Logging {
-    def main(args: Array[String]): Unit = {
-        val actor = remote.actorFor("service:hello", "localhost", 5555)
+object Server {
+    
+    class Master extends Actor with Logged {
+        self.spawnLink[A]
+        self.spawnLink[A]
+        self.spawnLink[A]
+        self.spawnLink[A]
         
-        val result = actor !! "hello"
-        log.info("result: %s", result)
-        val res = actor !! "sup"
-        log.info("res: %s", res)
-    }    
-}
-
-
-object Server extends Logging {
-    def main(args: Array[String]): Unit = {
-        remote.start("localhost", 5555)
-        // remote.registerPerSession("service:hello", actorOf[Session])
-        // log.info(System.getProperty("akka.conf"))
-        // log.info(System.getProp)
         
-        // log.info(System.getProperty("java.class.path"))
+        def receive = {
+            case "die" =>
+                trace("Master die!")
+                throw new Foo
+        }
     }
     
+    class A extends Actor with Logged {
+        override def preRestart(reason: Throwable) {
+            trace(this + " preRestart | " + reason)
+        }
+        
+        override def postRestart(reason: Throwable) {
+            trace(this + "A postRestart | " + reason)
+        }
+        
+        override def preStart {
+            trace(this + "A preInit")
+        }
+        
+        def receive = {
+            case "die" => 
+                trace("A got die :(")
+                throw new Foo
+            case x => trace("A got " + x)
+        }
+    }
+    
+    
+    
+    def main(args: Array[String]): Unit = {
+
+        val master = actorOf[Master]
+        
+        Supervisor(
+            SupervisorConfig(
+                OneForOneStrategy(List(classOf[Foo]), 3, 1000),
+                Supervise(master, Permanent) :: Nil
+            )
+        )
+        
+        Thread.sleep(5000)
+        master ! "die"
+    }
 }

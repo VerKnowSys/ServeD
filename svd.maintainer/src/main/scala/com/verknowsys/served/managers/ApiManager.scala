@@ -19,7 +19,7 @@ class ApiManager(owner: AccountManager) extends Manager(owner) {
         
         loop {
             receive {
-                case msg: ApiMessage => sender ! (owner !! msg) 
+                // case msg: ApiMessage => sender ! (owner !! msg) 
                 
                 case _ => messageNotRecognized(_)
             }

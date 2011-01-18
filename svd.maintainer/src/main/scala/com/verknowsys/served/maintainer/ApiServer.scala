@@ -1,43 +1,38 @@
-package com.verknowsys.served.maintainer
-
-import scala.actors.Actor
-import scala.actors.Actor._
-import scala.actors.remote.RemoteActor
-import scala.actors.remote.RemoteActor._
-import scala.actors.remote.Node
-
-import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.api._
-
-object ApiServer extends CommonActor {
-    final val port = 5555 // XXX: Hardcoded port number
-
-    start
-
-    def act {
-        loop {
-            react {
-                case Init =>
-                    RemoteActor.classLoader = getClass().getClassLoader()
-                    alive(port)
-                    register('ServeD, self)
-                    info("Started API Server at " + port)
-
-                case Quit =>
-                    info("Quitting ApiServer")
-                    exit
-                
-                
-                case Connect =>
-                    trace("Connect from %" % sender)
-                    sender ! Success
-                
-                case msg: ApiMessage => 
-                    trace("Got ApiMessage: % fromm %" % (msg, sender.receiver)) 
-                
-                case x => messageNotRecognized(x)
-            }
-        }
-    }
-}
+// package com.verknowsys.served.maintainer
+// 
+// import akka.actor.Actor
+// import akka.util.Logging
+// 
+// import com.verknowsys.served.utils.signals._
+// import com.verknowsys.served.api._
+// 
+// 
+// class ApiSession extends Actor {
+//     import self._
+//     
+//     var manager: Option[AccountManager] = None
+//     
+//     def receive = {
+//         case General.Connect(username) => 
+//             // XXX: This sucks, it really should be async
+//             (AccountsManager !? AccountManager.CheckUser(username)) match {
+//                 case Some(m) =>
+//                     manager = Some(m)
+//                     reply(Success)
+//                 case None => 
+//                     reply(Error("User with name '%' not found" % username))
+//             }
+//                     
+//         case _ => reply(Success)
+//     }
+// }
+// 
+// object ApiServer {
+//     final val host= "localhost"
+//     final val port = 5555
+//     
+//     def start {
+//         Actor.remote.start(host, port)
+//         Actor.remote.registerPerSession("service:api", Actor.actorOf[ApiSession])
+//     }
+// }

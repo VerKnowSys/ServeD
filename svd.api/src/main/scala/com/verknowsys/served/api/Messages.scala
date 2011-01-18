@@ -1,29 +1,36 @@
 package com.verknowsys.served.api
 
 sealed abstract class ApiMessage
+sealed abstract class ApiResponse extends ApiMessage
 
 // ServeD -> Client messages
 // common responses
-case object Success
-case class Error(val message: String)
+case object Success extends ApiResponse
+case class Error(val message: String) extends ApiResponse
 
 // General errors
 case object NotImplementedError
 
 
-case object Connect extends ApiMessage
-case object Disconnect extends ApiMessage
+object General {
+    sealed abstract class Base extends ApiMessage
+    
+    // Request
+    case class Connect(username: String) extends Base
+    case object Disconnect extends Base
+}
 
 object Git {
     sealed abstract class Base extends ApiMessage
-    // Client -> ServeD messages
+    
+    // Request
     case class CreateRepository(val name: String) extends Base
     case class RemoveRepository(val name: String) extends Base
     case object ListRepositories extends Base
     case class ShowRepository(val name: String) extends Base
     
 
-    // ServeD response
+    // Response
     case object RepositoryExistsError
     case class Repositories(val list: List[Repository])
     case class Repository(val name: String)
