@@ -18,6 +18,11 @@ case object ProcessMessages
 case object RemoteBackupDone
 case object RevertBackup
 
+// Internal response
+sealed abstract case class InternalResponse
+case object Success extends InternalResponse
+case object Failure extends InternalResponse
+
 // SvdSystemManager
 case object GetAllProcesses
 case object GetRunningProcesses

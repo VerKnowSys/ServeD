@@ -7,6 +7,8 @@ import akka.actor.Actor.actorOf
 import com.verknowsys.served.utils.kqueue.{CLibrary, kevent}
 import com.verknowsys.served.utils._
 
+import com.verknowsys.served.utils.signals.{Success, Failure}
+
 
 case class KqueueFileEvent(ident: Int, flags: Int)
 case class BareFileEvent(path: String, flags: Int)
@@ -114,10 +116,10 @@ class FileEventsManager extends Actor with Logged {
                         list += spawnNewFileWatcher(_, path, flags)
                     }
 
-                    
                 case None =>
                     self.sender.foreach { registerNewFileEvent(_, path, flags) }
             }
+            self reply Success
             
         // 
         case KqueueFileEvent(ident, flags) => 

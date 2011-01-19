@@ -70,12 +70,16 @@ trait ExpectActor {
     var expectActor: ActorRef = null
     implicit var senderOption: Option[ActorRef] = None
     
-    doBeforeSpec {
+    def beforeExpectActor {
+        println("doBeforeSpec")
+        println(expectActor)
         expectActor = actorOf[Expector].start
         senderOption = Some(expectActor)
     }
     
-    doAfterSpec {
+    def afterExpectActor {
+        println("doAfterSpec")
+        println(expectActor)
         expectActor.stop
     }
 }
