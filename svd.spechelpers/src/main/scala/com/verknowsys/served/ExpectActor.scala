@@ -33,12 +33,7 @@ class Expector extends Actor {
         }
     }
     
-    protected def take(size: Int) = {
-        val x = inbox.take(3).toList //(1 to size).foldLeft(List[Any]()){ case (xs, _) => xs :+ inbox.dequeue }
-        println(x)
-        println(x.size)
-        x
-    }
+    protected def take(size: Int) = (1 to size).foldLeft(List[Any]()){ case (xs, _) => xs :+ inbox.dequeue }
 }
 
 trait ExpectActor {
@@ -46,9 +41,18 @@ trait ExpectActor {
     
     implicit def actorRef2exp(ref: ActorRef) = new {
         def ?(expected: Any*) = {
-            (ref !! Expect(expected.size)) collect {
-                case list: List[_] => list mustEqual expected.toList
-                case None => throw new RuntimeException("TIMEOUT")
+            expected.size match {
+                case 1 if expected.head == None =>
+                    (ref !! Expect(1)) collect {
+                        case None => 
+                        case list: List[_] => list mustEqual Nil
+                    }
+                    
+                case _ =>
+                    (ref !! Expect(expected.size)) collect {
+                        case list: List[_] => list mustEqual expected.toList
+                        case None => throw new RuntimeException("TIMEOUT")
+                    }
             }
         }
         
@@ -58,7 +62,10 @@ trait ExpectActor {
                 case None => throw new RuntimeException("TIMEOUT")
             }
         }
+    
     }
+    
+    val nothing = None
     
     var expectActor: ActorRef = null
     implicit var senderOption: Option[ActorRef] = None
