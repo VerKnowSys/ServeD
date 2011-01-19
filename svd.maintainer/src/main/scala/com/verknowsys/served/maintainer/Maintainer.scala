@@ -63,6 +63,9 @@ object Maintainer extends CommonActor with Monitored {
     *   ServeD Maintainer Core
     */
     def main(args: Array[String]) {
+        
+        Utils.rootCheck
+        
         debug("Mainainer object size: " + Utils.sizeof(Maintainer))
         debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
         debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)

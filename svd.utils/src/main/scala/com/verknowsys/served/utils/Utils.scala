@@ -30,6 +30,23 @@ object Utils extends Logged {
     */   
     lazy val props = Config.props
     
+    
+    /**
+    *   @author dmilith
+    *   
+    *   check and inform when current user isn't superuser (root)
+    *   
+    */   
+    def rootCheck {
+        System.getProperty("user.name") match {
+            case "root" =>
+            case _ =>
+                lazy val err = "%s must be run as root user to perform some operations!".format(this.getClass)
+                error(err)
+        }
+    }
+    
+    
     // lazy val logger = {
     //     BasicConfigurator.resetConfiguration
     //     reloadLoggerConfiguration
