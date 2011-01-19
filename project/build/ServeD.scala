@@ -5,13 +5,14 @@ import extract._
 
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
     // Projects
-    lazy val api           = project("svd.api", "ServeD API", new SvdApi(_))
-    lazy val cli           = project("svd.cli", "ServeD CLI", new SvdCli(_), api)
-    lazy val spechelpers   = project("svd.spechelpers", "ServeD Spec Helpers", new SvdSpecHelpers(_))
-    lazy val utils         = project("svd.utils", "ServeD Utils", new SvdUtils(_), spechelpers)
-    lazy val systemmanager = project("svd.systemmanager", "ServeD SystemManager", new SvdSystemManager(_), utils)
-    lazy val notifications = project("svd.notifications", "ServeD Notifications", new SvdNotifications(_), utils)
-    lazy val maintainer    = project("svd.maintainer", "ServeD Maintainer", new SvdMaintainer(_), notifications, systemmanager, api, spechelpers)
+    lazy val conf          = project("svd.conf", "ServeD Configuration")
+    lazy val api           = project("svd.api", "ServeD API", new SvdApi(_), conf)
+    lazy val cli           = project("svd.cli", "ServeD CLI", new SvdCli(_), conf, api)
+    lazy val spechelpers   = project("svd.spechelpers", "ServeD Spec Helpers", new SvdSpecHelpers(_), conf)
+    lazy val utils         = project("svd.utils", "ServeD Utils", new SvdUtils(_), conf, spechelpers)
+    lazy val systemmanager = project("svd.systemmanager", "ServeD SystemManager", new SvdSystemManager(_), conf, utils)
+    lazy val notifications = project("svd.notifications", "ServeD Notifications", new SvdNotifications(_), conf, utils)
+    lazy val maintainer    = project("svd.maintainer", "ServeD Maintainer", new SvdMaintainer(_), conf, notifications, systemmanager, api, spechelpers)
     
     override def parallelExecution = false
     
@@ -44,7 +45,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdNotifications(info: ProjectInfo) extends SvdProject(info)
     
-    class SvdSpecHelpers(info: ProjectInfo) extends SvdProject(info) {
+    class SvdSpecHelpers(info: ProjectInfo) extends SvdProject(info) with SvdAkkaProject {
         val commons = commonsio
     }
     
