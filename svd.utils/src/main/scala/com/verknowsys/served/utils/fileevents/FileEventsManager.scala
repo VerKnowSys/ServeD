@@ -26,6 +26,7 @@ class FileWatcher(val owner: ActorRef, val path: String, val flags: Int) extends
     
     def receive = {
         case BareFileEvent(path, evflags) if ((evflags & flags) > 0) => owner ! FileEvent(path, evflags) 
+        case BareFileEvent(path, evflags) =>
         // TODO: Create some case classes and send FileModified, FileCreated, FileDeleted etc
     }
 }
@@ -120,8 +121,7 @@ class FileEventsManager extends Actor with Logged {
                     self.sender.foreach { registerNewFileEvent(_, path, flags) }
             }
             self reply Success
-            
-        // 
+
         case KqueueFileEvent(ident, flags) => 
             idents.get(ident.intValue).foreach { 
                 case (path, list) => list foreach { _ ! BareFileEvent(path, flags) }

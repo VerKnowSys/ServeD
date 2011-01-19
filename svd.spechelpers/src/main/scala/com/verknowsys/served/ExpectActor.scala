@@ -9,7 +9,7 @@ import scala.collection.mutable.Queue
 
 case class Expect(size: Int)
 
-class Expector extends Actor {
+class ExpectActor extends Actor {
     val inbox = Queue[Any]()
     
     def receive = {
@@ -36,16 +36,16 @@ class Expector extends Actor {
     protected def take(size: Int) = (1 to size).foldLeft(List[Any]()){ case (xs, _) => xs :+ inbox.dequeue }
 }
 
-trait ExpectActor {
+trait ExpectActorSpecification {
     self: Specification =>
     
     implicit def actorRef2exp(ref: ActorRef) = new {
         def ?(expected: Any*) = {
             expected.size match {
-                case 1 if expected.head == None =>
-                    (ref !! Expect(1)) collect {
-                        case None => 
-                        case list: List[_] => list mustEqual Nil
+                case 1 if expected.head == nothing =>
+                    (ref !! Expect(1)) match {
+                        case None => isExpectation {} // HACK: scala-specs 'pending-as-failure' hack 
+                        case Some(list: List[_]) => list must beEmpty
                     }
                     
                 case _ =>
@@ -71,15 +71,11 @@ trait ExpectActor {
     implicit var senderOption: Option[ActorRef] = None
     
     def beforeExpectActor {
-        println("doBeforeSpec")
-        println(expectActor)
-        expectActor = actorOf[Expector].start
+        expectActor = actorOf[ExpectActor].start
         senderOption = Some(expectActor)
     }
     
     def afterExpectActor {
-        println("doAfterSpec")
-        println(expectActor)
         expectActor.stop
     }
 }
