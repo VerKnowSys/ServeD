@@ -88,6 +88,8 @@ class SvdProcessTest extends Specification {
                 case e: Exception =>
                     fail("Alive isn't working well? It's %s".format(a.alive))
             }
+            // 2011-01-20 11:00:04 - dmilith - hacky: kill memcached after test pass
+            new SvdProcess("kill %d".format(a.pid), user = "root")
         }
 
     } // test should
