@@ -49,7 +49,7 @@ class SvdSystemManagerTest extends Specification {
             
             val procStat = sigarCore.getProcState(pid)
             procStat must notBeNull
-            ("Name" :: "Threads" :: "State" :: "Ppid" :: "Priority" :: "Nice" :: Nil).foreach{
+            ("Name" :: "State" :: "Ppid" :: "Priority" :: "Nice" :: Nil).foreach{ // "Threads" ::
                 elem =>
                     procStat.toString must beMatching(elem)
             }
