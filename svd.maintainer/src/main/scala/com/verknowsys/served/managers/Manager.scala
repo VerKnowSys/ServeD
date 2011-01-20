@@ -1,16 +1,13 @@
 package com.verknowsys.served.managers
 
-import scala.actors.Actor
-import com.verknowsys.served.utils.CommonActor
-import com.verknowsys.served.utils.monitor.Monitored
-
+import akka.actor.Actor
 /**
  * Base class for all managers
  * 
  * @author teamon
  */
-abstract class Manager(owner: AccountManager) extends CommonActor with Monitored {
-    start
+abstract class Manager(owner: AccountManager) extends Actor {
+    
     
     protected def account = owner.account
 }

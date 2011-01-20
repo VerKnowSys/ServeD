@@ -22,7 +22,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         override def parallelExecution = true
         override def installActions = "update" :: "run" :: Nil
         
-        val specs     = "org.scala-tools.testing" %% "specs" % "1.6.6" % "test"
+        val specsTest = "org.scala-tools.testing" %% "specs" % "1.6.6" % "test"
         
         override val growlTestImages = GrowlTestImages(
             Some("project/growl_images/pass.png"),
@@ -44,10 +44,13 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val sigar       = "org.hyperic" % "sigar" % "1.6.3.82"
     }
     
-    class SvdNotifications(info: ProjectInfo) extends SvdProject(info)
+    class SvdNotifications(info: ProjectInfo) extends SvdProject(info) {
+        val smack       = "jivesoftware" % "smack" % "3.0.4"
+    }
     
     class SvdSpecHelpers(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
         val commonsio = "commons-io" % "commons-io" % "1.4"
+        val specs     = "org.scala-tools.testing" %% "specs" % "1.6.6"
     }
     
     class SvdUtils(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
@@ -57,7 +60,6 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val commonsio   = "commons-io" % "commons-io" % "1.4"
         val messadmin   = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
         // val pircbot     = "pircbot" % "pircbot" % "1.4.2"
-        // val smack       = "jivesoftware" % "smack" % "3.0.4"
         // val smackx      = "jivesoftware" % "smackx" % "3.0.4"
         // val j2sshcommon = "sshtools" % "j2ssh-common" % "0.2.2"
         // val j2sshcore   = "sshtools" % "j2ssh-core" % "0.2.2"

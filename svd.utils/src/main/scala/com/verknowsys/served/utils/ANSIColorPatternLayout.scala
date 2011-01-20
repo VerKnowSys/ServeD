@@ -5,6 +5,13 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.Level._
 
 
+/** 
+ * Colorful message in console. Used by logback logger
+ * 
+ * See svd.conf/src/main/resources/logback.xml for loggerconfiguration
+ * 
+ * @author teamon
+ */
 class ANSIColorPatternLayout extends PatternLayout {
     final val Colors = Map(
         TRACE -> Console.MAGENTA,

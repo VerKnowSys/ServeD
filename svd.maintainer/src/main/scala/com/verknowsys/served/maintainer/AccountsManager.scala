@@ -1,17 +1,7 @@
 package com.verknowsys.served.maintainer
 
-// import scala.actors.Actor
 import scala.io.Source
-// import scala.collection.mutable.ListBuffer
-
 import com.verknowsys.served.Config
-// import com.verknowsys.served.utils.CommonActor
-// import com.verknowsys.served.utils.Logged
-// import com.verknowsys.served.utils.monitor.Monitored
-// import com.verknowsys.served.utils.kqueue.Kqueue
-// import com.verknowsys.served.managers.AccountManager
-
-// import scala.actors.Actor
 
 import com.verknowsys.served.managers.AccountManager
 
