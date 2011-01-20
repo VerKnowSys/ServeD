@@ -111,7 +111,7 @@ class SvdSystemManagerTest extends Specification {
             mem must notBeNull
             mem.getFree must beGreaterThan(1024L*1024L)
             mem.getUsed must beGreaterThan(1024L*1024L)
-            mem.getTotal must beGreaterThan(1024L*1024L*1024L*2L) // 2011-01-20 13:58:59 - dmilith - NOTE: minimum of 2GiB RAM on served machine is expected
+            mem.getTotal must beGreaterThan(1024L*1024L*1024L) // 2011-01-20 13:58:59 - dmilith - NOTE: minimum of 1GiB RAM on served machine is expected
             // println("Memory: %s Free, %s Used, %s Total".format(mem.getFree, mem.getUsed, mem.getTotal))
             
             val load = sigarCore.getLoadAverage
