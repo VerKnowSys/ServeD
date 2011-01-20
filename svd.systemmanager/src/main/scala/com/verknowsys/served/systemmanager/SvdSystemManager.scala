@@ -47,15 +47,15 @@ object SvdSystemManager extends CommonActor with Monitored {
                     info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
                     
 
-                    new SvdProcess(command = "memcached", user = "dmilith") ! Run
+                    val a = new SvdProcess(command = "memcached", user = "dmilith")
                     
-                    new SvdProcess(command = "cat /dev/urandom", user = "dmilith") ! Run
+                    new SvdProcess(command = "cat /dev/urandom", user = "dmilith")
                     
-                    new SvdProcess(command = "df -h", user = "dmilith") ! Run
+                    new SvdProcess(command = "df -h", user = "dmilith")
                     
-                    new SvdProcess(command = "df -h", user = "dmilith", useShell = false) ! Run // with shell it will just work fine
+                    new SvdProcess(command = "df -h", user = "dmilith", useShell = false) // without shell it wont work fine
                     
-                    new SvdProcess(command = "dff -h", user = "dmilith", outputRedirectDestination = "/tmp/df2") ! Run
+                    new SvdProcess(command = "dff -h", user = "dmilith", outputRedirectDestination = "/tmp/df2")
                     
                     
                     throw new Exception("DUPA1")
@@ -66,12 +66,12 @@ object SvdSystemManager extends CommonActor with Monitored {
                     // 2011-01-11 00:45:18 - dmilith - NOTE: TODO: here will go call after boot of clean system (no rc)
                     reply((nrs, nsp))
                     
-                case Command(cmd) =>
-                    info("Running Native Command: %s".format(cmd))
-                    val sysManProcess = new SvdProcess(cmd)
-                    val result = sysManProcess !? Run // 2011-01-10 23:53:22 - dmilith - NOTE: WAIT FOR PROCESS until end
-                    processes.add(sysManProcess)
-                    reply(result)
+                // case Command(cmd) =>
+                    // info("Running Native Command: %s".format(cmd))
+                    // val sysManProcess = new SvdProcess(cmd)
+                    // val result = sysManProcess !? Run // 2011-01-10 23:53:22 - dmilith - NOTE: WAIT FOR PROCESS until end
+                    // processes.add(sysManProcess)
+                    // reply(result)
                     
                 case Kill(cmd) =>
                     info("Killing Native Command: %s".format(cmd))
