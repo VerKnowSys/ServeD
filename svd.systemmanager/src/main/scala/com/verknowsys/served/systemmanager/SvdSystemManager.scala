@@ -48,10 +48,12 @@ object SvdSystemManager extends CommonActor with Monitored {
                     
 
                     val a = new SvdProcess(command = "memcached", user = "dmilith")
+                    warn("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
                     
-                    new SvdProcess(command = "cat /dev/urandom", user = "dmilith")
+                    // new SvdProcess(command = "cat /dev/urandom", user = "dmilith")
                     
-                    new SvdProcess(command = "df -h", user = "dmilith")
+                    val b = new SvdProcess(command = "df -h", user = "dmilith")
+                    warn("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
                     
                     new SvdProcess(command = "df -h", user = "dmilith", useShell = false) // without shell it wont work fine
                     
