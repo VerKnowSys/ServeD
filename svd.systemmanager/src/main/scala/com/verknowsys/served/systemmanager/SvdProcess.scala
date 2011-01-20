@@ -98,8 +98,12 @@ class SvdProcess(
             if (proc.exitValue > 0)
                 throw new RuntimeException("'%s' exited abnormally with error code: '%s'. Output info: '%s'".format(command, proc.exitValue, Source.fromFile(outputRedirectDestination).mkString))
         } catch {
-          case e: IllegalThreadStateException =>
-            trace("Process thrown: %s".format(e.getMessage))
+            case e: IllegalThreadStateException =>
+                trace("Process thrown: %s".format(e.getMessage))
+
+            case e: FileNotFoundException =>
+                warn("Process '%s' output does not exists!".format(command))
+
         }
         
         aPid
