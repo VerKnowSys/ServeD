@@ -1,4 +1,4 @@
-package com.verknowsys.served.utils.kqueue;
+package com.verknowsys.served.utils.fileevents;
 
 import com.sun.jna.*;
 

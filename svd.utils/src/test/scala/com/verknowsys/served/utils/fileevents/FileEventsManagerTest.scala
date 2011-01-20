@@ -10,7 +10,7 @@ import org.apache.commons.io.FileUtils
 import akka.actor._
 import akka.actor.Actor._
 
-import com.verknowsys.served.utils.kqueue.CLibrary._
+import com.verknowsys.served.utils.fileevents.CLibrary._
 
 
 class TestFileEventsReactor extends ExpectActor with FileEventsReactor {

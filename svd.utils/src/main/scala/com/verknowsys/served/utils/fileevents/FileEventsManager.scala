@@ -5,7 +5,6 @@ import scala.collection.mutable.{Map, ListBuffer}
 import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.actorOf
 
-import com.verknowsys.served.utils.kqueue.{CLibrary, kevent}
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals.{Success, Failure}
 

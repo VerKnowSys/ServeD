@@ -5,9 +5,12 @@ import scala.actors.Actor
 import scala.collection.mutable.{Map, ListBuffer}
 import com.verknowsys.served.utils.monitor.Monitored
 
+import com.verknowsys.served.utils.fileevents.{CLibrary, kevent}
+
 // TODO: throw custom exception, (or java.io something) instead of just Exception
 // TODO: Handle removed files
 
+@deprecated("Use com.verknowsys.served.fileevents package")
 case class FileEvent(val evflags: Int)
 
 /**
@@ -15,6 +18,8 @@ case class FileEvent(val evflags: Int)
  *
  * @author teamon 
  */
+ 
+@deprecated("Use com.verknowsys.served.fileevents package")
 class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => Unit) extends Actor with Monitored {
     case object StopWatching
     
@@ -49,6 +54,7 @@ class KqueueWatcher(val kqueue: Kqueue, val path: String, val flags: Int)(f: => 
  *
  * @author Author 
  */
+@deprecated("Use com.verknowsys.served.fileevents package")
 class Kqueue extends Thread {
     class KqueueException extends Exception
     class KeventException extends Exception
@@ -134,6 +140,7 @@ class Kqueue extends Thread {
  *
  * @author teamon 
  */
+@deprecated("Use com.verknowsys.served.fileevents package")
 object Kqueue {
     protected val clib = CLibrary.instance
     protected val kq = new Kqueue
