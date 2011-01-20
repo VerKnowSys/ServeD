@@ -18,8 +18,8 @@ class SvdProcessTest extends Specification {
 
     "SvdProcessTest" should {
         
-        // doBefore {
-        // }
+        doAfter {
+        }
 
 
         "SystemProcess should throw exception when there's no such process or bad proces pid given" in {
@@ -57,7 +57,7 @@ class SvdProcessTest extends Specification {
             var a: SvdProcess = null
             try {
                 synchronized {
-                    a = new SvdProcess("df", outputRedirectDestination = "/tmp/served_DUPA", useShell = true)
+                    a = new SvdProcess("df", outputRedirectDestination = "/tmp/served_DUPA", useShell = true, user = "root")
                     Thread.sleep(500)
                     a.alive must be(false)
                 }
