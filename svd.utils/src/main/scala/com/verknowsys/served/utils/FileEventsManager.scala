@@ -1,4 +1,4 @@
-package com.verknowsys.served.utils.fileevents
+package com.verknowsys.served.utils
 
 import com.sun.jna.NativeLong
 import scala.collection.mutable.{Map, ListBuffer}
@@ -7,19 +7,20 @@ import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.actorOf
 import akka.util.Logging
 
-import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals.{Success, Failure}
 
+object events {
+    case class KqueueFileEvent(ident: Int, flags: Int)
+    case class BareFileEvent(path: String, flags: Int)
+    case class FileEvent(path: String, flags: Int)
+    case class RegisterFileEvent(path: String, flags: Int)
 
-case class KqueueFileEvent(ident: Int, flags: Int)
-case class BareFileEvent(path: String, flags: Int)
-case class FileEvent(path: String, flags: Int)
+    class KqueueException extends Exception
+    class KeventException extends Exception
+    class FileOpenException extends Exception
+}
 
-case class RegisterFileEvent(path: String, flags: Int)
-
-class KqueueException extends Exception
-class KeventException extends Exception
-class FileOpenException extends Exception
+import events._
 
 /** 
  * File watcher actor. It receives kqueue events and sends message to [owner] if flags match 
@@ -30,7 +31,7 @@ class FileOpenException extends Exception
  * @author teamon
  */
 class FileWatcher(val owner: ActorRef, val path: String, val flags: Int) extends Actor with Logging {
-    log.trace("Starting new FileWatcher for % with % and %" % (owner, path, flags))
+    log.trace("Starting new FileWatcher for %s with %s and %s", owner, path, flags)
     
     def receive = {
         case BareFileEvent(path, evflags) if ((evflags & flags) > 0) => owner ! FileEvent(path, evflags) 
@@ -81,10 +82,10 @@ trait FileEventsReactor {
  * 
  * @author teamon
  */
-class FileEventsManager extends Actor with Logged {
+class FileEventsManager extends Actor with Logging {
     import CLibrary._
     
-    trace("Starting FileEventsManager")
+    log.trace("Starting FileEventsManager")
     
     protected val clib = CLibrary.instance
     protected val kq = clib.kqueue() // NOTE: C call

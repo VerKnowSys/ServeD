@@ -1,7 +1,7 @@
 package com.verknowsys.served.managers
 
 import com.verknowsys.served.utils.Utils
-import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.utils.signals.{Init, Quit, Ready}
 import com.verknowsys.served.maintainer.Account
 import com.verknowsys.served.utils.git.GitRepository
 import com.verknowsys.served.api._

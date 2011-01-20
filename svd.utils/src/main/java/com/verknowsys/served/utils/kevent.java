@@ -1,4 +1,4 @@
-package com.verknowsys.served.utils.fileevents;
+package com.verknowsys.served.utils;
 
 import com.sun.jna.*;
 

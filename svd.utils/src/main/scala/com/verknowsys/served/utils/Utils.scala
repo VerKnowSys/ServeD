@@ -1,13 +1,13 @@
 package com.verknowsys.served.utils
 
 import com.verknowsys.served._
-import com.verknowsys.served.utils.kqueue.Kqueue
 import java.io.{PrintWriter, File, OutputStreamWriter}
 import java.util.ArrayList
 import java.util.regex.Pattern
 import clime.messadmin.providers.sizeof.ObjectProfiler
 import scala.collection.JavaConversions._
 
+import akka.util.Logging
 
 /**
  * Utils object containing common functions
@@ -15,7 +15,7 @@ import scala.collection.JavaConversions._
  * @author dmilith
  *   
  */
-object Utils extends Logged {
+object Utils extends Logging {
     
     // checkOrCreateVendorDir 
     // XXX: This makes unnecessary logger and I/O bloat.
@@ -57,15 +57,15 @@ object Utils extends Logged {
     def checkOrCreateVendorDir = {
         val vendorPath = Config.homePath + Config.vendorDir
         if (new File(vendorPath).exists) {
-            debug("Making sure that vendor directory exists")
+            log.debug("Making sure that vendor directory exists")
         } else {
-            debug("No vendor directory available! Creating empty vendor directory")
+            log.debug("No vendor directory available! Creating empty vendor directory")
             new File(vendorPath).mkdir
         }
         vendorPath
     }
     
-    def getAllLT = trace("Live threads list:\n%s".format(Thread.getAllStackTraces.toList.map{ th => "%s - %s\n".format(th._1, th._2.toList.map{ elem => "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(elem.getFileName, elem.getClassName, elem.getMethodName, elem.getLineNumber, elem.isNativeMethod)})}))
+    def getAllLT = log.trace("Live threads list:\n%s".format(Thread.getAllStackTraces.toList.map{ th => "%s - %s\n".format(th._1, th._2.toList.map{ elem => "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(elem.getFileName, elem.getClassName, elem.getMethodName, elem.getLineNumber, elem.isNativeMethod)})}))
         
     /**
      *  @author dmilith

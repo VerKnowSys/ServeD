@@ -5,7 +5,7 @@ import scala.actors.Actor
 import scala.collection.mutable.{Map, ListBuffer}
 import com.verknowsys.served.utils.monitor.Monitored
 
-import com.verknowsys.served.utils.fileevents.{CLibrary, kevent}
+import com.verknowsys.served.utils.{CLibrary, kevent}
 
 // TODO: throw custom exception, (or java.io something) instead of just Exception
 // TODO: Handle removed files

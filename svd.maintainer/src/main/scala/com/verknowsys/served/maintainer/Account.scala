@@ -1,9 +1,10 @@
 package com.verknowsys.served.maintainer
 
-import com.verknowsys.served.utils.Logged
 import com.verknowsys.served.utils.git.GitRepository
 import java.io.File
 import org.apache.commons.io.FileUtils
+
+import akka.util.Logging
 
 /**
  * Account data storage
@@ -20,7 +21,7 @@ class Account (
         val information: String = "No information",
         val homeDir: String = "/home/",
         val shell: String = "/bin/bash"
-        ) extends Logged {
+        ) extends Logging {
 
     
     /**
@@ -51,7 +52,7 @@ class Account (
     def size = {
         try {
             val elementsSize = FileUtils.sizeOfDirectory(new File(homeDir))
-            debug("getAccountSize of " + homeDir + " folder: " + elementsSize)
+            log.debug("getAccountSize of " + homeDir + " folder: " + elementsSize)
             Some(elementsSize)
         } catch {
             case x: Exception =>

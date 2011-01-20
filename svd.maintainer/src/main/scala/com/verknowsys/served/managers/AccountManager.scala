@@ -1,20 +1,20 @@
 package com.verknowsys.served.managers
 
-import com.verknowsys.served.utils.Logged
 import com.verknowsys.served.maintainer.Account
 import akka.actor.Actor
+import akka.util.Logging
 
 /**
  * Account Manager - owner of all managers
  * 
  * @author teamon
  */
-class AccountManager(val account: Account) extends Actor with Logged {
+class AccountManager(val account: Account) extends Actor with Logging {
     // start
     
     // val gitManager = new GitManager(this)
     
-    trace("Starting AccountManager for account: " + account)
+    log.trace("Starting AccountManager for account: " + account)
     
     
     def receive = {

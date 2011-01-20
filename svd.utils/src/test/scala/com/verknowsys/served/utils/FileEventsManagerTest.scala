@@ -1,4 +1,4 @@
-package com.verknowsys.served.utils.fileevents
+package com.verknowsys.served.utils
 
 import com.verknowsys.served.SpecHelpers._
 import com.verknowsys.served.spechelpers._
@@ -9,9 +9,6 @@ import org.apache.commons.io.FileUtils
 
 import akka.actor._
 import akka.actor.Actor._
-
-import com.verknowsys.served.utils.fileevents.CLibrary._
-
 
 class TestFileEventsReactor extends ExpectActor with FileEventsReactor {
     registerFileEventFor("/tmp/served/file_events_test/single", Modified)

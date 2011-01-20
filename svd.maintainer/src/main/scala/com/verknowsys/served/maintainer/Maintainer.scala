@@ -5,7 +5,7 @@ package com.verknowsys.served.maintainer
 
 // import com.verknowsys.served.api._
 import com.verknowsys.served.Config
-import com.verknowsys.served.utils.{Utils, Logged}
+import com.verknowsys.served.utils.{Utils}
 // import com.verknowsys.served.utils.signals._
 // import com.verknowsys.served.systemmanager._
 // 
@@ -19,14 +19,15 @@ import com.verknowsys.served.utils.{Utils, Logged}
 import akka.actor.Actor
 import akka.actor.Actor.actorOf
 import akka.actor.Actor.registry
+import akka.util.Logging
 
 /**
  *  Main Maintainer loader.
  *
  *  @author dmilith, teamon
  */
-class Maintainer extends Actor with Logged {
-    debug("Maintainer is loading")
+class Maintainer extends Actor with Logging {
+    log.trace("Maintainer is loading")
     
     self.spawnLink[AccountsManager]
     
@@ -40,11 +41,11 @@ class Maintainer extends Actor with Logged {
 *   
 *   ServeD Maintainer Core
 */
-object Maintainer extends Logged {
+object Maintainer extends Logging {
     def main(args: Array[String]) {
-        debug("Mainainer object size: " + Utils.sizeof(Maintainer))
-        debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
-        debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
+        log.debug("Mainainer object size: " + Utils.sizeof(Maintainer))
+        log.debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
+        log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         
         // args foreach { _ match {
         //     case "--monitor" => 

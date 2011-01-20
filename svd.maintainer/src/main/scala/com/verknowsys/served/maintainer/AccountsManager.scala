@@ -6,7 +6,7 @@ import scala.io.Source
 
 import com.verknowsys.served.Config
 // import com.verknowsys.served.utils.CommonActor
-import com.verknowsys.served.utils.Logged
+// import com.verknowsys.served.utils.Logged
 // import com.verknowsys.served.utils.monitor.Monitored
 // import com.verknowsys.served.utils.kqueue.Kqueue
 // import com.verknowsys.served.managers.AccountManager
@@ -17,9 +17,10 @@ import com.verknowsys.served.managers.AccountManager
 
 import akka.actor.Actor
 import akka.actor.Actor.actorOf
+import akka.util.Logging
 
 
-class AccountsManager extends Actor with Logged {
+class AccountsManager extends Actor with Logging {
     // case object ReloadUsers
     // case class CheckUser(val username: String)
     
