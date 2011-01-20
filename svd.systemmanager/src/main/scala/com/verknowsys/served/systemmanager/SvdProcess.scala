@@ -31,6 +31,7 @@ class SvdProcess(
     
     // 2011-01-20 02:42:12 - dmilith - TODO: implement SvdProcess requirements
     // require(commandIsntHarmful)
+    // require(commandExists)
     // require(workDirExists)
     // require(usedShellValid)
     // require(userListed)
@@ -56,6 +57,9 @@ class SvdProcess(
                 false
         }
         
+    
+    override def toString = "SvdProcess: '%s', pid: %d".format(command, pid)
+
 
     private
 
@@ -69,41 +73,35 @@ class SvdProcess(
       */
     def process: Long = {
         var aPid: Long = 0L
-        val t = new Thread {
-            override def run = {
-                // 2011-01-10 23:33:11 - dmilith - TODO: implement params validation.
-                val cmdFormats = if (useShell) "%s -u %s -s %s > %s 2>&1" else "%s -u %s %s > %s 2>&1"
-                val cmd =  cmdFormats.format(Config.globalSudoExec, user, command, outputRedirectDestination).split(" ")
-                val rt = Runtime.getRuntime
-                val env = Config.env
-                val proc = rt.exec(cmd, env)
-                trace("CMD: %s".format(cmd.mkString(" ")))
-                rt.traceMethodCalls(false)
+        val cmdFormats = if (useShell) "%s -u %s -s %s > %s 2>&1" else "%s -u %s %s > %s 2>&1"
+        val cmd =  cmdFormats.format(Config.globalSudoExec, user, command, outputRedirectDestination).split(" ")
+        val rt = Runtime.getRuntime
+        val env = Config.env
+        val proc = rt.exec(cmd, env)
+        trace("CMD: %s".format(cmd.mkString(" ")))
+        rt.traceMethodCalls(false)
 
-                proc.getClass.getDeclaredFields.foreach{ f =>
-                    f.setAccessible(true)
-                    f.getName match {
-                        case "pid" =>
-                            aPid = f.get(proc).asInstanceOf[Int]
-                            debug("Pid: %s (of %s)".format(aPid, command))
+        proc.getClass.getDeclaredFields.foreach{ f =>
+            f.setAccessible(true)
+            f.getName match {
+                case "pid" =>
+                    aPid = f.get(proc).asInstanceOf[Int]
+                    debug("Pid: %s (of %s)".format(aPid, command))
 
-                        case _ =>
+                case _ =>
 
-                    }
-                    trace(f.getName+"="+f.get(proc))
-                }
-                
-                try { 
-                    if (proc.exitValue > 0)
-                        throw new RuntimeException("'%s' exited abnormally with error code: '%s'. Output info: '%s'".format(command, proc.exitValue, Source.fromFile(outputRedirectDestination).mkString))
-                } catch {
-                  case e: IllegalThreadStateException =>
-                    trace("Process thrown: %s".format(e.getMessage))
-                }
             }
+            trace(f.getName+"="+f.get(proc))
         }
-        t.start
-        t.join
+        
+        try { 
+            if (proc.exitValue > 0)
+                throw new RuntimeException("'%s' exited abnormally with error code: '%s'. Output info: '%s'".format(command, proc.exitValue, Source.fromFile(outputRedirectDestination).mkString))
+        } catch {
+          case e: IllegalThreadStateException =>
+            trace("Process thrown: %s".format(e.getMessage))
+        }
+        
         aPid
     }
 
