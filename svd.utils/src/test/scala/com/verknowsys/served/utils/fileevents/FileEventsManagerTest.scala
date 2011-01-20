@@ -14,7 +14,7 @@ import com.verknowsys.served.utils.kqueue.CLibrary._
 
 
 class TestFileEventsReactor extends ExpectActor with FileEventsReactor {
-    registerFileEventFor("/tmp/served/file_events_test/single", NOTE_WRITE | NOTE_EXTEND)
+    registerFileEventFor("/tmp/served/file_events_test/single", Modified)
 }
 
 class FileEventsManagerTest extends Specification with ExpectActorSpecification {
@@ -101,6 +101,8 @@ class FileEventsManagerTest extends Specification with ExpectActorSpecification 
             
             expectActor ? FileEvent(DIR + "/single", 0x02)
         }
+        
+        // TODO: Write (if possible) more stress tests
     }
     
 }
