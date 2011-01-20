@@ -1,5 +1,6 @@
 package com.verknowsys.served.utils
 
+import com.verknowsys.served.utils.events._
 import com.verknowsys.served.SpecHelpers._
 import com.verknowsys.served.spechelpers._
 import com.verknowsys.served.utils.signals.Success
