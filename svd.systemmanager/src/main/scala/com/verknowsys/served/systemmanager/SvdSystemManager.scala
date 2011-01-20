@@ -8,7 +8,7 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.kqueue._
 import com.verknowsys.served.utils.monitor.Monitored
-import com.verknowsys.served.systemmanager._
+import com.verknowsys.served.systemmanager.native._
 
 import org.hyperic.sigar._
 import java.io.FileNotFoundException
@@ -29,7 +29,7 @@ import scala.collection.JavaConversions._
 object SvdSystemManager extends CommonActor with Monitored {
     
     private val core = new Sigar
-    private val processes = ListBuffer[SvdSystemProcess]()
+    private val processes = ListBuffer[SvdProcess]()
     
     start
     
@@ -39,12 +39,26 @@ object SvdSystemManager extends CommonActor with Monitored {
         loop {
             receive {
                 case Init =>
-                    val nrs = new NativeSystemResources
-                    val nsp = new NativeSystemProcess(core.getPid)
+                    val nrs = new SystemResources
+                    val nsp = new SystemProcess(core.getPid)
                     
                     info("SystemManager ready")
                     info("System Resources Availability:\n%s".format(nrs))
                     info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
+                    
+
+                    val a = new SvdProcess(command = "memcached", user = "dmilith")
+                    warn("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
+                    
+                    // new SvdProcess(command = "cat /dev/urandom", user = "dmilith")
+                    
+                    val b = new SvdProcess(command = "df -h", user = "dmilith")
+                    warn("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
+                    
+                    new SvdProcess(command = "df -h", user = "dmilith", useShell = false) // without shell it wont work fine
+                    
+                    new SvdProcess(command = "dff -h", user = "dmilith", outputRedirectDestination = "/tmp/df2")
+                    
                     
                     throw new Exception("DUPA1")
                     throw new Exception("DUPA2")
@@ -54,15 +68,16 @@ object SvdSystemManager extends CommonActor with Monitored {
                     // 2011-01-11 00:45:18 - dmilith - NOTE: TODO: here will go call after boot of clean system (no rc)
                     reply((nrs, nsp))
                     
-                case Command(cmd) =>
-                    info("Running Native Command: %s".format(cmd))
-                    val sysManProcess = new SvdSystemProcess(cmd)
-                    val result = sysManProcess !? Run // 2011-01-10 23:53:22 - dmilith - NOTE: WAIT FOR PROCESS until end
-                    processes.add(sysManProcess)
-                    reply(result)
+                // case Command(cmd) =>
+                    // info("Running Native Command: %s".format(cmd))
+                    // val sysManProcess = new SvdProcess(cmd)
+                    // val result = sysManProcess !? Run // 2011-01-10 23:53:22 - dmilith - NOTE: WAIT FOR PROCESS until end
+                    // processes.add(sysManProcess)
+                    // reply(result)
                     
                 case Kill(cmd) =>
                     info("Killing Native Command: %s".format(cmd))
+                    // 2011-01-18 00:50:31 - dmilith - TODO: implement 'kill'
                     reply(Ready)
                 
                 case GetAllProcesses =>
@@ -70,7 +85,7 @@ object SvdSystemManager extends CommonActor with Monitored {
                     debug("All process IDs: %s".format(psAll.mkString(", ")))
                     psAll.foreach {
                         p =>
-                        	trace(new NativeSystemProcess(p))
+                        	trace(new SystemProcess(p))
                     }
                     reply(Ready)
                     

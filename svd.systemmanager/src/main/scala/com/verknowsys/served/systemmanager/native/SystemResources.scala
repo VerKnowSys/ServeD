@@ -1,4 +1,4 @@
-package com.verknowsys.served.systemmanager
+package com.verknowsys.served.systemmanager.native
 
 import org.hyperic.sigar._
 import scala.collection.JavaConversions._
@@ -9,7 +9,7 @@ import scala.collection.JavaConversions._
  * 
  * @author dmilith
 */
-class NativeSystemResources {
+class SystemResources {
     
     private val core = new Sigar
     private val mem = core.getMem

@@ -23,6 +23,17 @@ object Config {
 
     final val props = new Properties(mainConfigFile)
     
+    final val env = Array(
+        "TERM=xterm",
+        "TMPDIR=/tmp/",
+        "LC_CTYPE=UTF-8",
+        "PWD=%s".format(homePath + vendorDir),
+        "COMMAND_MODE=unix2003",
+        "HOME=%s".format(homePath),
+        "PATH=$HOME/bin:$HOME/Bin:/bin:/usr/bin:/usr/local/bin" // 2011-01-18 14:39:36 - dmilith - TODO: implement account privileges and their influence on PATH setting
+    )
+    
+    
     def apply(key: String) = props(key)
     
 
@@ -31,9 +42,17 @@ object Config {
      *   More dynamic settings from main properties file
      */
 
+     
+    def globalSudoExec = props("globalSudoExec") or "/usr/local/bin/sudo"
+    
+    def servedUserName = props("servedUserName") or "served"
+    
     def systemPasswdFile = props("systemPasswdFile") or homePath + vendorDir + "etc/passwd"
+    
     def checkInterval = props("checkInterval") or 1500
+    
     def sizeMultiplier = props("sizeMultiplier") or 1024
 
     def defaultGitRepoToWatch = props("defaultGitRepoToWatch") or "/git/ServeD.git" // XXX: Remove this
+    
 }

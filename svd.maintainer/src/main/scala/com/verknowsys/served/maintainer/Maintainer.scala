@@ -47,6 +47,10 @@ object Maintainer extends Logging {
         log.debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         
+        Utils.rootCheck
+        
+
+        
         // args foreach { _ match {
         //     case "--monitor" => 
         //         Monitor.start
