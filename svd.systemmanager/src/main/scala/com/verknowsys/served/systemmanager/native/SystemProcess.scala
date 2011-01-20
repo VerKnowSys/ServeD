@@ -14,6 +14,12 @@ class SystemProcess(val pid: Long) {
     private val stat = core.getProcState(pid)
     private val cpu = core.getProcCpu(pid)
     private val mem = core.getProcMem(pid)
+
+    require(pid > 0)
+    require(core != null)
+    require(stat != null)
+    require(cpu != null)
+    require(mem != null)
     
     val name = stat.getName
     val user = core.getProcCredName(pid).getUser
