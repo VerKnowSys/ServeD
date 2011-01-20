@@ -4,6 +4,7 @@ import scala.collection.mutable.Map
 import scala.collection.JavaConversions._
 import java.io.{FileInputStream, FileOutputStream}
 import java.util.{Properties => JProperties}
+import akka.util.Logging
 
 /** 
  * Property converter interface
@@ -83,7 +84,7 @@ class Property(parent: Properties, key: String){
  *
  * @author teamon
  */
-class Properties(filename: String) extends Logged {
+class Properties(filename: String) extends Logging {
     lazy val data = load
 
     /**
@@ -113,7 +114,7 @@ class Properties(filename: String) extends Logged {
             val jprops = new JProperties
             jprops.load(new FileInputStream(filename))
 
-            debug("Loaded file: " + filename)
+            log.debug("Loaded file: " + filename)
             Some(jprops.entrySet.iterator.foldLeft(Map[String, String]()) {
                 case (map, item) =>
                     map += (item.getKey.toString -> item.getValue.toString)
@@ -142,7 +143,7 @@ class Properties(filename: String) extends Logged {
             }
             jprops.store(file, "ServeD Properties: " + filename)
             file.close
-            debug("Saved file: " + filename)
+            log.debug("Saved file: " + filename)
         // } catch {
             // case e: Exception => error("Couldn`t save file %s, cause of exception: %s".format(filename, e))
         // }
