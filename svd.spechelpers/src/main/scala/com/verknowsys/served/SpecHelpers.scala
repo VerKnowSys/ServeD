@@ -21,6 +21,7 @@ object SpecHelpers {
         writeFile(path, content)
     }
     
+    @deprecated("Use ExpectActor")
     def waitWhileRunning(actors: Seq[Actor]*) {
         actors.flatten foreach { a =>
             while(a.getState != Actor.State.Blocked && a.getState != Actor.State.Suspended) { 
@@ -31,6 +32,7 @@ object SpecHelpers {
         }
     }
     
+    @deprecated("Use ExpectActor")
     def waitForDeath(actors: Seq[Actor]*) {
         actors.flatten foreach { a =>
             while(a.getState != Actor.State.Terminated) { 
@@ -46,6 +48,7 @@ object SpecHelpers {
     //     System.in.read
     // }
     
+    @deprecated("Use ExpectActor")
     class Counter extends Actor {
         case object Stop
         
