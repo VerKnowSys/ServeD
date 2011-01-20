@@ -58,7 +58,7 @@ class SvdProcess(
         }
         
     
-    override def toString = "SvdProcess: '%s', pid: %d".format(command, pid)
+    override def toString = "cmd: '%s', pid: %s".format(command, if (pid > 0) pid else "NSY") // 2011-01-20 13:39:07 - dmilith - NOTE: NS - Not Spawned Yet
 
 
     private
@@ -96,13 +96,13 @@ class SvdProcess(
         
         try { 
             if (proc.exitValue > 0)
-                throw new RuntimeException("'%s' exited abnormally with error code: '%s'. Output info: '%s'".format(command, proc.exitValue, Source.fromFile(outputRedirectDestination).mkString))
+                throw new RuntimeException("SvdProcess: '%s' exited abnormally with error code: '%s'. Output info: '%s'".format(command, proc.exitValue, Source.fromFile(outputRedirectDestination).mkString))
         } catch {
             case e: IllegalThreadStateException =>
                 trace("Process thrown: %s".format(e.getMessage))
 
             case e: FileNotFoundException =>
-                warn("Process '%s' output does not exists!".format(command))
+                debug("Process '%s' output does not exists!".format(command))
 
         }
         
