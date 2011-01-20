@@ -154,23 +154,12 @@ object Logger extends Actor {
  * 
  * @author teamon
  */
-trait Logged {
-    @deprecated("Use just 'trace' instead of 'logger.trace' (and other methods as well)")
-    lazy val logger = this
-    
-    import Logger.Message
-    import Logger.Level._
-    
-    def trace(msg: => String) = if(Logger.level <= Trace) Logger ! Message(this, msg, Trace)
-    def debug(msg: => String) = if(Logger.level <= Debug) Logger ! Message(this, msg, Debug)
-    def info(msg:  => String) = if(Logger.level <= Info)  Logger ! Message(this, msg, Info)
-    def warn(msg:  => String) = if(Logger.level <= Warn)  Logger ! Message(this, msg, Warn)
-    def error(msg: => String) = if(Logger.level <= Error) Logger ! Message(this, msg, Error)
-    
-    def trace(x: Any): Unit = trace(x.toString)
-    def debug(x: Any): Unit = debug(x.toString)
-    def info(x: Any): Unit = info(x.toString)
-    def warn(x: Any): Unit = warn(x.toString)
-    def error(x: Any): Unit = error(x.toString)
+@deprecated("Use akka.util.Logging")
+trait Logged extends akka.util.Logging {
+    def trace(x: Any): Unit = log.trace(x.toString)
+    def debug(x: Any): Unit = log.debug(x.toString)
+    def info(x: Any): Unit = log.info(x.toString)
+    def warn(x: Any): Unit = log.warn(x.toString)
+    def error(x: Any): Unit = log.error(x.toString)
 }
 

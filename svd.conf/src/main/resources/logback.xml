@@ -4,7 +4,7 @@
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
 			<layout class="com.verknowsys.served.utils.ANSIColorPatternLayout">
-	      <pattern>%-5level [%thread | %class{10}]: %message%n</pattern>
+	      <pattern>%-5level [%thread | %logger{10}]: %message%n</pattern>
 			</layout>
     </encoder>
   </appender>
@@ -20,7 +20,7 @@
   </appender>
 
   <logger name="akka" level="WARN"/>
-	<logger name="com.verknowsys.served" level="DEBUG"/>
+	<logger name="com.verknowsys.served" level="TRACE"/>
 
   <root level="INFO">
     <appender-ref ref="stdout"/>

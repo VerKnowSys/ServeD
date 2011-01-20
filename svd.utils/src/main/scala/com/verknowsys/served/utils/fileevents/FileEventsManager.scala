@@ -2,8 +2,10 @@ package com.verknowsys.served.utils.fileevents
 
 import com.sun.jna.NativeLong
 import scala.collection.mutable.{Map, ListBuffer}
+
 import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.actorOf
+import akka.util.Logging
 
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals.{Success, Failure}
@@ -27,8 +29,8 @@ class FileOpenException extends Exception
  * @param flags kqueue flags to watch
  * @author teamon
  */
-class FileWatcher(val owner: ActorRef, val path: String, val flags: Int) extends Actor with Logged {
-    trace("Starting new FileWatcher for % with % and %" % (owner, path, flags))
+class FileWatcher(val owner: ActorRef, val path: String, val flags: Int) extends Actor with Logging {
+    log.trace("Starting new FileWatcher for % with % and %" % (owner, path, flags))
     
     def receive = {
         case BareFileEvent(path, evflags) if ((evflags & flags) > 0) => owner ! FileEvent(path, evflags) 

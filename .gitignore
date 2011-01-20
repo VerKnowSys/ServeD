@@ -1,6 +1,7 @@
 .DS_Store
 *.class
 target/
+logs/
 lib_managed/
 src_managed/
 project/boot/
