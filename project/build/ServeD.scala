@@ -28,6 +28,12 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         
         val specs     = "org.scala-tools.testing" %% "specs" % "1.6.6"
         def commonsio = "commons-io" % "commons-io" % "1.4"
+        
+        override val growlTestImages = GrowlTestImages(
+            Some("project/growl_images/pass.png"),
+            Some("project/growl_images/fail.png"),
+            Some("project/growl_images/fail.png")
+        )
     }
     
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
