@@ -14,11 +14,11 @@ import org.hyperic.sigar._
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.RandomAccessFile
-import scala.actors.Actor
-import scala.actors.Actor._
+import akka.actor.Actor
 import com.sun.jna.{Native, Library}
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
+import akka.util.Logging
 
 
 /**
@@ -26,88 +26,77 @@ import scala.collection.JavaConversions._
 *   
 *   SystemManager - responsible for System Managment and Monitoring
 */
-object SvdSystemManager extends CommonActor with Monitored {
+class SvdSystemManager extends Actor with Logging {
     
     private val core = new Sigar
     private val processes = ListBuffer[SvdProcess]()
     
-    start
+    Native.setProtected(true) // 2010-10-11 23:43:21 - dmilith - set JVM protection (in case of JNA code fail it should only throw an exception)
     
     
-    def act {
-        Native.setProtected(true) // 2010-10-11 23:43:21 - dmilith - set JVM protection (in case of JNA code fail it should only throw an exception)
-        loop {
-            receive {
-                case Init =>
-                    val nrs = new SystemResources
-                    val nsp = new SystemProcess(core.getPid)
-                    
-                    info("SystemManager ready")
-                    info("System Resources Availability:\n%s".format(nrs))
-                    info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
-                    
-
-                    val a = new SvdProcess(command = "memcached", user = "dmilith")
-                    warn("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
-                    
-                    // new SvdProcess(command = "cat /dev/urandom", user = "dmilith")
-                    
-                    val b = new SvdProcess(command = "df -h", user = "dmilith")
-                    warn("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
-                    
-                    new SvdProcess(command = "df -h", user = "dmilith", useShell = false) // without shell it wont work fine
-                    
-                    new SvdProcess(command = "dff -h", user = "dmilith", outputRedirectDestination = "/tmp/df2")
-                    
-                    
-                    throw new Exception("DUPA1")
-                    throw new Exception("DUPA2")
-                    throw new Exception
-                    
-                    info("after exceptions")
-                    // 2011-01-11 00:45:18 - dmilith - NOTE: TODO: here will go call after boot of clean system (no rc)
-                    reply((nrs, nsp))
-                    
-                // case Command(cmd) =>
-                    // info("Running Native Command: %s".format(cmd))
-                    // val sysManProcess = new SvdProcess(cmd)
-                    // val result = sysManProcess !? Run // 2011-01-10 23:53:22 - dmilith - NOTE: WAIT FOR PROCESS until end
-                    // processes.add(sysManProcess)
-                    // reply(result)
-                    
-                case Kill(cmd) =>
-                    info("Killing Native Command: %s".format(cmd))
-                    // 2011-01-18 00:50:31 - dmilith - TODO: implement 'kill'
-                    reply(Ready)
-                
-                case GetAllProcesses =>
-                    val psAll = core.getProcList.toList
-                    debug("All process IDs: %s".format(psAll.mkString(", ")))
-                    psAll.foreach {
-                        p =>
-                        	trace(new SystemProcess(p))
-                    }
-                    reply(Ready)
-                    
-                case GetRunningProcesses =>
-                    debug("Processes running by ServeD: %s".format(processes.mkString(", ")))
-                    reply(processes)
+    def receive = {
+        case Init =>
+            val nrs = new SystemResources
+            val nsp = new SystemProcess(core.getPid)
             
+            log.info("SystemManager ready")
+            log.info("System Resources Availability:\n%s".format(nrs))
+            log.info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
+            
+
+            val a = new SvdProcess(command = "memcached", user = "dmilith")
+            log.warn("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
+            
+            val b = new SvdProcess(command = "df -h", user = "dmilith")
+            log.warn("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
+            
+            new SvdProcess(command = "df -h", user = "dmilith", useShell = false) // without shell it wont work fine
+            
+            new SvdProcess(command = "dff -h", user = "dmilith", outputRedirectDestination = "/tmp/df2")
+            
+            
+            // throw new Exception("DUPA1")
+            // throw new Exception("DUPA2")
+            // throw new Exception
+            
+            // log.info("after exceptions")
+            // 2011-01-11 00:45:18 - dmilith - NOTE: TODO: here will go call after boot of clean system (no rc)
+            self reply((nrs, nsp))
                     
-                case Quit =>
-                    info("Quitting SystemManager")
-                    reply(Ready)
-                    exit
-                
-                // case SendSignal(signal, pid) =>
-                    // trace("Send Signal Request, received with signal %s, for pid: %s".format(signal, pid))
-                    // reply(Ready)
-                    
-                case _ =>
-                    messageNotRecognized(_)
-                    reply(Ready)
+        // case Command(cmd) =>
+            // log.info("Running Native Command: %s".format(cmd))
+            // val sysManProcess = new SvdProcess(cmd)
+            // val result = sysManProcess !? Run // 2011-01-10 23:53:22 - dmilith - NOTE: WAIT FOR PROCESS until end
+            // processes.add(sysManProcess)
+            // reply(result)
+            
+        case Kill(cmd) =>
+            log.info("Killing Native Command: %s".format(cmd))
+            // 2011-01-18 00:50:31 - dmilith - TODO: implement 'kill'
+        
+        case GetAllProcesses =>
+            val psAll = core.getProcList.toList
+            log.debug("All process IDs: %s".format(psAll.mkString(", ")))
+            psAll.foreach {
+                p =>
+                	log.trace(new SystemProcess(p).toString)
             }
-        }
+            
+        case GetRunningProcesses =>
+            log.debug("Processes running by ServeD: %s".format(processes.mkString(", ")))
+            self reply(processes)
+    
+            
+        case Quit =>
+            log.info("Quitting SystemManager")
+            exit
+        
+        // case SendSignal(signal, pid) =>
+            // trace("Send Signal Request, received with signal %s, for pid: %s".format(signal, pid))
+            // reply(Ready)
+            
+        case _ =>
+        
     }
 
 
@@ -119,18 +108,19 @@ object SvdSystemManager extends CommonActor with Monitored {
     def sendSignalToPid(signal: POSIX.Value, @specialized pid: Int) =
         signal match {
             case POSIX.SIGHUP =>
-                trace("SigHUP sent to process pid: %s".format(pid))
+                log.trace("SigHUP sent to process pid: %s".format(pid))
                 
             case POSIX.SIGINT =>
-                trace("SigINT sent to process pid: %s".format(pid))
+                log.trace("SigINT sent to process pid: %s".format(pid))
                 
             case POSIX.SIGQUIT =>
-                trace("SigQUIT sent to process pid: %s".format(pid))
+                log.trace("SigQUIT sent to process pid: %s".format(pid))
                 
             case POSIX.SIGKILL =>
-                trace("SigKILL sent to process pid: %s".format(pid))
+                log.trace("SigKILL sent to process pid: %s".format(pid))
             
-            case _ => messageNotRecognized(_)                
+            case _ =>
+            
         }
 
 
@@ -182,7 +172,7 @@ object SvdSystemManager extends CommonActor with Monitored {
             // Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
             //                 val raf = new RandomAccessFile(watchedFile, "r")
             //                 raf.seek(raf.length - 1024)
-            //                 info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
+            //                 log.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
             //             }
         // }
     
