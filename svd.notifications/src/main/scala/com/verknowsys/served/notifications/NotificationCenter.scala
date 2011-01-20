@@ -1,6 +1,5 @@
 package com.verknowsys.served.notifications
 
-import scala.actors._
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
     
@@ -9,11 +8,14 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.git._
 import com.verknowsys.served.utils.signals._
 
-object NotificationCenter extends CommonActor {
+import akka.actor.Actor
+import akka.util.Logging
+
+object NotificationCenter extends Actor with Logging {
     case class Message(message: String)
     case class Status(status: String)
     
-    start
+    
     
     // XXX: Hardcoded gate
     val gates = new XMPPGate(
@@ -25,30 +27,34 @@ object NotificationCenter extends CommonActor {
     ) :: Nil
     
 
-    def act {
-        loop {
-            receive {
-                case Init =>                        
-                    info("NotificationCenter connecting gates")
-                    gates.foreach { _.connect }                                    
-                    info("NotificationCenter ready")
-                    
-                case Quit =>
-                    info("Quitting NotificationCenter")
-                    gates.foreach { _.disconnect }
-                    exit
-            
-                case Status(status) => 
-                    info("NotificationCenter ! Status(%s)".format(status))
-                    gates.foreach { _ setStatus status }
-                
-                case Message(msg) => 
-                    info("NotificationCenter ! Message(%s)".format(msg))
-                    gates.foreach { _ send msg }
-                
-                case _ => messageNotRecognized(_)
-            }
-        }
+    // def act {
+    //     loop {
+    //         receive {
+    //             case Init =>                        
+    //                 info("NotificationCenter connecting gates")
+    //                 gates.foreach { _.connect }                                    
+    //                 info("NotificationCenter ready")
+    //                 
+    //             case Quit =>
+    //                 info("Quitting NotificationCenter")
+    //                 gates.foreach { _.disconnect }
+    //                 exit
+    //         
+    //             case Status(status) => 
+    //                 info("NotificationCenter ! Status(%s)".format(status))
+    //                 gates.foreach { _ setStatus status }
+    //             
+    //             case Message(msg) => 
+    //                 info("NotificationCenter ! Message(%s)".format(msg))
+    //                 gates.foreach { _ send msg }
+    //             
+    //             case _ => messageNotRecognized(_)
+    //         }
+    //     }
+    // }
+    
+    def receive = {
+        case _ => 
     }
     
     override def toString = "NotificationCenter"

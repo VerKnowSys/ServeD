@@ -1,22 +1,21 @@
 package com.verknowsys.served.notifications
 
-import scala.actors._
 import scala.collection.mutable.ListBuffer
 
-import com.verknowsys.served.utils.Logged
+import akka.util.Logging
     
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
 
-class XMPPGate(host: String, port: Int, login: String, password: String, resource: String) extends Gate with MessageListener with Logged {
+class XMPPGate(host: String, port: Int, login: String, password: String, resource: String) extends Gate with MessageListener with Logging {
     val config = new ConnectionConfiguration(host, port)
     val connection = new XMPPConnection(config)
     val presence = new Presence(Presence.Type.available)
     val chats = ListBuffer[Chat]()
     
     def connect {
-        debug("Initiating XMPPGate connection")
+        log.debug("Initiating XMPPGate connection")
         // XMPPConnection.DEBUG_ENABLED = true
         config.setCompressionEnabled(true)
         config.setSASLAuthenticationEnabled(true)
@@ -24,11 +23,11 @@ class XMPPGate(host: String, port: Int, login: String, password: String, resourc
         
         try {
             connection.login(login, password, resource)
-            debug("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
+            log.debug("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
         } catch {
             case x: Throwable =>
                 error("Error while connecting to XMPP server. Please check login / password.")
-                debug( x.printStackTrace )
+                log.debug( x.printStackTrace.toString )
         }
         
         val chatmanager = connection.getChatManager
@@ -37,11 +36,11 @@ class XMPPGate(host: String, port: Int, login: String, password: String, resourc
             try {
                 chats += chatmanager.createChat(user, this)
             } catch {
-                case x: Throwable => info("Error: " + x )
+                case x: Throwable => log.info("Error: " + x )
             }
         }
         
-        trace("Number of users bound to be notified with repository changes: %s".format(chats.length))
+        log.trace("Number of users bound to be notified with repository changes: %s".format(chats.length))
         presence.setStatus("ServeD Git Bot Notifier | NC")
         presence.setMode(Presence.Mode.dnd)
         connection.sendPacket(presence)
@@ -56,18 +55,18 @@ class XMPPGate(host: String, port: Int, login: String, password: String, resourc
     def send(message: String) {
         chats.foreach { chatRecipient =>
             try {
-                debug("Trying to send messages, to User: " + chatRecipient.getParticipant)
+                log.debug("Trying to send messages, to User: " + chatRecipient.getParticipant)
                 chatRecipient.sendMessage(message)
-                trace("Sent message: " + message + " length: " + message.length)
+                log.trace("Sent message: " + message + " length: " + message.length)
             } catch {
                 case e: Throwable =>
-                    info("### Error " + e + "\nTrying to put commit onto list cause errors.")
+                    log.info("### Error " + e + "\nTrying to put commit onto list cause errors.")
             }
         }
     }
     
     def processMessage(chat: Chat, message: Message) {
-        trace("Received message: " + message + " (\"" + message.getBody + "\")")
+        log.trace("Received message: " + message + " (\"" + message.getBody + "\")")
         // if (message.getFrom.contains("verknowsys.com")) {   // XXX: hardcoded value
         //     trace("Message contains verknowsys: " + message.getFrom)
         //     message.getBody match {
