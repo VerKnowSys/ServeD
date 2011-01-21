@@ -43,10 +43,10 @@ import events._
 trait FileEventsReactor {
     self: Actor with Logging =>
     
-    final val Modified          = 0x01  // CLibrary.NOTE_WRITE | CLibrary.NOTE_EXTEND
-    final val Deleted           = 0x02  // CLibrary.NOTE_DELETE
-    final val Renamed           = 0x04  // CLibrary.NOTE_RENAME
-    final val AttributesChanged = 0x08  // CLibrary.NOTE_ATTRIB
+    final val Modified          = CLibrary.NOTE_WRITE | CLibrary.NOTE_EXTEND
+    final val Deleted           = CLibrary.NOTE_DELETE
+    final val Renamed           = CLibrary.NOTE_RENAME
+    final val AttributesChanged = CLibrary.NOTE_ATTRIB
     
     def registerFileEventFor(path: String, flags: Int){
         Actor.registry.actorFor[FileEventsManager] match {
@@ -113,11 +113,14 @@ class FileEventsManager extends Actor with Logging {
                 case Some((_, (p, list))) => list += ((flags, ref))
                 case None => registerNewFileEvent(path, flags, ref)
             }
+            
             log.trace("Registered new file event: %s / %s for %s", path, flags, ref)
             self reply Success
 
         // Forward event sent by kqueue to file watchers
         case KqueueFileEvent(ident, flags) => 
+            log.trace("New kqueue file event. flags: %x", flags)
+        
             idents.get(ident.intValue).foreach { 
                 case (path, list) => list collect {
                     case ((fl, ref)) if (fl & flags) > 0 => ref ! FileEvent(path, flags)

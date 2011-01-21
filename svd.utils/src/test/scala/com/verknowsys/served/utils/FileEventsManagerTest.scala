@@ -11,6 +11,9 @@ import org.apache.commons.io.FileUtils
 import akka.actor._
 import akka.actor.Actor._
 
+object TestReactor extends ExpectActor with FileEventsReactor
+import TestReactor._
+
 class TestFileEventsReactor extends ExpectActor with FileEventsReactor {
     registerFileEventFor("/tmp/served/file_events_test/single", Modified)
 }
@@ -65,9 +68,9 @@ class FileEventsManagerTest extends Specification with ExpectActorSpecification 
             
             expectActor ? Success
             
-            touch(DIR + "/single")
+            writeFile(DIR + "/single", "new content")
             
-            expectActor ? FileEvent(DIR + "/single", 0x02)
+            expectActor ?* (FileEvent(DIR + "/single", 0x04), FileEvent(DIR + "/single", 0x06))
         }
         
         // TODO: Write (if possible) more stress tests
