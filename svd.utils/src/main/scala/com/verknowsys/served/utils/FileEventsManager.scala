@@ -11,37 +11,16 @@ import com.verknowsys.served.utils.signals.{Success, Failure}
 
 object events {
     case class KqueueFileEvent(ident: Int, flags: Int)
-    case class BareFileEvent(path: String, flags: Int)
     case class FileEvent(path: String, flags: Int)
-    case class RegisterFileEvent(path: String, flags: Int)
+    case class RegisterFileEvent(path: String, flags: Int, ref: ActorRef)
 
     class KqueueException extends Exception
     class KeventException extends Exception
     class FileOpenException extends Exception
+    
 }
 
 import events._
-
-/** 
- * File watcher actor. It receives kqueue events and sends message to [owner] if flags match 
- * 
- * @param owner Owner actor of this file watch
- * @param path File path to watch
- * @param flags kqueue flags to watch
- * @author teamon
- */
-class FileWatcher(val owner: ActorRef, val path: String, val flags: Int) extends Actor with Logging {
-    log.trace("Starting new FileWatcher for %s with %s and %s", owner, path, flags)
-    
-    def receive = {
-        case BareFileEvent(path, evflags) if ((evflags & flags) > 0) => owner ! FileEvent(path, evflags) 
-        case _ => 
-        // case BareFileEvent(path, evflags) =>
-        // TODO: Create some case classes and send FileModified, FileCreated, FileDeleted etc
-    }
-}
-
-
 
 /** 
  * Include this trait in any akka Actor
@@ -62,15 +41,18 @@ class FileWatcher(val owner: ActorRef, val path: String, val flags: Int) extends
  * @author teamon
  */
 trait FileEventsReactor {
-    self: Actor =>
+    self: Actor with Logging =>
     
-    final val Modified = CLibrary.NOTE_WRITE | CLibrary.NOTE_EXTEND
-    final val Deleted  = CLibrary.NOTE_DELETE
-    final val Renamed  = CLibrary.NOTE_RENAME
-    final val AttributesChanged = CLibrary.NOTE_ATTRIB
+    final val Modified          = 0x01  // CLibrary.NOTE_WRITE | CLibrary.NOTE_EXTEND
+    final val Deleted           = 0x02  // CLibrary.NOTE_DELETE
+    final val Renamed           = 0x04  // CLibrary.NOTE_RENAME
+    final val AttributesChanged = 0x08  // CLibrary.NOTE_ATTRIB
     
     def registerFileEventFor(path: String, flags: Int){
-        Actor.registry.actorsFor[FileEventsManager].foreach { _ ! RegisterFileEvent(path, flags) }
+        Actor.registry.actorFor[FileEventsManager] match {
+            case Some(fem) => fem ! RegisterFileEvent(path, flags, this.self)
+            case None => log.error("Could not register file watcher. FileEventsManager worker not found.")
+        }
     }
 }
 
@@ -96,11 +78,11 @@ class FileEventsManager extends Actor with Logging {
     }
     
     /** 
-     * Mutable map holding [file descriptor => (path, file watcher actor)] 
+     * Mutable map holding [file descriptor => (path, list of (flags, actor ref))] 
      * 
      * @author teamon
      */
-    protected val idents = Map[Int, (String, ListBuffer[ActorRef])]()
+    protected val idents = Map[Int, (String, ListBuffer[(Int, ActorRef)])]()
         
     /** 
      * BSD kqueue events reader thread 
@@ -126,27 +108,25 @@ class FileEventsManager extends Actor with Logging {
     
     def receive = {
         // register new file event, sent from any actor
-        case RegisterFileEvent(path, flags) =>
+        case RegisterFileEvent(path, flags, ref) =>
             idents.find { case(_, (p, _)) => p == path } match {
-                case Some((_, (p, list))) =>
-                    self.sender.foreach {
-                        list += spawnNewFileWatcher(_, path, flags)
-                    }
-
-                case None =>
-                    self.sender.foreach { registerNewFileEvent(_, path, flags) }
+                case Some((_, (p, list))) => list += ((flags, ref))
+                case None => registerNewFileEvent(path, flags, ref)
             }
+            log.trace("Registered new file event: %s / %s for %s", path, flags, ref)
             self reply Success
 
         // Forward event sent by kqueue to file watchers
         case KqueueFileEvent(ident, flags) => 
             idents.get(ident.intValue).foreach { 
-                case (path, list) => list foreach { _ ! BareFileEvent(path, flags) }
+                case (path, list) => list collect {
+                    case ((fl, ref)) if (fl & flags) > 0 => ref ! FileEvent(path, flags)
+                }
             }
     }
     
     
-    protected def registerNewFileEvent(owner: ActorRef, path: String, flags: Int) = synchronized {
+    protected def registerNewFileEvent(path: String, flags: Int, ref: ActorRef) = synchronized {
         val ident = clib.open(path, O_RDONLY)
         if(ident == -1){
             throw new FileOpenException
@@ -164,13 +144,6 @@ class FileEventsManager extends Actor with Logging {
             throw new KeventException
         }
 
-        idents(ident) = (path, ListBuffer[ActorRef](spawnNewFileWatcher(owner, path, flags)))
-    }
-    
-    protected def spawnNewFileWatcher(owner: ActorRef, path: String, flags: Int) = {
-        val watcher = actorOf(new FileWatcher(owner, path, flags))
-        self.link(watcher)
-        watcher.start
-        watcher
+        idents(ident) = (path, ListBuffer[(Int, ActorRef)]((flags, ref)))
     }
 }

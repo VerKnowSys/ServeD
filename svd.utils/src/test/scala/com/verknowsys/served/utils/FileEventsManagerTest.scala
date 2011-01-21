@@ -15,39 +15,9 @@ class TestFileEventsReactor extends ExpectActor with FileEventsReactor {
     registerFileEventFor("/tmp/served/file_events_test/single", Modified)
 }
 
+
 class FileEventsManagerTest extends Specification with ExpectActorSpecification {
     final val DIR = "/tmp/served/file_events_test"
-    
-    var fw: ActorRef = null
-    
-    "FileWatcher" should {
-        doBefore { 
-            beforeExpectActor 
-            fw = actorOf(new FileWatcher(expectActor, "/path/to/file", 0x01 | 0x02)).start
-        }
-        
-        doAfter { 
-            afterExpectActor
-            registry.shutdownAll 
-        }
-        
-        "forward message with matching flag" in {
-            fw ! BareFileEvent("/path/to/file", 0x01)
-            expectActor ? FileEvent("/path/to/file", 0x01)
-        }
-        
-        "forward message with other matching flag" in {
-            fw ! BareFileEvent("/path/to/file", 0x02)
-            expectActor ? FileEvent("/path/to/file", 0x02)
-        }
-        
-        "not forward message with not matching flag" in {
-            fw ! BareFileEvent("/path/to/file", 0x04)
-            expectActor ? nothing
-        }
-
-    }
-    
     
     var fem: ActorRef = null
         
@@ -63,19 +33,19 @@ class FileEventsManagerTest extends Specification with ExpectActorSpecification 
             registry.shutdownAll 
         }
         
-        "start FileEventsManager withus FileWatcher" in {
+        "start FileEventsManager" in {
             registry.actorsFor[FileEventsManager] must haveSize(1)
-            registry.actorsFor[FileWatcher] must haveSize(0)
         }
             
-        "spawn new file watcher using explicit message" in {
+        "register new file event using explicit message" in {
             touch(DIR + "/single")
             
-            fem ! RegisterFileEvent(DIR + "/single", 0x02)
-            expectActor ? Success
+            expectActor = actorOf(new ExpectActor {
+                fem ! RegisterFileEvent(DIR + "/single", 0x02, self)
+            }).start
+            senderOption = Some(expectActor)
             
-            registry.actorsFor[FileEventsManager] must haveSize(1)
-            registry.actorsFor[FileWatcher] must haveSize(1)            
+            expectActor ? Success
         }
         
         "spawn new file watcher using FileEventsReactor trait" in {
