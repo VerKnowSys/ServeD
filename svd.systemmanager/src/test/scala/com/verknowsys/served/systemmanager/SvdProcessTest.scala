@@ -5,7 +5,7 @@ import com.verknowsys.served.utils.signals._
 import POSIX._
 import com.verknowsys.served.systemmanager._
 import com.verknowsys.served.systemmanager.native._
-import com.verknowsys.served.systemmanager.SvdSystemManager._
+import com.verknowsys.served.systemmanager._
 
 import org.hyperic.sigar._
 import org.specs._
