@@ -45,7 +45,7 @@ class SvdSystemManager extends Actor with Logging {
             log.info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
             
 
-            val a = new SvdProcess(command = "memcached", user = "dmilith")
+            val a = new SvdProcess(command = "memcached", user = "dmilith", outputRedirectDestination = "/tmp/dmilith_memcached.log")
             log.warn("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
             
             val b = new SvdProcess(command = "df -h", user = "dmilith")
@@ -53,7 +53,7 @@ class SvdSystemManager extends Actor with Logging {
             
             new SvdProcess(command = "df -h", user = "dmilith", useShell = false) // without shell it wont work fine
             
-            new SvdProcess(command = "dff -h", user = "dmilith", outputRedirectDestination = "/tmp/df2")
+            // new SvdProcess(command = "dff -h", user = "dmilith", outputRedirectDestination = "/tmp/df2")
             
             
             // throw new Exception("DUPA1")
@@ -62,7 +62,7 @@ class SvdSystemManager extends Actor with Logging {
             
             // log.info("after exceptions")
             // 2011-01-11 00:45:18 - dmilith - NOTE: TODO: here will go call after boot of clean system (no rc)
-            self reply((nrs, nsp))
+            // self reply((nrs, nsp))
                     
         // case Command(cmd) =>
             // log.info("Running Native Command: %s".format(cmd))

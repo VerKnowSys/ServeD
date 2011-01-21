@@ -14,6 +14,8 @@ import java.lang.reflect.{Field}
 import akka.util.Logging
 
 
+import akka.util.Logging
+
 /**
   * This class defines mechanism which system commands will be executed through (and hopefully monitored)
   *

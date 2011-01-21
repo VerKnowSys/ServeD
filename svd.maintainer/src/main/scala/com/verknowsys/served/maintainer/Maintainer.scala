@@ -6,7 +6,7 @@ package com.verknowsys.served.maintainer
 // import com.verknowsys.served.api._
 import com.verknowsys.served.Config
 import com.verknowsys.served.utils.{Utils}
-// import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.systemmanager._
 // 
 // import scala.collection.JavaConversions._
@@ -79,6 +79,9 @@ object Maintainer extends Logging {
         
         // info("AccountManager is loading")
         // AccountsManager ! Init
+        
+        val ssm = Actor.registry.actorFor[SvdSystemManager]
+        ssm.get ! Init
         
         // log.info("SystemManager is loading")
 
