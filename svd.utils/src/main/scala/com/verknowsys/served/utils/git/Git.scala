@@ -13,6 +13,8 @@ import org.eclipse.jgit.transport.RemoteConfig
 import java.io.File
 import java.util.Date
 
+import akka.util.Logging
+
 // NOTE: Jgit JavaDoc at http://s.teamon.eu/jgit-doc/
 
 
@@ -108,15 +110,15 @@ object GitRepository {
  *
  * @author teamon
  */
-class GitRepository(val dir: String) extends Logged {
+class GitRepository(val dir: String) extends Logging {
     lazy val (gitRepo, isBare) = {
         val file = new File(dir, ".git")
-        trace("Git repository watch. Dir: %s, File: %s".format(dir, file))
+        log.trace("Git repository watch. Dir: %s, File: %s".format(dir, file))
         if(file.exists) {
-            trace("File exists. Loading normal repository")
+            log.trace("File exists. Loading normal repository")
             (new FileRepository(file), false)
         } else {
-            trace("File not exists. Loading bare repository")
+            log.trace("File not exists. Loading bare repository")
             (new FileRepository(dir), true)
         }
     }
@@ -237,7 +239,7 @@ class GitRepository(val dir: String) extends Logged {
             case e: JGitInternalException =>
                 /// XXX Handle exception
                 /// Caused by: org.eclipse.jgit.errors.TransportException: ssh://tunemates@git.verknowsys.com/git/ServeD.git: Auth fail
-                error(e.getCause)
+                log.error(e, "JGit")
         }
     }
 }

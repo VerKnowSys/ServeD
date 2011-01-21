@@ -19,7 +19,7 @@ case object RemoteBackupDone
 case object RevertBackup
 
 // Internal response
-sealed abstract case class InternalResponse
+sealed abstract class InternalResponse
 case object Success extends InternalResponse
 case object Failure extends InternalResponse
 

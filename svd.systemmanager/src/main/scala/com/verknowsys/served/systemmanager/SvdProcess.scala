@@ -14,6 +14,8 @@ import java.io._
 import scala.io._
 import java.lang.reflect.{Field}
 
+import akka.util.Logging
+
 /**
   * This class defines mechanism which system commands will be executed through (and hopefully monitored)
   *
@@ -27,7 +29,7 @@ class SvdProcess(
     val workDir: String = "/tmp/",
     val outputRedirectDestination: String = "/tmp/served_redirXXX",
     val useShell: Boolean = true)
-        extends Logged {
+        extends Logging {
     
     // 2011-01-20 02:42:12 - dmilith - TODO: implement SvdProcess requirements
     // require(commandIsntHarmful)
@@ -36,13 +38,13 @@ class SvdProcess(
     // require(usedShellValid)
     // require(userListed)
     
-    debug("Spawning SystemProcess: (%s)".format(command))
+    log.debug("Spawning SystemProcess: (%s)", command)
     
     Native.setProtected(true)
 
     val pid = process
     
-    trace("Process %s spawned.".format(command))
+    log.trace("Process %s spawned.", command)
 
 
 
@@ -53,7 +55,7 @@ class SvdProcess(
 	        true
         } catch { 
             case x: Any =>
-                trace("SvdProcess: '%s' has just thrown '%s' in alive()".format(command, x))
+                log.trace("SvdProcess: '%s' has just thrown '%s' in alive()", command, x)
                 false
         }
         
@@ -78,7 +80,7 @@ class SvdProcess(
         val rt = Runtime.getRuntime
         val env = Config.env
         val proc = rt.exec(cmd, env)
-        trace("CMD: %s".format(cmd.mkString(" ")))
+        log.trace("CMD: %s", cmd.mkString(" "))
         rt.traceMethodCalls(false)
 
         proc.getClass.getDeclaredFields.foreach{ f =>
@@ -86,12 +88,12 @@ class SvdProcess(
             f.getName match {
                 case "pid" =>
                     aPid = f.get(proc).asInstanceOf[Int]
-                    debug("Pid: %s (of %s)".format(aPid, command))
+                    log.debug("Pid: %s (of %s)", aPid, command)
 
                 case _ =>
 
             }
-            trace(f.getName+"="+f.get(proc))
+            log.trace(f.getName+"="+f.get(proc))
         }
         
         try { 
@@ -99,10 +101,10 @@ class SvdProcess(
                 throw new RuntimeException("SvdProcess: '%s' exited abnormally with error code: '%s'. Output info: '%s'".format(command, proc.exitValue, Source.fromFile(outputRedirectDestination).mkString))
         } catch {
             case e: IllegalThreadStateException =>
-                trace("Process thrown: %s".format(e.getMessage))
+                log.trace("Process thrown: %s", e.getMessage)
 
             case e: FileNotFoundException =>
-                debug("Process '%s' output does not exists!".format(command))
+                log.debug("Process '%s' output does not exists!", command)
 
         }
         
