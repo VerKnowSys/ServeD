@@ -30,7 +30,7 @@ class Maintainer extends Actor with Logging {
     log.trace("Maintainer is loading")
     
     self.spawnLink[AccountsManager]
-    self.spawnLink[SvdSystemManager]
+    // self.spawnLink[SvdSystemManager]
         
     def receive = {
         case x => log.warn("not recognized message %s", x)
@@ -48,18 +48,24 @@ object Maintainer extends Logging {
         log.debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         
-        Utils.rootCheck
-        
+        if(args.isEmpty){
+            Utils.rootCheck // TODO: Move it to SSM
+            actorOf[Maintainer].start ! 0 // HACK: akka does not start if no message sent
+        } else {
+            args foreach { _ match {
+                case "--only=AccountManager" => actorOf[AccountsManager].start ! 0 // HACK: akka does not start if no message sent
+                    
+                case "--only=SvdSystemManager" => 
+                    Utils.rootCheck // TODO: Move it to SSM
+                    actorOf[SvdSystemManager].start ! 0 // HACK: akka does not start if no message sent
 
-        
-        // args foreach { _ match {
-        //     case "--monitor" => 
-        //         Monitor.start
-        //      
-        //     case x: Any => 
-        //         error("Unknow argument: " + x)
-        //         System.exit(1);
-        // }}
+                case x: Any => 
+                    error("Unknow argument: " + x)
+                    System.exit(1)
+            }}
+        }
+                
+
 
         
         // Utils.addShutdownHook {
@@ -69,10 +75,10 @@ object Maintainer extends Logging {
         //     Maintainer ! Quit
         // }
 
-        val maintainer = actorOf[Maintainer]
-        maintainer.start
+        // val maintainer = actorOf[Maintainer]
+        // maintainer.start
         
-        maintainer ! 0 // HACK: akka does not start if no message sent
+        // maintainer ! 0 // HACK: akka does not start if no message sent
         
         // info("NotificationCenter is loading")
         // NotificationCenter ! Init
@@ -80,8 +86,8 @@ object Maintainer extends Logging {
         // info("AccountManager is loading")
         // AccountsManager ! Init
         
-        val ssm = Actor.registry.actorFor[SvdSystemManager]
-        ssm.get ! Init
+        // val ssm = Actor.registry.actorFor[SvdSystemManager]
+        // ssm.get ! Init
         
         // log.info("SystemManager is loading")
 
