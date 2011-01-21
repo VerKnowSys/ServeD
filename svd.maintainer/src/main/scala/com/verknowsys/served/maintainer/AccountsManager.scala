@@ -2,27 +2,29 @@ package com.verknowsys.served.maintainer
 
 import scala.io.Source
 import com.verknowsys.served.Config
-
+import com.verknowsys.served.utils.FileEventsReactor
+import com.verknowsys.served.utils.events.FileEvent
 import com.verknowsys.served.managers.AccountManager
 
 import akka.actor.Actor
-import akka.actor.Actor.actorOf
+import akka.actor.Actor.{actorOf, registry}
 import akka.util.Logging
 
 
-class AccountsManager extends Actor with Logging {
+class AccountsManager extends Actor with FileEventsReactor with Logging {
     // case object ReloadUsers
     // case class CheckUser(val username: String)
     
-    // start
-
-    // val managers = new ListBuffer[AccountManager]
+    respawnUsersActors
     
-    spawnLinkUsersActors
-    
+    registerFileEventFor(Config.systemPasswdFile, Modified)
         
     def receive = {
-        case x => println("AM got " + x)
+        case FileEvent(path, Modified) => 
+            log.trace("/etc/passwd modified")
+            respawnUsersActors
+            
+        case msg => log.warn("Message not recognized: %s", msg)
     }
         
     // def act {
@@ -103,16 +105,22 @@ class AccountsManager extends Actor with Logging {
     //             new Account(line.split(":").toList)
     // }
     
-    private def spawnLinkUsersActors {
-       userAccounts foreach { account =>
-           val manager = actorOf(new AccountManager(account))
-           self.link(manager)
-           manager.start
-       }
+    private def respawnUsersActors {
+        // kill all Account Managers
+        log.trace("Actor.registry size before: %d", registry.actors.size)
+        registry.actorsFor[AccountManager] foreach { _.stop }
+        
+        // spawn Account Manager for each account entry in passwd file
+        userAccounts foreach { account =>
+            val manager = actorOf(new AccountManager(account))
+            self.link(manager)
+            manager.start
+        }
+        log.trace("Actor.registry size after: %d", registry.actors.size)
     }
     
     /**
-     * Function to parse and convert List[String] of passwd file entries to List[Account]
+     * Function to parse and convert passwd file entries to List[Account]
      * @author teamon
      */
     protected def allAccounts = {
