@@ -27,6 +27,7 @@ import akka.util.Logging
 *   SystemManager - responsible for System Managment and Monitoring
 */
 class SvdSystemManager extends Actor with Logging {
+    log.trace("SvdSystemManager is loading")
     
     private val core = new Sigar
     private val processes = ListBuffer[SvdProcess]()

@@ -30,9 +30,10 @@ class Maintainer extends Actor with Logging {
     log.trace("Maintainer is loading")
     
     self.spawnLink[AccountsManager]
-    
+    self.spawnLink[SvdSystemManager]
+        
     def receive = {
-        case _ => println("not recognized message")
+        case x => log.warn("not recognized message %s", x)
     }
 }
     
@@ -71,9 +72,7 @@ object Maintainer extends Logging {
         val maintainer = actorOf[Maintainer]
         maintainer.start
         
-        println(registry.actors.toList)
-        Thread.sleep(2000)
-        println(registry.actors.toList)
+        maintainer ! 0 // HACK: akka does not start if no message sent
         
         // info("NotificationCenter is loading")
         // NotificationCenter ! Init
@@ -81,9 +80,8 @@ object Maintainer extends Logging {
         // info("AccountManager is loading")
         // AccountsManager ! Init
         
-        log.info("SystemManager is loading")
-        val systemManager = actorOf[SvdSystemManager]
-        systemManager.start
+        // log.info("SystemManager is loading")
+
         
         // info("ApiServer is loading")
         // ApiServer.start
