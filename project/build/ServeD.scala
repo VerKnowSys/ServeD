@@ -103,9 +103,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val dispatch = "net.databinder" %% "dispatch-http" % "0.7.8"
 
         lazy val served = task { None } dependsOn(run(Array("--monitor")))
-        lazy val servedOnlyAm = task { None } dependsOn(run(Array("--only=AccountManager")))
-        lazy val servedOnlySsm = task { None } dependsOn(run(Array("--only=SvdSystemManager")))
-        
+        lazy val servedSkipSsm = task { None } dependsOn(run(Array("--skip-ssm")))
+            
         override def mainClass = Some("com.verknowsys.served.maintainer.Maintainer")
     }
     

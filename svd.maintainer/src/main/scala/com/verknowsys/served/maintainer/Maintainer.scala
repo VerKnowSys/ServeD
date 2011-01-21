@@ -5,13 +5,9 @@ package com.verknowsys.served.maintainer
 
 // import com.verknowsys.served.api._
 import com.verknowsys.served.Config
-import com.verknowsys.served.utils.{Utils}
+import com.verknowsys.served.utils.{Utils, FileEventsManager}
 import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.systemmanager._
-// 
-// import scala.collection.JavaConversions._
-// 
-// import com.verknowsys.served.notifications._
+import com.verknowsys.served.systemmanager.SvdSystemManager
 
 
 
@@ -26,12 +22,15 @@ import akka.util.Logging
  *
  *  @author dmilith, teamon
  */
-class Maintainer extends Actor with Logging {
+class Maintainer(skipSSM: Boolean = false) extends Actor with Logging {
     log.trace("Maintainer is loading")
     
+    self.spawnLink[FileEventsManager]
     self.spawnLink[AccountsManager]
-    // self.spawnLink[SvdSystemManager]
-        
+    
+    if(skipSSM) log.warn("Skipped SvdSystemManager spawn")
+    else self.spawnLink[SvdSystemManager]
+    
     def receive = {
         case x => log.warn("not recognized message %s", x)
     }
@@ -48,24 +47,24 @@ object Maintainer extends Logging {
         log.debug("Maintainer home dir: " + Config.homePath + Config.vendorDir)
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         
-        if(args.isEmpty){
-            Utils.rootCheck // TODO: Move it to SSM
-            actorOf[Maintainer].start ! 0 // HACK: akka does not start if no message sent
-        } else {
-            args foreach { _ match {
-                case "--only=AccountManager" => actorOf[AccountsManager].start ! 0 // HACK: akka does not start if no message sent
-                    
-                case "--only=SvdSystemManager" => 
-                    Utils.rootCheck // TODO: Move it to SSM
-                    actorOf[SvdSystemManager].start ! 0 // HACK: akka does not start if no message sent
-
-                case x: Any => 
-                    error("Unknow argument: " + x)
-                    System.exit(1)
-            }}
-        }
+        
+        var skip = false
+        
+        args foreach { _ match {
+            case "--skip-ssm" =>
+                skip = true
                 
+            case x: Any => 
+                error("Unknow argument: " + x)
+                System.exit(1)
+        
+        }}
 
+         
+        if(!skip) Utils.rootCheck // TODO: Move it to SSM
+        
+                        
+        actorOf(new Maintainer(skip)).start ! 0
 
         
         // Utils.addShutdownHook {
