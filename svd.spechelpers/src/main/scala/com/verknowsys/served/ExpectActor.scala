@@ -44,14 +44,14 @@ trait ExpectActorSpecification {
             expected.size match {
                 case 1 if expected.head == nothing =>
                     (ref !! Expect(1)) match {
-                        case None => isExpectation {} // HACK: scala-specs 'pending-as-failure' hack 
                         case Some(list: List[_]) => list must beEmpty
+                        case None => isExpectation {} // HACK: scala-specs 'pending-as-failure' hack 
                     }
                     
                 case _ =>
-                    (ref !! Expect(expected.size)) collect {
-                        case list: List[_] => list mustEqual expected.toList
-                        case None => throw new RuntimeException("TIMEOUT")
+                    (ref !! Expect(expected.size)) match {
+                        case Some(list: List[_]) => list mustEqual expected.toList
+                        case None => fail("Actor timeout: Expected %s".format(expected.toList))
                     }
             }
         }
@@ -59,7 +59,7 @@ trait ExpectActorSpecification {
         def ?*(expected: Any*) = {
             (ref !! Expect(expected.size)) collect {
                 case list: List[_] => list must containAll(expected.toSet)
-                case None => throw new RuntimeException("TIMEOUT")
+                case None => fail("Actor timeout: Expected %s".format(expected.toSet))
             }
         }
     
