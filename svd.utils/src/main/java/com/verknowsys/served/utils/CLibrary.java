@@ -7,8 +7,8 @@ import com.sun.jna.*;
  *
  * @author teamon 
  */
-public interface SvdCLibrary extends Library {
-    public static final SvdCLibrary instance = (SvdCLibrary) Native.loadLibrary("c", SvdCLibrary.class);
+public interface CLibrary extends Library {
+    public static final CLibrary instance = (CLibrary) Native.loadLibrary("c", CLibrary.class);
     
     // see sys/event.h header file
     public int kqueue();

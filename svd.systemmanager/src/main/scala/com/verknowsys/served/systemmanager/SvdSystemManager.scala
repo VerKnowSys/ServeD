@@ -6,7 +6,6 @@ package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.utils.kqueue._
 import com.verknowsys.served.utils.monitor.SvdMonitored
 import com.verknowsys.served.systemmanager.native._
 

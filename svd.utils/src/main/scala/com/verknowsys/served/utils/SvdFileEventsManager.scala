@@ -25,10 +25,10 @@ object events {
 trait SvdFileEventsReactor {
     self: Actor with Logging =>
     
-    final val Modified          = SvdCLibrary.NOTE_WRITE | SvdCLibrary.NOTE_EXTEND
-    final val Deleted           = SvdCLibrary.NOTE_DELETE
-    final val Renamed           = SvdCLibrary.NOTE_RENAME
-    final val AttributesChanged = SvdCLibrary.NOTE_ATTRIB
+    final val Modified          = CLibrary.NOTE_WRITE | CLibrary.NOTE_EXTEND
+    final val Deleted           = CLibrary.NOTE_DELETE
+    final val Renamed           = CLibrary.NOTE_RENAME
+    final val AttributesChanged = CLibrary.NOTE_ATTRIB
     
     def registerFileEventFor(path: String, flags: Int){
         Actor.registry.actorFor[SvdFileEventsManager] match {
@@ -47,11 +47,11 @@ trait SvdFileEventsReactor {
  * @author teamon
  */
 class SvdFileEventsManager extends Actor with Logging {
-    import SvdCLibrary._
+    import CLibrary._
     
     log.trace("Starting SvdFileEventsManager")
     
-    protected val clib = SvdCLibrary.instance
+    protected val clib = CLibrary.instance
     protected val kq = clib.kqueue() // NOTE: C call
     
     // check kqueue

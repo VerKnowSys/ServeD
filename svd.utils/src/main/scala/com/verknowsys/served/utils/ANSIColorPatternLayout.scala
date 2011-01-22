@@ -13,7 +13,7 @@ import ch.qos.logback.classic.Level._
  * 
  * @author teamon
  */
-class SvdANSIColorPatternLayout extends PatternLayout {
+class ANSIColorPatternLayout extends PatternLayout {
     PatternLayout.defaultConverterMap.put("level", classOf[LowerCaseLevelConverter].getName);
     
     final val Colors = Map(
