@@ -46,10 +46,10 @@ class SvdSystemManager extends Actor with Logging {
             
 
             val a = new SvdProcess(command = "memcached", user = "dmilith", outputRedirectDestination = "/tmp/dmilith_memcached.log")
-            log.warn("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
+            log.debug("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
             
             val b = new SvdProcess(command = "df -h", user = "dmilith")
-            log.warn("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
+            log.debug("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
             
             // new SvdProcess(command = "df -h", user = "dmilith", useShell = false) // without shell it wont work fine
             
@@ -179,7 +179,7 @@ class SvdSystemManager extends Actor with Logging {
     
     
     
-    override def toString = "SvdSvdSystemManager"
+    override def toString = "SvdSystemManager"
     
     
 }

@@ -11,7 +11,7 @@ import java.io._
 import java.lang._
 
 
-class SvdSvdSystemManagerTest extends Specification {
+class SvdSystemManagerTest extends Specification {
 
 
     "SvdSystemManager object" should {

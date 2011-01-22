@@ -23,7 +23,7 @@ sealed abstract class InternalResponse
 case object Success extends InternalResponse
 case object Failure extends InternalResponse
 
-// SvdSvdSystemManager
+// SvdSystemManager
 case object GetAllProcesses
 case object GetRunningProcesses
 
