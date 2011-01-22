@@ -2,27 +2,41 @@ package com.verknowsys.served.maintainer
 
 import scala.io.Source
 import com.verknowsys.served.SvdConfig
+import com.verknowsys.served.utils.SvdFileEventsReactor
+import com.verknowsys.served.utils.events.SvdFileEvent
+import com.verknowsys.served.managers._
 
-import com.verknowsys.served.managers.SvdAccountManager
-
-import akka.actor.Actor
-import akka.actor.Actor.actorOf
+import akka.actor.{Actor, ActorRef}
+import akka.actor.Actor.{actorOf, registry}
 import akka.util.Logging
 
+import com.verknowsys.served.api._
 
-class SvdAccountsManager extends Actor with Logging {
+
+case class GetAccountManager(username: String)
+
+class AccountsManager extends Actor with FileEventsReactor with Logging {
     // case object ReloadUsers
     // case class CheckUser(val username: String)
     
-    // start
-
-    // val managers = new ListBuffer[SvdAccountManager]
+    respawnUsersActors
     
-    spawnLinkUsersActors
-    
+    registerFileEventFor(Config.systemPasswdFile, Modified)
         
     def receive = {
-        case x => println("AM got " + x)
+        case FileEvent(path, Modified) => 
+            log.trace("Passwd file modified")
+            respawnUsersActors
+            
+        case GetAccountManager(username) =>
+            registry.actorsFor[AccountManager].find { e => 
+                (e !! GetAccount) collect { case a: Account => a.userName == username } getOrElse false 
+            } match {
+                case Some(ref: ActorRef) => self reply ref
+                case _ => self reply Error("AccountManeger for username %s not found".format(username))
+            }
+                        
+        case msg => log.warn("Message not recognized: %s", msg)
     }
         
     // def act {
@@ -103,16 +117,22 @@ class SvdAccountsManager extends Actor with Logging {
     //             new SvdAccount(line.split(":").toList)
     // }
     
-    private def spawnLinkUsersActors {
-       userSvdAccounts foreach { account =>
-           val manager = actorOf(new SvdAccountManager(account))
-           self.link(manager)
-           manager.start
-       }
+    private def respawnUsersActors {
+        // kill all Account Managers
+        log.trace("Actor.registry size before: %d", registry.actors.size)
+        registry.actorsFor[AccountManager] foreach { _.stop }
+        
+        // spawn Account Manager for each account entry in passwd file
+        userAccounts foreach { account =>
+            val manager = actorOf(new AccountManager(account))
+            self.link(manager)
+            manager.start
+        }
+        log.trace("Actor.registry size after: %d", registry.actors.size)
     }
     
     /**
-     * Function to parse and convert List[String] of passwd file entries to List[SvdAccount]
+     * Function to parse and convert passwd file entries to List[Account]
      * @author teamon
      */
     protected def allSvdAccounts = {

@@ -5,15 +5,9 @@ package com.verknowsys.served.maintainer
 
 // import com.verknowsys.served.api._
 import com.verknowsys.served.SvdConfig
-import com.verknowsys.served.utils.{SvdUtils}
-import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.systemmanager._
-// 
-// import scala.collection.JavaConversions._
-// 
-// import com.verknowsys.served.notifications._
-
-
+import com.verknowsys.served.utils.{Utils, SvdFileEventsManager}
+// import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.systemmanager.SvdSystemManager
 
 // akka
 import akka.actor.Actor
@@ -26,12 +20,17 @@ import akka.util.Logging
  *
  *  @author dmilith, teamon
  */
-class SvdMaintainer extends Actor with Logging {
-    log.trace("SvdMaintainer is loading")
+class Maintainer(skipSSM: Boolean = false) extends Actor with Logging {
+    log.trace("Maintainer is loading")
     
-    self.spawnLink[SvdAccountsManager]
-    self.spawnLink[SvdSystemManager]
-        
+    self.spawnLink[FileEventsManager]
+    self.spawnLink[AccountsManager]
+    
+    if(skipSSM) log.warn("Skipped SvdSystemManager spawn")
+    else self.spawnLink[SvdSystemManager]
+    
+    ApiServer.start
+    
     def receive = {
         case x => log.warn("not recognized message %s", x)
     }
@@ -50,29 +49,34 @@ object SvdMaintainer extends Logging {
         
         SvdUtils.rootCheck
         
-
+        var skip = false
         
-        // args foreach { _ match {
-        //     case "--monitor" => 
-        //         SvdMonitor.start
-        //      
-        //     case x: Any => 
-        //         error("Unknow argument: " + x)
-        //         System.exit(1);
-        // }}
-
+        args foreach { _ match {
+            case "--skip-ssm" =>
+                skip = true
+                
+            case x: Any => 
+                error("Unknow argument: " + x)
+                System.exit(1)
         
-        // SvdUtils.addShutdownHook {
-        //    \ SvdSystemManager\ ! Quit
-        //     SvdAccountsManager ! Quit
-        //     SvdNotificationCenter ! Quit
-        //     SvdMaintainer ! Quit
+        }}
+
+         
+        if(!skip) Utils.rootCheck // TODO: Move it to SSM
+        
+        actorOf(new Maintainer(skip)).start ! 0
+                
+        // Utils.addShutdownHook {
+        //     SvdSystemManager ! Quit
+        //     AccountsManager ! Quit
+        //     NotificationCenter ! Quit
+        //     Maintainer ! Quit
         // }
 
-        val maintainer = actorOf[SvdMaintainer]
-        maintainer.start
+        // val maintainer = actorOf[Maintainer]
+        // maintainer.start
         
-        maintainer ! 0 // HACK: akka does not start if no message sent
+        // maintainer ! 0 // HACK: akka does not start if no message sent
         
         // info("SvdNotificationCenter is loading")
         // SvdNotificationCenter ! Init
@@ -80,8 +84,8 @@ object SvdMaintainer extends Logging {
         // info("SvdAccountManager is loading")
         // SvdAccountsManager ! Init
         
-        val ssm = Actor.registry.actorFor[SvdSystemManager]
-        ssm.get ! Init
+        // val ssm = Actor.registry.actorFor[SvdSystemManager]
+        // ssm.get ! Init
         
         
         // log.info("SvdSystemManager is loading")

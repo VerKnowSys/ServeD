@@ -33,8 +33,12 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
     
-    class SvdCli(info: ProjectInfo) extends SvdProject(info) {
+    class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {
         lazy val cli = task { None; } dependsOn(run(Array("127.0.0.1", "5555")))
+
+        lazy val assemblyFast = assemblyTask(assemblyTemporaryPath, assemblyClasspath,
+                                              assemblyExtraJars, assemblyExclude
+                              ) dependsOn(compile) describedAs("Builds an optimized, single-file deployable JAR without running tests, just compile")
         
         override def mainClass = Some("com.verknowsys.served.cli.Runner")
     }
@@ -100,6 +104,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
 
         lazy val served = task { None } dependsOn(run(Array("--monitor")))
         lazy val svd = served
+        lazy val servedSkipSsm = task { None } dependsOn(run(Array("--skip-ssm")))
         
         override def mainClass = Some("com.verknowsys.served.maintainer.SvdMaintainer")
     }

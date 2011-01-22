@@ -11,16 +11,13 @@ import com.verknowsys.served.utils.signals.{Success, Failure}
 
 object events {
     case class SvdKqueueFileEvent(ident: Int, flags: Int)
-    case class BareFileEvent(path: String, flags: Int)
-    case class FileEvent(path: String, flags: Int)
-    case class RegisterFileEvent(path: String, flags: Int)
+    case class SvdFileEvent(path: String, flags: Int)
+    case class RegisterFile SvdRegisterFileEventEvent(path: String, flags: Int, ref: ActorRef)
 
     class SvdKqueueException extends Exception
-    class KeventException extends Exception
-    class FileOpenException extends Exception
+    class SvdKeventExceptionKeventException extends Exception
+    class SvdFileOpenException extends Exception
 }
-
-import events._
 
 /** 
  * File watcher actor. It receives kqueue events and sends message to [owner] if flags match 
@@ -32,45 +29,23 @@ import events._
  */
 class SvdFileWatcher(val owner: ActorRef, val path: String, val flags: Int) extends Actor with Logging {
     log.trace("Starting new SvdFileWatcher for %s with %s and %s", owner, path, flags)
-    
-    def receive = {
-        case BareFileEvent(path, evflags) if ((evflags & flags) > 0) => owner ! FileEvent(path, evflags) 
-        case _ => 
-        // case BareFileEvent(path, evflags) =>
-        // TODO: Create some case classes and send FileModified, FileCreated, FileDeleted etc
-    }
 }
 
+import events._
 
-
-/** 
- * Include this trait in any akka Actor
- *
- * Usage:
- * {{{
- * class MyActor extends Actor with SvdFileEventsReactor {
- *     registerFileEventFor("/path/to/file", Modified)
- * 
- *     def receive = {
- *         case FileEvent(path, Modified) => println("New file event for for " + path)
- *     }
- * }
- * }}}
- * 
- * Possible flags values: Modified, Deleted, Renamed, AttributesChanged
- * 
- * @author teamon
- */
 trait SvdFileEventsReactor {
-    self: Actor =>
+    self: Actor with Logging =>
     
-    final val Modified = SvdCLibrary.NOTE_WRITE | SvdCLibrary.NOTE_EXTEND
-    final val Deleted  = SvdCLibrary.NOTE_DELETE
-    final val Renamed  = SvdCLibrary.NOTE_RENAME
-    final val AttributesChanged = SvdCLibrary.NOTE_ATTRIB
+    final val Modified          = CLibrary.NOTE_WRITE | CLibrary.NOTE_EXTEND
+    final val Deleted           = CLibrary.NOTE_DELETE
+    final val Renamed           = CLibrary.NOTE_RENAME
+    final val AttributesChanged = CLibrary.NOTE_ATTRIB
     
     def registerFileEventFor(path: String, flags: Int){
-        Actor.registry.actorsFor[SvdFileEventsManager].foreach { _ ! RegisterFileEvent(path, flags) }
+        Actor.registry.actorFor[SvdFileEventsManager] match {
+            case Some(fem) => fem ! SvdRegisterFileEvent(path, flags, this.self)
+            case None => log.error("Could not register file watcher. FileEventsManager worker not found.")
+        }
     }
 }
 
@@ -96,11 +71,11 @@ class SvdFileEventsManager extends Actor with Logging {
     }
     
     /** 
-     * Mutable map holding [file descriptor => (path, file watcher actor)] 
+     * Mutable map holding [file descriptor => (path, list of (flags, actor ref))] 
      * 
      * @author teamon
      */
-    protected val idents = Map[Int, (String, ListBuffer[ActorRef])]()
+    protected val idents = Map[Int, (String, ListBuffer[(Int, ActorRef)])]()
         
     /** 
      * BSD kqueue events reader thread 
@@ -116,7 +91,7 @@ class SvdFileEventsManager extends Actor with Logging {
                 if(nev > 0){
                     SvdFileEventsManager.this.self ! SvdKqueueFileEvent(event.ident.intValue, event.fflags)
                 } else if(nev == -1){
-                    throw new KeventException
+                    throw new SvdKeventException
                 }
             }
         }
@@ -126,30 +101,31 @@ class SvdFileEventsManager extends Actor with Logging {
     
     def receive = {
         // register new file event, sent from any actor
-        case RegisterFileEvent(path, flags) =>
+        case SvdRegisterFileEvent(path, flags, ref) =>
             idents.find { case(_, (p, _)) => p == path } match {
-                case Some((_, (p, list))) =>
-                    self.sender.foreach {
-                        list += spawnNewSvdFileWatcher(_, path, flags)
-                    }
-
-                case None =>
-                    self.sender.foreach { registerNewFileEvent(_, path, flags) }
+                case Some((_, (p, list))) => list += ((flags, ref))
+                case None => registerNewFileEvent(path, flags, ref)
             }
+            
+            log.trace("Registered new file event: %s / %s for %s", path, flags, ref)
             self reply Success
 
         // Forward event sent by kqueue to file watchers
         case SvdKqueueFileEvent(ident, flags) => 
+            log.trace("New kqueue file event. flags: %x", flags)
+        
             idents.get(ident.intValue).foreach { 
-                case (path, list) => list foreach { _ ! BareFileEvent(path, flags) }
+                case (path, list) => list collect {
+                    case ((fl, ref)) if (fl & flags) > 0 => ref ! SvdFileEvent(path, flags)
+                }
             }
     }
     
     
-    protected def registerNewFileEvent(owner: ActorRef, path: String, flags: Int) = synchronized {
+    protected def registerNewFileEvent(path: String, flags: Int, ref: ActorRef) = synchronized {
         val ident = clib.open(path, O_RDONLY)
         if(ident == -1){
-            throw new FileOpenException
+            throw new SvdFileOpenException
         }
         
         val event = new kevent(new NativeLong(ident),
@@ -161,16 +137,9 @@ class SvdFileEventsManager extends Actor with Logging {
         
         val nev = clib.kevent(kq, event, 1, null, 0, null)
         if(nev == -1){
-            throw new KeventException
+            throw new SvdKeventException
         }
 
-        idents(ident) = (path, ListBuffer[ActorRef](spawnNewSvdFileWatcher(owner, path, flags)))
-    }
-    
-    protected def spawnNewSvdFileWatcher(owner: ActorRef, path: String, flags: Int) = {
-        val watcher = actorOf(new SvdFileWatcher(owner, path, flags))
-        self.link(watcher)
-        watcher.start
-        watcher
+        idents(ident) = (path, ListBuffer[(Int, ActorRef)]((flags, ref)))
     }
 }

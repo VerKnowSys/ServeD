@@ -1,6 +1,6 @@
 package com.verknowsys.served.managers
 
-import com.verknowsys.served.maintainer.SvdAccount
+import com.verknowsys.served.maintainer.Account
 import akka.actor.Actor
 import akka.util.Logging
 
@@ -11,7 +11,7 @@ case object GetAccount
  * 
  * @author teamon
  */
-class SvdAccountManager(val account: SvdAccount) extends Actor with Logging {
+class AccountManager(val account: Account) extends Actor with Logging {
     log.trace("Starting AccountManager for account: " + account)
     
     def receive = {
