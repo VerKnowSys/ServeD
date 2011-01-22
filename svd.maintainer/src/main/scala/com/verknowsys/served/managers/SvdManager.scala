@@ -6,7 +6,7 @@ import akka.actor.Actor
  * 
  * @author teamon
  */
-abstract class SvdManager(owner: SvdAccountSvdManager) extends Actor {
+abstract class SvdManager(owner: SvdAccountManager) extends Actor {
     
     
     protected def account = owner.account

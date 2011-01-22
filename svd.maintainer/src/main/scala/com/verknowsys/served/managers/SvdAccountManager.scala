@@ -9,16 +9,18 @@ import akka.util.Logging
  * 
  * @author teamon
  */
-class SvdAccountSvdManager(val account: SvdAccount) extends Actor with Logging {
+class SvdAccountManager(val account: SvdAccount) extends Actor with Logging {
     // start
     
-    // val gitSvdManager = new SvdGitSvdManager(this)
+    // val gitSvdManager = new SvdGitManager(this)
     
-    log.trace("Starting SvdAccountSvdManager for account: " + account)
+    log.trace("Starting SvdAccountManager for account: " + account)
     
     
     def receive = {
-        case x => println("got " + x)
+        case x =>
+            log.debug("got " + x)
+            
     }
     
     
@@ -28,11 +30,11 @@ class SvdAccountSvdManager(val account: SvdAccount) extends Actor with Logging {
     //             // case msg: Git.Base => sender ! (gitSvdManager !! msg)
     //             
     //             case Init =>
-    //                 info("SvdAccountSvdManager ready")
+    //                 info("SvdAccountManager ready")
     //                 reply(Ready)
     //                 
     //             case Quit =>
-    //                 info("Quitting SvdAccountSvdManager(" + account.userName + ")")
+    //                 info("Quitting SvdAccountManager(" + account.userName + ")")
     //                 reply(Ready)
     //                 exit
     //             
@@ -44,5 +46,5 @@ class SvdAccountSvdManager(val account: SvdAccount) extends Actor with Logging {
     // /**
     //  * @author teamon
     //  */
-    // override def toString = "SvdAccountSvdManager(" + account.userName + ")"
+    // override def toString = "SvdAccountManager(" + account.userName + ")"
 }

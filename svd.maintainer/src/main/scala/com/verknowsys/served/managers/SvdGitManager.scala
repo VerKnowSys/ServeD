@@ -15,7 +15,7 @@ import java.io.File
  * 
  * @author teamon
  */
-class SvdGitSvdManager(owner: SvdAccountSvdManager) extends SvdManager(owner) {
+class SvdGitManager(owner: SvdAccountManager) extends SvdManager(owner) {
     // def act {
     //     loop {
     //         receive {
@@ -37,11 +37,11 @@ class SvdGitSvdManager(owner: SvdAccountSvdManager) extends SvdManager(owner) {
     //                 sender ! NotImplementedError
     //             
     //             case Init =>
-    //                 info("SvdGitSvdManager ready")
+    //                 info("SvdGitManager ready")
     //                 reply(Ready)
     //                 
     //             case Quit =>
-    //                 info("Quitting SvdGitSvdManager")
+    //                 info("Quitting SvdGitManager")
     //                 reply(Ready)
     //                 exit
     //             

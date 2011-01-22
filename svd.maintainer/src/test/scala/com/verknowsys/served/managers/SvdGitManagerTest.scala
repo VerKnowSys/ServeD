@@ -4,8 +4,8 @@ import com.verknowsys.served._
 import org.specs._
 
 
-class SvdGitSvdManagerTest extends Specification {
-    // "SvdGitSvdManager" should {
+class SvdGitManagerTest extends Specification {
+    // "SvdGitManager" should {
     //     "correctly list repositories" in {
     // 
     //     }

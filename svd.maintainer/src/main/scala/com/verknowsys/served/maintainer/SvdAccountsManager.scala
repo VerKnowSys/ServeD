@@ -3,7 +3,7 @@ package com.verknowsys.served.maintainer
 import scala.io.Source
 import com.verknowsys.served.SvdConfig
 
-import com.verknowsys.served.managers.SvdAccountSvdManager
+import com.verknowsys.served.managers.SvdAccountManager
 
 import akka.actor.Actor
 import akka.actor.Actor.actorOf
@@ -16,7 +16,7 @@ class SvdAccountsManager extends Actor with Logging {
     
     // start
 
-    // val managers = new ListBuffer[SvdAccountSvdManager]
+    // val managers = new ListBuffer[SvdAccountManager]
     
     spawnLinkUsersActors
     
@@ -50,18 +50,18 @@ class SvdAccountsManager extends Actor with Logging {
     //                 trace("Reloading users list")
     //                 // How does it work
     //                 //
-    //                 // <managers> = ListBuffer[SvdAccountSvdManager]
+    //                 // <managers> = ListBuffer[SvdAccountManager]
     //                 // 1. Start
     //                 //  - loadSvdAccounts from /etc/passwd
-    //                 //  - for each SvdAccount spawn SvdAccountSvdManager and add it to <managers>
+    //                 //  - for each SvdAccount spawn SvdAccountManager and add it to <managers>
     //                 //  - setup SvdFileWatcher on /etc/passwd
     //                 //
     //                 // 2. /etc/passwd changed
     //                 // - read SvdAccounts list form /etc/passwd
     //                 // - for every SvdAccount 
-    //                 //   - check if there is existing SvdAccountSvdManager
-    //                 //     if not, spawn SvdAccountSvdManager and add it to <managers>
-    //                 // - for every SvdAccountSvdManager from <managers>
+    //                 //   - check if there is existing SvdAccountManager
+    //                 //     if not, spawn SvdAccountManager and add it to <managers>
+    //                 // - for every SvdAccountManager from <managers>
     //                 //   - check if it`s SvdAccount is in new accounts list
     //                 //     - if not, send Quit to manager and remove it from list
     //                 //
@@ -70,7 +70,7 @@ class SvdAccountsManager extends Actor with Logging {
     //                 val accounts = userSvdAccounts
     //                                                         
     //                 accounts foreach { a =>
-    //                     if(!managers.exists(_.account == a)) managers += new SvdAccountSvdManager(a)
+    //                     if(!managers.exists(_.account == a)) managers += new SvdAccountManager(a)
     //                 }
     //                 
     //                 managers.foreach { m =>
@@ -105,7 +105,7 @@ class SvdAccountsManager extends Actor with Logging {
     
     private def spawnLinkUsersActors {
        userSvdAccounts foreach { account =>
-           val manager = actorOf(new SvdAccountSvdManager(account))
+           val manager = actorOf(new SvdAccountManager(account))
            self.link(manager)
            manager.start
        }

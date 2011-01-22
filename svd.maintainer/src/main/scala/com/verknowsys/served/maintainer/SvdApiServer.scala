@@ -10,12 +10,12 @@
 // class SvdApiSession extends Actor {
 //     import self._
 //     
-//     var manager: Option[SvdAccountSvdManager] = None
+//     var manager: Option[SvdAccountManager] = None
 //     
 //     def receive = {
 //         case General.Connect(username) => 
 //             // XXX: This sucks, it really should be async
-//             (SvdAccountsManager !? SvdAccountSvdManager.CheckUser(username)) match {
+//             (SvdAccountsManager !? SvdAccountManager.CheckUser(username)) match {
 //                 case Some(m) =>
 //                     manager = Some(m)
 //                     reply(Success)

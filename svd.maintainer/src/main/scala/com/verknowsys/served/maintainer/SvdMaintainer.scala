@@ -77,11 +77,12 @@ object SvdMaintainer extends Logging {
         // info("SvdNotificationCenter is loading")
         // SvdNotificationCenter ! Init
         
-        // info("SvdAccountSvdManager is loading")
+        // info("SvdAccountManager is loading")
         // SvdAccountsManager ! Init
         
         val ssm = Actor.registry.actorFor[SvdSystemManager]
         ssm.get ! Init
+        
         
         // log.info("SvdSystemManager is loading")
 

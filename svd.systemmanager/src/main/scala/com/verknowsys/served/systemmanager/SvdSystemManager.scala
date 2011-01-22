@@ -51,6 +51,10 @@ class SvdSystemManager extends Actor with Logging {
             val b = new SvdProcess(command = "df -h", user = "dmilith")
             log.debug("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
             
+            
+            // val sam = Actor.registry.actorFor[SvdAccountManager]
+            // sam.get ! "go!"
+            
             // new SvdProcess(command = "df -h", user = "dmilith", useShell = false) // without shell it wont work fine
             
             // new SvdProcess(command = "dff -h", user = "dmilith", outputRedirectDestination = "/tmp/df2")
