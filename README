@@ -18,24 +18,38 @@
 	    
     0.4 - ZSH Shell
         >= 4.3.10
+        
+    0.5 - Sudo
+        >= 1.7.4p6
     
-	0.5 - Sigar library
+	0.6 - Sigar library
 	    >= 1.6.3.82
 	    
-	0.6 - Smack library (for XMPP Notifications)
+	0.7 - Smack library (for XMPP Notifications)
 	    >= 3.0.4
 
-    0.7 - pIRCbot library (for IRC Notifications)
+    0.8 - pIRCbot library (for IRC Notifications)
         >= 1.4.2
         
-	0.8 - List of currently supported platforms:
+	0.9 - List of currently supported platforms:
 	    Mac OSX (100% features, development),
 	    Free BSD (100% features, production),
 
 
 
 1. Instalation
-	1.1 - sbt "project SvdMaintainer" run
+    1.1 - install native libraries from "libs.native.64" folder (currently only 64bit systems are fully supported)
+        In FreeBSD 8.1:
+            A. Become superuser (root):
+                * sudo -i
+            B. Install ports:
+                * portsnap fetch
+                * portsnap extract
+            C. Install OpenJDK6 (OpenJDK7 will be supported parallely)
+                * unset JAVA_HOME
+                * cd /usr/ports/java/openjdk6 && make install
+                * follow requirements and instructions
+	1.2 - sbt "project SvdMaintainer" run
 
 
 
