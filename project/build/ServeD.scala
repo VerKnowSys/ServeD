@@ -124,32 +124,31 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val XXX  = ".*//.*(?i:xxx)(.*):?".r
         val NOTE = ".*//.*(?i:note)(.*):?".r
         val HACK = ".*//.*(?i:hack)(.*):?".r
+        val TODO = ".*//.*(?i:todo)(.*):?".r
+        val FIXME = ".*//.*(?i:fixme)(.*):?".r
         
         type Entry = (File, Int, String)
-        
-        val data = Map(
-            "xxx"  -> new ListBuffer[Entry],
-            "note" -> new ListBuffer[Entry],
-            "hack" -> new ListBuffer[Entry]
-        )
 
-        filetree(new File("."), ".*src(?!.*OLD).*\\.scala") foreach { f =>
-            FileUtilities.readString(f, log).right.get.split("\n").zipWithIndex.foreach { 
-                case (line, i) => 
-                    line match {
-                        case XXX(msg) => data("xxx") += ((f, i, msg))
-                        case NOTE(msg) => data("note") += ((f, i, msg))
-                        case HACK(msg) => data("hack") += ((f, i, msg))
-                        case _ =>
-                    }
-            }
+
+        filetree(new File("."), ".*src(?!.*OLD).*\\.scala") flatMap { file =>
+            FileUtilities.readString(file, log).right.get.split("\n").zipWithIndex.map { 
+                case (line, i) => line match {
+                    case XXX(msg)   => ("xxx",   file, i+1, msg)
+                    case NOTE(msg)  => ("note",  file, i+1, msg)
+                    case HACK(msg)  => ("hack",  file, i+1, msg)
+                    case TODO(msg)  => ("todo",  file, i+1, msg)
+                    case FIXME(msg) => ("fixme", file, i+1, msg)
+                    case _ => ("", null, 0, "")
+                }
+            } filter { _._3 != 0 }
+        } sort { 
+            case ((n1, _, _, _), (n2, _, _, _)) => (n1 compareTo n2) < 0
+        } foreach { 
+            case (name, file, line, msg) => 
+                println("[%s] %s:%d  %s".format(name, file.getPath.replaceAll("src/(main|test)/scala/com/verknowsys/served", "...$1..."), line, msg))
         }
         
-        data foreach {
-            case (name, list) =>
-                list foreach { case (file, i, msg) => println("[%s] %s:%d  %s".format(name, file.getPath, i+1, msg)) }
-        }
-        
+
         None
     }
     
