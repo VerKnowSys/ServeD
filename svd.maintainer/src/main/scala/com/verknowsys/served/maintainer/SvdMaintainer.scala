@@ -29,6 +29,8 @@ class SvdMaintainer(skipSSM: Boolean = false) extends Actor with Logging {
     if(skipSSM) log.warn("Skipped SvdSystemManager spawn")
     else self.spawnLink[SvdSystemManager]
     
+    registry.actorFor[SvdSystemManager] foreach { _ ! Init }
+    
     SvdApiServer.start
     
     def receive = {
@@ -86,8 +88,8 @@ object SvdMaintainer extends Logging {
         // info("SvdAccountManager is loading")
         // SvdAccountsManager ! Init
         
-        val ssm = Actor.registry.actorFor[SvdSystemManager]
-        ssm.get ! Init
+        // val ssm = Actor.registry.actorFor[SvdSystemManager]
+        // ssm.get ! Init
         
         
         // log.info("SvdSystemManager is loading")
