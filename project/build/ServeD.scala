@@ -1,6 +1,10 @@
 import sbt._
 import growl._
 import extract._
+import java.io.File
+import scala.util.matching.Regex
+import scala.collection.mutable.ListBuffer
+
 
 
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
@@ -110,6 +114,44 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
     
     // Other
+    lazy val notes = task { 
+        def filetree(file: File, pattern: String): List[File] = {
+            if(file.isDirectory) file.listFiles.toList.flatMap(filetree(_, pattern))
+            else if(file.getPath.matches(pattern)) List(file)
+            else Nil
+        }
+        
+        val XXX  = ".*//.*(?i:xxx)(.*):?".r
+        val NOTE = ".*//.*(?i:note)(.*):?".r
+        val HACK = ".*//.*(?i:hack)(.*):?".r
+        
+        type Entry = (File, Int, String)
+        
+        val data = Map(
+            "xxx"  -> new ListBuffer[Entry],
+            "note" -> new ListBuffer[Entry],
+            "hack" -> new ListBuffer[Entry]
+        )
+
+        filetree(new File("."), ".*src(?!.*OLD).*\\.scala") foreach { f =>
+            FileUtilities.readString(f, log).right.get.split("\n").zipWithIndex.foreach { 
+                case (line, i) => 
+                    line match {
+                        case XXX(msg) => data("xxx") += ((f, i, msg))
+                        case NOTE(msg) => data("note") += ((f, i, msg))
+                        case HACK(msg) => data("hack") += ((f, i, msg))
+                        case _ =>
+                    }
+            }
+        }
+        
+        data foreach {
+            case (name, list) =>
+                list foreach { case (file, i, msg) => println("[%s] %s:%d  %s".format(name, file.getPath, i+1, msg)) }
+        }
+        
+        None
+    }
     
 }
 

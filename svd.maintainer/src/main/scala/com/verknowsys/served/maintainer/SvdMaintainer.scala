@@ -26,6 +26,7 @@ class SvdMaintainer(skipSSM: Boolean = false) extends Actor with Logging {
     self.spawnLink[SvdFileEventsManager]
     self.spawnLink[SvdAccountsManager]
     
+    // NOTE: Temporary
     if(skipSSM) log.warn("Skipped SvdSystemManager spawn")
     else self.spawnLink[SvdSystemManager]
     
