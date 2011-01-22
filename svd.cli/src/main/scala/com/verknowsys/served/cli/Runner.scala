@@ -1,6 +1,7 @@
 package com.verknowsys.served.cli
 
 import akka.actor.Actor
+import akka.util.Logging
 import com.verknowsys.served.api._
 
 /** 
@@ -10,18 +11,18 @@ import com.verknowsys.served.api._
  * @param ServeD instance port
  * @author teamon
  */
-class ApiClient(host: String, port: Int){
+class ApiClient(host: String, port: Int) extends Logging {
     val svd = Actor.remote.actorFor("service:api", host, port)
     
-    println("Checking connection...")
+    log.trace("Checking connection...")
     (svd !! General.Connect(username)) match {
         case Some(response) => response match {
             case Success => 
-                println("ServeD 0.1.0 interactive shell. Welcome!")
+                println("ServeD 0.1.0 interactive shell. Welcome %s".format(username))
                 prompt
             case Error(message) =>
-                println("[ERROR] " + message)
-                exit
+                log.error("[ERROR] " + message)
+                quit
         }
         case None => 
             println("[ERROR] Connection timeout")
@@ -35,7 +36,7 @@ class ApiClient(host: String, port: Int){
      */
     def prompt {
         val args = Console.readLine(">>> ").split(" ").filterNot(_ == "")
-        if(!args.isEmpty) process(args)
+        if(!args.isEmpty) process(args.toList)
         prompt
     }
     
@@ -45,9 +46,11 @@ class ApiClient(host: String, port: Int){
      *
      * @author teamon
      */
-    def process(args: Seq[String]){
+    def process(args: List[String]){
+        log.debug("args: %s", args)
         args match {
-            case "exit" :: Nil => exit
+            case "echo" :: xs => svd ! xs.mkString(" ")
+            case "exit" :: Nil => quit
             case "help" :: Nil => displayHelp
             case _ => displayHelp
         }
@@ -60,7 +63,7 @@ class ApiClient(host: String, port: Int){
      *
      * @author teamon
      */ 
-    private val username = System.getProperty("user.name")
+    private lazy val username = System.getProperty("user.name")
 
     /**
      * Read help file
@@ -68,11 +71,16 @@ class ApiClient(host: String, port: Int){
      * @author teamon
      */
     private lazy val helpContent = io.Source.fromURL(Thread.currentThread.getContextClassLoader.getResource("help.txt")).mkString
+    
+    private def quit {
+        Actor.registry.shutdownAll
+        System.exit(0)
+    }
 }
 
 
-object Runner {
-    def main(args: Array[String]): Unit = {
+object Runner extends Logging {
+    def main(args: Array[String]) {
         if(args.length == 2) new ApiClient(args(0), args(1).toInt)
         else { println("Usage: com.verknowsys.served.cli.Runner HOST PORT")}
     }

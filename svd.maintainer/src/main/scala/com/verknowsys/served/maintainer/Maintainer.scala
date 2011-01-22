@@ -6,7 +6,7 @@ package com.verknowsys.served.maintainer
 // import com.verknowsys.served.api._
 import com.verknowsys.served.Config
 import com.verknowsys.served.utils.{Utils, FileEventsManager}
-import com.verknowsys.served.utils.signals._
+// import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.systemmanager.SvdSystemManager
 
 
@@ -30,6 +30,8 @@ class Maintainer(skipSSM: Boolean = false) extends Actor with Logging {
     
     if(skipSSM) log.warn("Skipped SvdSystemManager spawn")
     else self.spawnLink[SvdSystemManager]
+    
+    ApiServer.start
     
     def receive = {
         case x => log.warn("not recognized message %s", x)
@@ -65,8 +67,7 @@ object Maintainer extends Logging {
         
                         
         actorOf(new Maintainer(skip)).start ! 0
-
-        
+                
         // Utils.addShutdownHook {
         //     SvdSystemManager ! Quit
         //     AccountsManager ! Quit

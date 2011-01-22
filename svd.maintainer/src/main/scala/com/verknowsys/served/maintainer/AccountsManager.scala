@@ -4,12 +4,16 @@ import scala.io.Source
 import com.verknowsys.served.Config
 import com.verknowsys.served.utils.FileEventsReactor
 import com.verknowsys.served.utils.events.FileEvent
-import com.verknowsys.served.managers.AccountManager
+import com.verknowsys.served.managers._
 
-import akka.actor.Actor
+import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.{actorOf, registry}
 import akka.util.Logging
 
+import com.verknowsys.served.api._
+
+
+case class GetAccountManager(username: String)
 
 class AccountsManager extends Actor with FileEventsReactor with Logging {
     // case object ReloadUsers
@@ -21,9 +25,17 @@ class AccountsManager extends Actor with FileEventsReactor with Logging {
         
     def receive = {
         case FileEvent(path, Modified) => 
-            log.trace("/etc/passwd modified")
+            log.trace("Passwd file modified")
             respawnUsersActors
             
+        case GetAccountManager(username) =>
+            registry.actorsFor[AccountManager].find { e => 
+                (e !! GetAccount) collect { case a: Account => a.userName == username } getOrElse false 
+            } match {
+                case Some(ref: ActorRef) => self reply ref
+                case _ => self reply Error("AccountManeger for username %s not found".format(username))
+            }
+                        
         case msg => log.warn("Message not recognized: %s", msg)
     }
         
