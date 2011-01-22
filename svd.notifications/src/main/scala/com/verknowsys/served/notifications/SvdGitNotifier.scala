@@ -11,7 +11,7 @@ import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.git._
 import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.utils.kqueue.Kqueue
+import com.verknowsys.served.utils.kqueue.SvdKqueue
 
 import java.text.SimpleDateFormat
 
@@ -20,7 +20,7 @@ import akka.util.Logging
 
 
 class SvdGitNotifier(repo: GitRepository) extends Actor with Logging {
-    import NotificationCenter._
+    import SvdNotificationCenter._
 
     var oldHEAD = repo.head // XXX: var :(
 
@@ -37,8 +37,8 @@ class SvdGitNotifier(repo: GitRepository) extends Actor with Logging {
     //         repo.history(oldHEAD).toList.reverse.foreach { commit =>
     //             log.trace("Commit: " + commit)
     //             val message = "%s\n%s %s\n%s".format(commit.sha, new SimpleDateFormat("yyyy-MM-dd HH:mm").format(commit.date), commit.author.nameAndEmail, commit.message)
-    //             NotificationCenter ! Status("ServeD Git Bot Notifier (last: %s)".format(commit.sha))
-    //             NotificationCenter ! Message(message)
+    //             SvdNotificationCenter ! Status("ServeD Git Bot Notifier (last: %s)".format(commit.sha))
+    //             SvdNotificationCenter ! Message(message)
     //         }
     // 
     //         log.trace("OldHead sha: %s".format(oldHEAD))

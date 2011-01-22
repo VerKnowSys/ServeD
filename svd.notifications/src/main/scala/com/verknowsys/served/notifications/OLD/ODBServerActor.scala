@@ -8,7 +8,7 @@
 // import com.verknowsys.served.utils.signals.{Init, Quit}
 // import com.verknowsys.served.utils.props.Preferences
 // 
-// import org.neodatis.odb.{OdbConfiguration, ODBServer, ODBFactory}
+// import org.neodatis.odb.{OdbSvdConfiguration, ODBServer, ODBFactory}
 // import org.apache.log4j.Logger
 // import scala.actors._
 // 
@@ -23,8 +23,8 @@
 // 
 //  def initServer = {
 //    try {
-//      OdbConfiguration.setAutomaticCloseFileOnExit(true)
-//      OdbConfiguration.setDatabaseCharacterEncoding( "UTF8" )
+//      OdbSvdConfiguration.setAutomaticCloseFileOnExit(true)
+//      OdbSvdConfiguration.setDatabaseCharacterEncoding( "UTF8" )
 //      server = ODBFactory.openServer(props("databaseODBPort"))
 //      server.addBase(props("xmppDatabaseName"), absolutePathToBotODBDir + props("xmppDatabaseFileName"))
 //      server.addBase(props("ircDatabaseName"), absolutePathToBotODBDir + props("ircDatabaseFileName"))

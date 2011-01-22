@@ -38,7 +38,7 @@ class SvdProcess(
     // require(usedShellValid)
     // require(userListed)
     
-    log.debug("Spawning SystemProcess: (%s)".format(command))
+    log.debug("Spawning SvdSystemProcess: (%s)".format(command))
     
     Native.setProtected(true)
 
@@ -51,7 +51,7 @@ class SvdProcess(
     // 2011-01-20 01:11:06 - dmilith - XXX: TODO: find out is this a most efficient way:
     def alive = 
         try {
-	        new SystemProcess(pid)
+	        new SvdSystemProcess(pid)
 	        true
         } catch { 
             case x: Any =>
@@ -76,9 +76,9 @@ class SvdProcess(
     def process: Long = {
         var aPid: Long = 0L
         val cmdFormats = if (useShell) "%s -u %s -s %s > %s 2>&1" else "%s -u %s %s > %s 2>&1"
-        val cmd =  cmdFormats.format(Config.globalSudoExec, user, command, outputRedirectDestination).split(" ")
+        val cmd =  cmdFormats.format(SvdConfig.globalSudoExec, user, command, outputRedirectDestination).split(" ")
         val rt = Runtime.getRuntime
-        val env = Config.env
+        val env = SvdConfig.env
         val proc = rt.exec(cmd, env)
         log.trace("CMD: %s".format(cmd.mkString(" ")))
         rt.traceMethodCalls(false)

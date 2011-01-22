@@ -16,7 +16,7 @@
 // object SvdBotTests {
 //     def suite: Test = {
 //         val suite = new TestSuite(classOf[CommitTest])
-//         suite.addTestSuite(classOf[ConfigTest])
+//         suite.addTestSuite(classOf[SvdConfigTest])
 //         suite
 //     }
 // 
@@ -26,7 +26,7 @@
 // }
 // 
 // 
-// class CommitTest extends TestCase("commit") with Utils {
+// class CommitTest extends TestCase("commit") with SvdUtils {
 //     var commit: Commit = null
 // 
 //     override def setUp {
@@ -50,7 +50,7 @@
 // }
 // 
 // 
-// class ConfigTest extends TestCase("config") {
+// class SvdConfigTest extends TestCase("config") {
 //     //   var settings: Preferences = _
 // 
 //     override def setUp {
@@ -64,9 +64,9 @@
 //         assertTrue(true)
 //     }
 //     //
-//     //   def testConfigReadWrite = {
+//     //   def testSvdConfigReadWrite = {
 //     //       try {
-//     ////         settings.savePreferences("testConfig.xml")
+//     ////         settings.savePreferences("testSvdConfig.xml")
 //     //       } catch {
 //     //           case _ => {
 //     //               fail("Cannot save preferences file!")
@@ -81,7 +81,7 @@
 //     //       }
 //     //   }
 // 
-//     //   def testConfigSettings = {
+//     //   def testSvdConfigSettings = {
 //     //       assertTrue(settings.get("configFile").equals("testing.config"))
 //     //       settings.value("gitRepositoryProjectDir") = "/something"
 //     //       assertTrue(settings.get("gitRepositoryProjectDir").equals("/something"))

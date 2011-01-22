@@ -6,7 +6,7 @@
 // 
 // import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 // import props.Preferences
-// import utils.{Utils}
+// import utils.{SvdUtils}
 // import com.trolltech.qt.core._
 // import com.trolltech.qt.core.Qt.WindowStates
 // import actors.Actor;
@@ -91,7 +91,7 @@
 // }
 // 
 // 
-// object DeployerGUI extends UtilsCommon {
+// object DeployerGUI extends SvdUtilsCommon {
 // 
 //  override
 //  def logger = Logger.getLogger(DeployerGUI.getClass)

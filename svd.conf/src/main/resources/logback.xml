@@ -3,7 +3,7 @@
 <configuration scan="true" debug="true" scanPeriod="10 seconds">
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-			<layout class="com.verknowsys.served.utils.ANSIColorPatternLayout">
+			<layout class="com.verknowsys.served.utils.SvdANSIColorPatternLayout">
 	      <pattern>[%-5level] [%thread | %logger{10}]: %message%n</pattern>
 			</layout>
     </encoder>

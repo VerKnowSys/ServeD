@@ -7,15 +7,15 @@
 
 // package com.verknowsys.served.utils.kqueue
 // 
-// import com.verknowsys.served.SpecHelpers._
-// import com.verknowsys.served.utils.monitor.Monitor
+// import com.verknowsys.served.SvdSpecHelpers._
+// import com.verknowsys.served.utils.monitor.SvdMonitor
 // import org.specs._
 // import java.io._
-// import org.apache.commons.io.FileUtils
+// import org.apache.commons.io.FileSvdUtils
 // import scala.collection.mutable.ListBuffer
 // import scala.actors.Actor
 // 
-// class KqueueTest extends Specification {
+// class SvdKqueueTest extends Specification {
 //     final val DIR = "/tmp/served/kqueue_test"
 //     final val N = 50
 // 
@@ -30,17 +30,17 @@
 //         // }
 //     }
 //     
-//     "Kqueue" should {
+//     "SvdKqueue" should {
 //         doBefore { setup }
 //         
 //         "catch " + N + " watches for one file" in {
 //             var cnt = new Counter
 //             val filename = DIR + "/oneshot"
 //             
-//             FileUtils.touch(filename)
+//             FileSvdUtils.touch(filename)
 //             
 //             val watchers = range map { i =>
-//                 Kqueue.watch(filename, attributes = true){
+//                 SvdKqueue.watch(filename, attributes = true){
 //                     cnt ! i
 //                 }
 //             }
@@ -63,7 +63,7 @@
 //             all foreach { touch(_) }
 //             
 //             val watchers = all map { name =>
-//                 Kqueue.watch(name, attributes = true){
+//                 SvdKqueue.watch(name, attributes = true){
 //                     cnt ! name
 //                 }
 //             }
@@ -86,21 +86,21 @@
 //             
 //             val all = files("mod_me")
 //         
-//             all foreach { FileUtils.writeStringToFile(_, "x") }
+//             all foreach { FileSvdUtils.writeStringToFile(_, "x") }
 //         
 //             val editWatchers = all map { s =>
-//                 Kqueue.watch(s, modified = true){
+//                 SvdKqueue.watch(s, modified = true){
 //                     n ! s
 //                 }
 //             }
 //             
 //             val attribWatchers = all map { s =>
-//                 Kqueue.watch(s, attributes = true){
+//                 SvdKqueue.watch(s, attributes = true){
 //                     k ! s
 //                 }
 //             }
 //         
-//             all foreach { FileUtils.writeStringToFile(_, "y") }
+//             all foreach { FileSvdUtils.writeStringToFile(_, "y") }
 //             timeout
 //             waitWhileRunning(editWatchers, attribWatchers, n, k)
 //         
@@ -119,27 +119,27 @@
 //             var m = new Counter
 //             val all = files("rename_me")
 //         
-//             all foreach { FileUtils.touch(_) }
+//             all foreach { FileSvdUtils.touch(_) }
 //         
 //             val moveWatchers = all map { s =>
-//                 Kqueue.watch(s, renamed = true){
+//                 SvdKqueue.watch(s, renamed = true){
 //                     n ! s
 //                 }
 //             }
 //             
 //             val editWatchers = all map { s =>
-//                 Kqueue.watch(s, modified = true){
+//                 SvdKqueue.watch(s, modified = true){
 //                     k ! s
 //                 }
 //             }
 //             
 //             val attribWatchers = all map { s =>
-//                 Kqueue.watch(s, attributes = true){
+//                 SvdKqueue.watch(s, attributes = true){
 //                     m ! s
 //                 }
 //             }
 //         
-//             all foreach { s => FileUtils.moveFile(s, s + ".moved") }
+//             all foreach { s => FileSvdUtils.moveFile(s, s + ".moved") }
 //             timeout
 //             waitWhileRunning(moveWatchers, editWatchers, attribWatchers, n, k, m)
 //         
@@ -157,9 +157,9 @@
 // 
 // 
 //     private def setup {
-//         Monitor.start
+//         SvdMonitor.start
 //         // waitForEnter
 //         
-//         try { FileUtils.forceDelete(DIR) } catch { case _ => }
+//         try { FileSvdUtils.forceDelete(DIR) } catch { case _ => }
 //     }
 // }

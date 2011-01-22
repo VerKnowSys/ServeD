@@ -2,7 +2,7 @@ package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
-import POSIX._
+import SvdPOSIX._
 import com.verknowsys.served.systemmanager._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager._
@@ -22,18 +22,18 @@ class SvdProcessTest extends Specification {
         }
 
 
-        "SystemProcess should throw exception when there's no such process or bad proces pid given" in {
-            var a: SystemProcess = null
+        "SvdSystemProcess should throw exception when there's no such process or bad proces pid given" in {
+            var a: SvdSystemProcess = null
             try {
-                a = new SystemProcess(-1L)
-            	fail("SystemProcess '%s' with pid -1 was spawned?".format(a))
+                a = new SvdSystemProcess(-1L)
+            	fail("SvdSystemProcess '%s' with pid -1 was spawned?".format(a))
         	} catch { 
                 case x: Any =>
                     a = null
             }
             try {
-                a = new SystemProcess(433434343L)
-            	fail("SystemProcess '%s' with pid 433434343L was spawned?".format(a))
+                a = new SvdSystemProcess(433434343L)
+            	fail("SvdSystemProcess '%s' with pid 433434343L was spawned?".format(a))
         	} catch { 
                 case x: Any =>
                     a = null
@@ -42,8 +42,8 @@ class SvdProcessTest extends Specification {
         }
 
 
-        "SystemProcess should return object with information about process when querying system process" in {
-            val a = new SystemProcess(1L) // usually exists in POSIX system as launchd/init
+        "SvdSystemProcess should return object with information about process when querying system process" in {
+            val a = new SvdSystemProcess(1L) // usually exists in SvdPOSIX system as launchd/init
             a.pid must beGreaterThan(0L)
             a.name.size must beGreaterThan(0L)
             ("PNAME" :: "USER" :: "RES" :: "SHR" :: "PID" :: Nil).foreach{
@@ -67,7 +67,7 @@ class SvdProcessTest extends Specification {
                     fail("Exception occured: " + x)
             }
             try { 
-                new SystemProcess(a.pid)
+                new SvdSystemProcess(a.pid)
                 fail("SvdProcess pid should be non existant")
             } catch {
                 case _ =>

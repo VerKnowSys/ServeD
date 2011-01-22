@@ -5,14 +5,14 @@ import extract._
 
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
     // Projects
-    lazy val conf          = project("svd.conf", "ServeD Configuration")
-    lazy val api           = project("svd.api", "ServeD API", conf)
-    lazy val spechelpers   = project("svd.spechelpers", "ServeD Spec Helpers", new SvdSpecHelpers(_))
-    lazy val utils         = project("svd.utils", "ServeD Utils", new SvdUtils(_), conf, spechelpers)
-    lazy val cli           = project("svd.cli", "ServeD CLI", new SvdCli(_), utils, api)
-    lazy val systemmanager = project("svd.systemmanager", "ServeD SystemManager", new SvdSystemManager(_), utils)
-    lazy val notifications = project("svd.notifications", "ServeD Notifications", new SvdNotifications(_), utils)
-    lazy val maintainer    = project("svd.maintainer", "ServeD Maintainer", new SvdMaintainer(_), notifications, systemmanager, api)
+    lazy val conf          = project("svd.conf", "SvdConfiguration")
+    lazy val api           = project("svd.api", "SvdAPI", conf)
+    lazy val spechelpers   = project("svd.spechelpers", "SvdSpecHelpers", new SvdSpecHelpers(_))
+    lazy val utils         = project("svd.utils", "SvdUtils", new SvdUtils(_), conf, spechelpers)
+    lazy val cli           = project("svd.cli", "SvdCLI", new SvdCli(_), utils, api)
+    lazy val systemmanager = project("svd.systemmanager", "SvdSystemManager", new SvdSvdSystemManager(_), utils)
+    lazy val notifications = project("svd.notifications", "Notifications", new SvdNotifications(_), utils)
+    lazy val maintainer    = project("svd.maintainer", "SvdMaintainer", new SvdMaintainer(_), notifications, systemmanager, api)
     
     override def parallelExecution = false
     
@@ -39,7 +39,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         override def mainClass = Some("com.verknowsys.served.cli.Runner")
     }
     
-    class SvdSystemManager(info: ProjectInfo) extends SvdProject(info) {
+    class SvdSvdSystemManager(info: ProjectInfo) extends SvdProject(info) {
         val sigarSource = "org.hyperic" at "http://repository.jboss.org/maven2"
         val sigar       = "org.hyperic" % "sigar" % "1.6.3.82"
         import Process._
@@ -100,7 +100,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
 
         lazy val served = task { None } dependsOn(run(Array("--monitor")))
         
-        override def mainClass = Some("com.verknowsys.served.maintainer.Maintainer")
+        override def mainClass = Some("com.verknowsys.served.maintainer.SvdMaintainer")
     }
     
     // Other

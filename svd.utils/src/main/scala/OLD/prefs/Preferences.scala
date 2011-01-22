@@ -4,7 +4,7 @@
 // package com.verknowsys.served.utils.props
 // 
 // 
-// import com.verknowsys.served.utils.Utils
+// import com.verknowsys.served.utils.SvdUtils
 // 
 // import scala.collection.mutable.Map
 // import java.io.File
@@ -12,7 +12,7 @@
 // import xml.{Node, XML}
 // 
 // 
-// class Preferences(configFileNameInput: String) extends UtilsCommon {
+// class Preferences(configFileNameInput: String) extends SvdUtilsCommon {
 // 
 //  def this() = this("served.xml") // additional Constructor
 // 
@@ -309,14 +309,14 @@
 //  try { // read values from config or generate new stub
 //    value = fromXML(XML.loadFile(configFileName))
 //    validateValues
-//    info("Config file used (" + configFileName + ")")
+//    info("SvdConfig file used (" + configFileName + ")")
 //  } catch {
 //    case x: RuntimeException => {
 //      error("Bad Value in config file found:\n " + x)
 //      System.exit(1)
 //    }
 //    case x: Exception => {
-//      warn("*** Config file " + configFileName + " doesn't exists! Creating new one")
+//      warn("*** SvdConfig file " + configFileName + " doesn't exists! Creating new one")
 //      savePreferences
 //    }
 //  }

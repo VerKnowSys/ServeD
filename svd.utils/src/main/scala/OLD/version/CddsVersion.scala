@@ -8,7 +8,7 @@
 // import com.verknowsys.served.utils.jar.JarAccess
 // import com.verknowsys.served.utils.signals.{Init, Quit}
 // // import com.verknowsys.served.utils.deployer.Deployer
-// import com.verknowsys.served.utils.Utils
+// import com.verknowsys.served.utils.SvdUtils
 // 
 // import java.io._
 // import java.util.{UUID, Date}
@@ -23,7 +23,7 @@
 // 
 // abstract class CddsVersion(
 //    val configFile: String
-//    ) extends UtilsCommon {
+//    ) extends SvdUtilsCommon {
 // 
 //  lazy val debug = props("debug") getOrElse "true"
 //  lazy val repositoryDir = props("gitRepositoryProjectDir") getOrElse "/git/MyRepo.git"

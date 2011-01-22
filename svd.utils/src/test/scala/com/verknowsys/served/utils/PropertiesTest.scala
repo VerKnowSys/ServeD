@@ -1,13 +1,13 @@
 package com.verknowsys.served.utils
 
 import org.specs._
-import com.verknowsys.served.SpecHelpers._
+import com.verknowsys.served.SvdSpecHelpers._
 
 class PropertiesTest extends Specification {
     final val configFilename = "/tmp/config.properties"
     
     "Properties" should {
-        doBefore { setupConfigFile }
+        doBefore { setupSvdConfigFile }
 
         "read from file" in {
             val props = new Properties(configFilename)
@@ -125,7 +125,7 @@ class PropertiesTest extends Specification {
     }
 
 
-    private def setupConfigFile {
+    private def setupSvdConfigFile {
         val content = "app.existing.config.one = foo bar baz" ::
                 "app.existing.other.config.two = foo bar baz bar blah" ::
                 "some.nice.integer = 259" ::

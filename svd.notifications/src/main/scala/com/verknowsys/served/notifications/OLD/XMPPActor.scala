@@ -19,10 +19,10 @@
 // 
 // 
 // // TODO: to be refactored - Preferences should be parametrized
-// object XMPPActor extends Actor with MessageListener with Utils { 
+// object XMPPActor extends Actor with MessageListener with SvdUtils { 
 // 
 //  lazy val debug = props.bool("debug") getOrElse true
-//  lazy val config = new ConnectionConfiguration(props("xmppServer"), props.int("xmppPort") getOrElse 5222)
+//  lazy val config = new ConnectionSvdConfiguration(props("xmppServer"), props.int("xmppPort") getOrElse 5222)
 //  lazy val connection = new XMPPConnection(config)
 //  lazy val presence = new Presence(Presence.Type.available)
 //  lazy val login = props("xmppLogin") getOrElse "guest"
@@ -31,7 +31,7 @@
 //  lazy val gitRepositoryProjectDir = props("gitRepositoryProjectDir") getOrElse "/git/my_project.git"
 // 
 //  private var filter: AndFilter = null
-//  private var chatmanager: ChatManager = null
+//  private var chatmanager: ChatSvdManager = null
 //  private var chat: List[Chat] = List()
 //  
 //  
@@ -50,7 +50,7 @@
 //                 exit
 //      }
 //    }
-//    chatmanager = connection.getChatManager
+//    chatmanager = connection.getChatSvdManager
 //    debug("*** num of users: " + chat.length)
 //    propsh("users").foreach { x =>
 //      try {
@@ -102,8 +102,8 @@
 //  def getMessages: List[String] = {
 //    var odb: ODB = null
 //    var list: List[String] = List()
-//    OdbConfiguration.setAutomaticCloseFileOnExit(true)
-//    OdbConfiguration.setDatabaseCharacterEncoding( "UTF8" )
+//    OdbSvdConfiguration.setAutomaticCloseFileOnExit(true)
+//    OdbSvdConfiguration.setDatabaseCharacterEncoding( "UTF8" )
 //    try {
 //         odb = ODBFactory.openClient(props("xmppDatabaseListenAddress"), props("databaseODBPort"), props("xmppDatabaseName"))
 //        var query = new CriteriaQuery(classOf[Commit], Where.equal("toRead", true))

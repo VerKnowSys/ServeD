@@ -35,8 +35,7 @@
 
 
 1. Instalation
-	1.1 - sudo bin/installNativeLibraries
-	1.2 - sbt "project ServeD Maintainer" run
+	1.1 - sbt "project SvdMaintainer" run
 
 
 

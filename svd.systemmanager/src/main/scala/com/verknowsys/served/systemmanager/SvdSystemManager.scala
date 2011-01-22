@@ -7,7 +7,7 @@ package com.verknowsys.served.systemmanager
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.kqueue._
-import com.verknowsys.served.utils.monitor.Monitored
+import com.verknowsys.served.utils.monitor.SvdMonitored
 import com.verknowsys.served.systemmanager.native._
 
 import org.hyperic.sigar._
@@ -24,7 +24,7 @@ import akka.util.Logging
 /**
 *   @author dmilith
 *   
-*   SystemManager - responsible for System Managment and Monitoring
+*   SvdSystemManager - responsible for System Managment and SvdMonitoring
 */
 class SvdSystemManager extends Actor with Logging {
     log.trace("SvdSystemManager is loading")
@@ -37,10 +37,10 @@ class SvdSystemManager extends Actor with Logging {
     
     def receive = {
         case Init =>
-            val nrs = new SystemResources
-            val nsp = new SystemProcess(core.getPid)
+            val nrs = new SvdSystemResources
+            val nsp = new SvdSystemProcess(core.getPid)
             
-            log.info("SystemManager ready")
+            log.info("SvdSystemManager ready")
             log.info("System Resources Availability:\n%s".format(nrs))
             log.info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
             
@@ -51,7 +51,7 @@ class SvdSystemManager extends Actor with Logging {
             val b = new SvdProcess(command = "df -h", user = "dmilith")
             log.warn("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
             
-            new SvdProcess(command = "df -h", user = "dmilith", useShell = false) // without shell it wont work fine
+            // new SvdProcess(command = "df -h", user = "dmilith", useShell = false) // without shell it wont work fine
             
             // new SvdProcess(command = "dff -h", user = "dmilith", outputRedirectDestination = "/tmp/df2")
             
@@ -80,7 +80,7 @@ class SvdSystemManager extends Actor with Logging {
             log.debug("All process IDs: %s".format(psAll.mkString(", ")))
             psAll.foreach {
                 p =>
-                	log.trace(new SystemProcess(p).toString)
+                	log.trace(new SvdSystemProcess(p).toString)
             }
             
         case GetRunningProcesses =>
@@ -89,7 +89,7 @@ class SvdSystemManager extends Actor with Logging {
     
             
         case Quit =>
-            log.info("Quitting SystemManager")
+            log.info("Quitting SvdSystemManager")
             exit
         
         // case SendSignal(signal, pid) =>
@@ -106,18 +106,18 @@ class SvdSystemManager extends Actor with Logging {
     *   
     *   This function will send given signal (first param), to given pid (second param)
     */
-    def sendSignalToPid(signal: POSIX.Value, @specialized pid: Int) =
+    def sendSignalToPid(signal: SvdPOSIX.Value, @specialized pid: Int) =
         signal match {
-            case POSIX.SIGHUP =>
+            case SvdPOSIX.SIGHUP =>
                 log.trace("SigHUP sent to process pid: %s".format(pid))
                 
-            case POSIX.SIGINT =>
+            case SvdPOSIX.SIGINT =>
                 log.trace("SigINT sent to process pid: %s".format(pid))
                 
-            case POSIX.SIGQUIT =>
+            case SvdPOSIX.SIGQUIT =>
                 log.trace("SigQUIT sent to process pid: %s".format(pid))
                 
-            case POSIX.SIGKILL =>
+            case SvdPOSIX.SIGKILL =>
                 log.trace("SigKILL sent to process pid: %s".format(pid))
             
             case _ =>
@@ -128,7 +128,7 @@ class SvdSystemManager extends Actor with Logging {
     /**
     *   @author dmilith
     *   
-    *   Converts processes as String to List of SystemProcess'es.
+    *   Converts processes as String to List of SvdSystemProcess'es.
     *   
     *   Arguments: 
     *       show: Boolean. Default: true. 
@@ -137,7 +137,7 @@ class SvdSystemManager extends Actor with Logging {
     *           If true then it will return sorted alphabetically list of processes.
     *
     */
-    // def processList(showThreads: Boolean = true, sort: Boolean = true): List[SystemProcess] = {
+    // def processList(showThreads: Boolean = true, sort: Boolean = true): List[SvdSystemProcess] = {
         // val st = if (showThreads) 1 else 0
         // val so = if (sort) 1 else 0
         // val sourceList = pstreelib.processes(st, so).split("/").toList.filter { a =>
@@ -146,7 +146,7 @@ class SvdSystemManager extends Actor with Logging {
         //         }
         //         for (process <- sourceList) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
         //             yield
-        //                 new SystemProcess(
+        //                 new SvdSystemProcess(
         //                     name = process.split(",").head,
         //                     pid = process.split(",").last
         //                 )
@@ -170,7 +170,7 @@ class SvdSystemManager extends Actor with Logging {
     */
     // def watchLogs = {
             // val watchedFile = "/var/log/kernel.log"
-            // Kqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
+            // SvdKqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
             //                 val raf = new RandomAccessFile(watchedFile, "r")
             //                 raf.seek(raf.length - 1024)
             //                 log.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
@@ -179,7 +179,7 @@ class SvdSystemManager extends Actor with Logging {
     
     
     
-    override def toString = "SvdSystemManager"
+    override def toString = "SvdSvdSystemManager"
     
     
 }

@@ -41,17 +41,17 @@
 //    }
 //  }
 //  
-//  def getLinks(howMany: Int): List[LinkInfo] = {
+//  def getLinks(howMany: Int): List[SvdLinkInfo] = {
 //    var odb: ODB = null
-//    var list: List[LinkInfo] = List()
-//    OdbConfiguration.setAutomaticCloseFileOnExit(true)
-//    OdbConfiguration.setDatabaseCharacterEncoding( "UTF8" )
+//    var list: List[SvdLinkInfo] = List()
+//    OdbSvdConfiguration.setAutomaticCloseFileOnExit(true)
+//    OdbSvdConfiguration.setDatabaseCharacterEncoding( "UTF8" )
 //    try {
 //        odb = ODBFactory.openClient(props("ircDatabaseListenAddress"), props("databaseODBPort"), props("ircDatabaseName"))
-//        val query = new CriteriaQuery(classOf[LinkInfo]) //, Where.equal("date.getDay", (new Date).getDay))
+//        val query = new CriteriaQuery(classOf[SvdLinkInfo]) //, Where.equal("date.getDay", (new Date).getDay))
 //      val link = odb.getObjects(query.orderByDesc("date"))
 //        while (link.hasNext && (list.size <= howMany)) {
-//          val comm = (link.next).asInstanceOf[LinkInfo]
+//          val comm = (link.next).asInstanceOf[SvdLinkInfo]
 //          list ::= comm
 //        }
 //    } catch {
@@ -67,7 +67,7 @@
 //    return list
 //  }
 //  
-//  def putLinkToDatabase(arg: LinkInfo) {
+//  def putLinkToDatabase(arg: SvdLinkInfo) {
 //    var odb: ODB = null
 //    try {
 //      odb = ODBFactory.openClient(props("ircDatabaseListenAddress"), props("databaseODBPort"), props("ircDatabaseName"))
@@ -86,7 +86,7 @@
 //  
 //  override def onMessage(channel: String, sender: String, login: String, hostname: String, message: String) {
 //    if (message.contains("http://") || message.contains("www.")) {
-//      val link = new LinkInfo(sender, channel, "\"" + message + "\"")
+//      val link = new SvdLinkInfo(sender, channel, "\"" + message + "\"")
 //      putLinkToDatabase(link)
 //    }
 //    try {

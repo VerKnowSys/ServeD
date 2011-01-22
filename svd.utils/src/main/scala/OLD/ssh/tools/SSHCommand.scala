@@ -8,7 +8,7 @@
 // import com.verknowsys.served.utils.skeletons.JNLPSkeleton
 // import com.verknowsys.served.utils.signals.{Init, Quit}
 // import com.verknowsys.served.utils.jar.comparator.JarEntryComparator
-// import com.verknowsys.served.utils.Utils
+// import com.verknowsys.served.utils.SvdUtils
 // // import com.verknowsys.served.utils.version.CddsVersion
 // 
 // import actors.Actor
@@ -25,7 +25,7 @@
 //  * Time: 3:15:04 PM
 //  */
 // 
-// object SSHCommand extends UtilsCommon {
+// object SSHCommand extends SvdUtilsCommon {
 // 
 //     // val buildTextFile = "build.text" // XXX hardcoded but probably it will stay hardcoded anyway ;}
 //     val host = props("sshHost") getOrElse "127.0.0.1"

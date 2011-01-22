@@ -1,33 +1,33 @@
 package com.verknowsys.served.utils
 
 import com.verknowsys.served.utils.events._
-import com.verknowsys.served.SpecHelpers._
+import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.spechelpers._
 import com.verknowsys.served.utils.signals.Success
 import org.specs.Specification
 import java.io._
-import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FileSvdUtils
 
 import akka.actor._
 import akka.actor.Actor._
 
-class TestFileEventsReactor extends ExpectActor with FileEventsReactor {
+class TestSvdFileEventsReactor extends SvdExpectActor with SvdFileEventsReactor {
     registerFileEventFor("/tmp/served/file_events_test/single", Modified)
 }
 
-class FileEventsManagerTest extends Specification with ExpectActorSpecification {
+class FileEventsSvdManagerTest extends Specification with SvdExpectActorSpecification {
     final val DIR = "/tmp/served/file_events_test"
     
     var fw: ActorRef = null
     
-    "FileWatcher" should {
+    "SvdFileWatcher" should {
         doBefore { 
-            beforeExpectActor 
-            fw = actorOf(new FileWatcher(expectActor, "/path/to/file", 0x01 | 0x02)).start
+            beforeSvdExpectActor 
+            fw = actorOf(new SvdFileWatcher(expectActor, "/path/to/file", 0x01 | 0x02)).start
         }
         
         doAfter { 
-            afterExpectActor
+            afterSvdExpectActor
             registry.shutdownAll 
         }
         
@@ -51,21 +51,21 @@ class FileEventsManagerTest extends Specification with ExpectActorSpecification 
     
     var fem: ActorRef = null
         
-    "FileEventsManager" should {
+    "FileEventsSvdManager" should {
         doBefore { 
-            beforeExpectActor 
-            try { FileUtils.forceDelete(DIR) } catch { case _ => }
-            fem = actorOf[FileEventsManager].start   
+            beforeSvdExpectActor 
+            try { FileSvdUtils.forceDelete(DIR) } catch { case _ => }
+            fem = actorOf[FileEventsSvdManager].start   
         }
         
         doAfter { 
-            afterExpectActor
+            afterSvdExpectActor
             registry.shutdownAll 
         }
         
-        "start FileEventsManager withus FileWatcher" in {
-            registry.actorsFor[FileEventsManager] must haveSize(1)
-            registry.actorsFor[FileWatcher] must haveSize(0)
+        "start FileEventsSvdManager withus SvdFileWatcher" in {
+            registry.actorsFor[FileEventsSvdManager] must haveSize(1)
+            registry.actorsFor[SvdFileWatcher] must haveSize(0)
         }
             
         "spawn new file watcher using explicit message" in {
@@ -74,14 +74,14 @@ class FileEventsManagerTest extends Specification with ExpectActorSpecification 
             fem ! RegisterFileEvent(DIR + "/single", 0x02)
             expectActor ? Success
             
-            registry.actorsFor[FileEventsManager] must haveSize(1)
-            registry.actorsFor[FileWatcher] must haveSize(1)            
+            registry.actorsFor[FileEventsSvdManager] must haveSize(1)
+            registry.actorsFor[SvdFileWatcher] must haveSize(1)            
         }
         
-        "spawn new file watcher using FileEventsReactor trait" in {
+        "spawn new file watcher using SvdFileEventsReactor trait" in {
             touch(DIR + "/single")
             
-            expectActor = actorOf[TestFileEventsReactor].start
+            expectActor = actorOf[TestSvdFileEventsReactor].start
             senderOption = Some(expectActor)
             
             expectActor ? Success
@@ -90,7 +90,7 @@ class FileEventsManagerTest extends Specification with ExpectActorSpecification 
         "notify actors when file modified" in {
             touch(DIR + "/single")
             
-            expectActor = actorOf[TestFileEventsReactor].start
+            expectActor = actorOf[TestSvdFileEventsReactor].start
             senderOption = Some(expectActor)
             
             expectActor ? Success
