@@ -6,7 +6,7 @@ package com.verknowsys.served.maintainer
 // import com.verknowsys.served.api._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils.{SvdUtils, SvdFileEventsManager}
-// import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.systemmanager.SvdSystemManager
 
 // akka
@@ -54,6 +54,8 @@ object SvdMaintainer extends Logging {
         args foreach { _ match {
             case "--skip-ssm" =>
                 skip = true
+
+            case "--monitor" =>
                 
             case x: Any => 
                 error("Unknow argument: " + x)
@@ -84,8 +86,8 @@ object SvdMaintainer extends Logging {
         // info("SvdAccountManager is loading")
         // SvdAccountsManager ! Init
         
-        // val ssm = Actor.registry.actorFor[SvdSystemManager]
-        // ssm.get ! Init
+        val ssm = Actor.registry.actorFor[SvdSystemManager]
+        ssm.get ! Init
         
         
         // log.info("SvdSystemManager is loading")

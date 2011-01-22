@@ -42,7 +42,7 @@ class SvdProcess(
     
     Native.setProtected(true)
 
-    val pid = process
+    lazy val pid = process
     
     log.trace("Process %s spawned.".format(command))
 
@@ -60,7 +60,7 @@ class SvdProcess(
         }
         
     
-    override def toString = "cmd: '%s', pid: %s".format(command, if (pid > 0) pid else "NSY") // 2011-01-20 13:39:07 - dmilith - NOTE: NS - Not Spawned Yet
+    override def toString = "cmdSvdProc: '%s', pid: %s".format(command, if (pid > 0) pid else "NSY") // 2011-01-20 13:39:07 - dmilith - NOTE: NS - Not Spawned Yet
 
 
     private

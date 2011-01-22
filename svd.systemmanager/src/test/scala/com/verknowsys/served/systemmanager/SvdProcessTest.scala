@@ -94,7 +94,7 @@ class SvdProcessTest extends Specification {
                     }
                 } catch {
                     case e: Exception =>
-                        fail("Alive isn't working well? Exception: %s, Object: %s".format(e.getMessage, a))
+                        fail("Alive isn't working well? Exception: '%s', Object: '%s'".format(e.getMessage, a))
                 }
                 synchronized {
                     b = new SvdProcess("kill %d".format(a.pid), user = "root", useShell = false, outputRedirectDestination = "/tmp/served_kill")
@@ -104,11 +104,6 @@ class SvdProcessTest extends Specification {
                             b.toString must beMatching(elem)
                     }
                 }
-                
-                // Thread.sleep(500)
-                // b.alive must be(false)
-            // }
-            // 2011-01-20 11:00:04 - dmilith - hacky: kill memcached after test pass
         }
 
     } // test should
