@@ -1,1 +1,10 @@
-1. use proper naming. CamelCase, with Svd prefix
+
+1. Use proper naming. CamelCase, with Svd prefix for all custom ServeD classes.
+
+2. User A wont (and never should) know everything about user B's work. (Share knowledge about what You did with rest of team! "man synergy")
+
+3. It should work first. Then beautify it and optimize. (Prevent premature optimization!)
+
+4. Optimize when code (or part of code/ module) is in production stage of development only.
+
+5. Stability is more important than performance
