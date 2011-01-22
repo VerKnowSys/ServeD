@@ -22,6 +22,23 @@ object events {
 }
 
 
+/** 
+ * Include this trait in your actor to use file events
+ * 
+ * {{{
+ * class MyActor extends Actor with FileEventsReactor {
+ *     override def preStart {
+ *         registerFileEventFor("/path/to/file", Modified)
+ *     }
+ *     
+ *     def receive = {
+ *         case FileEvent(path, flags) => // handle event ...
+ *     }
+ * } 
+ * }}} 
+ * 
+ * @author teamon
+ */
 trait SvdFileEventsReactor {
     self: Actor with Logging =>
     
@@ -42,7 +59,7 @@ trait SvdFileEventsReactor {
 /** 
  * Main file events manager actor
  * 
- * For internal use only. STart it using {{{ actorOf[SvdFileEventsManager] }}}
+ * For internal use only. Start it using {{{ actorOf[SvdFileEventsManager] }}}
  * 
  * @author teamon
  */

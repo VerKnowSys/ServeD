@@ -15,7 +15,9 @@ object TestReactor extends SvdExpectActor with SvdFileEventsReactor
 import TestReactor._
 
 class TestFileEventsReactor extends SvdExpectActor with SvdFileEventsReactor {
-    registerFileEventFor("/tmp/served/file_events_test/single", Modified)
+    override def preStart {
+        registerFileEventFor("/tmp/served/file_events_test/single", Modified)
+    }
 }
 
 

@@ -19,9 +19,10 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with Logging {
     // case object ReloadUsers
     // case class CheckUser(val username: String)
     
-    respawnUsersActors
-    
-    registerFileEventFor(SvdConfig.systemPasswdFile, Modified)
+    override def preStart {
+        respawnUsersActors
+        registerFileEventFor(SvdConfig.systemPasswdFile, Modified)
+    }
         
     def receive = {
         case SvdFileEvent(path, Modified) => 
