@@ -11,7 +11,7 @@
 // import com.verknowsys.served.utils.monitor.SvdMonitor
 // import org.specs._
 // import java.io._
-// import org.apache.commons.io.FileSvdUtils
+// import org.apache.commons.io.FileUtils
 // import scala.collection.mutable.ListBuffer
 // import scala.actors.Actor
 // 
@@ -37,7 +37,7 @@
 //             var cnt = new Counter
 //             val filename = DIR + "/oneshot"
 //             
-//             FileSvdUtils.touch(filename)
+//             FileUtils.touch(filename)
 //             
 //             val watchers = range map { i =>
 //                 SvdKqueue.watch(filename, attributes = true){
@@ -86,7 +86,7 @@
 //             
 //             val all = files("mod_me")
 //         
-//             all foreach { FileSvdUtils.writeStringToFile(_, "x") }
+//             all foreach { FileUtils.writeStringToFile(_, "x") }
 //         
 //             val editWatchers = all map { s =>
 //                 SvdKqueue.watch(s, modified = true){
@@ -100,7 +100,7 @@
 //                 }
 //             }
 //         
-//             all foreach { FileSvdUtils.writeStringToFile(_, "y") }
+//             all foreach { FileUtils.writeStringToFile(_, "y") }
 //             timeout
 //             waitWhileRunning(editWatchers, attribWatchers, n, k)
 //         
@@ -119,7 +119,7 @@
 //             var m = new Counter
 //             val all = files("rename_me")
 //         
-//             all foreach { FileSvdUtils.touch(_) }
+//             all foreach { FileUtils.touch(_) }
 //         
 //             val moveWatchers = all map { s =>
 //                 SvdKqueue.watch(s, renamed = true){
@@ -139,7 +139,7 @@
 //                 }
 //             }
 //         
-//             all foreach { s => FileSvdUtils.moveFile(s, s + ".moved") }
+//             all foreach { s => FileUtils.moveFile(s, s + ".moved") }
 //             timeout
 //             waitWhileRunning(moveWatchers, editWatchers, attribWatchers, n, k, m)
 //         
@@ -160,6 +160,6 @@
 //         SvdMonitor.start
 //         // waitForEnter
 //         
-//         try { FileSvdUtils.forceDelete(DIR) } catch { case _ => }
+//         try { FileUtils.forceDelete(DIR) } catch { case _ => }
 //     }
 // }

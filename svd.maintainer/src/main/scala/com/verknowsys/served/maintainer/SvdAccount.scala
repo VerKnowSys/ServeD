@@ -50,7 +50,7 @@ class SvdAccount (
     // XXX: Remove me!
     // def size = {
     //     try {
-    //         val elementsSize = FileSvdUtils.sizeOfDirectory(new File(homeDir))
+    //         val elementsSize = FileUtils.sizeOfDirectory(new File(homeDir))
     //         log.debug("getSvdAccountSize of " + homeDir + " folder: " + elementsSize)
     //         Some(elementsSize)
     //     } catch {

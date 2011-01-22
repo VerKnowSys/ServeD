@@ -5,7 +5,7 @@ import scala.actors.Actor
 import scala.collection.mutable.{Map, ListBuffer}
 import com.verknowsys.served.utils.monitor.SvdMonitored
 
-import com.verknowsys.served.utils.{SvdCLibrary, SvdKevent}
+import com.verknowsys.served.utils.{SvdCLibrary, kevent}
 
 // TODO: throw custom exception, (or java.io something) instead of just Exception
 // TODO: Handle removed files
@@ -74,8 +74,8 @@ class SvdKqueue extends Thread {
 
     override def run {
         while(true) {
-            val event = new SvdKevent
-            val nev = SvdKqueue.clib.SvdKevent(kq, null, 0, event, 1, null)
+            val event = new kevent
+            val nev = SvdKqueue.clib.kevent(kq, null, 0, event, 1, null)
             if(nev == -1){
                 throw new KeventException
             } else if(nev > 0){
@@ -97,14 +97,14 @@ class SvdKqueue extends Thread {
                     throw new OpenException
                 }
 
-                val event = new SvdKevent(new NativeLong(ident),
+                val event = new kevent(new NativeLong(ident),
                                     (SvdCLibrary.EVFILT_VNODE).toShort,
                                     (SvdCLibrary.EV_ADD | SvdCLibrary.EV_ENABLE | SvdCLibrary.EV_CLEAR).toShort,
                                     watcher.flags,
                                     new NativeLong(),
                                     null)
 
-                val nev = SvdKqueue.clib.SvdKevent(kq, event, 1, null, 0, null)
+                val nev = SvdKqueue.clib.kevent(kq, event, 1, null, 0, null)
                 if(nev == -1){
                     throw new KeventException
                 }

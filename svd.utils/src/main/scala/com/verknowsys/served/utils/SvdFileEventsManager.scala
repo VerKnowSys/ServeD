@@ -78,7 +78,7 @@ trait SvdFileEventsReactor {
 /** 
  * Main file events manager actor
  * 
- * For internal use only. STart it using {{{ actorOf[FileEventsSvdManager] }}}
+ * For internal use only. STart it using {{{ actorOf[SvdFileEventsManager] }}}
  * 
  * @author teamon
  */
@@ -110,8 +110,8 @@ class SvdFileEventsManager extends Actor with Logging {
     protected val readerThread = new Thread {
         override def run {
             while(true){
-                val event = new SvdKevent
-                val nev = clib.SvdKevent(kq, null, 0, event, 1, null)
+                val event = new kevent
+                val nev = clib.kevent(kq, null, 0, event, 1, null)
 
                 if(nev > 0){
                     SvdFileEventsManager.this.self ! SvdKqueueFileEvent(event.ident.intValue, event.fflags)
@@ -152,14 +152,14 @@ class SvdFileEventsManager extends Actor with Logging {
             throw new FileOpenException
         }
         
-        val event = new SvdKevent(new NativeLong(ident),
+        val event = new kevent(new NativeLong(ident),
                     (EVFILT_VNODE).toShort,
                     (EV_ADD | EV_ENABLE | EV_CLEAR).toShort,
                     flags,
                     new NativeLong(),
                     null)
         
-        val nev = clib.SvdKevent(kq, event, 1, null, 0, null)
+        val nev = clib.kevent(kq, event, 1, null, 0, null)
         if(nev == -1){
             throw new KeventException
         }

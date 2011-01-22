@@ -3,11 +3,11 @@ package com.verknowsys.served.utils;
 import com.sun.jna.*;
 
 /**
- * C struct SvdKevent * mapping
+ * C struct kevent * mapping
  *
  * @author teamon 
  */
-public class SvdKevent extends Structure {
+public class kevent extends Structure {
     public NativeLong ident; // identifier for this event
     public short filter;    // filter for event
     public short flags;     // general flags
@@ -20,7 +20,7 @@ public class SvdKevent extends Structure {
      */
     public Pointer udata;
 
-    public SvdKevent() {
+    public kevent() {
         super();
     }
 
@@ -33,7 +33,7 @@ public class SvdKevent extends Structure {
      * @param udata opaque user data identifier
      * C type : void*
      */
-    public SvdKevent(NativeLong ident, short filter, short flags, int fflags, NativeLong data, Pointer udata) {
+    public kevent(NativeLong ident, short filter, short flags, int fflags, NativeLong data, Pointer udata) {
         super();
         this.ident = ident;
         this.filter = filter;
@@ -43,6 +43,6 @@ public class SvdKevent extends Structure {
         this.udata = udata;
     }
 
-    // public static class ByReference extends SvdKevent implements Structure.ByReference {};
-    // public static class ByValue extends SvdKevent implements Structure.ByValue {};
+    // public static class ByReference extends kevent implements Structure.ByReference {};
+    // public static class ByValue extends kevent implements Structure.ByValue {};
 }

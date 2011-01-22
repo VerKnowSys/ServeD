@@ -12,7 +12,7 @@ public interface SvdCLibrary extends Library {
     
     // see sys/event.h header file
     public int kqueue();
-    public int SvdKevent(int kq, SvdKevent change, int nchanges, SvdKevent event, int nevents, Pointer timeout);
+    public int kevent(int kq, kevent change, int nchanges, kevent event, int nevents, Pointer timeout);
     public void perror(String label);
     public int open(String filename, int flags);
     public void close(int fd);

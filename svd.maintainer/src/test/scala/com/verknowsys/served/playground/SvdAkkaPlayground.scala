@@ -53,7 +53,7 @@ object Server {
         val master = actorOf[Master]
         
         Supervisor(
-            SupervisorSvdConfig(
+            SupervisorConfig(
                 OneForOneStrategy(List(classOf[Foo]), 3, 1000),
                 Supervise(master, Permanent) :: Nil
             )

@@ -14,7 +14,7 @@
 // import actors._
 // import java.io._
 // import java.util.{UUID, Date, ArrayList}
-// import org.apache.commons.io.{FileSvdUtils, CopySvdUtils}
+// import org.apache.commons.io.{FileUtils, CopyUtils}
 // import org.apache.log4j.{ConsoleAppender, Level, PatternLayout, Logger}
 // import java.util.regex.{Matcher, Pattern}
 // import java.lang.String
@@ -150,7 +150,7 @@
 //                    signJar(t)
 //                  else { // don't sign jars when it's mac-app deploy
 //                    info("Copying jar: " + t.split("/").last)
-//                    FileSvdUtils.copyFileToDirectory(new File(t), new File(deployTmpDir)) // copy files to temporary dir
+//                    FileUtils.copyFileToDirectory(new File(t), new File(deployTmpDir)) // copy files to temporary dir
 //                  }
 //                  return true
 //                }
@@ -164,7 +164,7 @@
 //    def signJar(fileToBeSigned: String) = {
 //      new File(deployTmpDir).mkdir // make temporary place for jars before signinig
 //      info("Signing and copying jar: " + fileToBeSigned.split("/").last)
-//      FileSvdUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployTmpDir)) // copy files to temporary dir
+//      FileUtils.copyFileToDirectory(new File(fileToBeSigned), new File(deployTmpDir)) // copy files to temporary dir
 //      val signCommand = Array(
 //        props("jarSignerExecutable"), "-storepass", props("jarSignerPassword"),
 //        deployTmpDir + fileToBeSigned.split("/").last, props("jarSignerKeyName")
@@ -180,7 +180,7 @@
 //      backupDir.mkdir
 //      localDeployDir.mkdir
 //      info("Copying files from " + localDeployDir + " to " + backupDir)
-//      FileSvdUtils.copyDirectory(localDeployDir, backupDir)
+//      FileUtils.copyDirectory(localDeployDir, backupDir)
 //    }
 // 
 // 
@@ -194,7 +194,7 @@
 //          debug("COMPARATOR: " + comparator + ", -- diff?: " + comparator.diff_?)
 //          if (comparator.diff_?) {
 //            warn("File DIFFERENT: " + localFile.toString.split("/").last)
-//            FileSvdUtils.copyFileToDirectory(new File(deployTmpDir + localFile.toString.split("/").last), new File(codebaseLocalDir + "lib/"))
+//            FileUtils.copyFileToDirectory(new File(deployTmpDir + localFile.toString.split("/").last), new File(codebaseLocalDir + "lib/"))
 //          } else {
 //            info("File IDENTICAL: " + localFile.toString.split("/").last)
 //          }
@@ -218,17 +218,17 @@
 //        val tempJnlpFileName = "/tmp/" + props("jnlpFileName")
 //        jnlp.saveJNLP(tempJnlpFileName)
 //        info("Putting JNLP file to local deploy dir")
-//        FileSvdUtils.copyFileToDirectory(new File(tempJnlpFileName), new File(codebaseLocalDir))
+//        FileUtils.copyFileToDirectory(new File(tempJnlpFileName), new File(codebaseLocalDir))
 //      }
 //    }
 // 
 // 
 //    def copyAndInstallMacApp = {
 //      info("Copying jars to temporary mac app")
-//      FileSvdUtils.copyDirectory(new File(deployTmpDir), new File(codebaseLocalDir + "../Coviob.app/lib")) // XXX: hardcoded Coviob.app name
+//      FileUtils.copyDirectory(new File(deployTmpDir), new File(codebaseLocalDir + "../Coviob.app/lib")) // XXX: hardcoded Coviob.app name
 //      // XXX: application skeleton must be uploaded to ~/.svd before deploy
 //      info("Copying Application to /Applications")
-//      FileSvdUtils.copyDirectory(new File(codebaseLocalDir + "../Coviob.app"), new File("/Applications/Coviob.app"))
+//      FileUtils.copyDirectory(new File(codebaseLocalDir + "../Coviob.app"), new File("/Applications/Coviob.app"))
 //      info("Making executable of app starting script..")
 //      CommandExec.cmdExec(Array("chmod", "777", "/Applications/Coviob.app/Contents/MacOS/coviob2")) // XXX: why the fuck copying files will result changing permissions to files?!
 //    }

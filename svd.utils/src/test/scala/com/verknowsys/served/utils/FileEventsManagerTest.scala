@@ -6,7 +6,7 @@ import com.verknowsys.served.spechelpers._
 import com.verknowsys.served.utils.signals.Success
 import org.specs.Specification
 import java.io._
-import org.apache.commons.io.FileSvdUtils
+import org.apache.commons.io.FileUtils
 
 import akka.actor._
 import akka.actor.Actor._
@@ -15,7 +15,7 @@ class TestSvdFileEventsReactor extends SvdExpectActor with SvdFileEventsReactor 
     registerFileEventFor("/tmp/served/file_events_test/single", Modified)
 }
 
-class FileEventsSvdManagerTest extends Specification with SvdExpectActorSpecification {
+class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecification {
     final val DIR = "/tmp/served/file_events_test"
     
     var fw: ActorRef = null
@@ -51,11 +51,11 @@ class FileEventsSvdManagerTest extends Specification with SvdExpectActorSpecific
     
     var fem: ActorRef = null
         
-    "FileEventsSvdManager" should {
+    "SvdFileEventsManager" should {
         doBefore { 
             beforeSvdExpectActor 
-            try { FileSvdUtils.forceDelete(DIR) } catch { case _ => }
-            fem = actorOf[FileEventsSvdManager].start   
+            try { FileUtils.forceDelete(DIR) } catch { case _ => }
+            fem = actorOf[SvdFileEventsManager].start   
         }
         
         doAfter { 
@@ -63,8 +63,8 @@ class FileEventsSvdManagerTest extends Specification with SvdExpectActorSpecific
             registry.shutdownAll 
         }
         
-        "start FileEventsSvdManager withus SvdFileWatcher" in {
-            registry.actorsFor[FileEventsSvdManager] must haveSize(1)
+        "start SvdFileEventsManager withus SvdFileWatcher" in {
+            registry.actorsFor[SvdFileEventsManager] must haveSize(1)
             registry.actorsFor[SvdFileWatcher] must haveSize(0)
         }
             
@@ -74,7 +74,7 @@ class FileEventsSvdManagerTest extends Specification with SvdExpectActorSpecific
             fem ! RegisterFileEvent(DIR + "/single", 0x02)
             expectActor ? Success
             
-            registry.actorsFor[FileEventsSvdManager] must haveSize(1)
+            registry.actorsFor[SvdFileEventsManager] must haveSize(1)
             registry.actorsFor[SvdFileWatcher] must haveSize(1)            
         }
         
