@@ -27,7 +27,7 @@ class SvdProcess(
     val command: String = "",
     val user: String = "nobody",
     val workDir: String = "/tmp/",
-    val outputRedirectDestination: String = "/tmp/served_redirXXX",
+    val outputRedirectDestination: String = "/tmp/served_output_XXX", // 2011-01-22 17:39:06 - dmilith - NOTE: TODO: add date, and sha1
     val useShell: Boolean = true)
         extends Logging {
     
@@ -76,7 +76,7 @@ class SvdProcess(
     def process: Long = {
         var aPid: Long = 0L
         val cmdFormats = if (useShell) "%s -u %s -s %s > %s 2>&1" else "%s -u %s %s > %s 2>&1"
-        val cmd =  cmdFormats.format(SvdConfig.globalSudoExec, user, command, outputRedirectDestination).split(" ")
+        val cmd =  cmdFormats.format("sudo", user, command, outputRedirectDestination).split(" ")
         val rt = Runtime.getRuntime
         val env = SvdConfig.env
         val proc = rt.exec(cmd, env)

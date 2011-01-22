@@ -70,12 +70,12 @@ trait SvdExpectActorSpecification {
     var expectActor: ActorRef = null
     implicit var senderOption: Option[ActorRef] = None
     
-    def beforeSvdExpectActor {
+    def beforeExpectActor {
         expectActor = actorOf[SvdExpectActor].start
         senderOption = Some(expectActor)
     }
     
-    def afterSvdExpectActor {
+    def afterExpectActor {
         expectActor.stop
     }
 }

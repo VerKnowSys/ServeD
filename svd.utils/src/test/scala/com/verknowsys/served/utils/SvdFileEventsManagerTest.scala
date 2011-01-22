@@ -26,13 +26,13 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
         
     "SvdFileEventsManager" should {
         doBefore { 
-            beforeSvdExpectActor 
+            beforeExpectActor 
             try { FileUtils.forceDelete(DIR) } catch { case _ => }
             fem = actorOf[SvdFileEventsManager].start   
         }
         
         doAfter { 
-            afterSvdExpectActor
+            afterExpectActor
             registry.shutdownAll 
         }
         
@@ -54,7 +54,7 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
         "spawn new file watcher using SvdFileEventsReactor trait" in {
             touch(DIR + "/single")
             
-            expectActor = actorOf[TestSvdFileEventsReactor].start
+            expectActor = actorOf[TestFileEventsReactor].start
             senderOption = Some(expectActor)
             
             expectActor ? Success
@@ -63,7 +63,7 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
         "notify actors when file modified" in {
             touch(DIR + "/single")
             
-            expectActor = actorOf[TestSvdFileEventsReactor].start
+            expectActor = actorOf[TestFileEventsReactor].start
             senderOption = Some(expectActor)
             
             expectActor ? Success

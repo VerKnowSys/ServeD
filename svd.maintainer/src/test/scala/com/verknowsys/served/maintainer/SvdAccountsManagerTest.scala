@@ -1,7 +1,7 @@
 package com.verknowsys.served.maintainer
 
 import com.verknowsys.served.utils.SvdFileEventsManager
-import com.verknowsys.served.SpecHelpers._
+import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.spechelpers._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.managers._
@@ -14,16 +14,16 @@ import akka.actor.Actor._
 class SvdAccountsManagerTest extends Specification with SvdExpectActorSpecification {
     def changePasswdPath(path: String) {
         val passwd = readFile(System.getProperty("user.dir") + "/svd.maintainer/src/test/resources/etc/" + path)
-        writeFile(Config.systemPasswdFile, passwd)
+        writeFile(SvdConfig.systemPasswdFile, passwd)
     }      
     
-    def waitForKqueue = waitFor(500)
+    def waitForKqueue = waitFor(500) // 2011-01-22 17:41:34 - dmilith - XXX: hardcode
     
     var am: ActorRef = null
     var fem: ActorRef = null
     
-    "AccountsManager" should {
-        doBefore { 
+    "SvdAccountsManager" should {
+        doBefore {
             beforeExpectActor
             fem = actorOf[SvdFileEventsManager].start
         }

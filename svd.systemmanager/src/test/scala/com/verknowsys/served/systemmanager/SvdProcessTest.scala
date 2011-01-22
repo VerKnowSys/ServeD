@@ -13,6 +13,9 @@ import java.io._
 import java.lang._
 
 
+
+// 2011-01-22 17:57:49 - dmilith - TODO: extend tests for some critical moments: segvs, ooms and similar app behaviour
+
 class SvdProcessTest extends Specification {
 
 
@@ -55,41 +58,57 @@ class SvdProcessTest extends Specification {
         
         "it must be able to run df process properly using default PATH settings" in {
             var a: SvdProcess = null
-            try {
-                synchronized {
-                    a = new SvdProcess("df", outputRedirectDestination = "/tmp/served_DUPA", useShell = true, user = "root")
+            synchronized {
+                try {
+                    a = new SvdProcess("df", outputRedirectDestination = "/tmp/served_df_abc", useShell = true, user = "root")
                     Thread.sleep(500)
                     a.alive must be(false)
+                    a = null
+                } catch { 
+                    case x: Any =>
+                        fail("Exception occured: " + x)
                 }
-                a = null
-            } catch { 
-                case x: Any =>
-                    fail("Exception occured: " + x)
+                try { 
+                    new SvdSystemProcess(a.pid)
+                    fail("SvdProcess pid should be non existant")
+                } catch {
+                    case _ =>
+                }
+                a must beNull
             }
-            try { 
-                new SvdSystemProcess(a.pid)
-                fail("SvdProcess pid should be non existant")
-            } catch {
-                case _ =>
-            }
-            a must beNull
         }
 
 
-        "it must be able to check that process is alive or not" in {
+        // 2011-01-22 18:02:08 - dmilith - TODO: add sam test with shell
+        "it must be able to check that process is alive or not without shell" in {
             var a: SvdProcess = null
-            try {
-                synchronized {
-                    a = new SvdProcess("memcached", useShell = false)
-                    Thread.sleep(500)
-                    a.alive must be(true)
+            var b: SvdProcess = null
+                try {
+                    synchronized {
+                        a = new SvdProcess("memcached -u nobody", user = "root", useShell = false, outputRedirectDestination = "/tmp/served_memcached")
+                        a must notBeNull
+                        ("pid:" :: "cmd:" :: Nil).foreach{
+                            elem =>
+                                a.toString must beMatching(elem)
+                        }
+                    }
+                } catch {
+                    case e: Exception =>
+                        fail("Alive isn't working well? Exception: %s, Object: %s".format(e.getMessage, a))
                 }
-            } catch {
-                case e: Exception =>
-                    fail("Alive isn't working well? It's %s".format(a.alive))
-            }
+                synchronized {
+                    b = new SvdProcess("kill %d".format(a.pid), user = "root", useShell = false, outputRedirectDestination = "/tmp/served_kill")
+                    b must notBeNull
+                    ("pid:" :: "cmd:" :: Nil).foreach{
+                        elem =>
+                            b.toString must beMatching(elem)
+                    }
+                }
+                
+                // Thread.sleep(500)
+                // b.alive must be(false)
+            // }
             // 2011-01-20 11:00:04 - dmilith - hacky: kill memcached after test pass
-            new SvdProcess("kill %d".format(a.pid), user = "root")
         }
 
     } // test should

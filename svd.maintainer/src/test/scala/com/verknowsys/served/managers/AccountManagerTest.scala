@@ -1,17 +1,17 @@
 package com.verknowsys.served.managers
 
-import com.verknowsys.served.SpecHelpers._
+import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.spechelpers._
-import com.verknowsys.served.maintainer.Account
+import com.verknowsys.served.maintainer.SvdAccount
 import org.specs._
 
 import akka.actor._
 import akka.actor.Actor._
 
-class AccountManagerTest extends Specification with ExpectActorSpecification {
+class SvdAccountManagerTest extends Specification with SvdExpectActorSpecification {
     var am: ActorRef = null
     
-    "AccountManager" should {
+    "SvdAccountManager" should {
         doBefore { 
             beforeExpectActor
         }
@@ -22,8 +22,8 @@ class AccountManagerTest extends Specification with ExpectActorSpecification {
         }
         
         "respond to GetAccount" in {
-            val account = new Account(userName = "teamon")
-            am = actorOf(new AccountManager(account)).start
+            val account = new SvdAccount(userName = "teamon")
+            am = actorOf(new SvdAccountManager(account)).start
             am ! GetAccount
             expectActor ? account
         }

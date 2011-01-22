@@ -43,8 +43,6 @@ object SvdConfig {
      */
 
      
-    def globalSudoExec = props("globalSudoExec") or "/usr/local/bin/sudo"
-    
     def servedUserName = props("servedUserName") or "served"
     
     def systemPasswdFile = props("systemPasswdFile") or homePath + vendorDir + "etc/passwd"
