@@ -9,14 +9,14 @@ import com.verknowsys.served.api._
 import com.verknowsys.served.managers._
 
 
-class ApiSession extends Actor with Dispatcher {
+class SvdApiSession extends Actor with Dispatcher {
     private var manager: Option[ActorRef] = None // XXX: Var
     
     override def receive = {
         case General.Connect(username) =>
             log.trace("Remote client trying to connect with username %s", username)
 
-            (registry.actorFor[AccountsManager] flatMap (_ !! GetAccountManager(username))) match {
+            (registry.actorFor[SvdAccountsManager] flatMap (_ !! GetAccountManager(username))) match {
                 case Some(m: ActorRef) =>
                     manager = Some(m)
                     become(dispatch)
@@ -38,12 +38,12 @@ class ApiSession extends Actor with Dispatcher {
     }
 }
 
-object ApiServer {
+object SvdApiServer {
     final val host = "localhost"
     final val port = 5555
     
     def start {
         Actor.remote.start(host, port)
-        Actor.remote.registerPerSession("service:api", actorOf[ApiSession])
+        Actor.remote.registerPerSession("service:api", actorOf[SvdApiSession])
     }
 }

@@ -5,7 +5,7 @@ package com.verknowsys.served.maintainer
 
 // import com.verknowsys.served.api._
 import com.verknowsys.served.SvdConfig
-import com.verknowsys.served.utils.{Utils, SvdFileEventsManager}
+import com.verknowsys.served.utils.{SvdUtils, SvdFileEventsManager}
 // import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.systemmanager.SvdSystemManager
 
@@ -20,16 +20,16 @@ import akka.util.Logging
  *
  *  @author dmilith, teamon
  */
-class Maintainer(skipSSM: Boolean = false) extends Actor with Logging {
+class SvdMaintainer(skipSSM: Boolean = false) extends Actor with Logging {
     log.trace("Maintainer is loading")
     
-    self.spawnLink[FileEventsManager]
-    self.spawnLink[AccountsManager]
+    self.spawnLink[SvdFileEventsManager]
+    self.spawnLink[SvdAccountsManager]
     
     if(skipSSM) log.warn("Skipped SvdSystemManager spawn")
     else self.spawnLink[SvdSystemManager]
     
-    ApiServer.start
+    SvdApiServer.start
     
     def receive = {
         case x => log.warn("not recognized message %s", x)
@@ -62,9 +62,9 @@ object SvdMaintainer extends Logging {
         }}
 
          
-        if(!skip) Utils.rootCheck // TODO: Move it to SSM
+        if(!skip) SvdUtils.rootCheck // TODO: Move it to SSM
         
-        actorOf(new Maintainer(skip)).start ! 0
+        actorOf(new SvdMaintainer(skip)).start ! 0
                 
         // Utils.addShutdownHook {
         //     SvdSystemManager ! Quit

@@ -15,22 +15,22 @@ import com.verknowsys.served.api._
 
 case class GetAccountManager(username: String)
 
-class AccountsManager extends Actor with FileEventsReactor with Logging {
+class SvdAccountsManager extends Actor with SvdFileEventsReactor with Logging {
     // case object ReloadUsers
     // case class CheckUser(val username: String)
     
     respawnUsersActors
     
-    registerFileEventFor(Config.systemPasswdFile, Modified)
+    registerFileEventFor(SvdConfig.systemPasswdFile, Modified)
         
     def receive = {
-        case FileEvent(path, Modified) => 
+        case SvdFileEvent(path, Modified) => 
             log.trace("Passwd file modified")
             respawnUsersActors
             
         case GetAccountManager(username) =>
-            registry.actorsFor[AccountManager].find { e => 
-                (e !! GetAccount) collect { case a: Account => a.userName == username } getOrElse false 
+            registry.actorsFor[SvdAccountManager].find { e => 
+                (e !! GetAccount) collect { case a: SvdAccount => a.userName == username } getOrElse false 
             } match {
                 case Some(ref: ActorRef) => self reply ref
                 case _ => self reply Error("AccountManeger for username %s not found".format(username))
@@ -110,7 +110,7 @@ class AccountsManager extends Actor with FileEventsReactor with Logging {
      * Function to parse and convert List[String] of passwd file entries to List[SvdAccount]
      * @author dmilith
      */
-    // protected def allSvdAccounts = {
+    // protected def allAccounts = {
     //     val rawData = Source.fromFile(SvdConfig.systemPasswdFile, "utf-8").getLines.toList
     //     for(line <- rawData if !line.startsWith("#")) // XXX: hardcode
     //         yield
@@ -120,11 +120,11 @@ class AccountsManager extends Actor with FileEventsReactor with Logging {
     private def respawnUsersActors {
         // kill all Account Managers
         log.trace("Actor.registry size before: %d", registry.actors.size)
-        registry.actorsFor[AccountManager] foreach { _.stop }
+        registry.actorsFor[SvdAccountManager] foreach { _.stop }
         
         // spawn Account Manager for each account entry in passwd file
         userAccounts foreach { account =>
-            val manager = actorOf(new AccountManager(account))
+            val manager = actorOf(new SvdAccountManager(account))
             self.link(manager)
             manager.start
         }
@@ -135,7 +135,7 @@ class AccountsManager extends Actor with FileEventsReactor with Logging {
      * Function to parse and convert passwd file entries to List[Account]
      * @author teamon
      */
-    protected def allSvdAccounts = {
+    protected def allAccounts = {
         val rawData = Source.fromFile(SvdConfig.systemPasswdFile, "utf-8").getLines.toList
         for(SvdAccount(account) <- rawData) yield account
     }
@@ -145,6 +145,6 @@ class AccountsManager extends Actor with FileEventsReactor with Logging {
      * Returns only normal users' accounts
      * @author teamon
      */
-    protected def userSvdAccounts = allSvdAccounts.filter(_.isUser)
+    protected def userAccounts = allAccounts.filter(_.isUser)
     
 }

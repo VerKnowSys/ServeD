@@ -8,38 +8,27 @@ import akka.actor.Actor.actorOf
 import akka.util.Logging
 
 import com.verknowsys.served.utils.signals.{Success, Failure}
+import events._
+
 
 object events {
     case class SvdKqueueFileEvent(ident: Int, flags: Int)
     case class SvdFileEvent(path: String, flags: Int)
-    case class RegisterFile SvdRegisterFileEventEvent(path: String, flags: Int, ref: ActorRef)
+    case class SvdRegisterFileEvent(path: String, flags: Int, ref: ActorRef)
 
     class SvdKqueueException extends Exception
-    class SvdKeventExceptionKeventException extends Exception
+    class SvdKeventException extends Exception
     class SvdFileOpenException extends Exception
 }
 
-/** 
- * File watcher actor. It receives kqueue events and sends message to [owner] if flags match 
- * 
- * @param owner Owner actor of this file watch
- * @param path File path to watch
- * @param flags kqueue flags to watch
- * @author teamon
- */
-class SvdFileWatcher(val owner: ActorRef, val path: String, val flags: Int) extends Actor with Logging {
-    log.trace("Starting new SvdFileWatcher for %s with %s and %s", owner, path, flags)
-}
-
-import events._
 
 trait SvdFileEventsReactor {
     self: Actor with Logging =>
     
-    final val Modified          = CLibrary.NOTE_WRITE | CLibrary.NOTE_EXTEND
-    final val Deleted           = CLibrary.NOTE_DELETE
-    final val Renamed           = CLibrary.NOTE_RENAME
-    final val AttributesChanged = CLibrary.NOTE_ATTRIB
+    final val Modified          = SvdCLibrary.NOTE_WRITE | SvdCLibrary.NOTE_EXTEND
+    final val Deleted           = SvdCLibrary.NOTE_DELETE
+    final val Renamed           = SvdCLibrary.NOTE_RENAME
+    final val AttributesChanged = SvdCLibrary.NOTE_ATTRIB
     
     def registerFileEventFor(path: String, flags: Int){
         Actor.registry.actorFor[SvdFileEventsManager] match {
