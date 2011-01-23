@@ -11,17 +11,18 @@ import com.verknowsys.served.utils.signals._
 import akka.actor.Actor
 import akka.util.Logging
 
+
 object SvdNotificationCenter extends Actor with Logging {
     case class Message(message: String)
     case class Status(status: String)
     
     // XXX: Hardcoded gate
     val gates: List[Gate] = new SvdXMPPGate(
-        SvdConfig("xmpp.host") or "localhost", 
-        SvdConfig("xmpp.port") or 5222,
-        SvdConfig("xmpp.login") or "gitbot",
-        SvdConfig("xmpp.password") or "git-bot-666",
-        SvdConfig("xmpp.resource") or "served-bot-resource"
+        SvdConfig.notificationXmppHost, 
+        SvdConfig.notificationXmppPort,
+        SvdConfig.notificationXmppLogin,
+        SvdConfig.notificationXmppPassword,
+        SvdConfig.notificationXmppResource
     ) :: Nil
     
     override def preStart {

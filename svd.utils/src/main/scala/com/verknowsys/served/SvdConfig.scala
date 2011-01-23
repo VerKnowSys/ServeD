@@ -36,13 +36,19 @@ object SvdConfig {
      */
 
      
-    def defaultEncoding =       props("served.system.encoding") or "UTF-8"
-    def defaultPathEnviroment = props("served.system.terminal.environment.path") or "$HOME/bin:$HOME/Bin:/bin:/usr/bin:/usr/local/bin"
-    def defaultTmpDir =         props("served.system.terminal.environment.tmpdir") or "/tmp/"
-    def terminalType =          props("served.system.terminal.environment.term") or "xterm-color"
-    def terminalCommandMode =   props("served.system.terminal.environment.mode") or "unix2003"
-    def servedUserName =        props("served.system.username") or "served"
-    def systemPasswdFile =      props("served.system.password.filename") or homePath + vendorDir + "etc/passwd"
+    def defaultEncoding =           props("served.system.encoding") or "UTF-8"
+    def defaultPathEnviroment =     props("served.system.terminal.environment.path") or "$HOME/bin:$HOME/Bin:/bin:/usr/bin:/usr/local/bin"
+    def defaultTmpDir =             props("served.system.terminal.environment.tmpdir") or "/tmp/"
+    def terminalType =              props("served.system.terminal.environment.term") or "xterm-color"
+    def terminalCommandMode =       props("served.system.terminal.environment.mode") or "unix2003"
+    def servedUserName =            props("served.system.username") or "served"
+    def systemPasswdFile =          props("served.system.password.filename") or homePath + vendorDir + "etc/passwd"
+    
+    def notificationXmppHost =      props("served.notification.xmpp.host") or "127.0.0.1"
+    def notificationXmppPort =      props("served.notification.xmpp.port") or 5222
+    def notificationXmppLogin =     props("served.notification.xmpp.login") or "gitbot"
+    def notificationXmppPassword =  props("served.notification.xmpp.password") or "git-bot-666"
+    def notificationXmppResource =  props("served.notification.xmpp.resource") or "served-bot-notifier"
     // def sizeMultiplier =        props("served.output.multiplier") or 1024
     
     
