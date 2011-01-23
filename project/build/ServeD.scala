@@ -106,11 +106,10 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     class SvdMaintainer(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
         val dispatch = "net.databinder" %% "dispatch-http" % "0.7.8"
 
-        lazy val served = task { None } dependsOn(run(Array("--monitor")))
+        lazy val served = task { None } dependsOn(run(Array()))
         lazy val svd = served
-        lazy val servedSkipSsm = task { None } dependsOn(run(Array("--skip-ssm")))
         
-        override def mainClass = Some("com.verknowsys.served.maintainer.SvdMaintainer")
+        override def mainClass = Some("com.verknowsys.served.boot")
     }
     
     // Other

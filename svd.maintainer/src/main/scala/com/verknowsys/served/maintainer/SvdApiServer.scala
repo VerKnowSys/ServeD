@@ -38,12 +38,3 @@ class SvdApiSession extends Actor with Dispatcher {
     }
 }
 
-object SvdApiServer {
-    final val host = "localhost"
-    final val port = 5555
-    
-    def start {
-        Actor.remote.start(host, port)
-        Actor.remote.registerPerSession("service:api", actorOf[SvdApiSession])
-    }
-}

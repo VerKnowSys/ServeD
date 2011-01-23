@@ -54,6 +54,9 @@ object SvdConfig {
     def notificationXmppPassword =     props("served.notification.xmpp0.password") or "git-bot-666"
     def notificationXmppResource =     props("served.notification.xmpp0.resource") or "served-bot-notifier"
     
+    def remoteApiServerHost =          props("served.remote.apiserver.host") or "localhost"
+    def remoteApiServerPort =          props("served.remote.apiserver.port") or 5555
+    
     
     def apply(key: String) = props(key)
     

@@ -28,7 +28,7 @@ case class ProcessesList(pids: List[Long])
 *   SvdSystemManager - responsible for System Managment and SvdMonitoring
 */
 class SvdSystemManager extends Actor with Logging {
-    log.trace("SvdSystemManager is loading")
+    log.info("SvdSystemManager is loading")
     
     private val core = new Sigar
     private val processes = ListBuffer[SvdProcess]()
