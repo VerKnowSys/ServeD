@@ -87,19 +87,19 @@ class SvdProcessTest extends Specification {
                     synchronized {
                         a = new SvdProcess("memcached -u nobody", user = "root", useShell = false, outputRedirectDestination = "/tmp/served_memcached")
                         a must notBeNull
-                        ("pid:" :: "cmd:" :: Nil).foreach{
+                        ("pid:" :: "cmdSvdProc:" :: Nil).foreach{
                             elem =>
                                 a.toString must beMatching(elem)
                         }
                     }
                 } catch {
                     case e: Exception =>
-                        fail("Alive isn't working well? Exception: '%s', Object: '%s'".format(e.getMessage, a))
+                        fail("Alive isn't working well? Exception: %s, Object: %s".format(e.getMessage, a))
                 }
                 synchronized {
                     b = new SvdProcess("kill %d".format(a.pid), user = "root", useShell = false, outputRedirectDestination = "/tmp/served_kill")
                     b must notBeNull
-                    ("pid:" :: "cmd:" :: Nil).foreach{
+                    ("pid:" :: "cmdSvdProc:" :: Nil).foreach{
                         elem =>
                             b.toString must beMatching(elem)
                     }

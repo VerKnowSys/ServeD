@@ -4,10 +4,12 @@
 package com.verknowsys.served.maintainer
 
 // import com.verknowsys.served.api._
+import com.verknowsys.served.notifications._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils.{SvdUtils, SvdFileEventsManager}
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.systemmanager.SvdSystemManager
+import com.verknowsys.served.systemmanager.ProcessesList
 
 // akka
 import akka.actor.Actor
@@ -35,7 +37,16 @@ class SvdMaintainer(skipSSM: Boolean = false) extends Actor with Logging {
     SvdApiServer.start
     
     def receive = {
-        case x => log.warn("not recognized message %s", x)
+        case Init =>
+            registry.actorFor[SvdSystemManager] foreach { _ ! GetAllProcesses }
+        
+        case ProcessesList(pids) =>
+            log.trace("Got pids: %s", pids)
+            Thread.sleep(2000)
+            registry.actorFor[SvdSystemManager] foreach { _ ! GetAllProcesses }
+            
+        case x => 
+            log.warn("not recognized message %s", x)
     }
 }
     
@@ -69,8 +80,10 @@ object SvdMaintainer extends Logging {
          
         if(!skip) SvdUtils.rootCheck // TODO: Move it to SSM
         
-        actorOf(new SvdMaintainer(skip)).start ! 0
-                
+        actorOf(new SvdMaintainer(skip)).start ! Init
+        
+        actorOf(SvdNotificationCenter).start ! Status("Ready!")
+        
         // Utils.addShutdownHook {
         //     SvdSystemManager ! Quit
         //     AccountsManager ! Quit

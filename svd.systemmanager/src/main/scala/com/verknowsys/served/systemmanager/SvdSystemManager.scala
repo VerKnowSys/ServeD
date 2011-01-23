@@ -19,6 +19,8 @@ import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
 import akka.util.Logging
 
+case class ProcessesList(pids: List[Long])
+
 
 /**
 *   @author dmilith
@@ -81,10 +83,11 @@ class SvdSystemManager extends Actor with Logging {
         case GetAllProcesses =>
             val psAll = core.getProcList.toList
             log.debug("All process IDs: %s".format(psAll.mkString(", ")))
-            psAll.foreach {
-                p =>
-                	log.trace(new SvdSystemProcess(p).toString)
-            }
+            // psAll.foreach {
+            //     p =>
+            //      log.trace(new SvdSystemProcess(p).toString)
+            // }
+            self reply ProcessesList(psAll)
             
         case GetRunningProcesses =>
             log.debug("Processes running by ServeD: %s".format(processes.mkString(", ")))

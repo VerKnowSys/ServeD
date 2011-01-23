@@ -6,6 +6,7 @@ import com.verknowsys.served.utils.git._
 import com.verknowsys.served.utils.signals._
 
 import akka.actor.Actor
+import akka.util.Logging
 
 
 object SvdNotificationCenter extends Actor with Logging {

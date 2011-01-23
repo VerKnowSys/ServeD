@@ -3,14 +3,15 @@ package com.verknowsys.served.utils
 import org.specs._
 import com.verknowsys.served.SvdSpecHelpers._
 
-class PropertiesTest extends Specification {
+
+class SvdPropertiesTest extends Specification {
     final val configFilename = "/tmp/config.properties"
     
-    "Properties" should {
+    "SvdProperties" should {
         doBefore { setupSvdConfigFile }
 
         "read from file" in {
-            val props = new Properties(configFilename)
+            val props = new SvdProperties(configFilename)
             val a1 = props("app.existing.config.one") or ""
             val a2 = props("app.existing.other.config.two") or ""
             val a3 = props("app.not.existing.something") or "my default"
@@ -20,7 +21,7 @@ class PropertiesTest extends Specification {
         }
         
         "convert value to correct type" in {
-            val props = new Properties(configFilename)
+            val props = new SvdProperties(configFilename)
             
             val i1 = props("some.nice.integer") or 0
             val i2 = props("some.bad.integer") or 42
@@ -42,12 +43,12 @@ class PropertiesTest extends Specification {
         }
         
         "update properties file" in {
-            val props = new Properties(configFilename)
+            val props = new SvdProperties(configFilename)
             props("app.new.property.foo") = "very new"
             val s = props("app.new.property.foo") or ""
             s must_== "very new"
 
-            val new_props = new Properties(configFilename)
+            val new_props = new SvdProperties(configFilename)
             val s1 = new_props("app.existing.config.one") or "nothing!"
             val s2 = new_props("app.existing.other.config.two") or "nothing!"
             val s3 = new_props("app.not.existing.something") or "nothing!"
@@ -60,12 +61,12 @@ class PropertiesTest extends Specification {
         }
         
         "convert back to string" in {
-            val props = new Properties(configFilename)
+            val props = new SvdProperties(configFilename)
             props("some.bad.integer") = 4001
             props("some.bad.double") = 99.999
             props("some.bad.boolean") = true
 
-            val new_props = new Properties(configFilename)
+            val new_props = new SvdProperties(configFilename)
             val i1 = new_props("some.bad.integer") or 0
             val d1 = new_props("some.bad.double") or 0.0
             val b1 = new_props("some.bad.boolean") or false
@@ -80,47 +81,47 @@ class PropertiesTest extends Specification {
     
     "PropertyConverter" should {
         "StringPropertyConverter" in {
-            Property.StringPropertyConverter("foo") must_== Some("foo")
-            Property.StringPropertyConverter("bar") must_== Some("bar")
-            Property.StringPropertyConverter("") must_== Some("")
+            SvdProperty.StringPropertyConverter("foo") must_== Some("foo")
+            SvdProperty.StringPropertyConverter("bar") must_== Some("bar")
+            SvdProperty.StringPropertyConverter("") must_== Some("")
             
-            Property.StringPropertyConverter.toString("foo") must_== "foo"
-            Property.StringPropertyConverter.toString("bar") must_== "bar"
-            Property.StringPropertyConverter.toString("") must_== ""
+            SvdProperty.StringPropertyConverter.toString("foo") must_== "foo"
+            SvdProperty.StringPropertyConverter.toString("bar") must_== "bar"
+            SvdProperty.StringPropertyConverter.toString("") must_== ""
         }
         
         "IntPropertyConverter" in {
-            Property.IntPropertyConverter("1") must_== Some(1)
-            Property.IntPropertyConverter("123") must_== Some(123)
-            Property.IntPropertyConverter("-68") must_== Some(-68)
-            Property.IntPropertyConverter("42.634") must_== None
-            Property.IntPropertyConverter("") must_== None
-            Property.IntPropertyConverter("foo") must_== None
+            SvdProperty.IntPropertyConverter("1") must_== Some(1)
+            SvdProperty.IntPropertyConverter("123") must_== Some(123)
+            SvdProperty.IntPropertyConverter("-68") must_== Some(-68)
+            SvdProperty.IntPropertyConverter("42.634") must_== None
+            SvdProperty.IntPropertyConverter("") must_== None
+            SvdProperty.IntPropertyConverter("foo") must_== None
             
-            Property.IntPropertyConverter.toString(1) must_== "1"
-            Property.IntPropertyConverter.toString(-6) must_== "-6"
+            SvdProperty.IntPropertyConverter.toString(1) must_== "1"
+            SvdProperty.IntPropertyConverter.toString(-6) must_== "-6"
         }
         
         "DoublePropertyConverter" in {
-            Property.DoublePropertyConverter("1.0") must_== Some(1.0)
-            Property.DoublePropertyConverter("123.456") must_== Some(123.456)
-            Property.DoublePropertyConverter("-68") must_== Some(-68.0)
-            Property.DoublePropertyConverter("") must_== None
-            Property.DoublePropertyConverter("foo") must_== None
+            SvdProperty.DoublePropertyConverter("1.0") must_== Some(1.0)
+            SvdProperty.DoublePropertyConverter("123.456") must_== Some(123.456)
+            SvdProperty.DoublePropertyConverter("-68") must_== Some(-68.0)
+            SvdProperty.DoublePropertyConverter("") must_== None
+            SvdProperty.DoublePropertyConverter("foo") must_== None
             
-            Property.DoublePropertyConverter.toString(1.0) must_== "1.0"
-            Property.DoublePropertyConverter.toString(-6.5) must_== "-6.5"
+            SvdProperty.DoublePropertyConverter.toString(1.0) must_== "1.0"
+            SvdProperty.DoublePropertyConverter.toString(-6.5) must_== "-6.5"
         }
         
         "DoublePropertyConverter" in {
-            Property.BooleanPropertyConverter("true") must_== Some(true)
-            Property.BooleanPropertyConverter("false") must_== Some(false)
-            Property.BooleanPropertyConverter("-68") must_== None
-            Property.BooleanPropertyConverter("") must_== None
-            Property.BooleanPropertyConverter("foo") must_== None
+            SvdProperty.BooleanPropertyConverter("true") must_== Some(true)
+            SvdProperty.BooleanPropertyConverter("false") must_== Some(false)
+            SvdProperty.BooleanPropertyConverter("-68") must_== None
+            SvdProperty.BooleanPropertyConverter("") must_== None
+            SvdProperty.BooleanPropertyConverter("foo") must_== None
             
-            Property.BooleanPropertyConverter.toString(true) must_== "true"
-            Property.BooleanPropertyConverter.toString(false) must_== "false"
+            SvdProperty.BooleanPropertyConverter.toString(true) must_== "true"
+            SvdProperty.BooleanPropertyConverter.toString(false) must_== "false"
         }
     }
 

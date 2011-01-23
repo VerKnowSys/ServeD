@@ -14,7 +14,7 @@ import com.verknowsys.served.utils.SvdBenchmark
  * 
  * @author teamon
  */
-object StringReplace {
+object SvdStringReplace {
     def main(args: Array[String]): Unit = {
         SvdBenchmark(100000){ b =>
             b("format "){ "%s and %s".format("aaa", "bbb") }

@@ -1,9 +1,10 @@
 package com.verknowsys.served.notifications
 
-import scala.collection.mutable.ListBuffer
 
+import com.verknowsys.served._
+
+import scala.collection.mutable.ListBuffer
 import akka.util.Logging
-    
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
@@ -88,7 +89,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
     
 
     
-    def jids = SvdConfig.notificationRecipients.split(",")
+    def jids = SvdConfig.notificationXmppRecipients.split(",")
     
     
 }

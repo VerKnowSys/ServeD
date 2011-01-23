@@ -11,10 +11,10 @@ import org.apache.commons.io.FileUtils
 import akka.actor._
 import akka.actor.Actor._
 
-object TestReactor extends SvdExpectActor with SvdFileEventsReactor
-import TestReactor._
+object SvdTestReactor extends SvdExpectActor with SvdFileEventsReactor
+import SvdTestReactor._
 
-class TestFileEventsReactor extends SvdExpectActor with SvdFileEventsReactor {
+class SvdTestFileEventsReactor extends SvdExpectActor with SvdFileEventsReactor {
     override def preStart {
         registerFileEventFor("/tmp/served/file_events_test/single", Modified)
     }
@@ -56,7 +56,7 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
         "spawn new file watcher using SvdFileEventsReactor trait" in {
             touch(DIR + "/single")
             
-            expectActor = actorOf[TestFileEventsReactor].start
+            expectActor = actorOf[SvdTestFileEventsReactor].start
             senderOption = Some(expectActor)
             
             expectActor ? Success
@@ -65,7 +65,7 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
         "notify actors when file modified" in {
             touch(DIR + "/single")
             
-            expectActor = actorOf[TestFileEventsReactor].start
+            expectActor = actorOf[SvdTestFileEventsReactor].start
             senderOption = Some(expectActor)
             
             expectActor ? Success

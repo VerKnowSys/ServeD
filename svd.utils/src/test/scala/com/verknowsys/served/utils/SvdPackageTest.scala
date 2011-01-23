@@ -2,7 +2,7 @@ package com.verknowsys.served.utils
 
 import org.specs._
 
-class PackageTest extends Specification {
+class SvdPackageTest extends Specification {
     "String replace" should {
         "replace by name" in {
             "%{a} + %{b} = %{c}" % ("a" -> "1", "b" -> "2", "c" -> "3") must beEqual("1 + 2 = 3")
