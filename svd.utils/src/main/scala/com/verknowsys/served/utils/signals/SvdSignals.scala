@@ -27,5 +27,5 @@ case object Failure extends InternalResponse
 case object GetAllProcesses
 case object GetRunningProcesses
 
-case class Command(cmd: String)
-case class Kill(what: String)
+case class SpawnProcess(cmd: String)
+case class Kill(what: Int, signal: Any)

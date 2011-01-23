@@ -1,13 +1,15 @@
 package com.verknowsys.served.utils
 
+
 import com.verknowsys.served._
+
 import java.io.{PrintWriter, File, OutputStreamWriter}
 import java.util.ArrayList
 import java.util.regex.Pattern
 import clime.messadmin.providers.sizeof.ObjectProfiler
 import scala.collection.JavaConversions._
-
 import akka.util.Logging
+
 
 /**
  * SvdUtils object containing common functions
@@ -16,10 +18,6 @@ import akka.util.Logging
  *   
  */
 object SvdUtils extends Logging {
-    
-    // checkOrCreateVendorDir 
-    // XXX: This makes unnecessary logger and I/O bloat.
-    //      No need to run this for every class using SvdUtils trait. Should be moved somewhere else
     
         
     /**
@@ -47,24 +45,6 @@ object SvdUtils extends Logging {
     }
     
     
-    // lazy val logger = {
-    //     BasicSvdConfigurator.resetSvdConfiguration
-    //     reloadLoggerSvdConfiguration
-    //     Logger.getLogger(this.getClass)
-    // }
-    
-    // val loggerPropertiesFileWatch = SvdKqueue.watch(SvdConfig.loggerSvdConfigFile, modified = true) { 
-    //     debug("Logger properties file changed: " + SvdConfig.loggerSvdConfigFile)
-    //     reloadLoggerSvdConfiguration 
-    // }
-    // addShutdownHook { loggerPropertiesFileWatch.stop }
-    
-    // def reloadLoggerSvdConfiguration {
-    //     try { PropertySvdConfigurator.configure(SvdConfig.loggerSvdConfigFile) } 
-    //     catch { case _ => error("Couldn`t load file %s".format(SvdConfig.loggerSvdConfigFile)) }
-    // }
-    
-
     /**
      *  @author dmilith
      *
@@ -81,9 +61,17 @@ object SvdUtils extends Logging {
         }
         vendorPath
     }
+
     
-    def getAllLT = log.trace("Live threads list:\n%s".format(Thread.getAllStackTraces.toList.map{ th => "%s - %s\n".format(th._1, th._2.toList.map{ elem => "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(elem.getFileName, elem.getClassName, elem.getMethodName, elem.getLineNumber, elem.isNativeMethod)})}))
+    /**
+     *  @author dmilith
+     *
+     *  Get all live threads of ServeD. Useful only when debugging.
+     *
+     */
+    def getAllLiveThreads = log.trace("Live threads list:\n%s".format(Thread.getAllStackTraces.toList.map{ th => "%s - %s\n".format(th._1, th._2.toList.map{ elem => "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(elem.getFileName, elem.getClassName, elem.getMethodName, elem.getLineNumber, elem.isNativeMethod)})}))
         
+
     /**
      *  @author dmilith
      *
@@ -94,6 +82,7 @@ object SvdUtils extends Logging {
      *
      */
     def sizeof(any: Any) = ObjectProfiler.sizeof(any)
+    
     
     /**
      *  @author dmilith
@@ -113,5 +102,7 @@ object SvdUtils extends Logging {
                 override def run = block
             }
         )
+        
+        
 }
 
