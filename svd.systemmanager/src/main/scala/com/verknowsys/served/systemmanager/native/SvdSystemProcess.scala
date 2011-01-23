@@ -85,18 +85,15 @@ class SvdSystemProcess(val pid: Long) extends Logging {
             println("SORTED     : " + preList.sortWith(_.toInt < _.toInt))
             println("sourceList : " + sourceList)
             
-            sourceList.map {
+            sourceList.flatMap(
                 x =>
                     try {
-                	    new SvdSystemProcess(x) // 2011-01-23 17:56:26 - dmilith - NOTE: it takes process list of pids + currently spawned test process pid on which "No such process" exception may be thrown. It's 100% normal behaviour
+                	    new SvdSystemProcess(x) :: Nil // 2011-01-23 17:56:26 - dmilith - NOTE: it takes process list of pids + currently spawned test process pid on which "No such process" exception may be thrown. It's 100% normal behaviour
                     } catch {
                         case _ =>
                             Nil
                     }
-            } match {
-                case x: List[SvdSystemProcess] => // 2011-01-23 23:33:42 - dmilith - XXX: FIXME: warning
-                    x
-            }
+            )
         }
 
 
