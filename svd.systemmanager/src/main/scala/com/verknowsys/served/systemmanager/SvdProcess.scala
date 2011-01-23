@@ -48,7 +48,7 @@ class SvdProcess(
 
 
 
-    // 2011-01-20 01:11:06 - dmilith - XXX: TODO: find out is this a most efficient way:
+    // 2011-01-20 01:11:06 - dmilith - TODO: find out is this a most efficient way:
     def alive = 
         try {
 	        new SvdSystemProcess(pid)
