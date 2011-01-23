@@ -23,7 +23,17 @@ class SvdProcessTest extends Specification {
         
         doAfter {
         }
+        
 
+        "Root system process should exist on every supported system" in {
+            val root = new SvdSystemProcess(1) // 2011-01-23 16:39:04 - dmilith - NOTE: launchd on mac, init on bsd
+            root must notBeNull
+            ("PNAME" :: "USER" :: "RES" :: "SHR" :: "PID" :: Nil).foreach{
+                elem =>
+                    root.toString must beMatching(elem)
+            }
+        }
+        
 
         "SvdSystemProcess should throw exception when there's no such process or bad proces pid given" in {
             var a: SvdSystemProcess = null
@@ -60,7 +70,7 @@ class SvdProcessTest extends Specification {
             var a: SvdProcess = null
             synchronized {
                 try {
-                    a = new SvdProcess("df", outputRedirectDestination = "/tmp/served_df_abc", useShell = true, user = "root")
+                    a = new SvdProcess("ls", outputRedirectDestination = "/tmp/served_ls_abc", useShell = false, user = "root")
                     Thread.sleep(500)
                     a.alive must be(false)
                     a = null
