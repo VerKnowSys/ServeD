@@ -39,7 +39,8 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
             try {
                 chats += chatmanager.createChat(user, this)
             } catch {
-                case x: Throwable => log.error("Error: " + x )
+                case x: Throwable =>
+                    log.error("Error: " + x )
             }
         }
         
@@ -68,7 +69,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
         }
     }
     
-    def processMessage(chat: Chat, message: Message) {
+    def processMessage(chat: Chat, message: org.jivesoftware.smack.packet.Message) {
         log.trace("Received message: " + message + " (\"" + message.getBody + "\")")
         // if (message.getFrom.contains("verknowsys.com")) {   // XXX: hardcoded value
         //     trace("Message contains verknowsys: " + message.getFrom)
