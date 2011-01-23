@@ -43,6 +43,8 @@ object SvdConfig {
     def terminalCommandMode =           props("served.system.terminal.environment.mode") or "unix2003"
     def servedUserName =                props("served.system.username") or "served"
     def systemPasswdFile =              props("served.system.password.filename") or homePath + vendorDir + "etc/passwd"
+
+    def kqueueWaitInterval =            props("served.system.core.kqueue.wait") or 500
     
     def notificationXmppDebug =        props("served.notification.xmpp0.debug") or false
     def notificationXmppCompression =  props("served.notification.xmpp0.compression") or true

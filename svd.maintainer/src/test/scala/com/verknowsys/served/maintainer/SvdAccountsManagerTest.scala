@@ -12,12 +12,16 @@ import akka.actor.Actor._
 
 
 class SvdAccountsManagerTest extends Specification with SvdExpectActorSpecification {
+    
+    
     def changePasswdPath(path: String) {
         val passwd = readFile(System.getProperty("user.dir") + "/svd.maintainer/src/test/resources/etc/" + path)
         writeFile(SvdConfig.systemPasswdFile, passwd)
     }      
     
-    def waitForKqueue = waitFor(500) // 2011-01-22 17:41:34 - dmilith - XXX: hardcode
+    
+    def waitForKqueue = waitFor(SvdConfig.kqueueWaitInterval)
+    
     
     var am: ActorRef = null
     var fem: ActorRef = null
@@ -67,4 +71,6 @@ class SvdAccountsManagerTest extends Specification with SvdExpectActorSpecificat
             accounts.map(_.userName) must containAll("teamon" :: "dmilith" :: "foo" :: "bar" :: "baz" :: Nil)
         }
      }
+     
+     
 }
