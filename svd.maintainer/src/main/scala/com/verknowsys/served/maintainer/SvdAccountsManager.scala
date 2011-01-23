@@ -15,7 +15,8 @@ import com.verknowsys.served.api._
 
 case class GetAccountManager(username: String)
 
-class SvdAccountsManager extends Actor with SvdFileEventsReactor with Logging {
+class SvdAccountsManager extends Actor with SvdFileEventsReactor {
+    log.info("SvdAccountsManager is loading")
     // case object ReloadUsers
     // case class CheckUser(val username: String)
     

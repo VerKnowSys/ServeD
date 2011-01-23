@@ -66,7 +66,7 @@ trait SvdFileEventsReactor {
 class SvdFileEventsManager extends Actor with Logging {
     import CLibrary._
     
-    log.trace("Starting SvdFileEventsManager")
+    log.info("SvdFileEventsManager is loading")
     
     protected val clib = CLibrary.instance
     protected val kq = clib.kqueue() // NOTE: C call
