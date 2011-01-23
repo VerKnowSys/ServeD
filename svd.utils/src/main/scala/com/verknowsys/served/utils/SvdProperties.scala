@@ -7,11 +7,11 @@ import java.util.{Properties => JProperties}
 import akka.util.Logging
 
 /** 
- * Property converter interface
+ * SvdProperty converter interface
  *   
  * @author teamon
  */
-abstract class PropertyConverter[T, Property] {
+abstract class PropertyConverter[T, SvdProperty] {
     /** 
      * Convert string into T-type
      *   
@@ -32,23 +32,23 @@ abstract class PropertyConverter[T, Property] {
  *   
  * @author teamon
  */
-object Property {
-    implicit object StringPropertyConverter extends PropertyConverter[String, Property] {
+object SvdProperty {
+    implicit object StringPropertyConverter extends PropertyConverter[String, SvdProperty] {
         def apply(s: String) = Some(s)
         def toString(s: String) = s
     }
 
-    implicit object IntPropertyConverter extends PropertyConverter[Int, Property] {
+    implicit object IntPropertyConverter extends PropertyConverter[Int, SvdProperty] {
         def apply(s: String) = try { Some(s.toInt) } catch { case e:java.lang.NumberFormatException => None }
         def toString(i: Int) = i.toString
     }
 
-    implicit object DoublePropertyConverter extends PropertyConverter[Double, Property] {
+    implicit object DoublePropertyConverter extends PropertyConverter[Double, SvdProperty] {
         def apply(s: String) = try { Some(s.toDouble) } catch { case e:java.lang.NumberFormatException => None }
         def toString(d: Double) = d.toString
     }
 
-    implicit object BooleanPropertyConverter extends PropertyConverter[Boolean, Property] {
+    implicit object BooleanPropertyConverter extends PropertyConverter[Boolean, SvdProperty] {
         def apply(s: String) = try { Some(s.toBoolean) } catch { case e:java.lang.NumberFormatException => None }
         def toString(b: Boolean) = b.toString
     }
@@ -59,10 +59,10 @@ object Property {
  *   
  * @author teamon
  */
-class Property(parent: Properties, key: String){
+class SvdProperty(parent: SvdProperties, key: String){
     lazy val value = parent.data.flatMap(_ get key)
     
-    def or[T](default: T)(implicit conv: PropertyConverter[T, Property]):T = value.flatMap(conv(_)) getOrElse {
+    def or[T](default: T)(implicit conv: PropertyConverter[T, SvdProperty]):T = value.flatMap(conv(_)) getOrElse {
         parent(key) = default.toString
         default
     }    
@@ -84,22 +84,22 @@ class Property(parent: Properties, key: String){
  *
  * @author teamon
  */
-class Properties(filename: String) extends Logging {
+class SvdProperties(filename: String) extends Logging {
     lazy val data = load
 
     /**
-     *  Get value as Property object
+     *  Get value as SvdProperty object
      *
      * @author teamon
      */
-    def apply(key: String) = new Property(this, key)
+    def apply(key: String) = new SvdProperty(this, key)
     
     /** 
      * Update valueonverters
      *   
      * @author teamon
      */
-    def update[T](key: String, value: T)(implicit conv: PropertyConverter[T, Property]){
+    def update[T](key: String, value: T)(implicit conv: PropertyConverter[T, SvdProperty]){
         data.foreach(_(key) = conv.toString(value))
         save
     }
