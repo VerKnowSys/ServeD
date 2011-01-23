@@ -23,7 +23,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     // Dependencies
     class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject {
 
-        override def compileOptions = super.compileOptions ++ compileOptions("-client") ++ compileOptions("-XX:+UseCompressedOops") ++ (Unchecked :: Deprecation :: Nil).toSeq
+        override def compileOptions = super.compileOptions ++ compileOptions("-XX:+UseCompressedOops") ++ (Unchecked :: Deprecation :: Nil).toSeq
         override def parallelExecution = true
         override def installActions = "update" :: "run" :: Nil
         
