@@ -8,25 +8,28 @@ import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
 
+
 class SvdXMPPGate(host: String, port: Int, login: String, password: String, resource: String) extends Gate with MessageListener with Logging {
+    
     val config = new ConnectionConfiguration(host, port)
     val connection = new XMPPConnection(config)
     val presence = new Presence(Presence.Type.available)
     val chats = ListBuffer[Chat]()
     
+
     def connect {
-        log.debug("Initiating SvdXMPPGate connection")
-        // XMPPConnection.DEBUG_ENABLED = true
-        config.setCompressionEnabled(true)
-        config.setSASLAuthenticationEnabled(true)
+        log.debug("Initiating SvdXmppGate connection")
+        XMPPConnection.DEBUG_ENABLED = SvdConfig.notificationXmppDebug
+        config.setCompressionEnabled(SvdConfig.notificationXmppCompression)
+        config.setSASLAuthenticationEnabled(SvdConfig.notificationXmppUseSasl)
         connection.connect
         
         try {
             connection.login(login, password, resource)
-            log.debug("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
+            log.debug("Xmpp login: " + login + ", pass:" + password + ", resource:" + resource)
         } catch {
             case x: Throwable =>
-                error("Error while connecting to XMPP server. Please check login / password.")
+                log.error("Error while connecting to Xmpp server. Please check login / password.")
                 log.debug( x.printStackTrace.toString )
         }
         
@@ -36,12 +39,12 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
             try {
                 chats += chatmanager.createChat(user, this)
             } catch {
-                case x: Throwable => log.info("Error: " + x )
+                case x: Throwable => log.error("Error: " + x )
             }
         }
         
         log.trace("Number of users bound to be notified with repository changes: %s".format(chats.length))
-        presence.setStatus("ServeD Git Bot Notifier | NC")
+        presence.setStatus("ServeD® Xmpp Notifier")
         presence.setMode(Presence.Mode.dnd)
         connection.sendPacket(presence)
     }
@@ -84,5 +87,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
     
 
     
-    def jids = "dmilith@verknowsys.com" :: "i@teamon.eu" :: Nil // XXX: Hardcoded
+    def jids = SvdConfig.notificationRecipients.split(",")
+    
+    
 }
