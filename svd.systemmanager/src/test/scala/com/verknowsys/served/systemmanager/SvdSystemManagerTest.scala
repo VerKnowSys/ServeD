@@ -22,7 +22,8 @@ class SvdSystemManagerTest extends Specification {
 
         
         "signals defined should have proper integer value" in {
-
+            import SvdPOSIX._
+            
             SIGHUP.id must_== 1
             SIGINT.id must_== 2
             SIGQUIT.id must_== 3
