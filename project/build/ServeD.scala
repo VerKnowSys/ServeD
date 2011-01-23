@@ -127,9 +127,14 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val TODO = ".*//.*(?i:todo)(.*):?".r
         val FIXME = ".*//.*(?i:fixme)(.*):?".r
         
-        type Entry = (File, Int, String)
-
-
+        val Colors = Map(
+            "xxx" -> Console.MAGENTA,
+            "note" -> Console.YELLOW,
+            "hack" -> Console.RED,
+            "todo" -> Console.BLUE,
+            "fixme" -> Console.YELLOW
+        )
+        
         filetree(new File("."), ".*src(?!.*OLD).*\\.scala") flatMap { file =>
             FileUtilities.readString(file, log).right.get.split("\n").zipWithIndex.map { 
                 case (line, i) => line match {
@@ -145,7 +150,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             case ((n1, _, _, _), (n2, _, _, _)) => (n1 compareTo n2) < 0
         } foreach { 
             case (name, file, line, msg) => 
-                println("[%s] %s:%d  %s".format(name, file.getPath.replaceAll("src/(main|test)/scala/com/verknowsys/served", "...$1..."), line, msg))
+                println("[%s%s%s] %s:%d  %s%s%s".format(Colors(name), name, Console.RESET, file.getPath.replaceAll("src/(main|test)/scala/com/verknowsys/served", "...$1..."), line, Colors(name), msg, Console.RESET))
         }
         
 
