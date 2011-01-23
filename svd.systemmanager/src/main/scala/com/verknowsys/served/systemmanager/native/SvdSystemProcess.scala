@@ -2,13 +2,19 @@ package com.verknowsys.served.systemmanager.native
 
 import org.hyperic.sigar._
 import scala.collection.JavaConversions._
+import akka.util.Logging
+
 
 /**
- * Class which describes any system process
+ *  @author dmilith
+ *
+ *  This class gives access to additional native system information unavailable by default from JVM
  * 
- * @author dmilith
+ *  Arguments:
+ *      pid: Long
+ *
  */
-class SvdSystemProcess(val pid: Long) {
+class SvdSystemProcess(val pid: Long) extends Logging {
     
     private val core = new Sigar
     private val stat = core.getProcState(pid)
@@ -41,6 +47,7 @@ class SvdSystemProcess(val pid: Long) {
     
     val openFiles = -1L
     
+
     override def toString =
         (
         "PNAME:[%s],\n" +
@@ -59,5 +66,52 @@ class SvdSystemProcess(val pid: Long) {
         "TIME_USER:[%s],\n" +
         "OPEN_FILES:[%s]\n")
             .format(name, user, rss, shr, pid, ppid, thr, prio, nice, params.mkString(" "), timeStart, timeKernel, timeTotal, timeUser, openFiles)
+
+
+        /**
+        *   @author dmilith
+        *   
+        *   Converts processes as String to List of SvdSystemProcess'es.
+        *   
+        *   Arguments: 
+        *       sort: Boolean. Default: false.
+        *           If true then it will return sorted alphabetically list of processes.
+        *
+        */
+        def processList(sort: Boolean = false): List[SvdSystemProcess] = {
+            val preList = core.getProcList.toList // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
+            val sourceList = if (sort) preList.sortWith(_ < _) else preList
+            println(preList)
+            println(sourceList)
+            
+            val res = sourceList.map {
+                _ match {
+                    case x: Long =>
+                        try {
+                    	    new SvdSystemProcess(x) // 2011-01-23 17:56:26 - dmilith - NOTE: it takes process list of pids + currently spawned test process pid on which "No such process" exception may be thrown. It's 100% normal behaviour
+                        } catch {
+                            case _ =>
+                                Nil
+                        }
+                }
+            }
+            res match {
+                case result: List[SvdSystemProcess] =>
+                    return result
+            }
+        }
+
+
+        /**
+        *   @author dmilith
+        *   
+        *   Returns System Process count.
+        *
+        *   Arguments:
+        *       sort: Boolean. Default: false
+        *
+        */
+        def processCount(sort: Boolean = false) = processList(sort).size
+
     
 }

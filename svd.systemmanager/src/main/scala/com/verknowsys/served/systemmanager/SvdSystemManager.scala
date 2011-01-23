@@ -130,51 +130,7 @@ class SvdSystemManager extends Actor with Logging {
     
     
     override def toString = "SvdSystemManager"
-    
-    
-}
 
-
-/**
-*   @author dmilith
-*
-*   Static access for some functions
-*/
-object SvdSystemManager {
-
-
-    // 2011-01-23 04:08:09 - dmilith - XXX: FIXME: TODO: think twice dmilith, refactor this shit cause currently it's a bit messy right? ;f
-    // /**
-    // *   @author dmilith
-    // *   
-    // *   Converts processes as String to List of SvdSystemProcess'es.
-    // *   
-    // *   Arguments: 
-    // *       sort: Boolean. Default: false.
-    // *           If true then it will return sorted alphabetically list of processes.
-    // *
-    // */
-    // def processList(sort: Boolean = false): List[SvdSystemProcess] = {
-    //     val sourceList = (new SvdSystemManager).getProcList.toList.filter {
-    //         a =>
-    //             val tmp = a.split(",").head
-    //             (tmp != "root" && tmp != "init" && tmp != "launchd" && tmp != "") // 2010-10-24 13:59:33 - dmilith - XXX: hardcoded
-    //     }
-    //     log.debug("PLIST: %s", sourceList)
-    //     for (process <- sourceList) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
-    //         yield
-    //             new SvdSystemProcess()
-    //     Nil        
-    // }
-    // 
-    // 
-    // /**
-    // *   @author dmilith
-    // *   
-    // *   Returns System Process count.
-    // */
-    // def processCount(sort: Boolean = true) = processList(sort).size
 
     
 }
-
