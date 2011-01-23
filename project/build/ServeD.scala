@@ -49,9 +49,10 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
     
     class SvdSystemManager(info: ProjectInfo) extends SvdProject(info) {
+        import Process._
+        
         val sigarSource = "org.hyperic" at "http://repository.jboss.org/maven2"
         val sigar       = "org.hyperic" % "sigar" % "1.6.3.82"
-        import Process._
         
         lazy val stress = task {
 
@@ -70,8 +71,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
                         None
                     }
                 }
-                t.join
                 t.start
+                t.join
                 None
             }
             None
