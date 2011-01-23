@@ -106,18 +106,6 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with Logging {
     // }
 
 
-
-    /**
-     * Function to parse and convert List[String] of passwd file entries to List[SvdAccount]
-     * @author dmilith
-     */
-    // protected def allAccounts = {
-    //     val rawData = Source.fromFile(SvdConfig.systemPasswdFile, "utf-8").getLines.toList
-    //     for(line <- rawData if !line.startsWith("#")) // XXX: hardcode
-    //         yield
-    //             new SvdAccount(line.split(":").toList)
-    // }
-    
     private def respawnUsersActors {
         // kill all Account Managers
         log.trace("Actor.registry size before: %d", registry.actors.size)
@@ -131,13 +119,14 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with Logging {
         }
         log.trace("Actor.registry size after: %d", registry.actors.size)
     }
+
     
     /**
      * Function to parse and convert passwd file entries to List[Account]
      * @author teamon
      */
     protected def allAccounts = {
-        val rawData = Source.fromFile(SvdConfig.systemPasswdFile, "utf-8").getLines.toList
+        val rawData = Source.fromFile(SvdConfig.systemPasswdFile, SvdConfig.defaultEncoding).getLines.toList
         for(SvdAccount(account) <- rawData) yield account
     }
      
