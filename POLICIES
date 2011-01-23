@@ -8,3 +8,5 @@
 4. Optimize when code (or part of code/ module) is in production stage of development only.
 
 5. Stability is more important than performance
+
+6. Git "master" branch, should always be production ready
