@@ -28,6 +28,8 @@ case class ProcessesList(pids: List[Long])
 *   SvdSystemManager - responsible for System Managment and SvdMonitoring
 */
 class SvdSystemManager extends Actor with Logging {
+    import SvdPOSIX._
+    
     log.trace("SvdSystemManager is loading")
     
     private val core = new Sigar
@@ -61,7 +63,7 @@ class SvdSystemManager extends Actor with Logging {
             // new SvdProcess(command = "dff -h", user = "dmilith", outputRedirectDestination = "/tmp/df2")
             
             
-            // throw new Exception("DUPA1")
+            // throw new Exception("Zamierzony EXCEPTION!")
             // throw new Exception("DUPA2")
             // throw new Exception
             
@@ -76,32 +78,28 @@ class SvdSystemManager extends Actor with Logging {
             // processes.add(sysManProcess)
             // reply(result)
             
-        case Kill(cmd) =>
-            log.info("Killing Native Command: %s".format(cmd))
-            // 2011-01-18 00:50:31 - dmilith - TODO: implement 'kill'
-        
+        case Kill(pid, signal) => // 2011-01-23 04:13:34 - dmilith - NOTE: send standard SIGINT signal to app with some pid
+            log.info("Kill request for native application with Pid: %s. Sending signal: %s", pid, signal)
+            new SvdProcess("kill -%s %s".format(signal, pid), user = "root")
+            
+        case SpawnProcess(cmd) =>
+            log.debug("Requested process spawn: %s", cmd)
+            val spawn = new SvdProcess(cmd, user = "root") // 2011-01-23 05:27:11 - dmilith - XXX: temporary, that should be user's account name
+            log.trace("Spawned: %s", spawn)
+            
         case GetAllProcesses =>
             val psAll = core.getProcList.toList
             log.debug("All process IDs: %s".format(psAll.mkString(", ")))
-            // psAll.foreach {
-            //     p =>
-            //      log.trace(new SvdSystemProcess(p).toString)
-            // }
             self reply ProcessesList(psAll)
             
         case GetRunningProcesses =>
             log.debug("Processes running by ServeD: %s".format(processes.mkString(", ")))
             self reply(processes)
-    
-            
+                
         case Quit =>
             log.info("Quitting SvdSystemManager")
             exit
         
-        // case SendSignal(signal, pid) =>
-            // trace("Send Signal Request, received with signal %s, for pid: %s".format(signal, pid))
-            // reply(Ready)
-            
         case _ =>
         
     }
@@ -112,80 +110,71 @@ class SvdSystemManager extends Actor with Logging {
     *   
     *   This function will send given signal (first param), to given pid (second param)
     */
-    def sendSignalToPid(signal: SvdPOSIX.Value, @specialized pid: Int) =
+    def sendSignalToPid(signal: SvdPOSIX.Value, pid: Int) =
         signal match {
-            case SvdPOSIX.SIGHUP =>
+            case SIGHUP =>
                 log.trace("SigHUP sent to process pid: %s".format(pid))
                 
-            case SvdPOSIX.SIGINT =>
+            case SIGINT =>
                 log.trace("SigINT sent to process pid: %s".format(pid))
                 
-            case SvdPOSIX.SIGQUIT =>
+            case SIGQUIT =>
                 log.trace("SigQUIT sent to process pid: %s".format(pid))
                 
-            case SvdPOSIX.SIGKILL =>
+            case SIGKILL =>
                 log.trace("SigKILL sent to process pid: %s".format(pid))
             
             case _ =>
             
         }
-
-
-    /**
-    *   @author dmilith
-    *   
-    *   Converts processes as String to List of SvdSystemProcess'es.
-    *   
-    *   Arguments: 
-    *       show: Boolean. Default: true. 
-    *           If true then it will return user processes with listed every thread of every process.
-    *       sort: Boolean. Default: true.
-    *           If true then it will return sorted alphabetically list of processes.
-    *
-    */
-    // def processList(showThreads: Boolean = true, sort: Boolean = true): List[SvdSystemProcess] = {
-        // val st = if (showThreads) 1 else 0
-        // val so = if (sort) 1 else 0
-        // val sourceList = pstreelib.processes(st, so).split("/").toList.filter { a =>
-        //                 val tmp = a.split(",").head
-        //                 (tmp != "root" && tmp != "init" && tmp != "launchd" && tmp != "") // 2010-10-24 13:59:33 - dmilith - XXX: hardcoded
-        //         }
-        //         for (process <- sourceList) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
-        //             yield
-        //                 new SvdSystemProcess(
-        //                     name = process.split(",").head,
-        //                     pid = process.split(",").last
-        //                 )
-        // Nil        
-    // }
-    
-    
-    /**
-    *   @author dmilith
-    *   
-    *   Returns System Process count.
-    */
-    // @specialized def processCount(@specialized showThreads: Boolean = true, @specialized sort: Boolean = true) = processList(showThreads, sort).size
-    
-    
-    
-    /**
-    *   @author dmilith
-    *   XXX, TESTING, DIRTY, HACK
-    *   
-    */
-    // def watchLogs = {
-            // val watchedFile = "/var/log/kernel.log"
-            // SvdKqueue.watch(watchedFile, modified = true, deleted = true, renamed = true) {
-            //                 val raf = new RandomAccessFile(watchedFile, "r")
-            //                 raf.seek(raf.length - 1024)
-            //                 log.info("Changed /var/log/kernel.log. Last 1024 bytes: " + raf.readUTF)
-            //             }
-        // }
-    
     
     
     override def toString = "SvdSystemManager"
     
     
 }
+
+
+/**
+*   @author dmilith
+*
+*   Static access for some functions
+*/
+object SvdSystemManager {
+
+
+    // 2011-01-23 04:08:09 - dmilith - XXX: FIXME: TODO: think twice dmilith, refactor this shit cause currently it's a bit messy right? ;f
+    // /**
+    // *   @author dmilith
+    // *   
+    // *   Converts processes as String to List of SvdSystemProcess'es.
+    // *   
+    // *   Arguments: 
+    // *       sort: Boolean. Default: false.
+    // *           If true then it will return sorted alphabetically list of processes.
+    // *
+    // */
+    // def processList(sort: Boolean = false): List[SvdSystemProcess] = {
+    //     val sourceList = (new SvdSystemManager).getProcList.toList.filter {
+    //         a =>
+    //             val tmp = a.split(",").head
+    //             (tmp != "root" && tmp != "init" && tmp != "launchd" && tmp != "") // 2010-10-24 13:59:33 - dmilith - XXX: hardcoded
+    //     }
+    //     log.debug("PLIST: %s", sourceList)
+    //     for (process <- sourceList) // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
+    //         yield
+    //             new SvdSystemProcess()
+    //     Nil        
+    // }
+    // 
+    // 
+    // /**
+    // *   @author dmilith
+    // *   
+    // *   Returns System Process count.
+    // */
+    // def processCount(sort: Boolean = true) = processList(sort).size
+
+    
+}
+
