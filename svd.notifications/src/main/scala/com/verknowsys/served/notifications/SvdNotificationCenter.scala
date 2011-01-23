@@ -15,10 +15,8 @@ object SvdNotificationCenter extends Actor with Logging {
     case class Message(message: String)
     case class Status(status: String)
     
-    
-    
     // XXX: Hardcoded gate
-    val gates = new SvdXMPPGate(
+    val gates: List[Gate] = new SvdXMPPGate(
         SvdConfig("xmpp.host") or "localhost", 
         SvdConfig("xmpp.port") or 5222,
         SvdConfig("xmpp.login") or "gitbot",
@@ -26,43 +24,27 @@ object SvdNotificationCenter extends Actor with Logging {
         SvdConfig("xmpp.resource") or "served-bot-resource"
     ) :: Nil
     
+    override def preStart {
+        gates.foreach(_.connect)
+    }
 
-    // def act {
-    //     loop {
-    //         receive {
-    //             case Init =>                        
-    //                 info("SvdNotificationCenter connecting gates")
-    //                 gates.foreach { _.connect }                                    
-    //                 info("SvdNotificationCenter ready")
-    //                 
-    //             case Quit =>
-    //                 info("Quitting SvdNotificationCenter")
-    //                 gates.foreach { _.disconnect }
-    //                 exit
-    //         
-    //             case Status(status) => 
-    //                 info("SvdNotificationCenter ! Status(%s)".format(status))
-    //                 gates.foreach { _ setStatus status }
-    //             
-    //             case Message(msg) => 
-    //                 info("SvdNotificationCenter ! Message(%s)".format(msg))
-    //                 gates.foreach { _ send msg }
-    //             
-    //             case _ => messageNotRecognized(_)
-    //         }
-    //     }
-    // }
-    
     def receive = {
-        case _ => 
+        case Status(status) =>
+            log.info("Setting status %s", status)
+            gates.foreach(_ setStatus status)
+            
+        case Message(msg) =>
+            log.info("Sending message %s", msg)
+            gates.foreach(_ send msg)
+        
+        case msg => 
+            log.warn("Message not recoginzed: %s", msg)
+    }
+    
+    override def postStop {
+        gates.foreach(_.disconnect)
     }
     
     override def toString = "SvdNotificationCenter"
 }  
 
-trait Gate {
-    def connect
-    def disconnect
-    def setStatus(s: String)
-    def send(message: String)
-}
