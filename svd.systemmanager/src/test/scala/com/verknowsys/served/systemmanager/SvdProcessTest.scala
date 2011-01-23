@@ -24,14 +24,38 @@ class SvdProcessTest extends Specification {
         doAfter {
         }
         
+        doBefore {
+        }
+        
 
         "Root system process should exist on every supported system" in {
-            val root = new SvdSystemProcess(1) // 2011-01-23 16:39:04 - dmilith - NOTE: launchd on mac, init on bsd
+            val root = new SvdSystemProcess(1L) // 2011-01-23 16:39:04 - dmilith - NOTE: launchd on mac, init on bsd
             root must notBeNull
             ("PNAME" :: "USER" :: "RES" :: "SHR" :: "PID" :: Nil).foreach{
                 elem =>
                     root.toString must beMatching(elem)
             }
+        }
+        
+        
+        "SvdSystemProcess must be able to get process list from system" in {
+            val pslist = new SvdSystemProcess(1L) processList(false) // 2011-01-23 17:02:16 - dmilith - NOTE: CHECK: FIXME: it might not be hack at all
+            val pslistSorted = new SvdSystemProcess(1L) processList(sort = true)
+            pslist must notBeNull
+            pslistSorted must notBeNull
+            println("PLIST: " + pslist)
+            println("PLIST-S: " + pslistSorted)
+            if (pslistSorted == pslist)
+                fail("Sorted and Unsorted process list, never should be equal!")
+            pslist.size must beGreaterThan(10L)
+            pslistSorted.size must beGreaterThan(10L)
+        }
+
+        
+        "SvdSystemProcess must be able to get amount of processes in system" in {
+            val psAmount = new SvdSystemProcess(1L) processCount(false)
+            psAmount must notBeNull
+            psAmount must beGreaterThan(10L)
         }
         
 

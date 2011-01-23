@@ -78,26 +78,24 @@ class SvdSystemProcess(val pid: Long) extends Logging {
         *           If true then it will return sorted alphabetically list of processes.
         *
         */
-        def processList(sort: Boolean = false): List[SvdSystemProcess] = {
+        def processList(sort: Boolean = false) = {
             val preList = core.getProcList.toList // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
-            val sourceList = if (sort) preList.sortWith(_ < _) else preList
-            println(preList)
-            println(sourceList)
+            val sourceList = if (sort) preList.sortWith(_.toInt < _.toInt) else preList
+            println("UnSORTED   : " + preList)
+            println("SORTED     : " + preList.sortWith(_.toInt < _.toInt))
+            println("sourceList : " + sourceList)
             
-            val res = sourceList.map {
-                _ match {
-                    case x: Long =>
-                        try {
-                    	    new SvdSystemProcess(x) // 2011-01-23 17:56:26 - dmilith - NOTE: it takes process list of pids + currently spawned test process pid on which "No such process" exception may be thrown. It's 100% normal behaviour
-                        } catch {
-                            case _ =>
-                                Nil
-                        }
-                }
-            }
-            res match {
-                case result: List[SvdSystemProcess] =>
-                    return result
+            sourceList.map {
+                x =>
+                    try {
+                	    new SvdSystemProcess(x) // 2011-01-23 17:56:26 - dmilith - NOTE: it takes process list of pids + currently spawned test process pid on which "No such process" exception may be thrown. It's 100% normal behaviour
+                    } catch {
+                        case _ =>
+                            Nil
+                    }
+            } match {
+                case x: List[SvdSystemProcess] => // 2011-01-23 23:33:42 - dmilith - XXX: FIXME: warning
+                    x
             }
         }
 
