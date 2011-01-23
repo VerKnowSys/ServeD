@@ -1,16 +1,17 @@
-package com.verknowsys.served.systemmanager
-
-import com.sun.jna.{Native, Library}
+package com.verknowsys.served.utils.signals
 
 
 /**
- *   SvdPOSIX enum definition
+ *  SvdPOSIX enum definition
  * 
- * @author dmilith
+ *  @author dmilith
  */
 object SvdPOSIX extends Enumeration(initial = 1) {
+    
     type SvdPOSIX = Value
-    val SIGHUP, // 2010-10-05 15:03:27 - dmilith - NOTE: should have value 1
+    
+    
+    val SIGHUP, // 2010-10-05 15:03:27 - dmilith - NOTE: will have value 1 instead of default 0
         SIGINT,
         SIGQUIT,
         SIGILL,
@@ -42,4 +43,5 @@ object SvdPOSIX extends Enumeration(initial = 1) {
         SIGPOLL,
         SIGPWR,
         SIGSYS = Value
+
 }

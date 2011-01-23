@@ -41,9 +41,13 @@ class SvdMaintainer(skipSSM: Boolean = false) extends Actor with Logging {
             registry.actorFor[SvdSystemManager] foreach { _ ! GetAllProcesses }
         
         case ProcessesList(pids) =>
+            import SvdPOSIX._
             log.trace("Got pids: %s", pids)
             Thread.sleep(2000)
+            // 2011-01-23 05:29:52 - dmilith - XXX: temporary code:
             registry.actorFor[SvdSystemManager] foreach { _ ! GetAllProcesses }
+            registry.actorFor[SvdSystemManager] foreach { _ ! SpawnProcess("ls -la") }
+            registry.actorFor[SvdSystemManager] foreach { _ ! Kill(435343, SIGINT) }
             
         case x => 
             log.warn("not recognized message %s", x)
@@ -112,7 +116,7 @@ object SvdMaintainer extends Logging {
         // info("ApiServer is loading")
         // ApiServer.start
         
-        // SvdUtils.getAllLT
+        // SvdUtils.getAllLiveThreads
     }
 
 
