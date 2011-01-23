@@ -19,6 +19,8 @@ import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
 import akka.util.Logging
 
+case class ProcessesList(pids: List[Long])
+
 
 /**
 *   @author dmilith
@@ -44,11 +46,11 @@ class SvdSystemManager extends Actor with Logging {
             log.info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
             
 
-            val a = new SvdProcess(command = "memcached -u nobody", user = "root", outputRedirectDestination = "/tmp/served_nobody_memcached.log")
-            log.debug("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
+            // val a = new SvdProcess(command = "memcached -u nobody", user = "root", outputRedirectDestination = "/tmp/served_nobody_memcached.log")
+            // log.debug("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
             
-            val b = new SvdProcess(command = "df -h", user = "root")
-            log.debug("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
+            // val b = new SvdProcess(command = "df -h", user = "root")
+            // log.debug("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
             
             
             // val sam = Actor.registry.actorFor[SvdAccountManager]
@@ -81,10 +83,11 @@ class SvdSystemManager extends Actor with Logging {
         case GetAllProcesses =>
             val psAll = core.getProcList.toList
             log.debug("All process IDs: %s".format(psAll.mkString(", ")))
-            psAll.foreach {
-                p =>
-                	log.trace(new SvdSystemProcess(p).toString)
-            }
+            // psAll.foreach {
+            //     p =>
+            //      log.trace(new SvdSystemProcess(p).toString)
+            // }
+            self reply ProcessesList(psAll)
             
         case GetRunningProcesses =>
             log.debug("Processes running by ServeD: %s".format(processes.mkString(", ")))
