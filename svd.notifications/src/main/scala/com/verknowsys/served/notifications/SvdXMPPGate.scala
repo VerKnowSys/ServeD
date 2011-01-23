@@ -26,7 +26,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
             log.debug("XMPP: login: " + login + ", pass:" + password + ", resource:" + resource)
         } catch {
             case x: Throwable =>
-                error("Error while connecting to XMPP server. Please check login / password.")
+                log.error("Error while connecting to XMPP server. Please check login / password.")
                 log.debug( x.printStackTrace.toString )
         }
         
@@ -65,7 +65,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
         }
     }
     
-    def processMessage(chat: Chat, message: Message) {
+    def processMessage(chat: Chat, message: org.jivesoftware.smack.packet.Message) {
         log.trace("Received message: " + message + " (\"" + message.getBody + "\")")
         // if (message.getFrom.contains("verknowsys.com")) {   // XXX: hardcoded value
         //     trace("Message contains verknowsys: " + message.getFrom)

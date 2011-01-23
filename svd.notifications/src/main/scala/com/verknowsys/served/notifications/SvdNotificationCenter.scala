@@ -1,7 +1,4 @@
 package com.verknowsys.served.notifications
-
-import scala.collection.mutable.ListBuffer
-import scala.collection.JavaConversions._
     
 import com.verknowsys.served._
 import com.verknowsys.served.utils._
@@ -9,11 +6,10 @@ import com.verknowsys.served.utils.git._
 import com.verknowsys.served.utils.signals._
 
 import akka.actor.Actor
-import akka.util.Logging
 
-object SvdNotificationCenter extends Actor with Logging {
-    case class Message(message: String)
-    case class Status(status: String)
+
+class SvdNotificationCenter extends Actor {
+    log.trace("SvdNotificationCenter is loading")
     
     // XXX: Hardcoded gate
     val gates: List[Gate] = new SvdXMPPGate(
@@ -44,7 +40,5 @@ object SvdNotificationCenter extends Actor with Logging {
     override def postStop {
         gates.foreach(_.disconnect)
     }
-    
-    override def toString = "SvdNotificationCenter"
 }  
 
