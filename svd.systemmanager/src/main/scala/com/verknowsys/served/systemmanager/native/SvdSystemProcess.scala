@@ -15,11 +15,11 @@ class SvdSystemProcess(val pid: Long) {
     private val cpu = core.getProcCpu(pid)
     private val mem = core.getProcMem(pid)
 
-    require(pid > 0)
-    require(core != null)
-    require(stat != null)
-    require(cpu != null)
-    require(mem != null)
+    require(pid > 0, "SSP: PID always should be > 0!")
+    require(core != null, "SSP: Core cannot be null!")
+    require(stat != null, "SSP: Stat cannot be null!")
+    require(cpu != null, "SSP: Cpu cannot be null!")
+    require(mem != null, "SSP: Mem cannot be null!")
     
     val name = stat.getName
     val user = core.getProcCredName(pid).getUser
