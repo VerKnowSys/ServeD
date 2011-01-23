@@ -22,8 +22,10 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     // Dependencies
     class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject {
-
-        override def compileOptions = super.compileOptions ++ compileOptions("-make:changed") ++ compileOptions("-g:line") ++ (MaxCompileErrors(5) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq
+        
+        override def compileOrder = CompileOrder.JavaThenScala
+        override def javaCompileOptions = super.javaCompileOptions ++ javaCompileOptions("-source", "1.6")
+        override def compileOptions = super.compileOptions ++ compileOptions("-Xresident") ++ compileOptions("-make:changed") ++ compileOptions("-g:line") ++ (MaxCompileErrors(5) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq
         override def parallelExecution = true
         override def installActions = "update" :: "run" :: Nil
         
