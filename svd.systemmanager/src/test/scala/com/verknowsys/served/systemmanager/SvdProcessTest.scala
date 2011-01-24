@@ -27,6 +27,30 @@ class SvdProcessTest extends Specification {
         doBefore {
         }
         
+        
+        "Should detect harmful/ incorect commands automatically" in {
+            var exploit: SvdProcess = null
+            try {
+            	exploit = new SvdProcess("ls", user = "root")
+            } catch {
+                case _ =>
+                    fail("'Exploit' shouldn't be detected")
+            }
+            try { 
+                exploit = new SvdProcess("dupa", workDir = "/kozaczek.pel")
+                fail("Non existant workDir shouldn't be allowed!")
+            } catch {
+                case _ =>
+            }
+            try { 
+                exploit = new SvdProcess("ls -lar /", user = "root")
+                exploit must notBeNull
+            } catch {
+                case _ =>
+                    fail("Suspicious pattern shouldn't be found!")
+            }
+        }
+        
 
         "Root system process should exist on every supported system" in {
             val root = new SvdSystemProcess(1L) // 2011-01-23 16:39:04 - dmilith - NOTE: launchd on mac, init on bsd
