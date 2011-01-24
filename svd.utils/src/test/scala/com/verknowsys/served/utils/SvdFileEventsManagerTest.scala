@@ -18,6 +18,12 @@ class SvdTestFileEventsReactor extends SvdExpectActor with SvdFileEventsReactor 
     }
 }
 
+class SvdTestFileEventsReactorForFile(path: String) extends SvdExpectActor with SvdFileEventsReactor {
+    override def preStart {
+        registerFileEventFor(path, Modified)
+    }
+}
+
 case object TestGetIdents
 
 class TestSvdFileEventsManager extends SvdFileEventsManager {
@@ -92,11 +98,46 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
             expectActor ?* (SvdFileEvent(DIR + "/single", 0x04), SvdFileEvent(DIR + "/single", 0x06))
         }
         
-        "register few events" in {
+        "register few events for the same file" in {
             touch(DIR + "/single")
             actorOf[SvdTestFileEventsReactor].start
             actorOf[SvdTestFileEventsReactor].start
-            actorOf[SvdTestFileEventsReactor].start.isExpectation
+            expectActor = actorOf[SvdTestFileEventsReactor].start
+            senderOption = Some(expectActor)
+            
+            expectActor ? Success
+            
+            (fem !! TestGetIdents) match {
+                case Some(idents: SvdFileEventsManager#IdentsMap) => 
+                    idents must haveSize(1)
+                    idents.toList.head._2._2 must haveSize(3)
+                case _ => fail("timeout")
+            }
+        }
+        
+        "register few events for different files" in {
+            touch(DIR + "/one")
+            touch(DIR + "/two")
+            touch(DIR + "/three")
+            touch(DIR + "/four")
+            
+            actorOf(new SvdTestFileEventsReactorForFile(DIR + "/one")).start
+            actorOf(new SvdTestFileEventsReactorForFile(DIR + "/two")).start
+            actorOf(new SvdTestFileEventsReactorForFile(DIR + "/three")).start
+            expectActor = actorOf(new SvdTestFileEventsReactorForFile(DIR + "/four")).start
+            senderOption = Some(expectActor)
+            
+            expectActor ? Success
+            
+            (fem !! TestGetIdents) match {
+                case Some(idents: SvdFileEventsManager#IdentsMap) => 
+                    idents must haveSize(4)
+                    idents.toList(0)._2._2 must haveSize(1)
+                    idents.toList(1)._2._2 must haveSize(1)
+                    idents.toList(2)._2._2 must haveSize(1)
+                    idents.toList(3)._2._2 must haveSize(1)
+                case _ => fail("timeout")
+            }
         }
         
         "unregister events when stopped" in {
