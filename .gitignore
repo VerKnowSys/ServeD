@@ -6,6 +6,7 @@ lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/build.properties
+.scala_dependencies
 *.neodatis
 .idea
 *~
