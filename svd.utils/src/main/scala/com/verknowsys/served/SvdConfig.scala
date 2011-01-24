@@ -35,12 +35,18 @@ object SvdConfig {
      *   More dynamic settings from main properties file
      */
 
-     
+    
+    def nullDevice =                    props("served.system.devices.null") or "/dev/null"
+    def tmp =                           props("served.system.filesystems.tmp") or "/tmp/"
+    def noUser =                        props("served.system.username.nouser") or "nouser"
+    
     def defaultEncoding =               props("served.system.encoding") or "UTF-8"
+    
     def defaultPathEnviroment =         props("served.system.terminal.environment.path") or "$HOME/bin:$HOME/Bin:/bin:/usr/bin:/usr/local/bin"
     def defaultTmpDir =                 props("served.system.terminal.environment.tmpdir") or "/tmp/"
     def terminalType =                  props("served.system.terminal.environment.term") or "xterm-color"
     def terminalCommandMode =           props("served.system.terminal.environment.mode") or "unix2003"
+    
     def servedUserName =                props("served.system.username") or "served"
     def systemPasswdFile =              props("served.system.password.filename") or homePath + vendorDir + "etc/passwd"
 

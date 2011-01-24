@@ -26,15 +26,47 @@ class SvdProcessTest extends Specification {
         
         doBefore {
         }
+
         
+        "/dev/null canWrite should return true" in {
+            val cw = new File("/dev/null").canWrite
+            cw must beTrue
+            
+            FileUtils.touch("/tmp/DUPA3")
+            val dd = new File("/tmp/DUPA3").canWrite
+            dd must beTrue
+            
+            FileUtils.touch("/tmp/DUPA2")
+            val cw2 = new File("/tmp/DUPA2").canWrite
+            cw2 must beTrue
+        }
+        
+        
+        "Process with empty command cannot be accepted" in {
+            isExpectation(
+                try {
+                	val np = new SvdProcess("")
+                	fail("Empty process shouldn't be spawn")
+                } catch {
+                    case _ =>
+                }
+            )
+        }
+                
         
         "Should detect harmful/ incorect commands automatically" in {
             var exploit: SvdProcess = null
             try {
-            	exploit = new SvdProcess("ls", user = "root")
+            	exploit = new SvdProcess("ls", user = "root", useShell = false)
             } catch {
-                case _ =>
-                    fail("'Exploit' shouldn't be detected")
+                case x: Exception =>
+                    fail("'Exploit' shouldn't be detected (noShell)! Exception: %s".format(x))
+            }
+            try {
+            	exploit = new SvdProcess("ls", user = "root", useShell = true)
+            } catch {
+                case x: Exception =>
+                    fail("'Exploit' shouldn't be detected (Shell)! Exception: %s".format(x))
             }
             try { 
                 exploit = new SvdProcess("dupa", workDir = "/kozaczek.pel")
@@ -43,11 +75,13 @@ class SvdProcessTest extends Specification {
                 case _ =>
             }
             try { 
-                exploit = new SvdProcess("ls -lar /", user = "root")
-                exploit must notBeNull
+                val a = new SvdProcess("ls -lar", user = "root", useShell = true)
+                val b = new SvdProcess("ls -lar", user = "root", useShell = false)
+                a must notBeNull
+                // 2011-01-24 16:53:16 - dmilith - NOTE: b MAY be null, cause ls without shell may be exceptional case
             } catch {
-                case _ =>
-                    fail("Suspicious pattern shouldn't be found!")
+                case x: Throwable =>
+                    fail("Suspicious pattern shouldn't be found!: exc: %s".format(x))
             }
         }
         
@@ -89,9 +123,10 @@ class SvdProcessTest extends Specification {
                 a = new SvdSystemProcess(-1L)
             	fail("SvdSystemProcess '%s' with pid -1 was spawned?".format(a))
         	} catch { 
-                case x: Any =>
+                case x: Throwable =>
                     a = null
             }
+            a must beNull
             try {
                 a = new SvdSystemProcess(433434343L)
             	fail("SvdSystemProcess '%s' with pid 433434343L was spawned?".format(a))
@@ -117,51 +152,64 @@ class SvdProcessTest extends Specification {
         "it must be able to run ls process properly using default PATH settings" in {
             var a: SvdProcess = null
             try {
-                synchronized {
-                    a = new SvdProcess("ls", outputRedirectDestination = "/tmp/served_ls_abc", useShell = false, user = "root")
-                    a must notBeNull
-                    a = null
-                }
+                a = new SvdProcess("kill 4354545", user = "root")
+                fail("SvdProcess should fail here!")
             } catch { 
-                case x: Any =>
-                    fail("Problem with spawing process %s. Exception: %s".format(a, x))
+                case x: Throwable =>
+                    // fail("Problem with spawing process %s. Exception: %s".format(a, x))
             }
             try { 
                 new SvdSystemProcess(a.pid)
                 fail("SvdProcess pid should be non existant")
             } catch {
                 case _ =>
+                    a = null
+            } finally {
+                a must beNull
             }
-            a must beNull
         }
 
 
-        // 2011-01-22 18:02:08 - dmilith - TODO: add sam test with shell
         "it must be able to check that process is alive or not without shell" in {
             var a: SvdProcess = null
             var b: SvdProcess = null
+            var c: SvdProcess = null
+            synchronized {
                 try {
-                    synchronized {
-                        a = new SvdProcess("memcached -u nobody", user = "root", useShell = false, outputRedirectDestination = "/tmp/served_memcached")
-                        a must notBeNull
-                        ("pid:" :: "cmdSvdProc:" :: Nil).foreach{
-                            elem =>
-                                a.toString must beMatching(elem)
-                        }
+                    a = new SvdProcess("memcached -u nobody -p 11213", user = "root", useShell = true)
+                    a must notBeNull
+                    ("pid:" :: "cmdSvdProc:" :: Nil).foreach{
+                        elem =>
+                            a.toString must beMatching(elem)
                     }
-                } catch {
-                    case e: Exception =>
-                        fail("Alive isn't working well? Exception: %s, Object: %s".format(e.getMessage, a))
-                }
-                synchronized {
-                    b = new SvdProcess("kill %d".format(a.pid), user = "root", useShell = false, outputRedirectDestination = "/tmp/served_kill")
+                    b = new SvdProcess("memcached -u nobody -p 11212", user = "root")
                     b must notBeNull
                     ("pid:" :: "cmdSvdProc:" :: Nil).foreach{
                         elem =>
                             b.toString must beMatching(elem)
                     }
+                } catch {
+                    case e: Exception =>
+                        fail("Alive isn't working well? Exception: %s, Object: %s".format(e.getMessage, a))
+                } finally {
+                    // 2011-01-24 16:59:05 - dmilith - NOTE: in most cases this will return false: a.alive must beEqual(true)
+                    // b.alive must beEqual(true)
+                    try {
+                    	c = new SvdProcess("kill %d".format(a.pid), user = "root")}
+                    catch { 
+                        case _ =>
+                            c = new SvdProcess("echo abc", user = "root")
+                    } finally {
+                        c must notBeNull
+                        ("pid:" :: "cmdSvdProc:" :: Nil).foreach{
+                            elem =>
+                                c.toString must beMatching(elem)
+                        }
+                    }
                 }
+            }
         }
+        
 
     } // test should
 
