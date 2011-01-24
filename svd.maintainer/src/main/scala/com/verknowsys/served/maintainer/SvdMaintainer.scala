@@ -38,10 +38,12 @@ class SvdMaintainer extends Actor {
             import SvdPOSIX._
             log.trace("Got pids: %s", pids)
             Thread.sleep(2000)
-            // 2011-01-23 05:29:52 - dmilith - XXX: temporary code:
+            
+            // 2011-01-23 05:29:52 - dmilith - NOTE: temporary code:
             registry.actorFor[SvdSystemManager] foreach { _ ! GetAllProcesses }
             registry.actorFor[SvdSystemManager] foreach { _ ! SpawnProcess("ls -la") }
             registry.actorFor[SvdSystemManager] foreach { _ ! Kill(435343, SIGINT) }
+            // 2011-01-23 05:29:52 - dmilith - NOTE: EOF temporary code.
             
         case x => 
             log.warn("not recognized message %s", x)

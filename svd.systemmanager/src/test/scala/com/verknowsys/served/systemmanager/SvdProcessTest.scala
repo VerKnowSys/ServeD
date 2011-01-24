@@ -11,7 +11,7 @@ import org.hyperic.sigar._
 import org.specs._
 import java.io._
 import java.lang._
-
+import org.apache.commons.io.FileUtils
 
 
 // 2011-01-22 17:57:49 - dmilith - TODO: extend tests for some critical moments: segvs, ooms and similar app behaviour
@@ -105,8 +105,8 @@ class SvdProcessTest extends Specification {
 
         "SvdSystemProcess should return object with information about process when querying system process" in {
             val a = new SvdSystemProcess(1L) // usually exists in SvdPOSIX system as launchd/init
-            a.pid must beGreaterThan(0L)
-            a.name.size must beGreaterThan(0L)
+            a.pid must beEqual(1L)
+            a.name must beMatching("init|launchd")
             ("PNAME" :: "USER" :: "RES" :: "SHR" :: "PID" :: Nil).foreach{
                 elem =>
                     a.toString must beMatching(elem)
@@ -114,26 +114,26 @@ class SvdProcessTest extends Specification {
         }
 
         
-        "it must be able to run df process properly using default PATH settings" in {
+        "it must be able to run ls process properly using default PATH settings" in {
             var a: SvdProcess = null
-            synchronized {
-                try {
+            try {
+                synchronized {
                     a = new SvdProcess("ls", outputRedirectDestination = "/tmp/served_ls_abc", useShell = false, user = "root")
-                    Thread.sleep(500)
+                    a must notBeNull
                     a.alive must be(false)
                     a = null
-                } catch { 
-                    case x: Any =>
-                        fail("Exception occured: " + x)
                 }
-                try { 
-                    new SvdSystemProcess(a.pid)
-                    fail("SvdProcess pid should be non existant")
-                } catch {
-                    case _ =>
-                }
-                a must beNull
+            } catch { 
+                case x: Any =>
+                    fail("Problem with spawing process %s. Exception: %s".format(a, x))
             }
+            try { 
+                new SvdSystemProcess(a.pid)
+                fail("SvdProcess pid should be non existant")
+            } catch {
+                case _ =>
+            }
+            a must beNull
         }
 
 
