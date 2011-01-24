@@ -89,13 +89,12 @@ class SvdFileEventsManager extends Actor with Logging {
     log.info("SvdFileEventsManager is loading")
     
     protected val clib = CLibrary.instance
-    protected val kq = clib.kqueue() // NOTE: C call
-    
-    // check kqueue
-    if(kq == -1){
-        throw new SvdKqueueException
+    protected lazy val kq = {
+        val k = clib.kqueue() // NOTE: C call
+        if(k == -1) throw new SvdKqueueException // check kqueue
+        k
     }
-    
+
     /** 
      * Mutable map holding [file descriptor => (path, list of (flags, actor ref))] 
      * 
@@ -108,7 +107,7 @@ class SvdFileEventsManager extends Actor with Logging {
      * 
      * @author teamon
      */
-    protected val readerThread = new Thread {
+    protected lazy val readerThread = new Thread {
         override def run {
             while(true){
                 val event = new kevent
@@ -117,13 +116,16 @@ class SvdFileEventsManager extends Actor with Logging {
                 if(nev > 0){
                     SvdFileEventsManager.this.self ! SvdKqueueFileEvent(event.ident.intValue, event.fflags)
                 } else if(nev == -1){
-                    throw new SvdKeventException
+                    throw new SvdKeventException // TODO: Catch this somehow
                 }
             }
         }
     }
-    readerThread.start
-        
+    
+    override def preStart {
+        readerThread.start
+    }
+
     
     def receive = {
         // register new file event, sent from any actor
@@ -161,7 +163,7 @@ class SvdFileEventsManager extends Actor with Logging {
     }
     
     
-    protected def registerNewFileEvent(path: String, flags: Int, ref: ActorRef) = synchronized {
+    protected def registerNewFileEvent(path: String, flags: Int, ref: ActorRef): Unit = synchronized {
         val ident = clib.open(path, O_RDONLY)
         if(ident == -1){
             throw new SvdFileOpenException
@@ -176,9 +178,11 @@ class SvdFileEventsManager extends Actor with Logging {
         
         val nev = clib.kevent(kq, event, 1, null, 0, null)
         if(nev == -1){
-            throw new SvdKeventException
+            registerNewFileEvent(path, flags, ref) // XXX: try again, not really safe
+            // throw new SvdKeventException
+        } else {
+            idents(ident) = (path, ListBuffer[(Int, ActorRef)]((flags, ref)))   
         }
 
-        idents(ident) = (path, ListBuffer[(Int, ActorRef)]((flags, ref)))
     }
 }
