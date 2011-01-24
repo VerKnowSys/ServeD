@@ -50,20 +50,20 @@ class SvdSystemProcess(val pid: Long) extends Logging {
 
     override def toString =
         (
-        "PNAME:[%s],\n" +
-        "USER:[%s],\n" +
-        "RES:[%s],\n" +
-        "SHR:[%s],\n" +
-        "PID:[%s],\n" +
-        "PPID:[%s],\n" +
-        "THREADS:[%s],\n" +
-        "PRIO:[%s],\n" +
-        "NICE:[%s],\n" +
-        "COMMAND:[%s],\n" +
-        "TIME_START:[%s],\n" +
-        "TIME_KERNEL:[%s],\n" +
-        "TIME_TOTAL:[%s],\n" +
-        "TIME_USER:[%s],\n" +
+        "PNAME:[%s] " +
+        "USER:[%s] " +
+        "RES:[%s] " +
+        "SHR:[%s] " +
+        "PID:[%s] " +
+        "PPID:[%s] " +
+        "THREADS:[%s] " +
+        "PRIO:[%s] " +
+        "NICE:[%s] " +
+        "COMMAND:[%s] " +
+        "TIME_START:[%s] " +
+        "TIME_KERNEL:[%s] " +
+        "TIME_TOTAL:[%s] " +
+        "TIME_USER:[%s] " +
         "OPEN_FILES:[%s]\n")
             .format(name, user, rss, shr, pid, ppid, thr, prio, nice, params.mkString(" "), timeStart, timeKernel, timeTotal, timeUser, openFiles)
 
@@ -81,9 +81,9 @@ class SvdSystemProcess(val pid: Long) extends Logging {
         def processList(sort: Boolean = false) = {
             val preList = core.getProcList.toList // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
             val sourceList = if (sort) preList.sortWith(_.toInt < _.toInt) else preList
-            println("UnSORTED   : " + preList)
-            println("SORTED     : " + preList.sortWith(_.toInt < _.toInt))
-            println("sourceList : " + sourceList)
+            log.debug("UnSORTED   : " + preList)
+            log.debug("SORTED     : " + preList.sortWith(_.toInt < _.toInt))
+            log.trace("sourceList : " + sourceList)
             
             sourceList.flatMap(
                 x =>

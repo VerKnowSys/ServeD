@@ -2,8 +2,6 @@
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
 package com.verknowsys.served.notifications
-
-
 import java.util.Date
 
 

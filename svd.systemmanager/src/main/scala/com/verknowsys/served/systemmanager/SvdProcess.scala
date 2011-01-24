@@ -14,8 +14,6 @@ import java.lang.reflect.{Field}
 import akka.util.Logging
 
 
-import akka.util.Logging
-
 /**
   * This class defines mechanism which system commands will be executed through (and hopefully monitored)
   *
@@ -31,12 +29,15 @@ class SvdProcess(
     val useShell: Boolean = true)
         extends Logging {
     
+    
+    // require(commandIsntHarmful, "Prohibited execution of possibily dangerous function: %s, as user: %s, with shell? %s, work dir: %s, output file: %s".format(command, user, useShell, workDir, outputRedirectDestination))
+    
+    require(workDirExists, "Working dir must exist! Given: %s".format(workDir))
+
     // 2011-01-20 02:42:12 - dmilith - TODO: implement SvdProcess requirements
-    // require(commandIsntHarmful)
-    // require(commandExists)
-    // require(workDirExists)
-    // require(usedShellValid)
+    // require(commandExists, "Executed command seems to not exist. Execution terminated. Command: %s".format(command))
     // require(userListed)
+    
     
     log.debug("Spawning SvdSystemProcess: (%s)".format(command))
     
@@ -44,8 +45,30 @@ class SvdProcess(
 
     lazy val pid = process
     
+    // val harmfulCommandDefinition = """.*\[rm\].*""".r // 2011-01-24 00:56:38 - dmilith - TODO: fill with harmful patterns
+    
     log.trace("Process %s spawned.".format(command))
 
+    
+        
+    // def commandExists =
+    //         command match {
+    //             case 
+    //         }
+
+
+    def workDirExists =
+        new File(workDir).exists
+        
+
+    // def commandIsntHarmful =
+    //         command match {
+    //             case harmfulCommandDefinition() =>
+    //                 log.warn("Harmful command detected! Command: %s", command)
+    //                 false
+    //             case _ =>
+    //                 true
+    //         }
 
 
     // 2011-01-20 01:11:06 - dmilith - TODO: find out is this a most efficient way:
@@ -74,7 +97,7 @@ class SvdProcess(
       *
       */
     def process: Long = {
-        var aPid: Long = 0L
+        var aPid: Long = -1L
         val cmdFormats = if (useShell) "%s -u %s -s %s > %s 2>&1" else "%s -u %s %s > %s 2>&1"
         val cmd =  cmdFormats.format("sudo", user, command, outputRedirectDestination).split(" ")
         val rt = Runtime.getRuntime
