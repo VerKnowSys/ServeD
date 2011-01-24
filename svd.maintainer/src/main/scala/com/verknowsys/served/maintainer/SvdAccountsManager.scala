@@ -2,7 +2,7 @@ package com.verknowsys.served.maintainer
 
 import scala.io.Source
 import com.verknowsys.served.SvdConfig
-import com.verknowsys.served.utils.SvdFileEventsReactor
+import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.events.SvdFileEvent
 import com.verknowsys.served.managers._
 
