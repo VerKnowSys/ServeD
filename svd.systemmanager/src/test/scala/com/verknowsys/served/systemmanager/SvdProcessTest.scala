@@ -170,19 +170,22 @@ class SvdProcessTest extends Specification {
         }
 
 
-        "it must be able to check that process is alive or not without shell" in {
+//2011-01-24 19:25:51 - dmilith - TODO: what if some process is spawning a process?
+
+        "it must be able to check that process is alive or not without and with shell" in {
             var a: SvdProcess = null
             var b: SvdProcess = null
             var c: SvdProcess = null
+            var d: SvdProcess = null
             synchronized {
                 try {
-                    a = new SvdProcess("memcached -u nobody -p 11213", user = "root", useShell = true)
+                    a = new SvdProcess("memcached -u nobody -p 11313", user = "root", useShell = true)
                     a must notBeNull
                     ("pid:" :: "cmdSvdProc:" :: Nil).foreach{
                         elem =>
                             a.toString must beMatching(elem)
                     }
-                    b = new SvdProcess("memcached -u nobody -p 11212", user = "root")
+                    b = new SvdProcess("memcached -u nobody -p 11312", user = "root")
                     b must notBeNull
                     ("pid:" :: "cmdSvdProc:" :: Nil).foreach{
                         elem =>
@@ -195,15 +198,21 @@ class SvdProcessTest extends Specification {
                     // 2011-01-24 16:59:05 - dmilith - NOTE: in most cases this will return false: a.alive must beEqual(true)
                     // b.alive must beEqual(true)
                     try {
-                    	c = new SvdProcess("kill %d".format(a.pid), user = "root")}
-                    catch { 
+                    	c = new SvdProcess("kill -SIGKILL %d".format(a.pid), user = "root")
+                    	d = new SvdProcess("kill -SIGKILL %d".format(b.pid), user = "root")
+                    } catch { 
                         case _ =>
                             c = new SvdProcess("echo abc", user = "root")
+                            d = new SvdProcess("echo abc", user = "root")
                     } finally {
                         c must notBeNull
+                        d must notBeNull
                         ("pid:" :: "cmdSvdProc:" :: Nil).foreach{
                             elem =>
                                 c.toString must beMatching(elem)
+                                d.toString must beMatching(elem)
+                                a.alive must beFalse
+                                b.alive must beFalse
                         }
                     }
                 }

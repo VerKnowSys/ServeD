@@ -128,7 +128,7 @@ class SvdProcess(
 	        case x: IllegalThreadStateException =>
 	            log.debug("SvdProcess thread exited. No exitValue given.")
             case x: ProcessException =>
-                log.error("SvdProcess has exited with exception: %s".format(x))
+                log.error("%s".format(x))
         }
         
         aPid
