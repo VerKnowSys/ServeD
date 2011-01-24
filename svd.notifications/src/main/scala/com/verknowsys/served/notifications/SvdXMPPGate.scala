@@ -72,7 +72,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
     
     def processMessage(chat: Chat, message: org.jivesoftware.smack.packet.Message) {
         log.trace("Received message: " + message + " (\"" + message.getBody + "\")")
-        // if (message.getFrom.contains("verknowsys.com")) {   // XXX: hardcoded value
+        // if (message.getFrom.contains("verknowsys.com")) {
         //     trace("Message contains verknowsys: " + message.getFrom)
         //     message.getBody match {
         //         case "last" =>

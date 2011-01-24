@@ -2,7 +2,7 @@ package com.verknowsys.served.maintainer
 
 import com.verknowsys.served.utils.git.GitRepository
 import java.io.File
-
+import org.apache.commons.io.FileUtils
 import akka.util.Logging
 
 /**
@@ -47,18 +47,21 @@ class SvdAccount (
      */
     override def hashCode = (31*userName.hashCode)*31 + uid.hashCode
         
-    // XXX: Remove me!
-    // def size = {
-    //     try {
-    //         val elementsSize = FileUtils.sizeOfDirectory(new File(homeDir))
-    //         log.debug("getSvdAccountSize of " + homeDir + " folder: " + elementsSize)
-    //         Some(elementsSize)
-    //     } catch {
-    //         case x: Exception =>
-    //             error("Error: " + x)
-    //             None
-    //     }
-    // }
+
+    /**
+     * @author dmilith
+     */
+    def accountWeight =
+        try {
+            val elementsSize = FileUtils.sizeOfDirectory(new File(homeDir))
+            log.debug("getSvdAccountSize of " + homeDir + " folder: " + elementsSize)
+            Some(elementsSize)
+        } catch {
+            case x: Exception =>
+                log.error("accountWeight exception: " + x)
+                None
+        }
+
 }
 
 /**
