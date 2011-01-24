@@ -72,6 +72,11 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
             senderOption = Some(expectActor)
             
             expectActor ? Success
+            
+            (fem !! TestGetIdents) match {
+                case Some(idents: SvdFileEventsManager#IdentsMap) => idents.mapValues { case (a,b) => (a, b.toList) } must haveValue( (DIR + "/single", (Modified, expectActor) :: Nil))
+                case _ => fail("timeout")
+            }
         }
         
         "notify actors when file modified" in {
@@ -92,6 +97,22 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
             actorOf[SvdTestFileEventsReactor].start
             actorOf[SvdTestFileEventsReactor].start
             actorOf[SvdTestFileEventsReactor].start.isExpectation
+        }
+        
+        "unregister events when stopped" in {
+            touch(DIR + "/single")
+            
+            expectActor = actorOf[SvdTestFileEventsReactor].start
+            senderOption = Some(expectActor)
+            
+            expectActor ? Success
+            
+            expectActor.stop
+            
+            (fem !! TestGetIdents) match {
+                case Some(idents: SvdFileEventsManager#IdentsMap) => idents must beEmpty
+                case _ => fail("timeout")
+            }
         }
         
         // "raise SvdFileOpenException exception" in {
