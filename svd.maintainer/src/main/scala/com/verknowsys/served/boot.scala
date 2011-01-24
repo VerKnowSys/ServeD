@@ -1,7 +1,8 @@
 package com.verknowsys.served
 
-import akka.actor.ActorRef
-import akka.actor.Actor.{remote, actorOf}
+import akka.actor._
+import akka.config.Supervision._
+import akka.actor.Actor.{remote, actorOf, registry}
 import akka.util.Logging
 
 import com.verknowsys.served.utils.SvdFileEventsManager
@@ -13,13 +14,23 @@ import com.verknowsys.served.systemmanager.SvdSystemManager
 
 import com.verknowsys.served.utils.signals._
 
+
+
 object boot extends Logging {
     def apply(){
-        actorOf[SvdFileEventsManager].start
-        actorOf[SvdSystemManager].start
-        actorOf[SvdMaintainer].start ! Init
-        actorOf[SvdAccountsManager].start
-        // actorOf[SvdNotificationCenter].start
+        val list = (actorOf[SvdFileEventsManager] ::
+                   actorOf[SvdSystemManager] ::
+                   actorOf[SvdMaintainer] ::
+                   actorOf[SvdAccountsManager] :: 
+                   // actorOf[SvdNotificationCenter] :: 
+                   Nil).map(a => Supervise(a, Permanent))
+        // supervise and autostart
+        Supervisor(
+          SupervisorConfig(
+            OneForOneStrategy(List(classOf[Exception]), 3, 1000),
+            list))
+        
+        registry.actorFor[SvdMaintainer].foreach { _ ! Init }
         
         // ApiServer
         remote.start(SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
