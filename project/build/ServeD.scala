@@ -2,10 +2,7 @@ import sbt._
 import growl._
 import extract._
 import java.io.File
-import scala.util.matching.Regex
-import scala.collection.mutable.ListBuffer
-
-
+import reaktor.scct.ScctProject
 
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
     // Projects
@@ -21,7 +18,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     override def parallelExecution = false
     
     // Dependencies
-    class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject {
+    class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject {
         
         override def compileOrder = CompileOrder.JavaThenScala
         override def javaCompileOptions = super.javaCompileOptions ++ javaCompileOptions("-source", "1.6")
