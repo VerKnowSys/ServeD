@@ -155,7 +155,8 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
                 case _ => fail("timeout")
             }
         }
-        
+
+        // TODO: How to test throwing exceptions in other threads?
         // "raise SvdFileOpenException exception" in {
         //     {
         //         expectActor = actorOf(new SvdExpectActor {
@@ -163,18 +164,22 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
         //         }).start
         //     } must throwA[SvdFileOpenException]
         // }
-        // "unregister file event when stoped" in {
-        //     touch(DIR + "/single")
-        //     
-        //     expectActor = actorOf[SvdTestFileEventsReactor].start
-        //     senderOption = Some(expectActor)
-        //     
-        //     expectActor ? Success
-        //     
-        //     expectActor.stop
-        //     
-        //     // TODO: Test this!
-        // }
+        
+        "unregister file event when stoped" in {
+            touch(DIR + "/single")
+            
+            expectActor = actorOf[SvdTestFileEventsReactor].start
+            senderOption = Some(expectActor)
+            
+            expectActor ? Success
+            
+            expectActor.stop
+            
+            (fem !! TestGetIdents) match {
+                case Some(idents: SvdFileEventsManager#IdentsMap) => idents must beEmpty
+                case _ => fail("timeout")
+            }
+        }
     
         
         // TODO: Write (if possible) more stress tests
@@ -185,5 +190,51 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
             actorOf[SvdTestFileEventsReactor].start.isExpectation
         }
     }
+    
+    // TODO: this is sloooooooooooow
+    // "Stress test" should {
+    //     doBefore { 
+    //         beforeExpectActor 
+    //         try { FileUtils.forceDelete(DIR) } catch { case _ => }
+    //         fem = actorOf[TestSvdFileEventsManager].start
+    //     }
+    //     
+    //     doAfter { 
+    //         afterExpectActor
+    //         registry.shutdownAll 
+    //     }
+    //     
+    //     "get 100 modified files" in {
+    //         val range = (1 to 4)
+    //         val filename = (i: Int) => DIR + "/stress_" + i + "_mod"
+    //         
+    //         val actors = range map { i =>
+    //             val name = filename(i)
+    //             touch(name)
+    //             name
+    //         } map { name => 
+    //             (name, actorOf(new SvdTestFileEventsReactorForFile(name)).start) 
+    //         }
+    //         
+    //         actors.foreach { case(_, actor) => 
+    //             expectActor = actor
+    //             senderOption = Some(expectActor)
+    //     
+    //             expectActor ? Success
+    //         }
+    //     
+    //         actors.foreach { case(name, _) =>
+    //             writeFile(name, "new content")
+    //         }
+    //             
+    //         actors.foreach { case(name, actor) => 
+    //             println("expecting actor " + name)
+    //             expectActor = actor
+    //             senderOption = Some(expectActor)
+    //     
+    //             expectActor ?* (SvdFileEvent(name, 0x04), SvdFileEvent(name, 0x06))
+    //         }
+    //     }
+    // }
     
 }
