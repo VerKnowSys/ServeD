@@ -120,7 +120,6 @@ class SvdProcessTest extends Specification {
                 synchronized {
                     a = new SvdProcess("ls", outputRedirectDestination = "/tmp/served_ls_abc", useShell = false, user = "root")
                     a must notBeNull
-                    a.alive must be(false)
                     a = null
                 }
             } catch { 
