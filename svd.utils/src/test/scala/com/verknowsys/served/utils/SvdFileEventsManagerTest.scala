@@ -53,7 +53,7 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
             expectActor ? Success
         }
         
-        "spawn new file watcher using SvdFileEventsReactor trait" in {
+        "register new file event using SvdFileEventsReactor trait" in {
             touch(DIR + "/single")
             
             expectActor = actorOf[SvdTestFileEventsReactor].start
@@ -74,6 +74,20 @@ class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecific
             
             expectActor ?* (SvdFileEvent(DIR + "/single", 0x04), SvdFileEvent(DIR + "/single", 0x06))
         }
+        
+        // "unregister file event when stoped" in {
+        //     touch(DIR + "/single")
+        //     
+        //     expectActor = actorOf[SvdTestFileEventsReactor].start
+        //     senderOption = Some(expectActor)
+        //     
+        //     expectActor ? Success
+        //     
+        //     expectActor.stop
+        //     
+        //     // TODO: Test this!
+        // }
+    
         
         // TODO: Write (if possible) more stress tests
     }
