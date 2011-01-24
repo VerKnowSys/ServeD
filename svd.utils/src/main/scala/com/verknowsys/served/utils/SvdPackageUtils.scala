@@ -32,4 +32,9 @@ package object utils {
         } }
     }
     
+    final val Modified          = CLibrary.NOTE_WRITE | CLibrary.NOTE_EXTEND
+    final val Deleted           = CLibrary.NOTE_DELETE
+    final val Renamed           = CLibrary.NOTE_RENAME
+    final val AttributesChanged = CLibrary.NOTE_ATTRIB
+    
 }

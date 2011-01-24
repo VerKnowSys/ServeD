@@ -24,10 +24,8 @@ class ANSIColorPatternLayout extends PatternLayout {
         ERROR -> Console.RED
     )
 
-    final val DefaultColor = Console.RESET
-    
-    override def doLayout(event: ILoggingEvent) = Colors(event.getLevel) + super.doLayout(event) + DefaultColor
-    
+    override def doLayout(event: ILoggingEvent) = Colors(event.getLevel) + super.doLayout(event) + Console.RESET
+
 }
 
 class LowerCaseLevelConverter extends ClassicConverter {

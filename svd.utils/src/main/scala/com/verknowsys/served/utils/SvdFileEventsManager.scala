@@ -1,7 +1,7 @@
 package com.verknowsys.served.utils
 
 import com.sun.jna.NativeLong
-import scala.collection.mutable.{Map, ListBuffer}
+import scala.collection.mutable.{HashMap => MutableMap, ListBuffer}
 
 import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.actorOf
@@ -51,29 +51,25 @@ object events {
  */
 trait SvdFileEventsReactor {
     self: Actor with Logging =>
-    
-    final val Modified          = CLibrary.NOTE_WRITE | CLibrary.NOTE_EXTEND
-    final val Deleted           = CLibrary.NOTE_DELETE
-    final val Renamed           = CLibrary.NOTE_RENAME
-    final val AttributesChanged = CLibrary.NOTE_ATTRIB
-    
+
     def registerFileEventFor(path: String, flags: Int){
         Actor.registry.actorFor[SvdFileEventsManager] match {
             case Some(fem) => fem ! SvdRegisterFileEvent(path, flags, this.self)
-            case None => log.error("Could not register file watcher. FileEventsManager worker not found.")
+            case None => log.error("Could not register file event. FileEventsManager worker not found.")
         }
     }
     
     def unregisterFileEvents {
         Actor.registry.actorFor[SvdFileEventsManager] match {
             case Some(fem) => fem ! SvdUnregisterFileEvent(this.self)
-            case None => log.error("Could not unregister file watcher. FileEventsManager worker not found.")
+            case None => log.error("Could not unregister file event. FileEventsManager worker not found.")
         }
     }
     
     override def preRestart(reason: Throwable) = unregisterFileEvents
     override def postStop = unregisterFileEvents
 }
+
 
 
 /** 
@@ -95,12 +91,15 @@ class SvdFileEventsManager extends Actor with Logging {
         k
     }
 
+    type ActorRefList = ListBuffer[(Int, ActorRef)]
+    type IdentsMap = MutableMap[Int, (String, ActorRefList)]
+
     /** 
      * Mutable map holding [file descriptor => (path, list of (flags, actor ref))] 
      * 
      * @author teamon
      */
-    protected val idents = Map[Int, (String, ListBuffer[(Int, ActorRef)])]()
+    protected val idents = new IdentsMap
         
     /** 
      * BSD kqueue events reader thread 
@@ -181,7 +180,9 @@ class SvdFileEventsManager extends Actor with Logging {
             registerNewFileEvent(path, flags, ref) // XXX: try again, not really safe
             // throw new SvdKeventException
         } else {
-            idents(ident) = (path, ListBuffer[(Int, ActorRef)]((flags, ref)))   
+            val list = new ActorRefList()
+            list += ((flags, ref))
+            idents(ident) = (path, list)
         }
 
     }
