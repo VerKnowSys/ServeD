@@ -15,6 +15,7 @@ object events {
     case class SvdKqueueFileEvent(ident: Int, flags: Int)
     case class SvdFileEvent(path: String, flags: Int)
     case class SvdRegisterFileEvent(path: String, flags: Int, ref: ActorRef)
+    case class SvdUnregisterFileEvent(ref: ActorRef)
 
     class SvdKqueueException extends Exception
     class SvdKeventException extends Exception
@@ -26,14 +27,23 @@ object events {
  * Include this trait in your actor to use file events
  * 
  * {{{
- * class MyActor extends Actor with FileEventsReactor {
- *     override def preStart {
- *         registerFileEventFor("/path/to/file", Modified)
- *     }
- *     
+ * class MyActor extends Actor with FileEventsReactor {    
  *     def receive = {
  *         case FileEvent(path, flags) => // handle event ...
  *     }
+ * 
+ *     override def preStart {
+ *         registerFileEventFor("/path/to/file", Modified)
+ *     }
+ *
+ *     override def preRestart(reason: Throwable) {
+ *         super.preRestart(reason) // Must put this line to unregistr events on restart
+ *     }
+ *
+ *     override def postStop {
+ *         super.postStop // Must put this line to unregistr events on stop
+ *     }
+ * 
  * } 
  * }}} 
  * 
@@ -53,6 +63,16 @@ trait SvdFileEventsReactor {
             case None => log.error("Could not register file watcher. FileEventsManager worker not found.")
         }
     }
+    
+    def unregisterFileEvents {
+        Actor.registry.actorFor[SvdFileEventsManager] match {
+            case Some(fem) => fem ! SvdUnregisterFileEvent(this.self)
+            case None => log.error("Could not unregister file watcher. FileEventsManager worker not found.")
+        }
+    }
+    
+    override def preRestart(reason: Throwable) = unregisterFileEvents
+    override def postStop = unregisterFileEvents
 }
 
 
@@ -108,13 +128,26 @@ class SvdFileEventsManager extends Actor with Logging {
     def receive = {
         // register new file event, sent from any actor
         case SvdRegisterFileEvent(path, flags, ref) =>
-            idents.find { case(_, (p, _)) => p == path } match {
+            idents.find { case(i, (p, l)) => p == path } match {
                 case Some((_, (p, list))) => list += ((flags, ref))
                 case None => registerNewFileEvent(path, flags, ref)
             }
             
             log.trace("Registered new file event: %s / %s for %s", path, flags, ref)
+            log.trace("Registered file events: %s", idents)
             self reply Success
+            
+        case SvdUnregisterFileEvent(ref) =>
+            idents.foreach { case ((ident, (path, list))) =>
+                list filter { case ((flags, actor)) => actor == ref } foreach { list -= _ }
+                if(list.isEmpty){
+                    idents -= ident
+                }
+            }
+            
+            log.trace("Unregistered file events for %s", ref)
+            log.trace("Registered file events: %s", idents)
+            // self reply Success
 
         // Forward event sent by kqueue to file watchers
         case SvdKqueueFileEvent(ident, flags) => 
