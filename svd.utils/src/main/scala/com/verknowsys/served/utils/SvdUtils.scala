@@ -104,5 +104,13 @@ object SvdUtils extends Logging {
         )
         
         
+        
+    /** 
+     * Create new SvdLoopThread with provided function 
+     * 
+     * @author teamon
+     */
+    def loopThread(f: => Unit) = new SvdLoopThread(f)
+        
 }
 

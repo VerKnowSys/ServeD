@@ -106,23 +106,27 @@ class SvdFileEventsManager extends Actor with Logging {
      * 
      * @author teamon
      */
-    protected lazy val readerThread = new Thread {
-        override def run {
-            while(true){
-                val event = new kevent
-                val nev = clib.kevent(kq, null, 0, event, 1, null)
+    protected lazy val readerThread = SvdUtils.loopThread {
+        val event = new kevent
+        val nev = clib.kevent(kq, null, 0, event, 1, null)
 
-                if(nev > 0 && event != null){
-                    SvdFileEventsManager.this.self ! SvdKqueueFileEvent(event.ident.intValue, event.fflags)
-                } else if(nev == -1){
-                    throw new SvdKeventException // TODO: Catch this somehow
-                }
-            }
+        if(nev > 0 && event != null){
+            self ! SvdKqueueFileEvent(event.ident.intValue, event.fflags)
+        } else if(nev == -1){
+            throw new SvdKeventException // TODO: Catch this somehow
         }
     }
     
     override def preStart {
         readerThread.start
+    }
+    
+    override def preRestart(reason: Throwable) {
+        readerThread.kill
+    }
+    
+    override def postStop {
+        readerThread.kill
     }
 
     
