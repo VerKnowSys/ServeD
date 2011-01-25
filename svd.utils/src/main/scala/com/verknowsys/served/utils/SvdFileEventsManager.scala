@@ -110,7 +110,7 @@ class SvdFileEventsManager extends Actor with Logging {
         val event = new kevent
         val nev = clib.kevent(kq, null, 0, event, 1, null)
 
-        if(nev > 0 && event != null){
+        if(nev > 0 && event != null && event.ident != null){
             self ! SvdKqueueFileEvent(event.ident.intValue, event.fflags)
         } else if(nev == -1){
             throw new SvdKeventException // TODO: Catch this somehow
