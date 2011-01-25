@@ -19,13 +19,13 @@ import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
 import akka.util.Logging
 
-case class ProcessesList(pids: List[Long])
 
+case class ProcessesList(pids: List[Long])
 
 /**
 *   @author dmilith
 *   
-*   SvdSystemManager - responsible for System Managment and SvdMonitoring
+*   SvdSystemManager - responsible for System managment and monitoring
 */
 class SvdSystemManager extends Actor with Logging {
     import SvdPOSIX._
@@ -84,7 +84,7 @@ class SvdSystemManager extends Actor with Logging {
             
         case SpawnProcess(cmd) =>
             log.debug("Requested process spawn: %s", cmd)
-            val spawn = new SvdProcess(cmd, user = "root") // 2011-01-23 05:27:11 - dmilith - XXX: temporary, that should be user's account name
+            val spawn = new SvdProcess(cmd, user = "root", useShell = true) // 2011-01-23 05:27:11 - dmilith - XXX: temporary, that should be user's account name
             log.trace("Spawned: %s", spawn)
             
         case GetAllProcesses =>
