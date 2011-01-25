@@ -83,7 +83,15 @@ class SvdSystemManagerTest extends Specification {
 
                 val start = (new java.util.Date).getTime
                 while (a > 1) {
-                    val tmp = sigarCore.getProcList.filter{ x => sigarCore.getProcCredName(x).getUser != "root" }
+                    val tmp = sigarCore.getProcList.filter{ x =>
+                        try {
+                        	sigarCore.getProcCredName(x).getUser != "root"
+                        } catch { 
+                            case _ =>
+                                false
+                                // this one may fail here when one of spawed threads may be already dead
+                        }
+                    }
                     tmp must notBeNull
                     tmp.size must beGreaterThan(3)
                     a -= 1
