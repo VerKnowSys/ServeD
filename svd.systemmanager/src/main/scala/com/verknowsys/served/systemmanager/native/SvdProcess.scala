@@ -42,6 +42,7 @@ class SvdProcess(
     import SvdPOSIX._
     Native.setProtected(true)
 
+    // 2011-01-26 12:36:06 - dmilith - NOTE: TODO: check low level way of launching processes
     // val pid = {
     //         import CLibrary._
     //         val clib = CLibrary.instance
@@ -50,7 +51,15 @@ class SvdProcess(
     //         else
     //             -1
     //     }
-    
+
+    /**
+      * Spawns new system process
+      *
+      * @author dmilith
+      *
+      * @return spawned process pid
+      *
+      */
     val pid = {
         var aPid = -1L
         val cmdFormats = if (useShell) "%s -u %s -s %s > %s 2>&1" else "%s -u %s %s > %s 2>&1"
@@ -80,8 +89,6 @@ class SvdProcess(
                 log.debug("SvdProcess thread exited. No exitValue given.")
             case x: ProcessException =>
                 log.error("%s".format(x))
-            // case x: SigarException =>
-            //                 log.debug("SigarException: %s".format(x))
         }
         aPid
     }
@@ -91,7 +98,7 @@ class SvdProcess(
     	core.getProcState(pid)
     } catch { 
         case x: SigarException =>
-            log.error("Sigar has just throw: %s".format(x))
+            log.debug("Sigar has just throw: %s".format(x))
             new ProcState
     }
     
@@ -100,7 +107,7 @@ class SvdProcess(
     	core.getProcCpu(pid)
     } catch { 
         case x: SigarException =>
-            log.error("Sigar has just throw: %s".format(x))
+            log.debug("Sigar has just throw: %s".format(x))
             new ProcCpu
     }
     
@@ -109,10 +116,18 @@ class SvdProcess(
     	core.getProcMem(pid)
     } catch { 
         case x: SigarException =>
-            log.error("Sigar has just throw: %s".format(x))
+            log.debug("Sigar has just throw: %s".format(x))
             new ProcMem
     }
     
+
+    def params: Array[String] = try {
+    	core.getProcArgs(pid)
+    } catch { 
+        case _ =>
+            Array("")
+    }
+
     
     def name = stat.getName
     def runUser = core.getProcCredName(pid).getUser
@@ -120,13 +135,6 @@ class SvdProcess(
     def thr = stat.getThreads
     def prio = stat.getPriority
     def nice = stat.getNice
-    def params: Array[String] = try {
-    	core.getProcArgs(pid)
-    } catch { 
-        case _ =>
-            Array("")
-    }
-    
     def timeStart = cpu.getStartTime
     def timeKernel = cpu.getSys
     def timeTotal = cpu.getTotal
@@ -140,15 +148,10 @@ class SvdProcess(
     require(outputWritable, "SvdProcess output file (%s) isn't writable!".format(outputRedirectDestination))
     require(passACLs, "SvdProcess didn't pass ACL requirements! Failed process: %s".format(command))
     require(pid > 0, "SvdProcess PID always should be > 0!")
-    // require(core != null, "SvdProcess Core cannot be null!")
-    // require(stat != null, "SvdProcess Stat cannot be null!")
-    // require(cpu != null, "SvdProcess Cpu cannot be null!")
-    // require(mem != null, "SvdProcess Mem cannot be null!")
     
     // 2011-01-20 02:42:12 - dmilith - TODO: implement SvdProcess requirements
     // require(userListed)
 
-    
 
     def passACLs =
         true // 2011-01-25 20:56:10 - dmilith - TODO: implement ACL check
@@ -184,16 +187,6 @@ class SvdProcess(
                 false
         }
     
-    
-    /**
-      * Spawns new system process
-      *
-      * @author dmilith
-      *
-      * @return spawned process pid
-      *
-      */
-
 
     /**
       * Kills system process
@@ -296,7 +289,7 @@ object SvdProcess extends Logging {
     /**
      *  @author dmilith
      *
-     *  Returns given pid process info as String
+     *  Returns process info of given pid
      */
     def getProcessInfo(apid: Long) = {
         try {
