@@ -13,6 +13,7 @@ import scala.io._
 import java.lang.reflect.{Field}
 import akka.util.Logging
 import org.apache.commons.io.FileUtils
+import SvdPOSIX._
 
 
 class ProcessException(x: String) extends Exception(x)
@@ -37,6 +38,7 @@ class SvdProcess(
     require(commandNotEmpty, "SvdProcess require non-empty command to execute!")
     require(workDirExists, "SvdProcess working dir must exist! Given: %s".format(workDir))
     require(outputWritable, "SvdProcess output file (%s) isn't writable!".format(outputRedirectDestination))
+    require(passACLs, "SvdProcess didn't pass ACL requirements! Failed process: %s".format(command))
     
     // 2011-01-20 02:42:12 - dmilith - TODO: implement SvdProcess requirements
     // require(userListed)
@@ -50,6 +52,9 @@ class SvdProcess(
     
     log.trace("Process %s spawned.".format(command))
 
+
+    def passACLs =
+        true // 2011-01-25 20:56:10 - dmilith - TODO: implement ACL check
     
         
     def commandNotEmpty =
@@ -135,4 +140,48 @@ class SvdProcess(
     }
 
 
+    /**
+      * Kills system process
+      *
+      * @author dmilith
+      *
+      * @return true if succeeded, false if failed
+      *
+      */
+    def kill(signal: SvdPOSIX.Value = SIGINT) = {
+        SvdProcess.kill(pid, signal)
+    }
+
+}
+
+
+/**
+ *  @author dmilith
+ *
+ *  Static access to kill process from outside of process
+ */
+object SvdProcess {
+    
+    
+    /**
+      * Kills system process with given pid and signal
+      *
+      * @author dmilith
+      *
+      * @return true if succeeded, false if failed
+      *
+      */
+    def kill(pid: Long, signal: SvdPOSIX.Value = SIGINT) = {
+        import CLibrary._
+        val clib = CLibrary.instance
+        if (clib.kill(pid, signal.id) == 0)
+            true
+        else
+            false
+    }
+    
+    
+    
+    
+    
 }
