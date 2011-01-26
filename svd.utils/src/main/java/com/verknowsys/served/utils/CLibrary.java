@@ -12,6 +12,8 @@ public interface CLibrary extends Library {
 
     // 2011-01-26 00:47:55 - dmilith - NOTE: some SvdProcess requirements:
     public int kill(long pid, int signal);
+    public int execve(String filename, String[] argv, String[] envp);
+    public int fork();
     
     // see sys/event.h header file
     public int kqueue();

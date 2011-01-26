@@ -38,7 +38,7 @@ object boot extends Logging {
     }
     
     def main(args: Array[String]) {
-        log.debug("SvdConfig home dir: " + SvdConfig.homePath + SvdConfig.vendorDir)
+        log.debug("Home dir: " + SvdConfig.homePath + SvdConfig.vendorDir)
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         
         args foreach { _ match {
