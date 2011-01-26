@@ -9,6 +9,9 @@ import com.sun.jna.*;
  */
 public interface CLibrary extends Library {
     public static final CLibrary instance = (CLibrary) Native.loadLibrary("c", CLibrary.class);
+
+    // 2011-01-26 00:47:55 - dmilith - NOTE: some SvdProcess requirements:
+    public int kill(long pid, int signal);
     
     // see sys/event.h header file
     public int kqueue();
