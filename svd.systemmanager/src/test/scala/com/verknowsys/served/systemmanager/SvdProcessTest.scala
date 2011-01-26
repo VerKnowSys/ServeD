@@ -152,7 +152,7 @@ class SvdProcessTest extends Specification {
         "it must be able to run ls process properly using default PATH settings" in {
             var a: SvdProcess = null
             try {
-                a = new SvdProcess("kill 4354545", user = "root")
+                a.kill(SIGKILL) must beFalse
                 fail("SvdProcess should fail here!")
             } catch { 
                 case x: Throwable =>
@@ -197,23 +197,18 @@ class SvdProcessTest extends Specification {
                 } finally {
                     // 2011-01-24 16:59:05 - dmilith - NOTE: in most cases this will return false: a.alive must beEqual(true)
                     // b.alive must beEqual(true)
-                    try {
-                    	c = new SvdProcess("kill -SIGKILL %d".format(a.pid), user = "root")
-                    	d = new SvdProcess("kill -SIGKILL %d".format(b.pid), user = "root")
-                    } catch { 
-                        case _ =>
-                            c = new SvdProcess("echo abc", user = "root")
-                            d = new SvdProcess("echo abc", user = "root")
-                    } finally {
-                        c must notBeNull
-                        d must notBeNull
-                        ("pid:" :: "cmdSvdProc:" :: Nil).foreach{
-                            elem =>
-                                c.toString must beMatching(elem)
-                                d.toString must beMatching(elem)
-                                a.alive must beFalse
-                                b.alive must beFalse
-                        }
+                    a.kill(SIGKILL) must beTrue
+                    b.kill(SIGKILL) must beTrue
+                    c = new SvdProcess("echo abc", user = "root")
+                    d = new SvdProcess("echo abc", user = "root")
+                    c must notBeNull
+                    d must notBeNull
+                    ("pid:" :: "cmdSvdProc:" :: Nil).foreach{
+                        elem =>
+                            c.toString must beMatching(elem)
+                            d.toString must beMatching(elem)
+                            a.alive must beFalse
+                            b.alive must beFalse
                     }
                 }
             }
