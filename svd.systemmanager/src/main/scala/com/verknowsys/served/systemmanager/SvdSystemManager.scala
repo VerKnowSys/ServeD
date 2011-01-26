@@ -9,7 +9,6 @@ import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.monitor.SvdMonitored
 import com.verknowsys.served.systemmanager.native._
 
-import org.hyperic.sigar._
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -32,28 +31,26 @@ class SvdSystemManager extends Actor with Logging {
     
     log.info("SvdSystemManager is loading")
     
-    private val core = new Sigar
-    private val processes = ListBuffer[SvdProcess]()
-    
+
     Native.setProtected(true) // 2010-10-11 23:43:21 - dmilith - set JVM protection (in case of JNA code fail it should only throw an exception)
     
     
     def receive = {
         case Init =>
             val nrs = new SvdSystemResources
-            val nsp = new SvdSystemProcess(core.getPid)
             
             log.info("SvdSystemManager ready")
             log.info("System Resources Availability:\n%s".format(nrs))
-            log.info("Current PID: %d. System Information:\n%s".format(core.getPid, nsp))
+            // log.info("Current PID: %d. System Information:\n%s".format(SvdProcess.getCurrentProcessPid, SvdProcess.getProcessInfo(SvdProcess.getCurrentProcessPid)))
             
 
             val a = new SvdProcess(command = "memcached -u nobody", user = "root", outputRedirectDestination = "/tmp/served_nobody_memcached.log")
-            log.debug("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
+            // log.debug("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
+            a.kill(SIGINT)
             
-            val b = new SvdProcess(command = "df -h", user = "root")
-            log.debug("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
-            
+            val b = new SvdProcess(command = "df -h", user = "root", useShell = true)
+            // log.debug("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
+            b.kill(SIGINT)
             
             // val sam = Actor.registry.actorFor[SvdAccountManager]
             // sam.get ! "go!"
@@ -80,7 +77,7 @@ class SvdSystemManager extends Actor with Logging {
             
         case Kill(pid, signal) => // 2011-01-23 04:13:34 - dmilith - NOTE: send standard SIGINT signal to app with some pid
             log.info("Kill request for native application with Pid: %s. Sending signal: %s", pid, signal)
-            new SvdProcess("kill -%s %s".format(signal, pid), user = "root")
+            SvdProcess.kill(pid.asInstanceOf[Long], signal.asInstanceOf[SvdPOSIX.Value])
             
         case SpawnProcess(cmd) =>
             log.debug("Requested process spawn: %s", cmd)
@@ -88,14 +85,10 @@ class SvdSystemManager extends Actor with Logging {
             log.trace("Spawned: %s", spawn)
             
         case GetAllProcesses =>
-            val psAll = core.getProcList.toList
+            val psAll = SvdProcess.processList(true)
             log.debug("All process IDs: %s".format(psAll.mkString(", ")))
             self reply ProcessesList(psAll)
             
-        case GetRunningProcesses =>
-            log.debug("Processes running by ServeD: %s".format(processes.mkString(", ")))
-            self reply(processes)
-                
         case Quit =>
             log.info("Quitting SvdSystemManager")
             exit
