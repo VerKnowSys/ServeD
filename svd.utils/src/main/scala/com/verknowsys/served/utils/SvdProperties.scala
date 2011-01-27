@@ -5,6 +5,8 @@ import scala.collection.JavaConversions._
 import java.io.{FileInputStream, FileOutputStream}
 import java.util.{Properties => JProperties}
 import akka.util.Logging
+import org.apache.commons.io.FileUtils
+
 
 /** 
  * SvdProperty converter interface
@@ -112,6 +114,7 @@ class SvdProperties(filename: String) extends Logging {
     protected def load = {
         try {
             val jprops = new JProperties
+            FileUtils.touch(filename) // 2011-01-27 01:12:08 - dmilith - NOTE: this is required to avoid first time run failures
             jprops.load(new FileInputStream(filename))
 
             log.debug("Loaded file: " + filename)
