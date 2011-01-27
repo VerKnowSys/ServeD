@@ -39,7 +39,7 @@ class SvdProcess(
     log.debug("Spawning SvdProcess: (%s)".format(command))
 
     import SvdProcess._
-    import SvdPOSIX._
+    
     Native.setProtected(true)
 
     // 2011-01-26 12:36:06 - dmilith - NOTE: TODO: check low level way of launching processes
@@ -74,7 +74,7 @@ class SvdProcess(
             f.getName match {
                 case "pid" =>
                     aPid = f.get(proc).asInstanceOf[Int]
-                    log.debug("Pid: %s (of %s)".format(aPid, command))
+                    log.trace("PID: %s (of %s)".format(aPid, command))
                 case _ =>
             }
             log.trace(f.getName+"="+f.get(proc))
@@ -94,6 +94,11 @@ class SvdProcess(
     }
     
     
+    /**
+     *  @author dmilith
+     *
+     *   Accessors for process detail info
+     */
     def stat: ProcState = try {
     	core.getProcState(pid)
     } catch { 
@@ -143,6 +148,11 @@ class SvdProcess(
     def shr = mem.getShare
 
 
+    /**
+     *  @author dmilith
+     *
+     *   Requirements for spawning process
+     */
     require(commandNotEmpty, "SvdProcess require non-empty command to execute!")
     require(workDirExists, "SvdProcess working dir must exist! Given: %s".format(workDir))
     require(outputWritable, "SvdProcess output file (%s) isn't writable!".format(outputRedirectDestination))
@@ -153,18 +163,38 @@ class SvdProcess(
     // require(userListed)
 
 
+    /**
+     *  @author dmilith
+     *
+     *   All ACLs must pass for given process
+     */
     def passACLs =
         true // 2011-01-25 20:56:10 - dmilith - TODO: implement ACL check
     
-        
+    
+    /**
+     *  @author dmilith
+     *
+     *   Checks for empty command
+     */
     def commandNotEmpty =
         (command != "") && (command != null)
-        
 
+
+    /**
+     *  @author dmilith
+     *
+     *   Checks for dir existance
+     */
     def workDirExists =
         new File(workDir).exists
         
     
+    /**
+     *  @author dmilith
+     *
+     *   Checks for writable output
+     */
     def outputWritable = {
         try { 
             FileUtils.touch(outputRedirectDestination)
@@ -173,10 +203,13 @@ class SvdProcess(
         }
         new File(outputRedirectDestination).canWrite
     }
-        
-        
 
-    // 2011-01-20 01:11:06 - dmilith - TODO: find out is this a most efficient way:
+
+    /**
+     *  @author dmilith
+     *
+     *   Returns true if current process exists
+     */    
     def alive = 
         try {
              core.getProcState(pid)
