@@ -15,6 +15,10 @@ object SvdSpecHelpers {
 
     def writeFile(path: String, data: String) = FileUtils.writeStringToFile(path, data)
     
+    def mkdir(path: String) = FileUtils.forceMkdir(path)
+    
+    def rmdir(path: String) = try { FileUtils.forceDelete(path) } catch { case _ => }
+    
     def restoreFile(path: String)(f: => Unit){
         val content = readFile(path)
         f
