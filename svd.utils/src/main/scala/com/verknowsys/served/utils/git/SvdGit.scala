@@ -16,6 +16,7 @@ import java.util.Date
 import akka.util.Logging
 
 // NOTE: Jgit JavaDoc at http://s.teamon.eu/jgit-doc/
+// NOTE: Jgit User guide at http://wiki.eclipse.org/JGit/User_Guide
 
 
 /**
@@ -86,11 +87,13 @@ object GitRepository {
      * Create git repository for specified directory
      * @author teamon
     */
-    def create(dir: String, bare: Boolean = false): GitRepository = {
-        // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
-        val repo = new GitRepository(dir)
-        repo.gitRepo.create(bare)
-        repo
+    def init(dir: String, bare: Boolean = false): GitRepository = {
+        val path = if(bare) dir else dir + "/.git"
+
+        val repo = new FileRepository(path)
+        repo.create(bare) // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
+
+        new GitRepository(dir)
     }
     
     /**
@@ -112,13 +115,12 @@ object GitRepository {
  */
 class GitRepository(val dir: String) extends Logging {
     lazy val (gitRepo, isBare) = {
-        val file = new File(dir, ".git")
-        log.trace("Git repository watch. Dir: %s, File: %s".format(dir, file))
-        if(file.exists) {
-            log.trace("File exists. Loading normal repository")
-            (new FileRepository(file), false)
+        val dotgit = new File(dir, ".git")
+        if(dotgit.exists) {
+            log.trace(".git directory exists. Loading normal repository")
+            (new FileRepository(dotgit), false)
         } else {
-            log.trace("File not exists. Loading bare repository")
+            log.trace(".git directory does not exist. Loading bare repository")
             (new FileRepository(dir), true)
         }
     }
