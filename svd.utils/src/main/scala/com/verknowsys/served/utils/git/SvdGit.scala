@@ -130,28 +130,71 @@ class GitRepository(val dir: String) extends Logging {
     lazy val (headPath, headFile) = if(isBare) (dir + "/refs/heads", "master") else (dir + "/.git/logs", "HEAD")
     
     
+    /** 
+     * Return git repository name (actually it is the name of directory)
+     * 
+     * @author teamon
+     */
     def name = new File(dir).getName
+    
+    /**
+     * Returns git ref for HEAD
+     *
+     * @author teamon
+     */
+    def head = gitRepo.getRef("HEAD")
+    
+    
+    // Basic git commands (close to command line)
+    
+    
+    /** 
+     * Same as `git add [path]`
+     *
+     * {{{
+     * repo.add("README") // relative path
+     * }}}
+     * 
+     * @param file path added to git
+     * @author teamon
+     */
+    def add(path: String) = git.add.addFilepattern(path).call
+
+    /** 
+     * Same as `git commit -m [message]`
+     *
+     * {{{
+     * repo.commit("First commit")
+     * }}}
+     * 
+     * @param file path added to git
+     * @author teamon
+     */
+    def commit(message: String) = git.commit.setMessage(message).call
+
+
+    def history: Iterator[RevCommit] = git.log.call.iterator
+
+    def history(from: AnyObjectId, to: AnyObjectId = head) = git.log.addRange(from, to).call
+
+
+
 
     /**
      * Returns current branch name
      *
      * @author teamon
      */
-    def currentBranch = gitRepo.getBranch
+    // def currentBranch = gitRepo.getBranch
 
     /**
      * Returns commit history (all commits)
      *
      * @author teamon
      */
-    def history = git.log.call
+    // def history = git.log.call
     
-    /**
-     * Returns commit history (all commits)
-     *
-     * @author teamon
-     */
-    def head = gitRepo.getRef("HEAD")
+
 
     /**
      * Returns commit history for specified range
@@ -165,7 +208,7 @@ class GitRepository(val dir: String) extends Logging {
      *
      * @author teamon
      */
-    def history(from: AnyObjectId, to: AnyObjectId = head) = git.log.addRange(from, to).call
+    // def history(from: AnyObjectId, to: AnyObjectId = head) = git.log.addRange(from, to).call
     
 
     /**
@@ -173,18 +216,18 @@ class GitRepository(val dir: String) extends Logging {
      *
      * @author teamon
      */
-    def authors = {
-        val authors = Map[String, Int]()
-
-        history.foreach {
-            commit =>
-                val label = commit.author.nameAndEmail
-                if (authors.contains(label)) authors(label) += 1
-                else authors(label) = 1
-        }
-
-        authors.toMap
-    }
+    // def authors = {
+    //     val authors = Map[String, Int]()
+    // 
+    //     history.foreach {
+    //         commit =>
+    //             val label = commit.author.nameAndEmail
+    //             if (authors.contains(label)) authors(label) += 1
+    //             else authors(label) = 1
+    //     }
+    // 
+    //     authors.toMap
+    // }
 
     /**
      * Adds remote to repository
@@ -196,12 +239,12 @@ class GitRepository(val dir: String) extends Logging {
      *
      * @author teamon
      **/
-    def addRemote(name: String, uri: String) {
-        val config = gitRepo.getConfig
-        val remoteConfig = new RemoteConfig(config, name)
-        remoteConfig.addURI(uri)
-        remoteConfig.update(config)
-    }
+    // def addRemote(name: String, uri: String) {
+    //     val config = gitRepo.getConfig
+    //     val remoteConfig = new RemoteConfig(config, name)
+    //     remoteConfig.addURI(uri)
+    //     remoteConfig.update(config)
+    // }
 
     /**
      * Performs 'git pull' on repository
@@ -210,38 +253,38 @@ class GitRepository(val dir: String) extends Logging {
      *
      * @author teamon
      */
-    def pull {
-        try {
-            // TODO: Add progress monitor
-            // val monitor = new ProgressSvdMonitor {
-            //     def beginTask(title: String, totalWorks: Int) {
-            //         println("[pm] beginTask: %s, %d".format(title, totalWorks))
-            //     }
-            // 
-            //     def endTask {
-            //         println("[pm] endTask")
-            //     }
-            // 
-            //     def start(totalTasks: Int) {
-            //         println("[pm] start: %d".format(totalTasks))
-            //     }
-            // 
-            //     def update(completed: Int) {
-            //         println("[pm] update: %d".format(completed))
-            //     }
-            // 
-            //     def isCancelled = false
-            // }
-            // 
-            // val head = git.fetch.setProgressSvdMonitor(monitor).call.getAdvertisedRef("HEAD")
-            
-            val head = git.fetch.call.getAdvertisedRef("HEAD")
-            git.merge.include(head).call
-        } catch {
-            case e: JGitInternalException =>
-                /// XXX Handle exception
-                /// Caused by: org.eclipse.jgit.errors.TransportException: ssh://tunemates@git.verknowsys.com/git/ServeD.git: Auth fail
-                log.error(e, "JGit")
-        }
-    }
+    // def pull {
+    //     try {
+    //         // TODO: Add progress monitor
+    //         // val monitor = new ProgressSvdMonitor {
+    //         //     def beginTask(title: String, totalWorks: Int) {
+    //         //         println("[pm] beginTask: %s, %d".format(title, totalWorks))
+    //         //     }
+    //         // 
+    //         //     def endTask {
+    //         //         println("[pm] endTask")
+    //         //     }
+    //         // 
+    //         //     def start(totalTasks: Int) {
+    //         //         println("[pm] start: %d".format(totalTasks))
+    //         //     }
+    //         // 
+    //         //     def update(completed: Int) {
+    //         //         println("[pm] update: %d".format(completed))
+    //         //     }
+    //         // 
+    //         //     def isCancelled = false
+    //         // }
+    //         // 
+    //         // val head = git.fetch.setProgressSvdMonitor(monitor).call.getAdvertisedRef("HEAD")
+    //         
+    //         val head = git.fetch.call.getAdvertisedRef("HEAD")
+    //         git.merge.include(head).call
+    //     } catch {
+    //         case e: JGitInternalException =>
+    //             /// XXX Handle exception
+    //             /// Caused by: org.eclipse.jgit.errors.TransportException: ssh://tunemates@git.verknowsys.com/git/ServeD.git: Auth fail
+    //             log.error(e, "JGit")
+    //     }
+    // }
 }

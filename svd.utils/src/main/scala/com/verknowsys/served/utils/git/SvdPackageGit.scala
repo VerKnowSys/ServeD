@@ -17,8 +17,11 @@ package object git {
     implicit def StringToObjectId(s: String) = ObjectId.fromString(s)
 
     implicit def RefToObjectId(r: Ref) = r.getObjectId
+    
+    implicit def RefToSha(r: Ref) = new { def sha = ObjectId.toString(r.getObjectId) }
 
     implicit def StringToGitRepository(s: String) = new GitRepository(s)
 
     implicit def StringToURIish(s: String) = new URIish(s)
+    
 }
