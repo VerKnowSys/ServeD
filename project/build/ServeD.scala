@@ -90,8 +90,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdUtils(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
         // val jgitRepository = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
-        val mavenLocal = "Local Maven Repository" at "file://"+Path.userHome+"/.m2/repository"
-        val javaNet        = "java.net" at "http://download.java.net/maven/2"
+        val mavenLocal = "teamon.eu" at "http://maven.teamon.eu"
+        val javaNet    = "java.net" at "http://download.java.net/maven/2"
         
         val commonsio   = "commons-io" % "commons-io" % "1.4"
         val messadmin   = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
