@@ -89,7 +89,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
     
     class SvdUtils(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
-        val jgitRepository = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
+        // val jgitRepository = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
+        val mavenLocal = "Local Maven Repository" at "file://"+Path.userHome+"/.m2/repository"
         val javaNet        = "java.net" at "http://download.java.net/maven/2"
         
         val commonsio   = "commons-io" % "commons-io" % "1.4"
@@ -98,7 +99,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         // val smackx      = "jivesoftware" % "smackx" % "3.0.4"
         // val j2sshcommon = "sshtools" % "j2ssh-common" % "0.2.2"
         // val j2sshcore   = "sshtools" % "j2ssh-core" % "0.2.2"
-        val jgit        = "org.eclipse.jgit" % "org.eclipse.jgit" % "0.11.0-SNAPSHOT" // Move it out
+        val jgit        = "org.eclipse.jgit" % "org.eclipse.jgit" % "0.11.1-SNAPSHOT" // Move it out
         val jna         = "net.java.dev.jna" % "jna" % "3.2.5"
         val swing       = "org.scala-lang" % "scala-swing" % "2.8.1"
         val akkaRemote  = akkaModule("remote")

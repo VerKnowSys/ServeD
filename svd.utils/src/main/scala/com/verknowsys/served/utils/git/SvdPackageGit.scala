@@ -3,6 +3,8 @@ package com.verknowsys.served.utils
 import org.eclipse.jgit.lib.{ObjectId, PersonIdent, Ref}
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.transport.URIish
+import org.eclipse.jgit.transport.RemoteConfig
+
 
 /**
  * Package object holding implicit conversions from JGit objects to its wrappers
@@ -23,5 +25,10 @@ package object git {
     implicit def StringToGitRepository(s: String) = new GitRepository(s)
 
     implicit def StringToURIish(s: String) = new URIish(s)
+    
+    implicit def RemoteConfigWrap(rc: RemoteConfig) = new {
+        def name = rc.getName
+        def uris = rc.getURIs
+    }
     
 }

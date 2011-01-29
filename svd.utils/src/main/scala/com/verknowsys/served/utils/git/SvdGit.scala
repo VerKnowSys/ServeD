@@ -6,10 +6,13 @@ import scala.collection.mutable.Map
 import scala.collection.JavaConversions._
 import org.eclipse.jgit.api._
 import org.eclipse.jgit.api.errors.JGitInternalException
+import org.eclipse.jgit.api.errors.InvalidConfigurationException
 import org.eclipse.jgit.lib.{AnyObjectId, ObjectId, PersonIdent, Constants, ProgressMonitor}
+import org.eclipse.jgit.lib.TextProgressMonitor
 import org.eclipse.jgit.storage.file.FileRepository
 import org.eclipse.jgit.revwalk.{RevCommit, RevWalk}
-import org.eclipse.jgit.transport.RemoteConfig
+import org.eclipse.jgit.transport.{RemoteConfig, Transport, RefSpec, URIish}
+
 import java.io.File
 import java.util.Date
 
@@ -87,13 +90,36 @@ object GitRepository {
      * Create git repository for specified directory
      * @author teamon
     */
-    def init(dir: String, bare: Boolean = false): GitRepository = {
-        val path = if(bare) dir else dir + "/.git"
-
-        val repo = new FileRepository(path)
-        repo.create(bare) // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
-
+    // def init(dir: String, bare: Boolean = false) = {
+    //     val path = if(bare) dir else dir + "/.git"
+    // 
+    //     val repo = new FileRepository(path)
+    //     repo.create(bare) // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
+    // 
+    //     new GitRepository(dir)
+    // }
+    
+    def init(dir: String, bare: Boolean = false) = {
+        Git.init().setDirectory(dir).setBare(bare).call
         new GitRepository(dir)
+    }
+    
+    /**
+     * Clone git repository to specified directory
+     * clone is init + add remote + pull
+     * 
+     * @author teamon
+    */
+    def clone(dir: String, remote: String) = {
+        val path = dir + "/.git" // TODO: git clone --bare
+
+        val frepo = new FileRepository(path)
+        frepo.create(false) // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
+
+        // val repo = new GitRepository(dir)
+        // repo.addRemote("origin", remote)
+        // repo.pull
+        // repo
     }
     
     /**
@@ -114,7 +140,7 @@ object GitRepository {
  * @author teamon
  */
 class GitRepository(val dir: String) extends Logging {
-    lazy val (gitRepo, isBare) = {
+    lazy val (gitRepo, isBare) = { // a bit hacky, but it works
         val dotgit = new File(dir, ".git")
         if(dotgit.exists) {
             log.trace(".git directory exists. Loading normal repository")
@@ -144,6 +170,13 @@ class GitRepository(val dir: String) extends Logging {
      */
     def head = gitRepo.getRef("HEAD")
     
+    /**
+     * Returns current branch name
+     *
+     * @author teamon
+     */
+    def currentBranch = gitRepo.getBranch
+    
     
     // Basic git commands (close to command line)
     
@@ -155,7 +188,7 @@ class GitRepository(val dir: String) extends Logging {
      * repo.add("README") // relative path
      * }}}
      * 
-     * @param file path added to git
+     * @param path path added to git
      * @author teamon
      */
     def add(path: String) = git.add.addFilepattern(path).call
@@ -167,35 +200,31 @@ class GitRepository(val dir: String) extends Logging {
      * repo.commit("First commit")
      * }}}
      * 
-     * @param file path added to git
+     * @param message commit message
      * @author teamon
      */
     def commit(message: String) = git.commit.setMessage(message).call
-
-
-    def history: Iterator[RevCommit] = git.log.call.iterator
-
-    def history(from: AnyObjectId, to: AnyObjectId = head) = git.log.addRange(from, to).call
-
-
-
-
-    /**
-     * Returns current branch name
-     *
-     * @author teamon
-     */
-    // def currentBranch = gitRepo.getBranch
-
-    /**
-     * Returns commit history (all commits)
-     *
-     * @author teamon
-     */
-    // def history = git.log.call
     
+    
+    /** 
+     * Same as `git branch [name]`
+     *
+     * {{{
+     * repo.branch("newbranch")
+     * }}}
+     * 
+     * @param name name of new branch
+     * @author teamon
+     */
+    def branch(name: String) = git.branchCreate.setName(name).call
 
-
+    /**
+     * Returns commit history iterator
+     *
+     * @author teamon
+     */
+    def history: Iterator[RevCommit] = git.log.call.iterator
+    
     /**
      * Returns commit history for specified range
      * @example
@@ -208,8 +237,7 @@ class GitRepository(val dir: String) extends Logging {
      *
      * @author teamon
      */
-    // def history(from: AnyObjectId, to: AnyObjectId = head) = git.log.addRange(from, to).call
-    
+    def history(from: AnyObjectId, to: AnyObjectId = head): Iterator[RevCommit] = git.log.addRange(from, to).call.iterator
 
     /**
      * Returns map of authors: (Author`s name and email -> number of commits)
@@ -228,63 +256,40 @@ class GitRepository(val dir: String) extends Logging {
     // 
     //     authors.toMap
     // }
+    
+    
+    def remotes = RemoteConfig.getAllRemoteConfigs(gitRepo.getConfig).toList
 
     /**
      * Adds remote to repository
      *
-     * @example
-     * val repo = GitRepository.create("/path/to/new/repo")
-     *       repo.addRemote("origin", "/path/to/remote/repo.git")
-     *       repo.pull
+     * {{{
+     * repo.addRemote("origin", "/path/to/remote/repo.git")
+     * }}}
      *
      * @author teamon
      **/
-    // def addRemote(name: String, uri: String) {
-    //     val config = gitRepo.getConfig
-    //     val remoteConfig = new RemoteConfig(config, name)
-    //     remoteConfig.addURI(uri)
-    //     remoteConfig.update(config)
-    // }
+    def addRemote(name: String, uri: String) {
+        val config = gitRepo.getConfig
+        config.setString("branch", "master", "remote", "origin")
+        config.setString("branch", "master", "merge", "refs/heads/master")
+                
+        val remoteConfig = new RemoteConfig(config, name)
+        remoteConfig.addURI(new URIish(uri))
+        remoteConfig.addFetchRefSpec(new RefSpec("+refs/heads/*:refs/remotes/origin/*"));
+        remoteConfig.update(config)
+        config.save
+    }
 
     /**
      * Performs 'git pull' on repository
      *
-     * In fact it does 'git fetch' followed by 'git pull FEATCH_HEADA'
+     * In fact it does 'git fetch' followed by 'git pull FEATCH_HEAD'
      *
      * @author teamon
      */
-    // def pull {
-    //     try {
-    //         // TODO: Add progress monitor
-    //         // val monitor = new ProgressSvdMonitor {
-    //         //     def beginTask(title: String, totalWorks: Int) {
-    //         //         println("[pm] beginTask: %s, %d".format(title, totalWorks))
-    //         //     }
-    //         // 
-    //         //     def endTask {
-    //         //         println("[pm] endTask")
-    //         //     }
-    //         // 
-    //         //     def start(totalTasks: Int) {
-    //         //         println("[pm] start: %d".format(totalTasks))
-    //         //     }
-    //         // 
-    //         //     def update(completed: Int) {
-    //         //         println("[pm] update: %d".format(completed))
-    //         //     }
-    //         // 
-    //         //     def isCancelled = false
-    //         // }
-    //         // 
-    //         // val head = git.fetch.setProgressSvdMonitor(monitor).call.getAdvertisedRef("HEAD")
-    //         
-    //         val head = git.fetch.call.getAdvertisedRef("HEAD")
-    //         git.merge.include(head).call
-    //     } catch {
-    //         case e: JGitInternalException =>
-    //             /// XXX Handle exception
-    //             /// Caused by: org.eclipse.jgit.errors.TransportException: ssh://tunemates@git.verknowsys.com/git/ServeD.git: Auth fail
-    //             log.error(e, "JGit")
-    //     }
-    // }
+    def pull =  git.pull.call
+
+    
+    def push(remote: String = Constants.DEFAULT_REMOTE_NAME, ref: String = currentBranch) = git.push.setRemote(remote).setRefSpecs(new RefSpec(ref)).call
 }
