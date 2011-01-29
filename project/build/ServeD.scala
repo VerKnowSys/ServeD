@@ -98,7 +98,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         // val smackx      = "jivesoftware" % "smackx" % "3.0.4"
         // val j2sshcommon = "sshtools" % "j2ssh-common" % "0.2.2"
         // val j2sshcore   = "sshtools" % "j2ssh-core" % "0.2.2"
-        val jgit        = "org.eclipse.jgit" % "org.eclipse.jgit" % "0.10.0-SNAPSHOT" // Move it out
+        val jgit        = "org.eclipse.jgit" % "org.eclipse.jgit" % "0.11.0-SNAPSHOT" // Move it out
         val jna         = "net.java.dev.jna" % "jna" % "3.2.5"
         val swing       = "org.scala-lang" % "scala-swing" % "2.8.1"
         val akkaRemote  = akkaModule("remote")
