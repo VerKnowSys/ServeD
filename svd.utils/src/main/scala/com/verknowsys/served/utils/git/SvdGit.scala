@@ -90,18 +90,9 @@ object GitRepository {
      * Create git repository for specified directory
      * @author teamon
     */
-    // def init(dir: String, bare: Boolean = false) = {
-    //     val path = if(bare) dir else dir + "/.git"
-    // 
-    //     val repo = new FileRepository(path)
-    //     repo.create(bare) // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
-    // 
-    //     new GitRepository(dir)
-    // }
-    
     def init(dir: String, bare: Boolean = false) = {
         Git.init().setDirectory(dir).setBare(bare).call
-        new GitRepository(dir)
+        new GitRepository(dir) // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
     }
     
     /**
@@ -111,15 +102,10 @@ object GitRepository {
      * @author teamon
     */
     def clone(dir: String, remote: String) = {
-        val path = dir + "/.git" // TODO: git clone --bare
-
-        val frepo = new FileRepository(path)
-        frepo.create(false) // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
-
-        // val repo = new GitRepository(dir)
-        // repo.addRemote("origin", remote)
-        // repo.pull
-        // repo
+        val repo = init(dir)
+        repo.addRemote("origin", remote)
+        repo.pull
+        repo
     }
     
     /**
@@ -140,21 +126,15 @@ object GitRepository {
  * @author teamon
  */
 class GitRepository(val dir: String) extends Logging {
-    lazy val (gitRepo, isBare) = { // a bit hacky, but it works
-        val dotgit = new File(dir, ".git")
-        if(dotgit.exists) {
-            log.trace(".git directory exists. Loading normal repository")
-            (new FileRepository(dotgit), false)
-        } else {
-            log.trace(".git directory does not exist. Loading bare repository")
-            (new FileRepository(dir), true)
-        }
-    }
-    
+    val dotgit = new File(dir, ".git")
+    val directory = if(dotgit.exists) dotgit else new File(dir)
+    val gitRepo = new FileRepository(directory)
+
     lazy val git = new Git(gitRepo)
 
-    lazy val (headPath, headFile) = if(isBare) (dir + "/refs/heads", "master") else (dir + "/.git/logs", "HEAD")
+    // lazy val (headPath, headFile) = if(isBare) (dir + "/refs/heads", "master") else (dir + "/.git/logs", "HEAD")
     
+    def isBare = gitRepo.isBare
     
     /** 
      * Return git repository name (actually it is the name of directory)
@@ -162,6 +142,13 @@ class GitRepository(val dir: String) extends Logging {
      * @author teamon
      */
     def name = new File(dir).getName
+    
+    /** 
+     * Return git repository name path
+     * 
+     * @author teamon
+     */
+    def path = gitRepo.getWorkTree.getPath
     
     /**
      * Returns git ref for HEAD
@@ -239,24 +226,6 @@ class GitRepository(val dir: String) extends Logging {
      */
     def history(from: AnyObjectId, to: AnyObjectId = head): Iterator[RevCommit] = git.log.addRange(from, to).call.iterator
 
-    /**
-     * Returns map of authors: (Author`s name and email -> number of commits)
-     *
-     * @author teamon
-     */
-    // def authors = {
-    //     val authors = Map[String, Int]()
-    // 
-    //     history.foreach {
-    //         commit =>
-    //             val label = commit.author.nameAndEmail
-    //             if (authors.contains(label)) authors(label) += 1
-    //             else authors(label) = 1
-    //     }
-    // 
-    //     authors.toMap
-    // }
-    
     
     def remotes = RemoteConfig.getAllRemoteConfigs(gitRepo.getConfig).toList
 
@@ -284,12 +253,36 @@ class GitRepository(val dir: String) extends Logging {
     /**
      * Performs 'git pull' on repository
      *
-     * In fact it does 'git fetch' followed by 'git pull FEATCH_HEAD'
-     *
      * @author teamon
      */
     def pull =  git.pull.call
 
-    
+    /**
+     * Performs 'git push' on repository
+     *
+     * @author teamon
+     */
     def push(remote: String = Constants.DEFAULT_REMOTE_NAME, ref: String = currentBranch) = git.push.setRemote(remote).setRefSpecs(new RefSpec(ref)).call
+}
+
+
+class GitRepositoryStats(repo: GitRepository){
+    /**
+     * Returns map of authors: (Author`s name and email -> number of commits)
+     *
+     * @author teamon
+     */
+    def authors = {
+        // TODO: Reimplement this using fold/reduce/collect/whatever, mutable map is lame
+        val authors = Map[String, Int]()
+    
+        repo.history.foreach {
+            commit =>
+                val label = commit.author.nameAndEmail
+                if (authors.contains(label)) authors(label) += 1
+                else authors(label) = 1
+        }
+    
+        authors.toMap
+    }
 }

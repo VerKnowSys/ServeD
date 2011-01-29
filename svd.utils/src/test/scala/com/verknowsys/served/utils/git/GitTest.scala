@@ -24,6 +24,7 @@ class GitTest extends Specification {
 
         "create new normal repository" in {
             val repo = GitRepository.init(DIR+"/newrepo")
+            repo.path must_== DIR + "/newrepo"
             repo.name must_== "newrepo"
             repo.isBare must beFalse
             
@@ -49,12 +50,16 @@ class GitTest extends Specification {
             dotgit.exists must beFalse
         }
         
-        // "clone remote repository" in {
-        //     prepareRemoteRepo(DIR+"/remoterepo.git")
-        //     
-        //     val repo = GitRepository.clone(DIR+"/cloned_from_remote", DIR+"/remoterepo.git")
-        //     repo.history must haveSize(6)
-        // }
+        "clone remote repository" in {
+            val source = GitRepository.init(newRepoPath)
+            writeFile(source.path + "/README", "Remote repo README")
+            source.add("README")
+            source.commit("initial for clone")
+            
+            val target = GitRepository.clone(newRepoPath, source.path)
+            target.history must haveSize(1)
+            target.history.next.message must_== "initial for clone"
+        }
     }
     
     "GitRepository commands" should {
@@ -64,16 +69,16 @@ class GitTest extends Specification {
         doBefore {
             rmdir(DIR)
             mkdir(DIR)
-            repo = GitRepository.init(repoRoot)
         }
         
         "have null HEAD" in {
+            val repo = GitRepository.init(newRepoPath)
             repo.head.getObjectId must beNull
-            println(repo.currentBranch)
         }
         
         "add new file and commit" in {
-            writeFile(repoRoot + "/README", "Some readme text")
+            val repo = GitRepository.init(newRepoPath)
+            writeFile(repo.path + "/README", "Some readme text")
             repo.add("README")
             repo.commit("init")
 
@@ -91,7 +96,8 @@ class GitTest extends Specification {
         }
         
         "make few commits" in {
-            writeFile(repoRoot + "/README", "Some readme text")
+            val repo = GitRepository.init(newRepoPath)
+            writeFile(repo.path + "/README", "Some readme text")
             repo.add("README")
             repo.commit("init")
 
@@ -114,6 +120,7 @@ class GitTest extends Specification {
         }
         
         "remote" in {
+            val repo = GitRepository.init(newRepoPath)
             repo.remotes must haveSize(0)
 
             repo.addRemote("origin", "/path/to/remote.git")
@@ -124,20 +131,21 @@ class GitTest extends Specification {
 
             repo.remotes.map(_.name) must containAll("origin" :: "github" :: Nil)
             
-            val sameRepo = new GitRepository(repoRoot)
+            val sameRepo = new GitRepository(repo.path)
             sameRepo.remotes must haveSize(2)
         }
         
         "push" in {
-            writeFile(repoRoot + "/README", "Some readme text")
+            val repo = GitRepository.init(newRepoPath)
+            
+            writeFile(repo.path + "/README", "Some readme text")
             repo.add("README")
             repo.commit("init")
             
-            prepareEmptyRemoteRepo(DIR + "/remote_repo.git")
-            val remote = new GitRepository(DIR + "/remote_repo.git")
+            val remote = GitRepository.init(newRepoPath)
             remote.history must throwA[NoHeadException]
             
-            repo.addRemote("origin", DIR + "/remote_repo.git")
+            repo.addRemote("origin", remote.path)
             repo.push()
             
             remote.history must haveSize(1)
@@ -145,36 +153,18 @@ class GitTest extends Specification {
         
         "pull" in {
             val source = GitRepository.init(newRepoPath)
-            writeFile(source.gitRepo.getWorkTree.getPath + "/README", "Remote repo README")
+            writeFile(source.path + "/README", "Remote repo README")
             source.add("README")
             source.commit("initial")
-            
-            
+
+
             val target = GitRepository.init(newRepoPath)
-            target.addRemote("origin", source.gitRepo.getWorkTree.getPath)
+            target.addRemote("origin", source.path)
             target.pull
-            
-            
+
             target.history must haveSize(1)
-            
         }
 
     }
-    
-    def prepareEmptyRemoteRepo(path: String) {
-        val repo = GitRepository.init(path)
-    }
-    
 
-    // def prepareNon
-        // writeFile(path + "/README", "Remote repository README")
-        // repo.add("README")
-        // repo.commit("init")
-        // 
-        // (1 to 5) foreach { i=>
-        //     writeFile(path + "/file" + i, "File " + i)
-        //     repo.add(path + "/file" + i)
-        //     repo.commit("added " + i)
-        // }
-    // }
 }
