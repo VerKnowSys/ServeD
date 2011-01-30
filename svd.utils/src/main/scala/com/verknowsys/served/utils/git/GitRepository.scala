@@ -2,7 +2,7 @@ package com.verknowsys.served.utils.git
 
 import scala.collection.JavaConversions._
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.lib.{AnyObjectId, Constants, Ref}
+import org.eclipse.jgit.lib.{AnyObjectId, Constants, Ref, PersonIdent}
 import org.eclipse.jgit.storage.file.FileRepository
 import org.eclipse.jgit.revwalk.{RevCommit}
 import org.eclipse.jgit.transport.{RemoteConfig, RefSpec}
@@ -121,7 +121,8 @@ class GitRepository(val dir: String) extends Logging {
      * @param message commit message
      * @author teamon
      */
-    def commit(message: String) = git.commit.setMessage(message).call
+    def commit(message: String, author: PersonIdent = null, committer: PersonIdent = null) = 
+        git.commit.setMessage(message).setAuthor(author).setCommitter(committer).call
     
     
     /** 

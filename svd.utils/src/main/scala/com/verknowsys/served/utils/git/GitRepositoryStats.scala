@@ -17,7 +17,7 @@ class GitRepositoryStats(repo: GitRepository){
     
         repo.history.foreach {
             commit =>
-                val label = commit.author.nameAndEmail
+                val label = "%s [%s]".format(commit.author.name, commit.author.email)
                 if (authors.contains(label)) authors(label) += 1
                 else authors(label) = 1
         }

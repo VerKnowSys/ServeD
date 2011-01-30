@@ -200,7 +200,34 @@ class GitTest extends Specification {
             repo.checkout("master")
             repo.history must haveSize(1)
         }
+        
+        "single commit" in {
+            val repo = GitRepository.init(newRepoPath)
+            writeFile(repo.path + "/README", "Some readme text")
+            repo.add("README")
+            
+            val me = new Author("T. Tobolski", "teamon@example.com")
+            val him = new Author("D. Dettlaff", "dmilith@example.com")
+            repo.commit("init", author = me, committer = him)
+            
+            val commit = repo.history.next
+            commit.message must_== "init"
+            commit.author.name must_== "T. Tobolski"
+            commit.author.email must_== "teamon@example.com"
+            commit.committer.name must_== "D. Dettlaff"
+            commit.committer.email must_== "dmilith@example.com"
+            
+            commit.sha must_== repo.head.sha
+        }
 
+    }
+    
+    "Author" should {
+        "init" in {
+            val author = new Author("T. Tobolski", "teamon@example.com")
+            author.name must_== "T. Tobolski"
+            author.email must_== "teamon@example.com"
+        }
     }
 
 }

@@ -13,8 +13,10 @@ import org.eclipse.jgit.transport.RemoteConfig
  */
 package object git {
     implicit def RevCommitToCommit(c: RevCommit) = new Commit(c)
+    implicit def CommitToRevCommit(c: Commit) = c.origin
 
     implicit def PersonIdentToAuthor(c: PersonIdent) = new Author(c)
+    implicit def AuthorToPersonIdent(c: Author) = c.origin
 
     implicit def StringToObjectId(s: String) = ObjectId.fromString(s)
 

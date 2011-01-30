@@ -4,7 +4,7 @@ import org.eclipse.jgit.revwalk.RevCommit
 import java.util.Date
 
 /**
- * JGit RevCommit wrapper for more scala-like syntax
+ * JGit RevCommit wrapper for more scala-friendly syntax
  *
  * @author teamon
  **/
@@ -36,4 +36,11 @@ class Commit(val origin: RevCommit) {
      * @author teamon
      */
     def author = origin.getAuthorIdent
+    
+    /**
+     * Returns commit`s committer
+     *
+     * @author teamon
+     */
+    def committer = origin.getCommitterIdent
 }
