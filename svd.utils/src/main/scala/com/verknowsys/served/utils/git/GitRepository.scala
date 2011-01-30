@@ -1,7 +1,7 @@
 package com.verknowsys.served.utils.git
 
 import scala.collection.JavaConversions._
-import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.{Git => JGit}
 import org.eclipse.jgit.lib.{AnyObjectId, Constants, Ref, PersonIdent}
 import org.eclipse.jgit.storage.file.FileRepository
 import org.eclipse.jgit.revwalk.{RevCommit}
@@ -16,13 +16,13 @@ import akka.util.Logging
  * 
  * @author teamon
  */
-object GitRepository {
+object Git {
     /**
      * Create git repository for specified directory
      * @author teamon
     */
     def init(dir: String, bare: Boolean = false) = {
-        Git.init().setDirectory(new File(dir)).setBare(bare).call
+        JGit.init().setDirectory(new File(dir)).setBare(bare).call
         new GitRepository(dir) // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
     }
     
@@ -46,7 +46,7 @@ object GitRepository {
     def list(dir: String): List[GitRepository] = {
         val list = new File(dir).list
         if(list == null) List()
-        else list.toList.map { new GitRepository(_) }
+        else list.toList.map(new GitRepository(_))
     }
 
 }
@@ -61,7 +61,7 @@ class GitRepository(val dir: String) extends Logging {
     val directory = if(dotgit.exists) dotgit else new File(dir)
     val gitRepo = new FileRepository(directory)
 
-    lazy val git = new Git(gitRepo)
+    lazy val git = new JGit(gitRepo)
 
     // lazy val (headPath, headFile) = if(isBare) (dir + "/refs/heads", "master") else (dir + "/.git/logs", "HEAD")
     

@@ -25,8 +25,6 @@ package object git {
         def sha = ObjectId.toString(r.getObjectId) 
     }
 
-    implicit def StringToGitRepository(s: String) = new GitRepository(s)
-
     implicit def StringToURIish(s: String) = new URIish(s)
     
     implicit def RemoteConfigWrap(rc: RemoteConfig) = new {

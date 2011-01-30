@@ -23,7 +23,7 @@ class GitTest extends Specification {
         }
 
         "create new normal repository" in {
-            val repo = GitRepository.init(DIR+"/newrepo")
+            val repo = Git.init(DIR+"/newrepo")
             repo.path must_== DIR + "/newrepo"
             repo.name must_== "newrepo"
             repo.isBare must beFalse
@@ -38,7 +38,7 @@ class GitTest extends Specification {
         }
         
         "create new bare repository" in {
-            val repo = GitRepository.init(DIR+"/newbarerepo", bare = true)
+            val repo = Git.init(DIR+"/newbarerepo", bare = true)
             repo.name must_== "newbarerepo"
             repo.isBare must beTrue
             
@@ -51,33 +51,40 @@ class GitTest extends Specification {
         }
         
         "clone remote repository" in {
-            val source = GitRepository.init(newRepoPath)
+            val source = Git.init(newRepoPath)
             writeFile(source.path + "/README", "Remote repo README")
             source.add("README")
             source.commit("initial for clone")
             
-            val target = GitRepository.clone(newRepoPath, source.path)
+            val target = Git.clone(newRepoPath, source.path)
             target.history must haveSize(1)
             target.history.next.message must_== "initial for clone"
+        }
+        
+        "list repositories in directory" in {
+            val one = Git.init(DIR + "/one")
+            val two = Git.init(DIR + "/two")
+            val three = Git.init(DIR + "/three")
+            
+            val list = Git.list(DIR)
+            list must haveSize(3)
+            list.map(_.name) must containAll("one" :: "two" :: "three" :: Nil)
         }
     }
     
     "GitRepository commands" should {
-        var repo: GitRepository = null
-        val repoRoot = DIR+"/testrepo"
-        
         doBefore {
             rmdir(DIR)
             mkdir(DIR)
         }
         
         "have null HEAD" in {
-            val repo = GitRepository.init(newRepoPath)
+            val repo = Git.init(newRepoPath)
             repo.head.getObjectId must beNull
         }
         
         "add new file and commit" in {
-            val repo = GitRepository.init(newRepoPath)
+            val repo = Git.init(newRepoPath)
             writeFile(repo.path + "/README", "Some readme text")
             repo.add("README")
             repo.commit("init")
@@ -96,13 +103,13 @@ class GitTest extends Specification {
         }
         
         "make few commits" in {
-            val repo = GitRepository.init(newRepoPath)
+            val repo = Git.init(newRepoPath)
             writeFile(repo.path + "/README", "Some readme text")
             repo.add("README")
             repo.commit("init")
 
             (1 to 10) foreach { i=>
-                writeFile(repoRoot + "/README", "Changed to " + i)
+                writeFile(repo.path + "/README", "Changed to " + i)
                 repo.add("README")
                 repo.commit("changed " + i)
             }
@@ -120,7 +127,7 @@ class GitTest extends Specification {
         }
         
         "remote" in {
-            val repo = GitRepository.init(newRepoPath)
+            val repo = Git.init(newRepoPath)
             repo.remotes must haveSize(0)
 
             repo.addRemote("origin", "/path/to/remote.git")
@@ -136,12 +143,12 @@ class GitTest extends Specification {
         }
         
         "push" in {
-            val repo = GitRepository.init(newRepoPath)
+            val repo = Git.init(newRepoPath)
             writeFile(repo.path + "/README", "Some readme text")
             repo.add("README")
             repo.commit("init")
             
-            val remote = GitRepository.init(newRepoPath)
+            val remote = Git.init(newRepoPath)
             remote.history must throwA[NoHeadException]
             
             repo.addRemote("origin", remote.path)
@@ -151,13 +158,13 @@ class GitTest extends Specification {
         }
         
         "pull" in {
-            val source = GitRepository.init(newRepoPath)
+            val source = Git.init(newRepoPath)
             writeFile(source.path + "/README", "Remote repo README")
             source.add("README")
             source.commit("initial")
 
 
-            val target = GitRepository.init(newRepoPath)
+            val target = Git.init(newRepoPath)
             target.addRemote("origin", source.path)
             target.pull
 
@@ -165,7 +172,7 @@ class GitTest extends Specification {
         }
         
         "branch" in {
-            val repo = GitRepository.init(newRepoPath)
+            val repo = Git.init(newRepoPath)
             writeFile(repo.path + "/README", "Some readme text")
             repo.add("README")
             repo.commit("init")
@@ -181,7 +188,7 @@ class GitTest extends Specification {
         }
         
         "checkout" in {
-            val repo = GitRepository.init(newRepoPath)
+            val repo = Git.init(newRepoPath)
             writeFile(repo.path + "/README", "Some readme text")
             repo.add("README")
             repo.commit("init")
@@ -202,7 +209,7 @@ class GitTest extends Specification {
         }
         
         "single commit" in {
-            val repo = GitRepository.init(newRepoPath)
+            val repo = Git.init(newRepoPath)
             writeFile(repo.path + "/README", "Some readme text")
             repo.add("README")
             
