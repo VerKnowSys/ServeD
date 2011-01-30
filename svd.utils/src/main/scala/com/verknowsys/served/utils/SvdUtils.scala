@@ -128,5 +128,9 @@ object SvdUtils extends Logging {
      */
     def rmdir(path: String) = try { FileUtils.forceDelete(path) } catch { case _ => }
 
+
+    def chown(user: String, group: String = "users", recursive: Boolean = true) {
+        // TODO: Implement me please (soon!)
+    }
 }
 
