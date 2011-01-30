@@ -4,6 +4,7 @@ package com.verknowsys.served.utils
 import com.verknowsys.served._
 
 import java.io.{PrintWriter, File, OutputStreamWriter}
+import org.apache.commons.io.FileUtils
 import java.util.ArrayList
 import java.util.regex.Pattern
 import clime.messadmin.providers.sizeof.ObjectProfiler
@@ -119,6 +120,13 @@ object SvdUtils extends Logging {
      */
     
     def fileExists(path: String) = (new java.io.File(path)).exists
-        
+    
+    /** 
+     * Removes directory
+     * 
+     * @author teamon
+     */
+    def rmdir(path: String) = try { FileUtils.forceDelete(path) } catch { case _ => }
+
 }
 
