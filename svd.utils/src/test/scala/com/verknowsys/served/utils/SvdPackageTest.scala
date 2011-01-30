@@ -14,4 +14,28 @@ class SvdPackageTest extends Specification {
             "% + % = %" % (2,1,3) must beEqual("2 + 1 = 3")
         }
     }
+    
+    "Path builder" should {
+        "work" in {
+            "foo"  / "bar"  must_== "foo/bar"
+            "foo/" / "bar"  must_== "foo/bar"
+            "foo"  / "/bar" must_== "foo/bar"
+            "foo/" / "/bar" must_== "foo/bar"
+            
+            "foo/bar"  / "baz"  must_== "foo/bar/baz"
+            "foo/bar/" / "baz"  must_== "foo/bar/baz"
+            "foo/bar"  / "/baz" must_== "foo/bar/baz"
+            "foo/bar/" / "/baz" must_== "foo/bar/baz"
+            
+            "/abs/foo/bar"  / "baz"  must_== "/abs/foo/bar/baz"
+            "/abs/foo/bar/" / "baz"  must_== "/abs/foo/bar/baz"
+            "/abs/foo/bar"  / "/baz" must_== "/abs/foo/bar/baz"
+            "/abs/foo/bar/" / "/baz" must_== "/abs/foo/bar/baz"
+            
+            "/abs/foo/bar"  / "baz/blah"  must_== "/abs/foo/bar/baz/blah"
+            "/abs/foo/bar/" / "baz/blah"  must_== "/abs/foo/bar/baz/blah"
+            "/abs/foo/bar"  / "/baz/blah" must_== "/abs/foo/bar/baz/blah"
+            "/abs/foo/bar/" / "/baz/blah" must_== "/abs/foo/bar/baz/blah"
+        }
+    }
 }

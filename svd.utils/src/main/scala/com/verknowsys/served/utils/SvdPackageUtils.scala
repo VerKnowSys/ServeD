@@ -15,6 +15,18 @@ package object utils {
      */
     implicit def StringToFile(s: String) = new File(s)
     
+    implicit def StringToPath(a: String) = new {
+        def /(b: String) = {
+            if(a.last == '/'){
+                if(b.head == '/') a + b.substring(1)
+                else a + b
+            } else {
+                if(b.head == '/') a + b
+                else a + '/' + b
+            }
+        }
+    }
+    
     /**
      * Replace string usign key-value
      * 
