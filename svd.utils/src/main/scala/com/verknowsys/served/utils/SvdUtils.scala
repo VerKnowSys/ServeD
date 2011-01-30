@@ -111,6 +111,14 @@ object SvdUtils extends Logging {
      * @author teamon
      */
     def loopThread(f: => Unit) = new SvdLoopThread(f)
+    
+    /** 
+     * Checks if file exists
+     * 
+     * @author teamon
+     */
+    
+    def fileExists(path: String) = (new java.io.File(path)).exists
         
 }
 
