@@ -7,6 +7,7 @@ import scala.actors.Actor._
 import scala.actors.remote.RemoteActor
 import scala.actors.remote.RemoteActor._
 import scala.actors.remote.Node
+import com.verknowsys.served.utils._
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -24,7 +25,7 @@ import scala.collection.mutable.ListBuffer
 @serializable case class SvdMonitoredData(val time: Long, val list: Map[String, Actor.State.Value])
 @serializable case object GetSvdMonitoredData
 
-object SvdMonitor extends Actor with SvdMonitoredLike {
+object SvdMonitor extends Actor with SvdMonitoredLike { // 2011-01-30 13:16:18 - dmilith - XXX: with SvdExceptionHandler
     final val port = 8888
     val startTime = System.currentTimeMillis
     val monitored = new ListBuffer[SvdMonitoredLike]

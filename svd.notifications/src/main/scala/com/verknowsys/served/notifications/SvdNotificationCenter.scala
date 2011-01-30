@@ -9,7 +9,7 @@ import akka.actor.Actor
 import akka.util.Logging
 
 
-class SvdNotificationCenter extends Actor {
+class SvdNotificationCenter extends Actor with SvdExceptionHandler {
     log.info("SvdNotificationCenter is loading")    
     
     val gates: List[Gate] = new SvdXMPPGate(

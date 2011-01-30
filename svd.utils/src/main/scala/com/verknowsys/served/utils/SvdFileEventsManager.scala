@@ -49,7 +49,7 @@ object events {
  * 
  * @author teamon
  */
-trait SvdFileEventsReactor {
+trait SvdFileEventsReactor extends SvdExceptionHandler {
     self: Actor with Logging =>
 
     def registerFileEventFor(path: String, flags: Int){
@@ -64,6 +64,7 @@ trait SvdFileEventsReactor {
             case Some(fem) => fem ! SvdUnregisterFileEvent(this.self)
             case None => log.error("Could not unregister file event. FileEventsManager worker not found.")
         }
+        super.postStop // 2011-01-30 01:06:54 - dmilith - NOTE: execute SvdExceptionHandler's code
     }
     
     override def preRestart(reason: Throwable) = unregisterFileEvents
@@ -79,7 +80,7 @@ trait SvdFileEventsReactor {
  * 
  * @author teamon
  */
-class SvdFileEventsManager extends Actor with Logging {
+class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
     import CLibrary._
     
     log.info("SvdFileEventsManager is loading")

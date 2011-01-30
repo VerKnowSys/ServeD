@@ -99,7 +99,7 @@ import javax.swing.table._
     // }
 // }
 
-class Reader(host: String, port: Int, repaintFun: () => Unit) extends Actor { 
+class Reader(host: String, port: Int, repaintFun: () => Unit) extends Actor { // 2011-01-30 13:17:04 - dmilith - XXX: with SvdExceptionHandler 
     val data = Map[String, List[Actor.State.Value]]()
 
     start

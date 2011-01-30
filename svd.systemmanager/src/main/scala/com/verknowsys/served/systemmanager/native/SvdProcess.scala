@@ -80,11 +80,15 @@ class SvdProcess(
             log.trace(f.getName+"="+f.get(proc))
         }
         try {
-         if (proc.exitValue > 0)
-                 throw new ProcessException("SvdProcess: '%s' exited abnormally with error code: '%s'. Output info: '%s'".format(command, proc.exitValue,
-                     if (outputRedirectDestination != SvdConfig.nullDevice) Source.fromFile(outputRedirectDestination).mkString else "NONE"
-                 ))
-         } catch { 
+            if (proc.exitValue > 0)
+                throw new ProcessException("SvdProcess: '%s' exited abnormally with error code: '%s'. Output info: '%s'".format(
+                    command, proc.exitValue,
+                        if (outputRedirectDestination != SvdConfig.nullDevice)
+                            Source.fromFile(outputRedirectDestination).mkString
+                        else
+                            "NONE"
+                ))
+        } catch {
             case x: IllegalThreadStateException =>
                 log.debug("SvdProcess thread exited. No exitValue given.")
             case x: ProcessException =>

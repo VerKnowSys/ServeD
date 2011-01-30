@@ -7,7 +7,7 @@ package com.verknowsys.served.maintainer
 import com.verknowsys.served.boot
 import com.verknowsys.served.notifications._
 import com.verknowsys.served.SvdConfig
-import com.verknowsys.served.utils.{SvdUtils, SvdFileEventsManager}
+import com.verknowsys.served.utils.{SvdUtils, SvdFileEventsManager, SvdExceptionHandler}
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.systemmanager.ProcessesList
@@ -23,7 +23,7 @@ import akka.util.Logging
  *
  *  @author dmilith, teamon
  */
-class SvdMaintainer extends Actor {
+class SvdMaintainer extends Actor with SvdExceptionHandler {
     log.info("Maintainer is loading")
         
     registry.actorFor[SvdSystemManager] foreach { _ ! Init }
@@ -43,7 +43,7 @@ class SvdMaintainer extends Actor {
             registry.actorFor[SvdSystemManager] foreach { _ ! GetAllProcesses }
             registry.actorFor[SvdSystemManager] foreach { _ ! Init }
             registry.actorFor[SvdSystemManager] foreach { _ ! SpawnProcess("echo 'dupa'") }
-            // registry.actorFor[SvdSystemManager] foreach { _ ! Kill(435343, SIGINT) }
+            registry.actorFor[SvdSystemManager] foreach { _ ! Kill(435343, SIGINT) }
             // 2011-01-23 05:29:52 - dmilith - NOTE: EOF temporary code.
             
         case x => 

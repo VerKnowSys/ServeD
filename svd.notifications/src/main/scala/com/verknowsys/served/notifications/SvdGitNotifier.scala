@@ -15,7 +15,7 @@ import akka.actor.Actor
 import akka.util.Logging
 
 
-class SvdGitNotifier(repo: GitRepository) extends Actor with Logging {
+class SvdGitNotifier(repo: GitRepository) extends Actor with Logging with SvdExceptionHandler {
 
     var oldHEAD = repo.head // XXX: var :(
 

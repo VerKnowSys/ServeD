@@ -9,7 +9,7 @@ import scala.collection.mutable.Queue
 
 case class Expect(size: Int)
 
-class SvdExpectActor extends Actor {
+class SvdExpectActor extends Actor { // 2011-01-30 13:14:38 - dmilith - XXX: should extend SvdExceptionHandler
     val inbox = Queue[Any]()
     
     def receive = {

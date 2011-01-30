@@ -5,11 +5,12 @@ import akka.actor.Actor.{actorOf, registry}
 import akka.routing.Dispatcher
 import akka.util.Logging
 
+import com.verknowsys.served.utils.SvdExceptionHandler
 import com.verknowsys.served.api._
 import com.verknowsys.served.managers._
 
 
-class SvdApiSession extends Actor with Dispatcher {
+class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
     private var manager: Option[ActorRef] = None // XXX: Var
     
     override def receive = {
