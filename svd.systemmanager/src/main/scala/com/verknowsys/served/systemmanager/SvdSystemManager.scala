@@ -26,7 +26,7 @@ case class ProcessesList(pids: List[Long])
 *   
 *   SvdSystemManager - responsible for System managment and monitoring
 */
-class SvdSystemManager extends Actor with Logging {
+class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
     import SvdPOSIX._
     
     log.info("SvdSystemManager is loading")
@@ -78,6 +78,7 @@ class SvdSystemManager extends Actor with Logging {
         case Kill(pid, signal) => // 2011-01-23 04:13:34 - dmilith - NOTE: send standard SIGINT signal to app with some pid
             log.info("Kill request for native application with Pid: %s. Sending signal: %s", pid, signal)
             SvdProcess.kill(pid.asInstanceOf[Long], signal.asInstanceOf[SvdPOSIX.Value])
+            throw new RuntimeException("Dupa zbladła")
             
         case SpawnProcess(cmd) =>
             log.debug("Requested process spawn: %s", cmd)
