@@ -15,17 +15,26 @@ class ApiClient(host: String, port: Int) extends Logging {
     val svd = Actor.remote.actorFor("service:api", host, port)
     
     log.trace("Checking connection...")
-    (svd !! General.Connect(username)) match {
-        case Some(response) => response match {
-            case Success => 
-                println("ServeD 0.1.0 interactive shell. Welcome %s".format(username))
-                prompt
-            case Error(message) =>
-                log.error("[ERROR] " + message)
-                quit
-        }
-        case None => 
-            println("[ERROR] Connection timeout")
+    // (svd !! General.Connect(username)) match {
+    //     case Some(response) => response match {
+    //         case Success => 
+    //             println("ServeD 0.1.0 interactive shell. Welcome %s".format(username))
+    //             prompt
+    //         case Error(message) =>
+    //             log.error("[ERROR] " + message)
+    //             quit
+    //     }
+    //     case None => 
+    //         println("[ERROR] Connection timeout")
+    // }
+    
+    request(General.Connect(username)) {
+        case Success => 
+            println("ServeD 0.1.0 interactive shell. Welcome %s".format(username))
+            prompt
+        case Error(message) =>
+            log.error("[ERROR] " + message)
+            quit
     }
     
 
@@ -40,6 +49,14 @@ class ApiClient(host: String, port: Int) extends Logging {
         prompt
     }
     
+    def request(msg: ApiMessage)(f: PartialFunction[Any, Unit]) {
+        (svd !! msg) match {
+            case Some(response) if f.isDefinedAt(response) => f(response)
+            case Some(response) => log.error("Unhandled reponse %s", response)
+            case None => log.error("Connection timeout")
+        }
+    }
+    
     
     /**
      * Match parameters to correct action
@@ -49,6 +66,25 @@ class ApiClient(host: String, port: Int) extends Logging {
     def process(args: List[String]){
         log.debug("args: %s", args)
         args match {
+            
+            case "git" :: xs => xs match {
+                case "list" :: Nil => 
+                    request(Git.ListRepositories) {
+                        case Git.Repositories(list) => list.foreach(r => println(" - " + r.name))
+                    }
+                    
+                case "create" :: name :: Nil =>
+                    request(Git.CreateRepository(name)) {
+                        case Success =>
+                            log.info("Repository %s created", name)
+                        case Git.RepositoryExistsError => 
+                            log.error("Repository with name %s already exists", name)
+                    }
+                    
+                case _ => log.error("Command not found. TODO: Display help for git commands")
+            }
+            
+            
             case "echo" :: xs => svd ! xs.mkString(" ")
             case "exit" :: Nil => quit
             case "help" :: Nil => displayHelp

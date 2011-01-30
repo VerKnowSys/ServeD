@@ -1,9 +1,9 @@
 svd command line tool help
 
 == git ==
+git list all        List all repositories
 git create [name]   Create repository
 git remove [name]   Remove repository
-git list all        List all repositories   
 
 == other ==
 help                Display help
