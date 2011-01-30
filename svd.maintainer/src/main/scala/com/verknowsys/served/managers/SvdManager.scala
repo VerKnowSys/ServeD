@@ -1,7 +1,8 @@
 package com.verknowsys.served.managers
 
 import akka.actor.Actor
-import com.verknowsys.served.utils._
+import com.verknowsys.served.utils.SvdExceptionHandler
+import com.verknowsys.served.maintainer.SvdAccount
 
 
 /**
@@ -9,8 +10,6 @@ import com.verknowsys.served.utils._
  * 
  * @author teamon
  */
-abstract class SvdManager(owner: SvdAccountManager) extends Actor with SvdExceptionHandler {
-    
-    
-    protected def account = owner.account
+abstract class SvdManager(account: SvdAccount) extends Actor with SvdExceptionHandler {
+
 }

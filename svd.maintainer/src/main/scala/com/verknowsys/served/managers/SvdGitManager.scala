@@ -1,58 +1,48 @@
 package com.verknowsys.served.managers
 
-// import com.verknowsys.served.utils.SvdUtils
-// import com.verknowsys.served.utils.signals.{Init, Quit, Ready}
-// import com.verknowsys.served.maintainer.SvdAccount
-// import com.verknowsys.served.utils.git.GitRepository
-// import com.verknowsys.served.api._
-// import com.verknowsys.served.api.Git._
-
-import java.io.File
-
+import com.verknowsys.served.maintainer.SvdAccount
+import com.verknowsys.served.utils._
+import com.verknowsys.served.utils.git
+import com.verknowsys.served.api._
 
 /**
- * Git SvdManager
+ * Git Manager
  * 
  * @author teamon
  */
-class SvdGitManager(owner: SvdAccountManager) extends SvdManager(owner) {
-    // def act {
-    //     loop {
-    //         receive {
-    //             // Creates new bare git repository under HOME/git/REPO_NAME
-    //             case CreateRepository(name) => 
-    //                 trace("Creating new git repository %s for account %s".format(name, account.userName))
-    //                 GitRepository.create(gitDir + name, bare = true)
-    //                 sender ! Success
-    //                 
-    //             case RemoveRepository(name) =>
-    //                 warn("Unimplemented yet!") // TODO
-    //                 sender ! NotImplementedError
-    //             
-    //             case ListRepositories =>
-    //                 sender ! Repositories(GitRepository.list(gitDir).map { r => Repository(r.name) })
-    //             
-    //             case ShowRepository(name) =>
-    //                 warn("Unimplemented yet!") // TODO
-    //                 sender ! NotImplementedError
-    //             
-    //             case Init =>
-    //                 info("SvdGitManager ready")
-    //                 reply(Ready)
-    //                 
-    //             case Quit =>
-    //                 info("Quitting SvdGitManager")
-    //                 reply(Ready)
-    //                 exit
-    //             
-    //             case _ => messageNotRecognized(_)
-    //         }
-    //     }
-    // }
+class SvdGitManager(account: SvdAccount) extends SvdManager(account) {
+    log.trace("Starting GitManager for account: " + account)
 
     def receive = {
-        case _ =>
+        case Git.ListRepositories =>
+            log.trace("Listing git repositories in %s", gitHomeDir)
+            self reply Git.Repositories(git.Git.list(gitHomeDir).map(_.name))
+            
+        case Git.ShowRepository(name) =>
+            log.warn("Unimplemented yet!") // TODO: NIY
+            self reply NotImplementedError
+            
+        case Git.CreateRepository(name) =>
+            if(SvdUtils.fileExists(gitHomeDir / name)) {
+                self reply Git.RepositoryExistsError
+            } else {
+                log.trace("Creating new git repository: %s for account: %s".format(name, account.userName))
+                git.Git.init(gitHomeDir / name, bare = true)
+                SvdUtils.chown(gitHomeDir / name, account.userName)
+                self reply Success
+            }
+            
+        case Git.RemoveRepository(name) =>
+            if(SvdUtils.fileExists(gitHomeDir / name)) {
+                log.trace("Removing git repository: %s for account: %s".format(name, account.userName))
+                SvdUtils.rmdir(gitHomeDir / name)
+                self reply Success
+            } else {
+                self reply Git.RepositoryDoesNotExistError
+            }
+        
+        case msg => log.warn("Message not recoginzed: %s", msg)
     }
-    
-    protected lazy val gitDir = account.homeDir + "git/"
+
+    protected lazy val gitHomeDir = account.homeDir / "git"
 }
