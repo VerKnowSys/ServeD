@@ -137,7 +137,6 @@ class GitTest extends Specification {
         
         "push" in {
             val repo = GitRepository.init(newRepoPath)
-            
             writeFile(repo.path + "/README", "Some readme text")
             repo.add("README")
             repo.commit("init")
@@ -163,6 +162,43 @@ class GitTest extends Specification {
             target.pull
 
             target.history must haveSize(1)
+        }
+        
+        "branch" in {
+            val repo = GitRepository.init(newRepoPath)
+            writeFile(repo.path + "/README", "Some readme text")
+            repo.add("README")
+            repo.commit("init")
+            
+            repo.branchList must haveSize(1)
+                        
+            repo.branchList.map(_.name.split("/").last) must contain("master")
+            
+            repo.branch("feature")
+            
+            repo.branchList must haveSize(2)
+            repo.branchList.map(_.name.split("/").last) must containAll("master" :: "feature" :: Nil)
+        }
+        
+        "checkout" in {
+            val repo = GitRepository.init(newRepoPath)
+            writeFile(repo.path + "/README", "Some readme text")
+            repo.add("README")
+            repo.commit("init")
+            
+            repo.currentBranch must_== "master"
+            
+            repo.branch("feature")
+            repo.checkout("feature")
+            
+            writeFile(repo.path + "/README", "Some readme text added only in feature branch")
+            repo.add("README")
+            repo.commit("changed README")
+            
+            repo.history must haveSize(2)
+            
+            repo.checkout("master")
+            repo.history must haveSize(1)
         }
 
     }

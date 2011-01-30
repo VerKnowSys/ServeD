@@ -2,7 +2,7 @@ package com.verknowsys.served.utils.git
 
 import scala.collection.JavaConversions._
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.lib.{AnyObjectId, Constants}
+import org.eclipse.jgit.lib.{AnyObjectId, Constants, Ref}
 import org.eclipse.jgit.storage.file.FileRepository
 import org.eclipse.jgit.revwalk.{RevCommit}
 import org.eclipse.jgit.transport.{RemoteConfig, RefSpec}
@@ -135,6 +135,25 @@ class GitRepository(val dir: String) extends Logging {
      * @author teamon
      */
     def branch(name: String) = git.branchCreate.setName(name).call
+    
+    /** 
+     * Returns list of all branches
+     * 
+     * @author teamon
+     */
+    def branchList = git.branchList.call.toList
+    
+    /** 
+     * Same as `git checkout [name]`
+     *
+     * {{{
+     * repo.checkout("somebranch")
+     * }}}
+     * 
+     * @param name name of branch or commit sha1
+     * @author teamon
+     */
+    def checkout(name: String) = git.checkout.setName(name).call
 
     /**
      * Returns commit history iterator
@@ -155,9 +174,13 @@ class GitRepository(val dir: String) extends Logging {
      *
      * @author teamon
      */
-    def history(from: AnyObjectId, to: AnyObjectId = head): Iterator[RevCommit] = git.log.addRange(from, to).call.iterator
+    def history(from: AnyObjectId, to: AnyObjectId = head.getObjectId): Iterator[RevCommit] = git.log.addRange(from, to).call.iterator
 
-    
+    /**
+     * Return list of remotes
+     *
+     * @author teamon
+     **/
     def remotes = RemoteConfig.getAllRemoteConfigs(gitRepo.getConfig).toList
 
     /**
