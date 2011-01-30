@@ -22,13 +22,13 @@ class SvdAccountManager(val account: SvdAccount) extends Actor with Logging with
             
         case Git.ListRepositories =>
             log.trace(gitHomeDir)
-            self reply Git.Repositories(git.Git.list(gitHomeDir).map(r => Git.Repository(r.name)))
+            self reply Git.Repositories(git.Git.list(gitHomeDir).map(_.name))
             
         case Git.CreateRepository(name) =>
             if(SvdUtils.fileExists(gitHomeDir / name)) {
                 self reply Git.RepositoryExistsError
             } else {
-                git.Git.init(gitHomeDir / name)
+                git.Git.init(gitHomeDir / name, bare = true)
                 self reply Success
             }
             

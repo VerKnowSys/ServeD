@@ -7,6 +7,6 @@ libs << "svd.api/target/scala_2.8.1/classes"
 libs << "svd.conf/target/scala_2.8.1/resources"
 libs << "project/boot/scala-2.8.1/lib/scala-library.jar"
 
-system("sudo sbt 'project SvdCLI' compile")
 system("sudo rm -r logs")
+system("sudo sbt 'project SvdCLI' compile") &&
 system("java -cp " + libs.join(":") + " com.verknowsys.served.cli.Runner localhost 5555")

@@ -15,6 +15,18 @@ package object utils {
      */
     implicit def StringToFile(s: String) = new File(s)
     
+    /**
+     * Join two paths into one
+     *
+     * {{{
+     * "foo/bar"  / "baz"  // "foo/bar/baz"
+     * "foo/bar/" / "baz"  // "foo/bar/baz"
+     * "foo/bar"  / "/baz" // "foo/bar/baz"
+     * "foo/bar/" / "/baz" // "foo/bar/baz"
+     * }}}
+     *
+     * @author teamon
+     */
     implicit def StringToPath(a: String) = new {
         def /(b: String) = {
             if(a.last == '/'){

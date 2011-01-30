@@ -45,6 +45,11 @@ class ApiClient(host: String, port: Int) extends Logging {
         }
     }
     
+    def confirm(msg: String) = {
+        log.warn(msg)
+        Console.readLine("[Y/n]: ") == "Y"
+    }
+    
     
     /**
      * Match parameters to correct action
@@ -58,7 +63,7 @@ class ApiClient(host: String, port: Int) extends Logging {
             case "git" :: xs => xs match {
                 case "list" :: Nil => 
                     request(Git.ListRepositories) {
-                        case Git.Repositories(list) => list.foreach(r => println(" - " + r.name))
+                        case Git.Repositories(list) => list.foreach(r => println(" - " + r))
                     }
                     
                 case "create" :: name :: Nil =>
@@ -71,13 +76,14 @@ class ApiClient(host: String, port: Int) extends Logging {
                     
                 case ("remove" | "rm") :: name :: Nil =>
                     // TODO: Confirm!
-                    request(Git.RemoveRepository(name)) {
-                        case Success =>
-                            log.info("Repository %s removed", name)
-                        case Git.RepositoryDoesNotExistError =>
-                            log.error("Repository with name %s does not exist", name)
+                    if(confirm("Are you sure you want to remove repository %s? This operation cannot be undone!".format(name))){
+                        request(Git.RemoveRepository(name)) {
+                            case Success =>
+                                log.info("Repository %s removed", name)
+                            case Git.RepositoryDoesNotExistError =>
+                                log.error("Repository with name %s does not exist", name)
+                        }
                     }
-                    
                 case _ => log.error("Command not found. TODO: Display help for git commands")
             }
             
