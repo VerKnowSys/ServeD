@@ -1,5 +1,6 @@
 package com.verknowsys.served.utils.git
 
+import com.verknowsys.served.utils._
 import scala.collection.JavaConversions._
 import org.eclipse.jgit.api.{Git => JGit}
 import org.eclipse.jgit.lib.{AnyObjectId, Constants, Ref, PersonIdent}
@@ -22,8 +23,9 @@ object Git {
      * @author teamon
     */
     def init(dir: String, bare: Boolean = false) = {
-        JGit.init().setDirectory(new File(dir)).setBare(bare).call
-        new GitRepository(dir) // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
+        val directory = if(bare) dir + ".git" else dir
+        JGit.init().setDirectory(new File(directory)).setBare(bare).call
+        new GitRepository(directory) // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
     }
     
     /**
@@ -56,10 +58,9 @@ object Git {
  *
  * @author teamon
  */
-class GitRepository(val dir: String) extends Logging {
-    val dotgit = new File(dir, ".git")
-    val directory = if(dotgit.exists) dotgit else new File(dir)
-    val gitRepo = new FileRepository(directory)
+class GitRepository(dir: String) extends Logging {
+    val dirname = if(dir.endsWith(".git")) dir else dir / ".git"
+    val gitRepo = new FileRepository(dirname)
 
     lazy val git = new JGit(gitRepo)
 
@@ -72,7 +73,7 @@ class GitRepository(val dir: String) extends Logging {
      * 
      * @author teamon
      */
-    def name = new File(dir).getName
+    def name = new File(dir).getName.replace(".git", "")
     
     /** 
      * Return git repository name path
@@ -197,7 +198,7 @@ class GitRepository(val dir: String) extends Logging {
         val config = gitRepo.getConfig
         config.setString("branch", "master", "remote", "origin")
         config.setString("branch", "master", "merge", "refs/heads/master")
-                
+
         val remoteConfig = new RemoteConfig(config, name)
         remoteConfig.addURI(uri)
         remoteConfig.addFetchRefSpec(new RefSpec("+refs/heads/*:refs/remotes/origin/*"));
@@ -210,7 +211,7 @@ class GitRepository(val dir: String) extends Logging {
      *
      * @author teamon
      */
-    def pull =  git.pull.call
+    def pull = git.pull.call
 
     /**
      * Performs 'git push' on repository

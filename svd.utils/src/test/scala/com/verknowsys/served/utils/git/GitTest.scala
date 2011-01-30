@@ -42,11 +42,11 @@ class GitTest extends Specification {
             repo.name must_== "newbarerepo"
             repo.isBare must beTrue
             
-            val file = new File(DIR+"/newbarerepo")
+            val file = new File(DIR+"/newbarerepo.git")
             file.exists must beTrue
             file.isDirectory must beTrue
             
-            val dotgit = new File(DIR+"/newbarerepo/.git")
+            val dotgit = new File(DIR+"/newbarerepo.git/.git")
             dotgit.exists must beFalse
         }
         
