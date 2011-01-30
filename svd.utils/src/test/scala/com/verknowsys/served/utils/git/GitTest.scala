@@ -62,13 +62,17 @@ class GitTest extends Specification {
         }
         
         "list repositories in directory" in {
-            val one = Git.init(DIR + "/one")
-            val two = Git.init(DIR + "/two")
-            val three = Git.init(DIR + "/three")
+            Git.list("/tmp/foo") must haveSize(0)
+            Git.list(DIR) must haveSize(0)
+            
+            Git.init(DIR + "/one")
+            Git.init(DIR + "/two")
+            Git.init(DIR + "/three")
             
             val list = Git.list(DIR)
             list must haveSize(3)
             list.map(_.name) must containAll("one" :: "two" :: "three" :: Nil)
+            
         }
     }
     
