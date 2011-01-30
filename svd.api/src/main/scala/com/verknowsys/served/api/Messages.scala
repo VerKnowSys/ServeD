@@ -32,6 +32,7 @@ object Git {
 
     // Response
     case object RepositoryExistsError
+    case object RepositoryDoesNotExistError
     case class Repositories(val list: List[Repository])
     case class Repository(val name: String)
 }

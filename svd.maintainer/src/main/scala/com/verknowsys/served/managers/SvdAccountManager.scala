@@ -34,6 +34,14 @@ class SvdAccountManager(val account: SvdAccount) extends Actor with Logging with
                 git.Git.init(account.homeDir + "/git/" + name)
                 self reply Success
             }
+            
+        case Git.RemoveRepository(name) =>
+            if(SvdUtils.fileExists(account.homeDir + "/git/" + name)) {
+                SvdUtils.rmdir(account.homeDir + "/git/" + name)
+                self reply Success
+            } else {
+                self reply Git.RepositoryDoesNotExistError
+            }
         
         case msg => log.warn("Message net recoginzed: %s", msg)
     }

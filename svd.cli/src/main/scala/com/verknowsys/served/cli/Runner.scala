@@ -13,21 +13,9 @@ import com.verknowsys.served.api._
  */
 class ApiClient(host: String, port: Int) extends Logging {
     val svd = Actor.remote.actorFor("service:api", host, port)
-    
+
     log.trace("Checking connection...")
-    // (svd !! General.Connect(username)) match {
-    //     case Some(response) => response match {
-    //         case Success => 
-    //             println("ServeD 0.1.0 interactive shell. Welcome %s".format(username))
-    //             prompt
-    //         case Error(message) =>
-    //             log.error("[ERROR] " + message)
-    //             quit
-    //     }
-    //     case None => 
-    //         println("[ERROR] Connection timeout")
-    // }
-    
+
     request(General.Connect(username)) {
         case Success => 
             println("ServeD 0.1.0 interactive shell. Welcome %s".format(username))
@@ -79,6 +67,15 @@ class ApiClient(host: String, port: Int) extends Logging {
                             log.info("Repository %s created", name)
                         case Git.RepositoryExistsError => 
                             log.error("Repository with name %s already exists", name)
+                    }
+                    
+                case ("remove" | "rm") :: name :: Nil =>
+                    // TODO: Confirm!
+                    request(Git.RemoveRepository(name)) {
+                        case Success =>
+                            log.info("Repository %s removed", name)
+                        case Git.RepositoryDoesNotExistError =>
+                            log.error("Repository with name %s does not exist", name)
                     }
                     
                 case _ => log.error("Command not found. TODO: Display help for git commands")
