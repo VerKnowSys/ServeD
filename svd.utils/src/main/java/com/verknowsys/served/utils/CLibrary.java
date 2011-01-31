@@ -14,6 +14,8 @@ public interface CLibrary extends Library {
     public int kill(long pid, int signal);
     public int execve(String filename, String[] argv, String[] envp);
     public int fork();
+    public int chmod(String filename, int mode);
+    public int chown(String filename, int user, int group);
     
     // see sys/event.h header file
     public int kqueue();

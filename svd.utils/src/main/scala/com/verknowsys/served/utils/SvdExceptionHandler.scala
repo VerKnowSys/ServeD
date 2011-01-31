@@ -24,7 +24,7 @@ trait SvdExceptionHandler extends Actor with Logging {
                 aName.lastIndexOf(name) != -1
         }
         val iterator = files.iterator
-        log.trace("PWD: " + root)
+        log.trace("findFileInDir. Looking for: %s in %s. Extensions: %s, Recursive: %s".format(name, root, extensions.mkString(" "), recursive))
         while (iterator.hasNext) {
             val file = iterator.next.asInstanceOf[File]
             // log.trace("FILE: " + file.getAbsolutePath)

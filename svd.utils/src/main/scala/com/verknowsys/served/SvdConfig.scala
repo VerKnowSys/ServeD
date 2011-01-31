@@ -13,7 +13,7 @@ object SvdConfig {
      *
      */
      
-    final val version = "0.1.pre1"
+    final val version = "0.1.pre2"
     final val mainPropertiesFilename = "/served-%s.properties".format(version)
     final val props = new SvdProperties(mainPropertiesFilename)
 
@@ -36,13 +36,15 @@ object SvdConfig {
          "HOME=%s".format(homePath),
          "PATH=%s".format(defaultPathEnviroment) // 2011-01-18 14:39:36 - dmilith - TODO: implement account privileges and their influence on PATH setting
      )
-    
+
+
     def homePath =                      props("served.vendor.home") or System.getProperty("user.home") + "/"
     def vendorDir =                     props("served.vendor.dir") or ".svd/"
     
     def nullDevice =                    props("served.system.devices.null") or "/dev/null"
     def tmp =                           props("served.system.filesystems.tmp") or "/tmp/"
-    def noUser =                        props("served.system.username.nouser") or "nouser"
+    def noUser =                        props("served.system.user.name.nouser") or "nouser"
+    def defaultUserGroup =              props("served.system.user.group") or 1000
     
     def defaultEncoding =               props("served.system.encoding") or "UTF-8"
     
