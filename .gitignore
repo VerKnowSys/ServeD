@@ -7,6 +7,8 @@ src_managed/
 project/boot/
 project/plugins/project/build.properties
 .scala_dependencies
+svd.1
+svd.1.html
 *.neodatis
 .idea
 *~
