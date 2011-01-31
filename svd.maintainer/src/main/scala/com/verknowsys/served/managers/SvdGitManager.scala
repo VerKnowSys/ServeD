@@ -23,7 +23,7 @@ class SvdGitManager(account: SvdAccount) extends SvdManager(account) {
             self reply NotImplementedError
             
         case Git.CreateRepository(name) =>
-            if(SvdUtils.fileExists(gitHomeDir / name)) {
+            if(SvdUtils.fileExists(gitHomeDir / name + ".git")) {
                 self reply Git.RepositoryExistsError
             } else {
                 log.trace("Creating new git repository: %s for account: %s".format(name, account.userName))
@@ -33,9 +33,9 @@ class SvdGitManager(account: SvdAccount) extends SvdManager(account) {
             }
             
         case Git.RemoveRepository(name) =>
-            if(SvdUtils.fileExists(gitHomeDir / name)) {
+            if(SvdUtils.fileExists(gitHomeDir / name + ".git")) {
                 log.trace("Removing git repository: %s for account: %s".format(name, account.userName))
-                SvdUtils.rmdir(gitHomeDir / name)
+                SvdUtils.rmdir(gitHomeDir / name + ".git")
                 self reply Success
             } else {
                 self reply Git.RepositoryDoesNotExistError
