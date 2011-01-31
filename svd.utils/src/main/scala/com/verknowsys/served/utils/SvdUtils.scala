@@ -113,25 +113,54 @@ object SvdUtils extends Logging {
      */
     def loopThread(f: => Unit) = new SvdLoopThread(f)
     
+    
     /** 
      * Checks if file exists
      * 
      * @author teamon
      */
-    
     def fileExists(path: String) = (new java.io.File(path)).exists
+    
     
     /** 
      * Removes directory
      * 
      * @author teamon
      */
-    def rmdir(path: String) = try { FileUtils.forceDelete(path) } catch { case _ => }
+    def rmdir(path: String) = try { FileUtils.forceDelete(path) } catch { case x: Throwable => log.warn(x.getMessage) }
 
 
-    def chown(path: String, user: String, group: String = "users", recursive: Boolean = true) {
-        // TODO: Implement me please (soon!)
+    /** 
+     * Changes owner of file at given path
+     * 
+     * @author dmilith
+     */
+    def chown(path: String, user: Int, group: Int = SvdConfig.defaultUserGroup, recursive: Boolean = true) = {
+        // 2011-01-31 00:24:13 - dmilith - TODO: implement recursive call
+        import CLibrary._
+        val clib = CLibrary.instance
+        if (clib.chown(path, user, group) == 0)
+            0
+        else
+            -1
     }
+    
+    
+    /** 
+     * Changes permissions of file at given path
+     * 
+     * @author dmilith
+     */
+    def chmod(path: String, user: Int, group: Int = SvdConfig.defaultUserGroup, recursive: Boolean = true) = {
+        // 2011-01-31 00:24:13 - dmilith - TODO: implement recursive call
+        import CLibrary._
+        val clib = CLibrary.instance
+        if (clib.chmod(path, user) == 0)
+            0
+        else
+            -1
+    }
+    
     
 }
 
