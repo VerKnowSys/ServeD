@@ -13,7 +13,7 @@ object SvdConfig {
      *
      */
      
-    final val version = "0.1.pre2"
+    final val version = "0.1"
     final val mainPropertiesFilename = "/served-%s.properties".format(version)
     final val props = new SvdProperties(mainPropertiesFilename)
 
