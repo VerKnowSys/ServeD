@@ -1,0 +1,30 @@
+svd(1) -- ServeD Command Line Interface
+=============================================
+
+## DESCRIPTION
+
+svd is ServeD interactive shell that gives you access to (almost) all ServeD features
+
+## COMMANDS
+
+### Git
+  Commands related to manipulation your git repositories
+
+  * `git list`:
+    List your git repositories
+    
+  * `git show` <name>:
+    Show detailed information about repository
+  
+  * `git create` <name>:
+    Create repository with given name
+    
+  * `git remove` <name>, `git rm` <name>:
+    Remove repository with given name
+    
+## COPYRIGHT
+
+ServeD is Copyright (C) 2009-2011 VerKnowSys <http://verknowsys.com>
+
+  * Daniel _(dmilith)_ Dettlaff (<http://dmilith.verknowsys.com>)
+  * Tymon _(teamon)_ Tobolski (<http://teamon.eu>)

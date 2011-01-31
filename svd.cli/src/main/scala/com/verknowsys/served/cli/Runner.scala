@@ -109,7 +109,7 @@ class ApiClient(host: String, port: Int) extends Logging {
      * 
      * @author teamon
      */
-    private lazy val helpContent = io.Source.fromURL(Thread.currentThread.getContextClassLoader.getResource("help.txt")).mkString
+    private lazy val helpContent = io.Source.fromURL(Thread.currentThread.getContextClassLoader.getResource("svd.ronn")).mkString
     
     private def quit {
         Actor.registry.shutdownAll
