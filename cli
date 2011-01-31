@@ -3,6 +3,7 @@
 libs = Dir["svd.utils/lib_managed/scala_2.8.1/compile/*.jar"]
 libs << "svd.utils/target/scala_2.8.1/classes"
 libs << "svd.cli/target/scala_2.8.1/classes"
+libs << "svd.cli/target/scala_2.8.1/resources"
 libs << "svd.api/target/scala_2.8.1/classes"
 libs << "svd.conf/target/scala_2.8.1/resources"
 libs << "project/boot/scala-2.8.1/lib/scala-library.jar"
