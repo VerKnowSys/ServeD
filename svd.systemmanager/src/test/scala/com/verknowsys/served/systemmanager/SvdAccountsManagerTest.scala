@@ -57,7 +57,7 @@ class SvdAccountsManagerTest extends Specification with SvdExpectActorSpecificat
             val managers = registry.actorsFor[SvdAccountManager]
             managers must haveSize(1)
             managers.map(a => (a !! GetAccount).get) must
-                contain(SvdAccount("teamon", "*", 1001, 1001, "User &", "/home/teamon", "/usr/local/bin/zsh", null))
+                contain(SvdAccount("teamon", "*", 1001, 1001, "User &", "/home/teamon", "/usr/local/bin/zsh", Nil))
         }
         
         "spawn few Account Managers" in {
