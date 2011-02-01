@@ -190,41 +190,30 @@ class SvdAccountTest extends Specification with Logging {
             val acl3 = OneProcAllowed("memcached") :: SSHAllowed :: Nil
             
             acl1 match {
-                case (ExecutionAllowed(xx :: Nil) :: y :: Nil) =>
-                    xx must beEqual("/bin/ls") // or beEqual("/bin/du") or beEqual(Nil)
-                    y must be(ExecutionAllowed)
-                    true
+                case ExecutionAllowed(xx :: yy :: Nil) :: RootAllowed :: Nil =>
+                    xx must beEqual("/bin/ls")
+                    yy must beEqual("/bin/du")
                 case x => 
-                    fail("acl1 should beLike expected. Exc: %s".format(x))
+                    fail("acl1 should be like expected. Exc: %s".format(x))
             }
-            
-            acl1 match {
-                case RootAllowed :: Nil =>
-                    true
-                case _ =>
-                    fail("acl1 should beLike expected")
-            }
-            
             acl2 match {
                 case ExecutionAllowed(xx :: Nil) :: Nil =>
-                    xx must beMatching("uname")
-                    true
+                    xx must beEqual("uname")
                 case _ =>
-                    fail("acl2 should beLike expected")
+                    fail("acl2 should be like expected")
             }
-
             acl3 match {
-                case OneProcAllowed(name) :: Nil =>
+                case OneProcAllowed(name) :: SSHAllowed :: Nil =>
                     name must notBeNull
-                    true
+                    name must beEqual("memcached")
                 case _ =>
-                    fail("acl3 should beLike expected")
+                    fail("acl3a should be like expected")
             }
             acl3 match {
-                case SSHAllowed :: Nil =>
-                    true
+                case xx :: SSHAllowed :: Nil =>
+                    xx must beEqual(OneProcAllowed("memcached"))
                 case _ =>
-                    fail("acl3 should beLike expected")
+                    fail("acl3b should be like expected")
             }
             
         }
