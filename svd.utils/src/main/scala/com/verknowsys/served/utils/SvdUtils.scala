@@ -14,6 +14,7 @@ import java.io._
 import scala.io._
 import scala.util.matching.Regex
 import java.util.UUID
+import com.sun.jna.Native
 
 
 /**
@@ -23,6 +24,9 @@ import java.util.UUID
  *   
  */
 object SvdUtils extends Logging {
+    
+    
+    Native.setProtected(true)
     
         
     /**
@@ -176,13 +180,10 @@ object SvdUtils extends Logging {
      */
     def recursiveListFilesFromPath(filePath: File): Array[File] = {
         val out = filePath.listFiles
-        try { 
-          out ++ out.filter(_.isDirectory).flatMap(recursiveListFilesFromPath(_))
-        } catch {
-          case e: Exception => // 2011-02-01 12:05:19 - dmilith - NOTE: TODO: this shouldn't be required
-            log.error("recursiveListFilesFromPath: %s".format(e.getMessage))
+        if (out != null)
+            out ++ out.filter(_.isDirectory).flatMap(recursiveListFilesFromPath(_))
+        else
             Array()
-        }
     }
 
     
@@ -194,13 +195,10 @@ object SvdUtils extends Logging {
     def recursiveListFilesByRegex(filePath: File, regex: Regex): Array[File] = {
         val list = filePath.listFiles
         val out = list.filter(filePath => regex.findFirstIn(filePath.getName).isDefined)
-        try { 
-          out ++ list.filter(_.isDirectory).flatMap(recursiveListFilesByRegex(_, regex))
-        } catch {
-          case e: Exception =>  // 2011-02-01 12:05:19 - dmilith - NOTE: TODO: this exception catch shouldn't be required
-            log.error("recursiveListFilesByRegex: %s".format(e.getMessage))
+        if (out != null)
+            out ++ list.filter(_.isDirectory).flatMap(recursiveListFilesByRegex(_, regex))
+        else
             Array()
-        }
     }
     
     
