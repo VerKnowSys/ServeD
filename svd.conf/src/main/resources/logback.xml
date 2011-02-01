@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<configuration scan="true" debug="true" scanPeriod="10 seconds">
+<configuration scan="true" debug="false" scanPeriod="10 seconds">
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
 			<layout class="com.verknowsys.served.utils.ANSIColorPatternLayout">
-	      <pattern>[%-5level] [%thread | %logger{10}]: %message%n</pattern>
+				<pattern>[%-5level] [%d] [%thread{10} | %logger{10}]: %message%n</pattern>
 			</layout>
     </encoder>
   </appender>
