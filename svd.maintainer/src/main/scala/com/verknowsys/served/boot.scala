@@ -1,5 +1,6 @@
 package com.verknowsys.served
 
+
 import akka.actor._
 import akka.config.Supervision._
 import akka.actor.Actor.{remote, actorOf, registry}
@@ -7,7 +8,7 @@ import akka.util.Logging
 
 import com.verknowsys.served.utils.SvdFileEventsManager
 import com.verknowsys.served.maintainer.SvdMaintainer
-import com.verknowsys.served.maintainer.SvdAccountsManager
+import com.verknowsys.served.systemmanager.SvdAccountsManager
 import com.verknowsys.served.maintainer.SvdApiSession
 import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.systemmanager.SvdSystemManager
@@ -17,6 +18,8 @@ import com.verknowsys.served.utils.signals._
 
 
 object boot extends Logging {
+
+
     def apply(){
         val list = (actorOf[SvdFileEventsManager] ::
                    actorOf[SvdSystemManager] ::
@@ -37,6 +40,7 @@ object boot extends Logging {
         remote.registerPerSession("service:api", actorOf[SvdApiSession])
     }
     
+
     def main(args: Array[String]) {
         log.debug("Home dir: " + SvdConfig.homePath + SvdConfig.vendorDir)
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
@@ -50,6 +54,7 @@ object boot extends Logging {
         }}
         
         boot()
-
     }
+    
+    
 }
