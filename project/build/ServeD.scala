@@ -4,25 +4,29 @@ import extract._
 import java.io.File
 import reaktor.scct.ScctProject
 
+
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
+    
     // Projects
     lazy val conf          = project("svd.conf", "SvdConfiguration")
     lazy val api           = project("svd.api", "SvdAPI", conf)
     lazy val spechelpers   = project("svd.spechelpers", "SvdSpecHelpers", new SvdSpecHelpers(_))
     lazy val utils         = project("svd.utils", "SvdUtils", new SvdUtils(_), conf, spechelpers)
     lazy val cli           = project("svd.cli", "SvdCLI", new SvdCli(_), utils, api)
-    lazy val systemmanager = project("svd.systemmanager", "SvdSystemManager", new SvdSystemManager(_), utils)
+    lazy val systemmanager = project("svd.systemmanager", "SvdSystemManager", new SvdSystemManager(_), utils, api)
     lazy val notifications = project("svd.notifications", "Notifications", new SvdNotifications(_), utils)
     lazy val maintainer    = project("svd.maintainer", "SvdMaintainer", new SvdMaintainer(_), notifications, systemmanager, api)
     
+    
     override def parallelExecution = false
+    
     
     // Dependencies
     class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject {
         
         override def compileOrder = CompileOrder.JavaThenScala
         override def javaCompileOptions = super.javaCompileOptions ++ javaCompileOptions("-source", "1.6")
-        override def compileOptions = super.compileOptions ++ compileOptions("-Xresident") ++ compileOptions("-g:line") ++ (MaxCompileErrors(5) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq // ++ compileOptions("-make:changed")
+        override def compileOptions = super.compileOptions ++ compileOptions("-Xresident") ++ compileOptions("-g:source") ++ (MaxCompileErrors(5) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq // ++ compileOptions("-make:changed")
         override def parallelExecution = true
         override def installActions = "update" :: "run" :: Nil
         
@@ -35,7 +39,9 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         )
     }
     
+    
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
+    
     
     class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {
         lazy val cli = task { None; } dependsOn(run(Array("127.0.0.1", "5555")))
@@ -47,14 +53,16 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         override def mainClass = Some("com.verknowsys.served.cli.Runner")
     }
     
+    
     class SvdSystemManager(info: ProjectInfo) extends SvdProject(info) {
         import Process._
         
         val sigarSource = "org.hyperic" at "http://repository.jboss.org/maven2"
         val sigar       = "org.hyperic" % "sigar" % "1.6.3.82"
         
+        override def parallelExecution = true
+        
         lazy val stress = task {
-
             val compiler = "/usr/bin/clang"
             val tasks = "cpu_load_gen" :: "disk_load_gen" :: Nil
             val currDir = System.getProperty("user.dir")
@@ -79,14 +87,17 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         
     }
     
+    
     class SvdNotifications(info: ProjectInfo) extends SvdProject(info) {
         val smack       = "jivesoftware" % "smack" % "3.0.4"
     }
+    
     
     class SvdSpecHelpers(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
         val commonsio = "commons-io" % "commons-io" % "1.4"
         val specs     = "org.scala-tools.testing" %% "specs" % "1.6.6"
     }
+    
     
     class SvdUtils(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
         // val jgitRepository = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
@@ -105,6 +116,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val akkaRemote  = akkaModule("remote")
     }
     
+    
     class SvdMaintainer(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
         val dispatch = "net.databinder" %% "dispatch-http" % "0.7.8"
 
@@ -113,6 +125,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         
         override def mainClass = Some("com.verknowsys.served.boot")
     }
+    
     
     // Other
     lazy val notes = task { 
@@ -157,6 +170,10 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
 
         None
     }
+    
+    
+    val todo = notes
+    
     
 }
 
