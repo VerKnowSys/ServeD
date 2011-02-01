@@ -28,7 +28,7 @@ class SvdGitManager(account: SvdAccount) extends SvdManager(account) {
             } else {
                 log.trace("Creating new git repository: %s for account: %s".format(name, account.userName))
                 git.Git.init(gitHomeDir / name, bare = true)
-                SvdUtils.chown(gitHomeDir / name, account.uid.toInt) // 2011-01-31 00:57:46 - dmilith - XXX: toInt shouldn't be here. Change SvdAccount!
+                SvdUtils.chown(gitHomeDir / name, account.uid)
                 self reply Success
             }
             
