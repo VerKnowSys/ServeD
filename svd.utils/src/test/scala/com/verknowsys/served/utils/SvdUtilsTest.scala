@@ -58,7 +58,7 @@ class SvdUtilsTest extends Specification with Logging {
         SvdUtils.chown("/tmp/dupa_32745923/", user = (Random.nextInt * 1000), group = (Random.nextInt * 2340), recursive = true) must beTrue
     }
     
-    "chmod should change permissions" in {
+    "chmod should change permissions and count files in given folder properly" in {
         try { 
           SvdUtils.chmod("/tmpfdsa/dupadsf_327/xfdsayz", 0777, true)
           fail("Chmod should fail on attempt to chmod nonexistant file")
@@ -68,6 +68,7 @@ class SvdUtilsTest extends Specification with Logging {
         val f = new File("/tmp/dupa_327").mkdir
         val g = new File("/tmp/dupa_327/abc").mkdir
         val h = new File("/tmp/dupa_327/xyz").mkdir
+        FileUtils.touch("/tmp/dupa_327/dupa00")
         FileUtils.touch("/tmp/dupa_32745923/xyz/dupa00")
         FileUtils.touch("/tmp/dupa_32745923/abc/dupa01")
         FileUtils.touch("/tmp/dupa_32745923/dupa011")
@@ -77,6 +78,7 @@ class SvdUtilsTest extends Specification with Logging {
         SvdUtils.chmod("/tmp/dupa_327/xyz", 0777, true) must beTrue
         FileUtils.touch("/tmp/dupa_32745923/dupa011")
         SvdUtils.chmod("/tmp/dupa_32745923/dupa011", 0111, false) must beTrue
+        SvdUtils.recursiveListFilesFromPath("/tmp/dupa_327").size must beEqual(3)
     }
     
     "recursive file listings should work properly without regex" in {
