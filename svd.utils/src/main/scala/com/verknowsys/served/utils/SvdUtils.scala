@@ -12,6 +12,8 @@ import scala.collection.JavaConversions._
 import akka.util.Logging
 import java.io._
 import scala.io._
+import scala.util.matching.Regex
+import java.util.UUID
 
 
 /**
@@ -46,6 +48,14 @@ object SvdUtils extends Logging {
                 error(err)
         }
     }
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   Generate unique identifier
+     */
+    def uuid = UUID.randomUUID
     
     
     /**
@@ -159,35 +169,63 @@ object SvdUtils extends Logging {
     }
 
 
+    /**
+     *  @author dmilith
+     *
+     *   Recursive list files in given path
+     */
+    def recursiveListFilesFromPath(filePath: File): Array[File] = {
+        val out = filePath.listFiles
+        try { 
+          out ++ out.filter(_.isDirectory).flatMap(recursiveListFilesFromPath(_))
+        } catch {
+          case e: Exception => // 2011-02-01 12:05:19 - dmilith - NOTE: TODO: this shouldn't be required
+            log.error("recursiveListFilesFromPath: %s".format(e.getMessage))
+            Array()
+        }
+    }
+
+    
+    /**
+     *  @author dmilith
+     *
+     *   Recursive list files in given path + match by Regex
+     */
+    def recursiveListFilesByRegex(filePath: File, regex: Regex): Array[File] = {
+        val list = filePath.listFiles
+        val out = list.filter(filePath => regex.findFirstIn(filePath.getName).isDefined)
+        try { 
+          out ++ list.filter(_.isDirectory).flatMap(recursiveListFilesByRegex(_, regex))
+        } catch {
+          case e: Exception =>  // 2011-02-01 12:05:19 - dmilith - NOTE: TODO: this exception catch shouldn't be required
+            log.error("recursiveListFilesByRegex: %s".format(e.getMessage))
+            Array()
+        }
+    }
+    
+    
     /** 
      * Changes owner of file at given path
      * 
      * @author dmilith
      */
-    def chown(path: String, user: Int, group: Int = SvdConfig.defaultUserGroup, recursive: Boolean = true) = {
-        import CLibrary._
-        val clib = CLibrary.instance
-        
-        val isPathADir = new File(path).isDirectory
-        if (! new File(path).exists)
-            throw new Exception("Chown path doesn't exists! Cannot chown non existant file/ directory.")
-            
-        val files = if (isPathADir) FileUtils.listFiles(path, Array("*"), recursive).toList else (new File(path) :: Nil)
-        log.trace("chown(path: %s, user: %d, group: %d, recursion: %s): File list size %s".format(path, user, group, recursive, files.size))
-        files.foreach{
-            file =>
-                file match {
-                    case x: File =>
-                        log.trace("chowning: %s".format(x))
-                        if (clib.chown(x.getAbsolutePath, user, group) != 0)
-                            throw new Exception("Error occured while chowning: %s".format(file))
+    def chown(path: String, user: Int, group: Int = SvdConfig.defaultUserGroup, recursive: Boolean = true) =
+        if (!(new File(path)).exists) {
+            log.warn("Chown: File/ path doesn't exists! Cannot chown non existant file/ directory! IGNORING!")
+            false
+        } else {
+            import CLibrary._
+            val clib = CLibrary.instance
+            val files = if (recursive) SvdUtils.recursiveListFilesFromPath(new File(path)).toList else (new File(path) :: Nil)
+            log.trace("chown(path: %s, user: %d, group: %d, recursion: %s): File list: %s. Amount of files: %s".format(path, user, group, recursive, files.mkString(", "), files.length))
 
-                    case x: Any =>
-                        log.error("chowning Any?")
-                }
+            for (file <- files) {
+                log.trace("chowning: %s".format(file.getAbsolutePath))
+                if (clib.chown(file.getAbsolutePath, user, group) != 0)
+                    throw new Exception("Error occured while chowning: %s".format(file))
+            }
+            true            
         }
-        true
-    }
     
     
     /** 
@@ -195,15 +233,23 @@ object SvdUtils extends Logging {
      * 
      * @author dmilith
      */
-    def chmod(path: String, user: Int, group: Int = SvdConfig.defaultUserGroup, recursive: Boolean = true) = {
-        // 2011-01-31 00:24:13 - dmilith - TODO: implement recursive call
-        import CLibrary._
-        val clib = CLibrary.instance
-        if (clib.chmod(path, user) == 0)
-            0
-        else
-            -1
-    }
+    def chmod(path: String, mode: Int, recursive: Boolean = true) =
+        if (!(new File(path)).exists) {
+            log.warn("Chmod: File/ path doesn't exists! Cannot chmod non existant file/ directory! IGNORING!")
+            false
+        } else {
+            import CLibrary._
+            val clib = CLibrary.instance
+            val files = if (recursive) SvdUtils.recursiveListFilesFromPath(new File(path)).toList else (new File(path) :: Nil)
+            log.trace("chmod(path: %s, mode: %d, recursion: %s)".format(path, mode, recursive))
+
+            for (file <- files) {
+                log.trace("chmoding: %s".format(file.getAbsolutePath))
+                if (clib.chmod(file.getAbsolutePath, mode) != 0)
+                    throw new Exception("Error occured while chmoding: %s".format(file))
+            }
+            true            
+        }
     
     
 }
