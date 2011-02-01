@@ -1,8 +1,14 @@
-package com.verknowsys.served.maintainer
+package com.verknowsys.served.systemmanager
+
+
+import com.verknowsys.served.systemmanager.native._
+import com.verknowsys.served.systemmanager.acl._
 
 import org.specs._
 
+
 class SvdAccountTest extends Specification {
+
     "SvdAccount" should {
         
         "provide default parameters" in {
@@ -18,10 +24,10 @@ class SvdAccountTest extends Specification {
         }
         
         "be equal" in {
-            val a1 = SvdAccount("aa", "xx", 1000, 2000, "foo bar", "/home/aa", "/path/to/bash")
-            val a2 = SvdAccount("aa", "yy", 1000, 2000, "foo foo", "/home/aax", "/path/to/zsh")
-            val b = SvdAccount("bb", "zz", 2000, 2000, "foo bar baz", "/home/bb", "/path/to/ksh")
-            val c = SvdAccount("cc", "zz", 2000, 2000, "foo bar blah", "/home/cc", "/path/to/sh")
+            val a1 = SvdAccount("aa", "xx", 1000, 2000, "foo bar", "/home/aa", "/path/to/bash", null)
+            val a2 = SvdAccount("aa", "yy", 1000, 2000, "foo foo", "/home/aax", "/path/to/zsh", null)
+            val b = SvdAccount("bb", "zz", 2000, 2000, "foo bar baz", "/home/bb", "/path/to/ksh", null)
+            val c = SvdAccount("cc", "zz", 2000, 2000, "foo bar blah", "/home/cc", "/path/to/sh", null)
 
             a1 must beEqual(a1);        a1.hashCode must beEqual(a1.hashCode)
             a1 must beEqual(a2);        a1.hashCode must beEqual(a2.hashCode)
@@ -45,11 +51,11 @@ class SvdAccountTest extends Specification {
         }
         
         "isUser" in {
-            SvdAccount("", "", 1, 1, "", "/home/teamon", "/path/to/shell").isUser must beTrue
-            SvdAccount("", "", 1, 1, "", "/home/foo", "/path/to/shell").isUser must beTrue
-            SvdAccount("", "", 1, 1, "", "/foo", "/path/to/shell").isUser must beFalse
-            SvdAccount("", "", 1, 1, "", "/foo/home", "/path/to/shell").isUser must beFalse
-            SvdAccount("", "", 1, 1, "", "/foo/home/bar", "/path/to/shell").isUser must beFalse
+            SvdAccount("", "", 1, 1, "", "/home/teamon", "/path/to/shell", null).isUser must beTrue
+            SvdAccount("", "", 1, 1, "", "/home/foo", "/path/to/shell", null).isUser must beTrue
+            SvdAccount("", "", 1, 1, "", "/foo", "/path/to/shell", null).isUser must beFalse
+            SvdAccount("", "", 1, 1, "", "/foo/home", "/path/to/shell", null).isUser must beFalse
+            SvdAccount("", "", 1, 1, "", "/foo/home/bar", "/path/to/shell", null).isUser must beFalse
         }
         
         "correctly parse passwd line" in {
@@ -62,6 +68,46 @@ class SvdAccountTest extends Specification {
             account.information must beEqual("info")
             account.homeDir must beEqual("/path/to/home")
             account.shell must beEqual("/path/to/shell")
+        }
+        
+        "chown should obey SvdACL implementation" in {
+            val acl1 = new SvdACL with ExecutionAllowed with RootAllowed
+            val acl2 = new SvdACL with ExecutionAllowed
+            val acl3 = new SvdACL with OneProcAllowed with SSHAllowed
+            
+            acl1 must beLike {
+                case x: ExecutionAllowed =>
+                    true
+                case _ =>
+                    fail("acl1 should beLike expected")
+            }
+            acl1 must beLike {
+                case x: RootAllowed =>
+                    true
+                case _ =>
+                    fail("acl1 should beLike expected")
+            }
+            
+            acl2 must beLike {
+                case x: ExecutionAllowed =>
+                    true
+                case _ =>
+                    fail("acl2 should beLike expected")
+            }
+
+            acl3 must beLike {
+                case x: OneProcAllowed =>
+                    true
+                case _ =>
+                    fail("acl3 should beLike expected")
+            }
+            acl3 must beLike {
+                case x: SSHAllowed =>
+                    true
+                case _ =>
+                    fail("acl3 should beLike expected")
+            }
+            
         }
         
     }

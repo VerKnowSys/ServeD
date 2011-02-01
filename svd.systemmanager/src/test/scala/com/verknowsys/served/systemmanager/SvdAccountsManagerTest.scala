@@ -1,10 +1,12 @@
-package com.verknowsys.served.maintainer
+package com.verknowsys.served.systemmanager
 
+
+import com.verknowsys.served.systemmanager.native._
+import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.utils.SvdFileEventsManager
 import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.spechelpers._
 import com.verknowsys.served.SvdConfig
-import com.verknowsys.served.managers._
 import org.specs._
 
 import akka.actor._
@@ -53,7 +55,7 @@ class SvdAccountsManagerTest extends Specification with SvdExpectActorSpecificat
             
             val managers = registry.actorsFor[SvdAccountManager]
             managers must haveSize(1)
-            managers.map(a => (a !! GetAccount).get) must contain(SvdAccount("teamon", "*", 1001, 1001, "User &", "/home/teamon", "/usr/local/bin/zsh"))
+            managers.map(a => (a !! GetAccount).get) must contain(SvdAccount("teamon", "*", 1001, 1001, "User &", "/home/teamon", "/usr/local/bin/zsh", null))
         }
         
         "spawn few Account Managers" in {

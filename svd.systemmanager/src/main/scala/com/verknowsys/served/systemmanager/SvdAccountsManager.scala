@@ -1,30 +1,36 @@
-package com.verknowsys.served.maintainer
+package com.verknowsys.served.systemmanager
 
-import scala.io.Source
+
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.events.SvdFileEvent
-import com.verknowsys.served.managers._
+import com.verknowsys.served.systemmanager.native._
+import com.verknowsys.served.systemmanager.managers._
+import com.verknowsys.served.api._
 
 import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.{actorOf, registry}
 import akka.util.Logging
+import scala.io.Source
 
-import com.verknowsys.served.api._
 
 
 case class GetAccountManager(username: String)
 
+
 class SvdAccountsManager extends Actor with SvdFileEventsReactor {
+
     log.info("SvdAccountsManager is loading")
     // case object ReloadUsers
     // case class CheckUser(val username: String)
     
+
     override def preStart {
         respawnUsersActors
         registerFileEventFor(SvdConfig.systemPasswdFile, Modified)
     }
         
+
     def receive = {
         case SvdFileEvent(path, Modified) => 
             log.trace("Passwd file modified")
@@ -41,6 +47,7 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor {
         case msg => log.warn("Message not recognized: %s", msg)
     }
         
+
     // def act {
     //     // TODO: Catch java.io.FileNotFoundException and exit. ServeD can`t run withour passwd file
     //     val watchPasswdFile = SvdKqueue.watch(SvdConfig.systemPasswdFile, modified = true) {
@@ -137,5 +144,6 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor {
      * @author teamon
      */
     protected def userAccounts = allAccounts.filter(_.isUser)
+
     
 }

@@ -1,15 +1,20 @@
-package com.verknowsys.served.managers
+package com.verknowsys.served.systemmanager.managers
 
-import com.verknowsys.served.maintainer.SvdAccount
+
+import com.verknowsys.served.systemmanager.native._
+import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.spechelpers._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.api._
+
 import akka.actor.Actor.{actorOf, registry}
 import akka.actor.ActorRef
 import org.specs._
 
+
 class SvdGitManagerTest extends Specification with SvdExpectActorSpecification {
+
     val homeDir = testPath("home/teamon")
     val account = new SvdAccount(userName = "teamon", homeDir = homeDir)
     var gitm: ActorRef = null

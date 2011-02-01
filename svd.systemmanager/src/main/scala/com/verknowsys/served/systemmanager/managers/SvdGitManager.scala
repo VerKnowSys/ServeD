@@ -1,9 +1,11 @@
-package com.verknowsys.served.managers
+package com.verknowsys.served.systemmanager.managers
 
-import com.verknowsys.served.maintainer.SvdAccount
+
+import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.git
 import com.verknowsys.served.api._
+
 
 /**
  * Git Manager
@@ -11,8 +13,10 @@ import com.verknowsys.served.api._
  * @author teamon
  */
 class SvdGitManager(account: SvdAccount) extends SvdManager(account) {
+    
     log.trace("Starting GitManager for account: " + account)
 
+    
     def receive = {
         case Git.ListRepositories =>
             log.trace("Listing git repositories in %s", gitHomeDir)
@@ -44,5 +48,7 @@ class SvdGitManager(account: SvdAccount) extends SvdManager(account) {
         case msg => log.warn("Message not recoginzed: %s", msg)
     }
 
+    
     protected lazy val gitHomeDir = account.homeDir / "git"
+    
 }

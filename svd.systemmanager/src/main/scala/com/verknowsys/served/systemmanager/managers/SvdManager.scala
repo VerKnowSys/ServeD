@@ -1,8 +1,10 @@
-package com.verknowsys.served.managers
+package com.verknowsys.served.systemmanager.managers
+
+
+import com.verknowsys.served.utils.SvdExceptionHandler
+import com.verknowsys.served.systemmanager.native._
 
 import akka.actor.Actor
-import com.verknowsys.served.utils.SvdExceptionHandler
-import com.verknowsys.served.maintainer.SvdAccount
 
 
 /**
