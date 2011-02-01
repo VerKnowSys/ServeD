@@ -10,6 +10,8 @@ import java.util.regex.Pattern
 import clime.messadmin.providers.sizeof.ObjectProfiler
 import scala.collection.JavaConversions._
 import akka.util.Logging
+import java.io._
+import scala.io._
 
 
 /**
@@ -130,19 +132,61 @@ object SvdUtils extends Logging {
     def rmdir(path: String) = try { FileUtils.forceDelete(path) } catch { case x: Throwable => log.warn(x.getMessage) }
 
 
+    /**
+     *  @author dmilith
+     *
+     *   Find file in given directory. Named params available: name, root, extensions and recursive
+     */
+    def findFileInDir(
+        name: String,
+        root: String = System.getProperty("user.dir"),
+        extensions: Array[String] = Array("scala", "java"),
+        recursive: Boolean = true): String = {
+            val files = FileUtils.listFiles(root, extensions, recursive)
+            val filter = new FilenameFilter { 
+                def accept(dir: File, aName: String) =
+                    aName.lastIndexOf(name) != -1
+            }
+            val iterator = files.iterator
+            log.trace("Looking for: %s in %s. Extensions: %s, Recursive: %s".format(name, root, extensions.mkString(" "), recursive))
+            while (iterator.hasNext) {
+                val file = iterator.next.asInstanceOf[File] // 2011-02-01 06:44:08 - dmilith - XXX: try matcher here
+                if (filter.accept(root, file.toString)) {
+        			return file.getAbsolutePath
+        		}
+            }
+        ""
+    }
+
+
     /** 
      * Changes owner of file at given path
      * 
      * @author dmilith
      */
     def chown(path: String, user: Int, group: Int = SvdConfig.defaultUserGroup, recursive: Boolean = true) = {
-        // 2011-01-31 00:24:13 - dmilith - TODO: implement recursive call
         import CLibrary._
         val clib = CLibrary.instance
-        if (clib.chown(path, user, group) == 0)
-            0
-        else
-            -1
+        
+        val isPathADir = new File(path).isDirectory
+        if (! new File(path).exists)
+            throw new Exception("Chown path doesn't exists! Cannot chown non existant file/ directory.")
+            
+        val files = if (isPathADir) FileUtils.listFiles(path, Array("*"), recursive).toList else (new File(path) :: Nil)
+        log.trace("chown(path: %s, user: %d, group: %d, recursion: %s): File list size %s".format(path, user, group, recursive, files.size))
+        files.foreach{
+            file =>
+                file match {
+                    case x: File =>
+                        log.trace("chowning: %s".format(x))
+                        if (clib.chown(x.getAbsolutePath, user, group) != 0)
+                            throw new Exception("Error occured while chowning: %s".format(file))
+
+                    case x: Any =>
+                        log.error("chowning Any?")
+                }
+        }
+        true
     }
     
     
