@@ -638,7 +638,7 @@ svd.conf}</string>
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
 
 \f0\fs20 \cf2 \expnd0\expndtw0\kerning0
-Config}</string>
+SvdConfig}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -725,7 +725,7 @@ Config}</string>
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
 
 \f0\fs20 \cf2 \expnd0\expndtw0\kerning0
-Utils}</string>
+SvdUtils}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
