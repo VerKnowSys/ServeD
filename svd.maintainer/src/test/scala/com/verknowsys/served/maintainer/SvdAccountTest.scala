@@ -10,18 +10,18 @@ class SvdAccountTest extends Specification {
             
             a.userName must beEqual("guest")
             a.pass must beEqual("x")
-            a.uid must beEqual("1000")
-            a.gid must beEqual("1000")
+            a.uid must beEqual(1000)
+            a.gid must beEqual(1000)
             a.information must beEqual("No information")
             a.homeDir must beEqual("/home/")
             a.shell must beEqual("/bin/bash")
         }
         
         "be equal" in {
-            val a1 = SvdAccount("aa", "xx", "1000", "2000", "foo bar", "/home/aa", "/path/to/bash")
-            val a2 = SvdAccount("aa", "yy", "1000", "2000", "foo foo", "/home/aax", "/path/to/zsh")
-            val b = SvdAccount("bb", "zz", "2000", "2000", "foo bar baz", "/home/bb", "/path/to/ksh")
-            val c = SvdAccount("cc", "zz", "2000", "2000", "foo bar blah", "/home/cc", "/path/to/sh")
+            val a1 = SvdAccount("aa", "xx", 1000, 2000, "foo bar", "/home/aa", "/path/to/bash")
+            val a2 = SvdAccount("aa", "yy", 1000, 2000, "foo foo", "/home/aax", "/path/to/zsh")
+            val b = SvdAccount("bb", "zz", 2000, 2000, "foo bar baz", "/home/bb", "/path/to/ksh")
+            val c = SvdAccount("cc", "zz", 2000, 2000, "foo bar blah", "/home/cc", "/path/to/sh")
 
             a1 must beEqual(a1);        a1.hashCode must beEqual(a1.hashCode)
             a1 must beEqual(a2);        a1.hashCode must beEqual(a2.hashCode)
@@ -45,20 +45,20 @@ class SvdAccountTest extends Specification {
         }
         
         "isUser" in {
-            SvdAccount("", "", "", "", "", "/home/teamon", "/path/to/shell").isUser must beTrue
-            SvdAccount("", "", "", "", "", "/home/foo", "/path/to/shell").isUser must beTrue
-            SvdAccount("", "", "", "", "", "/foo", "/path/to/shell").isUser must beFalse
-            SvdAccount("", "", "", "", "", "/foo/home", "/path/to/shell").isUser must beFalse
-            SvdAccount("", "", "", "", "", "/foo/home/bar", "/path/to/shell").isUser must beFalse
+            SvdAccount("", "", 1, 1, "", "/home/teamon", "/path/to/shell").isUser must beTrue
+            SvdAccount("", "", 1, 1, "", "/home/foo", "/path/to/shell").isUser must beTrue
+            SvdAccount("", "", 1, 1, "", "/foo", "/path/to/shell").isUser must beFalse
+            SvdAccount("", "", 1, 1, "", "/foo/home", "/path/to/shell").isUser must beFalse
+            SvdAccount("", "", 1, 1, "", "/foo/home/bar", "/path/to/shell").isUser must beFalse
         }
         
         "correctly parse passwd line" in {
-            val SvdAccount(account) = "teamon:pass:myUid:myGid:info:/path/to/home:/path/to/shell"
+            val SvdAccount(account) = "teamon:pass:1001:1002:info:/path/to/home:/path/to/shell"
             
             account.userName must beEqual("teamon")
             account.pass must beEqual("pass")
-            account.uid must beEqual("myUid")
-            account.gid must beEqual("myGid")
+            account.uid must beEqual(1001)
+            account.gid must beEqual(1002)
             account.information must beEqual("info")
             account.homeDir must beEqual("/path/to/home")
             account.shell must beEqual("/path/to/shell")
