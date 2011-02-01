@@ -56,14 +56,14 @@ trait SvdFileEventsReactor extends SvdExceptionHandler {
     def registerFileEventFor(path: String, flags: Int){
         Actor.registry.actorFor[SvdFileEventsManager] match {
             case Some(fem) => fem ! SvdRegisterFileEvent(path, flags, this.self)
-            case None => log.error("Could not register file event. FileEventsManager worker not found.")
+            case None => log.warn("Could not register file event. FileEventsManager worker not found.")
         }
     }
     
     def unregisterFileEvents {
         Actor.registry.actorFor[SvdFileEventsManager] match {
             case Some(fem) => fem ! SvdUnregisterFileEvent(this.self)
-            case None => log.error("Could not unregister file event. FileEventsManager worker not found.")
+            case None => log.warn("Could not unregister file event. FileEventsManager worker not found.")
         }
         super.postStop // 2011-01-30 01:06:54 - dmilith - NOTE: execute SvdExceptionHandler's code
     }

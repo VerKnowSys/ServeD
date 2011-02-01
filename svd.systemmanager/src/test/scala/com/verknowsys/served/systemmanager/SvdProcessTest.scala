@@ -71,7 +71,7 @@ class SvdProcessTest extends Specification {
         "Should detect harmful/ incorect commands automatically" in {
             var exploit: SvdProcess = null
             try {
-            	exploit = new SvdProcess("ls", user = "root", useShell = false)
+            	exploit = new SvdProcess("dig +trace wp.pl", user = "root", useShell = false)
             } catch {
                 case x: Exception =>
                     fail("'Exploit' shouldn't be detected (noShell)! Exception: %s".format(x))
