@@ -1,12 +1,11 @@
+ServeD POLICIES:
 
-1. Use proper naming. CamelCase, with Svd prefix for all custom ServeD classes.
-
-2. User A wont (and never should) know everything about user B's work. (Share knowledge about what You did with rest of team! "man synergy")
-
-3. It should work first. Then beautify it and optimize. (Prevent premature optimization!)
-
-4. Optimize when code (or part of code/ module) is in production stage of development only.
-
-5. Stability is more important than performance
-
-6. Git "master" branch, should always be production ready
+§ 1.	Use proper naming common used in project. CamelCase, with Svd prefix for all custom ServeD classes required.
+§ 2.	User A usually wont (and rarely should) know everything about user B's work. (Share knowledge about what You did with rest of team! "man synergy")
+§ 3.	Your code should work first, no matter how awful it is. It's Your trouble to make it better and beautify it, and optimize.
+§ 4.	Optimize when code (or part of code/ module) is in production stage of development only.
+§ 5.	Stability is more important than performance, but we care about performance more than a bit.
+§ 6.	Git "master" branch, should always be production ready (testable, compilable).
+§ 7.	Be helpful for others. Be useful with Your knowlege. Share with your experience.
+§ 8.	Don't afraid to tell teammate that (s)he did wrong. Explain yourself, then goto: §9
+§ 9.	If you have right, then You're the winner. If your solution is better - we love you, let's use it.
