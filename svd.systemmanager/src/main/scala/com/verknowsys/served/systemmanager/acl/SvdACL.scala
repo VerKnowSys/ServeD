@@ -2,11 +2,21 @@ package com.verknowsys.served.systemmanager.acl
 
 
 /**
-*   @author dmilith
-*
-*   Include this ACL to give access to some functionality
-*/
-trait OperationAllowed
+ *  @author dmilith
+ *
+ *   This case class contains ACL traits for SvdAccount security
+ */
+class SvdACL
+
+
+/**
+ *  @author dmilith
+ *
+ *   Include this ACL to grant permission for execution of process
+ */
+trait ExecutionAllowed {
+    this: SvdACL =>
+}
 
 
 /**
@@ -14,7 +24,9 @@ trait OperationAllowed
 *
 *   Include this ACL to allow to use root account to spawn/ access to file
 */
-trait RootAllowed
+trait RootAllowed {
+    this: SvdACL =>
+}
 
 
 /**
@@ -22,7 +34,9 @@ trait RootAllowed
 *
 *   Include this ACL when user is allowed to log in
 */
-trait LoginAllowed
+trait LoginAllowed {
+    this: SvdACL =>
+}
 
 
 /**
@@ -30,7 +44,9 @@ trait LoginAllowed
 *
 *   Include this ACL to start "one-process-account"
 */
-trait OneProcAllowed
+trait OneProcAllowed {
+    this: SvdACL =>
+}
 
 
 /**
@@ -38,4 +54,7 @@ trait OneProcAllowed
 *
 *   Include this ACL to allow user to login with ssh 2
 */
-trait SSHAllowed
+trait SSHAllowed {
+    this: SvdACL =>
+}
+

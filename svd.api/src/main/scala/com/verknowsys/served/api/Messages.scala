@@ -1,5 +1,6 @@
 package com.verknowsys.served.api
 
+
 sealed abstract class ApiMessage
 sealed abstract class ApiResponse extends ApiMessage
 
@@ -19,6 +20,7 @@ object General {
     case class Connect(username: String) extends Base
     case object Disconnect extends Base
 }
+
 
 object Git {
     sealed abstract class Base extends ApiMessage
