@@ -80,7 +80,14 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
         case Kill(pid, signal) => // 2011-01-23 04:13:34 - dmilith - NOTE: send standard SIGINT signal to app with some pid
             log.info("Kill request for native application with Pid: %s. Sending signal: %s", pid, signal)
             SvdProcess.kill(pid.asInstanceOf[Long], signal.asInstanceOf[SvdPOSIX.Value])
-            throw new RuntimeException("Dupa zbladła")
+            
+            SvdUtils.chown("/tmp/dupa007", user = 666, group = 6666)
+            SvdUtils.chown("/tmp/dupa_32745923", user = 666, group = 6666)
+            
+            // throw new Exception("Dupa zbladła")
+            // throw new RuntimeException("Dupa zbladła bardzo")
+            // throw new Throwable("Dupa biała jak ściana")
+            
             
         case SpawnProcess(cmd) =>
             log.debug("Requested process spawn: %s", cmd)

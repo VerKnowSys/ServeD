@@ -1,12 +1,19 @@
 package com.verknowsys.served.systemmanager.acl
 
 
+import com.verknowsys.served.utils._
+
+
 /**
  *  @author dmilith
  *
  *   This case class contains ACL traits for SvdAccount security
  */
-class SvdACL
+case class SvdACL {
+
+    def uuid = SvdUtils.uuid
+    
+}
 
 
 /**
