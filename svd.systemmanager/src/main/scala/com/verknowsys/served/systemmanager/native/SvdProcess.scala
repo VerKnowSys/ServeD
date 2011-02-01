@@ -92,8 +92,8 @@ class SvdProcess(
         } catch {
             case x: IllegalThreadStateException =>
                 log.debug("SvdProcess thread exited. No exitValue given.")
-            case x: ProcessException =>
-                log.error("ProcessException occured: %s".format(x.getMessage))
+            // case x: ProcessException =>
+            //                 log.error("ProcessException occured: %s".format(x.getMessage))
         }
         aPid
     }

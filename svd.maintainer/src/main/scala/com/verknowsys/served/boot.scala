@@ -23,16 +23,20 @@ object boot extends Logging {
     def apply(){
         val list = (actorOf[SvdFileEventsManager] ::
                    actorOf[SvdSystemManager] ::
-                   actorOf[SvdMaintainer] ::
                    actorOf[SvdAccountsManager] :: 
+                   actorOf[SvdMaintainer] ::
                    // actorOf[SvdNotificationCenter] :: 
-                   Nil).map(a => Supervise(a, Permanent))
+                   Nil).map(Supervise(_, Permanent))
         // supervise and autostart
         Supervisor(
           SupervisorConfig(
-            OneForOneStrategy(List(classOf[Exception]), 3, 1000),
+            OneForOneStrategy(List(classOf[Exception], classOf[RuntimeException], classOf[NullPointerException]), 50, 1000),
             list))
-        
+
+
+        // 2011-02-01 21:13:24 - dmilith - NOTE: this is default order of starting Managers and Maintainer:
+        registry.actorFor[SvdAccountsManager].foreach { _ ! Init }
+        registry.actorFor[SvdSystemManager].foreach { _ ! Init }
         registry.actorFor[SvdMaintainer].foreach { _ ! Init }
         
         // ApiServer

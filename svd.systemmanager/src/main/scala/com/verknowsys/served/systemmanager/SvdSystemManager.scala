@@ -46,7 +46,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             log.info("Current PID: %d. System Information:\n%s".format(SvdProcess.getCurrentProcessPid, SvdProcess.getProcessInfo(SvdProcess.getCurrentProcessPid)))
             
 
-            val a = new SvdProcess(command = "memcached -u nobody", user = "root", outputRedirectDestination = "/tmp/served_nobody_memcached.log")
+            val a = new SvdProcess(command = "dig +trace arka.gdynia.pl", user = "root", outputRedirectDestination = "/tmp/served_nobody_memcached.log")
             // log.debug("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
             a.kill(SIGINT)
             
