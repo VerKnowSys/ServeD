@@ -3,6 +3,7 @@ package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils._
+import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.events.SvdFileEvent
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager.managers._
@@ -32,6 +33,12 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
         
 
     def receive = {
+        case Init =>
+            log.debug("SvdAccountsManager received Init. Running default task..")
+            self ! SvdFileEvent("/var/log/system.log", Modified) // 2011-02-01 21:21:20 - dmilith - NOTE: this is intended: one entry will work on fBSD, one on Mac
+            self ! SvdFileEvent("/var/log/messages", Modified)
+            
+        
         case SvdFileEvent(path, Modified) => 
             log.trace("Passwd file modified")
             respawnUsersActors

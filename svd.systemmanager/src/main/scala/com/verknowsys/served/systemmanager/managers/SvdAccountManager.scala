@@ -3,6 +3,7 @@ package com.verknowsys.served.systemmanager.managers
 
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.SvdExceptionHandler
+import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.api.Git
 import akka.actor.Actor
 import akka.util.Logging
@@ -25,6 +26,9 @@ class SvdAccountManager(val account: SvdAccount) extends Actor with SvdException
     
 
     def receive = {
+        case Init =>
+            log.info("SvdAccountManager received Init.")
+            
         case GetAccount => 
             self reply account
             
