@@ -21,12 +21,14 @@ import akka.util.Logging
 
 case class ProcessesList(pids: List[Long])
 
+
 /**
 *   @author dmilith
 *   
 *   SvdSystemManager - responsible for System managment and monitoring
 */
 class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
+
     import SvdPOSIX._
     
     log.info("SvdSystemManager is loading")
@@ -40,7 +42,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             val nrs = new SvdSystemResources
             
             log.info("SvdSystemManager ready")
-            log.info("System Resources Availability:\n%s".format(nrs))
+            log.info("System Resources Availability: [%s]".format(nrs))
             log.info("Current PID: %d. System Information:\n%s".format(SvdProcess.getCurrentProcessPid, SvdProcess.getProcessInfo(SvdProcess.getCurrentProcessPid)))
             
 
@@ -124,7 +126,6 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
     
     
     override def toString = "SvdSystemManager"
-
 
     
 }

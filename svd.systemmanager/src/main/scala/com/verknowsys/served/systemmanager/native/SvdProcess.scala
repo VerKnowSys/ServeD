@@ -6,16 +6,17 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.monitor._
 import com.verknowsys.served.systemmanager.native._
+import com.verknowsys.served.systemmanager.acl._
+import SvdPOSIX._
 
 import org.hyperic.sigar._
 import com.sun.jna.{Native, Library}
 import scala.collection.JavaConversions._
-import java.io._
 import scala.io._
+import java.io._
 import java.lang.reflect.{Field}
 import akka.util.Logging
 import org.apache.commons.io.FileUtils
-import SvdPOSIX._
 
 
 class ProcessException(x: String) extends Exception(x)
@@ -39,7 +40,6 @@ class SvdProcess(
     log.debug("Spawning SvdProcess: (%s)".format(command))
 
     import SvdProcess._
-    
     Native.setProtected(true)
 
     // 2011-01-26 12:36:06 - dmilith - NOTE: TODO: check low level way of launching processes
@@ -51,6 +51,7 @@ class SvdProcess(
     //         else
     //             -1
     //     }
+
 
     /**
       * Spawns new system process
@@ -92,7 +93,7 @@ class SvdProcess(
             case x: IllegalThreadStateException =>
                 log.debug("SvdProcess thread exited. No exitValue given.")
             case x: ProcessException =>
-                log.error("%s".format(x))
+                log.error("ProcessException occured: %s".format(x.getMessage))
         }
         aPid
     }
@@ -172,8 +173,7 @@ class SvdProcess(
      *
      *   All ACLs must pass for given process
      */
-    def passACLs =
-        true // 2011-01-25 20:56:10 - dmilith - TODO: implement ACL check
+    def passACLs = SvdAccount.aclFor(name)
     
     
     /**

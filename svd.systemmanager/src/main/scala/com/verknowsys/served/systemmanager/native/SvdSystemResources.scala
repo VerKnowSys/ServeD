@@ -30,18 +30,19 @@ class SvdSystemResources {
     val memTotal = mem.getTotal
     val memUsagePercentage = mem.getUsedPercent
     
+    
     override def toString =
         (
-        "MEM_USED:[%d],\n" +
-        "MEM_FREE:[%d],\n" +
-        "MEM_TOTAL[%d],\n" +
-        "MEM_USAGE_PERC[%f],\n" +
-        "SWAP_USED:[%d],\n" +
-        "SWAP_FREE:[%d],\n" +
-        "SWAP_TOTAL:[%d],\n" +
-        "TCP_CONN_OPEN:[%d],\n" +
-        "TCP_FAILED_ATT:[%d],\n" +
-        "TCP_IN_ERROR:[%d]\n")
+        "MEM_USED:[%d], " +
+        "MEM_FREE:[%d], " +
+        "MEM_TOTAL[%d], " +
+        "MEM_USAGE_PERC[%f], " +
+        "SWAP_USED:[%d], " +
+        "SWAP_FREE:[%d], " +
+        "SWAP_TOTAL:[%d], " +
+        "TCP_CONN_OPEN:[%d], " +
+        "TCP_FAILED_ATT:[%d], " +
+        "TCP_IN_ERROR:[%d] ")
             .format(memUsed, memFree, memTotal, memUsagePercentage, swapUsed, swapFree, swapTotal, tcpConnections, tcpFailedAttempts, tcpInError)
     
 }

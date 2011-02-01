@@ -3,6 +3,7 @@
 
 package com.verknowsys.served.maintainer
 
+
 // import com.verknowsys.served.api._
 import com.verknowsys.served.boot
 import com.verknowsys.served.notifications._
@@ -18,12 +19,14 @@ import akka.actor.Actor.actorOf
 import akka.actor.Actor.registry
 import akka.util.Logging
 
+
 /**
  *  Main SvdMaintainer loader.
  *
  *  @author dmilith, teamon
  */
 class SvdMaintainer extends Actor with SvdExceptionHandler {
+
     log.info("Maintainer is loading")
         
     registry.actorFor[SvdSystemManager] foreach { _ ! Init }
