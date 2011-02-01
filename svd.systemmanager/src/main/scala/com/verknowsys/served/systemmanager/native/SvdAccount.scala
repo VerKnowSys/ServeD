@@ -85,6 +85,7 @@ object SvdAccount {
      */
     def aclFor(name: String) = {
         // 2011-02-01 07:03:11 - dmilith - TODO: implement ACL mangling
+        
         true
     }
     
@@ -92,9 +93,9 @@ object SvdAccount {
     /**
      * @author teamon
      */
-    def apply(a: String, b: String, c: Int, d: Int, e: String, f: String, g: String, h: SvdACL) = new SvdAccount(a, b, c.toInt, d.toInt, e, f, g, h.asInstanceOf[SvdACL]) 
-
-
+    def apply(a: String, b: String, c: Int, d: Int, e: String, f: String, g: String, h: SvdACL) = new SvdAccount(a, b, c.toInt, d.toInt, e, f, g, h) 
+    
+    
     /**
      * @author teamon
      */
@@ -102,13 +103,13 @@ object SvdAccount {
         if(line.startsWith("#")) None
         else {
             line.split(":") match {
-                case Array(a, b, c, d, e, f, g, h) => Some(SvdAccount(a, b, c.toInt, d.toInt, e, f, g, h.asInstanceOf[SvdACL]))
+                case Array(a, b, c, d, e, f, g, h) => Some(SvdAccount(a, b, c.toInt, d.toInt, e, f, g, null)) // 2011-02-01 14:52:17 - dmilith - XXX: HACK: ignoring acls
                 case _ => None
             }
         }
     }
     
-
+    
     /**
      * @author teamon
      */

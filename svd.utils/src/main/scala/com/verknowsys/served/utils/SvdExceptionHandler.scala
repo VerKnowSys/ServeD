@@ -14,11 +14,17 @@ import com.verknowsys.served.utils._
  *
  *   This trait should be used by all ServeD actors
  */
-trait SvdExceptionHandler extends Actor with Logging {
-    
+trait SvdExceptionHandler extends Actor with Logging { 
     
     // 2011-01-30 01:36:28 - dmilith - NOTE: txmt protocol example: txmt://open/?url=file://~/.bash_profile&line=11&column=2
+    
+    /**
+     *  @author dmilith
+     *
+     *   
+     */
     override def preRestart(reason: Throwable) = {
+        super.preRestart(reason)
         log.trace("preRestart executed in %s".format(this.getClass))
         log.error(
             """

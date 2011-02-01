@@ -58,8 +58,8 @@ class SvdAccountTest extends Specification {
             SvdAccount("", "", 1, 1, "", "/foo/home/bar", "/path/to/shell", null).isUser must beFalse
         }
         
-        "correctly parse passwd line" in {
-            val SvdAccount(account) = "teamon:pass:1001:1002:info:/path/to/home:/path/to/shell"
+        "correctly parse ordered arguments" in {
+            val account = new SvdAccount("teamon", "pass", 1001, 1002, "info", "/path/to/home", "/path/to/shell", new SvdACL with RootAllowed )
             
             account.userName must beEqual("teamon")
             account.pass must beEqual("pass")
@@ -68,6 +68,12 @@ class SvdAccountTest extends Specification {
             account.information must beEqual("info")
             account.homeDir must beEqual("/path/to/home")
             account.shell must beEqual("/path/to/shell")
+            account.acls must beLike {
+                case x: RootAllowed =>
+                    x must notBeNull
+                case _ =>
+                    fail("ACLS didn't pass our test.")
+            }
         }
         
         "chown should obey SvdACL implementation" in {

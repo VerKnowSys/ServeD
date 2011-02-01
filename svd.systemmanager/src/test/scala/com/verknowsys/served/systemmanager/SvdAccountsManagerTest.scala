@@ -1,6 +1,7 @@
 package com.verknowsys.served.systemmanager
 
 
+import com.verknowsys.served.systemmanager.acl._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.utils.SvdFileEventsManager
@@ -17,7 +18,7 @@ class SvdAccountsManagerTest extends Specification with SvdExpectActorSpecificat
     
     
     def changePasswdPath(path: String) {
-        val passwd = readFile(System.getProperty("user.dir") + "/svd.maintainer/src/test/resources/etc/" + path)
+        val passwd = readFile(System.getProperty("user.dir") + "/svd.systemmanager/src/test/resources/etc/" + path)
         writeFile(SvdConfig.systemPasswdFile, passwd)
     }      
     
@@ -55,7 +56,8 @@ class SvdAccountsManagerTest extends Specification with SvdExpectActorSpecificat
             
             val managers = registry.actorsFor[SvdAccountManager]
             managers must haveSize(1)
-            managers.map(a => (a !! GetAccount).get) must contain(SvdAccount("teamon", "*", 1001, 1001, "User &", "/home/teamon", "/usr/local/bin/zsh", null))
+            managers.map(a => (a !! GetAccount).get) must
+                contain(SvdAccount("teamon", "*", 1001, 1001, "User &", "/home/teamon", "/usr/local/bin/zsh", null))
         }
         
         "spawn few Account Managers" in {

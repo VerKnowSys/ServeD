@@ -18,7 +18,7 @@ import scala.io.Source
 case class GetAccountManager(username: String)
 
 
-class SvdAccountsManager extends Actor with SvdFileEventsReactor {
+class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExceptionHandler {
 
     log.info("SvdAccountsManager is loading")
     // case object ReloadUsers
