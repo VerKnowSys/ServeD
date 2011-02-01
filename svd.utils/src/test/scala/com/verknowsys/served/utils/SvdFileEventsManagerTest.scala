@@ -14,6 +14,7 @@ import akka.actor.Actor._
 
 class SvdTestFileEventsReactor extends SvdExpectActor with SvdFileEventsReactor {
     override def preStart {
+        new File("/tmp/served/file_events_test").mkdir
         registerFileEventFor("/tmp/served/file_events_test/single", Modified)
     }
 }
@@ -34,6 +35,7 @@ class TestSvdFileEventsManager extends SvdFileEventsManager {
 
 class SvdFileEventsManagerTest extends Specification with SvdExpectActorSpecification {
     final val DIR = "/tmp/served/file_events_test"
+    new File(DIR).mkdir
     
     var fem: ActorRef = null
         
