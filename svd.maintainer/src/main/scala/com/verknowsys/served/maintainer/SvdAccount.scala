@@ -15,8 +15,8 @@ import akka.util.Logging
 class SvdAccount (
         val userName: String = "guest",
         val pass: String = "x",
-        val uid: String = "1000",
-        val gid: String = "1000",
+        val uid: Int = 1000,
+        val gid: Int = 1000,
         val information: String = "No information",
         val homeDir: String = "/home/",
         val shell: String = "/bin/bash"
@@ -29,10 +29,12 @@ class SvdAccount (
      */
     def isUser = homeDir.startsWith("/home")
     
+    
     /**
      * @author teamon 
      */
     override def toString = "SvdAccount(" + userName + ")"
+    
     
     /**
      * @author teamon
@@ -41,6 +43,7 @@ class SvdAccount (
         case a: SvdAccount => this.userName == a.userName && this.uid == a.uid
         case _ => false
     } 
+    
     
     /**
      * @author teamon
@@ -68,10 +71,13 @@ class SvdAccount (
  * @author teamon
  */
 object SvdAccount {
+    
+    
     /**
      * @author teamon
      */
-    def apply(a: String, b: String, c: String, d: String, e: String, f: String, g: String) = new SvdAccount(a, b, c, d, e, f, g) 
+    def apply(a: String, b: String, c: Int, d: Int, e: String, f: String, g: String) = new SvdAccount(a, b, c.toInt, d.toInt, e, f, g) 
+
 
     /**
      * @author teamon
@@ -80,12 +86,13 @@ object SvdAccount {
         if(line.startsWith("#")) None
         else {
             line.split(":") match {
-                case Array(a, b, c, d, e, f, g) => Some(SvdAccount(a, b, c, d, e, f, g))
+                case Array(a, b, c, d, e, f, g) => Some(SvdAccount(a, b, c.toInt, d.toInt, e, f, g))
                 case _ => None
             }
         }
     }
     
+
     /**
      * @author teamon
      */
@@ -93,4 +100,6 @@ object SvdAccount {
         case a:SvdAccount => Some((a.userName, a.pass, a.uid, a.gid, a.information, a.homeDir, a.shell))
         case _ => None
     }
+
+
 }
