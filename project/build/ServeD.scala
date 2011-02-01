@@ -60,7 +60,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val sigarSource = "org.hyperic" at "http://repository.jboss.org/maven2"
         val sigar       = "org.hyperic" % "sigar" % "1.6.3.82"
         
-        override def parallelExecution = true
+        override def parallelExecution = false
         
         lazy val stress = task {
             val compiler = "/usr/bin/clang"
