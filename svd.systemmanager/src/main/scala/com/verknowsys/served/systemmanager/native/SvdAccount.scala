@@ -103,7 +103,7 @@ object SvdAccount {
         if(line.startsWith("#")) None
         else {
             line.split(":") match {
-                case Array(a, b, c, d, e, f, g, h) => Some(SvdAccount(a, b, c.toInt, d.toInt, e, f, g, null)) // 2011-02-01 14:52:17 - dmilith - XXX: HACK: ignoring acls
+                case Array(a, b, c, d, e, f, g) => Some(SvdAccount(a, b, c.toInt, d.toInt, e, f, g, null)) // 2011-02-01 14:52:17 - dmilith - XXX: HACK: ignoring acls
                 case _ => None
             }
         }
