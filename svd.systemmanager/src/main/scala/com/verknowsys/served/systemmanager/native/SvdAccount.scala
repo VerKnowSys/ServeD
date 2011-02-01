@@ -15,7 +15,7 @@ import akka.util.Logging
  * @author teamon
  * 
  */
-class SvdAccount (
+case class SvdAccount (
         val userName: String = "guest",
         val pass: String = "x",
         val uid: Int = 1000,
@@ -38,22 +38,7 @@ class SvdAccount (
      * @author teamon 
      */
     override def toString = "SvdAccount(" + userName + ")"
-    
-    
-    /**
-     * @author teamon
-     */
-    override def equals(that: Any) = that match {
-        case a: SvdAccount => this.userName == a.userName && this.uid == a.uid
-        case _ => false
-    } 
-    
-    
-    /**
-     * @author teamon
-     */
-    override def hashCode = (31*userName.hashCode)*31 + uid.hashCode
-        
+
 
     /**
      * @author dmilith
@@ -89,13 +74,12 @@ object SvdAccount {
         true
     }
     
-    
-    /**
-     * @author teamon
-     */
-    def apply(a: String, b: String, c: Int, d: Int, e: String, f: String, g: String, h: SvdACL) = new SvdAccount(a, b, c.toInt, d.toInt, e, f, g, h) 
-    
-    
+    def unapply(x: AnyRef) = x match {
+        case a: SvdAccount => Some((a.userName, a.pass, a.uid, a.gid, a.information, a.homeDir, a.shell, a.acls))
+        case _ => None
+    }
+
+
     /**
      * @author teamon
      */
@@ -108,15 +92,4 @@ object SvdAccount {
             }
         }
     }
-    
-    
-    /**
-     * @author teamon
-     */
-    def unapply(s: AnyRef) = s match {
-        case a:SvdAccount => Some((a.userName, a.pass, a.uid, a.gid, a.information, a.homeDir, a.shell, a.acls))
-        case _ => None
-    }
-
-
 }
