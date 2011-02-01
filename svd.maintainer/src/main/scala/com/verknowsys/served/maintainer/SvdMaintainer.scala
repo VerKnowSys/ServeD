@@ -40,7 +40,7 @@ class SvdMaintainer extends Actor with SvdExceptionHandler {
         case ProcessesList(pids) =>
             import SvdPOSIX._
             log.trace("Got pids: %s", pids)
-            Thread.sleep(2000)
+            Thread.sleep(SvdConfig.sleepDefaultPause)
             
             // 2011-01-23 05:29:52 - dmilith - NOTE: temporary code:
             registry.actorFor[SvdSystemManager] foreach { _ ! GetAllProcesses }

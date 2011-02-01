@@ -233,7 +233,7 @@ object SvdUtils extends Logging {
      */
     def chmod(path: String, mode: Int, recursive: Boolean = true) =
         if (!(new File(path)).exists) {
-            log.warn("Chmod: File/ path doesn't exists! Cannot chmod non existant file/ directory! IGNORING!")
+            log.warn("Chmod: File or directory doesn't exists! Cannot chmod non existant file: '%s'! IGNORING!".format(path))
             false
         } else {
             import CLibrary._
