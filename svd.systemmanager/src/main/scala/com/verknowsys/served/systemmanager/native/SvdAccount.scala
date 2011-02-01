@@ -74,22 +74,16 @@ object SvdAccount {
         true
     }
     
-<<<<<<< HEAD
+
+    /**
+     * @author teamon
+     */
     def unapply(x: AnyRef) = x match {
         case a: SvdAccount => Some((a.userName, a.pass, a.uid, a.gid, a.information, a.homeDir, a.shell, a.acls))
         case _ => None
     }
 
 
-=======
-    
-    /**
-     * @author teamon
-     */
-    // def apply(a: String, b: String, c: Int, d: Int, e: String, f: String, g: String, h: List[Any]) = new SvdAccount(a, b, c.toInt, d.toInt, e, f, g, h.toList) 
-    
-    
->>>>>>> More dirty code in SvdACL. Moved traits to case classes. SvdProcess is now case class. More specs for SvdAccount.
     /**
      * @author teamon
      */
@@ -97,11 +91,7 @@ object SvdAccount {
         if(line.startsWith("#")) None
         else {
             line.split(":") match {
-<<<<<<< HEAD
-                case Array(a, b, c, d, e, f, g) => Some(SvdAccount(a, b, c.toInt, d.toInt, e, f, g, null)) // 2011-02-01 14:52:17 - dmilith - XXX: HACK: ignoring acls
-=======
                 case Array(a, b, c, d, e, f, g, h) => Some(new SvdAccount(a, b, c.toInt, d.toInt, e, f, g, h.toList))
->>>>>>> More dirty code in SvdACL. Moved traits to case classes. SvdProcess is now case class. More specs for SvdAccount.
                 case _ => None
             }
         }
