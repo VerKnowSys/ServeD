@@ -28,7 +28,7 @@ abstract class Worker(tasks: List[Task]) extends Actor {
                     runTask(task)
                 case Nil =>
                     (ci orElse self.sender) foreach { _ ! BuildSucceed(history) }
-                    self stop // TODO
+                    self stop
             }
 
         case res @ ProcessFinished(exitCode, stdout, stderr) =>
@@ -37,7 +37,7 @@ abstract class Worker(tasks: List[Task]) extends Actor {
                 self ! Build
             } else {
                 ci.foreach { _ ! BuildFailed(res :: history) }
-                self stop // TODO
+                self stop
             }
     }
     
