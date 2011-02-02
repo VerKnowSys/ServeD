@@ -91,7 +91,9 @@ class SvdAccountTest extends Specification with Logging {
         "generation of new copy of account data should be simple" in {
             val account = new SvdAccount("teamon", "pass", 1001, 1002, "info", "/path/to/home", "/path/to/shell", SSHAllowed :: Nil )
             val acc2 = account copy(pass = "lalala666")
+            val acc3 = account copy(acls = (RootAllowed :: SSHAllowed :: Nil))
             "lalala666" must beEqual(acc2.pass)
+            (RootAllowed :: SSHAllowed :: Nil) must beEqual(acc3.acls)
             account.userName must beEqual(acc2.userName)
             account.uid must beEqual(acc2.uid)
             account.gid must beEqual(acc2.gid)
