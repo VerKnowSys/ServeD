@@ -91,7 +91,7 @@ object SvdAccount {
         if(line.startsWith("#")) None
         else {
             line.split(":") match {
-                case Array(a, b, c, d, e, f, g, h) => Some(new SvdAccount(a, b, c.toInt, d.toInt, e, f, g, h.toList))
+                case Array(a, b, c, d, e, f, g) => Some(new SvdAccount(a, b, c.toInt, d.toInt, e, f, g))
                 case _ => None
             }
         }
