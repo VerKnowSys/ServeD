@@ -13,6 +13,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     lazy val spechelpers   = project("svd.spechelpers", "SvdSpecHelpers", new SvdSpecHelpers(_))
     lazy val utils         = project("svd.utils", "SvdUtils", new SvdUtils(_), conf, spechelpers)
     lazy val cli           = project("svd.cli", "SvdCLI", new SvdCli(_), utils, api)
+    lazy val ci            = project("svd.ci", "SvdCI", new SvdCI(_), utils, api)
     lazy val systemmanager = project("svd.systemmanager", "SvdSystemManager", new SvdSystemManager(_), utils, api)
     lazy val notifications = project("svd.notifications", "Notifications", new SvdNotifications(_), utils)
     lazy val maintainer    = project("svd.maintainer", "SvdMaintainer", new SvdMaintainer(_), notifications, systemmanager, api)
@@ -41,6 +42,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
+    class SvdCI(info: ProjectInfo) extends SvdProject(info)
     
     
     class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {
