@@ -19,7 +19,7 @@ case object GetAccount
  */
 class SvdAccountManager(val account: SvdAccount) extends Actor with SvdExceptionHandler {
 
-    log.trace("Starting AccountManager for account: " + account)
+    log.info("Starting AccountManager for account: " + account)
     
     val gitManager = Actor.actorOf(new SvdGitManager(account))
     self startLink gitManager
