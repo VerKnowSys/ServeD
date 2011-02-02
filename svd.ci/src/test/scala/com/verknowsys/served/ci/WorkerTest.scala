@@ -24,8 +24,9 @@ class TestProcess(val worker: ActorRef, val cmd: String) extends Actor {
             log.debug("Starting process: %s", cmd)
             Thread.sleep(100)
             log.debug("Finished process: %s", cmd)
-            worker ! ProcessFinished(0, "stdout: " + cmd, "stderr: " + cmd)
             
+            val exitCode = if(cmd.matches(".*fail.*")) 1 else 0
+            worker ! ProcessFinished(exitCode, "stdout: " + cmd, "stderr: " + cmd)
     }
 }
 
@@ -50,7 +51,9 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
         "return Success with one item in history when given one task" in {
             val worker = actorOf(new TestWorker(expectActor, TestTask("foo") :: Nil)).start
             worker ! Build
-            expectActor ? BuildSucceed(ProcessFinished(0, "stdout: foo", "stderr: foo") :: Nil)
+            expectActor ? BuildSucceed(
+                ProcessFinished(0, "stdout: foo", "stderr: foo") :: Nil
+            )
         }
         
         "return Success with full history reversed when given list" in {
@@ -61,6 +64,38 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
                 ProcessFinished(0, "stdout: c", "stderr: c") ::
                 ProcessFinished(0, "stdout: b", "stderr: b") ::
                 ProcessFinished(0, "stdout: a", "stderr: a") ::
+                Nil
+            )
+        }
+        
+        "return Failure when given one failing task" in {
+            val worker = actorOf(new TestWorker(expectActor, TestTask("foo-fail") :: Nil)).start
+            worker ! Build
+            expectActor ? BuildFailed(
+                ProcessFinished(1, "stdout: foo-fail", "stderr: foo-fail") :: Nil
+            )
+        }
+        
+        "return Failure with full history when given list of tasks with last one failing" in {
+            val tasks = TestTask("good") :: TestTask("nice") :: TestTask("cute") :: TestTask("fail") :: Nil
+            val worker = actorOf(new TestWorker(expectActor, tasks)).start
+            worker ! Build
+            expectActor ? BuildFailed(
+                ProcessFinished(1, "stdout: fail", "stderr: fail") ::
+                ProcessFinished(0, "stdout: cute", "stderr: cute") ::
+                ProcessFinished(0, "stdout: nice", "stderr: nice") ::
+                ProcessFinished(0, "stdout: good", "stderr: good") ::
+                Nil
+            )
+        }
+        
+        "return Failure with partial history when given list of tasks with middle one failing" in {
+            val tasks = TestTask("good") :: TestTask("failing one") :: TestTask("cute") :: TestTask("fail") :: Nil
+            val worker = actorOf(new TestWorker(expectActor, tasks)).start
+            worker ! Build
+            expectActor ? BuildFailed(
+                ProcessFinished(1, "stdout: failing one", "stderr: failing one") ::
+                ProcessFinished(0, "stdout: good", "stderr: good") ::
                 Nil
             )
         }

@@ -11,7 +11,8 @@ import akka.actor.ActorRef
  * worker ! Build
  * }}}
  * 
- * @param tasks well isn't it obvious
+ * @param ci    Owner actor reference
+ * @param tasks List of tasks to run
  * @author teamon
  */
 class Worker(ci: ActorRef, tasks: List[Task]) extends Actor {
@@ -49,11 +50,3 @@ class Worker(ci: ActorRef, tasks: List[Task]) extends Actor {
         // TODO: Spawn new Process with task.cmd command as parameter
     }
 }
-
-
-case object Build
-case class ProcessFinished(exitCode: Int, stdout: String, stderr: String)
-
-abstract sealed class BuildResult(history: List[ProcessFinished])
-case class BuildFailed(history: List[ProcessFinished]) extends BuildResult(history)
-case class BuildSucceed(history: List[ProcessFinished]) extends BuildResult(history)
