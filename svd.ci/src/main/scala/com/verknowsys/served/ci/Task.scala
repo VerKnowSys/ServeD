@@ -13,11 +13,11 @@ package com.verknowsys.served.ci
  * @param cmd command that will be run
  * @author teamon
  */
-abstract sealed case class Task(val cmd: String)
+abstract class Task(val cmd: String)
 
 object Task {
-    object Clean extends Task("sbt clean")
-    object Compile extends Task("sbt compile")
-    object Update extends Task("sbt update")
-    object Test extends Task("sbt test")
+    case object Clean extends Task("sbt clean")
+    case object Compile extends Task("sbt compile")
+    case object Update extends Task("sbt update")
+    case object Test extends Task("sbt test")
 }
