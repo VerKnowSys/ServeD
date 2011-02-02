@@ -16,13 +16,12 @@ import akka.actor.ActorRef
  * @author teamon
  */
 class Worker(tasks: List[Task]) extends Actor {
-    log.debug("Starting Worker with tasks: %s", tasks)
+    log.trace("Starting Worker with tasks: %s", tasks)
     
     def receive = waiting(Nil, tasks, None)
 
     def waiting(history: List[ProcessFinished], tasks: List[Task], ci: Option[ActorRef]): Receive = {
         case Build =>
-            log.trace("Worker received Build")
             tasks match {
                 case task :: rest =>
                     become(waiting(history, rest, ci orElse self.sender))
@@ -33,7 +32,6 @@ class Worker(tasks: List[Task]) extends Actor {
             }
 
         case res @ ProcessFinished(exitCode, stdout, stderr) =>
-            log.trace("Worker received: %s", res)
             if(exitCode == 0) {
                 become(waiting(res :: history, tasks, ci))
                 self ! Build
@@ -44,8 +42,7 @@ class Worker(tasks: List[Task]) extends Actor {
     }
     
     protected def runTask(task: Task) {
-        log.debug("Running task: %s", task)
-        
-        // TODO: Spawn new Process with task.cmd command as parameter
+        log.warn("Not Yet Implemented. Worker#runTask. Called with param: %s", task)
+        // TODO: NYI Spawn new Process with task.cmd command as parameter
     }
 }

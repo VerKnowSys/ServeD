@@ -8,23 +8,14 @@ import org.specs._
 
 class TestWorker(tasks: List[Task]) extends Worker(tasks) {
     protected override def runTask(task: Task) {
-        log.debug("Running task: %s", task)
-        
         val process = actorOf(new TestProcess(self, task.cmd)).start
         process ! Build
     }
 }
 
 class TestProcess(val worker: ActorRef, val cmd: String) extends Actor {
-    log.debug("Starting TestProcess with command: %s", cmd)
-    
     def receive = {
         case Build =>
-            log.trace("TestProcess received Build")
-            log.debug("Starting process: %s", cmd)
-            Thread.sleep(100)
-            log.debug("Finished process: %s", cmd)
-            
             val exitCode = if(cmd.matches(".*fail.*")) 1 else 0
             worker ! ProcessFinished(exitCode, "stdout: " + cmd, "stderr: " + cmd)
     }
