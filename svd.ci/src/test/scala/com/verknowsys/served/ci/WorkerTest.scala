@@ -6,7 +6,7 @@ import akka.actor.Actor._
 import akka.actor.ActorRef
 import org.specs._
 
-class TestWorker(ci: ActorRef, tasks: List[Task]) extends Worker(ci, tasks) {
+class TestWorker(tasks: List[Task]) extends Worker(tasks) {
     protected override def runTask(task: Task) {
         log.debug("Running task: %s", task)
         
@@ -43,13 +43,13 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
         }
         
         "return Success with empty history when given empty task list" in {
-            val worker = actorOf(new TestWorker(expectActor, Nil)).start
+            val worker = actorOf(new TestWorker(Nil)).start
             worker ! Build
             expectActor ? BuildSucceed(Nil)
         }
         
         "return Success with one item in history when given one task" in {
-            val worker = actorOf(new TestWorker(expectActor, TestTask("foo") :: Nil)).start
+            val worker = actorOf(new TestWorker(TestTask("foo") :: Nil)).start
             worker ! Build
             expectActor ? BuildSucceed(
                 ProcessFinished(0, "stdout: foo", "stderr: foo") :: Nil
@@ -58,7 +58,7 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
         
         "return Success with full history reversed when given list" in {
             val tasks = TestTask("a") :: TestTask("b") :: TestTask("c") :: Nil
-            val worker = actorOf(new TestWorker(expectActor, tasks)).start
+            val worker = actorOf(new TestWorker(tasks)).start
             worker ! Build
             expectActor ? BuildSucceed(
                 ProcessFinished(0, "stdout: c", "stderr: c") ::
@@ -69,7 +69,7 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
         }
         
         "return Failure when given one failing task" in {
-            val worker = actorOf(new TestWorker(expectActor, TestTask("foo-fail") :: Nil)).start
+            val worker = actorOf(new TestWorker(TestTask("foo-fail") :: Nil)).start
             worker ! Build
             expectActor ? BuildFailed(
                 ProcessFinished(1, "stdout: foo-fail", "stderr: foo-fail") :: Nil
@@ -78,7 +78,7 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
         
         "return Failure with full history when given list of tasks with last one failing" in {
             val tasks = TestTask("good") :: TestTask("nice") :: TestTask("cute") :: TestTask("fail") :: Nil
-            val worker = actorOf(new TestWorker(expectActor, tasks)).start
+            val worker = actorOf(new TestWorker(tasks)).start
             worker ! Build
             expectActor ? BuildFailed(
                 ProcessFinished(1, "stdout: fail", "stderr: fail") ::
@@ -91,7 +91,7 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
         
         "return Failure with partial history when given list of tasks with middle one failing" in {
             val tasks = TestTask("good") :: TestTask("failing one") :: TestTask("cute") :: TestTask("fail") :: Nil
-            val worker = actorOf(new TestWorker(expectActor, tasks)).start
+            val worker = actorOf(new TestWorker(tasks)).start
             worker ! Build
             expectActor ? BuildFailed(
                 ProcessFinished(1, "stdout: failing one", "stderr: failing one") ::

@@ -15,31 +15,30 @@ import akka.actor.ActorRef
  * @param tasks List of tasks to run
  * @author teamon
  */
-class Worker(ci: ActorRef, tasks: List[Task]) extends Actor {
+class Worker(tasks: List[Task]) extends Actor {
     log.debug("Starting Worker with tasks: %s", tasks)
     
-    def receive = waiting(Nil, tasks)
+    def receive = waiting(Nil, tasks, None)
 
-    def waiting(history: List[ProcessFinished], tasks: List[Task]): Receive = {
+    def waiting(history: List[ProcessFinished], tasks: List[Task], ci: Option[ActorRef]): Receive = {
         case Build =>
             log.trace("Worker received Build")
             tasks match {
                 case task :: rest =>
-                    become(waiting(history, rest))
+                    become(waiting(history, rest, ci orElse self.sender))
                     runTask(task)
                 case Nil =>
-                    ci ! BuildSucceed(history)
+                    (ci orElse self.sender) foreach { _ ! BuildSucceed(history) }
                     self stop // TODO
-                    
             }
 
         case res @ ProcessFinished(exitCode, stdout, stderr) =>
             log.trace("Worker received: %s", res)
             if(exitCode == 0) {
-                become(waiting(res :: history, tasks))
+                become(waiting(res :: history, tasks, ci))
                 self ! Build
             } else {
-                ci ! BuildFailed(res :: history)
+                ci.foreach { _ ! BuildFailed(res :: history) }
                 self stop // TODO
             }
     }
