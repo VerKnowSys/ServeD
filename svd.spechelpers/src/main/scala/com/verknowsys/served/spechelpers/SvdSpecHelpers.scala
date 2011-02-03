@@ -2,8 +2,28 @@ package com.verknowsys.served
 
 import org.apache.commons.io.FileUtils
 import java.io.File
-import scala.actors.Actor
-import scala.collection.mutable.ListBuffer
+import org.specs.matcher.Matcher
+import org.specs.specification.Result
+import akka.actor.ActorRef
+
+
+package object spechelpers {
+    implicit def toActorRefMatcherResult(result: Result[ActorRef]) = new {
+        def shutdown = result.matchWithMatcher(new Matcher[ActorRef]{
+            def apply(ref: => ActorRef) = {
+                val r = ref
+                (r.isShutdown, r + " is shutdown", r + " is not shutdown")
+            }
+        })
+        
+        def running = result.matchWithMatcher(new Matcher[ActorRef]{
+            def apply(ref: => ActorRef) = {
+                val r = ref
+                (r.isRunning, r + " is running", r + " is not running")
+            }
+        })
+    }
+}
 
 object SvdSpecHelpers {
 	implicit def StringToFile(s: String) = new File(s)
