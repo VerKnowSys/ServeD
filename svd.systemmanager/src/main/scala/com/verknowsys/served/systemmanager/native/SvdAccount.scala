@@ -60,7 +60,7 @@ case class SvdAccount (
 /**
  * @author teamon
  */
-object SvdAccount {
+object SvdAccount extends Logging {
     
     
     /**
@@ -92,7 +92,11 @@ object SvdAccount {
         else {
             line.split(":") match {
                 case Array(a, b, c, d, e, f, g) => Some(new SvdAccount(a, b, c.toInt, d.toInt, e, f, g))
-                case _ => None
+                case null =>
+                    log.warn("Something weird happened on unapply in SvdAccount. Got null here!")
+                    None
+                case _ =>
+                    None
             }
         }
     }
