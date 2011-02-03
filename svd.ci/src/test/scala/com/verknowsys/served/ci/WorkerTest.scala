@@ -37,6 +37,7 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
             val worker = actorOf(new TestWorker(Nil)).start
             worker ! Build
             expectActor ? BuildSucceed(Nil)
+            worker must be shutdown
         }
         
         "return Success with one item in history when given one task" in {
@@ -45,6 +46,7 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
             expectActor ? BuildSucceed(
                 ProcessFinished(0, "stdout: foo", "stderr: foo") :: Nil
             )
+            worker must be shutdown
         }
         
         "return Success with full history reversed when given list" in {
@@ -57,6 +59,7 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
                 ProcessFinished(0, "stdout: a", "stderr: a") ::
                 Nil
             )
+            worker must be shutdown
         }
         
         "return Failure when given one failing task" in {
@@ -65,6 +68,7 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
             expectActor ? BuildFailed(
                 ProcessFinished(1, "stdout: foo-fail", "stderr: foo-fail") :: Nil
             )
+            worker must be shutdown
         }
         
         "return Failure with full history when given list of tasks with last one failing" in {
@@ -78,6 +82,7 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
                 ProcessFinished(0, "stdout: good", "stderr: good") ::
                 Nil
             )
+            worker must be shutdown
         }
         
         "return Failure with partial history when given list of tasks with middle one failing" in {
@@ -89,6 +94,7 @@ class WorkerTest extends Specification with SvdExpectActorSpecification {
                 ProcessFinished(0, "stdout: good", "stderr: good") ::
                 Nil
             )
+            worker must be shutdown
         }
         
     }
