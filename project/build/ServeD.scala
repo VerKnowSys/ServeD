@@ -26,7 +26,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         
         override def compileOrder = CompileOrder.JavaThenScala
         override def javaCompileOptions = super.javaCompileOptions ++ javaCompileOptions("-source", "1.6")
-        override def compileOptions = super.compileOptions ++ compileOptions("-Xresident") ++ compileOptions("-g:source") ++ (MaxCompileErrors(5) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq // ++ compileOptions("-make:changed")
+        override def compileOptions = super.compileOptions ++ compileOptions("-Ywarn-dead-code") ++ compileOptions("-Xshow-phases") ++ compileOptions("-Xresident") ++ compileOptions("-g:source") ++ (MaxCompileErrors(1) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq // ++ compileOptions("-make:changed")
         override def parallelExecution = true
         override def installActions = "update" :: "run" :: Nil
         
