@@ -15,7 +15,7 @@ import akka.actor.ActorRef
  * @param tasks List of tasks to run
  * @author teamon
  */
-abstract class Worker(tasks: List[Task]) extends Actor {
+class Worker(tasks: List[Task]) extends Actor {
     log.trace("Starting Worker with tasks: %s", tasks)
     
     def receive = waiting(Nil, tasks, None)
@@ -41,7 +41,8 @@ abstract class Worker(tasks: List[Task]) extends Actor {
             }
     }
     
-    protected def runTask(task: Task)
-        // log.warn("Not Yet Implemented. Worker#runTask. Called with param: %s", task)
+    protected def runTask(task: Task){
+        log.warn("Not Yet Implemented. Worker#runTask. Called with param: %s", task)
         // TODO: NYI Spawn new Process with task.cmd command as parameter
+    }
 }
