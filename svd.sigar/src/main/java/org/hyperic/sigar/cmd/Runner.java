@@ -40,7 +40,7 @@ public class Runner {
 
     static {
         wantedJars.put("junit", Boolean.FALSE);
-        wantedJars.put("log4j", Boolean.FALSE);
+        // wantedJars.put("log4j", Boolean.FALSE);
     }
 
     private static void printMissingJars() {
