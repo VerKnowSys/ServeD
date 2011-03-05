@@ -235,10 +235,12 @@ class SvdProcess(
       *
       */
     def kill(signal: SvdPOSIX.Value = SIGINT) = {
-        if (alive)
+        while (pid == -1L)
+            Thread.sleep(100)
+        if (SvdProcess.getProcessInfo(pid) != "NONE") 
             SvdProcess.kill(pid, signal)
         else
-            true // if process already dead, do nothing but return true
+            true // already killed so we might return true
     }
         
 
