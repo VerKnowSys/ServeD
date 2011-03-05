@@ -311,8 +311,7 @@ object SvdProcess extends Logging {
     def processList(sort: Boolean = false) = {
         val preList = core.getProcList.toList // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
         val sourceList = if (sort) preList.sortWith(_.toInt < _.toInt) else preList
-        log.trace("UnSORTED   : " + preList)
-        log.trace("SORTED     : " + preList.sortWith(_.toInt < _.toInt))
+        log.trace("unsorted    : " + preList)
         log.debug("processList : " + sourceList)
         sourceList
     }
