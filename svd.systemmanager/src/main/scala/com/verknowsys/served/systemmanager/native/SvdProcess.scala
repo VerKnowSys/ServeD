@@ -234,8 +234,13 @@ class SvdProcess(
       * @return true if succeeded, false if failed
       *
       */
-    def kill(signal: SvdPOSIX.Value = SIGINT) =
-        SvdProcess.kill(pid, signal)
+    def kill(signal: SvdPOSIX.Value = SIGINT) = {
+        if (alive)
+            SvdProcess.kill(pid, signal)
+        else
+            true // if process already dead, do nothing but return true
+    }
+        
 
 
     override def toString =
