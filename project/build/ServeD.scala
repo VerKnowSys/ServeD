@@ -19,25 +19,37 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     lazy val maintainer     = project("svd.maintainer", "SvdMaintainer", new SvdMaintainer(_), notifications, systemmanager, api)
     
     
-    override def parallelExecution = false
-    
-    
     // Dependencies
     class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject {
         
-        override def compileOrder = CompileOrder.JavaThenScala
-        override def javaCompileOptions = super.javaCompileOptions ++ javaCompileOptions("-source", "1.6")
-        override def compileOptions = super.compileOptions ++ compileOptions("-Ywarn-dead-code") ++ compileOptions("-Xshow-phases") ++ compileOptions("-Xresident") ++ compileOptions("-g:source") ++ (MaxCompileErrors(1) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq // ++ compileOptions("-make:changed")
         override def parallelExecution = true
+        
+        override def compileOrder = CompileOrder.JavaThenScala
+        
+        override def javaCompileOptions = super.javaCompileOptions ++
+            javaCompileOptions("-g:none") ++
+            javaCompileOptions("-encoding", "UTF-8") ++
+            javaCompileOptions("-source", "1.6") ++
+            javaCompileOptions("-target", "1.6") ++
+            javaCompileOptions("-Xlint:unchecked") ++
+            javaCompileOptions("-Xlint:deprecation")
+            
+        override def compileOptions = super.compileOptions ++
+            compileOptions("-Ywarn-dead-code") ++
+            compileOptions("-Xshow-phases") ++
+            compileOptions("-Xresident") ++
+            compileOptions("-g:source") ++
+            (MaxCompileErrors(1) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq // ++ compileOptions("-make:changed")
+        
         override def installActions = "update" :: "run" :: Nil
         
-        val specsTest = "org.scala-tools.testing" %% "specs" % "1.6.6" % "test"
-                
         override val growlTestImages = GrowlTestImages(
             Some("project/growl_images/pass.png"),
             Some("project/growl_images/fail.png"),
             Some("project/growl_images/fail.png")
         )
+
+        val specsTest = "org.scala-tools.testing" %% "specs" % "1.6.6" % "test"
     }
     
     
@@ -63,7 +75,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     class SvdSystemManager(info: ProjectInfo) extends SvdProject(info) {
         import Process._
         
-        override def parallelExecution = false
+        // override def parallelExecution = false
         
         lazy val stress = task {
             val compiler = "/usr/bin/clang"
