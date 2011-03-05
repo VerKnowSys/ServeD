@@ -255,7 +255,7 @@ class SvdProcess(
            "TIME_TOTAL:[%s] " +
            "TIME_USER:[%s] " +
            "\n")
-               .format(name, user, rss, shr, pid, ppid, thr, prio, nice, params.mkString(" "), timeStart, timeKernel, timeTotal, timeUser)
+               .format(name, user, rss, shr, pid, ppid, thr, prio, nice, command, timeStart, timeKernel, timeTotal, timeUser)
 
 
     log.trace("Process %s spawned.".format(command))
