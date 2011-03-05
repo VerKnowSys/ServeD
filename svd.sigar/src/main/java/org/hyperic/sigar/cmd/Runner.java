@@ -211,7 +211,6 @@ public class Runner {
             "org.hyperic.sigar.cmd.",
             "org.hyperic.sigar.test.",
             "org.hyperic.sigar.",
-            "org.hyperic.sigar.win32.",
             "org.hyperic.sigar.jmx.",
         };
 

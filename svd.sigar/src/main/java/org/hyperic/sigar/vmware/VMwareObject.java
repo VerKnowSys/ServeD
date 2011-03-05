@@ -34,7 +34,7 @@ abstract class VMwareObject {
     };
 
     private static boolean loadLibraries() {
-        if (!(SigarLoader.IS_LINUX || SigarLoader.IS_WIN32)) {
+        if (!(SigarLoader.IS_LINUX)) {
             return false;
         }
 
@@ -45,29 +45,6 @@ abstract class VMwareObject {
 
             if (lib == null) {
                 return false;
-            }
-
-            if (SigarLoader.IS_WIN32) {
-                File root = new File(lib).getParentFile();
-                String[] libs = {
-                    "libeay32.dll",
-                    "ssleay32.dll"
-                };
-
-                for (int i=0; i<libs.length; i++) {
-                    File ssllib =
-                        new File(root, libs[i]);
-                    if (!ssllib.exists()) {
-                        return false;
-                    }
-
-                    try {
-                        System.load(ssllib.getPath());
-                    } catch (UnsatisfiedLinkError e) {
-                        e.printStackTrace();
-                        return false;
-                    }
-                }
             }
 
             return init(lib);

@@ -103,17 +103,9 @@ public class FileCompleter
         else {
             this.name = file.getName();
             dir = file.getParentFile();
-            if (dir == null) {
-                if (SigarLoader.IS_WIN32 &&
-                    (line.length() == 1) &&
-                    Character.isLetter(line.charAt(0)))
-                {
-                    //e.g. C:\
-                    return line + ":\\";
-                }
-
+            if (dir == null)
                 return line;
-            }
+
             if (!(dir.exists() && dir.isDirectory())) {
                 return line;
             }

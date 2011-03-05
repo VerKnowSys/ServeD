@@ -25,8 +25,7 @@ import java.util.List;
 
 import org.hyperic.jni.ArchName;
 import org.hyperic.sigar.SigarLoader;
-import org.hyperic.sigar.win32.RegistryKey;
-import org.hyperic.sigar.win32.Win32Exception;
+
 
 public class VMControlLibrary {
     private static final boolean IS64 = ArchName.is64();
@@ -158,70 +157,8 @@ public class VMControlLibrary {
         link(VMCONTROL_SO);
     }
 
-    private static void linkWin32() {
-        List dlls = new ArrayList();
-
-        RegistryKey root = null;
-        try {
-            root =
-                RegistryKey.LocalMachine.openSubKey(REGISTRY_ROOT);
-
-            String[] keys = root.getSubKeyNames();
-            for (int i=0; i<keys.length; i++) {
-                String name = keys[i];
-                if (!name.startsWith("VMware ")) {
-                    continue;
-                }
-
-                RegistryKey subkey = null;
-                try {
-                    subkey = root.openSubKey(name);
-                    String path = subkey.getStringValue("InstallPath");
-                    if (path == null) {
-                        continue;
-                    }
-                    path = path.trim();
-                    if (path.length() == 0) {
-                        continue;
-                    }
-                    File dll = new File(path + VMCONTROL_DLL);
-                    if (dll.exists()) {
-                        //prefer VMware Server or VMware GSX Server
-                        if (name.endsWith(" Server")) {
-                            dlls.add(0, dll.getPath());
-                        }
-                        //Scripting API will also work
-                        else if (name.endsWith(" API")) {
-                            dlls.add(dll.getPath());
-                        }
-                    }
-                } catch (Win32Exception e) {
-
-                } finally {
-                    if (subkey != null) {
-                        subkey.close();
-                    }
-                }
-            }
-        } catch (Win32Exception e) {
-        } finally {
-            if (root != null) {
-                root.close();
-            }
-        }
-
-        if (dlls.size() != 0) {
-            setSharedLibrary((String)dlls.get(0));
-        }
-    }
-
     public static void link(String name)
         throws IOException {
-
-        if (SigarLoader.IS_WIN32) {
-            linkWin32();
-            return;
-        }
 
         File out = new File(name).getAbsoluteFile();
         if (out.isDirectory()) {

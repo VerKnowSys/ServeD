@@ -103,10 +103,6 @@ public class Shell extends ShellBase {
         registerCommandHandler("time", new Time(this));
         registerCommandHandler("ulimit", new Ulimit(this));
         registerCommandHandler("who", new Who(this));
-        if (SigarLoader.IS_WIN32) {
-            registerCommandHandler("service", new Win32Service(this));
-            registerCommandHandler("fversion", new FileVersionInfo(this));
-        }
         try {
             //requires junit.jar
             registerCommandHandler("test", "org.hyperic.sigar.test.SigarTestRunner");
