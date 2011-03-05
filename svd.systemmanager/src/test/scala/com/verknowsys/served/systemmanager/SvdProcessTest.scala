@@ -163,39 +163,31 @@ class SvdProcessTest extends Specification {
             var b: SvdProcess = null
             var c: SvdProcess = null
             var d: SvdProcess = null
-            try {
-                synchronized {
-                    a = new SvdProcess("sleep 50000", user = "root", useShell = true)
-                    a must notBeNull
-                    ("PNAME:" :: "COMMAND:" :: Nil).foreach{
-                        elem =>
-                            a.toString must beMatching(elem)
-                    }
-                    a.kill(SIGINT) must beTrue
-                }
-                synchronized {
-                    b = new SvdProcess("sleep 51111", user = "root", useShell = true)
-                    b must notBeNull
-                    ("PNAME:" :: "COMMAND:" :: Nil).foreach{
-                        elem =>
-                            b.toString must beMatching(elem)
-                    }
-                    b.kill(SIGINT) must beTrue
-                }
-            } catch {
-                case e: Exception =>
-                    fail("Exception: %s, Object: %s".format(e, a))
-            } finally {
-                c = new SvdProcess("echo abc", user = "root", stdOut = "/tmp/echo_abc_1234.text")
-                c.stdOut must beMatching("abc")
-                d = new SvdProcess("echo abc", user = "root")
-                c must notBeNull
-                d must notBeNull
-                ("PID:" :: "PNAME" :: "COMMAND:" :: Nil).foreach{
-                    elem =>
-                        c.toString must beMatching(elem)
-                        d.toString must beMatching(elem)
-                }
+            a = new SvdProcess("sleep 50000", user = "root", useShell = true)
+            a must notBeNull
+            ("PNAME:" :: "COMMAND:" :: Nil).foreach{
+                elem =>
+                    a.toString must beMatching(elem)
+            }
+            a.kill(SIGINT) must beTrue
+
+            b = new SvdProcess("sleep 51111", user = "root", useShell = true)
+            b must notBeNull
+            ("PNAME:" :: "COMMAND:" :: Nil).foreach{
+                elem =>
+                    b.toString must beMatching(elem)
+            }
+            b.kill(SIGINT) must beTrue
+
+            c = new SvdProcess("echo abc", user = "root", stdOut = "/tmp/echo_abc_1234.text")
+            c.stdOut must beMatching("abc")
+            d = new SvdProcess("echo abc", user = "root")
+            c must notBeNull
+            d must notBeNull
+            ("PID:" :: "PNAME" :: "COMMAND:" :: Nil).foreach{
+                elem =>
+                    c.toString must beMatching(elem)
+                    d.toString must beMatching(elem)
             }
         }
         
