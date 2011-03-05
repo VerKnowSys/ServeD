@@ -30,13 +30,13 @@
 			<key>GanttGroupShading</key>
 			<false/>
 			<key>GanttVisibleRect</key>
-			<string>{{101, 0}, {1058, 778}}</string>
+			<string>{{-20, 0}, {1432, 863}}</string>
 			<key>OutlineVisibleRect</key>
-			<string>{{52, 0}, {393, 778}}</string>
+			<string>{{0, 0}, {304, 863}}</string>
 			<key>ScaleWidths</key>
 			<dict>
 				<key>Automatic</key>
-				<real>28.571428298950195</real>
+				<real>19.6746826171875</real>
 				<key>Day</key>
 				<real>405</real>
 				<key>Hour</key>
@@ -83,6 +83,9 @@
 				<string>Notes</string>
 				<string>Title</string>
 				<string>Effort</string>
+				<string>Start</string>
+				<string>Dependencies</string>
+				<string>Assigned</string>
 			</array>
 			<key>calendarController</key>
 			<dict>
@@ -123,7 +126,7 @@
 				<real>20</real>
 			</dict>
 			<key>dayWidth</key>
-			<real>28.571428298950195</real>
+			<real>19.6746826171875</real>
 			<key>resourceSplit</key>
 			<real>0.72776281833648682</real>
 			<key>resourcesController</key>
@@ -154,7 +157,7 @@
 				<key>SelectedScale</key>
 				<string>Automatic</string>
 				<key>TimelineVisibleRect</key>
-				<string>{{-153, 0}, {767, 604}}</string>
+				<string>{{-51, 0}, {767, 604}}</string>
 				<key>activeColumnIdentifiers</key>
 				<array>
 					<string>IM</string>
@@ -178,9 +181,9 @@
 				</dict>
 			</dict>
 			<key>side</key>
-			<real>0.73192358016967773</real>
+			<real>0.82638490200042725</real>
 			<key>window</key>
-			<string>{{116, 104}, {1475, 912}}</string>
+			<string>{{22, 40}, {1760, 997}}</string>
 		</dict>
 	</array>
 	<key>displaySeconds</key>
@@ -198,7 +201,7 @@
 	<key>displayTimes</key>
 	<true/>
 	<key>endDate</key>
-	<string>20110511 17:00</string>
+	<string>20110525 08:15</string>
 	<key>flatNumbering</key>
 	<false/>
 	<key>groupTaskStyle</key>
@@ -461,8 +464,12 @@
 				<integer>31</integer>
 				<integer>33</integer>
 			</array>
+			<key>endPlanDate</key>
+			<string>20110511170000</string>
 			<key>objectId</key>
 			<integer>-1</integer>
+			<key>startPlanDate</key>
+			<string>20110305000000</string>
 		</dict>
 		<dict>
 			<key>doneSeconds</key>
@@ -471,8 +478,8 @@
 			<real>32400</real>
 			<key>effortDone</key>
 			<real>32400</real>
-			<key>forcedStart</key>
-			<string>20110310100000</string>
+			<key>endPlanDate</key>
+			<string>20110311110000</string>
 			<key>objectId</key>
 			<integer>1</integer>
 			<key>prerequisites</key>
@@ -484,6 +491,8 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110310100000</string>
 			<key>task</key>
 			<string>Rozwiązać problem SIGSEGV (segmentation fault)</string>
 			<key>workDone</key>
@@ -502,6 +511,8 @@
 				<integer>19</integer>
 				<integer>18</integer>
 			</array>
+			<key>endPlanDate</key>
+			<string>20110407111500</string>
 			<key>forcedStart</key>
 			<string>20110317140000</string>
 			<key>objectId</key>
@@ -515,16 +526,22 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110317140000</string>
 			<key>task</key>
 			<string>Web Service</string>
 		</dict>
 		<dict>
 			<key>effort</key>
 			<real>81000</real>
+			<key>endPlanDate</key>
+			<string>20110322113000</string>
 			<key>forcedStart</key>
 			<string>20110317140000</string>
 			<key>objectId</key>
 			<integer>18</integer>
+			<key>startPlanDate</key>
+			<string>20110317140000</string>
 			<key>task</key>
 			<string>Mail Password Changer</string>
 			<key>workSeconds</key>
@@ -535,6 +552,8 @@
 		<dict>
 			<key>effort</key>
 			<real>56700</real>
+			<key>endPlanDate</key>
+			<string>20110407111500</string>
 			<key>forcedStart</key>
 			<string>20110405113000</string>
 			<key>objectId</key>
@@ -560,6 +579,8 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110405113000</string>
 			<key>task</key>
 			<string>WebMail access</string>
 			<key>workSeconds</key>
@@ -574,8 +595,8 @@
 			<real>103500</real>
 			<key>effortDone</key>
 			<real>20699.998046875</real>
-			<key>forcedStart</key>
-			<string>20110322151500</string>
+			<key>endPlanDate</key>
+			<string>20110328110000</string>
 			<key>objectId</key>
 			<integer>21</integer>
 			<key>prerequisites</key>
@@ -599,6 +620,8 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110322151500</string>
 			<key>task</key>
 			<string>Account Manager</string>
 			<key>workDone</key>
@@ -614,10 +637,14 @@
 				<integer>29</integer>
 				<integer>21</integer>
 			</array>
+			<key>endPlanDate</key>
+			<string>20110328110000</string>
 			<key>forcedStart</key>
 			<string>20110315113000</string>
 			<key>objectId</key>
 			<integer>22</integer>
+			<key>startPlanDate</key>
+			<string>20110315113000</string>
 			<key>task</key>
 			<string>System Manager</string>
 		</dict>
@@ -627,10 +654,14 @@
 				<integer>36</integer>
 				<integer>35</integer>
 			</array>
+			<key>endPlanDate</key>
+			<string>20110411113000</string>
 			<key>forcedStart</key>
 			<string>20110318110000</string>
 			<key>objectId</key>
 			<integer>23</integer>
+			<key>startPlanDate</key>
+			<string>20110318110000</string>
 			<key>task</key>
 			<string>Notifications</string>
 		</dict>
@@ -641,10 +672,14 @@
 			<real>85500</real>
 			<key>effortDone</key>
 			<real>21375</real>
+			<key>endPlanDate</key>
+			<string>20110322154500</string>
 			<key>forcedStart</key>
 			<string>20110317160000</string>
 			<key>objectId</key>
 			<integer>24</integer>
+			<key>startPlanDate</key>
+			<string>20110317160000</string>
 			<key>task</key>
 			<string>API</string>
 			<key>workDone</key>
@@ -661,8 +696,8 @@
 			<real>514800</real>
 			<key>effortDone</key>
 			<real>231660</real>
-			<key>forcedStart</key>
-			<string>20110309081500</string>
+			<key>endPlanDate</key>
+			<string>20110401161500</string>
 			<key>objectId</key>
 			<integer>25</integer>
 			<key>prerequisites</key>
@@ -674,6 +709,8 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110309081500</string>
 			<key>task</key>
 			<string>Maintainer</string>
 			<key>workDone</key>
@@ -690,10 +727,12 @@
 			<real>98100</real>
 			<key>effortDone</key>
 			<real>88290</real>
-			<key>forcedStart</key>
-			<string>20110302130000</string>
+			<key>endPlanDate</key>
+			<string>20110307161500</string>
 			<key>objectId</key>
 			<integer>26</integer>
+			<key>startPlanDate</key>
+			<string>20110302130000</string>
 			<key>task</key>
 			<string>Sigar</string>
 			<key>workDone</key>
@@ -710,8 +749,8 @@
 			<real>1060200</real>
 			<key>effortDone</key>
 			<real>31806</real>
-			<key>forcedStart</key>
-			<string>20110315134500</string>
+			<key>endPlanDate</key>
+			<string>20110505111500</string>
 			<key>objectId</key>
 			<integer>27</integer>
 			<key>prerequisites</key>
@@ -723,6 +762,8 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110315134500</string>
 			<key>task</key>
 			<string>Torture Machine</string>
 			<key>workDone</key>
@@ -739,8 +780,8 @@
 			<real>98100</real>
 			<key>effortDone</key>
 			<real>78479.9921875</real>
-			<key>forcedStart</key>
-			<string>20110304164500</string>
+			<key>endPlanDate</key>
+			<string>20110310110000</string>
 			<key>objectId</key>
 			<integer>28</integer>
 			<key>prerequisites</key>
@@ -752,6 +793,8 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110304164500</string>
 			<key>task</key>
 			<string>Utils</string>
 			<key>workDone</key>
@@ -768,8 +811,8 @@
 			<real>57600</real>
 			<key>effortDone</key>
 			<real>48959.99609375</real>
-			<key>forcedStart</key>
-			<string>20110315144500</string>
+			<key>endPlanDate</key>
+			<string>20110317144500</string>
 			<key>objectId</key>
 			<integer>29</integer>
 			<key>prerequisites</key>
@@ -781,6 +824,8 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110315144500</string>
 			<key>task</key>
 			<string>Process Manager</string>
 			<key>workDone</key>
@@ -793,8 +838,8 @@
 		<dict>
 			<key>effort</key>
 			<real>806400</real>
-			<key>forcedStart</key>
-			<string>20110404080000</string>
+			<key>endPlanDate</key>
+			<string>20110511170000</string>
 			<key>objectId</key>
 			<integer>31</integer>
 			<key>prerequisites</key>
@@ -806,6 +851,8 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110404080000</string>
 			<key>task</key>
 			<string>Hadoop FS implementation</string>
 			<key>workSeconds</key>
@@ -820,6 +867,8 @@
 			<real>622800</real>
 			<key>effortDone</key>
 			<real>217980</real>
+			<key>endPlanDate</key>
+			<string>20110421141500</string>
 			<key>forcedStart</key>
 			<string>20110323081500</string>
 			<key>objectId</key>
@@ -833,6 +882,8 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110323081500</string>
 			<key>task</key>
 			<string>CLI</string>
 			<key>workDone</key>
@@ -845,6 +896,8 @@
 		<dict>
 			<key>effort</key>
 			<real>57600</real>
+			<key>endPlanDate</key>
+			<string>20110411113000</string>
 			<key>forcedStart</key>
 			<string>20110407113000</string>
 			<key>objectId</key>
@@ -858,6 +911,8 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110407113000</string>
 			<key>task</key>
 			<string>Xmpp</string>
 			<key>workSeconds</key>
@@ -868,10 +923,14 @@
 		<dict>
 			<key>effort</key>
 			<real>55800</real>
+			<key>endPlanDate</key>
+			<string>20110401164500</string>
 			<key>forcedStart</key>
 			<string>20110331081500</string>
 			<key>objectId</key>
 			<integer>36</integer>
+			<key>startPlanDate</key>
+			<string>20110331081500</string>
 			<key>task</key>
 			<string>Mail</string>
 			<key>workSeconds</key>
@@ -882,6 +941,8 @@
 		<dict>
 			<key>effort</key>
 			<real>28800</real>
+			<key>endPlanDate</key>
+			<string>20110323110000</string>
 			<key>forcedStart</key>
 			<string>20110322110000</string>
 			<key>objectId</key>
@@ -895,6 +956,8 @@
 					<integer>3</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110322110000</string>
 			<key>task</key>
 			<string>Web Service - Login page</string>
 			<key>workSeconds</key>
@@ -905,6 +968,8 @@
 		<dict>
 			<key>effort</key>
 			<real>54000</real>
+			<key>endPlanDate</key>
+			<string>20110325170000</string>
 			<key>forcedStart</key>
 			<string>20110324090000</string>
 			<key>objectId</key>
@@ -918,6 +983,8 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110324090000</string>
 			<key>task</key>
 			<string>Web Service - Admin page</string>
 			<key>workSeconds</key>
@@ -928,6 +995,8 @@
 		<dict>
 			<key>effort</key>
 			<real>169200</real>
+			<key>endPlanDate</key>
+			<string>20110405110000</string>
 			<key>forcedStart</key>
 			<string>20110328130000</string>
 			<key>objectId</key>
@@ -941,6 +1010,8 @@
 					<integer>2</integer>
 				</dict>
 			</array>
+			<key>startPlanDate</key>
+			<string>20110328130000</string>
 			<key>task</key>
 			<string>Web Service - Graphical User Interface for system monitoring</string>
 			<key>workSeconds</key>
