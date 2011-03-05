@@ -34,6 +34,7 @@ class SvdProcess(
     val workDir: String = SvdConfig.tmp,
     val stdOut: String = SvdConfig.nullDevice,
     val stdErr: String = SvdConfig.nullDevice,
+    val waitFor: Boolean = false,
     val useShell: Boolean = false)
         extends Logging {
 
@@ -80,6 +81,9 @@ class SvdProcess(
             }
             log.trace(f.getName+"="+f.get(proc))
         }
+        if (waitFor) // 2011-03-05 16:59:47 - dmilith - NOTE: synchronized process, waiting until process ends
+            proc.waitFor
+            
         try {
             if (proc.exitValue > 0)
                 log.debug("SvdProcess: '%s' exited abnormally with error code: '%s'. Output info: '%s'".format(
