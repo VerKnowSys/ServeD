@@ -63,7 +63,7 @@ class SvdProcess(
       */
     val pid = {
         var aPid = -1L
-        val cmdFormats = if (useShell) "%s -u %s -H -s %s > %s 2> %s" else "%s -u %s -H %s > %s 2> %s"
+        val cmdFormats = if (useShell) "%s -H -u %s %s > %s 2> %s" else "%s -u %s %s > %s 2> %s"
         val cmd =  cmdFormats.format("sudo", user, command, stdOut, stdErr).split(" ")
         val rt = Runtime.getRuntime
         val env = SvdConfig.env
@@ -82,7 +82,7 @@ class SvdProcess(
         }
         try {
             if (proc.exitValue > 0)
-                throw new ProcessException("SvdProcess: '%s' exited abnormally with error code: '%s'. Output info: '%s'".format(
+                log.debug("SvdProcess: '%s' exited abnormally with error code: '%s'. Output info: '%s'".format(
                     command, proc.exitValue,
                         if (stdOut != SvdConfig.nullDevice)
                             "STDOUT:\n" + Source.fromFile(stdOut).mkString +
