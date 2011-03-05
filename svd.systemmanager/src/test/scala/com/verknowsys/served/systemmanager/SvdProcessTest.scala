@@ -170,7 +170,7 @@ class SvdProcessTest extends Specification {
                     elem =>
                         a.toString must beMatching(elem)
                 }
-                b = new SvdProcess("sleep 51111", user = "root")
+                b = new SvdProcess("sleep 51111", user = "root", useShell = true)
                 b must notBeNull
                 ("PNAME:" :: "COMMAND:" :: Nil).foreach{
                     elem =>
