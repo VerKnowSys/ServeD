@@ -26,7 +26,7 @@ import com.sun.jna.Native
 object SvdUtils extends Logging {
     
     
-    Native.setProtected(true)
+    // Native.setProtected(true)
     
         
     /**

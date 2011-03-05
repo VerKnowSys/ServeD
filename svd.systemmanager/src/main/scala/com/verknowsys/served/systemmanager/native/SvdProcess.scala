@@ -40,7 +40,7 @@ class SvdProcess(
     log.debug("Spawning SvdProcess: (%s)".format(command))
 
     import SvdProcess._
-    Native.setProtected(true)
+    // Native.setProtected(true)
 
     // 2011-01-26 12:36:06 - dmilith - NOTE: TODO: check low level way of launching processes
     // val pid = {
