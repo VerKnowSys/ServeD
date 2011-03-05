@@ -43,7 +43,13 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
     
-    class SvdPersistence(info: ProjectInfo) extends SvdProject(info)
+    class SvdPersistence(info: ProjectInfo) extends SvdProject(info){
+        val novusRels = "repo.novus rels" at "http://repo.novus.com/releases/"
+        val novusSnaps = "repo.novus snaps" at "http://repo.novus.com/snapshots/"
+        
+        val casbah = "com.mongodb.casbah" %% "casbah" % "2.0.2"
+        val salat = "com.novus" %% "salat" % "0.0.6-SNAPSHOT"
+    }
     
     class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {
         lazy val cli = task { None; } dependsOn(run(Array("127.0.0.1", "5555")))
