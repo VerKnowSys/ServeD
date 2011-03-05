@@ -63,13 +63,13 @@ class SvdProcess(
       */
     val pid = {
         var aPid = -1L
-        val cmdFormats = if (useShell) "%s -u %s -s %s > %s 2> %s" else "%s -u %s %s > %s 2> %s"
+        val cmdFormats = if (useShell) "%s -u %s -H -s %s > %s 2> %s" else "%s -u %s -H %s > %s 2> %s"
         val cmd =  cmdFormats.format("sudo", user, command, stdOut, stdErr).split(" ")
         val rt = Runtime.getRuntime
         val env = SvdConfig.env
         val proc = rt.exec(cmd, env)
         log.trace("CMD: %s".format(cmd.mkString(" ")))
-        rt.traceMethodCalls(false)
+        rt.traceMethodCalls(true)
         proc.getClass.getDeclaredFields.foreach{ f =>
             f.setAccessible(true)
             f.getName match {
