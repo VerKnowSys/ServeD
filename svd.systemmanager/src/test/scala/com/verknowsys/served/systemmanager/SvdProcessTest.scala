@@ -201,6 +201,32 @@ class SvdProcessTest extends Specification {
         }
         
 
+        // 2011-03-05 18:29:02 - dmilith - NOTE: XXX: dangerous code for Mac OS X ;>
+        // "it must be able to spawn synchronized (waiting) processes" in {
+        //     var a: SvdProcess = null
+        //     var pid = -1L
+        //     
+        //     val t1 = new Thread {
+        //         override def run = {
+        //             while (pid == -1L) {
+        //                 pid = (new SvdProcess("read", user = "root", useShell = true, waitFor = true)).pid
+        //                 exit
+        //             }
+        //             // wait forever
+        //         }
+        //     }
+        //     
+        //     t1.start
+        //     
+        //     while (pid == -1L)
+        //         SvdProcess.kill(pid, SIGKILL)
+        //     
+        //     t1.join
+        // 
+        //     a.alive must beFalse
+        // }
+        
+
     } // test should
 
 
