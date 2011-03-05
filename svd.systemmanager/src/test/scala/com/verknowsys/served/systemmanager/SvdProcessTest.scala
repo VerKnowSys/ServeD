@@ -194,7 +194,10 @@ class SvdProcessTest extends Specification {
         
         // 2011-03-05 12:42:36 - dmilith - TODO: implement alive() spec
         "it must pass alive specs" in {
-            true must beTrue 
+            val b = new SvdProcess("memcached -u root", user = "root", useShell = false)
+            b.alive must beTrue
+            b.kill(SIGINT)
+            b.alive must beFalse
         }
         
 

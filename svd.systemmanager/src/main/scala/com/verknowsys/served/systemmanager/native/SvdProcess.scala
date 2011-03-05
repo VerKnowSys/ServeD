@@ -215,15 +215,14 @@ class SvdProcess(
      *
      *   Returns true if current process exists
      */    
-    def alive = 
-        try {
-             core.getProcState(pid)
-             true
-        } catch { 
-            case x: SigarException =>
-                log.trace("SvdProcess: %s alive() check thrown: %s".format(command, x))
-                false
-        }
+    def alive = {
+        while (pid == -1L)
+            Thread.sleep(10)
+        if (SvdProcess.getProcessInfo(pid) == "NONE") 
+            false
+        else
+            true
+    }
     
 
     /**
@@ -236,7 +235,7 @@ class SvdProcess(
       */
     def kill(signal: SvdPOSIX.Value = SIGINT) = {
         while (pid == -1L)
-            Thread.sleep(100)
+            Thread.sleep(10)
         if (SvdProcess.getProcessInfo(pid) != "NONE") 
             SvdProcess.kill(pid, signal)
         else
