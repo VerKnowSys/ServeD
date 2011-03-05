@@ -80,7 +80,7 @@ public abstract class ShellBase
     }
 
     public void registerSigIntHandler() {
-        ShellIntHandler.register(this); //catch ctrl-c
+        // ShellIntHandler.register(this); //catch ctrl-c
     }
 
     public void init (String applicationName, 
@@ -260,7 +260,7 @@ public abstract class ShellBase
     public void run() {
         String input = null;
 
-        ShellIntHandler.push(this);
+        // ShellIntHandler.push(this);
 
         while (true) {
             try {
