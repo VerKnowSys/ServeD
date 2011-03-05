@@ -54,8 +54,6 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     
     class SvdSigar(info: ProjectInfo) extends SvdProject(info)
-        // val sigarSource = "org.hyperic" at "http://repository.jboss.org/maven2"
-        //         val sigar       = "org.hyperic" % "sigar" % "1.6.3.82"
     
     
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
@@ -74,8 +72,6 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdSystemManager(info: ProjectInfo) extends SvdProject(info) {
         import Process._
-        
-        // override def parallelExecution = false
         
         lazy val stress = task {
             val compiler = "/usr/bin/clang"
