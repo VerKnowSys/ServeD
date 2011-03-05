@@ -108,7 +108,7 @@ class SvdProcess(
     	core.getProcState(pid)
     } catch { 
         case x: SigarException =>
-            log.debug("Sigar has just throw: %s".format(x))
+            log.debug("Sigar has just thrown: %s".format(x))
             new ProcState
     }
     
@@ -117,7 +117,7 @@ class SvdProcess(
     	core.getProcCpu(pid)
     } catch { 
         case x: SigarException =>
-            log.debug("Sigar has just throw: %s".format(x))
+            log.debug("Sigar has just thrown: %s".format(x))
             new ProcCpu
     }
     
@@ -126,7 +126,7 @@ class SvdProcess(
     	core.getProcMem(pid)
     } catch { 
         case x: SigarException =>
-            log.debug("Sigar has just throw: %s".format(x))
+            log.debug("Sigar has just thrown: %s".format(x))
             new ProcMem
     }
     
@@ -304,9 +304,9 @@ object SvdProcess extends Logging {
     def processList(sort: Boolean = false) = {
         val preList = core.getProcList.toList // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
         val sourceList = if (sort) preList.sortWith(_.toInt < _.toInt) else preList
-        log.debug("UnSORTED   : " + preList)
-        log.debug("SORTED     : " + preList.sortWith(_.toInt < _.toInt))
-        log.trace("sourceList : " + sourceList)
+        log.trace("UnSORTED   : " + preList)
+        log.trace("SORTED     : " + preList.sortWith(_.toInt < _.toInt))
+        log.debug("processList : " + sourceList)
         sourceList
     }
     

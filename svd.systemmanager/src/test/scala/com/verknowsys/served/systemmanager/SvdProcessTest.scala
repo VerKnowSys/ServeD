@@ -164,13 +164,13 @@ class SvdProcessTest extends Specification {
             var c: SvdProcess = null
             var d: SvdProcess = null
             try {
-                a = new SvdProcess("memcached -u nobody -p 11313", user = "root", useShell = true)
+                a = new SvdProcess("sleep 50000", user = "root", useShell = true)
                 a must notBeNull
                 ("PNAME:" :: "COMMAND:" :: Nil).foreach{
                     elem =>
                         a.toString must beMatching(elem)
                 }
-                b = new SvdProcess("memcached -u nobody -p 11312", user = "root")
+                b = new SvdProcess("sleep 51111", user = "root")
                 b must notBeNull
                 ("PNAME:" :: "COMMAND:" :: Nil).foreach{
                     elem =>
@@ -182,8 +182,8 @@ class SvdProcessTest extends Specification {
             } finally {
                 // 2011-01-24 16:59:05 - dmilith - NOTE: in most cases this will return false: a.alive must beEqual(true)
                 // b.alive must beEqual(true)
-                a.kill(SIGKILL) must beTrue
-                b.kill(SIGKILL) must beTrue
+                a.kill(SIGINT) must beTrue
+                b.kill(SIGINT) must beTrue
                 c = new SvdProcess("echo abc", user = "root")
                 d = new SvdProcess("echo abc", user = "root")
                 c must notBeNull
