@@ -34,9 +34,6 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
     log.info("SvdSystemManager is loading")
     
 
-    // Native.setProtected(true) // 2010-10-11 23:43:21 - dmilith - set JVM protection (in case of JNA code fail it should only throw an exception)
-    
-    
     def receive = {
         case Init =>
             val nrs = new SvdSystemResources
@@ -46,7 +43,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             log.info("Current PID: %d. System Information:\n%s".format(SvdProcess.getCurrentProcessPid, SvdProcess.getProcessInfo(SvdProcess.getCurrentProcessPid)))
             
 
-            val a = new SvdProcess(command = "dig +trace arka.gdynia.pl", user = "root", outputRedirectDestination = "/tmp/served_nobody_memcached.log")
+            val a = new SvdProcess(command = "dig +trace arka.gdynia.pl", user = "root", stdOut = "/tmp/served_nobody_memcached.log")
             // log.debug("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
             a.kill(SIGINT)
             

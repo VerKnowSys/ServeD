@@ -32,7 +32,8 @@ class SvdProcess(
     val command: String,
     val user: String = SvdConfig.noUser,
     val workDir: String = SvdConfig.tmp,
-    val outputRedirectDestination: String = SvdConfig.nullDevice,
+    val stdOut: String = SvdConfig.nullDevice,
+    val stdErr: String = SvdConfig.nullDevice,
     val useShell: Boolean = false)
         extends Logging {
 
@@ -40,7 +41,6 @@ class SvdProcess(
     log.debug("Spawning SvdProcess: (%s)".format(command))
 
     import SvdProcess._
-    // Native.setProtected(true)
 
     // 2011-01-26 12:36:06 - dmilith - NOTE: TODO: check low level way of launching processes
     // val pid = {
@@ -63,8 +63,8 @@ class SvdProcess(
       */
     val pid = {
         var aPid = -1L
-        val cmdFormats = if (useShell) "%s -u %s -s %s > %s 2>&1" else "%s -u %s %s > %s 2>&1"
-        val cmd =  cmdFormats.format("sudo", user, command, outputRedirectDestination).split(" ")
+        val cmdFormats = if (useShell) "%s -u %s -s %s > %s 2> %s" else "%s -u %s %s > %s 2> %s"
+        val cmd =  cmdFormats.format("sudo", user, command, stdOut, stdErr).split(" ")
         val rt = Runtime.getRuntime
         val env = SvdConfig.env
         val proc = rt.exec(cmd, env)
@@ -84,16 +84,16 @@ class SvdProcess(
             if (proc.exitValue > 0)
                 throw new ProcessException("SvdProcess: '%s' exited abnormally with error code: '%s'. Output info: '%s'".format(
                     command, proc.exitValue,
-                        if (outputRedirectDestination != SvdConfig.nullDevice)
-                            Source.fromFile(outputRedirectDestination).mkString
+                        if (stdOut != SvdConfig.nullDevice)
+                            "STDOUT:\n" + Source.fromFile(stdOut).mkString +
+                                (if (stdErr != SvdConfig.nullDevice)
+                                    "STDERR:\n" + Source.fromFile(stdErr).mkString else "")
                         else
                             "NONE"
                 ))
         } catch {
             case x: IllegalThreadStateException =>
                 log.debug("SvdProcess thread exited. No exitValue given.")
-            // case x: ProcessException =>
-            //                 log.error("ProcessException occured: %s".format(x.getMessage))
         }
         aPid
     }
@@ -160,7 +160,7 @@ class SvdProcess(
      */
     require(commandNotEmpty, "SvdProcess require non-empty command to execute!")
     require(workDirExists, "SvdProcess working dir must exist! Given: %s".format(workDir))
-    require(outputWritable, "SvdProcess output file (%s) isn't writable!".format(outputRedirectDestination))
+    require(outputWritable, "SvdProcess output file (%s or %s) aren't writable!".format(stdOut, stdErr))
     require(passACLs, "SvdProcess didn't pass ACL requirements! Failed process: %s".format(command))
     require(pid > 0, "SvdProcess PID always should be > 0!")
     
@@ -201,13 +201,14 @@ class SvdProcess(
      */
     def outputWritable = {
         try { 
-            FileUtils.touch(outputRedirectDestination)
+            FileUtils.touch(stdOut)
+            FileUtils.touch(stdErr)
         } catch {
             case _ =>
         }
-        new File(outputRedirectDestination).canWrite
+        (new File(stdOut).canWrite) && (new File(stdErr).canWrite)
     }
-
+    
 
     /**
      *  @author dmilith
