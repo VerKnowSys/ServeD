@@ -181,7 +181,8 @@ class SvdProcessTest extends Specification {
                     fail("Alive isn't working well? Exception: %s, Object: %s".format(e.getMessage, a))
             } finally {
                 // 2011-01-24 16:59:05 - dmilith - NOTE: in most cases this will return false: a.alive must beEqual(true)
-                // b.alive must beEqual(true)
+                b.alive must beEqual(true)
+                a.alive must beEqual(true)
                 a.kill(SIGINT) must beTrue
                 b.kill(SIGINT) must beTrue
                 c = new SvdProcess("echo abc", user = "root")
