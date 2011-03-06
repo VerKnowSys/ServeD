@@ -14,6 +14,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     lazy val spechelpers    = project("svd.spechelpers", "SvdSpecHelpers", new SvdSpecHelpers(_))
     lazy val utils          = project("svd.utils", "SvdUtils", new SvdUtils(_), conf, spechelpers)
     lazy val cli            = project("svd.cli", "SvdCLI", new SvdCli(_), utils, api)
+    lazy val db             = project("svd.db", "SvdDB", new SvdDB(_), utils, api)
     lazy val systemmanager  = project("svd.systemmanager", "SvdSystemManager", new SvdSystemManager(_), utils, api, sigar)
     lazy val notifications  = project("svd.notifications", "Notifications", new SvdNotifications(_), utils)
     lazy val maintainer     = project("svd.maintainer", "SvdMaintainer", new SvdMaintainer(_), notifications, systemmanager, api)
@@ -75,6 +76,11 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdSystemManager(info: ProjectInfo) extends SvdProject(info) {
         import Process._
+        
+        val sigarSource = "org.hyperic" at "http://repository.jboss.org/maven2"
+        val sigar       = "org.hyperic" % "sigar" % "1.6.3.82"
+        
+        override def parallelExecution = false
         
         lazy val stress = task {
             val compiler = "/usr/bin/clang"
