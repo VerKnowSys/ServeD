@@ -13,53 +13,59 @@ class DBTest extends Specification {
             val uuid1 = UUID.randomUUID
             val uuid2 = UUID.randomUUID
 
+
             db << DBObj(uuid1, "name" -> "x1")
             db.current.count must_== 1
             db.history.count must_== 0
             db.current.head("name") must_== "x1"
             db(uuid1).get("name") must_== "x1"
+            db.historyFor(uuid1) must beEmpty
+            db.historyFor(uuid2) must beEmpty
+            
             
             db << DBObj(uuid2, "name" -> "y1")
             db.current.count must_== 2
             db.history.count must_== 0
             db(uuid1).get("name") must_== "x1"
             db(uuid2).get("name") must_== "y1"
+            db.historyFor(uuid1) must beEmpty
+            db.historyFor(uuid2) must beEmpty
+            
             
             db << DBObj(uuid1, "name" -> "x2")
             db.current.count must_== 2
             db.history.count must_== 1
             db(uuid1).get("name") must_== "x2"
             db(uuid2).get("name") must_== "y1"
-            
             db.historyFor(uuid1) must haveSize(1)
             db.historyFor(uuid1).head("name") must_== "x1"
+            db.historyFor(uuid2) must beEmpty
             
-            // val dbobjoption = db.history(uuid1)
-            //             val dbobj = dbobjoption.get
-            //             val dblistoption = dbobj.getAs[BasicDBList]("history")
-            //             val dblist = dblistoption.get.map(_.asInstanceOf[DBObject])
-            //             val first: DBObject = dblist.head
-            //             val name = first("name")
-            //             name must_== "x1"
-            // .head.asDBObject("name") //map(_.asDBObject)
-            
-            
-            // val obj = db.history(uuid1).get.getAs[BasicDBList]("history").get.head.asDBObject("name") //map(_.asDBObject)
-            // println(obj)
-            // 
-            // ("name") must_== "x1"
             
             db << DBObj(uuid1, "name" -> "x3")
             db.current.count must_== 2
             db.history.count must_== 1
+            db(uuid1).get("name") must_== "x3"
+            db(uuid2).get("name") must_== "y1"
+            db.historyFor(uuid1) must haveSize(2)
+            db.historyFor(uuid1).map(_("name")) must_== List("x2", "x1")
+            db.historyFor(uuid2) must beEmpty
+            
             
             db << DBObj(uuid1, "name" -> "x4")
             db.current.count must_== 2
             db.history.count must_== 1
+            db.historyFor(uuid1) must haveSize(3)
+            db.historyFor(uuid1).map(_("name")) must_== List("x3", "x2", "x1")
+            db.historyFor(uuid2) must beEmpty
             
             db << DBObj(uuid2, "name" -> "y2")
             db.current.count must_== 2
             db.history.count must_== 2
+            db.historyFor(uuid1) must haveSize(3)
+            db.historyFor(uuid1).map(_("name")) must_== List("x3", "x2", "x1")
+            db.historyFor(uuid2) must haveSize(1)
+            db.historyFor(uuid2).map(_("name")) must_== List("y1")
 
             db.close
         }

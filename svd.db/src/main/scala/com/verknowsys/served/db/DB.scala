@@ -30,7 +30,7 @@ class DB {
     def apply(uuid: UUID) = current.findOne(uuid)
     
     def historyFor(uuid: UUID): Iterable[DBObject] = 
-        history.findOne(uuid).flatMap(_.getAs[BasicDBList]("history")).map(_.map(_.asInstanceOf[DBObject]).toList) getOrElse Nil
+        history.findOne(uuid).flatMap(_.getAs[BasicDBList]("history")).map(_.map(_.asInstanceOf[DBObject]).toList.reverse) getOrElse Nil
     
     
     def drop {
