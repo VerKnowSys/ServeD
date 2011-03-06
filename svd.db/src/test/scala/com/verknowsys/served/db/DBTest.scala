@@ -18,6 +18,17 @@ class DBTest extends Specification {
             db.close
         }
         
+        "just store some data" in {
+            val uuid = UUID.randomUUID
+            db(uuid) must_== None
+            db(uuid) = ("name" -> "teamon")
+            db(uuid).get("name") must_== "teamon"
+            
+            db.close
+            db = new DB
+            db(uuid).get("name") must_== "teamon"
+        }
+        
         "work" in {
             val uuid1 = UUID.randomUUID
             val uuid2 = UUID.randomUUID
