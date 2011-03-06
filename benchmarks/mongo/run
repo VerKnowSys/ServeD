@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+
+cp = %w(
+  casbah-commons_2.8.1-2.0.2.jar
+  casbah-core_2.8.1-2.0.2.jar
+  casbah-gridfs_2.8.1-2.0.2.jar
+  casbah-query_2.8.1-2.0.2.jar
+  mongo-java-driver-2.4.jar
+  joda-time-1.6.jar
+  slf4j-api-1.6.0.jar
+  time_2.8.0-0.2.jar
+  scalaj-collection_2.8.0-1.0.jar
+).map {|e| "../../svd.persistence/lib_managed/scala_2.8.1/compile/#{e}"}.join(":")
+
+system("scalac -cp #{cp}:. mongo.scala && scala -cp #{cp}:. benchmarks.mongo.MongoBenchmark")
+
+# CP="-cp :." 
+
+# `scalac $CP mongo.scala` && scala benchmarks.mongo.MongoBenchmark
+
+# 
+# :casbah-gridfs_2.8.1-2.0.2.jar:.

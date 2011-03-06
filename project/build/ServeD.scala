@@ -58,6 +58,9 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
     
+    class SvdDB(info: ProjectInfo) extends SvdProject(info){
+        val casbah = "com.mongodb.casbah" %% "casbah" % "2.0.2"
+    }
     
     class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {
         lazy val cli = task { None; } dependsOn(run(Array("127.0.0.1", "5555")))
