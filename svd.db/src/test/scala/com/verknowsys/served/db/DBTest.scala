@@ -91,6 +91,18 @@ class DBTest extends Specification {
             db(uuid) = ("name" -> "bar")
             db.current.count must_== 1
             db.history.count must_== 1
+            
+            db(uuid) = ("name" -> "baz")
+            db(uuid) = ("name" -> "baz")
+            db(uuid) = ("name" -> "xxx")
+            db(uuid) = ("name" -> "xxx")
+            db(uuid) = ("name" -> "xxx")
+            db(uuid) = ("name" -> "xxx")
+            db(uuid) = ("name" -> "yyy")
+            
+            db.current.count must_== 1
+            db.history.count must_== 1
+            db.historyFor(uuid).map(_("name")) must_== List("xxx", "baz", "bar", "foo")
         }
     }
 }
