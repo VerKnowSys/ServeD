@@ -3,34 +3,36 @@ package com.verknowsys.served.db
 import com.mongodb.casbah.Imports._
 import java.util.UUID
 
-case class DBObj(uuid: UUID, pairs: (String, Any)*) {
-    def toMongo = MongoDBObject(pairs:_*) + ("uuid" -> muuid)
-    def muuid = (uuid.getMostSignificantBits, uuid.getLeastSignificantBits)
+case class DBObj(uuid: UUID, data: (String, Any)*) {
+    def toMongo = MongoDBObject(data:_*) + uuid
 }
 
 class DB {
     val mongoConn = MongoConnection()
     val mongoDB = mongoConn("served")
-    
+
     val current = mongoDB("current")
     val history = mongoDB("history")
-    
+
     setup
 
-    
     def <<(dbobj: DBObj){
         val mobj = dbobj.toMongo
-        current.findOne(MongoDBObject("uuid" -> dbobj.muuid)) foreach { o =>
+        current.findOne(dbobj.uuid) foreach { o =>
             // if(o != mobj){
-                history.update(MongoDBObject("uuid" -> dbobj.muuid), $push("history" -> o), true, false)
+                history.update(dbobj.uuid, $push("history" -> o), true, false)
                 current -= o
             // }
         }
         current += mobj
     }
 
-    def apply(uuid: UUID) = current.findOne(MongoDBObject("uuid" -> (uuid.getMostSignificantBits, uuid.getLeastSignificantBits)))
-
+    def apply(uuid: UUID) = current.findOne(uuid)
+    
+    def historyFor(uuid: UUID): Iterable[DBObject] = 
+        history.findOne(uuid).flatMap(_.getAs[BasicDBList]("history")).map(_.map(_.asInstanceOf[DBObject]).toList) getOrElse Nil
+    
+    
     def drop {
         current.drop
         history.drop
