@@ -8,33 +8,36 @@
 
 0. Requirements:
 
-	0.1 - Java - OpenJDK (recommended, but all Sun-Compatible JVMs should work).
-	    >= Latest 1.6, 64-bit
+    0.1 - Java - OpenJDK (recommended, but all Sun-Compatible JVMs should work).
+        >= Latest 1.6, 64-bit
 
-	0.2 - Simple Build Tool (sbt: http://code.google.com/p/simple-build-tool/)
-	    >= 0.7.4
+    0.2 - Simple Build Tool (sbt: http://code.google.com/p/simple-build-tool/)
+        >= 0.7.4
 
-	0.3 - Scala (will be downloaded by sbt automatically)
-	    >= 2.8.1
-	    
+    0.3 - Scala (will be downloaded by sbt automatically)
+        >= 2.8.1
+        
     0.4 - ZSH Shell (for SvdSystemManager)
         >= 4.3.10
         
     0.5 - Sudo (for SvdSystemManager)
         >= 1.7.4p6
     
-	0.6 - Sigar library (for SvdSystemManager)
-	    >= 1.6.3.82
-	    
-	0.7 - Smack library (for XMPP Notifications)
-	    >= 3.0.4
+    0.6 - Sigar library (for SvdSystemManager)
+        >= 1.6.3.82
+        
+    0.7 - Smack library (for XMPP Notifications)
+        >= 3.0.4
 
     0.8 - pIRCbot library (for IRC Notifications)
         >= 1.4.2
         
-	0.9 - List of currently supported platforms:
-	    Mac OSX (100% features, development),
-	    Free BSD (100% features, production),
+    0.9 - mongo database (for SvdDB, mongodb: http://mongodb.org)
+        >= 1.6.5-x86_64
+        
+    0.10 - List of currently supported platforms:
+        Mac OSX (100% features, development),
+        Free BSD (100% features, production),
 
 
 
@@ -50,7 +53,7 @@
                 * unset JAVA_HOME
                 * cd /usr/ports/java/openjdk6 && make install
                 * follow requirements and instructions
-	1.2 - sbt "project SvdMaintainer" run
+    1.2 - sbt "project SvdMaintainer" run
 
 
 
@@ -62,26 +65,26 @@ That's all folks
 
 
 Questions?
-	I'm as "dmilith" on:
-	- #scala.pl, #scala at irc.freenode.net
-	- dmilith@verknowsys.com on jabber/mail
-	- dmilith@gmail.com on google sucking asses jabber/mail
-	- dmilith on Skype
-	
-	
-	And I'm as "teamon" on:
-	- #scala.pl, #scala at irc.freenode.net
-	- i@teamon.eu on jabber/mail
+    I'm as "dmilith" on:
+    - #scala.pl, #scala at irc.freenode.net
+    - dmilith@verknowsys.com on jabber/mail
+    - dmilith@gmail.com on google sucking asses jabber/mail
+    - dmilith on Skype
+    
+    
+    And I'm as "teamon" on:
+    - #scala.pl, #scala at irc.freenode.net
+    - i@teamon.eu on jabber/mail
 
 
 
 Rules for colab-team:
-	- Every var should contain "XXX" mark in code comments
-	- FP is the main rule here for coding
-	
+    - Every var should contain "XXX" mark in code comments
+    - FP is the main rule here for coding
+    
 More detailed rules are in POLICIES file in same directory.
 
-	
+    
 
 
 /** 
