@@ -8,37 +8,53 @@ import reaktor.scct.ScctProject
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
     
     // Projects
-    lazy val conf          = project("svd.conf", "SvdConfiguration")
-    lazy val api           = project("svd.api", "SvdAPI", conf)
-    lazy val spechelpers   = project("svd.spechelpers", "SvdSpecHelpers", new SvdSpecHelpers(_))
-    lazy val utils         = project("svd.utils", "SvdUtils", new SvdUtils(_), conf, spechelpers)
-    lazy val db            = project("svd.db", "SvdDB", new SvdDB(_), utils, api)
-    lazy val cli           = project("svd.cli", "SvdCLI", new SvdCli(_), utils, api)
-    lazy val systemmanager = project("svd.systemmanager", "SvdSystemManager", new SvdSystemManager(_), utils, api)
-    lazy val notifications = project("svd.notifications", "Notifications", new SvdNotifications(_), utils)
-    lazy val maintainer    = project("svd.maintainer", "SvdMaintainer", new SvdMaintainer(_), notifications, systemmanager, api)
-    
-    
-    override def parallelExecution = false
+    lazy val sigar          = project("svd.sigar", "SvdSigar")
+    lazy val conf           = project("svd.conf", "SvdConfiguration")
+    lazy val api            = project("svd.api", "SvdAPI", conf)
+    lazy val spechelpers    = project("svd.spechelpers", "SvdSpecHelpers", new SvdSpecHelpers(_))
+    lazy val utils          = project("svd.utils", "SvdUtils", new SvdUtils(_), conf, spechelpers)
+    lazy val cli            = project("svd.cli", "SvdCLI", new SvdCli(_), utils, api)
+    lazy val db             = project("svd.db", "SvdDB", new SvdDB(_), utils, api)
+    lazy val systemmanager  = project("svd.systemmanager", "SvdSystemManager", new SvdSystemManager(_), utils, api, sigar)
+    lazy val notifications  = project("svd.notifications", "Notifications", new SvdNotifications(_), utils)
+    lazy val maintainer     = project("svd.maintainer", "SvdMaintainer", new SvdMaintainer(_), notifications, systemmanager, api)
     
     
     // Dependencies
     class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject {
         
-        override def compileOrder = CompileOrder.JavaThenScala
-        override def javaCompileOptions = super.javaCompileOptions ++ javaCompileOptions("-source", "1.6")
-        override def compileOptions = super.compileOptions ++ compileOptions("-Ywarn-dead-code") ++ compileOptions("-Xshow-phases") ++ compileOptions("-Xresident") ++ compileOptions("-g:source") ++ (MaxCompileErrors(1) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq // ++ compileOptions("-make:changed")
         override def parallelExecution = true
-        override def installActions = "update" :: "run" :: Nil
         
-        val specsTest = "org.scala-tools.testing" %% "specs" % "1.6.6" % "test"
+        override def compileOrder = CompileOrder.JavaThenScala
+        
+        override def javaCompileOptions = super.javaCompileOptions ++
+            javaCompileOptions("-g:none") ++
+            javaCompileOptions("-encoding", "UTF-8") ++
+            javaCompileOptions("-source", "1.6") ++
+            javaCompileOptions("-target", "1.6") ++
+            javaCompileOptions("-Xlint:unchecked") ++
+            javaCompileOptions("-Xlint:deprecation")
+            
+        override def compileOptions = super.compileOptions ++
+            compileOptions("-Ywarn-dead-code") ++
+            compileOptions("-Xshow-phases") ++
+            compileOptions("-Xresident") ++
+            compileOptions("-g:source") ++
+            (MaxCompileErrors(1) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq // ++ compileOptions("-make:changed")
+        
+        override def installActions = "update" :: "run" :: Nil
         
         override val growlTestImages = GrowlTestImages(
             Some("project/growl_images/pass.png"),
             Some("project/growl_images/fail.png"),
             Some("project/growl_images/fail.png")
         )
+
+        val specsTest = "org.scala-tools.testing" %% "specs" % "1.6.6" % "test"
     }
+    
+    
+    class SvdSigar(info: ProjectInfo) extends SvdProject(info)
     
     
     class SvdApi(info: ProjectInfo) extends SvdProject(info)

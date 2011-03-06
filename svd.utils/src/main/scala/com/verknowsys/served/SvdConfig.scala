@@ -13,7 +13,7 @@ object SvdConfig {
      *
      */
      
-    final val version = "0.1"
+    final val version = "0.1.1"
     final val mainPropertiesFilename = "/served-%s.properties".format(version)
     final val props = new SvdProperties(mainPropertiesFilename)
 
@@ -34,6 +34,7 @@ object SvdConfig {
          "PWD=%s%s".format(homePath, vendorDir),
          "COMMAND_MODE=%s".format(terminalCommandMode),
          "HOME=%s".format(homePath),
+         "SHELL=%s".format(defaultShell),
          "PATH=%s".format(defaultPathEnviroment) // 2011-01-18 14:39:36 - dmilith - TODO: implement account privileges and their influence on PATH setting
      )
 
@@ -48,6 +49,7 @@ object SvdConfig {
     
     def defaultEncoding =               props("served.system.encoding") or "UTF-8"
     
+    def defaultShell =                  props("served.system.terminal.environment.shell") or "zsh"
     def defaultPathEnviroment =         props("served.system.terminal.environment.path") or "$HOME/bin:$HOME/Bin:/bin:/usr/bin:/usr/local/bin"
     def defaultTmpDir =                 props("served.system.terminal.environment.tmpdir") or "/tmp/"
     def terminalType =                  props("served.system.terminal.environment.term") or "xterm-color"

@@ -85,7 +85,6 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
     import CLibrary._
     
     log.info("SvdFileEventsManager is loading")
-    Native.setProtected(true)
     
     protected val clib = CLibrary.instance
     protected lazy val kq = {
