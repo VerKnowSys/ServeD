@@ -16,18 +16,20 @@ class DB {
 
     setup
 
-    def <<(dbobj: DBObj){
-        val mobj = dbobj.toMongo
-        current.findOne(dbobj.uuid) foreach { o =>
+    def apply(uuid: UUID) = current.findOne(uuid)
+    
+    def update(uuid: UUID, obj: MongoDBObject): Unit = {
+        val dbobj = obj + uuid
+        current.findOne(uuid) foreach { o =>
             // if(o != mobj){
-                history.update(dbobj.uuid, $push("history" -> o), true, false)
+                history.update(uuid, $push("history" -> o), true, false)
                 current -= o
             // }
         }
-        current += mobj
+        current += dbobj
     }
-
-    def apply(uuid: UUID) = current.findOne(uuid)
+    
+    def update(uuid: UUID, data: (String, Any)*): Unit = update(uuid, MongoDBObject(data:_*))
     
     def historyFor(uuid: UUID): Iterable[DBObject] = 
         history.findOne(uuid).flatMap(_.getAs[BasicDBList]("history")).map(_.map(_.asInstanceOf[DBObject]).toList.reverse) getOrElse Nil

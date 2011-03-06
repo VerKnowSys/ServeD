@@ -14,7 +14,7 @@ class DBTest extends Specification {
             val uuid2 = UUID.randomUUID
 
 
-            db << DBObj(uuid1, "name" -> "x1")
+            db(uuid1) = ("name" -> "x1")
             db.current.count must_== 1
             db.history.count must_== 0
             db.current.head("name") must_== "x1"
@@ -23,7 +23,7 @@ class DBTest extends Specification {
             db.historyFor(uuid2) must beEmpty
             
             
-            db << DBObj(uuid2, "name" -> "y1")
+            db(uuid2) = ("name" -> "y1")
             db.current.count must_== 2
             db.history.count must_== 0
             db(uuid1).get("name") must_== "x1"
@@ -32,7 +32,7 @@ class DBTest extends Specification {
             db.historyFor(uuid2) must beEmpty
             
             
-            db << DBObj(uuid1, "name" -> "x2")
+            db(uuid1) = ("name" -> "x2")
             db.current.count must_== 2
             db.history.count must_== 1
             db(uuid1).get("name") must_== "x2"
@@ -42,7 +42,7 @@ class DBTest extends Specification {
             db.historyFor(uuid2) must beEmpty
             
             
-            db << DBObj(uuid1, "name" -> "x3")
+            db(uuid1) = ("name" -> "x3")
             db.current.count must_== 2
             db.history.count must_== 1
             db(uuid1).get("name") must_== "x3"
@@ -52,14 +52,14 @@ class DBTest extends Specification {
             db.historyFor(uuid2) must beEmpty
             
             
-            db << DBObj(uuid1, "name" -> "x4")
+            db(uuid1) = ("name" -> "x4")
             db.current.count must_== 2
             db.history.count must_== 1
             db.historyFor(uuid1) must haveSize(3)
             db.historyFor(uuid1).map(_("name")) must_== List("x3", "x2", "x1")
             db.historyFor(uuid2) must beEmpty
             
-            db << DBObj(uuid2, "name" -> "y2")
+            db(uuid2) = ("name" -> "y2")
             db.current.count must_== 2
             db.history.count must_== 2
             db.historyFor(uuid1) must haveSize(3)
