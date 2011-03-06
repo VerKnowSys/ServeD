@@ -1,6 +1,7 @@
 package com.verknowsys.served.db
 
 import com.mongodb.casbah.Imports._
+import scala.collection.JavaConversions._
 import java.util.UUID
 
 case class DBObj(uuid: UUID, data: (String, Any)*) {
@@ -17,34 +18,39 @@ class DB {
     setup
 
     def apply(uuid: UUID) = current.findOne(uuid)
-    
+
     def update(uuid: UUID, obj: MongoDBObject): Unit = {
-        val dbobj = obj + uuid
-        current.findOne(uuid) foreach { o =>
-            // if(o != mobj){
-                history.update(uuid, $push("history" -> o), true, false)
-                current -= o
-            // }
+        current.findOne(uuid) match {
+            case Some(oldObj) =>
+                val oldMap = oldObj.toMap
+                oldMap.remove("_id")
+                oldMap.remove("uuid")
+                if(oldMap != obj.toMap){
+                    history.update(uuid, $push("history" -> oldObj), true, false)
+                    current -= oldObj
+                    current += (obj + uuid)
+                }
+            case None =>
+                current += (obj + uuid)
         }
-        current += dbobj
     }
-    
+
     def update(uuid: UUID, data: (String, Any)*): Unit = update(uuid, MongoDBObject(data:_*))
-    
+
     def historyFor(uuid: UUID): Iterable[DBObject] = 
         history.findOne(uuid).flatMap(_.getAs[BasicDBList]("history")).map(_.map(_.asInstanceOf[DBObject]).toList.reverse) getOrElse Nil
-    
-    
+
+
     def drop {
         current.drop
         history.drop
         setup
     }
-    
+
     def setup {
         current.ensureIndex("uuid")
         history.ensureIndex("uuid")
     }
-    
+
     def close = mongoConn.close
 }

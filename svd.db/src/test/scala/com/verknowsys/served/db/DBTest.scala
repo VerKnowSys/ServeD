@@ -5,15 +5,24 @@ import com.mongodb.casbah.Imports._
 import org.specs._
 
 class DBTest extends Specification {
+    var db: DB = null
+    
     "DB" should {
-        "work" in {
-            val db = new DB
+        
+        doBefore {
+            db = new DB
             db.drop
-
+        }
+        
+        doAfter {
+            db.close
+        }
+        
+        "work" in {
             val uuid1 = UUID.randomUUID
             val uuid2 = UUID.randomUUID
-
-
+        
+        
             db(uuid1) = ("name" -> "x1")
             db.current.count must_== 1
             db.history.count must_== 0
@@ -66,8 +75,22 @@ class DBTest extends Specification {
             db.historyFor(uuid1).map(_("name")) must_== List("x3", "x2", "x1")
             db.historyFor(uuid2) must haveSize(1)
             db.historyFor(uuid2).map(_("name")) must_== List("y1")
-
-            db.close
+        }
+        
+        "should not duplicated data" in {
+            val uuid = UUID.randomUUID
+            
+            db(uuid) = ("name" -> "foo")
+            db.current.count must_== 1
+            db.history.count must_== 0
+            
+            db(uuid) = ("name" -> "foo")
+            db.current.count must_== 1
+            db.history.count must_== 0
+            
+            db(uuid) = ("name" -> "bar")
+            db.current.count must_== 1
+            db.history.count must_== 1
         }
     }
 }
