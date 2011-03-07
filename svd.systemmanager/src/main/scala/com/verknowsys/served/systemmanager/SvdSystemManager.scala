@@ -88,7 +88,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             
         case SpawnProcess(cmd) =>
             log.debug("Requested process spawn: %s", cmd)
-            val spawn = new SvdProcess(cmd, user = "root", useShell = true) // 2011-01-23 05:27:11 - dmilith - XXX: temporary, that should be user's account name
+            val spawn = new SvdProcess(cmd, user = "root") // 2011-01-23 05:27:11 - dmilith - XXX: temporary, that should be user's account name
             log.trace("Spawned: %s", spawn)
             
         case GetAllProcesses =>

@@ -32,10 +32,7 @@ class SvdProcess(
     val command: String,
     val user: String = SvdConfig.noUser,
     val workDir: String = SvdConfig.tmp,
-    val stdOut: String = SvdConfig.nullDevice,
-    val stdErr: String = SvdConfig.nullDevice,
-    val waitFor: Boolean = false,
-    val useShell: Boolean = false)
+    val waitFor: Boolean = false)
         extends Logging {
 
     
@@ -64,8 +61,8 @@ class SvdProcess(
       */
     val pid = {
         var aPid = -1L
-        val cmdFormats = if (useShell) "%s -H -u %s %s > %s 2> %s" else "%s -u %s %s > %s 2> %s"
-        val cmd =  cmdFormats.format("sudo", user, command, stdOut, stdErr).split(" ")
+        val cmdFormats = "%s -H -u %s %s"
+        val cmd =  cmdFormats.format("sudo", user, command).split(" ")
         val rt = Runtime.getRuntime
         val env = SvdConfig.env
         val proc = rt.exec(cmd, env)
@@ -86,15 +83,8 @@ class SvdProcess(
             
         try {
             if (proc.exitValue > 0)
-                log.debug("SvdProcess: '%s' exited abnormally with error code: '%s'. Output info: '%s'".format(
-                    command, proc.exitValue,
-                        if (stdOut != SvdConfig.nullDevice)
-                            "STDOUT:\n" + Source.fromFile(stdOut).mkString +
-                                (if (stdErr != SvdConfig.nullDevice)
-                                    "STDERR:\n" + Source.fromFile(stdErr).mkString else "")
-                        else
-                            "NONE"
-                ))
+                log.debug("SvdProcess: '%s' exited abnormally with error code: '%s'.".format(
+                    command, proc.exitValue))
         } catch {
             case x: IllegalThreadStateException =>
                 log.debug("SvdProcess thread exited. No exitValue given.")
@@ -164,7 +154,6 @@ class SvdProcess(
      */
     require(commandNotEmpty, "SvdProcess require non-empty command to execute!")
     require(workDirExists, "SvdProcess working dir must exist! Given: %s".format(workDir))
-    require(outputWritable, "SvdProcess output file (%s or %s) aren't writable!".format(stdOut, stdErr))
     require(passACLs, "SvdProcess didn't pass ACL requirements! Failed process: %s".format(command))
     require(pid > 0, "SvdProcess PID always should be > 0!")
     
@@ -196,23 +185,7 @@ class SvdProcess(
      */
     def workDirExists =
         new File(workDir).exists
-        
-    
-    /**
-     *  @author dmilith
-     *
-     *   Checks for writable output
-     */
-    def outputWritable = {
-        try { 
-            FileUtils.touch(stdOut)
-            FileUtils.touch(stdErr)
-        } catch {
-            case _ =>
-        }
-        (new File(stdOut).canWrite) && (new File(stdErr).canWrite)
-    }
-    
+            
 
     /**
      *  @author dmilith
