@@ -43,9 +43,9 @@ class SvdMaintainer extends Actor with SvdExceptionHandler {
             Thread.sleep(SvdConfig.sleepDefaultPause)
             
             // 2011-01-23 05:29:52 - dmilith - NOTE: temporary code:
-            registry.actorFor[SvdSystemManager] foreach { _ ! GetAllProcesses }
-            registry.actorFor[SvdSystemManager] foreach { _ ! SpawnProcess("echo 'dupa'") }
-            registry.actorFor[SvdSystemManager] foreach { _ ! Kill(435343, SIGINT) }
+            // registry.actorFor[SvdSystemManager] foreach { _ ! GetAllProcesses }
+            // registry.actorFor[SvdSystemManager] foreach { _ ! SpawnProcess("echo 'dupa'") }
+            // registry.actorFor[SvdSystemManager] foreach { _ ! Kill(435343, SIGINT) }
             // 2011-01-23 05:29:52 - dmilith - NOTE: EOF temporary code.
 
         case x => 

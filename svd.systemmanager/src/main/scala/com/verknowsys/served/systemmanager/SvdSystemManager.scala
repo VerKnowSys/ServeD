@@ -41,6 +41,9 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             log.info("Starting main MongoDB instance..")
             val db = new SvdProcess("/usr/local/bin/mongod --logpath /tmp/MONGO_STD --port 50000 --dbpath /tmp --bind_ip 127.0.0.1 --noauth -verbose --syncdelay 10 --noscripting --nounixsocket", user = "root")
             
+            log.info("Starting main Memcached instance..")
+            val mc = new SvdProcess("memcached -u root -l 127.0.0.1 -p 50001", user = "root")
+            
             log.info("SvdSystemManager ready")
             log.info("System Resources Availability: [%s]".format(nrs))
             log.info("Current PID: %d. System Information:\n%s".format(SvdProcess.getCurrentProcessPid, SvdProcess.getProcessInfo(SvdProcess.getCurrentProcessPid)))
