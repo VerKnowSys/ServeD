@@ -32,6 +32,10 @@ class SvdMaintainer extends Actor with SvdExceptionHandler {
     registry.actorFor[SvdSystemManager] foreach { _ ! Init }
     registry.actorFor[SvdNotificationCenter] foreach { _ ! Status("Ready!") }
     
+    SvdUtils.addShutdownHook {
+        log.info("Performing shutdown, after interruption request..")
+        exit(0)
+    }
     
     def receive = {
         case Init =>
