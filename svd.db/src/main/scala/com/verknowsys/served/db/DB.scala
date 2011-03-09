@@ -4,6 +4,9 @@ import com.mongodb.casbah.Imports._
 import scala.collection.JavaConversions._
 import java.util.UUID
 
+import com.novus.salat._
+import com.novus.salat.global._
+
 case class DBObj(uuid: UUID, data: (String, Any)*) {
     def toMongo = MongoDBObject(data:_*) + uuid
 }
@@ -53,4 +56,10 @@ class DB {
     }
 
     def close = mongoConn.close
+    
+    def all[T <: CaseClass](implicit manifest: Manifest[T]) = current.find(MongoDBObject("_typeHint" -> manifest.toString)).map(grater[T].asObject(_))
+    
+    def all[T <: CaseClass](pairs: (String, Any)*)(implicit manifest: Manifest[T]) = current.find(Map("_typeHint" -> manifest.toString) ++ pairs).map(grater[T].asObject(_))
+    
+    def <<[T <: CaseClass : Manifest](obj: T) = current.insert(grater[T].asDBObject(obj))
 }
