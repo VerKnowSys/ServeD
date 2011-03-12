@@ -18,7 +18,7 @@ class ApiClient(host: String, port: Int) extends Logging {
 
     request(General.Connect(username)) {
         case Success => 
-            println("ServeD 0.1.0 interactive shell. Welcome %s".format(username))
+            println("ServeD interactive shell. Welcome %s".format(username))
             prompt
         case Error(message) =>
             log.error("[ERROR] " + message)
