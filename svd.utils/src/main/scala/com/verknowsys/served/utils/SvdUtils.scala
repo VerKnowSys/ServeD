@@ -108,7 +108,7 @@ object SvdUtils extends Logging {
      *  Returns size (in bytes) of given object in JVM memory
      *
      *  @example
-     *  info ( sizeof ( new Date ( ) ))
+     *  println(sizeof(new Date))
      *
      */
     def sizeof(any: Any) = ObjectProfiler.sizeof(any)
@@ -132,7 +132,18 @@ object SvdUtils extends Logging {
                 override def run = block
             }
         )
-        
+
+
+    /**
+     *  @author dmilith
+     *
+     *   counts time spent on operation in given block
+     */
+    def bench(block: => Unit) = {
+        val start = System.currentTimeMillis
+        block
+        System.currentTimeMillis - start
+    }
         
         
     /** 
