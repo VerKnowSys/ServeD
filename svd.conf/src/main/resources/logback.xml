@@ -21,6 +21,7 @@
 
   <logger name="akka" level="WARN"/>
 	<logger name="com.verknowsys.served" level="TRACE"/>
+	<logger name="com.verknowsys.served.systemmanager.managers" level="INFO"/>
 
   <root level="WARN">
     <appender-ref ref="stdout"/>
