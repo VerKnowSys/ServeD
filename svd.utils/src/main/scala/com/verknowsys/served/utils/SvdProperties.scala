@@ -125,7 +125,7 @@ class SvdProperties(filename: String) extends Logging {
             
         } catch {
             case e: Exception =>
-                error("Could not save file %s, cause of exception: %s".format(filename, e))
+                log.error("Could not save file %s, cause of exception: %s".format(filename, e))
                 None
         }
     }
