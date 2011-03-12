@@ -50,6 +50,22 @@ object SvdUtils extends Logging {
         }
     }
     
+
+    /**
+     *  @author dmilith
+     *
+     *   returns true if running system matches BSD
+     */
+    def isBSD = System.getProperty("os.name").contains("BSD")
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   returns true if running system matches Linux
+     */
+    def isLinux = System.getProperty("os.name").contains("Linux")
+    
     
     /**
      *  @author dmilith
