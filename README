@@ -23,19 +23,16 @@
     0.5 - Sudo (for SvdSystemManager)
         >= 1.7.4p6
     
-    0.6 - Sigar library (for SvdSystemManager)
-        >= 1.6.3.82
-        
-    0.7 - Smack library (for XMPP Notifications)
+    0.6 - Smack library (for XMPP Notifications)
         >= 3.0.4
 
-    0.8 - pIRCbot library (for IRC Notifications)
+    0.7 - pIRCbot library (for IRC Notifications)
         >= 1.4.2
         
-    0.9 - mongo database (for SvdDB, mongodb: http://mongodb.org)
+    0.8 - mongo database (for SvdDB, mongodb: http://mongodb.org)
         >= 1.6.5-x86_64
         
-    0.10 - List of currently supported platforms:
+    0.9 - List of currently supported platforms:
         Mac OSX (100% features, development),
         Free BSD (100% features, production),
 
