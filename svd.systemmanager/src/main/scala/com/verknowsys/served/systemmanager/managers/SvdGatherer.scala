@@ -23,17 +23,19 @@ import akka.util.Logging
 class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
     
     
-    def userPostfix = account.userName + "/svd.gather"
+    // 2011-03-12 15:17:32 - dmilith - TODO: implement folder privileges/file/folder existance checking
+    
+    def userPostfix = account.userName / "svd.gather"
     
     
     def gatherFileLocation = 
         if (SvdUtils.isBSD)
-            "/home/" + userPostfix
+            "/home" / userPostfix
         else
-            "/Users/" + userPostfix
+            "/Users" / userPostfix
 
 
-    log.trace("Starting SvdGatherer for account: %s. Account gath file: %s".format(account, gatherFileLocation))
+    log.info("Starting SvdGatherer for account: %s. Account gath file: %s".format(account, gatherFileLocation))
     
     def receive = {
         case Init =>
