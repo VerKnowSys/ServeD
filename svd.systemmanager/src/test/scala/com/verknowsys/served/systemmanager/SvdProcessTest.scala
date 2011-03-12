@@ -197,7 +197,9 @@ class SvdProcessTest extends Specification {
             synchronized {
                 val b = new SvdProcess("read", user = "root")
                 b.alive must beTrue
+                Thread.sleep(250)
                 b.kill(SIGKILL)
+                Thread.sleep(250)
                 b.alive must beFalse
             }
         }
