@@ -43,7 +43,7 @@ case class SvdAccount (
     /**
      * @author dmilith
      */
-    def accountWeight =
+    def accountWeight: Option[Long] =
         try {
             val elementsSize = FileUtils.sizeOfDirectory(new File(homeDir))
             log.debug("getSvdAccountSize of " + homeDir + " folder: " + elementsSize)
