@@ -32,7 +32,8 @@ class SvdProcess(
     val command: String,
     val user: String = SvdConfig.noUser,
     val workDir: String = SvdConfig.tmp,
-    val waitFor: Boolean = false)
+    val waitFor: Boolean = false,
+    val shutdownHook: Unit = {})
         extends Logging {
 
     
@@ -60,10 +61,19 @@ class SvdProcess(
       *
       */
     val pid = {
+        val cwd = System.getProperty("user.dir")
+        System.setProperty("user.dir", workDir)
+        log.trace("USER.DIR = %s", System.getProperty("user.dir"))
         var aPid = -1L
         val cmdFormats = "%s -H -u %s %s"
         val cmd =  cmdFormats.format("sudo", user, command).split(" ")
         val rt = Runtime.getRuntime
+        rt.addShutdownHook(new Thread {
+            override def run = {
+                log.info("Shutdown hook on process: %s".format(this))
+                shutdownHook
+            }
+        })
         val env = SvdConfig.env
         val proc = rt.exec(cmd, env)
         log.trace("CMD: %s".format(cmd.mkString(" ")))
@@ -87,8 +97,9 @@ class SvdProcess(
                     command, proc.exitValue))
         } catch {
             case x: IllegalThreadStateException =>
-                log.debug("SvdProcess thread exited. No exitValue given.")
+                log.debug("Process hasn't exited. It should be spawned in background")
         }
+        System.setProperty("user.dir", cwd) 
         aPid
     }
     
