@@ -17,7 +17,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     lazy val systemmanager  = project("svd.systemmanager", "SvdSystemManager", new SvdSystemManager(_), utils, api, sigar)
     lazy val notifications  = project("svd.notifications", "Notifications", new SvdNotifications(_), utils)
     lazy val maintainer     = project("svd.maintainer", "SvdMaintainer", new SvdMaintainer(_), notifications, systemmanager, api)
-    
+    lazy val web            = project("svd.web", "SvdWeb", new SvdWeb(_))
     
     // Dependencies
     class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject {
@@ -135,6 +135,19 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         lazy val svd = served
         
         override def mainClass = Some("com.verknowsys.served.boot")
+    }
+    
+    class SvdWeb(info: ProjectInfo) extends DefaultWebProject(info){
+        val liftVersion = "2.2"
+        
+        override def libraryDependencies = Set(
+          "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
+          "net.liftweb" %% "lift-mapper" % liftVersion % "compile->default",
+          "org.mortbay.jetty" % "jetty" % "6.1.22" % "test->default",
+          "junit" % "junit" % "4.5" % "test->default",
+          "org.scala-tools.testing" % "specs" % "1.6.2.1" % "test->default",
+          "com.h2database" % "h2" % "1.2.138"
+        ) ++ super.libraryDependencies
     }
     
     
