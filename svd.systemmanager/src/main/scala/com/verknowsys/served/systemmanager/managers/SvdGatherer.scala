@@ -25,18 +25,11 @@ import akka.util.Logging
 class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
     
     
-    val gatherFilename = "svd.gather.%s".format(account.userName)
-    
-    private val core = new Sigar
-
-
-    private def gatherFileLocation = SvdUtils.checkOrCreateDir(SvdConfig.homePath + SvdConfig.vendorDir) / gatherFilename
-
-
     private def gather = SvdUtils.loopThread {
         log.trace("Time elapsed on gather(): %d".format(
             SvdUtils.bench {
                 try {
+                    val core = new Sigar
                     val userPs = core.getProcList.filter{ p => core.getProcCredName(p).getUser == account.userName }
                     log.trace("UserPs (%s): %s".format(account.userName, userPs.mkString(", ")))
                     val userPsWithAllData = userPs.map{
@@ -48,26 +41,20 @@ class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
                         )
                     }
                     
-                    case class PSData(
-                        val pid: Int,
-                        val name: String,
-                        val cpu: Long,
-                        val mem: Long
-                    )
-
                     // 2011-03-13 15:24:53 - dmilith - NOTE: appending data to user process database
-                    val db = new DB
-                    userPsWithAllData.foreach{
-                        rec =>
-                            db << PSData(rec._1, rec._2, rec._3, rec._4)
-                    }
-                    db.close
+                    // val db = new DB
+                    //                     userPsWithAllData.foreach{
+                    //                         rec =>
+                    //                             val value = PSData(rec._1.toInt, rec._2, rec._3.toInt, rec._4.toInt)
+                    //                             db << value
+                    //                             log.trace("DB single object size: %d".format(SvdUtils.sizeof(value)))
+                    //                     }
                     
-                    // val users = db.all[User].toList
-                    // users must haveSize(2)
-                    // users must contain(teamon)
-                    // users must contain(dmilith)
                     
+                    // log.trace("DB objects in db: %d".format(db.all[PSData].toList.length))
+                    // log.trace("DB stats: %s".format(db.current.stats))
+                    
+                    // db.close
                     
                     log.debug("userData of (%s):\n%s".format(
                         account,
@@ -90,7 +77,7 @@ class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
     }.start
     
     
-    log.info("Running SvdGatherer for account: %s. (Account gath file: %s)".format(account, gatherFileLocation))
+    log.info("Running SvdGatherer for account: %s".format(account))
     gather
     
     
@@ -101,5 +88,4 @@ class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
             
     }
  
-    
 }
