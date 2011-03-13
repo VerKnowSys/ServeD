@@ -1,0 +1,17 @@
+<div class="lift:surround?with=simple;at=content"> 
+  <h2>Login</h2>
+  <lift:Auth.login form="POST">
+     <div>
+         <label for="username">Username:</label>
+         <f:username id="username"/>
+     </div>
+     <div>
+         <label for="password">Password:</label>
+         <f:password id="password"/>
+     </div>
+     <div>
+         <f:send/>
+    </div>
+  </lift:Auth.login>
+  
+</div>

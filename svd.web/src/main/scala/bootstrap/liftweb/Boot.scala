@@ -8,6 +8,8 @@ import net.liftweb.http._
 import net.liftweb.sitemap._
 import net.liftweb.sitemap.Loc._
 
+import com.verknowsys.served.web.lib.Session
+
 /**
  * A class that's instantiated early and run.  It allows the application
  * to modify lift's environment
@@ -18,13 +20,34 @@ class Boot {
     LiftRules.addToPackages("com.verknowsys.served.web")
 
     // Build SiteMap
-    val entries = List(
-        Menu.i("Home") / "index", // the simple way to declare a menu
+
+    val Authorized = If(
+        () => Session.authorized,
+        () => RedirectWithState(
+            "/login",
+            RedirectState(() => S.notice("Please log in first"))
+        )
+    )
+
+    val Unauthorized = Unless(
+        () => Session.authorized,
+        () => RedirectResponse("/")
+    )
+
+    val entries =
+        Menu(Loc("home", "index" :: Nil, "Home", Authorized)) ::
+        Menu(Loc("login", "login" :: Nil, "Login", Unauthorized)) ::
+        Menu(Loc("logout", "logout" :: Nil, "Logout", EarlyResponse(() => {
+            Session.logout
+            Full(RedirectWithState("/",
+                RedirectState(() => S.notice("Logged out"))
+            ))
+        }), Authorized)) ::
+        Nil
 
         // more complex because this menu allows anything in the
         // /static path to be visible
-        Menu(Loc("Static", Link(List("static"), true, "/static/index"), "Static Content"))
-    )
+        // Menu(Loc("Static", Link(List("static"), true, "/static/index"), "Static Content"))
 
     // set the sitemap.  Note if you don't want access control for
     // each page, just comment this line out.
