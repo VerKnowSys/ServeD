@@ -6,6 +6,7 @@ import akka.config.Supervision._
 import akka.actor.Actor.{remote, actorOf, registry}
 import akka.util.Logging
 
+import com.verknowsys.served.utils.SvdUtils
 import com.verknowsys.served.utils.SvdFileEventsManager
 import com.verknowsys.served.maintainer.SvdMaintainer
 import com.verknowsys.served.systemmanager.SvdAccountsManager
@@ -46,6 +47,14 @@ object boot extends Logging {
     
 
     def main(args: Array[String]) {
+        
+        SvdUtils.checkOrCreateVendorDir
+        
+        if (SvdUtils.isLinux) {
+            log.error("Linux systems aren't supported yet!")
+            System.exit(1)
+        }
+        
         log.debug("Home dir: " + SvdConfig.homePath + SvdConfig.vendorDir)
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         
@@ -57,6 +66,7 @@ object boot extends Logging {
                 System.exit(1)
         }}
         
+        log.info("Starting %s".format(SvdConfig.served))
         boot()
     }
     

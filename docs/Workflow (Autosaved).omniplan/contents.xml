@@ -90,7 +90,7 @@
 			<key>calendarController</key>
 			<dict>
 				<key>OutlineVisibleRect</key>
-				<string>{{0, 0}, {546, 524}}</string>
+				<string>{{0, 0}, {609, 616}}</string>
 				<key>activeColumnIdentifiers</key>
 				<array>
 					<string>IM</string>
@@ -107,13 +107,13 @@
 					<key>Notes</key>
 					<real>20</real>
 					<key>Resource</key>
-					<real>411</real>
+					<real>474</real>
 					<key>Type</key>
 					<real>48</real>
 				</dict>
 			</dict>
 			<key>calendarSplit</key>
-			<real>0.61627906560897827</real>
+			<real>0.61626261472702026</real>
 			<key>columnWidths</key>
 			<dict>
 				<key>Effort</key>
@@ -128,13 +128,13 @@
 			<key>dayWidth</key>
 			<real>34.404941558837891</real>
 			<key>resourceSplit</key>
-			<real>0.7145422101020813</real>
+			<real>0.7146371603012085</real>
 			<key>resourcesController</key>
 			<dict>
 				<key>DayWidth</key>
 				<real>25</real>
 				<key>OutlineVisibleRect</key>
-				<string>{{0, 0}, {462, 828}}</string>
+				<string>{{0, 0}, {449, 803}}</string>
 				<key>ScaleWidths</key>
 				<dict>
 					<key>Automatic</key>
@@ -157,7 +157,7 @@
 				<key>SelectedScale</key>
 				<string>Automatic</string>
 				<key>TimelineVisibleRect</key>
-				<string>{{-166, 0}, {1151, 828}}</string>
+				<string>{{-166, 0}, {1119, 803}}</string>
 				<key>activeColumnIdentifiers</key>
 				<array>
 					<string>IM</string>
@@ -183,7 +183,7 @@
 			<key>side</key>
 			<real>0.81303811073303223</real>
 			<key>window</key>
-			<string>{{54, 66}, {1635, 937}}</string>
+			<string>{{15, 108}, {1635, 937}}</string>
 		</dict>
 	</array>
 	<key>displaySeconds</key>
@@ -450,7 +450,7 @@
 	<key>taskDifferenceEngine</key>
 	<dict>
 		<key>nextId</key>
-		<integer>58</integer>
+		<integer>60</integer>
 	</dict>
 	<key>taskUserKeys</key>
 	<array/>
@@ -823,11 +823,11 @@
 				</dict>
 			</array>
 			<key>doneSeconds</key>
-			<real>31806</real>
+			<real>57024</real>
 			<key>effort</key>
-			<real>1060200</real>
+			<real>1900800</real>
 			<key>effortDone</key>
-			<real>31806</real>
+			<real>57024</real>
 			<key>endPlanDate</key>
 			<string>20110507111500</string>
 			<key>objectId</key>
@@ -846,11 +846,11 @@
 			<key>task</key>
 			<string>Torture Machine</string>
 			<key>workDone</key>
-			<real>8.8350000381469727</real>
+			<real>15.840000152587891</real>
 			<key>workSeconds</key>
-			<real>1060200</real>
+			<real>1900800</real>
 			<key>workTime</key>
-			<real>294.5</real>
+			<real>528</real>
 		</dict>
 		<dict>
 			<key>assignments</key>
@@ -992,6 +992,15 @@
 			<string>CLI (svd.cli)</string>
 		</dict>
 		<dict>
+			<key>assignments</key>
+			<array>
+				<dict>
+					<key>id</key>
+					<integer>3</integer>
+					<key>units</key>
+					<real>1</real>
+				</dict>
+			</array>
 			<key>effort</key>
 			<real>57600</real>
 			<key>endPlanDate</key>
@@ -1019,6 +1028,15 @@
 			<real>16</real>
 		</dict>
 		<dict>
+			<key>assignments</key>
+			<array>
+				<dict>
+					<key>id</key>
+					<integer>1</integer>
+					<key>units</key>
+					<real>1</real>
+				</dict>
+			</array>
 			<key>effort</key>
 			<real>55800</real>
 			<key>endPlanDate</key>
@@ -1366,7 +1384,7 @@
 		<integer>-1</integer>
 	</array>
 	<key>uuid</key>
-	<string>86F76CFE-E601-4D02-AD25-BE2CA36619A0</string>
+	<string>0232D125-F2F8-45D2-BE56-6860D026D3AA</string>
 	<key>version</key>
 	<integer>2</integer>
 </dict>

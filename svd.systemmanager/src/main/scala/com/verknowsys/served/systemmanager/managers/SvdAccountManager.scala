@@ -24,6 +24,9 @@ class SvdAccountManager(val account: SvdAccount) extends Actor with SvdException
     val gitManager = Actor.actorOf(new SvdGitManager(account))
     self startLink gitManager
     
+    val gatherer = Actor.actorOf(new SvdGatherer(account))
+    self startLink gatherer
+    
 
     def receive = {
         case Init =>

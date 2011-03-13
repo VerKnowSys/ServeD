@@ -15,6 +15,7 @@ import scala.io._
 import scala.util.matching.Regex
 import java.util.UUID
 import com.sun.jna.Native
+import java.util.{Calendar, GregorianCalendar}
 
 
 /**
@@ -50,31 +51,70 @@ object SvdUtils extends Logging {
         }
     }
     
+
+    /**
+     *  @author dmilith
+     *
+     *   returns true if running system matches BSD
+     */
+    def isBSD = System.getProperty("os.name").contains("BSD")
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   returns true if running system matches Linux
+     */
+    def isLinux = System.getProperty("os.name").contains("Linux")
+    
     
     /**
      *  @author dmilith
      *
      *   Generate unique identifier
      */
-    def uuid = UUID.randomUUID
+    def newUuid = UUID.randomUUID
     
     
     /**
      *  @author dmilith
      *
-     *  Checks and creates (if missing) config property file for application
+     *  Checks and creates (if missing) given directory name
+     *
+     */    
+    def checkOrCreateDir(dir: String) = {
+        if (new File(dir).exists) {
+            log.debug("Directory: '%s' exists".format(dir))
+        } else {
+            log.debug("No directory named: '%s' available! Creating empty one.".format(dir))
+            new File(dir).mkdirs
+        }
+        dir
+    }
+    
+
+    /**
+     *  @author dmilith
+     *
+     *   converts seconds to friendly format: hh-mm-ss
+     */
+    def secondsToHMS(seconds: Int) = {
+        val calendar = new GregorianCalendar(0,0,0,0,0,0)
+        calendar.set(Calendar.SECOND, seconds)
+        "%02dh:%02dm:%02ds".format(
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            calendar.get(Calendar.SECOND))
+    }
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *  Checks and creates (if missing) ServeD vendor dir
      *
      */
-    def checkOrCreateVendorDir = {
-        val vendorPath = SvdConfig.homePath + SvdConfig.vendorDir
-        if (new File(vendorPath).exists) {
-            log.debug("Making sure that vendor directory exists")
-        } else {
-            log.debug("No vendor directory available! Creating empty vendor directory")
-            new File(vendorPath).mkdir
-        }
-        vendorPath
-    }
+    def checkOrCreateVendorDir = checkOrCreateDir(SvdConfig.homePath + SvdConfig.vendorDir)
 
     
     /**
@@ -92,7 +132,7 @@ object SvdUtils extends Logging {
      *  Returns size (in bytes) of given object in JVM memory
      *
      *  @example
-     *  info ( sizeof ( new Date ( ) ))
+     *  println(sizeof(new Date))
      *
      */
     def sizeof(any: Any) = ObjectProfiler.sizeof(any)
@@ -116,7 +156,18 @@ object SvdUtils extends Logging {
                 override def run = block
             }
         )
-        
+
+
+    /**
+     *  @author dmilith
+     *
+     *   counts time spent on operation in given block
+     */
+    def bench(block: => Unit) = {
+        val start = System.currentTimeMillis
+        block
+        System.currentTimeMillis - start
+    }
         
         
     /** 

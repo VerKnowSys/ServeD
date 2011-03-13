@@ -71,13 +71,13 @@ class SvdProcessTest extends Specification {
         "Should detect harmful/ incorect commands automatically" in {
             var exploit: SvdProcess = null
             try {
-            	exploit = new SvdProcess("dig +trace wp.pl", user = "root", useShell = false, stdOut = "/tmp/dig_comm_66634.text", stdErr = "/tmp/dig_comm_66634_err.text")
+            	exploit = new SvdProcess("dig +trace wp.pl", user = "root")
             } catch {
                 case x: Exception =>
                     fail("'Exploit' shouldn't be detected (noShell)! Exception: %s".format(x))
             }
             try {
-            	exploit = new SvdProcess("ls", user = "root", useShell = true, stdOut = "/tmp/ls_comm_666.text", stdErr = "/tmp/ls_comm_666_err.text")
+            	exploit = new SvdProcess("ls", user = "root")
             } catch {
                 case x: Exception =>
                     fail("'Exploit' shouldn't be detected (Shell)! Exception: %s".format(x))
@@ -89,8 +89,8 @@ class SvdProcessTest extends Specification {
                 case _ =>
             }
             try { 
-                val a = new SvdProcess("ls -lar", user = "root", useShell = true)
-                val b = new SvdProcess("ls -lar", user = "root", useShell = true)
+                val a = new SvdProcess("ls -lar", user = "root")
+                val b = new SvdProcess("ls -lar", user = "root")
                 a must notBeNull
                 // 2011-01-24 16:53:16 - dmilith - NOTE: b MAY be null, cause ls without shell may be exceptional case
             } catch {
@@ -163,7 +163,7 @@ class SvdProcessTest extends Specification {
             var b: SvdProcess = null
             var c: SvdProcess = null
             var d: SvdProcess = null
-            a = new SvdProcess("sleep 50000", user = "root", useShell = true)
+            a = new SvdProcess("sleep 50000", user = "root")
             a must notBeNull
             ("PNAME:" :: "COMMAND:" :: Nil).foreach{
                 elem =>
@@ -171,7 +171,7 @@ class SvdProcessTest extends Specification {
             }
             a.kill(SIGINT) must beTrue
 
-            b = new SvdProcess("sleep 51111", user = "root", useShell = true)
+            b = new SvdProcess("sleep 51111", user = "root")
             b must notBeNull
             ("PNAME:" :: "COMMAND:" :: Nil).foreach{
                 elem =>
@@ -179,8 +179,8 @@ class SvdProcessTest extends Specification {
             }
             b.kill(SIGINT) must beTrue
 
-            c = new SvdProcess("echo abc", user = "root", stdOut = "/tmp/echo_abc_1234.text")
-            c.stdOut must beMatching("abc")
+            c = new SvdProcess("echo abc", user = "root")
+            // c.stdOut must beMatching("abc")
             d = new SvdProcess("echo abc", user = "root")
             c must notBeNull
             d must notBeNull
@@ -194,10 +194,14 @@ class SvdProcessTest extends Specification {
         
         // 2011-03-05 12:42:36 - dmilith - TODO: implement alive() spec
         "it must pass alive specs" in {
-            val b = new SvdProcess("read", user = "root", useShell = true)
-            b.alive must beTrue
-            b.kill(SIGKILL)
-            b.alive must beFalse
+            synchronized {
+                val b = new SvdProcess("read", user = "root")
+                b.alive must beTrue
+                Thread.sleep(250)
+                b.kill(SIGKILL)
+                Thread.sleep(250)
+                b.alive must beFalse
+            }
         }
         
 
