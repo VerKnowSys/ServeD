@@ -77,5 +77,21 @@ class ODBTest extends Specification {
             result2 must haveSize(1)
             result2 must contain(lopex)
         }
+        
+        // "query by uuid" in {
+        //     val uuid1 = UUID.randomUUID
+        //     val uuid2 = UUID.randomUUID
+        //     val uuid3 = UUID.randomUUID
+        //     
+        //     val teamon  = User(uuid1, "teamon")
+        //     val dmilith = User(uuid2, "dmilith")
+        //     
+        //     db << teamon
+        //     db << dmilith
+        //     
+        //     db[User](uuid1) must beSome(teamon)
+        //     db[User](uuid2) must beSome(dmilith)
+        //     db[User](uuid3) must beNone
+        // }
     }
 }
