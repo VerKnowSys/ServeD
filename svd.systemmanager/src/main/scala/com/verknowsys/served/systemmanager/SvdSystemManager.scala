@@ -4,6 +4,7 @@
 package com.verknowsys.served.systemmanager
 
 
+import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.monitor.SvdMonitored
@@ -39,10 +40,14 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             val nrs = new SvdSystemResources
             
             log.info("Starting main MongoDB instance..")
-            val db = new SvdProcess("/usr/local/bin/mongod --logpath /tmp/MONGO_STD --port 50000 --dbpath /tmp --bind_ip 127.0.0.1 --noauth -verbose --syncdelay 10 --noscripting --nounixsocket", user = "root")
+            val db = new SvdProcess(
+                "mongod --logpath %s --dbpath %s --bind_ip 127.0.0.1 --noauth --noscripting --nounixsocket".format(
+                SvdConfig.homePath / SvdConfig.vendorDir / "mongo_gather.log",
+                SvdUtils.checkOrCreateDir(SvdConfig.homePath / SvdConfig.vendorDir / "mongo_gather.db")
+            ), user = "root")
             
-            log.info("Starting main Memcached instance..")
-            val mc = new SvdProcess("memcached -u root -l 127.0.0.1 -p 50001", user = "root")
+            // log.info("Starting main Memcached instance..")
+            // val mc = new SvdProcess("memcached -u root -l 127.0.0.1 -p 50001", user = "root")
             
             log.info("SvdSystemManager ready")
             log.info("System Resources Availability: [%s]".format(nrs))
@@ -109,30 +114,6 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
         case _ =>
         
     }
-
-
-    /**
-    *   @author dmilith  
-    *   
-    *   This function will send given signal (first param), to given pid (second param)
-    */
-    def sendSignalToPid(signal: SvdPOSIX.Value, pid: Int) =
-        signal match {
-            case SIGHUP =>
-                log.trace("SigHUP sent to process pid: %s".format(pid))
-                
-            case SIGINT =>
-                log.trace("SigINT sent to process pid: %s".format(pid))
-                
-            case SIGQUIT =>
-                log.trace("SigQUIT sent to process pid: %s".format(pid))
-                
-            case SIGKILL =>
-                log.trace("SigKILL sent to process pid: %s".format(pid))
-            
-            case _ =>
-            
-        }
     
     
     override def toString = "SvdSystemManager"
