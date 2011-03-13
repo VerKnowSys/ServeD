@@ -44,7 +44,7 @@ class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
                         pid => ( // 2011-03-13 02:30:02 - dmilith - NOTE: tuple with whole major user data:
                             pid,
                             core.getProcState(pid).getName, // NOTE: process name
-                            core.getProcCpu(pid).getUser, // NOTE: time in seconds 
+                            core.getProcCpu(pid).getTotal / 1000, // NOTE: time in seconds 
                             core.getProcMem(pid).getResident / 1024 / 1024 // NOTE: unit is MegaByte.
                         )
                     }
