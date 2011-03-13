@@ -5,7 +5,9 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.api._
+import com.verknowsys.served.db._
 
+import org.apache.commons.io.FileUtils
 import org.hyperic.sigar._
 import akka.actor.Actor
 import akka.actor.Actor.actorOf
@@ -23,7 +25,7 @@ import akka.util.Logging
 class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
     
     
-    val gatherFilename = "svd.gather"
+    val gatherFilename = "svd.gather.%s".format(account.userName)
     
     private val core = new Sigar
 
@@ -32,9 +34,6 @@ class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
 
 
     private def gather = SvdUtils.loopThread {
-
-        // 2011-03-12 18:21:30 - dmilith - TODO: add real database write / save here
-        
         log.trace("Time elapsed on gather(): %d".format(
             SvdUtils.bench {
                 try {
@@ -48,6 +47,28 @@ class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
                             core.getProcMem(pid).getResident / 1024 / 1024 // NOTE: unit is MegaByte.
                         )
                     }
+                    
+                    case class PSData(
+                        val pid: Int,
+                        val name: String,
+                        val cpu: Long,
+                        val mem: Long
+                    )
+
+                    // 2011-03-13 15:24:53 - dmilith - NOTE: appending data to user process database
+                    val db = new DB
+                    userPsWithAllData.foreach{
+                        rec =>
+                            db << PSData(rec._1, rec._2, rec._3, rec._4)
+                    }
+                    db.close
+                    
+                    // val users = db.all[User].toList
+                    // users must haveSize(2)
+                    // users must contain(teamon)
+                    // users must contain(dmilith)
+                    
+                    
                     log.debug("userData of (%s):\n%s".format(
                         account,
                         userPsWithAllData.map{
@@ -56,12 +77,14 @@ class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
                                     elem._1, elem._2, SvdUtils.secondsToHMS(elem._3.toInt), elem._4) // 2011-03-13 03:28:20 - dmilith - NOTE: in very unusual cases it may lead to truncation of Long value, but I've never ever seen pid bigger than Integer value.
                         }.mkString("\n")
                     ))
+                    
                 } catch {
                     case x: SigarException =>
                         log.warn("Gather(), Sigar Exception occured: %s".format(x.getMessage))
                 }
             }
         ))
+        
         Thread.sleep(SvdConfig.gatherTimeout)
         
     }.start
