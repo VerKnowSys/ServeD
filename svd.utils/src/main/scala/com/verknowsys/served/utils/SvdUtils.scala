@@ -101,6 +101,7 @@ object SvdUtils extends Logging {
      *   simple String compression (zip inflate/deflate)
      */
     def compress(input: String) = {
+        // 2011-03-13 20:48:01 - dmilith - TODO: implement check for too short string to compress (<40 chars)
         val byteInput = input.getBytes
         val bos = new ByteArrayOutputStream(byteInput.length)
         val buf = new Array[Byte](1024)
@@ -121,11 +122,16 @@ object SvdUtils extends Logging {
         }
         val compressedByte = bos.toByteArray
         val compressedString = new String(compressedByte)
-        log.debug("Original string:\n%s\n\nCompressed one:\n%s".format(input, compressedString))
+        log.debug("Original string length: %d, Compressed one: %d".format(input.length, compressedString.length))
         compressedString
     }
     
     
+    /**
+     *  @author dmilith
+     *
+     *   simple String decompression (zip inflate/deflate)
+     */
     def decompress(input: String) = {
         // Decompress the data
         val decompressor = new Inflater
@@ -148,10 +154,10 @@ object SvdUtils extends Logging {
             case e: Exception =>
                 log.trace("Exception in decompress: " + e)
         }
-
         val decompressedByte = bos.toByteArray
         val decompressedString = new String(decompressedByte)
-        log.debug("Compressed string:\n%s\n\nDecompressed one:\n%s".format(input, decompressedString))
+        log.debug("Compressed string length: %d, Decompressed one: %d".format(input.length, decompressedString.length))
+        decompressedString
     }
     
 

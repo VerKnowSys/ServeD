@@ -40,8 +40,8 @@ object SvdConfig {
      )
 
 
-    def homePath =                      props("served.vendor.home") or System.getProperty("user.home") + "/"
-    def vendorDir =                     props("served.vendor.dir") or ".svd/"
+    def homePath =                      props("served.vendor.home") or System.getProperty("user.home")
+    def vendorDir =                     props("served.vendor.dir") or ".svd"
     
     def nullDevice =                    props("served.system.devices.null") or "/dev/null"
     def tmp =                           props("served.system.filesystems.tmp") or "/tmp/"
