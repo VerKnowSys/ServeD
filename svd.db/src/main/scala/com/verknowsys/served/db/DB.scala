@@ -59,7 +59,7 @@ class DB {
     
     def all[T <: CaseClass](implicit manifest: Manifest[T]) = current.find(MongoDBObject("_typeHint" -> manifest.toString)).map(grater[T].asObject(_))
     
-    def all[T <: CaseClass](pairs: (String, Any)*)(implicit manifest: Manifest[T]) = current.find(Map("_typeHint" -> manifest.toString) ++ pairs).map(grater[T].asObject(_))
+    def all[T <: CaseClass : Manifest](pairs: (String, Any)*) = current.find(Map("_typeHint" -> manifest[T].toString) ++ pairs).map(grater[T].asObject(_))
     
     def <<[T <: CaseClass : Manifest](obj: T) = current.insert(grater[T].asDBObject(obj))
 }
