@@ -47,10 +47,14 @@ object boot extends Logging {
     
 
     def main(args: Array[String]) {
+        
+        SvdUtils.checkOrCreateVendorDir
+        
         if (SvdUtils.isLinux) {
             log.error("Linux systems aren't supported yet!")
             System.exit(1)
         }
+        
         log.debug("Home dir: " + SvdConfig.homePath + SvdConfig.vendorDir)
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         

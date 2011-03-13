@@ -8,6 +8,7 @@ import com.verknowsys.served.spechelpers._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.api._
 
+import java.util.{Calendar, GregorianCalendar}
 import akka.actor.Actor.{actorOf, registry}
 import akka.actor.ActorRef
 import org.specs._
@@ -50,5 +51,31 @@ class SvdGathererTest extends Specification with SvdExpectActorSpecification {
             expectActor ? Nil
         }
  
+        "Calendar should give correct values" in {
+            val calendar0 = new GregorianCalendar(0,0,0,0,0,0)
+            calendar0.get(Calendar.HOUR) must beEqual(0)
+            calendar0.get(Calendar.MINUTE) must beEqual(0)
+            calendar0.get(Calendar.SECOND) must beEqual(0)
+            
+            val calendar1 = new GregorianCalendar(0,0,0,0,0,0)
+            calendar1.set(Calendar.SECOND, 3666)
+            calendar1.get(Calendar.HOUR) must beEqual(1)
+            calendar1.get(Calendar.MINUTE) must beEqual(1)
+            calendar1.get(Calendar.SECOND) must beEqual(6)
+            
+            val calendar2 = new GregorianCalendar(0,0,0,0,0,0)
+            calendar2.set(Calendar.SECOND, 3667)
+            calendar2.get(Calendar.HOUR) must beEqual(1)
+            calendar2.get(Calendar.MINUTE) must beEqual(1)
+            calendar2.get(Calendar.SECOND) must beEqual(7)
+        }
+        
+        "SvdUtils.secondsToHMS() should give correct values" in {
+            val matcher = SvdUtils.secondsToHMS(3666)
+            matcher must beMatching("01h:01m:06s")
+            val matcher2 = SvdUtils.secondsToHMS(3667L.toInt)
+            matcher2 must beMatching("01h:01m:07s")
+        }
+        
     }
 }

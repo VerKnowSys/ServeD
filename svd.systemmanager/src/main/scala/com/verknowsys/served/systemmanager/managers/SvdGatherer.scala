@@ -23,49 +23,39 @@ import akka.util.Logging
 class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
     
     
+    val gatherFilename = "svd.gather"
+    
     private val core = new Sigar
-    
-    
-    // 2011-03-12 15:17:32 - dmilith - TODO: implement folder privileges/file/folder existance checking
-    private def userPostfix = account.userName / "svd.gather"
-    
-    
-    private def gatherFileLocation = 
-        if (SvdUtils.isBSD)
-            "/home" / userPostfix
-        else
-            "/Users" / userPostfix
+
+
+    private def gatherFileLocation = SvdUtils.checkOrCreateDir(SvdConfig.homePath + SvdConfig.vendorDir) / gatherFilename
 
 
     private def gather = SvdUtils.loopThread {
-        log.debug("Gathering data for: %s".format(account))
-        // 2011-03-12 18:21:30 - dmilith - TODO: add real database write/save here
+
+        // 2011-03-12 18:21:30 - dmilith - TODO: add real database write / save here
         
-        log.trace("gather() time elapsed: %d".format(
+        log.trace("Time elapsed on gather(): %d".format(
             SvdUtils.bench {
                 try {
-                    val accountWeight = account.accountWeight.getOrElse(0)
-                    log.trace("AccountWeight(%s): %s".format(account.userName, accountWeight))
-                    
-                    val userPs = core.getProcList.filterNot{ p => core.getProcCredName(p).getUser != account.userName }
-                    log.trace("UserPs (%s): %s".format(account.userName, userPs.mkString(". ")))
-
-                    val memUsage = userPs.map{ p => core.getProcMem(p).getResident / 1024 / 1024 }
-                    log.trace("MemUsage (%s): %sMiB".format(account.userName, memUsage.mkString("MiB, ")))
-
-                    val memUsageAll = memUsage.sum
-                    log.trace("MemUsageAll (%s): %sMiB".format(account.userName, memUsageAll))
-
-                    val cpuUsage = userPs.map{ p => core.getProcCpu(p).getTotal }
-                    
-                    log.trace("CpuUsage (%s): %s".format(account.userName, cpuUsage.map{
-                        p =>
-                            val h = (p / 3600)
-                            val m = (p / 60) - (h * 60)
-                            val s = p - (h * 3600) + (m * 60)
-                            "%2d:%2d:%2d".format(h, m, s)
-                        }.mkString(",\t")))
-                    
+                    val userPs = core.getProcList.filter{ p => core.getProcCredName(p).getUser == account.userName }
+                    log.trace("UserPs (%s): %s".format(account.userName, userPs.mkString(", ")))
+                    val userPsWithAllData = userPs.map{
+                        pid => ( // 2011-03-13 02:30:02 - dmilith - NOTE: tuple with whole major user data:
+                            pid,
+                            core.getProcState(pid).getName, // NOTE: process name
+                            core.getProcCpu(pid).getTotal / 1000, // NOTE: time in seconds 
+                            core.getProcMem(pid).getResident / 1024 / 1024 // NOTE: unit is MegaByte.
+                        )
+                    }
+                    log.debug("userData of (%s):\n%s".format(
+                        account,
+                        userPsWithAllData.map{
+                            elem =>
+                                "%10d - %30s - %15s - %10d MiB".format(
+                                    elem._1, elem._2, SvdUtils.secondsToHMS(elem._3.toInt), elem._4) // 2011-03-13 03:28:20 - dmilith - NOTE: in very unusual cases it may lead to truncation of Long value, but I've never ever seen pid bigger than Integer value.
+                        }.mkString("\n")
+                    ))
                 } catch {
                     case x: SigarException =>
                         log.warn("Gather(), Sigar Exception occured: %s".format(x.getMessage))
@@ -73,6 +63,7 @@ class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
             }
         ))
         Thread.sleep(SvdConfig.gatherTimeout)
+        
     }.start
     
     
