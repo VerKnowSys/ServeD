@@ -99,9 +99,16 @@ class SvdGathererTest extends Specification with SvdExpectActorSpecification {
             println("chpoint (length): %d".format(chplen))
             println("chpoint (compress): %d".format(complen))
             println("chpoint (decompress): %d".format(decomplen))
-            
+            for (i <- 1.to(500000)) {
+                str.append(in.read)
+            }
+            println("Will compress String of length: %d".format(str.toString.length))
+            println("####################################################################\n" +
+                SvdUtils.bench {
+                    SvdUtils.decompress(SvdUtils.compress(str.toString))
+                }
+            )
             in.close
-            
             chplen must beEqual(decomplen)
             chplen must beGreaterThan(complen)
         }

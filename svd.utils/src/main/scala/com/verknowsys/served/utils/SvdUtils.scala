@@ -104,7 +104,7 @@ object SvdUtils extends Logging {
         // 2011-03-13 20:48:01 - dmilith - TODO: implement check for too short string to compress (<40 chars)
         val byteInput = input.getBytes
         val bos = new ByteArrayOutputStream(byteInput.length)
-        val buf = new Array[Byte](1024)
+        val buf = new Array[Byte](128)
         val compressor = new Deflater
         compressor.setLevel(Deflater.BEST_COMPRESSION)
         compressor.setInput(byteInput)
@@ -135,7 +135,7 @@ object SvdUtils extends Logging {
     def decompress(input: String) = {
         // Decompress the data
         val decompressor = new Inflater
-        val buf = new Array[Byte](1024)
+        val buf = new Array[Byte](128)
         val compressedByte = input.getBytes
         decompressor.setInput(compressedByte)
         val bos = new ByteArrayOutputStream(compressedByte.length)
