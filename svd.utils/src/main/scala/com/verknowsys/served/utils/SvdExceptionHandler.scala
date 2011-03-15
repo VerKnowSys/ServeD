@@ -31,7 +31,7 @@ trait SvdExceptionHandler extends Actor with Logging {
     Restarting Actor: (%s) cause of %s.
     Throwable details: (%s).
             """.format(
-                self.getClass.getName, reason.getMessage,
+                this.getClass.getName, reason.getMessage,
                 reason.getStackTrace.map {
                     traceElement =>
                         """
