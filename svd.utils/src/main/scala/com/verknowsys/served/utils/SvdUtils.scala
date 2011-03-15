@@ -3,19 +3,21 @@ package com.verknowsys.served.utils
 
 import com.verknowsys.served._
 
-import java.io.{PrintWriter, File, OutputStreamWriter}
 import org.apache.commons.io.FileUtils
-import java.util.ArrayList
-import java.util.regex.Pattern
 import clime.messadmin.providers.sizeof.ObjectProfiler
 import scala.collection.JavaConversions._
-import akka.util.Logging
-import java.io._
-import scala.io._
 import scala.util.matching.Regex
-import java.util.UUID
+import akka.util.Logging
+import scala.io._
 import com.sun.jna.Native
+import java.io._
+import java.util.UUID
 import java.util.{Calendar, GregorianCalendar}
+import java.util.zip.DataFormatException
+import java.util.zip.Deflater
+import java.util.zip.Inflater
+import java.util.ArrayList
+import java.util.regex.Pattern
 
 
 /**
@@ -90,6 +92,72 @@ object SvdUtils extends Logging {
             new File(dir).mkdirs
         }
         dir
+    }
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   simple String compression (zip inflate/deflate)
+     */
+    def compress(input: String) = {
+        // 2011-03-13 20:48:01 - dmilith - TODO: implement check for too short string to compress (<40 chars)
+        val byteInput = input.getBytes
+        val bos = new ByteArrayOutputStream(byteInput.length)
+        val buf = new Array[Byte](128)
+        val compressor = new Deflater
+        compressor.setLevel(Deflater.BEST_COMPRESSION)
+        compressor.setInput(byteInput)
+        compressor.finish
+        while (!compressor.finished) {
+            val count = compressor.deflate(buf)
+            bos.write(buf, 0, count)
+        }
+        try {
+            bos.close
+        } catch {
+            case e: Exception => {
+                e.printStackTrace // 2011-03-13 17:38:52 - dmilith - XXX: temporary code
+            }
+        }
+        val compressedByte = bos.toByteArray
+        val compressedString = new String(compressedByte)
+        log.debug("Original string length: %d, Compressed one: %d".format(input.length, compressedString.length))
+        compressedString
+    }
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   simple String decompression (zip inflate/deflate)
+     */
+    def decompress(input: String) = {
+        // Decompress the data
+        val decompressor = new Inflater
+        val buf = new Array[Byte](128)
+        val compressedByte = input.getBytes
+        decompressor.setInput(compressedByte)
+        val bos = new ByteArrayOutputStream(compressedByte.length)
+        
+        while (!decompressor.finished) {
+            try {
+                val count = decompressor.inflate(buf)
+                bos.write(buf, 0, count)
+            } catch {
+                case e: DataFormatException =>
+            }
+        }
+        try {
+            bos.close
+        } catch {
+            case e: Exception =>
+                log.trace("Exception in decompress: " + e)
+        }
+        val decompressedByte = bos.toByteArray
+        val decompressedString = new String(decompressedByte)
+        log.debug("Compressed string length: %d, Decompressed one: %d".format(input.length, decompressedString.length))
+        decompressedString
     }
     
 

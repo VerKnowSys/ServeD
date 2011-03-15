@@ -36,9 +36,9 @@ object boot extends Logging {
 
 
         // 2011-02-01 21:13:24 - dmilith - NOTE: this is default order of starting Managers and Maintainer:
-        registry.actorFor[SvdAccountsManager].foreach { _ ! Init }
-        registry.actorFor[SvdSystemManager].foreach { _ ! Init }
         registry.actorFor[SvdMaintainer].foreach { _ ! Init }
+        registry.actorFor[SvdSystemManager].foreach { _ ! Init }
+        registry.actorFor[SvdAccountsManager].foreach { _ ! Init }
         
         // ApiServer
         remote.start(SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
@@ -55,7 +55,7 @@ object boot extends Logging {
             System.exit(1)
         }
         
-        log.debug("Home dir: " + SvdConfig.homePath + SvdConfig.vendorDir)
+        log.debug("Home dir: " + (SvdConfig.homePath + "/" + SvdConfig.vendorDir))
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         
         args foreach { _ match {

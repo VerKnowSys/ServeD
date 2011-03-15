@@ -5,9 +5,13 @@ import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.spechelpers._
+import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.api._
+import com.verknowsys.served.db._
+import com.verknowsys.served._
 
+import java.io._
 import java.util.{Calendar, GregorianCalendar}
 import akka.actor.Actor.{actorOf, registry}
 import akka.actor.ActorRef
@@ -77,5 +81,37 @@ class SvdGathererTest extends Specification with SvdExpectActorSpecification {
             matcher2 must beMatching("01h:01m:07s")
         }
         
+        "we should be able to check when it's worth to compress String" in {
+            val in = new BufferedReader(new FileReader("/dev/urandom"))
+            
+            val str = new StringBuilder("")
+            println(SvdUtils.bench {
+                for (i <- 1.to(1500)) {
+                    str.append(in.read)
+                }    
+            })
+            
+            val chpoint = str.toString
+            // println("str: %s".format(chpoint))
+            val chplen = chpoint.length
+            val complen = SvdUtils.compress(chpoint).length
+            val decomplen = SvdUtils.decompress(SvdUtils.compress(chpoint)).length
+            println("chpoint (length): %d".format(chplen))
+            println("chpoint (compress): %d".format(complen))
+            println("chpoint (decompress): %d".format(decomplen))
+            for (i <- 1.to(500000)) {
+                str.append(in.read)
+            }
+            println("Will compress String of length: %d".format(str.toString.length))
+            println("####################################################################\n" +
+                SvdUtils.bench {
+                    SvdUtils.decompress(SvdUtils.compress(str.toString))
+                }
+            )
+            in.close
+            chplen must beEqual(decomplen)
+            chplen must beGreaterThan(complen)
+        }
+
     }
 }

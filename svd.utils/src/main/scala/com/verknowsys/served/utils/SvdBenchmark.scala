@@ -2,29 +2,48 @@ package com.verknowsys.served.utils
 
 import scala.collection.mutable.ListBuffer
 
-object SvdBenchmark {
-    class SvdBenchmark(n: Int){
-        val tests = new ListBuffer[(String, () => Unit)]
-        
-        def apply(name: String)(func: => Unit){
-            tests += ((name, func _))
-        }
-        
-        def run {
-            tests.foreach { case (name, func) =>
-                val start = System.currentTimeMillis
-        
-                (1 to n) foreach { i => func() }
-                val time = System.currentTimeMillis - start
-                
-                println(name + "   " + time)
-            }
+/**
+ * Simple benchmark utility
+ * 
+ * Usage
+ * {{{
+ *     import com.verknowsys.utils.Benchmark._
+ * 
+ *     benchmark(10000)(
+ *         report("foo"){ foo() } ::
+ *         report("bar"){ bar() } ::
+ *         Nil
+ *     )
+ * }}}
+ * 
+ * will print
+ * 
+ * {{{
+ *     Name                    Time(s)
+ *     ===============================
+ *     foo                    0.084000
+ *     bar                    0.082000
+ * }}}
+ */ 
+object Benchmark {
+    case class BenchmarkReport(name: String, f: () => Unit){
+        def run(n: Int) = {
+            val start = System.currentTimeMillis
+            (1 to n) foreach { i => f() }
+            val time = System.currentTimeMillis - start
+            (name, time)
         }
     }
     
-    def apply(n: Int)(f: (SvdBenchmark) => Unit){
-        val bench = new SvdBenchmark(n)
-        f(bench)
-        bench.run
+    def benchmark(n: Int)(reports: List[BenchmarkReport]) = {
+        val results = reports.map(_.run(n))
+        println("Name                    Time(s)")
+        println("===============================")
+        results.foreach { case (name, time) =>
+            printf("%-20s %10f\n", name, time / 1000.0)
+        }
+        results
     }
+    
+    def report(name: String)(f: => Unit) = BenchmarkReport(name, f _)
 }

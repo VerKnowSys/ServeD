@@ -14,7 +14,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     lazy val spechelpers    = project("svd.spechelpers", "SvdSpecHelpers", new SvdSpecHelpers(_))
     lazy val utils          = project("svd.utils", "SvdUtils", new SvdUtils(_), conf, spechelpers)
     lazy val cli            = project("svd.cli", "SvdCLI", new SvdCli(_), utils, api)
-    lazy val systemmanager  = project("svd.systemmanager", "SvdSystemManager", new SvdSystemManager(_), utils, api, sigar)
+    lazy val db             = project("svd.db", "SvdDB", new SvdDB(_), utils, api)
+    lazy val systemmanager  = project("svd.systemmanager", "SvdSystemManager", new SvdSystemManager(_), utils, api, sigar, db)
     lazy val notifications  = project("svd.notifications", "Notifications", new SvdNotifications(_), utils)
     lazy val maintainer     = project("svd.maintainer", "SvdMaintainer", new SvdMaintainer(_), notifications, systemmanager, api)
     
@@ -58,6 +59,13 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
     
+    class SvdDB(info: ProjectInfo) extends SvdProject(info){
+        val novusRels = "repo.novus rels" at "http://repo.novus.com/releases/"
+        val novusSnaps = "repo.novus snaps" at "http://repo.novus.com/snapshots/"
+        
+        val casbah = "com.mongodb.casbah" %% "casbah" % "2.0.2"
+        val salat = "com.novus" %% "salat" % "0.0.6-SNAPSHOT"
+    }
     
     class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {
         lazy val cli = task { None; } dependsOn(run(Array("127.0.0.1", "5555")))
@@ -72,6 +80,11 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdSystemManager(info: ProjectInfo) extends SvdProject(info) {
         import Process._
+        
+        val sigarSource = "org.hyperic" at "http://repository.jboss.org/maven2"
+        val sigar       = "org.hyperic" % "sigar" % "1.6.3.82"
+        
+        override def parallelExecution = false
         
         lazy val stress = task {
             val compiler = "/usr/bin/clang"
