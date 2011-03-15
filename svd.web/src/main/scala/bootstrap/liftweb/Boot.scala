@@ -35,7 +35,8 @@ class Boot {
     )
 
     val entries =
-        Menu(Loc("home", "index" :: Nil, "Home", Authorized)) ::
+        Menu(Loc("home", "index" :: Nil, "Home", Unauthorized)) ::
+        Menu(Loc("log", "log" :: Nil, "Akka Log", Unauthorized)) ::
         Menu(Loc("login", "login" :: Nil, "Login", Unauthorized)) ::
         Menu(Loc("logout", "logout" :: Nil, "Logout", EarlyResponse(() => {
             Session.logout

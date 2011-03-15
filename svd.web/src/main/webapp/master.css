@@ -380,4 +380,8 @@ form.inline p { margin-bottom:0; }
     padding: 20px;
 }
 
+#graph {
+    font-family: Menlo;
+}
+
 
