@@ -140,6 +140,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     class SvdWeb(info: ProjectInfo) extends DefaultWebProject(info){
         val liftVersion = "2.2"
         
+        override def jettyWebappPath  = webappPath
+        
         override def libraryDependencies = Set(
           "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
           "net.liftweb" %% "lift-mapper" % liftVersion % "compile->default",
