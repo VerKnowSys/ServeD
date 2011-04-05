@@ -15,7 +15,7 @@ import JsCmds._
 import JE._
 
 
-class LogScript {
+class AkkaActors {
     def render = Script(JsRaw("var LogData = " + collectData))
     
     val hasStarted = ".+: \\[Actor\\[(.+?):(.+?)\\]\\] has started".r
@@ -32,20 +32,4 @@ class LogScript {
                 ("ev" -> "linked") ~ ("aid" -> aid) ~ ("acls" -> short(acls)) ~ ("bid" -> bid) ~ ("bcls" -> short(bcls))
         }.toList
     ))
-
-
-
-        // class ActorInfo(cls: String, id: String){
-        //     var state = State.New
-        //     val linked = new ListBuffer[ActorInfo]
-        //     var inTree = false
-        // 
-        //     def short = cls.split("\\.").last
-        // }
-        // 
-        // object App {
-        //     val display = new Display
-        // 
-        //     val actors = Map[String, ActorInfo]()
-
 }

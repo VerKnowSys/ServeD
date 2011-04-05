@@ -15,12 +15,6 @@ import com.verknowsys.served.web.lib.Session
  * to modify lift's environment
  */
 class Boot {
-    def boot {
-    // where to search snippet
-    LiftRules.addToPackages("com.verknowsys.served.web")
-
-    // Build SiteMap
-
     val Authorized = If(
         () => Session.authorized,
         () => RedirectWithState(
@@ -34,33 +28,33 @@ class Boot {
         () => RedirectResponse("/")
     )
 
-    val entries =
-        Menu(Loc("home", "index" :: Nil, "Home", Unauthorized)) ::
-        Menu(Loc("log", "log" :: Nil, "Akka Log", Unauthorized)) ::
-        Menu(Loc("login", "login" :: Nil, "Login", Unauthorized)) ::
-        Menu(Loc("logout", "logout" :: Nil, "Logout", EarlyResponse(() => {
+    def siteMap = SiteMap(
+        Menu(S ? "Home") / "index" >> Authorized,
+        Menu(S ? "Monitoring") / "monitoring" >> Authorized submenus (
+            Menu(S ? "Akka actors") / "monitoring" / "akka_actors",
+            Menu(S ? "CPU usage")   / "monitoring" / "cpu"
+        ),
+
+        Menu(S ? "Log in") / "login" >> Unauthorized,
+        Menu(Loc("logout", "logout" :: Nil, "Log out", EarlyResponse(() => {
             Session.logout
             Full(RedirectWithState("/",
                 RedirectState(() => S.notice("Logged out"))
             ))
-        }), Authorized)) ::
-        Nil
-
-        // more complex because this menu allows anything in the
-        // /static path to be visible
-        // Menu(Loc("Static", Link(List("static"), true, "/static/index"), "Static Content"))
-
-    // set the sitemap.  Note if you don't want access control for
-    // each page, just comment this line out.
-    LiftRules.setSiteMap(SiteMap(entries:_*))
-
-    //Show the spinny image when an Ajax call starts
-    LiftRules.ajaxStart = Full(() => LiftRules.jsArtifacts.show("ajax-loader").cmd)
+        }), Authorized, Hidden))
+    )
     
-    // Make the spinny image go away when it ends
-    LiftRules.ajaxEnd = Full(() => LiftRules.jsArtifacts.hide("ajax-loader").cmd)
+    def boot {
+        // where to search snippet
+        LiftRules.addToPackages("com.verknowsys.served.web")
 
-    // Force the request to be UTF-8
-    LiftRules.early.append(_.setCharacterEncoding("UTF-8"))
-  }
+        LiftRules.setSiteMap(siteMap)
+
+        // Ajax loader
+        LiftRules.ajaxStart = Full(() => LiftRules.jsArtifacts.show("ajax-loader").cmd)
+        LiftRules.ajaxEnd = Full(() => LiftRules.jsArtifacts.hide("ajax-loader").cmd)
+
+        // Force the request to be UTF-8
+        LiftRules.early.append(_.setCharacterEncoding("UTF-8"))
+    }
 }

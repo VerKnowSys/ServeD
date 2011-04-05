@@ -15,11 +15,11 @@ class Auth {
         bind("f", xhtml,
             "username" -%> SHtml.text(username.get, username.set),
             "password" -%> SHtml.password("", password = _),
-            "send" -%> SHtml.submit("Send!", () => {
+            "send" -%> SHtml.submit("Log in", () => {
                 if(Session.login(username.get, password)){
                     S.redirectTo("/")
                 } else {
-                    S.error("Wrong usernmae")
+                    S.error("Wrong username")
                 }
             })
         )

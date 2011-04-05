@@ -1,17 +1,35 @@
-<div class="lift:surround?with=simple;at=content"> 
-  <h2>Login</h2>
-  <lift:Auth.login form="POST">
-     <div>
-         <label for="username">Username:</label>
-         <f:username id="username"/>
-     </div>
-     <div>
-         <label for="password">Password:</label>
-         <f:password id="password"/>
-     </div>
-     <div>
-         <f:send/>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:lift="http://liftweb.net/">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="/css/login.css" />
+    <title>ServeD - login</title>
+  </head>
+
+  <body>
+    <div id="login_container">
+      <a id="appname" href="#">Welcome to ServeD</a>
+      <div id="login_wrapper">
+        <lift:Auth.login form="POST">
+          <lift:Msgs showAll="true"/>
+          <div>
+            <label for="username">Username:</label>
+            <f:username id="username"/>
+          </div>
+          <div>
+            <label for="password">Password:</label>
+            <f:password id="password"/>
+          </div>
+          <div>
+            <f:send/>
+          </div>
+        </lift:Auth.login>
+      </div>
+      <div id="footer">
+        Copyright &copy; <a href="http://verknowsys.com">VerKnowSys</a> 2011
+      </div>
     </div>
-  </lift:Auth.login>
-  
-</div>
+  </body>
+</html>
+

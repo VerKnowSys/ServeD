@@ -1,0 +1,85 @@
+@import "reset.css";
+@import "layout.css";
+
+#login_container {
+    width: 300px;
+    position: absolute;
+    margin-left: -150px;
+    top: 200px;
+    left: 50%;
+}
+
+#login_wrapper {
+    clear: both;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0 1px 3px #999;
+    -webkit-box-shadow: 0 1px 3px #999;
+    background: #fff;
+    overflow: hidden;
+}
+
+#lift__noticesContainer__ ul {
+    text-align: center;
+    color: red;
+    list-style: none;
+}
+
+#appname {
+    margin-bottom: 10px;
+}
+
+form {
+	padding: 20px;
+	margin: 0 auto;
+}
+form div {
+	margin-bottom: 10px;
+	font-size: 13px;
+	overflow: hidden;
+	position: relative;
+}
+
+form label {
+  display: block;
+  float: left;
+  width: 100px;
+  text-align: left;
+  padding: 4px 5px 4px 0;
+}
+
+form input[type=text],
+form input[type=password], 
+form textarea {
+	padding: 3px;
+	border: solid 1px #ccc;
+	border-top-color: #555;
+	border-left-color: #555;
+	color: #4d483f;
+	width: 250px;
+	float: left;
+	font-size: 13px;
+}
+
+
+form input[type=submit] {
+	margin-bottom: 10px;
+}
+
+form .actions {
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+}
+form fieldset {
+  padding-top: 10px;
+  margin-top: 10px;
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+}
+form legend {
+  width: 100%;
+  font-size: 15px;
+  font-weight: bold;
+}
