@@ -1,5 +1,8 @@
 package com.verknowsys.served.web.snippet
 
+import com.verknowsys.served.web.lib.Session
+import com.verknowsys.served.api.Admin
+
 import net.liftweb.util._
 import net.liftweb.util.Helpers._
 import net.liftweb.common._
@@ -30,4 +33,6 @@ class AkkaActors {
                 ("ev" -> "linked") ~ ("aid" -> aid) ~ ("acls" -> short(acls)) ~ ("bid" -> bid) ~ ("bcls" -> short(bcls))
         }.toList
     ))
+    
+    def list = "li *" #> Session.api.request(Admin.ListActors){ case Admin.ActorsList(list) => list.map(_.toString).toList }.getOrElse(Nil)
 }

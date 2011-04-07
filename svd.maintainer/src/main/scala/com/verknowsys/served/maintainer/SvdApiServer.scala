@@ -5,6 +5,7 @@ import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.{actorOf, registry}
 import akka.routing.Dispatcher
 import akka.util.Logging
+import akka.serialization.RemoteActorSerialization._
 
 import com.verknowsys.served.utils.SvdExceptionHandler
 import com.verknowsys.served.api._
@@ -18,6 +19,10 @@ class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
     
 
     override def receive = {
+        case General.CreateSession =>
+            log.trace("Create new session for remote clientrname %s")
+            self reply toRemoteActorRefProtocol(actorOf[SvdApiSession].start)
+        
         case General.Connect(username) =>
             log.trace("Remote client trying to connect with username %s", username)
 

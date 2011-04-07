@@ -1,7 +1,5 @@
 package com.verknowsys.served.api
 
-import akka.actor.ActorRef
-
 sealed abstract class ApiMessage
 sealed abstract class ApiResponse extends ApiMessage
 
@@ -18,6 +16,7 @@ object General {
     sealed abstract class Base extends ApiMessage
     
     // Request
+    case object CreateSession extends Base
     case class Connect(username: String) extends Base
     case object Disconnect extends Base
 }
