@@ -6,13 +6,11 @@ import net.liftweb.common._
 
 import net.liftweb.json.JsonAST
 import net.liftweb.json.JsonDSL._
+import net.liftweb.json.Printer.compact
 
 
-import net.liftweb._
-import http._
-import js._
-import JsCmds._
-import JE._
+import net.liftweb.http.js.JsCmds._
+import net.liftweb.http.js.JE._
 
 
 class AkkaActors {
