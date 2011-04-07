@@ -1,5 +1,6 @@
 package com.verknowsys.served.api
 
+import akka.actor.ActorRef
 
 sealed abstract class ApiMessage
 sealed abstract class ApiResponse extends ApiMessage
@@ -37,4 +38,24 @@ object Git {
     case object RepositoryDoesNotExistError
     case class Repositories(val list: List[String])
     case class Repository(val name: String)
+}
+
+object Admin {
+    sealed abstract class Base extends ApiMessage
+    
+    // Request
+    case object ListActors extends Base
+    
+    // Response
+    case class ActorsList(list: Array[ActorInfo])
+    
+    case class ActorInfo(
+        uuid: String,
+        cls: String,
+        homeAddress: Option[java.net.InetSocketAddress],
+        status: String,
+        // linkedActors: List[ActorInfo],
+        supervisor: Option[String], // Option[Uuid]
+        mailboxSize: Int
+    )
 }

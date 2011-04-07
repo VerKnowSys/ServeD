@@ -9,6 +9,7 @@ import akka.util.Logging
 import com.verknowsys.served.utils.SvdUtils
 import com.verknowsys.served.utils.SvdFileEventsManager
 import com.verknowsys.served.maintainer.SvdMaintainer
+import com.verknowsys.served.maintainer.SvdSystemInfo
 import com.verknowsys.served.systemmanager.SvdAccountsManager
 import com.verknowsys.served.maintainer.SvdApiSession
 import com.verknowsys.served.notifications.SvdNotificationCenter
@@ -26,6 +27,7 @@ object boot extends Logging {
                    actorOf[SvdSystemManager] ::
                    actorOf[SvdAccountsManager] :: 
                    actorOf[SvdMaintainer] ::
+                   actorOf[SvdSystemInfo] ::
                    // actorOf[SvdNotificationCenter] :: 
                    Nil).map(Supervise(_, Permanent))
         // supervise and autostart
