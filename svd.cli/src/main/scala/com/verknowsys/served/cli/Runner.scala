@@ -87,6 +87,11 @@ class ApiClient(host: String, port: Int) extends Logging {
                 case _ => log.error("Command not found. TODO: Display help for git commands")
             }
             
+            case "info" :: Nil =>
+                request(Admin.ListActors) {
+                    case Admin.ActorsList(list) => list.foreach(println)
+                }
+            
             
             case "echo" :: xs => svd ! xs.mkString(" ")
             case "exit" :: Nil => quit
