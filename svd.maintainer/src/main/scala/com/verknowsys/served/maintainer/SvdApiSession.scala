@@ -1,11 +1,9 @@
 package com.verknowsys.served.maintainer
 
-
 import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.{actorOf, registry}
 import akka.routing.Dispatcher
 import akka.util.Logging
-import akka.serialization.RemoteActorSerialization._
 
 import com.verknowsys.served.utils.SvdExceptionHandler
 import com.verknowsys.served.api._
@@ -16,13 +14,8 @@ import com.verknowsys.served.systemmanager.managers._
 class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
 
     private var manager: Option[ActorRef] = None // XXX: Var
-    
 
     override def receive = {
-        case General.CreateSession =>
-            log.trace("Create new session for remote clientrname %s")
-            self reply toRemoteActorRefProtocol(actorOf[SvdApiSession].start)
-        
         case General.Connect(username) =>
             log.trace("Remote client trying to connect with username %s", username)
 
@@ -32,20 +25,16 @@ class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
                     become(dispatch)
                     self reply Success
                     log.trace("Remote client successfully connected with username %s", username)
-        
+
                 case Some(e: Error) => 
                     self reply e
-        
+
                 case _ =>
                     self reply Error("User with name '%s' not found".format(username))
             }
     }
-    
 
     protected def routes = {
-        // case General.Connect(username) =>
-            // self reply toRemoteActorRefProtocol(actorOf[SvdApiSession].start)
-            
         case msg: Admin.Base =>
             log.debug("Remote client sent %s. Forwarding to SvdSystemInfo", msg)
             registry.actorFor[SvdSystemInfo].get
@@ -54,7 +43,5 @@ class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
             log.debug("Remote client sent %s. Forwarding to AccountManager", msg)
             manager.get
     }
-
-
 }
 

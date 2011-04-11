@@ -4,7 +4,6 @@ import net.liftweb.http.SessionVar
 
 import akka.actor.{Actor, ActorRef}
 import akka.util.Logging
-import akka.serialization.RemoteActorSerialization._
 
 import com.verknowsys.served.api._
 
@@ -14,16 +13,6 @@ object Session {
     object api {
         final val host = "localhost"
         final val port = 5555
-        
-        def reconnect = {
-            (svd.get !! General.CreateSession) match {
-                case Some(response) => response match {
-                    case bytes: Array[Byte] => svd.set(fromBinaryToRemoteActorRef(bytes))
-                    case _ => // log error
-                }
-                case None => // log error
-            }
-        }
 
         object svd extends SessionVar[ActorRef](service)
 
@@ -35,11 +24,10 @@ object Session {
             }
         }
         
-        protected def service = Actor.remote.actorFor("service:api", host, port)
+        protected def service = RemoteSession(host, port).get // HACK: Handle error!!
     }
 
     def login(username: String, password: String) = {
-        api.reconnect
         api.request(General.Connect(username)) {
             case Success =>
                 Username.set(username)
