@@ -1,21 +1,16 @@
 package com.verknowsys.served.cli
 
-import akka.actor.Actor
+import akka.actor.{Actor, ActorRef}
 import akka.util.Logging
 import com.verknowsys.served.api._
+
 
 /** 
  * CLI 
  * 
- * @param ServeD instance host
- * @param ServeD instance port
  * @author teamon
  */
-class ApiClient(host: String, port: Int) extends Logging {
-    val svd = Actor.remote.actorFor("service:api", host, port)
-
-    log.trace("Checking connection...")
-
+class ApiClient(svd: ActorRef) extends Logging {
     request(General.Connect(username)) {
         case Success => 
             println("ServeD interactive shell. Welcome %s".format(username))
@@ -24,7 +19,6 @@ class ApiClient(host: String, port: Int) extends Logging {
             log.error("[ERROR] " + message)
             quit
     }
-    
 
     /**
      * Show prompt and read arguments
@@ -125,7 +119,13 @@ class ApiClient(host: String, port: Int) extends Logging {
 
 object Runner extends Logging {
     def main(args: Array[String]) {
-        if(args.length == 2) new ApiClient(args(0), args(1).toInt)
-        else { println("Usage: com.verknowsys.served.cli.Runner HOST PORT")}
+        if(args.length == 2) {
+            RemoteSession(args(0), args(1).toInt) match {
+                case Some(svd) => new ApiClient(svd)
+                case None => log.error("Unable to connect to ServeD")
+            }
+        } else { 
+            log.error("Usage: com.verknowsys.served.cli.Runner HOST PORT")
+        }
     }
 }

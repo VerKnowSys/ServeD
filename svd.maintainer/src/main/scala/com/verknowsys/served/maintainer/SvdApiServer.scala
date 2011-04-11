@@ -43,6 +43,9 @@ class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
     
 
     protected def routes = {
+        // case General.Connect(username) =>
+            // self reply toRemoteActorRefProtocol(actorOf[SvdApiSession].start)
+            
         case msg: Admin.Base =>
             log.debug("Remote client sent %s. Forwarding to SvdSystemInfo", msg)
             registry.actorFor[SvdSystemInfo].get

@@ -10,7 +10,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     // Projects
     lazy val sigar          = project("svd.sigar", "SvdSigar")
     lazy val conf           = project("svd.conf", "SvdConfiguration")
-    lazy val api            = project("svd.api", "SvdAPI", conf)
+    lazy val api            = project("svd.api", "SvdAPI", new SvdApi(_), conf)
     lazy val spechelpers    = project("svd.spechelpers", "SvdSpecHelpers", new SvdSpecHelpers(_))
     lazy val utils          = project("svd.utils", "SvdUtils", new SvdUtils(_), conf, spechelpers)
     lazy val cli            = project("svd.cli", "SvdCLI", new SvdCli(_), utils, api)
@@ -56,7 +56,9 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     class SvdSigar(info: ProjectInfo) extends SvdProject(info)
     
     
-    class SvdApi(info: ProjectInfo) extends SvdProject(info)
+    class SvdApi(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
+        val akkaRemote  = akkaModule("remote")
+    }
     
     
     class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {

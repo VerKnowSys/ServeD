@@ -10,10 +10,10 @@ import com.verknowsys.served.utils.SvdUtils
 import com.verknowsys.served.utils.SvdFileEventsManager
 import com.verknowsys.served.maintainer.SvdMaintainer
 import com.verknowsys.served.maintainer.SvdSystemInfo
+import com.verknowsys.served.maintainer.SvdApiConnection
 import com.verknowsys.served.systemmanager.SvdAccountsManager
-import com.verknowsys.served.maintainer.SvdApiSession
-import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.systemmanager.SvdSystemManager
+import com.verknowsys.served.notifications.SvdNotificationCenter
 
 import com.verknowsys.served.utils.signals._
 
@@ -44,7 +44,7 @@ object boot extends Logging {
         
         // ApiServer
         remote.start(SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
-        remote.registerPerSession("service:api", actorOf[SvdApiSession])
+        remote.registerPerSession("service:api", actorOf[SvdApiConnection])
     }
     
 
