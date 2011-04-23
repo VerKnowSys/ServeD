@@ -10,10 +10,10 @@ import org.neodatis.odb.core.query.nq.NativeQuery
 
 
 
-case class User(val name: String, uuid: UUID = UUID.randomUUID) extends DBObject(uuid)
+case class User(val name: String, uid: UUID = UUID.randomUUID) extends DBObject(uid)
 object Users extends DBManager[User]
 
-case class Drug(val name: String, uuid: UUID = UUID.randomUUID) extends DBObject(uuid)
+case class Drug(val name: String, uid: UUID = UUID.randomUUID) extends DBObject(uid)
 object Drugs extends DBManager[Drug]
 
 class DBTest extends Specification {
@@ -116,6 +116,22 @@ class DBTest extends Specification {
             val users4 = Users(db)(_.name == "lopex")
             users4 must haveSize(1)
             users4 must contain(lopex)
+        }
+        
+        "query by uuid" in {
+            val uuid1 = UUID.randomUUID
+            val uuid2 = UUID.randomUUID
+            val uuid3 = UUID.randomUUID
+            
+            val teamon  = User("teamon", uuid1)
+            val dmilith = User("dmilith", uuid2)
+            
+            db << teamon
+            db << dmilith
+            
+            Users(db)(uuid1) must beSome(teamon)
+            Users(db)(uuid2) must beSome(dmilith)
+            Users(db)(uuid3) must beNone
         }
     }
     

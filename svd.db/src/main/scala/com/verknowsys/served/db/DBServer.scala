@@ -2,13 +2,14 @@ package com.verknowsys.served.db
 
 import org.neodatis.odb._
 import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery
+import org.neodatis.odb.core.query.criteria.Where
 import org.neodatis.odb.core.query.nq.NativeQuery
 import java.util.UUID
 import java.io.Serializable
 import scala.collection.JavaConversions._
 
 
-class DBObject(uuid: UUID) extends Serializable
+class DBObject(val uuid: UUID) extends Serializable
 
 class DBServer(port: Int, path: String){
     protected val server = ODBFactory.openServer(port)
@@ -51,35 +52,12 @@ class DBManager[T <: DBObject : ClassManifest] {
             }))
         }
         
+        def apply(uuid: UUID): Option[T] = apply(_.uuid.compareTo(uuid) == 0).headOption
+        
         def all = asScalaIterable(db.odb.getObjects(new CriteriaQuery(klazz)))
 
         def count = db.odb.count(new CriteriaQuery(klazz))
     }
 }
 
-
-// class Predicate[T : ClassManifest](predicate: (T) => Boolean) extends NativeQuery {
-//     setPolymorphic(true)
-//     
-//     def `match`(obj: Any): Boolean = obj match {
-//         case t: T => predicate(t)
-//         case _ => false
-//     }
-//     
-//     def getObjectType = classManifest[T].erasure
-// }
-
-// class Predicate[T](predicate: (T) => Boolean) extends SimpleNativeQuery {
-//     def `match`(obj: T) = {
-//         println("Match: ")
-//         predicate(obj)
-//     }
-// }
-
-// class DBObjects[T](objects: Objects[T]) extends Iterable[T] {
-//     
-// }
-
-class DBClient(val current: DB, val history: DB){
-    
-}
+class DBClient(val current: DB, val history: DB)
