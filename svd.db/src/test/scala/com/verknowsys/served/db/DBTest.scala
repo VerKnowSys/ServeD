@@ -4,7 +4,17 @@ import org.specs._
 import com.verknowsys.served.SvdSpecHelpers._
 import java.util.UUID
 
-case class User(name: String, uuid: UUID = UUID.randomUUID) extends DBObject(uuid)
+import org.neodatis.odb.core.query.nq.SimpleNativeQuery
+import org.neodatis.odb.core.query.nq.NativeQuery
+
+
+
+
+case class User(val name: String, uuid: UUID = UUID.randomUUID) extends DBObject(uuid)
+object Users extends DBManager[User]
+
+case class Drug(val name: String, uuid: UUID = UUID.randomUUID) extends DBObject(uuid)
+object Drugs extends DBManager[Drug]
 
 class DBTest extends Specification {
     var server: DBServer = null
@@ -23,15 +33,89 @@ class DBTest extends Specification {
         }
         
         "store Users" in {
-            val teamon = User("teamon")
-            val dmilith = User("dmilith")
+            val teamon = new User("teamon")
+            val dmilith = new User("dmilith")
             
             db << teamon
             db << dmilith
             
-            db.count[User].intValue must_== 2
-            db.current.count[User].intValue must_== 2
-            db.history.count[User].intValue must_== 0
+            Users(db).count.intValue must_== 2
+            Users(db.current).count.intValue must_== 2
+            Users(db.history).count.intValue must_== 0
+            
+            
+            val users1 = Users(db).all
+            users1 must haveSize(2)
+            users1 must contain(teamon)
+            users1 must contain(dmilith)
+            
+            val users2 = Users(db.current).all
+            users2 must haveSize(2)
+            users2 must contain(teamon)
+            users2 must contain(dmilith)
+            
+            val users3 = Users(db.history).all
+            users3 must haveSize(0)
+        }
+        
+        "store Users and Drugs" in {
+            val teamon  = new User("teamon")
+            val dmilith = new User("dmilith")
+            val cig     = new Drug("cig")
+            val joint   = new Drug("joint")
+            
+            db << teamon
+            db << dmilith
+            db << cig
+            db << joint
+            
+            val users1 = Users(db).all
+            users1 must haveSize(2)
+            users1 must contain(teamon)
+            users1 must contain(dmilith)
+            
+            val drugs1 = Drugs(db).all
+            drugs1 must haveSize(2)
+            drugs1 must contain(cig)
+            drugs1 must contain(joint)
+            
+            val users2 = Users(db.history).all
+            users2 must haveSize(0)
+            
+            val drugs2 = Drugs(db.history).all
+            drugs2 must haveSize(0)
+        }
+        
+        "query by predicate" in {
+            val teamon = new User("teamon")
+            val dmilith = new User("dmilith")
+            val lopex = new User("lopex")
+            
+            db << teamon
+            db << dmilith
+            db << lopex
+            db << Drug("a")
+            db << Drug("b")
+            db << Drug("c")
+            
+            val users1 = Users(db)(e => true)
+            users1 must haveSize(3)
+            users1 must contain(teamon)
+            users1 must contain(dmilith)
+            users1 must contain(lopex)
+            
+            val users2 = Users(db)(_.name == "teamon")
+            users2 must haveSize(1)
+            users2 must contain(teamon)
+            
+            val users3 = Users(db){ e => e.name == "teamon" || e.name == "dmilith" }
+            users3 must haveSize(2)
+            users3 must contain(teamon)
+            users3 must contain(dmilith)
+            
+            val users4 = Users(db)(_.name == "lopex")
+            users4 must haveSize(1)
+            users4 must contain(lopex)
         }
     }
     

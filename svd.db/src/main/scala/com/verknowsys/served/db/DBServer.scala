@@ -2,9 +2,13 @@ package com.verknowsys.served.db
 
 import org.neodatis.odb._
 import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery
+import org.neodatis.odb.core.query.nq.NativeQuery
 import java.util.UUID
+import java.io.Serializable
+import scala.collection.JavaConversions._
 
-class DBObject(uuid: UUID)
+
+class DBObject(uuid: UUID) extends Serializable
 
 class DBServer(port: Int, path: String){
     protected val server = ODBFactory.openServer(port)
@@ -28,10 +32,53 @@ class DBServer(port: Int, path: String){
 
 class DB(val odb: ODB) {
     def <<(obj: DBObject) = odb.store(obj)
-    
-    def count[T <: DBObject : ClassManifest] =
-        odb.count(new CriteriaQuery(classManifest[T].erasure))
 }
+
+class DBManager[T <: DBObject : ClassManifest] {
+    def apply(db: DB) = new {
+        val klazz = classManifest[T].erasure
+        
+        def apply(predicate: T => Boolean): Iterable[T] = {
+            asScalaIterable(db.odb.getObjects(new NativeQuery {
+                setPolymorphic(true)
+
+                def `match`(obj: Any): Boolean = obj match {
+                    case x: T => predicate(x)
+                    case _ => false
+                }
+
+                def getObjectType = klazz
+            }))
+        }
+        
+        def all = asScalaIterable(db.odb.getObjects(new CriteriaQuery(klazz)))
+
+        def count = db.odb.count(new CriteriaQuery(klazz))
+    }
+}
+
+
+// class Predicate[T : ClassManifest](predicate: (T) => Boolean) extends NativeQuery {
+//     setPolymorphic(true)
+//     
+//     def `match`(obj: Any): Boolean = obj match {
+//         case t: T => predicate(t)
+//         case _ => false
+//     }
+//     
+//     def getObjectType = classManifest[T].erasure
+// }
+
+// class Predicate[T](predicate: (T) => Boolean) extends SimpleNativeQuery {
+//     def `match`(obj: T) = {
+//         println("Match: ")
+//         predicate(obj)
+//     }
+// }
+
+// class DBObjects[T](objects: Objects[T]) extends Iterable[T] {
+//     
+// }
 
 class DBClient(val current: DB, val history: DB){
     
