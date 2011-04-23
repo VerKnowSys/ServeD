@@ -1,10 +1,42 @@
-// package com.verknowsys.served.db
-// 
-// import java.util.UUID
-// import com.mongodb.casbah.Imports._
-// import org.specs._
-// 
-// class DBTest extends Specification {
+package com.verknowsys.served.db
+
+import org.specs._
+import com.verknowsys.served.SvdSpecHelpers._
+import java.util.UUID
+
+case class User(name: String, uuid: UUID = UUID.randomUUID) extends DBObject(uuid)
+
+class DBTest extends Specification {
+    var server: DBServer = null
+    var db: DBClient = null
+
+    "DB" should {
+        doBefore {
+            rmdir("/tmp/svd_db_test")
+            mkdir("/tmp/svd_db_test")
+            server = new DBServer(9000, "/tmp/svd_db_test/dbservertest")
+            db = server.openClient
+        }
+        
+        doAfter {
+            server.close
+        }
+        
+        "store Users" in {
+            val teamon = User("teamon")
+            val dmilith = User("dmilith")
+            
+            db << teamon
+            db << dmilith
+            
+            db.count[User].intValue must_== 2
+            db.current.count[User].intValue must_== 2
+            db.history.count[User].intValue must_== 0
+        }
+    }
+    
+}
+
 //     var db: DB = null
 //     
 //     "DB" should {

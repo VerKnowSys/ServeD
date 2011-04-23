@@ -60,11 +60,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
     
     class SvdDB(info: ProjectInfo) extends SvdProject(info){
-        val novusRels = "repo.novus rels" at "http://repo.novus.com/releases/"
-        val novusSnaps = "repo.novus snaps" at "http://repo.novus.com/snapshots/"
-        
-        val casbah = "com.mongodb.casbah" %% "casbah" % "2.0.2"
-        val salat = "com.novus" %% "salat" % "0.0.6-SNAPSHOT"
+        val neodatis = "org.neodatis.odb" % "neodatis-odb" % "1.9.30.689"
     }
     
     class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {

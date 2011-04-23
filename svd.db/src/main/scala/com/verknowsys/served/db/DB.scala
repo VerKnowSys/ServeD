@@ -1,10 +1,10 @@
 package com.verknowsys.served.db
 
-import com.mongodb.casbah.Imports._
-import com.novus.salat._
-import com.novus.salat.global._
-import scala.collection.JavaConversions._
-import java.util.UUID
+// import com.mongodb.casbah.Imports._
+// import com.novus.salat._
+// import com.novus.salat.global._
+// import scala.collection.JavaConversions._
+// import java.util.UUID
 
 
 
@@ -12,14 +12,14 @@ import java.util.UUID
 //     def toMongo = MongoDBObject(data:_*) + uuid
 // }
 
-class DB {
-    val mongoConn = MongoConnection()
-    val mongoDB = mongoConn("served")
-
-    val current = mongoDB("current")
-    val history = mongoDB("history")
-
-    setup
+// class DB {
+//     val mongoConn = MongoConnection()
+//     val mongoDB = mongoConn("served")
+// 
+//     val current = mongoDB("current")
+//     val history = mongoDB("history")
+// 
+//     setup
 
     // def apply(uuid: UUID) = current.findOne(uuid)
 
@@ -45,24 +45,24 @@ class DB {
     //     history.findOne(uuid).flatMap(_.getAs[BasicDBList]("history")).map(_.map(_.asInstanceOf[DBObject]).toList.reverse) getOrElse Nil
 
 
-    def drop {
-        current.drop
-        history.drop
-        setup
-    }
+    // def drop {
+    //     current.drop
+    //     history.drop
+    //     setup
+    // }
 
-    def setup {
-        current.ensureIndex("uuid")
-        history.ensureIndex("uuid")
-    }
+    // def setup {
+    //     current.ensureIndex("uuid")
+    //     history.ensureIndex("uuid")
+    // }
 
-    def close = mongoConn.close
+    // def close = mongoConn.close
     
-    def all[T <: CaseClass: Manifest] = current.find(MongoDBObject("_typeHint" -> manifest[T].toString)).map(grater[T].asObject(_))
+    // def all[T <: CaseClass: Manifest] = current.find(MongoDBObject("_typeHint" -> manifest[T].toString)).map(grater[T].asObject(_))
     
-    def all[T <: CaseClass : Manifest](pairs: (String, Any)*) = current.find(Map("_typeHint" -> manifest[T].toString) ++ pairs).map(grater[T].asObject(_))
+    // def all[T <: CaseClass : Manifest](pairs: (String, Any)*) = current.find(Map("_typeHint" -> manifest[T].toString) ++ pairs).map(grater[T].asObject(_))
     
-    def <<[T <: CaseClass : Manifest](obj: T) = current.insert(grater[T].asDBObject(obj))
+    // def <<[T <: CaseClass : Manifest](obj: T) = current.insert(grater[T].asDBObject(obj))
     
     // def apply[T <: CaseClass : Manifest](uuid: UUID): Option[T] = {
     //     val m = MongoDBObject("_typeHind" -> manifest[T].toString, "uuid" -> uuid)
@@ -71,4 +71,4 @@ class DB {
     //     
     //     current.findOne(MongoDBObject("_typeHind" -> manifest[T].toString, "uuid" -> uuid)).map(grater[T].asObject(_))
     // }
-}
+// }
