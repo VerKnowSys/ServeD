@@ -4,7 +4,7 @@ package com.verknowsys.served.maintainer
 import com.verknowsys.served.api.Admin._
 
 // akka
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, SupervisorActor}
 
 
 /**
@@ -17,9 +17,9 @@ class SvdSystemInfo extends Actor {
     
     def receive = {
         case ListActors =>
-            self reply ActorsList(Actor.registry.actors.map(ref2info))
+            self reply ActorsList(Actor.registry.actorsFor[SupervisorActor].map(ref2info))
     }
     
     protected def ref2info(ref: ActorRef): ActorInfo = 
-        ActorInfo(ref.uuid.toString, ref.actorClassName, ref.homeAddress, ref.isRunning.toString, ref.supervisor.map(_.uuid.toString), ref.mailboxSize)
+        ActorInfo(ref.uuid.toString, ref.actorClassName, ref.isRunning.toString, ref.linkedActors.map(ref2info))
 }

@@ -17,22 +17,37 @@ import net.liftweb.http.js.JE._
 
 
 class AkkaActors {
-    def render = Script(JsRaw("var LogData = " + collectData))
+    // def render = Script(JsRaw("var LogData = " + collectData))
+    // 
+    // // val hasStarted = ".+: \\[Actor\\[(.+?):(.+?)\\]\\] has started".r
+    // // val linking = ".+: Linking actor \\[Actor\\[(.+?):(.+?)\\]\\] to actor \\[Actor\\[(.+?):(.+?)\\]\\]".r
+    // 
+    // protected def short(cls: String) = cls.split("\\.").last
+    // 
+    // protected def collectData = compact(JsonAST.render(
+    //     allActors.map { a =>
+    //         a.supervisor match {
+    //             case Some(s) =>
+    //                 ("ev" -> "linked") ~ ("aid" -> a.uuid) ~ ("acls" -> short(a.cls)) ~ ("bid" -> s._1) ~ ("bcls" -> short(s._2))
+    //             case None => 
+    //                 ("ev" -> "started") ~ ("id" -> a.uuid) ~ ("cls" -> short(a.cls))
+    //         }
+    //     }
+    //     
+    //     // io.Source.fromFile("logs/akka.log").getLines.collect { 
+    //     //     case hasStarted(cls, id) => 
+    //     //         ("ev" -> "started") ~ ("id" -> id) ~ ("cls" -> cls.split("\\.").last)
+    //     //         
+    //     //     case linking(acls, aid, bcls, bid) => 
+    //     //         ("ev" -> "linked") ~ ("aid" -> aid) ~ ("acls" -> short(acls)) ~ ("bid" -> bid) ~ ("bcls" -> short(bcls))
+    //     // }.toList
+    // ))
     
-    val hasStarted = ".+: \\[Actor\\[(.+?):(.+?)\\]\\] has started".r
-    val linking = ".+: Linking actor \\[Actor\\[(.+?):(.+?)\\]\\] to actor \\[Actor\\[(.+?):(.+?)\\]\\]".r
+    def list = "li *" #> allActors.map(_.toString)
     
-    def short(cls: String) = cls.split("\\.").last
     
-    protected def collectData = compact(JsonAST.render(
-        io.Source.fromFile("logs/akka.log").getLines.collect { 
-            case hasStarted(cls, id) => 
-                ("ev" -> "started") ~ ("id" -> id) ~ ("cls" -> cls.split("\\.").last)
-                
-            case linking(acls, aid, bcls, bid) => 
-                ("ev" -> "linked") ~ ("aid" -> aid) ~ ("acls" -> short(acls)) ~ ("bid" -> bid) ~ ("bcls" -> short(bcls))
-        }.toList
-    ))
     
-    def list = "li *" #> Session.api.request(Admin.ListActors){ case Admin.ActorsList(list) => list.map(_.toString).toList }.getOrElse(Nil)
+    protected def allActors = Session.api.request(Admin.ListActors){ case Admin.ActorsList(arr) => arr.toList }.getOrElse(Nil)
+    
+    protected def actorsTree = Session.api.request(Admin.ListTreeActors){ case Admin.ActorsList(arr) => arr.toList }.getOrElse(Nil)
 }
