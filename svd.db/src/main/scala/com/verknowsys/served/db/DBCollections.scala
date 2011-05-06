@@ -27,10 +27,7 @@ class NativeQueryCollection[T <: DBObject : ClassManifest](odb: ODB, predicate: 
     protected[db] def nativeQuery = new NativeQuery {
         setPolymorphic(true)
 
-        def `match`(obj: Any): Boolean = obj match {
-            case x: T => predicate(x)
-            case _ => false
-        }
+        def `match`(obj: Any): Boolean = predicate(obj.asInstanceOf[T])
 
         def getObjectType = objectType
     }
