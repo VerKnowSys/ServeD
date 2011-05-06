@@ -21,8 +21,8 @@ import com.verknowsys.served.db._
 // Create case class that extends `DBObject`
 case class User(val name: String, id: UUID = randomUUID) extends DBObject(id)
 
-// Create collection object (it *should* be plural form of above)
-object Users extends DBCollection[User]
+// Create collection object
+object Users extends DB[User]
 
 
 // ### Database connection
@@ -66,30 +66,30 @@ db << newUser
 
 // #### Select by UUID
 
-// Given some UUID it is possible to select one record from database
+// With some UUID given it is possible to select one record from database.
 // The result will be `Option[T]`
 Users(db)(uuid)                 // => Some(User("teamon"))
 Users(db)(someNotExistingUuid)  // => None
 
-// The `User(db)` method returns `DBCollection` object dedicated to `User` type objects
+// The `User(db)` method returns `DBCollection` object dedicated to `User` type objects.
 
 // #### Find records by query
 
-// `DBCollection` allows to find objects using pure scala syntax
+// `DBCollection` allows to find objects using pure scala syntax.
 // The `apply` method takes `T => Boolean` argument
 Users(db)(_.name == "teamon")           // => List(User("teamon"))
 Users(db)(_.name.indexOf("e") != -1)    // => List(User("teamon"), User("lopex"))
 Users(db)(_.name == "nosuchuser")       // => Nil
 
-// To get all recors form database simply call `all`
-Users(db).all   // => List(User("teamon"), User("lopex"), User("dmilith"))
+// `Users(db)` is already collection of all object of type `Uses`
+Users(db)   // => List(User("teamon"), User("lopex"), User("dmilith"))
 
 // ### History of changes
 
-// As mentioned above, object update does not modify already stored object but moves it to *history*
-// To access history you need an object or its uuid
+// As mentioned above, object update does not modify already stored object but moves it to *history*.
+// To access history you need an object or its uuid.
 // The `historyFor` method returns `List[T]` of all previos versions of object, without current
-// in order from the newset to oldest
+// in order from the newset to oldest.
 val user = User("teamon")
 db << user
 db << user.copy(name = "teamon 2")
@@ -97,7 +97,7 @@ db << user.copy(name = "teamon 3")
 
 Users(db).historyFor(user)  // => List(User("teamon 2"), User("teamon"))
 
-// Each object has a saving timestamp. You can access it with `savedAt` method
+// Each object has a saving timestamp. You can access it with `savedAt` method.
 user.savedAt // => Time of save action
 
 
