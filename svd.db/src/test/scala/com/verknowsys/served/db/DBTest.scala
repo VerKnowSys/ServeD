@@ -2,19 +2,12 @@ package com.verknowsys.served.db
 
 import org.specs._
 import com.verknowsys.served.SvdSpecHelpers._
-import java.util.UUID
 
-import org.neodatis.odb.core.query.nq.SimpleNativeQuery
-import org.neodatis.odb.core.query.nq.NativeQuery
+case class User(val name: String, id: UUID = randomUUID) extends DBObject(id)
+object Users extends DB[User]
 
-
-
-
-case class User(val name: String, uid: UUID = UUID.randomUUID) extends DBObject(uid)
-object Users extends DBManager[User]
-
-case class Drug(val name: String, uid: UUID = UUID.randomUUID) extends DBObject(uid)
-object Drugs extends DBManager[Drug]
+case class Drug(val name: String, id: UUID = randomUUID) extends DBObject(id)
+object Drugs extends DB[Drug]
 
 class DBTest extends Specification {
     var server: DBServer = null
@@ -32,6 +25,12 @@ class DBTest extends Specification {
             server.close
         }
         
+        "Data model" in {
+            val teamon = new User("teamon")
+            val teamon2 = teamon.copy()
+            teamon.uuid must_== teamon2.uuid
+        }
+        
         "store Users" in {
             val teamon = new User("teamon")
             val dmilith = new User("dmilith")
@@ -39,23 +38,13 @@ class DBTest extends Specification {
             db << teamon
             db << dmilith
             
-            Users(db).count.intValue must_== 2
-            Users(db.current).count.intValue must_== 2
-            Users(db.history).count.intValue must_== 0
+            Users(db).count must_== 2
             
             
-            val users1 = Users(db).all
+            val users1 = Users(db)
             users1 must haveSize(2)
             users1 must contain(teamon)
             users1 must contain(dmilith)
-            
-            val users2 = Users(db.current).all
-            users2 must haveSize(2)
-            users2 must contain(teamon)
-            users2 must contain(dmilith)
-            
-            val users3 = Users(db.history).all
-            users3 must haveSize(0)
         }
         
         "store Users and Drugs" in {
@@ -69,21 +58,15 @@ class DBTest extends Specification {
             db << cig
             db << joint
             
-            val users1 = Users(db).all
+            val users1 = Users(db)
             users1 must haveSize(2)
             users1 must contain(teamon)
             users1 must contain(dmilith)
             
-            val drugs1 = Drugs(db).all
+            val drugs1 = Drugs(db)
             drugs1 must haveSize(2)
             drugs1 must contain(cig)
             drugs1 must contain(joint)
-            
-            val users2 = Users(db.history).all
-            users2 must haveSize(0)
-            
-            val drugs2 = Drugs(db.history).all
-            drugs2 must haveSize(0)
         }
         
         "query by predicate" in {
@@ -119,12 +102,12 @@ class DBTest extends Specification {
         }
         
         "query by uuid" in {
-            val uuid1 = UUID.randomUUID
-            val uuid2 = UUID.randomUUID
-            val uuid3 = UUID.randomUUID
+            val teamon  = User("teamon")
+            val dmilith = User("dmilith")
             
-            val teamon  = User("teamon", uuid1)
-            val dmilith = User("dmilith", uuid2)
+            val uuid1 = teamon.uuid
+            val uuid2 = dmilith.uuid
+            val uuid3 = randomUUID
             
             db << teamon
             db << dmilith
@@ -133,119 +116,64 @@ class DBTest extends Specification {
             Users(db)(uuid2) must beSome(dmilith)
             Users(db)(uuid3) must beNone
         }
+        
+        "use history" in {
+            val teamon  = User("teamon")
+            val dmilith = User("dmilith")
+            
+            val uuid1 = teamon.uuid
+            val uuid2 = dmilith.uuid
+            val uuid3 = randomUUID
+            
+            db << teamon
+            db << dmilith
+            
+            Users(db) must haveSize(2)
+            Users(db).historyFor(uuid1) must beEmpty
+            Users(db).historyFor(uuid2) must beEmpty
+            Users(db).historyFor(uuid3) must beEmpty
+            
+            val teamon2 = teamon.copy(name = "teamon2")
+            val teamon3 = teamon.copy(name = "teamon3")
+            val dmilith2 = dmilith.copy(name = "dmilith2")
+            
+            db << teamon2
+            
+            Users(db) must haveSize(2)
+            Users(db)(uuid1) must beSome(teamon2)
+            Users(db)(uuid2) must beSome(dmilith)
+            Users(db)(uuid3) must beNone
+            Users(db).historyFor(uuid1) must haveSize(1)
+            Users(db).historyFor(uuid1) must contain(teamon)
+            Users(db).historyFor(uuid2) must beEmpty
+            Users(db).historyFor(uuid3) must beEmpty
+            
+            
+            db << teamon3
+            
+            Users(db) must haveSize(2)
+            Users(db)(uuid1) must beSome(teamon3)
+            Users(db)(uuid2) must beSome(dmilith)
+            Users(db)(uuid3) must beNone
+            Users(db).historyFor(uuid1) must haveSize(2)
+            Users(db).historyFor(uuid1) must contain(teamon)
+            Users(db).historyFor(uuid1) must contain(teamon2)
+            Users(db).historyFor(uuid2) must beEmpty
+            Users(db).historyFor(uuid3) must beEmpty
+            
+            db << dmilith2
+            
+            Users(db) must haveSize(2)
+            Users(db)(uuid1) must beSome(teamon3)
+            Users(db)(uuid2) must beSome(dmilith2)
+            Users(db)(uuid3) must beNone
+            Users(db).historyFor(uuid1) must haveSize(2)
+            Users(db).historyFor(uuid1) must contain(teamon)
+            Users(db).historyFor(uuid1) must contain(teamon2)
+            Users(db).historyFor(uuid2) must haveSize(1)
+            Users(db).historyFor(uuid2) must contain(dmilith)
+            Users(db).historyFor(uuid3) must beEmpty
+        }
     }
     
 }
-
-//     var db: DB = null
-//     
-//     "DB" should {
-//         
-//         doBefore {
-//             db = new DB
-//             db.drop
-//         }
-//         
-//         doAfter {
-//             db.close
-//         }
-        
-        // "just store some data" in {
-        //     val uuid = UUID.randomUUID
-        //     db(uuid) must_== None
-        //     db(uuid) = ("name" -> "teamon")
-        //     db(uuid).get("name") must_== "teamon"
-        //     
-        //     db.close
-        //     db = new DB
-        //     db(uuid).get("name") must_== "teamon"
-        // }
-        // 
-        // "work" in {
-        //     val uuid1 = UUID.randomUUID
-        //     val uuid2 = UUID.randomUUID
-        // 
-        // 
-        //     db(uuid1) = ("name" -> "x1")
-        //     db.current.count must_== 1
-        //     db.history.count must_== 0
-        //     db.current.head("name") must_== "x1"
-        //     db(uuid1).get("name") must_== "x1"
-        //     db.historyFor(uuid1) must beEmpty
-        //     db.historyFor(uuid2) must beEmpty
-        //     
-        //     
-        //     db(uuid2) = ("name" -> "y1")
-        //     db.current.count must_== 2
-        //     db.history.count must_== 0
-        //     db(uuid1).get("name") must_== "x1"
-        //     db(uuid2).get("name") must_== "y1"
-        //     db.historyFor(uuid1) must beEmpty
-        //     db.historyFor(uuid2) must beEmpty
-        //     
-        //     
-        //     db(uuid1) = ("name" -> "x2")
-        //     db.current.count must_== 2
-        //     db.history.count must_== 1
-        //     db(uuid1).get("name") must_== "x2"
-        //     db(uuid2).get("name") must_== "y1"
-        //     db.historyFor(uuid1) must haveSize(1)
-        //     db.historyFor(uuid1).head("name") must_== "x1"
-        //     db.historyFor(uuid2) must beEmpty
-        //     
-        //     
-        //     db(uuid1) = ("name" -> "x3")
-        //     db.current.count must_== 2
-        //     db.history.count must_== 1
-        //     db(uuid1).get("name") must_== "x3"
-        //     db(uuid2).get("name") must_== "y1"
-        //     db.historyFor(uuid1) must haveSize(2)
-        //     db.historyFor(uuid1).map(_("name")) must_== List("x2", "x1")
-        //     db.historyFor(uuid2) must beEmpty
-        //     
-        //     
-        //     db(uuid1) = ("name" -> "x4")
-        //     db.current.count must_== 2
-        //     db.history.count must_== 1
-        //     db.historyFor(uuid1) must haveSize(3)
-        //     db.historyFor(uuid1).map(_("name")) must_== List("x3", "x2", "x1")
-        //     db.historyFor(uuid2) must beEmpty
-        //     
-        //     db(uuid2) = ("name" -> "y2")
-        //     db.current.count must_== 2
-        //     db.history.count must_== 2
-        //     db.historyFor(uuid1) must haveSize(3)
-        //     db.historyFor(uuid1).map(_("name")) must_== List("x3", "x2", "x1")
-        //     db.historyFor(uuid2) must haveSize(1)
-        //     db.historyFor(uuid2).map(_("name")) must_== List("y1")
-        // }
-        // 
-        // "should not duplicated data" in {
-        //     val uuid = UUID.randomUUID
-        //     
-        //     db(uuid) = ("name" -> "foo")
-        //     db.current.count must_== 1
-        //     db.history.count must_== 0
-        //     
-        //     db(uuid) = ("name" -> "foo")
-        //     db.current.count must_== 1
-        //     db.history.count must_== 0
-        //     
-        //     db(uuid) = ("name" -> "bar")
-        //     db.current.count must_== 1
-        //     db.history.count must_== 1
-        //     
-        //     db(uuid) = ("name" -> "baz")
-        //     db(uuid) = ("name" -> "baz")
-        //     db(uuid) = ("name" -> "xxx")
-        //     db(uuid) = ("name" -> "xxx")
-        //     db(uuid) = ("name" -> "xxx")
-        //     db(uuid) = ("name" -> "xxx")
-        //     db(uuid) = ("name" -> "yyy")
-        //     
-        //     db.current.count must_== 1
-        //     db.history.count must_== 1
-        //     db.historyFor(uuid).map(_("name")) must_== List("xxx", "baz", "bar", "foo")
-        // }
-    // }
-// }
