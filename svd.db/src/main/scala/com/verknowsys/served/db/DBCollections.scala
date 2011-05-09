@@ -8,7 +8,9 @@ import scala.collection.JavaConversions._
 class TopLevelCollection[T <: DBObject : ClassManifest](db: DBClient) extends ClassQueryCollection[T](db.currentODB){
     def apply(uuid: UUID) = new NativeQueryCollection(db.currentODB, findByUUID(uuid)).headOption
     
-    def historyFor(uuid: UUID) = new NativeQueryCollection(db.historyODB, findByUUID(uuid))
+    def historyFor(uuid: UUID): NativeQueryCollection[T] = new NativeQueryCollection(db.historyODB, findByUUID(uuid))
+    
+    def historyFor(obj: T): NativeQueryCollection[T] = historyFor(obj.uuid)
     
     protected[db] def findByUUID(uuid: UUID): T => Boolean = _.uuid.compareTo(uuid) == 0
 }

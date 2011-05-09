@@ -3,12 +3,6 @@ package com.verknowsys.served.db
 import org.specs._
 import com.verknowsys.served.SvdSpecHelpers._
 
-case class User(val name: String, id: UUID = randomUUID) extends DBObject(id)
-object Users extends DB[User]
-
-case class Drug(val name: String, id: UUID = randomUUID) extends DBObject(id)
-object Drugs extends DB[Drug]
-
 class DBTest extends Specification {
     var server: DBServer = null
     var db: DBClient = null
@@ -174,6 +168,24 @@ class DBTest extends Specification {
             Users(db).historyFor(uuid2) must contain(dmilith)
             Users(db).historyFor(uuid3) must beEmpty
         }
+        
+        "not save identical object" in {
+            val teamon = User("teamon")
+            db << teamon
+            db << teamon
+            db << teamon
+            db << teamon
+            
+            Users(db) must haveSize(1)
+            Users(db).historyFor(teamon) must beEmpty
+            
+            val teamon2 = teamon.copy()
+            db << teamon2
+            
+            Users(db) must haveSize(1)
+            Users(db).historyFor(teamon) must beEmpty
+        }
+
     }
     
 }

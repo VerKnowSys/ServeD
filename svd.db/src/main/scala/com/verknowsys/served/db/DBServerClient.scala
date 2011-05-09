@@ -2,20 +2,20 @@ package com.verknowsys.served.db
 
 import org.neodatis.odb._
 
-abstract class DBObject(val uuid: UUID = randomUUID) // TODO: Add timestamp
-
 class DBClient(val currentODB: ODB, val historyODB: ODB){
     def <<[T <: DBObject : ClassManifest](newObj: T) = {
         // TODO: Hash neodatis internal oid when updating (relation consistency)
         // TODO: Update timestamp
         find(newObj.uuid) match {
-            case Some(oldObj) =>
+            case Some(oldObj) if oldObj != newObj =>
                 historyODB.store(oldObj)
                 historyODB.commit
                 currentODB.delete(oldObj)
                 currentODB.store(newObj)
+            case Some(oldObj) =>
             case None =>
                 currentODB.store(newObj)
+            
         }
         currentODB.commit
     }
