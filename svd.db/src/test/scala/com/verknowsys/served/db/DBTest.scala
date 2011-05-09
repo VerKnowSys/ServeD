@@ -185,6 +185,22 @@ class DBTest extends Specification {
             Users(db) must haveSize(1)
             Users(db).historyFor(teamon) must beEmpty
         }
+        
+        "sort history by descending createdAt" in {
+            val teamon1 = User("teamon 1")
+            db << teamon1
+            val teamon2 = teamon1.copy(name = "teamon 2")
+            db << teamon2
+            val teamon3 = teamon1.copy(name = "teamon 3")
+            db << teamon3
+            val teamon4 = teamon1.copy(name = "teamon 4")
+            db << teamon4
+            val teamon5 = teamon1.copy(name = "teamon 5")
+            db << teamon5
+
+            Users(db).historyFor(teamon1) must haveSize(4)
+            Users(db).historyFor(teamon1).toList must_== teamon4 :: teamon3 :: teamon2 :: teamon1 :: Nil
+        }
 
     }
     

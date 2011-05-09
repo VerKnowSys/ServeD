@@ -8,7 +8,7 @@ import scala.collection.JavaConversions._
 class TopLevelCollection[T <: DBObject : ClassManifest](db: DBClient) extends ClassQueryCollection[T](db.currentODB){
     def apply(uuid: UUID) = new FindByUUIDCollection(db.currentODB, uuid).headOption
     
-    def historyFor(uuid: UUID): FindByUUIDCollection[T] = new FindByUUIDCollection(db.historyODB, uuid)
+    def historyFor(uuid: UUID): FindByUUIDCollection[T] = new FindByUUIDOrderedCollection(db.historyODB, uuid)
     
     def historyFor(obj: T): FindByUUIDCollection[T] = historyFor(obj.uuid)
 }
@@ -19,6 +19,14 @@ class ClassQueryCollection[T <: DBObject : ClassManifest](odb: ODB) extends Abst
     def count = odb.count(new CriteriaQuery(objectType)).intValue
     
     def apply(f: T => Boolean) = new NativeQueryCollection(odb, f)
+}
+
+class FindByUUIDOrderedCollection[T <: DBObject : ClassManifest](odb: ODB, uuid: UUID) extends FindByUUIDCollection[T](odb, uuid) {
+    override protected[db] def nativeQuery = {
+        val nq = super.nativeQuery
+        nq.orderByDesc("createdAt")
+        nq
+    }
 }
 
 class FindByUUIDCollection[T <: DBObject : ClassManifest](odb: ODB, uuid: UUID) extends AbstractCollection[T] {
