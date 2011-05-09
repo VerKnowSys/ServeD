@@ -6,13 +6,11 @@ import org.neodatis.odb.core.query.nq.NativeQuery
 import scala.collection.JavaConversions._
 
 class TopLevelCollection[T <: DBObject : ClassManifest](db: DBClient) extends ClassQueryCollection[T](db.currentODB){
-    def apply(uuid: UUID) = new NativeQueryCollection(db.currentODB, findByUUID(uuid)).headOption
+    def apply(uuid: UUID) = new FindByUUIDCollection(db.currentODB, uuid).headOption
     
-    def historyFor(uuid: UUID): NativeQueryCollection[T] = new NativeQueryCollection(db.historyODB, findByUUID(uuid))
+    def historyFor(uuid: UUID): FindByUUIDCollection[T] = new FindByUUIDCollection(db.historyODB, uuid)
     
-    def historyFor(obj: T): NativeQueryCollection[T] = historyFor(obj.uuid)
-    
-    protected[db] def findByUUID(uuid: UUID): T => Boolean = _.uuid.compareTo(uuid) == 0
+    def historyFor(obj: T): FindByUUIDCollection[T] = historyFor(obj.uuid)
 }
 
 class ClassQueryCollection[T <: DBObject : ClassManifest](odb: ODB) extends AbstractCollection[T] {
@@ -21,6 +19,22 @@ class ClassQueryCollection[T <: DBObject : ClassManifest](odb: ODB) extends Abst
     def count = odb.count(new CriteriaQuery(objectType)).intValue
     
     def apply(f: T => Boolean) = new NativeQueryCollection(odb, f)
+}
+
+class FindByUUIDCollection[T <: DBObject : ClassManifest](odb: ODB, uuid: UUID) extends AbstractCollection[T] {
+    def objects = odb.getObjects(nativeQuery)
+    
+    protected[db] def nativeQuery = new NativeQuery {
+        setPolymorphic(true)
+
+        def `match`(obj: Any): Boolean = {
+            val dbobj = obj.asInstanceOf[T]
+            dbobj.uuid.getMostSignificantBits == uuid.getMostSignificantBits &&
+                dbobj.uuid.getLeastSignificantBits == uuid.getLeastSignificantBits
+        }
+
+        def getObjectType = objectType
+    }
 }
 
 class NativeQueryCollection[T <: DBObject : ClassManifest](odb: ODB, predicate: T => Boolean) extends AbstractCollection[T] {
