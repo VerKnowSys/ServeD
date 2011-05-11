@@ -14,8 +14,13 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     lazy val spechelpers    = project("svd.spechelpers", "SvdSpecHelpers", new SvdSpecHelpers(_))
     lazy val utils          = project("svd.utils", "SvdUtils", new SvdUtils(_), conf, spechelpers)
     lazy val cli            = project("svd.cli", "SvdCLI", new SvdCli(_), utils, api)
+<<<<<<< HEAD
     lazy val db             = project("svd.db", "SvdDB", new SvdDB(_), utils, api)
     lazy val systemmanager  = project("svd.systemmanager", "SvdSystemManager", new SvdSystemManager(_), utils, api, sigar, db)
+=======
+    lazy val db             = project("svd.db", "SvdDB", new SvdDB(_), utils)
+    lazy val systemmanager  = project("svd.systemmanager", "SvdSystemManager", new SvdSystemManager(_), utils, api, sigar)
+>>>>>>> 398a03c2c769d07e28156b2346f36fea9addc13f
     lazy val notifications  = project("svd.notifications", "Notifications", new SvdNotifications(_), utils)
     lazy val maintainer     = project("svd.maintainer", "SvdMaintainer", new SvdMaintainer(_), notifications, systemmanager, api)
     
@@ -60,11 +65,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     class SvdApi(info: ProjectInfo) extends SvdProject(info)
     
     class SvdDB(info: ProjectInfo) extends SvdProject(info){
-        val novusRels = "repo.novus rels" at "http://repo.novus.com/releases/"
-        val novusSnaps = "repo.novus snaps" at "http://repo.novus.com/snapshots/"
-        
-        val casbah = "com.mongodb.casbah" %% "casbah" % "2.0.2"
-        val salat = "com.novus" %% "salat" % "0.0.6-SNAPSHOT"
+        val neodatis = "org.neodatis.odb" % "neodatis-odb" % "1.9.30.689"
     }
     
     class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {
@@ -166,7 +167,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val FIXME = ".*//.*(?i:fixme)(.*):?".r
         
         val Colors = Map(
-            "xxx" -> Console.MAGENTA,
+            "xxx " -> Console.MAGENTA,
             "note" -> Console.YELLOW,
             "hack" -> Console.RED,
             "todo" -> Console.BLUE,
@@ -176,7 +177,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         filetree(new File("."), ".*src(?!.*OLD).*\\.scala") flatMap { file =>
             FileUtilities.readString(file, log).right.get.split("\n").zipWithIndex.map { 
                 case (line, i) => line match {
-                    case XXX(msg)   => ("xxx",   file, i+1, msg)
+                    case XXX(msg)   => ("xxx ",  file, i+1, msg)
                     case NOTE(msg)  => ("note",  file, i+1, msg)
                     case HACK(msg)  => ("hack",  file, i+1, msg)
                     case TODO(msg)  => ("todo",  file, i+1, msg)
@@ -185,7 +186,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
                 }
             } filter { _._3 != 0 }
         } sort { 
-            case ((n1, _, _, _), (n2, _, _, _)) => (n1 compareTo n2) < 0
+            case ((n1, f1, _, _), (n2, f2, _, _)) => if(n1.compareTo(n2) == 0) f1.compareTo(f2) < 0 else n1.compareTo(n2) < 0
         } foreach { 
             case (name, file, line, msg) => 
                 println("[%s%s%s] %s:%d  %s%s%s".format(Colors(name), name, Console.RESET, file.getPath.replaceAll("src/(main|test)/scala/com/verknowsys/served", "...$1..."), line, Colors(name), msg, Console.RESET))

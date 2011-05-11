@@ -1,0 +1,3 @@
+#!/bin/zsh
+
+rocco docs/**/*.scala -o target
