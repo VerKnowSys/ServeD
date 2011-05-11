@@ -1,3 +1,20 @@
 #!/bin/zsh
 
+if which pygmentize > /dev/null; 
+then
+else
+    easy_install pygments
+fi
+
+if gem list roccc | grep rocc > /dev/null;
+then
+else
+    p=`pwd`
+    cd /tmp
+    git clone git://github.com/VerKnowSys/rocco.git
+    cd rocco
+    rake install
+    cd $p
+fi
+
 rocco docs/**/*.scala -o target
