@@ -313,7 +313,7 @@
 //  } catch {
 //    case x: RuntimeException => {
 //      error("Bad Value in config file found:\n " + x)
-//      System.exit(1)
+//      sys.exit(1)
 //    }
 //    case x: Exception => {
 //      warn("*** SvdConfig file " + configFileName + " doesn't exists! Creating new one")

@@ -109,7 +109,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             
         case Quit =>
             log.info("Quitting SvdSystemManager")
-            exit
+            sys.exit(0)
         
         case _ =>
         

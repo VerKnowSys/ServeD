@@ -57,7 +57,7 @@ object boot extends Logging {
         
         if (SvdUtils.isLinux) {
             log.error("Linux systems aren't supported yet!")
-            System.exit(1)
+            sys.exit(1)
         }
         
         log.debug("Home dir: " + (SvdConfig.homePath + "/" + SvdConfig.vendorDir))
@@ -68,7 +68,7 @@ object boot extends Logging {
 
             case x: Any => 
                 log.error("Unknow argument: %s. Exiting", x)
-                System.exit(1)
+                sys.exit(1)
         }}
         
         log.info("Starting %s".format(SvdConfig.served))

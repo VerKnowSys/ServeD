@@ -35,7 +35,7 @@ class SvdMaintainer extends Actor with SvdExceptionHandler {
     
     SvdUtils.addShutdownHook {
         log.info("Performing shutdown, after interruption request..")
-        exit(0)
+        sys.exit(0)
     }
     
     def receive = {

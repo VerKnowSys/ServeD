@@ -27,7 +27,7 @@ object RunWebApp extends Application {
   } catch {
     case exc : Exception => {
       exc.printStackTrace()
-      System.exit(100)
+      sys.exit(100)
     }
   }
 }

@@ -150,7 +150,7 @@ class ApiClient(svd: ActorRef) extends Logging {
     
     private def quit {
         Actor.registry.shutdownAll
-        System.exit(0)
+        sys.exit(0)
     }
 }
 
