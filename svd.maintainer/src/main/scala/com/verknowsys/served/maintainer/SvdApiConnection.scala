@@ -1,10 +1,10 @@
 package com.verknowsys.served.maintainer
 
 import akka.actor.Actor
-import akka.util.Logging
 import akka.routing.Dispatcher
 import akka.serialization.RemoteActorSerialization.toRemoteActorRefProtocol
 
+import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.utils.SvdExceptionHandler
 import com.verknowsys.served.api._
 

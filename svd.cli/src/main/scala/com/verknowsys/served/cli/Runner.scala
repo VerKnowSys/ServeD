@@ -1,7 +1,7 @@
 package com.verknowsys.served.cli
 
 import akka.actor.{Actor, ActorRef}
-import akka.util.Logging
+import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.api._
 
 

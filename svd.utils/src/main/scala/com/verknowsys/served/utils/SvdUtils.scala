@@ -9,7 +9,6 @@ import java.util.ArrayList
 import java.util.regex.Pattern
 import clime.messadmin.providers.sizeof.ObjectProfiler
 import scala.collection.JavaConversions._
-import akka.util.Logging
 import java.io._
 import scala.io._
 import scala.util.matching.Regex

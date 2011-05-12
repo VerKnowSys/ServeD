@@ -4,8 +4,8 @@ package com.verknowsys.served
 import akka.actor._
 import akka.config.Supervision._
 import akka.actor.Actor.{remote, actorOf, registry}
-import akka.util.Logging
 
+import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.utils.SvdUtils
 import com.verknowsys.served.utils.SvdFileEventsManager
 import com.verknowsys.served.maintainer.SvdMaintainer

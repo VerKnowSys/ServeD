@@ -3,8 +3,8 @@ package com.verknowsys.served.web.lib
 import net.liftweb.http.SessionVar
 
 import akka.actor.{Actor, ActorRef}
-import akka.util.Logging
 
+import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.api._
 
 object Session {

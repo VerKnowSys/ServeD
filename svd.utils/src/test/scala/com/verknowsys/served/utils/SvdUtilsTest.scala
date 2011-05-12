@@ -2,12 +2,12 @@ package com.verknowsys.served.utils
 
 
 import com.verknowsys.served.SvdSpecHelpers._
+import com.verknowsys.served.utils.Logging
 
 import scala.util._
 import org.apache.commons.io.FileUtils
 import org.specs._
 import java.io.File
-import akka.util.Logging
 
 
 class SvdUtilsTest extends Specification with Logging {

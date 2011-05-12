@@ -43,6 +43,7 @@ object Admin {
     sealed abstract class Base extends ApiMessage
     
     // Request
+    case object ListTreeActors extends Base
     case object ListActors extends Base
     
     // Response

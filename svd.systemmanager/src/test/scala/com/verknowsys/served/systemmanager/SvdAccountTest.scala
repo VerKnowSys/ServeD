@@ -3,9 +3,9 @@ package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager.acl._
+import com.verknowsys.served.utils.Logging
 
 import org.specs._
-import akka.util.Logging
 
 
 class SvdAccountTest extends Specification with Logging {

@@ -2,6 +2,9 @@ package com.verknowsys.served.maintainer
 
 
 import com.verknowsys.served.api.Admin._
+import com.verknowsys.served.utils.Logging
+import scala.collection.JavaConversions._
+
 
 // akka
 import akka.actor.{Actor, ActorRef, SupervisorActor}
@@ -12,7 +15,7 @@ import akka.actor.{Actor, ActorRef, SupervisorActor}
  *
  *  @author teamon
  */
-class SvdSystemInfo extends Actor {
+class SvdSystemInfo extends Actor with Logging {
     log.trace("Started SvdSystemInfo")
     
     def receive = {
@@ -21,5 +24,5 @@ class SvdSystemInfo extends Actor {
     }
     
     protected def ref2info(ref: ActorRef): ActorInfo = 
-        ActorInfo(ref.uuid.toString, ref.actorClassName, ref.isRunning.toString, ref.linkedActors.map(ref2info))
+        ActorInfo(ref.uuid.toString, ref.actorClassName, ref.isRunning.toString, ref.linkedActors.values.toList.map(ref2info))
 }

@@ -3,10 +3,10 @@ package com.verknowsys.served.systemmanager.native
 
 import com.verknowsys.served.systemmanager.acl._
 import com.verknowsys.served.utils.git.GitRepository
+import com.verknowsys.served.utils.Logging
 
 import java.io.File
 import org.apache.commons.io.FileUtils
-import akka.util.Logging
 import scala.util.matching.Regex
 
 /**
@@ -96,7 +96,7 @@ object SvdAccount extends Logging {
     /**
      * @author teamon
      */
-    def unapply(x: AnyRef) = x match {
+    def unapply(x: Any) = x match {
         case a: SvdAccount => Some((a.userName, a.pass, a.uid, a.gid, a.information, a.homeDir, a.shell, a.acls))
         case _ => None
     }

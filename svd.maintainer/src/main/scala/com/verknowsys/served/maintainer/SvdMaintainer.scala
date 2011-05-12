@@ -12,12 +12,13 @@ import com.verknowsys.served.utils.{SvdUtils, SvdFileEventsManager, SvdException
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.systemmanager.ProcessesList
+import com.verknowsys.served.utils.Logging
+
 
 // akka
 import akka.actor.Actor
 import akka.actor.Actor.actorOf
 import akka.actor.Actor.registry
-import akka.util.Logging
 
 
 /**

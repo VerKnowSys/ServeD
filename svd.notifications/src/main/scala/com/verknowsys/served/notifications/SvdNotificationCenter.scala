@@ -4,9 +4,9 @@ import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.git._
 import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.utils.Logging
 
 import akka.actor.Actor
-import akka.util.Logging
 
 
 class SvdNotificationCenter extends Actor with SvdExceptionHandler {

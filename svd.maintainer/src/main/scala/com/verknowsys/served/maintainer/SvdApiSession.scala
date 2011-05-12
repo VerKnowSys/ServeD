@@ -3,8 +3,8 @@ package com.verknowsys.served.maintainer
 import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.{actorOf, registry}
 import akka.routing.Dispatcher
-import akka.util.Logging
 
+import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.utils.SvdExceptionHandler
 import com.verknowsys.served.api._
 import com.verknowsys.served.systemmanager._

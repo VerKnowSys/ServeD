@@ -4,7 +4,6 @@ import scala.collection.mutable.Map
 import scala.collection.JavaConversions._
 import java.io.{FileInputStream, FileOutputStream}
 import java.util.{Properties => JProperties}
-import akka.util.Logging
 import org.apache.commons.io.FileUtils
 
 
