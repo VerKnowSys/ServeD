@@ -50,7 +50,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             Some("project/growl_images/fail.png")
         )
 
-        val specsTest = "org.scala-tools.testing" %% "specs" % "1.6.6" % "test"
+        val scalaToolsSnapshots = "scala-tools snapshots" at "http://scala-tools.org/repo-snapshots/"
+        val specsTest = "org.scala-tools.testing" % "specs_2.9.0.RC5" % "1.6.8-SNAPSHOT" % "test"
     }
     
     
@@ -117,7 +118,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdSpecHelpers(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
         val commonsio = "commons-io" % "commons-io" % "1.4"
-        val specs     = "org.scala-tools.testing" %% "specs" % "1.6.6"
+        val specs = "org.scala-tools.testing" % "specs_2.9.0.RC5" % "1.6.8-SNAPSHOT"
     }
     
     
@@ -154,8 +155,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         override def jettyWebappPath  = webappPath
         
         override def libraryDependencies = Set(
-          "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
-          "net.liftweb" %% "lift-mapper" % liftVersion % "compile->default",
+          "net.liftweb" % "lift-webkit_2.8.1" % liftVersion % "compile->default",
+          // "net.liftweb" % "lift-mapper_2.8.1" % liftVersion % "compile->default",
           "org.mortbay.jetty" % "jetty" % "6.1.22" % "test->default",
           "junit" % "junit" % "4.5" % "test->default",
           "org.scala-tools.testing" % "specs" % "1.6.2.1" % "test->default",
