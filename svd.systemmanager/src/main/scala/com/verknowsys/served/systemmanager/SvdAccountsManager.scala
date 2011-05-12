@@ -11,7 +11,6 @@ import com.verknowsys.served.api._
 
 import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.{actorOf, registry}
-import akka.util.Logging
 import scala.io.Source
 
 

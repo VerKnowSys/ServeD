@@ -1,7 +1,6 @@
 package com.verknowsys.served.utils
 
 import akka.actor.Actor
-import akka.util.Logging
 import org.apache.commons.io.FileUtils
 import java.io._
 import java.util.Collection

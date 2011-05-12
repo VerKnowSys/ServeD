@@ -7,7 +7,6 @@ import com.sun.jna.NativeLong
 import scala.collection.mutable.{HashMap => MutableMap, ListBuffer}
 import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.actorOf
-import akka.util.Logging
 import com.sun.jna.{Native, Library}
 import events._
 
