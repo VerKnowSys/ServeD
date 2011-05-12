@@ -5,11 +5,8 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.api._
-<<<<<<< HEAD
 import com.verknowsys.served.db._
-=======
 import com.verknowsys.served.utils.Logging
->>>>>>> c8832422d6c61ec4b9a898f0cb617a43c47fb772
 
 import org.apache.commons.io.FileUtils
 import org.hyperic.sigar._
