@@ -7,6 +7,7 @@ import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.monitor._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager.acl._
+import com.verknowsys.served.utils.Logging
 import SvdPOSIX._
 
 import org.hyperic.sigar._
@@ -15,7 +16,6 @@ import scala.collection.JavaConversions._
 import scala.io._
 import java.io._
 import java.lang.reflect.{Field}
-import akka.util.Logging
 import org.apache.commons.io.FileUtils
 
 

@@ -8,11 +8,11 @@ import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.git._
 import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.utils.Logging
 
 import java.text.SimpleDateFormat
 
 import akka.actor.Actor
-import akka.util.Logging
 
 
 class SvdGitNotifier(repo: GitRepository) extends Actor with Logging with SvdExceptionHandler {

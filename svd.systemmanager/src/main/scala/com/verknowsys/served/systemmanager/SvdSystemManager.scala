@@ -9,6 +9,7 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.monitor.SvdMonitored
 import com.verknowsys.served.systemmanager.native._
+import com.verknowsys.served.utils.Logging
 
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -17,7 +18,6 @@ import akka.actor.Actor
 import com.sun.jna.{Native, Library}
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
-import akka.util.Logging
 
 
 case class ProcessesList(pids: List[Long])
@@ -109,7 +109,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             
         case Quit =>
             log.info("Quitting SvdSystemManager")
-            exit
+            sys.exit(0)
         
         case _ =>
         

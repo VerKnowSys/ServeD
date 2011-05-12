@@ -6,13 +6,13 @@ import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.api._
 import com.verknowsys.served.db._
+import com.verknowsys.served.utils.Logging
 
 import org.apache.commons.io.FileUtils
 import org.hyperic.sigar._
 import akka.actor.Actor
 import akka.actor.Actor.actorOf
 import akka.actor.Actor.registry
-import akka.util.Logging
 
 
 /**

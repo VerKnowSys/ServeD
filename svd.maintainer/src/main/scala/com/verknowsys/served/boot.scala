@@ -4,15 +4,17 @@ package com.verknowsys.served
 import akka.actor._
 import akka.config.Supervision._
 import akka.actor.Actor.{remote, actorOf, registry}
-import akka.util.Logging
 
+import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.utils.SvdUtils
 import com.verknowsys.served.utils.SvdFileEventsManager
+import com.verknowsys.served.utils.LoggingManager
 import com.verknowsys.served.maintainer.SvdMaintainer
+import com.verknowsys.served.maintainer.SvdSystemInfo
+import com.verknowsys.served.maintainer.SvdApiConnection
 import com.verknowsys.served.systemmanager.SvdAccountsManager
-import com.verknowsys.served.maintainer.SvdApiSession
-import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.systemmanager.SvdSystemManager
+import com.verknowsys.served.notifications.SvdNotificationCenter
 
 import com.verknowsys.served.utils.signals._
 
@@ -22,12 +24,15 @@ object boot extends Logging {
 
 
     def apply(){
-        val list = (actorOf[SvdFileEventsManager] ::
-                   actorOf[SvdSystemManager] ::
-                   actorOf[SvdAccountsManager] :: 
-                   actorOf[SvdMaintainer] ::
-                   // actorOf[SvdNotificationCenter] :: 
-                   Nil).map(Supervise(_, Permanent))
+        val list = (
+            actorOf[SvdFileEventsManager] ::
+            actorOf[LoggingManager] ::
+            actorOf[SvdSystemManager] ::
+            actorOf[SvdAccountsManager] :: 
+            actorOf[SvdMaintainer] ::
+            actorOf[SvdSystemInfo] ::
+            // actorOf[SvdNotificationCenter] :: 
+            Nil).map(Supervise(_, Permanent))
         // supervise and autostart
         Supervisor(
           SupervisorConfig(
@@ -42,7 +47,7 @@ object boot extends Logging {
         
         // ApiServer
         remote.start(SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
-        remote.registerPerSession("service:api", actorOf[SvdApiSession])
+        remote.registerPerSession("service:api", actorOf[SvdApiConnection])
     }
     
 
@@ -52,7 +57,7 @@ object boot extends Logging {
         
         if (SvdUtils.isLinux) {
             log.error("Linux systems aren't supported yet!")
-            System.exit(1)
+            sys.exit(1)
         }
         
         log.debug("Home dir: " + (SvdConfig.homePath + "/" + SvdConfig.vendorDir))
@@ -63,7 +68,7 @@ object boot extends Logging {
 
             case x: Any => 
                 log.error("Unknow argument: %s. Exiting", x)
-                System.exit(1)
+                sys.exit(1)
         }}
         
         log.info("Starting %s".format(SvdConfig.served))

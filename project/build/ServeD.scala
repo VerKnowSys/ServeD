@@ -10,15 +10,15 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     // Projects
     lazy val sigar          = project("svd.sigar", "SvdSigar")
     lazy val conf           = project("svd.conf", "SvdConfiguration")
-    lazy val api            = project("svd.api", "SvdAPI", conf)
+    lazy val api            = project("svd.api", "SvdAPI", new SvdApi(_), conf)
     lazy val spechelpers    = project("svd.spechelpers", "SvdSpecHelpers", new SvdSpecHelpers(_))
-    lazy val utils          = project("svd.utils", "SvdUtils", new SvdUtils(_), conf, spechelpers)
+    lazy val utils          = project("svd.utils", "SvdUtils", new SvdUtils(_), api, conf, spechelpers)
     lazy val cli            = project("svd.cli", "SvdCLI", new SvdCli(_), utils, api)
     lazy val db             = project("svd.db", "SvdDB", new SvdDB(_), utils, api)
     lazy val systemmanager  = project("svd.systemmanager", "SvdSystemManager", new SvdSystemManager(_), utils, api, sigar, db)
     lazy val notifications  = project("svd.notifications", "Notifications", new SvdNotifications(_), utils)
     lazy val maintainer     = project("svd.maintainer", "SvdMaintainer", new SvdMaintainer(_), notifications, systemmanager, api)
-    
+    lazy val web            = project("svd.web", "SvdWeb", new SvdWeb(_), conf, utils, api)
     
     // Dependencies
     class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject {
@@ -50,14 +50,17 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             Some("project/growl_images/fail.png")
         )
 
-        val specsTest = "org.scala-tools.testing" %% "specs" % "1.6.6" % "test"
+        val scalaToolsSnapshots = "scala-tools snapshots" at "http://scala-tools.org/repo-snapshots/"
+        val specsTest = "org.scala-tools.testing" % "specs_2.9.0.RC5" % "1.6.8-SNAPSHOT" % "test"
     }
     
     
     class SvdSigar(info: ProjectInfo) extends SvdProject(info)
     
     
-    class SvdApi(info: ProjectInfo) extends SvdProject(info)
+    class SvdApi(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
+        val akkaRemote  = akkaModule("remote")
+    }
     
     class SvdDB(info: ProjectInfo) extends SvdProject(info){
         val neodatis = "org.neodatis.odb" % "neodatis-odb" % "1.9.30.689"
@@ -115,7 +118,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     
     class SvdSpecHelpers(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
         val commonsio = "commons-io" % "commons-io" % "1.4"
-        val specs     = "org.scala-tools.testing" %% "specs" % "1.6.6"
+        val specs = "org.scala-tools.testing" % "specs_2.9.0.RC5" % "1.6.8-SNAPSHOT"
     }
     
     
@@ -144,6 +147,21 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         lazy val svd = served
         
         override def mainClass = Some("com.verknowsys.served.boot")
+    }
+    
+    class SvdWeb(info: ProjectInfo) extends DefaultWebProject(info){
+        val liftVersion = "2.3"
+        
+        override def jettyWebappPath  = webappPath
+        
+        override def libraryDependencies = Set(
+          "net.liftweb" % "lift-webkit_2.8.1" % liftVersion % "compile->default",
+          // "net.liftweb" % "lift-mapper_2.8.1" % liftVersion % "compile->default",
+          "org.mortbay.jetty" % "jetty" % "6.1.22" % "test->default",
+          "junit" % "junit" % "4.5" % "test->default",
+          "org.scala-tools.testing" % "specs" % "1.6.2.1" % "test->default",
+          "com.h2database" % "h2" % "1.2.138"
+        ) ++ super.libraryDependencies
     }
     
     

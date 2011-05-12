@@ -7,7 +7,6 @@ import org.apache.commons.io.FileUtils
 import clime.messadmin.providers.sizeof.ObjectProfiler
 import scala.collection.JavaConversions._
 import scala.util.matching.Regex
-import akka.util.Logging
 import scala.io._
 import com.sun.jna.Native
 import java.io._

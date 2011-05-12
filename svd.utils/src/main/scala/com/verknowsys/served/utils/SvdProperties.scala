@@ -4,7 +4,6 @@ import scala.collection.mutable.Map
 import scala.collection.JavaConversions._
 import java.io.{FileInputStream, FileOutputStream}
 import java.util.{Properties => JProperties}
-import akka.util.Logging
 import org.apache.commons.io.FileUtils
 
 
@@ -86,7 +85,7 @@ class SvdProperty(parent: SvdProperties, key: String){
  *
  * @author teamon
  */
-class SvdProperties(filename: String) extends Logging {
+class SvdProperties(filename: String) {
     lazy val data = load
 
     /**
@@ -106,6 +105,16 @@ class SvdProperties(filename: String) extends Logging {
         save
     }
     
+    /** 
+     * Remove key
+     *   
+     * @author teamon
+     */
+    def remove(key: String){
+        data.foreach(_ -= key)
+        save
+    }
+    
     /**
      * Loads properties file and returns Map
      *
@@ -117,7 +126,6 @@ class SvdProperties(filename: String) extends Logging {
             FileUtils.touch(filename) // 2011-01-27 01:12:08 - dmilith - NOTE: this is required to avoid first time run failures
             jprops.load(new FileInputStream(filename))
 
-            log.debug("Loaded file: " + filename)
             Some(jprops.entrySet.iterator.foldLeft(Map[String, String]()) {
                 case (map, item) =>
                     map += (item.getKey.toString -> item.getValue.toString)
@@ -125,7 +133,7 @@ class SvdProperties(filename: String) extends Logging {
             
         } catch {
             case e: Exception =>
-                log.error("Could not save file %s, cause of exception: %s".format(filename, e))
+                // log.error("Could not read file %s, cause of exception: %s".format(filename, e))
                 None
         }
     }
@@ -146,7 +154,7 @@ class SvdProperties(filename: String) extends Logging {
             }
             jprops.store(file, "ServeD Properties: " + filename)
             file.close
-            log.debug("Saved file: " + filename)
+            // log.debug("Saved file: " + filename)
         // } catch {
             // case e: Exception => error("Couldn`t save file %s, cause of exception: %s".format(filename, e))
         // }
