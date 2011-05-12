@@ -57,7 +57,7 @@ class ApiClient(svd: ActorRef) extends Logging {
             case "git" :: xs => xs match {
                 case "list" :: Nil => 
                     request(Git.ListRepositories) {
-                        case Git.Repositories(list) => list.foreach(r => println(" - " + r))
+                        case Git.Repositories(list) => print(list)
                     }
                     
                 case "create" :: name :: Nil =>
@@ -69,7 +69,6 @@ class ApiClient(svd: ActorRef) extends Logging {
                     }
                     
                 case ("remove" | "rm") :: name :: Nil =>
-                    // TODO: Confirm!
                     if(confirm("Are you sure you want to remove repository %s? This operation cannot be undone!".format(name))){
                         request(Git.RemoveRepository(name)) {
                             case Success =>
@@ -85,6 +84,34 @@ class ApiClient(svd: ActorRef) extends Logging {
                 request(Admin.ListActors) {
                     case Admin.ActorsList(list) => list.foreach(println)
                 }
+                
+            case "logger" :: xs => xs match {
+                case "list" :: Nil =>
+                    request(Logger.ListEntries) {
+                        case Logger.Entries(entries) => print(entries.map(e => e._1 + ": " + e._2))
+                    }
+                    
+                case ("remove" | "rm") :: className :: Nil =>
+                    request(Logger.RemoveEntry(className)){
+                        case Success => log.info("Entry removed")
+                    }
+                
+                case className :: level :: Nil => 
+                    parseLoggerLevel(level) match {
+                        case Some(lvl) =>
+                            request(Logger.AddEntry(className, lvl)){
+                                case Success => log.info("Entry added")
+                            }
+                            
+                        case None =>
+                            log.error("Invalid logger level")
+                    }
+                    
+                
+                
+                case _ => log.error("logger [list|add|remove]")
+                
+            }
             
             
             case "echo" :: xs => svd ! xs.mkString(" ")
@@ -94,7 +121,18 @@ class ApiClient(svd: ActorRef) extends Logging {
         }
     }
     
+    def print(list: Iterable[String]) = list.foreach(println)
+    
     def displayHelp = println(helpContent)  
+    
+    def parseLoggerLevel(str: String) = str.toLowerCase match {
+        case "error" => Some(Logger.Levels.Error)
+        case "warn"  => Some(Logger.Levels.Warn)
+        case "info"  => Some(Logger.Levels.Info)
+        case "debug" => Some(Logger.Levels.Debug)
+        case "trace" => Some(Logger.Levels.Trace)
+        case _ => None
+    }
     
     /**
      * Get system username
