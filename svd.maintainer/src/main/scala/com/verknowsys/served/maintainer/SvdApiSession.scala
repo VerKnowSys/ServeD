@@ -6,6 +6,7 @@ import akka.routing.Dispatcher
 
 import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.utils.SvdExceptionHandler
+import com.verknowsys.served.utils.LoggingManager
 import com.verknowsys.served.api._
 import com.verknowsys.served.systemmanager._
 import com.verknowsys.served.systemmanager.managers._
@@ -35,6 +36,10 @@ class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
     }
 
     protected def routes = {
+        case msg: Logger.Base =>
+            log.debug("Remote client sent %s. Forwarding to LoggingManager", msg)
+            registry.actorFor[LoggingManager].get
+            
         case msg: Admin.Base =>
             log.debug("Remote client sent %s. Forwarding to SvdSystemInfo", msg)
             registry.actorFor[SvdSystemInfo].get

@@ -1,7 +1,7 @@
 package com.verknowsys.served.api
 
-sealed abstract class ApiMessage
-sealed abstract class ApiResponse extends ApiMessage
+/*sealed*/ abstract class ApiMessage
+/*sealed*/ abstract class ApiResponse extends ApiMessage
 
 // ServeD -> Client messages
 // common responses
@@ -59,3 +59,8 @@ object Admin {
         // mailboxSize: Int
     )
 }
+
+
+
+
+
