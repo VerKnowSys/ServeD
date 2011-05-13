@@ -75,11 +75,27 @@ object LoggerUtils {
     }
 }
 
+
 class ConsoleLogger(klazz: String) extends AbstractLogger(klazz){
-    protected[utils] def display(level: Logger.Levels.Value, message: String, className: String) { 
-        println(level + " : (" + className + ") " + message)
+    import Logger.Levels._
+    
+    final val Colors = Map(
+        Error -> Console.RED,
+        Warn  -> Console.YELLOW,
+        Info  -> Console.WHITE,
+        Debug -> Console.CYAN,
+        Trace -> Console.MAGENTA
+    )
+    
+    final val format = "%{level}:[%{class}] %{message}"
+    
+    protected[utils] def display(level: Logger.Levels.Value, message: String, className: String) {
+        println(Colors(level) + (format % ("level" -> "%-5s".format(level), "class" -> formatClassName(className), "message" -> message)) + Console.RESET)
     }
+    
+    protected[utils] def formatClassName(className: String) = className.replace("com.verknowsys.served", "svd")
 }
+
 
 abstract class AbstractLogger(klazz: String) {
     import Logger.Levels._
