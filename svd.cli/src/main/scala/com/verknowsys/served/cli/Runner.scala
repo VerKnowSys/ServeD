@@ -23,24 +23,24 @@ class ApiClient(svd: Svd) {
     request(General.Connect(username)) {
         case Success => 
             info("ServeD interactive shell. Welcome %s", username)
-            prompt
+            prompt(new Prompt)
         case Error(message) =>
             error(message)
             quit
     }
+    
 
+    
     /**
      * Show prompt and read arguments
      *
      * @author teamon
      */
-    def prompt {
-        val args = Console.readLine(">>> ").split(" ").filterNot(_ == "")
+    def prompt(in: Prompt) {
+        val args = in.readLine
         if(!args.isEmpty) commands(args.toList)
-        prompt
+        prompt(in)
     }
-
-
 
     /**
      * Get system username

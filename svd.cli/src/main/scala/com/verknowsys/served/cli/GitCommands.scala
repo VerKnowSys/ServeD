@@ -13,7 +13,7 @@ object GitCommands extends Commands {
             case "create" :: name :: Nil =>
                 request(Git.CreateRepository(name)) {
                     case Success =>
-                        ("Repository %s created", name)
+                        info("Repository %s created", name)
                     case Git.RepositoryExistsError => 
                         error("Repository with name %s already exists", name)
                 }

@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 libs = Dir["svd.utils/lib_managed/scala_2.9.0/compile/*.jar"]
+libs += Dir["svd.cli/lib_managed/scala_2.9.0/compile/*.jar"]
 libs << "svd.utils/target/scala_2.9.0/classes"
 libs << "svd.cli/target/scala_2.9.0/classes"
 libs << "svd.cli/target/scala_2.9.0/resources"
@@ -8,6 +9,6 @@ libs << "svd.api/target/scala_2.9.0/classes"
 libs << "svd.conf/target/scala_2.9.0/resources"
 libs << "project/boot/scala-2.9.0/lib/scala-library.jar"
 
-system("sudo rm -r logs")
+system("sudo rm -rf logs")
 system("sudo sbt 'project SvdCLI' compile") &&
 system("java -cp " + libs.join(":") + " com.verknowsys.served.cli.Runner localhost 5555")

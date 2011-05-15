@@ -10,7 +10,7 @@ object GeneralCommands extends Commands {
     def commands(implicit svd: Svd) = {
         case "info" :: Nil =>
             request(Admin.ListActors) {
-                case Admin.ActorsList(list) => list.foreach(println)
+                case Admin.ActorsList(list) => print(list)
             }
 
         case "echo" :: xs => 
