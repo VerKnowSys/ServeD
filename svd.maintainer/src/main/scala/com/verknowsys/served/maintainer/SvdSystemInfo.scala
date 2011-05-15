@@ -19,10 +19,15 @@ class SvdSystemInfo extends Actor with Logging {
     log.trace("Started SvdSystemInfo")
     
     def receive = {
-        case ListActors =>
+        case ListTreeActors =>
             self reply ActorsList(Actor.registry.actorsFor[SupervisorActor].map(ref2info))
     }
     
     protected def ref2info(ref: ActorRef): ActorInfo = 
-        ActorInfo(ref.uuid.toString, ref.actorClassName, ref.isRunning.toString, ref.linkedActors.values.toList.map(ref2info))
+        ActorInfo(
+            uuid            = ref.uuid.toString,
+            className       = ref.actorClassName,
+            status          = ref.isRunning.toString,
+            linkedActors    = ref.linkedActors.values.toList.map(ref2info)
+        )
 }

@@ -51,12 +51,9 @@ object Admin {
     
     case class ActorInfo(
         uuid: String,
-        cls: String,
-        // homeAddress: Option[java.net.InetSocketAddress],
+        className: String,
         status: String,
-        // linkedActors: List[ActorInfo],
-        linkedActors: List[ActorInfo]  
-        // mailboxSize: Int
+        linkedActors: List[ActorInfo]
     )
 }
 

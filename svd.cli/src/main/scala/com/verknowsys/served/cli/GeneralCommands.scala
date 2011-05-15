@@ -9,8 +9,8 @@ abstract class Commands {
 object GeneralCommands extends Commands {
     def commands(implicit svd: Svd) = {
         case "info" :: Nil =>
-            request(Admin.ListActors) {
-                case Admin.ActorsList(list) => print(list)
+            request(Admin.ListTreeActors) {
+                case Admin.ActorsList(arr) => printActorsTree(arr.toList)
             }
 
         case "echo" :: xs => 
@@ -26,7 +26,19 @@ object GeneralCommands extends Commands {
             displayHelp
     }
     
-    def displayHelp = println(helpContent)  
+    def displayHelp = println(helpContent)
+    
+    
+    def printActorsTree(actors: List[Admin.ActorInfo], level: Int = 0){
+        val size = 60 - 2*level
+        actors foreach { a =>
+            
+            info("%s[%-"+size+"s] %s (%s)", "  " * level, shortClassName(a.className), a.uuid, a.status)
+            printActorsTree(a.linkedActors, level + 1)
+        }
+    }
+    
+    def shortClassName(className: String) = className.replace("com.verknowsys.served.", "")
     
     /**
      * Read help file
