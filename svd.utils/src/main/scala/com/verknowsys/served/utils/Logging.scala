@@ -87,10 +87,8 @@ class ConsoleLogger(klazz: String) extends AbstractLogger(klazz){
         Trace -> Console.MAGENTA
     )
     
-    final val format = "%{level}:[%{class}] %{message}"
-    
     protected[utils] def display(level: Logger.Levels.Value, message: String, className: String) {
-        println(Colors(level) + (format % ("level" -> "%-5s".format(level), "class" -> formatClassName(className), "message" -> message)) + Console.RESET)
+        message.split("\n").foreach(line => println("[%s%-5s%s] <%s> %s%s%s".format(Colors(level), level, Console.RESET, formatClassName(className), Colors(level), line, Console.RESET)))
     }
     
     protected[utils] def formatClassName(className: String) = className.replace("com.verknowsys.served", "svd")
