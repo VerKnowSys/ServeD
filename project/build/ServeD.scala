@@ -141,6 +141,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val jna         = "net.java.dev.jna" % "jna" % "3.2.5"
         val swing       = "org.scala-lang" % "scala-swing" % "2.8.1"
         val akkaRemote  = akkaModule("remote")
+        val akkaTestKit = akkaModule("testkit")
     }
     
     
