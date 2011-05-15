@@ -41,8 +41,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             compileOptions("-Xshow-phases") ++
             compileOptions("-Xresident") ++
             compileOptions("-g:source") ++
-            compileOptions("-Xlint:unchecked") ++
-            compileOptions("-Xlint:deprecation")
+            // compileOptions("-Xlint:unchecked") ++
+            // compileOptions("-Xlint:deprecation") 
             (MaxCompileErrors(1) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq // ++ compileOptions("-make:changed")
         
         override def installActions = "update" :: "run" :: Nil
@@ -58,12 +58,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
     
     
-<<<<<<< HEAD
-    class SvdApi(info: ProjectInfo) extends SvdProject(info)
     class SvdCI(info: ProjectInfo) extends SvdProject(info)
-=======
     class SvdSigar(info: ProjectInfo) extends SvdProject(info)
->>>>>>> master
     
     
     class SvdApi(info: ProjectInfo) extends SvdProject(info) with AkkaProject {

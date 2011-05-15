@@ -3,6 +3,9 @@ package com.verknowsys.served.ci
 import akka.actor.Actor
 import akka.actor.ActorRef
 
+import com.verknowsys.served.utils.Logging
+
+
 /** 
  * CI Worker.
  * 
@@ -15,8 +18,8 @@ import akka.actor.ActorRef
  * @param tasks List of tasks to run
  * @author teamon
  */
-class Worker(tasks: List[Task]) extends Actor {
-    log.trace("Starting Worker with tasks: %s", tasks)
+class Worker(tasks: List[Task]) extends Actor with Logging {
+    log.info("Starting Worker with tasks: %s", tasks)
     
     def receive = waiting(Nil, tasks, None)
 
