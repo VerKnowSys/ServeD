@@ -15,10 +15,11 @@ import java.io._
 import java.util.{Calendar, GregorianCalendar}
 import akka.actor.Actor.{actorOf, registry}
 import akka.actor.ActorRef
+import akka.testkit.TestKit
 import org.specs._
 
 
-class SvdGathererTest extends Specification with SvdExpectActorSpecification {
+class SvdGathererTest extends Specification with TestKit {
 
     val homeDir1 = testPath("home/teamon")
     val homeDir2 = testPath("home/dmilith")
@@ -32,7 +33,6 @@ class SvdGathererTest extends Specification with SvdExpectActorSpecification {
     
     "SvdGatherer" should {
         doBefore {
-            beforeExpectActor
             gather1 = actorOf(new SvdGatherer(account1)).start
             gather2 = actorOf(new SvdGatherer(account2)).start
             mkdir(homeDir1)
@@ -40,7 +40,6 @@ class SvdGathererTest extends Specification with SvdExpectActorSpecification {
         }
         
         doAfter {
-            afterExpectActor
             registry.shutdownAll
             rmdir(homeDir1)
             rmdir(homeDir2)
@@ -48,11 +47,10 @@ class SvdGathererTest extends Specification with SvdExpectActorSpecification {
         
         "create more than one instance of SvdGatherer" in {
             gather1 ! "Test signal 1"
-            expectActor ? Nil
-            afterExpectActor
-            beforeExpectActor
+            expectMsg(Nil)
+            
             gather2 ! "Test signal 2"
-            expectActor ? Nil
+            expectMsg(Nil)
         }
  
         "Calendar should give correct values" in {

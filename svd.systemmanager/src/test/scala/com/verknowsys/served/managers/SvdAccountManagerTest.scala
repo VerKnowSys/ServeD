@@ -9,28 +9,19 @@ import org.specs._
 
 import akka.actor._
 import akka.actor.Actor._
+import akka.testkit.TestKit
 
 
-class SvdAccountManagerTest extends Specification with SvdExpectActorSpecification {
+class SvdAccountManagerTest extends Specification with TestKit {
 
     var am: ActorRef = null
     
     "SvdAccountManager" should {
-        doBefore { 
-            beforeExpectActor
-        }
-        
-        doAfter { 
-            afterExpectActor
-            registry.shutdownAll 
-        }
-        
         "respond to GetAccount" in {
             val account = new SvdAccount(userName = "teamon")
             am = actorOf(new SvdAccountManager(account)).start
             am ! GetAccount
-            expectActor ? account
+            expectMsg(account)
         }
      }
-    
 }

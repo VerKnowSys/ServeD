@@ -2,7 +2,6 @@ package com.verknowsys.served.utils
 
 
 import com.verknowsys.served.SvdSpecHelpers._
-import com.verknowsys.served.utils.Logging
 
 import scala.util._
 import org.apache.commons.io.FileUtils
