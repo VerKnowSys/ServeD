@@ -8,7 +8,6 @@ import org.eclipse.jgit.storage.file.FileRepository
 import org.eclipse.jgit.revwalk.{RevCommit}
 import org.eclipse.jgit.transport.{RemoteConfig, RefSpec}
 import java.io.File
-import akka.util.Logging
 
 /** 
  * Common methods for setting up git repository. 

@@ -2,9 +2,9 @@ package com.verknowsys.served.notifications
 
 
 import com.verknowsys.served._
+import com.verknowsys.served.utils.Logging
 
 import scala.collection.mutable.ListBuffer
-import akka.util.Logging
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._

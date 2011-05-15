@@ -1,7 +1,6 @@
 package com.verknowsys.served.utils
 
 import akka.actor.Actor
-import akka.util.Logging
 import org.apache.commons.io.FileUtils
 import java.io._
 import java.util.Collection
@@ -31,7 +30,7 @@ trait SvdExceptionHandler extends Actor with Logging {
     Restarting Actor: (%s) cause of %s.
     Throwable details: (%s).
             """.format(
-                self.getClass.getName, reason.getMessage,
+                this.getClass.getName, reason.getMessage,
                 reason.getStackTrace.map {
                     traceElement =>
                         """

@@ -3,10 +3,11 @@ package com.verknowsys.served.systemmanager.native
 
 import com.verknowsys.served.systemmanager.acl._
 import com.verknowsys.served.utils.git.GitRepository
+import com.verknowsys.served.utils.Logging
+
 import java.io.File
 import org.apache.commons.io.FileUtils
-import akka.util.Logging
-
+import scala.util.matching.Regex
 
 /**
  * SvdAccount data storage
@@ -21,7 +22,7 @@ case class SvdAccount (
         val uid: Int = 1000,
         val gid: Int = 1000,
         val information: String = "No information",
-        val homeDir: String = "/home/",
+        val homeDir: String = "/tmp",
         val shell: String = "/bin/bash",
         val acls: List[Any] = Nil
         ) extends Logging {
@@ -31,7 +32,7 @@ case class SvdAccount (
      * Checks if account is for normal user
      * @author teamon
      */
-    def isUser = homeDir.startsWith("/home")
+    def isUser = SvdAccount.isUser(this)
     
     
     /**
@@ -43,7 +44,7 @@ case class SvdAccount (
     /**
      * @author dmilith
      */
-    def accountWeight =
+    def accountWeight: Option[Long] =
         try {
             val elementsSize = FileUtils.sizeOfDirectory(new File(homeDir))
             log.debug("getSvdAccountSize of " + homeDir + " folder: " + elementsSize)
@@ -64,6 +65,23 @@ object SvdAccount extends Logging {
     
     
     /**
+     * Checks if account is for normal user
+     * @author teamon, dmilith
+     */
+    def isUser(account: SvdAccount) = {
+        val unixLikeHome = "/home/.*".r
+        val macLikeHome = "/Users/.*".r
+        account.homeDir match {
+            case unixLikeHome() => true
+            case macLikeHome() => true
+            case x =>
+                log.debug("Value of 'homeDir' for user '%s' is: '%s'. It's system user.".format(account.userName, x, false))
+                false
+        }
+    }
+    
+    
+    /**
      *  @author dmilith
      *  
      *  Returns ACLs of given user
@@ -78,7 +96,7 @@ object SvdAccount extends Logging {
     /**
      * @author teamon
      */
-    def unapply(x: AnyRef) = x match {
+    def unapply(x: Any) = x match {
         case a: SvdAccount => Some((a.userName, a.pass, a.uid, a.gid, a.information, a.homeDir, a.shell, a.acls))
         case _ => None
     }

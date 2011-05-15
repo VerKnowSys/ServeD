@@ -3,18 +3,20 @@ package com.verknowsys.served.utils
 
 import com.verknowsys.served._
 
-import java.io.{PrintWriter, File, OutputStreamWriter}
 import org.apache.commons.io.FileUtils
-import java.util.ArrayList
-import java.util.regex.Pattern
 import clime.messadmin.providers.sizeof.ObjectProfiler
 import scala.collection.JavaConversions._
-import akka.util.Logging
-import java.io._
-import scala.io._
 import scala.util.matching.Regex
-import java.util.UUID
+import scala.io._
 import com.sun.jna.Native
+import java.io._
+import java.util.UUID
+import java.util.{Calendar, GregorianCalendar}
+import java.util.zip.DataFormatException
+import java.util.zip.Deflater
+import java.util.zip.Inflater
+import java.util.ArrayList
+import java.util.regex.Pattern
 
 
 /**
@@ -26,9 +28,6 @@ import com.sun.jna.Native
 object SvdUtils extends Logging {
     
     
-    Native.setProtected(true)
-    
-        
     /**
     *   @author dmilith
     *   
@@ -49,9 +48,25 @@ object SvdUtils extends Logging {
             case "root" =>
             case _ =>
                 lazy val err = "%s must be run as root user to perform some operations!".format(this.getClass)
-                error(err)
+                sys.error(err)
         }
     }
+    
+
+    /**
+     *  @author dmilith
+     *
+     *   returns true if running system matches BSD
+     */
+    def isBSD = System.getProperty("os.name").contains("BSD")
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   returns true if running system matches Linux
+     */
+    def isLinux = System.getProperty("os.name").contains("Linux")
     
     
     /**
@@ -59,25 +74,114 @@ object SvdUtils extends Logging {
      *
      *   Generate unique identifier
      */
-    def uuid = UUID.randomUUID
+    def newUuid = UUID.randomUUID
     
     
     /**
      *  @author dmilith
      *
-     *  Checks and creates (if missing) config property file for application
+     *  Checks and creates (if missing) given directory name
+     *
+     */    
+    def checkOrCreateDir(dir: String) = {
+        if (new File(dir).exists) {
+            log.debug("Directory: '%s' exists".format(dir))
+        } else {
+            log.debug("No directory named: '%s' available! Creating empty one.".format(dir))
+            new File(dir).mkdirs
+        }
+        dir
+    }
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   simple String compression (zip inflate/deflate)
+     */
+    def compress(input: String) = {
+        // 2011-03-13 20:48:01 - dmilith - TODO: implement check for too short string to compress (<40 chars)
+        val byteInput = input.getBytes
+        val bos = new ByteArrayOutputStream(byteInput.length)
+        val buf = new Array[Byte](128)
+        val compressor = new Deflater
+        compressor.setLevel(Deflater.BEST_COMPRESSION)
+        compressor.setInput(byteInput)
+        compressor.finish
+        while (!compressor.finished) {
+            val count = compressor.deflate(buf)
+            bos.write(buf, 0, count)
+        }
+        try {
+            bos.close
+        } catch {
+            case e: Exception => {
+                e.printStackTrace // 2011-03-13 17:38:52 - dmilith - XXX: temporary code
+            }
+        }
+        val compressedByte = bos.toByteArray
+        val compressedString = new String(compressedByte)
+        log.debug("Original string length: %d, Compressed one: %d".format(input.length, compressedString.length))
+        compressedString
+    }
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   simple String decompression (zip inflate/deflate)
+     */
+    def decompress(input: String) = {
+        // Decompress the data
+        val decompressor = new Inflater
+        val buf = new Array[Byte](128)
+        val compressedByte = input.getBytes
+        decompressor.setInput(compressedByte)
+        val bos = new ByteArrayOutputStream(compressedByte.length)
+        
+        while (!decompressor.finished) {
+            try {
+                val count = decompressor.inflate(buf)
+                bos.write(buf, 0, count)
+            } catch {
+                case e: DataFormatException =>
+            }
+        }
+        try {
+            bos.close
+        } catch {
+            case e: Exception =>
+                log.trace("Exception in decompress: " + e)
+        }
+        val decompressedByte = bos.toByteArray
+        val decompressedString = new String(decompressedByte)
+        log.debug("Compressed string length: %d, Decompressed one: %d".format(input.length, decompressedString.length))
+        decompressedString
+    }
+    
+
+    /**
+     *  @author dmilith
+     *
+     *   converts seconds to friendly format: hh-mm-ss
+     */
+    def secondsToHMS(seconds: Int) = {
+        val calendar = new GregorianCalendar(0,0,0,0,0,0)
+        calendar.set(Calendar.SECOND, seconds)
+        "%02dh:%02dm:%02ds".format(
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            calendar.get(Calendar.SECOND))
+    }
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *  Checks and creates (if missing) ServeD vendor dir
      *
      */
-    def checkOrCreateVendorDir = {
-        val vendorPath = SvdConfig.homePath + SvdConfig.vendorDir
-        if (new File(vendorPath).exists) {
-            log.debug("Making sure that vendor directory exists")
-        } else {
-            log.debug("No vendor directory available! Creating empty vendor directory")
-            new File(vendorPath).mkdir
-        }
-        vendorPath
-    }
+    def checkOrCreateVendorDir = checkOrCreateDir(SvdConfig.homePath + SvdConfig.vendorDir)
 
     
     /**
@@ -95,7 +199,7 @@ object SvdUtils extends Logging {
      *  Returns size (in bytes) of given object in JVM memory
      *
      *  @example
-     *  info ( sizeof ( new Date ( ) ))
+     *  println(sizeof(new Date))
      *
      */
     def sizeof(any: Any) = ObjectProfiler.sizeof(any)
@@ -119,7 +223,18 @@ object SvdUtils extends Logging {
                 override def run = block
             }
         )
-        
+
+
+    /**
+     *  @author dmilith
+     *
+     *   counts time spent on operation in given block
+     */
+    def bench(block: => Unit) = {
+        val start = System.currentTimeMillis
+        block
+        System.currentTimeMillis - start
+    }
         
         
     /** 
@@ -201,6 +316,9 @@ object SvdUtils extends Logging {
             Array()
     }
     
+    
+    // NOTE: These two methods below could be easily refactored into one (teamon)
+    // 
     
     /** 
      * Changes owner of file at given path

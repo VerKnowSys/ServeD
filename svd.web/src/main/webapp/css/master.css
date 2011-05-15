@@ -1,0 +1,17 @@
+@import "reset.css";
+@import "layout.css";
+
+.debug .container_12 {
+    background-image: url(http://s.teamon.eu/960gs/12_col.png);
+}
+
+
+
+
+/*#subnav {
+    background-color: red;
+}
+
+#content {
+    background-color: green;
+}*/

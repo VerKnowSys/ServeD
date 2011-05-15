@@ -19,11 +19,13 @@
     </rollingPolicy>
   </appender>
 
-  <logger name="akka" level="WARN"/>
+  <logger name="akka" level="TRACE">
+      <appender-ref ref="R"/>
+  </logger>
 	<logger name="com.verknowsys.served" level="TRACE"/>
+	<logger name="com.verknowsys.served.systemmanager.managers" level="TRACE"/>
 
   <root level="WARN">
     <appender-ref ref="stdout"/>
-    <appender-ref ref="R"/>
   </root>
 </configuration>

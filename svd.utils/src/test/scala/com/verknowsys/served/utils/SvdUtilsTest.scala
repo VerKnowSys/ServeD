@@ -7,7 +7,6 @@ import scala.util._
 import org.apache.commons.io.FileUtils
 import org.specs._
 import java.io.File
-import akka.util.Logging
 
 
 class SvdUtilsTest extends Specification with Logging {
@@ -74,8 +73,11 @@ class SvdUtilsTest extends Specification with Logging {
         FileUtils.touch("/tmp/dupa_32745923/dupa011")
         FileUtils.touch("/tmp/dupa_32745923/dupa003")
         SvdUtils.chmod("/tmp/dupa_327", 0777, true) must beTrue
+        SvdUtils.chmod("/tmp/dupa_327", 0777, false) must beTrue
         SvdUtils.chmod("/tmp/dupa_327/abc", 0777, true) must beTrue
+        SvdUtils.chmod("/tmp/dupa_327/abc", 0777, false) must beTrue
         SvdUtils.chmod("/tmp/dupa_327/xyz", 0777, true) must beTrue
+        SvdUtils.chmod("/tmp/dupa_327/xyz", 0777, false) must beTrue
         FileUtils.touch("/tmp/dupa_32745923/dupa011")
         SvdUtils.chmod("/tmp/dupa_32745923/dupa011", 0111, false) must beTrue
         SvdUtils.recursiveListFilesFromPath("/tmp/dupa_327").size must beEqual(3)

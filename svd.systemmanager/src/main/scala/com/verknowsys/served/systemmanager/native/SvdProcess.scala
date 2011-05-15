@@ -7,6 +7,7 @@ import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.monitor._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager.acl._
+import com.verknowsys.served.utils.Logging
 import SvdPOSIX._
 
 import org.hyperic.sigar._
@@ -15,7 +16,6 @@ import scala.collection.JavaConversions._
 import scala.io._
 import java.io._
 import java.lang.reflect.{Field}
-import akka.util.Logging
 import org.apache.commons.io.FileUtils
 
 
@@ -32,15 +32,14 @@ class SvdProcess(
     val command: String,
     val user: String = SvdConfig.noUser,
     val workDir: String = SvdConfig.tmp,
-    val outputRedirectDestination: String = SvdConfig.nullDevice,
-    val useShell: Boolean = false)
+    val waitFor: Boolean = false,
+    val shutdownHook: Unit = {})
         extends Logging {
 
     
     log.debug("Spawning SvdProcess: (%s)".format(command))
 
     import SvdProcess._
-    Native.setProtected(true)
 
     // 2011-01-26 12:36:06 - dmilith - NOTE: TODO: check low level way of launching processes
     // val pid = {
@@ -62,14 +61,23 @@ class SvdProcess(
       *
       */
     val pid = {
+        val cwd = System.getProperty("user.dir")
+        System.setProperty("user.dir", workDir)
+        log.trace("USER.DIR = %s", System.getProperty("user.dir"))
         var aPid = -1L
-        val cmdFormats = if (useShell) "%s -u %s -s %s > %s 2>&1" else "%s -u %s %s > %s 2>&1"
-        val cmd =  cmdFormats.format("sudo", user, command, outputRedirectDestination).split(" ")
+        val cmdFormats = "%s -H -u %s %s"
+        val cmd =  cmdFormats.format("sudo", user, command).split(" ")
         val rt = Runtime.getRuntime
+        rt.addShutdownHook(new Thread {
+            override def run = {
+                log.info("Shutdown hook on process: %s".format(this))
+                shutdownHook
+            }
+        })
         val env = SvdConfig.env
         val proc = rt.exec(cmd, env)
         log.trace("CMD: %s".format(cmd.mkString(" ")))
-        rt.traceMethodCalls(false)
+        rt.traceMethodCalls(true)
         proc.getClass.getDeclaredFields.foreach{ f =>
             f.setAccessible(true)
             f.getName match {
@@ -80,21 +88,18 @@ class SvdProcess(
             }
             log.trace(f.getName+"="+f.get(proc))
         }
+        if (waitFor) // 2011-03-05 16:59:47 - dmilith - NOTE: synchronized process, waiting until process ends
+            proc.waitFor
+            
         try {
             if (proc.exitValue > 0)
-                throw new ProcessException("SvdProcess: '%s' exited abnormally with error code: '%s'. Output info: '%s'".format(
-                    command, proc.exitValue,
-                        if (outputRedirectDestination != SvdConfig.nullDevice)
-                            Source.fromFile(outputRedirectDestination).mkString
-                        else
-                            "NONE"
-                ))
+                log.debug("SvdProcess: '%s' exited abnormally with error code: '%s'.".format(
+                    command, proc.exitValue))
         } catch {
             case x: IllegalThreadStateException =>
-                log.debug("SvdProcess thread exited. No exitValue given.")
-            // case x: ProcessException =>
-            //                 log.error("ProcessException occured: %s".format(x.getMessage))
+                log.debug("Process hasn't exited. It should be spawned in background")
         }
+        System.setProperty("user.dir", cwd) 
         aPid
     }
     
@@ -108,7 +113,7 @@ class SvdProcess(
     	core.getProcState(pid)
     } catch { 
         case x: SigarException =>
-            log.debug("Sigar has just throw: %s".format(x))
+            log.debug("Sigar has just thrown: %s".format(x))
             new ProcState
     }
     
@@ -117,7 +122,7 @@ class SvdProcess(
     	core.getProcCpu(pid)
     } catch { 
         case x: SigarException =>
-            log.debug("Sigar has just throw: %s".format(x))
+            log.debug("Sigar has just thrown: %s".format(x))
             new ProcCpu
     }
     
@@ -126,7 +131,7 @@ class SvdProcess(
     	core.getProcMem(pid)
     } catch { 
         case x: SigarException =>
-            log.debug("Sigar has just throw: %s".format(x))
+            log.debug("Sigar has just thrown: %s".format(x))
             new ProcMem
     }
     
@@ -160,7 +165,6 @@ class SvdProcess(
      */
     require(commandNotEmpty, "SvdProcess require non-empty command to execute!")
     require(workDirExists, "SvdProcess working dir must exist! Given: %s".format(workDir))
-    require(outputWritable, "SvdProcess output file (%s) isn't writable!".format(outputRedirectDestination))
     require(passACLs, "SvdProcess didn't pass ACL requirements! Failed process: %s".format(command))
     require(pid > 0, "SvdProcess PID always should be > 0!")
     
@@ -192,37 +196,21 @@ class SvdProcess(
      */
     def workDirExists =
         new File(workDir).exists
-        
-    
-    /**
-     *  @author dmilith
-     *
-     *   Checks for writable output
-     */
-    def outputWritable = {
-        try { 
-            FileUtils.touch(outputRedirectDestination)
-        } catch {
-            case _ =>
-        }
-        new File(outputRedirectDestination).canWrite
-    }
-
+            
 
     /**
      *  @author dmilith
      *
      *   Returns true if current process exists
      */    
-    def alive = 
-        try {
-             core.getProcState(pid)
-             true
-        } catch { 
-            case x: SigarException =>
-                log.trace("SvdProcess: %s alive() check thrown: %s".format(command, x))
-                false
-        }
+    def alive = {
+        while (pid == -1L)
+            Thread.sleep(10)
+        if (SvdProcess.getProcessInfo(pid) == "NONE") 
+            false
+        else
+            true
+    }
     
 
     /**
@@ -233,8 +221,15 @@ class SvdProcess(
       * @return true if succeeded, false if failed
       *
       */
-    def kill(signal: SvdPOSIX.Value = SIGINT) =
-        SvdProcess.kill(pid, signal)
+    def kill(signal: SvdPOSIX.Value = SIGINT) = {
+        while (pid == -1L)
+            Thread.sleep(10)
+        if (SvdProcess.getProcessInfo(pid) != "NONE") 
+            SvdProcess.kill(pid, signal)
+        else
+            true // already killed so we might return true
+    }
+        
 
 
     override def toString =
@@ -254,7 +249,7 @@ class SvdProcess(
            "TIME_TOTAL:[%s] " +
            "TIME_USER:[%s] " +
            "\n")
-               .format(name, user, rss, shr, pid, ppid, thr, prio, nice, params.mkString(" "), timeStart, timeKernel, timeTotal, timeUser)
+               .format(name, user, rss, shr, pid, ppid, thr, prio, nice, command, timeStart, timeKernel, timeTotal, timeUser)
 
 
     log.trace("Process %s spawned.".format(command))
@@ -304,9 +299,8 @@ object SvdProcess extends Logging {
     def processList(sort: Boolean = false) = {
         val preList = core.getProcList.toList // 2010-10-24 01:09:51 - dmilith - NOTE: toList, cause JNA returns Java's "Array" here.
         val sourceList = if (sort) preList.sortWith(_.toInt < _.toInt) else preList
-        log.debug("UnSORTED   : " + preList)
-        log.debug("SORTED     : " + preList.sortWith(_.toInt < _.toInt))
-        log.trace("sourceList : " + sourceList)
+        log.trace("unsorted    : " + preList)
+        log.debug("processList : " + sourceList)
         sourceList
     }
     

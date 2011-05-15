@@ -9,6 +9,7 @@ import scala.collection.mutable.Queue
 
 case class Expect(size: Int)
 
+@deprecated("Use akka.testkit")
 class SvdExpectActor extends Actor { // 2011-01-30 13:14:38 - dmilith - XXX: should extend SvdExceptionHandler
     val inbox = Queue[Any]()
     
@@ -36,6 +37,7 @@ class SvdExpectActor extends Actor { // 2011-01-30 13:14:38 - dmilith - XXX: sho
     protected def take(size: Int) = (1 to size).foldLeft(List[Any]()){ case (xs, _) => xs :+ inbox.dequeue }
 }
 
+@deprecated("Use akka.testkit")
 trait SvdExpectActorSpecification {
     self: Specification =>
     

@@ -10,10 +10,11 @@ import com.verknowsys.served.api._
 
 import akka.actor.Actor.{actorOf, registry}
 import akka.actor.ActorRef
+import akka.testkit.TestKit
 import org.specs._
 
 
-class SvdGitManagerTest extends Specification with SvdExpectActorSpecification {
+class SvdGitManagerTest extends Specification with TestKit {
 
     val homeDir = testPath("home/teamon")
     val account = new SvdAccount(userName = "teamon", homeDir = homeDir)
@@ -21,25 +22,23 @@ class SvdGitManagerTest extends Specification with SvdExpectActorSpecification {
     
     "SvdGitManager" should {
         doBefore {
-            beforeExpectActor
             gitm = actorOf(new SvdGitManager(account)).start
             mkdir(homeDir)
         }
         
         doAfter {
-            afterExpectActor
             registry.shutdownAll
             rmdir(homeDir)
         }
         
         "return empty repository list" in {
             gitm ! Git.ListRepositories
-            expectActor ? Git.Repositories(Nil)
+            expectMsg(Git.Repositories(Nil))
         }
         
         "create new bare repository under git directory" in {
             gitm ! Git.CreateRepository("foo")
-            expectActor ? Success
+            expectMsg(Success)
             
             homeDir / "git" must beADirectoryPath
             homeDir / "git" / "foo.git" must beADirectoryPath
@@ -47,34 +46,34 @@ class SvdGitManagerTest extends Specification with SvdExpectActorSpecification {
             new git.GitRepository(homeDir / "git" / "foo.git").isBare must beTrue
             
             gitm ! Git.ListRepositories
-            expectActor ? Git.Repositories("foo" :: Nil)
+            expectMsg(Git.Repositories("foo" :: Nil))
         }
         
         "do not allow creating repository with existing name" in {
             gitm ! Git.CreateRepository("foo")
-            expectActor ? Success
+            expectMsg(Success)
             
             gitm ! Git.CreateRepository("foo")
-            expectActor ? Git.RepositoryExistsError
+            expectMsg(Git.RepositoryExistsError)
         }
         
         "remove repository" in {
             gitm ! Git.CreateRepository("foo")
-            expectActor ? Success
+            expectMsg(Success)
             
             gitm ! Git.ListRepositories
-            expectActor ? Git.Repositories("foo" :: Nil)
+            expectMsg(Git.Repositories("foo" :: Nil))
             
             gitm ! Git.RemoveRepository("foo")
-            expectActor ? Success
+            expectMsg(Success)
             
             gitm ! Git.ListRepositories
-            expectActor ? Git.Repositories(Nil)
+            expectMsg(Git.Repositories(Nil))
         }
         
         "raise error when removing non existing repository" in {
             gitm ! Git.RemoveRepository("foo")
-            expectActor ? Git.RepositoryDoesNotExistError
+            expectMsg(Git.RepositoryDoesNotExistError)
         }
     }
 }

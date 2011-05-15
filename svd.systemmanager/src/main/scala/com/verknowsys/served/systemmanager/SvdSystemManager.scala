@@ -4,10 +4,12 @@
 package com.verknowsys.served.systemmanager
 
 
+import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.monitor.SvdMonitored
 import com.verknowsys.served.systemmanager.native._
+import com.verknowsys.served.utils.Logging
 
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -16,7 +18,6 @@ import akka.actor.Actor
 import com.sun.jna.{Native, Library}
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
-import akka.util.Logging
 
 
 case class ProcessesList(pids: List[Long])
@@ -34,25 +35,32 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
     log.info("SvdSystemManager is loading")
     
 
-    Native.setProtected(true) // 2010-10-11 23:43:21 - dmilith - set JVM protection (in case of JNA code fail it should only throw an exception)
-    
-    
     def receive = {
         case Init =>
             val nrs = new SvdSystemResources
+            
+            log.info("Starting main MongoDB instance..")
+            val db = new SvdProcess(
+                "mongod --logpath %s --dbpath %s --bind_ip 127.0.0.1 --noauth --noscripting --nounixsocket".format(
+                SvdConfig.homePath / SvdConfig.vendorDir / "mongo_gather.log",
+                SvdUtils.checkOrCreateDir(SvdConfig.homePath / SvdConfig.vendorDir / "mongo_gather.db")
+            ), user = "root")
+            
+            // log.info("Starting main Memcached instance..")
+            // val mc = new SvdProcess("memcached -u root -l 127.0.0.1 -p 50001", user = "root")
             
             log.info("SvdSystemManager ready")
             log.info("System Resources Availability: [%s]".format(nrs))
             log.info("Current PID: %d. System Information:\n%s".format(SvdProcess.getCurrentProcessPid, SvdProcess.getProcessInfo(SvdProcess.getCurrentProcessPid)))
             
 
-            val a = new SvdProcess(command = "dig +trace arka.gdynia.pl", user = "root", outputRedirectDestination = "/tmp/served_nobody_memcached.log")
+            // val a = new SvdProcess(command = "dig +trace arka.gdynia.pl", user = "root", stdOut = "/tmp/served_nobody_memcached.log")
             // log.debug("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
-            a.kill(SIGINT)
+            // a.kill(SIGINT)
             
-            val b = new SvdProcess(command = "df -h", user = "root", useShell = true)
+            // val b = new SvdProcess(command = "df -h", user = "root", useShell = true)
             // log.debug("%s, status: %s".format(b, if (b.alive) "RUNNING" else "DEAD"))
-            b.kill(SIGINT)
+            // b.kill(SIGINT)
             
             // val sam = Actor.registry.actorFor[SvdAccountManager]
             // sam.get ! "go!"
@@ -78,11 +86,11 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             // reply(result)
             
         case Kill(pid, signal) => // 2011-01-23 04:13:34 - dmilith - NOTE: send standard SIGINT signal to app with some pid
-            log.info("Kill request for native application with Pid: %s. Sending signal: %s", pid, signal)
-            SvdProcess.kill(pid.asInstanceOf[Long], signal.asInstanceOf[SvdPOSIX.Value])
+            // log.info("Kill request for native application with Pid: %s. Sending signal: %s", pid, signal)
+            // SvdProcess.kill(pid.asInstanceOf[Long], signal.asInstanceOf[SvdPOSIX.Value])
             
-            SvdUtils.chown("/tmp/dupa007", user = 666, group = 6666)
-            SvdUtils.chown("/tmp/dupa_32745923", user = 666, group = 6666)
+            // SvdUtils.chown("/tmp/dupa007", user = 666, group = 6666)
+            // SvdUtils.chown("/tmp/dupa_32745923", user = 666, group = 6666)
             
             // throw new Exception("Dupa zbladła")
             // throw new RuntimeException("Dupa zbladła bardzo")
@@ -91,7 +99,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             
         case SpawnProcess(cmd) =>
             log.debug("Requested process spawn: %s", cmd)
-            val spawn = new SvdProcess(cmd, user = "root", useShell = true) // 2011-01-23 05:27:11 - dmilith - XXX: temporary, that should be user's account name
+            val spawn = new SvdProcess(cmd, user = "root") // 2011-01-23 05:27:11 - dmilith - XXX: temporary, that should be user's account name
             log.trace("Spawned: %s", spawn)
             
         case GetAllProcesses =>
@@ -101,35 +109,11 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             
         case Quit =>
             log.info("Quitting SvdSystemManager")
-            exit
+            sys.exit(0)
         
         case _ =>
         
     }
-
-
-    /**
-    *   @author dmilith  
-    *   
-    *   This function will send given signal (first param), to given pid (second param)
-    */
-    def sendSignalToPid(signal: SvdPOSIX.Value, pid: Int) =
-        signal match {
-            case SIGHUP =>
-                log.trace("SigHUP sent to process pid: %s".format(pid))
-                
-            case SIGINT =>
-                log.trace("SigINT sent to process pid: %s".format(pid))
-                
-            case SIGQUIT =>
-                log.trace("SigQUIT sent to process pid: %s".format(pid))
-                
-            case SIGKILL =>
-                log.trace("SigKILL sent to process pid: %s".format(pid))
-            
-            case _ =>
-            
-        }
     
     
     override def toString = "SvdSystemManager"

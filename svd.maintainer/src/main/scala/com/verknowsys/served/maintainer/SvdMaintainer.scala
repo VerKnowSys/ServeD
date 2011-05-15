@@ -12,12 +12,13 @@ import com.verknowsys.served.utils.{SvdUtils, SvdFileEventsManager, SvdException
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.systemmanager.ProcessesList
+import com.verknowsys.served.utils.Logging
+
 
 // akka
 import akka.actor.Actor
 import akka.actor.Actor.actorOf
 import akka.actor.Actor.registry
-import akka.util.Logging
 
 
 /**
@@ -32,6 +33,10 @@ class SvdMaintainer extends Actor with SvdExceptionHandler {
     registry.actorFor[SvdSystemManager] foreach { _ ! Init }
     registry.actorFor[SvdNotificationCenter] foreach { _ ! Status("Ready!") }
     
+    SvdUtils.addShutdownHook {
+        log.info("Performing shutdown, after interruption request..")
+        sys.exit(0)
+    }
     
     def receive = {
         case Init =>
@@ -43,9 +48,9 @@ class SvdMaintainer extends Actor with SvdExceptionHandler {
             Thread.sleep(SvdConfig.sleepDefaultPause)
             
             // 2011-01-23 05:29:52 - dmilith - NOTE: temporary code:
-            registry.actorFor[SvdSystemManager] foreach { _ ! GetAllProcesses }
-            registry.actorFor[SvdSystemManager] foreach { _ ! SpawnProcess("echo 'dupa'") }
-            registry.actorFor[SvdSystemManager] foreach { _ ! Kill(435343, SIGINT) }
+            // registry.actorFor[SvdSystemManager] foreach { _ ! GetAllProcesses }
+            // registry.actorFor[SvdSystemManager] foreach { _ ! SpawnProcess("echo 'dupa'") }
+            // registry.actorFor[SvdSystemManager] foreach { _ ! Kill(435343, SIGINT) }
             // 2011-01-23 05:29:52 - dmilith - NOTE: EOF temporary code.
 
         case x => 

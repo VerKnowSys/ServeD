@@ -22,6 +22,19 @@ svd is ServeD interactive shell that gives you access to (almost) all ServeD fea
   * `git remove` <name>, `git rm` <name>:
     Remove repository with given name
     
+### Logger
+  Commands related to ServeD logger settings. It allows setting custom logger level for every class/package.
+  
+  * `logger list`:
+    List logger configuration entries
+    
+  * `logger` <package> [error|warn|info|debug|trace]:
+    Change logger level for specified package.
+  
+  * `logger rm` <package>:
+    Remove configuration entry for <package>.
+    
+    
 ## COPYRIGHT
 
 ServeD is Copyright (C) 2009-2011 VerKnowSys <http://verknowsys.com>

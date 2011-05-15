@@ -3,9 +3,9 @@ package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager.acl._
+import com.verknowsys.served.utils.Logging
 
 import org.specs._
-import akka.util.Logging
 
 
 class SvdAccountTest extends Specification with Logging {
@@ -22,16 +22,21 @@ class SvdAccountTest extends Specification with Logging {
             a.uid must beEqual(1000)
             a.gid must beEqual(1000)
             a.information must beEqual("No information")
-            a.homeDir must beEqual("/home/")
+            a.homeDir must beEqual("/tmp")
             a.shell must beEqual("/bin/bash")
         }
         
         "isUser" in {
-            SvdAccount("", "", 1, 1, "", "/home/teamon", "/path/to/shell", Nil).isUser must beTrue
             SvdAccount("", "", 1, 1, "", "/home/foo", "/path/to/shell", Nil).isUser must beTrue
+            SvdAccount("", "", 1, 1, "", "/Users/foo2", "/path/to/shell", Nil).isUser must beTrue
             SvdAccount("", "", 1, 1, "", "/foo", "/path/to/shell", Nil).isUser must beFalse
-            SvdAccount("", "", 1, 1, "", "/foo/home", "/path/to/shell", Nil).isUser must beFalse
             SvdAccount("", "", 1, 1, "", "/foo/home/bar", "/path/to/shell", Nil).isUser must beFalse
+            val tmn = SvdAccount("", "", 1, 1, "", "/home/teamon", "/path/to/shell", Nil)
+            tmn.isUser must beTrue
+            SvdAccount.isUser(tmn) must beTrue
+            val foo = SvdAccount("", "", 1, 1, "", "/foo/home", "/path/to/shell", Nil)
+            foo.isUser must beFalse
+            SvdAccount.isUser(foo) must beFalse
         }
         
         "correctly parse ordered arguments" in {
@@ -114,6 +119,7 @@ class SvdAccountTest extends Specification with Logging {
             res must beTrue
         }
         
+                
     }
 
 }

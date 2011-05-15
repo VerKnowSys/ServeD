@@ -1,8 +1,7 @@
 package com.verknowsys.served.api
 
-
-sealed abstract class ApiMessage
-sealed abstract class ApiResponse extends ApiMessage
+/*sealed*/ abstract class ApiMessage
+/*sealed*/ abstract class ApiResponse extends ApiMessage
 
 // ServeD -> Client messages
 // common responses
@@ -17,6 +16,7 @@ object General {
     sealed abstract class Base extends ApiMessage
     
     // Request
+    case object CreateSession extends Base
     case class Connect(username: String) extends Base
     case object Disconnect extends Base
 }
@@ -38,3 +38,26 @@ object Git {
     case class Repositories(val list: List[String])
     case class Repository(val name: String)
 }
+
+object Admin {
+    sealed abstract class Base extends ApiMessage
+    
+    // Request
+    case object ListTreeActors extends Base
+    case object ListActors extends Base
+    
+    // Response
+    case class ActorsList(list: Array[ActorInfo])
+    
+    case class ActorInfo(
+        uuid: String,
+        className: String,
+        status: String,
+        linkedActors: List[ActorInfo]
+    )
+}
+
+
+
+
+

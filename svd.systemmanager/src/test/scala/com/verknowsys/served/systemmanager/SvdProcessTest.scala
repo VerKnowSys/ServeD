@@ -71,13 +71,13 @@ class SvdProcessTest extends Specification {
         "Should detect harmful/ incorect commands automatically" in {
             var exploit: SvdProcess = null
             try {
-            	exploit = new SvdProcess("dig +trace wp.pl", user = "root", useShell = false)
+            	exploit = new SvdProcess("dig +trace wp.pl", user = "root")
             } catch {
                 case x: Exception =>
                     fail("'Exploit' shouldn't be detected (noShell)! Exception: %s".format(x))
             }
             try {
-            	exploit = new SvdProcess("ls", user = "root", useShell = true)
+            	exploit = new SvdProcess("ls", user = "root")
             } catch {
                 case x: Exception =>
                     fail("'Exploit' shouldn't be detected (Shell)! Exception: %s".format(x))
@@ -89,8 +89,8 @@ class SvdProcessTest extends Specification {
                 case _ =>
             }
             try { 
-                val a = new SvdProcess("ls -lar", user = "root", useShell = true)
-                val b = new SvdProcess("ls -lar", user = "root", useShell = true)
+                val a = new SvdProcess("ls -lar", user = "root")
+                val b = new SvdProcess("ls -lar", user = "root")
                 a must notBeNull
                 // 2011-01-24 16:53:16 - dmilith - NOTE: b MAY be null, cause ls without shell may be exceptional case
             } catch {
@@ -158,43 +158,77 @@ class SvdProcessTest extends Specification {
         
 //2011-01-24 19:25:51 - dmilith - TODO: what if some process is spawning a process?
 
-        "it must be able to check that process is alive or not without and with shell" in {
+        "it must be able to check that process is killable and maintainable (basics) + stdOut output check" in {
             var a: SvdProcess = null
             var b: SvdProcess = null
             var c: SvdProcess = null
             var d: SvdProcess = null
-            try {
-                a = new SvdProcess("memcached -u nobody -p 11313", user = "root", useShell = true)
-                a must notBeNull
-                ("PNAME:" :: "COMMAND:" :: Nil).foreach{
-                    elem =>
-                        a.toString must beMatching(elem)
-                }
-                b = new SvdProcess("memcached -u nobody -p 11312", user = "root")
-                b must notBeNull
-                ("PNAME:" :: "COMMAND:" :: Nil).foreach{
-                    elem =>
-                        b.toString must beMatching(elem)
-                }
-            } catch {
-                case e: Exception =>
-                    fail("Alive isn't working well? Exception: %s, Object: %s".format(e.getMessage, a))
-            } finally {
-                // 2011-01-24 16:59:05 - dmilith - NOTE: in most cases this will return false: a.alive must beEqual(true)
-                // b.alive must beEqual(true)
-                a.kill(SIGKILL) must beTrue
-                b.kill(SIGKILL) must beTrue
-                c = new SvdProcess("echo abc", user = "root")
-                d = new SvdProcess("echo abc", user = "root")
-                c must notBeNull
-                d must notBeNull
-                ("PID:" :: "PNAME" :: "COMMAND:" :: Nil).foreach{
-                    elem =>
-                        c.toString must beMatching(elem)
-                        d.toString must beMatching(elem)
-                }
+            a = new SvdProcess("sleep 50000", user = "root")
+            a must notBeNull
+            ("PNAME:" :: "COMMAND:" :: Nil).foreach{
+                elem =>
+                    a.toString must beMatching(elem)
+            }
+            a.kill(SIGINT) must beTrue
+
+            b = new SvdProcess("sleep 51111", user = "root")
+            b must notBeNull
+            ("PNAME:" :: "COMMAND:" :: Nil).foreach{
+                elem =>
+                    b.toString must beMatching(elem)
+            }
+            b.kill(SIGINT) must beTrue
+
+            c = new SvdProcess("echo abc", user = "root")
+            // c.stdOut must beMatching("abc")
+            d = new SvdProcess("echo abc", user = "root")
+            c must notBeNull
+            d must notBeNull
+            ("PID:" :: "PNAME" :: "COMMAND:" :: Nil).foreach{
+                elem =>
+                    c.toString must beMatching(elem)
+                    d.toString must beMatching(elem)
             }
         }
+        
+        
+        // 2011-03-05 12:42:36 - dmilith - TODO: implement alive() spec
+        "it must pass alive specs" in {
+            synchronized {
+                val b = new SvdProcess("read", user = "root")
+                b.alive must beTrue
+                Thread.sleep(250)
+                b.kill(SIGKILL)
+                Thread.sleep(250)
+                b.alive must beFalse
+            }
+        }
+        
+
+        // 2011-03-05 18:29:02 - dmilith - NOTE: XXX: dangerous code for Mac OS X ;>
+        // "it must be able to spawn synchronized (waiting) processes" in {
+        //     var a: SvdProcess = null
+        //     var pid = -1L
+        //     
+        //     val t1 = new Thread {
+        //         override def run = {
+        //             while (pid == -1L) {
+        //                 pid = (new SvdProcess("read", user = "root", useShell = true, waitFor = true)).pid
+        //                 exit
+        //             }
+        //             // wait forever
+        //         }
+        //     }
+        //     
+        //     t1.start
+        //     
+        //     while (pid == -1L)
+        //         SvdProcess.kill(pid, SIGKILL)
+        //     
+        //     t1.join
+        // 
+        //     a.alive must beFalse
+        // }
         
 
     } // test should

@@ -9,12 +9,14 @@ import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.spechelpers._
 import com.verknowsys.served.SvdConfig
 import org.specs._
+import akka.testkit.TestKit
+
 
 import akka.actor._
 import akka.actor.Actor._
 
 
-class SvdAccountsManagerTest extends Specification with SvdExpectActorSpecification {
+class SvdAccountsManagerTest extends Specification with TestKit {
     
     
     def changePasswdPath(path: String) {
@@ -31,12 +33,10 @@ class SvdAccountsManagerTest extends Specification with SvdExpectActorSpecificat
     
     "SvdAccountsManager" should {
         doBefore {
-            beforeExpectActor
             fem = actorOf[SvdFileEventsManager].start
         }
         
         doAfter { 
-            afterExpectActor
             registry.shutdownAll 
         }
         

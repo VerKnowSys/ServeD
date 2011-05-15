@@ -7,7 +7,6 @@ import com.sun.jna.NativeLong
 import scala.collection.mutable.{HashMap => MutableMap, ListBuffer}
 import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.actorOf
-import akka.util.Logging
 import com.sun.jna.{Native, Library}
 import events._
 
@@ -85,7 +84,6 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
     import CLibrary._
     
     log.info("SvdFileEventsManager is loading")
-    Native.setProtected(true)
     
     protected val clib = CLibrary.instance
     protected lazy val kq = {

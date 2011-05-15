@@ -2,9 +2,7 @@ package com.verknowsys.served
 
 import com.verknowsys.served.utils.SvdProperties
 
-
 object SvdConfig {
-    
 
     /**
      * @author dmilith, teamon
@@ -13,10 +11,17 @@ object SvdConfig {
      *
      */
      
-    final val version = "0.1"
-    final val mainPropertiesFilename = "/served-%s.properties".format(version)
+    final val version = "0.1.2"
+    final val served = "ServeD v" + version
+    final val configurationFilesPrefix = if(environment == "test") "/tmp/config" else ""
+    
+    final val mainPropertiesFilename = configurationFilesPrefix + "/served-%s.properties".format(version)
+    final val loggerPropertiesFilename = configurationFilesPrefix + "/served-%s-logger.properties".format(version)
     final val props = new SvdProperties(mainPropertiesFilename)
-
+    
+    
+    // NOTE: Not-so-good code for environment handling (teamon)
+    var environment = "test"
 
     /**
      *   @author dmilith, teamon
@@ -34,12 +39,13 @@ object SvdConfig {
          "PWD=%s%s".format(homePath, vendorDir),
          "COMMAND_MODE=%s".format(terminalCommandMode),
          "HOME=%s".format(homePath),
+         "SHELL=%s".format(defaultShell),
          "PATH=%s".format(defaultPathEnviroment) // 2011-01-18 14:39:36 - dmilith - TODO: implement account privileges and their influence on PATH setting
      )
 
 
-    def homePath =                      props("served.vendor.home") or System.getProperty("user.home") + "/"
-    def vendorDir =                     props("served.vendor.dir") or ".svd/"
+    def homePath =                      props("served.vendor.home") or System.getProperty("user.home")
+    def vendorDir =                     props("served.vendor.dir") or ".svd"
     
     def nullDevice =                    props("served.system.devices.null") or "/dev/null"
     def tmp =                           props("served.system.filesystems.tmp") or "/tmp/"
@@ -48,6 +54,7 @@ object SvdConfig {
     
     def defaultEncoding =               props("served.system.encoding") or "UTF-8"
     
+    def defaultShell =                  props("served.system.terminal.environment.shell") or "zsh"
     def defaultPathEnviroment =         props("served.system.terminal.environment.path") or "$HOME/bin:$HOME/Bin:/bin:/usr/bin:/usr/local/bin"
     def defaultTmpDir =                 props("served.system.terminal.environment.tmpdir") or "/tmp/"
     def terminalType =                  props("served.system.terminal.environment.term") or "xterm-color"
@@ -57,6 +64,7 @@ object SvdConfig {
     def terminalLanguageLCTYPE =        props("served.system.terminal.environment.lc_ctype") or "en_US.UTF-8"
     def terminalLanguageLCMESSAGES =    props("served.system.terminal.environment.lc_messages") or "en_US.UTF-8"
     
+    def gatherTimeout =                 props("served.system.gatherer.timeout") or 10000
     def servedUserName =                props("served.system.username") or "served"
     def systemPasswdFile =              props("served.system.password.filename") or homePath + vendorDir + "etc/passwd"
 

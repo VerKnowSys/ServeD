@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+
+if which cloc > /dev/null; 
+then
+else
+    brew install cloc
+fi
+
+echo "Code LOC"
+cloc --skip-uniqueness --exclude-dir=test,target,OLD,doc,docs,.git,.idea,lib,bin,project .
+
+echo "Test LOC"
+cloc --skip-uniqueness --exclude-dir=main,target,OLD,doc,docs,.git,.idea,lib,bin,project .
+
