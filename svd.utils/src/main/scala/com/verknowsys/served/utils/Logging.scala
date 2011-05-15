@@ -70,7 +70,7 @@ object LoggerUtils {
     
     // Serach for matching class entry
     protected def _level(parts: List[String]): Option[Logger.Levels.Value] = parts match {
-        case x :: xs => _levels.get(xs.reverse.mkString(".")) orElse _level(xs)
+        case x :: xs => _levels.get(parts.reverse.mkString(".")) orElse _level(xs)
         case Nil => None
     }
 }

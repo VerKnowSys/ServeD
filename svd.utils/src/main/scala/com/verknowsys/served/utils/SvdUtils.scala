@@ -317,6 +317,9 @@ object SvdUtils extends Logging {
     }
     
     
+    // NOTE: These two methods below could be easily refactored into one (teamon)
+    // 
+    
     /** 
      * Changes owner of file at given path
      * 
