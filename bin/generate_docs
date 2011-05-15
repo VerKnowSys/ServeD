@@ -6,11 +6,12 @@ else
     easy_install pygments
 fi
 
-if gem list roccc | grep rocc > /dev/null;
+if gem list rocco | grep rocco > /dev/null;
 then
 else
     p=`pwd`
     cd /tmp
+    rm -rf /tmp/rocco
     git clone git://github.com/VerKnowSys/rocco.git
     cd rocco
     rake install
