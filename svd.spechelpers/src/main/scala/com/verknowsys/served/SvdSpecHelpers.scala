@@ -41,7 +41,7 @@ object SvdSpecHelpers {
         writeFile(path, content)
     }
     
-    @deprecated("Use SvdExpectActor")
+    @deprecated("Use akka.testkit")
     def waitWhileRunning(actors: Seq[Actor]*) {
         actors.flatten foreach { a =>
             while(a.getState != Actor.State.Blocked && a.getState != Actor.State.Suspended) { 
@@ -52,7 +52,7 @@ object SvdSpecHelpers {
         }
     }
     
-    @deprecated("Use SvdExpectActor")
+    @deprecated("Use akka.testkit")
     def waitForDeath(actors: Seq[Actor]*) {
         actors.flatten foreach { a =>
             while(a.getState != Actor.State.Terminated) { 
@@ -68,7 +68,7 @@ object SvdSpecHelpers {
     //     System.in.read
     // }
     
-    @deprecated("Use SvdExpectActor")
+    @deprecated("Use akka.testkit")
     class Counter extends Actor {
         case object Stop
         
