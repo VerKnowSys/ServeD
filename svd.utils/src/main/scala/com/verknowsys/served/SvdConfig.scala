@@ -2,9 +2,7 @@ package com.verknowsys.served
 
 import com.verknowsys.served.utils.SvdProperties
 
-
 object SvdConfig {
-    
 
     /**
      * @author dmilith, teamon
@@ -15,10 +13,15 @@ object SvdConfig {
      
     final val version = "0.1.2"
     final val served = "ServeD v" + version
-    final val mainPropertiesFilename = "/served-%s.properties".format(version)
-    final val loggerPropertiesFilename = "/served-%s-logger.properties".format(version)
+    final val configurationFilesPrefix = if(environment == "test") "/tmp/config" else ""
+    
+    final val mainPropertiesFilename = configurationFilesPrefix + "/served-%s.properties".format(version)
+    final val loggerPropertiesFilename = configurationFilesPrefix + "/served-%s-logger.properties".format(version)
     final val props = new SvdProperties(mainPropertiesFilename)
-
+    
+    
+    // NOTE: Not-so-good code for environment handling (teamon)
+    var environment = "test"
 
     /**
      *   @author dmilith, teamon

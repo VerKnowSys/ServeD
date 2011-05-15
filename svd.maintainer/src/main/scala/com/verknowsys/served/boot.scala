@@ -50,8 +50,8 @@ object boot extends Logging {
         remote.registerPerSession("service:api", actorOf[SvdApiConnection])
     }
     
-
     def main(args: Array[String]) {
+        SvdConfig.environment = "production"
         
         SvdUtils.checkOrCreateVendorDir
         
@@ -63,15 +63,7 @@ object boot extends Logging {
         log.debug("Home dir: " + (SvdConfig.homePath + "/" + SvdConfig.vendorDir))
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         
-        args foreach { _ match {
-            case "--monitor" =>
-
-            case x: Any => 
-                log.error("Unknow argument: %s. Exiting", x)
-                sys.exit(1)
-        }}
-        
-        log.info("Starting %s".format(SvdConfig.served))
+        log.info("Starting %s (env: %s)", SvdConfig.served, SvdConfig.environment)
         boot()
     }
     
