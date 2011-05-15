@@ -40,6 +40,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             compileOptions("-Xshow-phases") ++
             compileOptions("-Xresident") ++
             compileOptions("-g:source") ++
+            compileOptions("-Xlint:unchecked") ++
+            compileOptions("-Xlint:deprecation")
             (MaxCompileErrors(1) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq // ++ compileOptions("-make:changed")
         
         override def installActions = "update" :: "run" :: Nil

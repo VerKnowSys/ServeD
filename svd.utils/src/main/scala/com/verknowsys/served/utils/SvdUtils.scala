@@ -48,7 +48,7 @@ object SvdUtils extends Logging {
             case "root" =>
             case _ =>
                 lazy val err = "%s must be run as root user to perform some operations!".format(this.getClass)
-                error(err)
+                sys.error(err)
         }
     }
     

@@ -60,7 +60,7 @@ class NativeQueryCollection[T <: DBObject : ClassManifest](odb: ODB, predicate: 
 abstract class AbstractCollection[T <: DBObject : ClassManifest] extends Iterable[T] {
     val objectType = classManifest[T].erasure
 
-    def iterator = asScalaIterable(objects).iterator
+    def iterator = collectionAsScalaIterable(objects).iterator
 
     def objects: Objects[T]
 }
