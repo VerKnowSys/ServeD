@@ -43,5 +43,25 @@ class StorageTest extends Specification {
         // "average CPU by name and time range" in {
         //     
         // }
+        
+        "calculate sum of memory by PID" in {
+            db.save(new ProcessInfo(120, "Foo", 1, 20))
+            db.save(new ProcessInfo(120, "Foo", 10, 21))
+            db.save(new ProcessInfo(120, "Foo", 5, 22))
+            db.save(new ProcessInfo(120, "Foo", 4, 23))
+            db.sumMemByPID(120) must_== 86
+        }
+        
+        // "average CPU by PID and time range" in {
+        //     
+        // }
+        
+        "calculate sum of memory by name" in {
+            db.save(new ProcessInfo(120, "Foo", 1, 20))
+            db.save(new ProcessInfo(120, "Foo", 10, 21))
+            db.save(new ProcessInfo(120, "Foo", 5, 22))
+            db.save(new ProcessInfo(120, "Foo", 4, 23))
+            db.sumMemByName("Foo") must_== 86
+        }
      }
 }

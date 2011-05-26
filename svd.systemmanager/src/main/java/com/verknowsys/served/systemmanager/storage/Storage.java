@@ -17,6 +17,13 @@ public class Storage {
     private PreparedStatement avgCpuByNameAndTimeStatement = null;
     private PreparedStatement avgCpuByTimeStatement = null;
     
+    private PreparedStatement sumMemByPIDStatement = null;
+    private PreparedStatement sumMemByPIDAndTimeStatement = null;
+    private PreparedStatement sumMemByNameStatement = null;
+    private PreparedStatement sumMemByNameAndTimeStatement = null;
+    private PreparedStatement sumMemByTimeStatement = null;
+    
+    
     public Storage(String databaseFilePath) throws SQLException {
         // Check if database file exist, if not, setup processinfo table
         boolean doSetup = !(new File(databaseFilePath)).exists();
@@ -29,6 +36,13 @@ public class Storage {
         avgCpuByNameStatement = conn.prepareStatement("SELECT AVG(cpu) AS avg_cpu FROM processinfo WHERE name = ?;");
         avgCpuByNameAndTimeStatement = conn.prepareStatement("SELECT AVG(cpu) AS avg_cpu FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
         avgCpuByTimeStatement = conn.prepareStatement("SELECT AVG(cpu) AS avg_cpu FROM processinfo WHERE time BETWEEN ? AND ?;");
+
+        sumMemByPIDStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE pid = ?;");
+        sumMemByPIDAndTimeStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
+        sumMemByNameStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE name = ?;");
+        sumMemByNameAndTimeStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
+        sumMemByTimeStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE time BETWEEN ? AND ?;");
+
     }
     
     private void setupTable() throws SQLException {
@@ -125,11 +139,65 @@ public class Storage {
         return results.getFloat("avg_cpu");
     }
     
-    // public int sumMemByPID(int pid);
-    // public int sumMemByPIDAndTime(int pid, Timestamp from, Timestamp to);
-    // public int sumMemByName(String name);
-    // public int sumMemByNameAndTime(String name, Timestamp from, Timestamp to);
-    // public int sumMemByTime(Timestamp from, Timestamp to);
+    /**
+     * Returns total of memory usage for specified PID
+     * @author teamon
+     */
+    public int sumMemByPID(int pid) throws SQLException {
+        sumMemByPIDStatement.setInt(1, pid);
+        ResultSet results = sumMemByPIDStatement.executeQuery();
+        results.next();
+        return results.getInt("sum_mem");
+    }
+    
+    /**
+     * Returns total of memory usage for specified PID and time range
+     * @author teamon
+     */
+    public int sumMemByPIDAndTime(int pid, Timestamp from, Timestamp to) throws SQLException {
+        sumMemByPIDAndTimeStatement.setInt(1, pid);
+        sumMemByPIDAndTimeStatement.setTimestamp(2, from);
+        sumMemByPIDAndTimeStatement.setTimestamp(3, to);
+        ResultSet results = sumMemByPIDAndTimeStatement.executeQuery();
+        results.next();
+        return results.getInt("sum_mem");
+    }
+    
+    /**
+     * Returns total of memory usage for specified process name
+     * @author teamon
+     */
+    public int sumMemByName(String name) throws SQLException {
+        sumMemByNameStatement.setString(1, name);
+        ResultSet results = sumMemByNameStatement.executeQuery();
+        results.next();
+        return results.getInt("sum_mem");
+    }
+    
+    /**
+     * Returns total of memory usage for specified process name and time range
+     * @author teamon
+     */
+    public int sumMemByNameAndTime(String name, Timestamp from, Timestamp to) throws SQLException {
+        sumMemByNameAndTimeStatement.setString(1, name);
+        sumMemByNameAndTimeStatement.setTimestamp(2, from);
+        sumMemByNameAndTimeStatement.setTimestamp(3, to);
+        ResultSet results = sumMemByNameAndTimeStatement.executeQuery();
+        results.next();
+        return results.getInt("sum_mem");
+    }
+    
+    /**
+     * Returns total of memory usage within specified time range
+     * @author teamon
+     */
+    public int sumMemByTime(Timestamp from, Timestamp to) throws SQLException {
+        sumMemByTimeStatement.setTimestamp(1, from);
+        sumMemByTimeStatement.setTimestamp(2, to);
+        ResultSet results = sumMemByTimeStatement.executeQuery();
+        results.next();
+        return results.getInt("sum_mem");
+    }
     
     // public float avgMemByPID(int pid);
     // public float avgMemByPIDAndTime(int pid, Timestamp from, Timestamp to);
