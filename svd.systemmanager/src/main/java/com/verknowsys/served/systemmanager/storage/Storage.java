@@ -11,6 +11,13 @@ import java.io.File;
 public class Storage {
     private Connection conn = null;
     private PreparedStatement insertStatement = null;
+    
+    private PreparedStatement sumCpuByPIDStatement = null;
+    private PreparedStatement sumCpuByPIDAndTimeStatement = null;
+    private PreparedStatement sumCpuByNameStatement = null;
+    private PreparedStatement sumCpuByNameAndTimeStatement = null;
+    private PreparedStatement sumCpuByTimeStatement = null;
+    
     private PreparedStatement avgCpuByPIDStatement = null;
     private PreparedStatement avgCpuByPIDAndTimeStatement = null;
     private PreparedStatement avgCpuByNameStatement = null;
@@ -23,6 +30,12 @@ public class Storage {
     private PreparedStatement sumMemByNameAndTimeStatement = null;
     private PreparedStatement sumMemByTimeStatement = null;
     
+    private PreparedStatement avgMemByPIDStatement = null;
+    private PreparedStatement avgMemByPIDAndTimeStatement = null;
+    private PreparedStatement avgMemByNameStatement = null;
+    private PreparedStatement avgMemByNameAndTimeStatement = null;
+    private PreparedStatement avgMemByTimeStatement = null;
+    
     
     public Storage(String databaseFilePath) throws SQLException {
         // Check if database file exist, if not, setup processinfo table
@@ -31,6 +44,13 @@ public class Storage {
         if(doSetup) setupTable();
         
         insertStatement = conn.prepareStatement("INSERT INTO processinfo VALUES (?, ?, ?, ?, ?);");
+        
+        sumCpuByPIDStatement = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE pid = ?;");
+        sumCpuByPIDAndTimeStatement = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
+        sumCpuByNameStatement = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE name = ?;");
+        sumCpuByNameAndTimeStatement = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
+        sumCpuByTimeStatement = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE time BETWEEN ? AND ?;");
+        
         avgCpuByPIDStatement = conn.prepareStatement("SELECT AVG(cpu) AS avg_cpu FROM processinfo WHERE pid = ?;");
         avgCpuByPIDAndTimeStatement = conn.prepareStatement("SELECT AVG(cpu) AS avg_cpu FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
         avgCpuByNameStatement = conn.prepareStatement("SELECT AVG(cpu) AS avg_cpu FROM processinfo WHERE name = ?;");
@@ -42,6 +62,12 @@ public class Storage {
         sumMemByNameStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE name = ?;");
         sumMemByNameAndTimeStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
         sumMemByTimeStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE time BETWEEN ? AND ?;");
+
+        avgMemByPIDStatement = conn.prepareStatement("SELECT AVG(mem) AS avg_mem FROM processinfo WHERE pid = ?;");
+        avgMemByPIDAndTimeStatement = conn.prepareStatement("SELECT AVG(mem) AS avg_mem FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
+        avgMemByNameStatement = conn.prepareStatement("SELECT AVG(mem) AS avg_mem FROM processinfo WHERE name = ?;");
+        avgMemByNameAndTimeStatement = conn.prepareStatement("SELECT AVG(mem) AS avg_mem FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
+        avgMemByTimeStatement = conn.prepareStatement("SELECT AVG(mem) AS avg_mem FROM processinfo WHERE time BETWEEN ? AND ?;");
 
     }
     
@@ -67,17 +93,72 @@ public class Storage {
         insertStatement.execute();
     }
     
+    
     // public List<ProcessInfo> getByPID(int pid);
     // public List<ProcessInfo> getByPIDAndTime(int pid, Timestamp from, Timestamp to);
     // public List<ProcessInfo> getByName(String name);
     // public List<ProcessInfo> getByNameAndTime(String name, Timestamp from, Timestamp to);
     // public List<ProcessInfo> getByTime(Timestamp from, Timestamp to);
-    
-    // public int sumCpuByPID(int pid);
-    // public int sumCpuByPIDAndTime(int pid, Timestamp from, Timestamp to);
-    // public int sumCpuByName(String name);
-    // public int sumCpuByNameAndTime(String name, Timestamp from, Timestamp to);
-    // public int sumCpuByTime(Timestamp from, Timestamp to);
+
+    /**
+     * Returns total of CPU usage for specified PID
+     * @author teamon
+     */
+    public int sumCpuByPID(int pid) throws SQLException {
+        sumCpuByPIDStatement.setInt(1, pid);
+        ResultSet results = sumCpuByPIDStatement.executeQuery();
+        results.next();
+        return results.getInt("sum_cpu");
+    }
+
+    /**
+     * Returns total of CPU usage for specified PID and time range
+     * @author teamon
+     */
+    public int sumCpuByPIDAndTime(int pid, Timestamp from, Timestamp to) throws SQLException {
+        sumCpuByPIDAndTimeStatement.setInt(1, pid);
+        sumCpuByPIDAndTimeStatement.setTimestamp(2, from);
+        sumCpuByPIDAndTimeStatement.setTimestamp(3, to);
+        ResultSet results = sumCpuByPIDAndTimeStatement.executeQuery();
+        results.next();
+        return results.getInt("sum_cpu");
+    }
+
+    /**
+     * Returns total of CPU usage for specified process name
+     * @author teamon
+     */
+    public int sumCpuByName(String name) throws SQLException {
+        sumCpuByNameStatement.setString(1, name);
+        ResultSet results = sumCpuByNameStatement.executeQuery();
+        results.next();
+        return results.getInt("sum_cpu");
+    }
+
+    /**
+     * Returns total of CPU usage for specified process name and time range
+     * @author teamon
+     */
+    public int sumCpuByNameAndTime(String name, Timestamp from, Timestamp to) throws SQLException {
+        sumCpuByNameAndTimeStatement.setString(1, name);
+        sumCpuByNameAndTimeStatement.setTimestamp(2, from);
+        sumCpuByNameAndTimeStatement.setTimestamp(3, to);
+        ResultSet results = sumCpuByNameAndTimeStatement.executeQuery();
+        results.next();
+        return results.getInt("sum_cpu");
+    }
+
+    /**
+     * Returns total of CPU usage within specified time range
+     * @author teamon
+     */
+    public int sumCpuByTime(Timestamp from, Timestamp to) throws SQLException {
+        sumCpuByTimeStatement.setTimestamp(1, from);
+        sumCpuByTimeStatement.setTimestamp(2, to);
+        ResultSet results = sumCpuByTimeStatement.executeQuery();
+        results.next();
+        return results.getInt("sum_cpu");
+    }
     
     /**
      * Returns average CPU usage for specified PID
@@ -199,9 +280,63 @@ public class Storage {
         return results.getInt("sum_mem");
     }
     
-    // public float avgMemByPID(int pid);
-    // public float avgMemByPIDAndTime(int pid, Timestamp from, Timestamp to);
-    // public float avgMemByName(String name);
-    // public float avgMemByNameAndTime(String name, Timestamp from, Timestamp to);
-    // public float avgMemByTime(Timestamp from, Timestamp to);
+    /**
+     * Returns average memory usage for specified PID
+     * @author teamon
+     */
+    public float avgMemByPID(int pid) throws SQLException {
+        avgMemByPIDStatement.setInt(1, pid);
+        ResultSet results = avgMemByPIDStatement.executeQuery();
+        results.next();
+        return results.getFloat("avg_mem");
+    }
+
+    /**
+     * Returns average memory usage for specified PID and time range
+     * @author teamon
+     */
+    public float avgMemByPIDAndTime(int pid, Timestamp from, Timestamp to) throws SQLException {
+        avgMemByPIDAndTimeStatement.setInt(1, pid);
+        avgMemByPIDAndTimeStatement.setTimestamp(2, from);
+        avgMemByPIDAndTimeStatement.setTimestamp(3, to);
+        ResultSet results = avgMemByPIDAndTimeStatement.executeQuery();
+        results.next();
+        return results.getFloat("avg_mem");
+    }
+
+    /**
+     * Returns average memory usage for specified process name
+     * @author teamon
+     */
+    public float avgMemByName(String name) throws SQLException {
+        avgMemByNameStatement.setString(1, name);
+        ResultSet results = avgMemByNameStatement.executeQuery();
+        results.next();
+        return results.getFloat("avg_mem");
+    }
+
+    /**
+     * Returns average memory usage for specified process name and time range
+     * @author teamon
+     */
+    public float avgMemByNameAndTime(String name, Timestamp from, Timestamp to) throws SQLException {
+        avgMemByNameAndTimeStatement.setString(1, name);
+        avgMemByNameAndTimeStatement.setTimestamp(2, from);
+        avgMemByNameAndTimeStatement.setTimestamp(3, to);
+        ResultSet results = avgMemByNameAndTimeStatement.executeQuery();
+        results.next();
+        return results.getFloat("avg_mem");
+    }
+
+    /**
+     * Returns average memory usage for all processes within specified time range
+     * @author teamon
+     */
+    public float avgMemByTime(Timestamp from, Timestamp to) throws SQLException {
+        avgMemByTimeStatement.setTimestamp(1, from);
+        avgMemByTimeStatement.setTimestamp(2, to);
+        ResultSet results = avgMemByTimeStatement.executeQuery();
+        results.next();
+        return results.getFloat("avg_mem");
+    }
 }

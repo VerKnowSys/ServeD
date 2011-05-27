@@ -1,14 +1,24 @@
 package com.verknowsys.served.systemmanager.storage
 
 import org.specs._
+import com.verknowsys.served.SvdSpecHelpers._
 
 
 class StorageTest extends Specification {
+    val now = new java.util.Date
+    
+    def time(sec: Int = 0) = new java.sql.Timestamp(now.getYear(), now.getMonth(), now.getDay(), now.getHours(), now.getMinutes(), sec, 0);
+     
     var db: Storage = null
     
     "Storage" should {
         doBefore {
-            db = new Storage("/tmp/storage_test.db")
+            mkdir("/tmp/served_tests")
+            db = new Storage("/tmp/served_tests/storage_test.db")
+        }
+        
+        doAfter {
+            rmdir("/tmp/served_tests")
         }
         
         // "create table if file do not exists" in {
@@ -28,9 +38,13 @@ class StorageTest extends Specification {
             db.avgCpuByPID(120) must_== 5.0
         }
         
-        // "average CPU by PID and time range" in {
-        //     
-        // }
+        "calculate average CPU by PID and time range" in {
+            db.save(new ProcessInfo(120, "Foo", 1, 20, time()))
+            db.save(new ProcessInfo(120, "Foo", 10, 21, time(100)))
+            db.save(new ProcessInfo(120, "Foo", 5, 22, time(200)))
+            db.save(new ProcessInfo(120, "Foo", 8, 23, time(300)))
+            db.avgCpuByPIDAndTime(120, time(150), time(400)) must_== 4.5
+        }
         
         "calculate average CPU by name" in {
             db.save(new ProcessInfo(120, "Foo", 1, 20))
