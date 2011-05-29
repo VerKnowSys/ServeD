@@ -29,7 +29,9 @@ package object utils {
      */
     implicit def StringToPath(a: String) = new {
         def /(b: String) = {
-            if(a.last == '/'){
+            if(a.isEmpty) b
+            else if(b.isEmpty) a
+            else if(a.last == '/'){
                 if(b.head == '/') a + b.substring(1)
                 else a + b
             } else {

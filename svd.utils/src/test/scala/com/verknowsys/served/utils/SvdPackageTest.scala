@@ -17,6 +17,10 @@ class SvdPackageTest extends Specification {
     
     "Path builder" should {
         "work" in {
+            ""  / "bar"  must_== "bar"
+            "foo"  / ""  must_== "foo"
+            ""  / ""  must_== ""
+            
             "foo"  / "bar"  must_== "foo/bar"
             "foo/" / "bar"  must_== "foo/bar"
             "foo"  / "/bar" must_== "foo/bar"

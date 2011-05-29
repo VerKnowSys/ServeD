@@ -1,5 +1,6 @@
 package com.verknowsys.served
 
+import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.SvdProperties
 
 object SvdConfig {
@@ -15,8 +16,8 @@ object SvdConfig {
     final val served = "ServeD v" + version
     final val configurationFilesPrefix = if(environment == "test") "/tmp/config" else ""
     
-    final val mainPropertiesFilename = configurationFilesPrefix + "/served-%s.properties".format(version)
-    final val loggerPropertiesFilename = configurationFilesPrefix + "/served-%s-logger.properties".format(version)
+    final val mainPropertiesFilename = configurationFilesPrefix / "served-%s.properties".format(version)
+    final val loggerPropertiesFilename = configurationFilesPrefix / "served-%s-logger.properties".format(version)
     final val props = new SvdProperties(mainPropertiesFilename)
     
     
@@ -66,7 +67,7 @@ object SvdConfig {
     
     def gatherTimeout =                 props("served.system.gatherer.timeout") or 10000
     def servedUserName =                props("served.system.username") or "served"
-    def systemPasswdFile =              props("served.system.password.filename") or homePath + vendorDir + "etc/passwd"
+    def systemPasswdFile =              props("served.system.password.filename") or homePath / vendorDir / "etc" / "passwd"
 
     def kqueueWaitInterval =            props("served.system.core.kqueue.wait") or 500
     def sleepDefaultPause =             props("served.system.core.default.pause") or 1000
