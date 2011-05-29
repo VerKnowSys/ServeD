@@ -10,11 +10,9 @@ import scala.xml._
 import com.verknowsys.served.web.lib.Session
 import com.verknowsys.served.api._
 
-object Log extends net.liftweb.common.Logger
 
 
-
-class Logging {
+object AddLoggerEntry extends LiftScreen {
     final val loggerLevels = Map(
         "error" -> Logger.Levels.Error,
         "warn"  -> Logger.Levels.Warn,
@@ -23,7 +21,26 @@ class Logging {
         "trace" -> Logger.Levels.Trace
     )
     
+    final val loggerLevelsList = loggerLevels.values.toList
     
+    val className = field("Class name", "", 
+                        trim,
+                        valMinLen(1, "Class name can not be blank"))
+                        
+    
+    val level = select("Level", loggerLevelsList.head, loggerLevelsList)
+    
+    override def finishButton: Elem = <button>{"Add entry"}</button>  
+    
+    
+    def finish() {
+        Session.api.request(Logger.AddEntry(className.is, level.is)){
+            case Success => S.notice("Logger level " + level.is + " set for class " + className.is)
+        }
+    }
+}
+
+class Logging {
     def listEntries = {
         val entries = Session.api.request(Logger.ListEntries){ case Logger.Entries(entries) => entries.toList }.getOrElse(Nil)
         ".row *" #> entries.map { entry =>
@@ -39,32 +56,35 @@ class Logging {
         }
     }
     
-    
-    def manage(xhtml: NodeSeq): NodeSeq = {
-        var className = ""
-        var level = ""
+        // 
+        // def addEntry = {
+        //     var className = ""
+        //     var level = ""
+        //     
+        //     def processEntry() = {
+        //         // Simple validation
+        //         if(!className.isEmpty) {
+        //             loggerLevels.get(level.toLowerCase) match {
+        //                 case Some(lvl) =>
+        //                     Session.api.request(Logger.AddEntry(className, lvl)){
+        //                         case Success => S.notice("Logger level " + lvl + " set for class " + className)
+        //                     }
+        //                 case None =>
+        //                     S.error("Invalid logging level")
+        //             }
+        //         } else {
+        //             S.error("Empty class name")
+        //         }
+        //     }
+        //     
         
-        def processEntry() = {
-            // Simple validation
-            if(!className.isEmpty) {
-                loggerLevels.get(level.toLowerCase) match {
-                    case Some(lvl) =>
-                        Session.api.request(Logger.AddEntry(className, lvl)){
-                            case Success => S.notice("Logger level " + lvl + " set for class " + className)
-                        }
-                    case None =>
-                        S.error("Invalid logging level")
-                }
-            } else {
-                S.error("Empty class name")
-            }
-        }
+        // "cla§ssName" -> 
         
-        bind("entry", xhtml,
-            "className" -> SHtml.text(className, className = _),
-            "level"     -> SHtml.text(level, level = _),
-            "submit"    -> SHtml.submit("Add entry", processEntry)
-        )
-    }
+        // // bind("entry", xhtml,
+        //     "#className" #> SHtml.text(className, className = _) &
+        //     "#level"     #> SHtml.text(level, level = _) &
+        //     "#submit"    #> SHtml.submit("Add entry", processEntry)
+        // // )
+    // }
 }
 
