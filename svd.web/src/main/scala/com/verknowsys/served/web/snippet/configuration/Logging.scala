@@ -10,8 +10,6 @@ import scala.xml._
 import com.verknowsys.served.web.lib.Session
 import com.verknowsys.served.api._
 
-
-
 object AddLoggerEntry extends LiftScreen {
     final val loggerLevels = Map(
         "error" -> Logger.Levels.Error,
@@ -55,36 +53,5 @@ class Logging {
             })
         }
     }
-    
-        // 
-        // def addEntry = {
-        //     var className = ""
-        //     var level = ""
-        //     
-        //     def processEntry() = {
-        //         // Simple validation
-        //         if(!className.isEmpty) {
-        //             loggerLevels.get(level.toLowerCase) match {
-        //                 case Some(lvl) =>
-        //                     Session.api.request(Logger.AddEntry(className, lvl)){
-        //                         case Success => S.notice("Logger level " + lvl + " set for class " + className)
-        //                     }
-        //                 case None =>
-        //                     S.error("Invalid logging level")
-        //             }
-        //         } else {
-        //             S.error("Empty class name")
-        //         }
-        //     }
-        //     
-        
-        // "cla§ssName" -> 
-        
-        // // bind("entry", xhtml,
-        //     "#className" #> SHtml.text(className, className = _) &
-        //     "#level"     #> SHtml.text(level, level = _) &
-        //     "#submit"    #> SHtml.submit("Add entry", processEntry)
-        // // )
-    // }
 }
 
