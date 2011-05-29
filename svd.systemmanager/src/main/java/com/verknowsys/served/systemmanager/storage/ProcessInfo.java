@@ -25,4 +25,18 @@ public class ProcessInfo {
     public String toString(){
         return "ProcessInfo(" + pid + "," + name + "," + cpu + "," + mem + "," + time + ")";
     }
+    
+    public boolean equals(Object obj){
+        if(obj instanceof ProcessInfo){
+            ProcessInfo that = (ProcessInfo)obj;
+            return (
+                that.pid == this.pid &&
+                that.cpu == this.cpu &&
+                that.mem == this.mem &&
+                that.name.equals(this.name)
+            );
+        } else {
+            return false;
+        }
+    }
 }

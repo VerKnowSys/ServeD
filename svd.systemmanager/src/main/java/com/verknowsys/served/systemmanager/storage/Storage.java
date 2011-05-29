@@ -15,6 +15,9 @@ public class Storage {
     
     private PreparedStatement getByPIDStatement = null;
     private PreparedStatement getByPIDAndTimeStatement = null;
+    private PreparedStatement getByNameStatement = null;
+    private PreparedStatement getByNameAndTimeStatement = null;
+    private PreparedStatement getByTimeStatement = null;
     
     private PreparedStatement sumCpuByPIDStatement = null;
     private PreparedStatement sumCpuByPIDAndTimeStatement = null;
@@ -51,6 +54,9 @@ public class Storage {
         
         getByPIDStatement               = conn.prepareStatement("SELECT * FROM processinfo WHERE pid = ?");
         getByPIDAndTimeStatement        = conn.prepareStatement("SELECT * FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?");
+        getByNameStatement              = conn.prepareStatement("SELECT * FROM processinfo WHERE name = ?");
+        getByNameAndTimeStatement       = conn.prepareStatement("SELECT * FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?");
+        getByTimeStatement              = conn.prepareStatement("SELECT * FROM processinfo WHERE time BETWEEN ? AND ?");
         
         sumCpuByPIDStatement            = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE pid = ?;");
         sumCpuByPIDAndTimeStatement     = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
@@ -83,7 +89,6 @@ public class Storage {
     }
     
     private void setupTable() throws SQLException {
-        System.out.println("Setting up tables");
         conn.createStatement().executeUpdate("SET CACHE_SIZE 0;");
         conn.createStatement().executeUpdate("DROP TABLE IF EXISTS processinfo;");
         conn.createStatement().executeUpdate("CREATE TABLE processinfo (" +
@@ -112,12 +117,19 @@ public class Storage {
     // every array size can be determined before creation
     
     
+    /**
+     * Returns list of records with specified PID
+     * @author teamon
+     */
     public List<ProcessInfo> getByPID(int pid) throws SQLException {
         getByPIDStatement.setInt(1, pid);
         return resultsToList(getByPIDStatement.executeQuery());
     }
     
-    
+    /**
+     * Returns list of records with specified PID within time range
+     * @author teamon
+     */
     public List<ProcessInfo> getByPIDAndTime(int pid, Timestamp from, Timestamp to) throws SQLException {
         getByPIDAndTimeStatement.setInt(1, pid);
         getByPIDAndTimeStatement.setTimestamp(2, from);
@@ -125,6 +137,40 @@ public class Storage {
         return resultsToList(getByPIDAndTimeStatement.executeQuery());
     }
     
+    /**
+     * Returns list of records with specified name
+     * @author teamon
+     */
+    public List<ProcessInfo> getByName(String name) throws SQLException {
+        getByNameStatement.setString(1, name);
+        return resultsToList(getByNameStatement.executeQuery());
+    }
+    
+    /**
+     * Returns list of records with specified name within time range
+     * @author teamon
+     */
+    public List<ProcessInfo> getByNameAndTime(String name, Timestamp from, Timestamp to) throws SQLException {
+        getByNameAndTimeStatement.setString(1, name);
+        getByNameAndTimeStatement.setTimestamp(2, from);
+        getByNameAndTimeStatement.setTimestamp(3, to);
+        return resultsToList(getByNameAndTimeStatement.executeQuery());
+    }
+    
+    /**
+     * Returns list of records within time range
+     * @author teamon
+     */
+    public List<ProcessInfo> getByTime(Timestamp from, Timestamp to) throws SQLException {
+        getByTimeStatement.setTimestamp(1, from);
+        getByTimeStatement.setTimestamp(2, to);
+        return resultsToList(getByTimeStatement.executeQuery());
+    }
+    
+    /**
+     * Convert ResultSet into list of ProcessInfo objects
+     * @author teamon
+     */
     protected List<ProcessInfo> resultsToList(ResultSet results) throws SQLException {
         List<ProcessInfo> list = new ArrayList<ProcessInfo>();
         while(results.next()){
@@ -138,11 +184,6 @@ public class Storage {
         }
         return list;
     }
-    
-    // public List<ProcessInfo> getByPIDAndTime(int pid, Timestamp from, Timestamp to);
-    // public List<ProcessInfo> getByName(String name);
-    // public List<ProcessInfo> getByNameAndTime(String name, Timestamp from, Timestamp to);
-    // public List<ProcessInfo> getByTime(Timestamp from, Timestamp to);
 
     /**
      * Returns total of CPU usage for specified PID
@@ -223,7 +264,6 @@ public class Storage {
         avgCpuByPIDAndTimeStatement.setInt(1, pid);
         avgCpuByPIDAndTimeStatement.setTimestamp(2, from);
         avgCpuByPIDAndTimeStatement.setTimestamp(3, to);
-        System.out.println(avgCpuByPIDAndTimeStatement.toString());
         
         ResultSet results = avgCpuByPIDAndTimeStatement.executeQuery();
         results.next();
