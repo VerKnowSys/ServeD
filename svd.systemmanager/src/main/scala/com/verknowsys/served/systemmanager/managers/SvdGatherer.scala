@@ -23,6 +23,7 @@ import akka.actor.Actor.registry
  *
  */
 class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
+    log.info("Starting Gatherer for account: " + account)
     
     
     private def gather = SvdUtils.loopThread {
@@ -76,9 +77,9 @@ class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
         
     }.start
     
-    
-    log.info("Running SvdGatherer for account: %s".format(account))
-    gather
+    override def preStart {
+        // gather
+    }
     
     
     def receive = {

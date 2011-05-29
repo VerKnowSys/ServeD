@@ -19,10 +19,12 @@ class LoggingManager extends Actor with Logging with SvdFileEventsReactor {
             self reply Logger.Entries(LoggerUtils.levels)
             
         case Logger.AddEntry(className, level) =>
+            log.trace("Setting logger level %s for class %s", level, className)
             LoggerUtils.addEntry(className, level)
             self reply Success
             
         case Logger.RemoveEntry(className) =>
+            log.trace("Removing logger level settings for class %s", className)
             LoggerUtils.removeEntry(className)
             self reply Success
             

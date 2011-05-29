@@ -13,8 +13,7 @@ import com.verknowsys.served.api._
  * @author teamon
  */
 class SvdGitManager(account: SvdAccount) extends SvdManager(account) {
-    
-    log.trace("Starting GitManager for account: " + account)
+    log.info("Starting GitManager for account: " + account)
 
     
     def receive = {
@@ -32,7 +31,7 @@ class SvdGitManager(account: SvdAccount) extends SvdManager(account) {
             } else {
                 log.trace("Creating new git repository: %s for account: %s".format(name, account.userName))
                 git.Git.init(gitHomeDir / name, bare = true)
-                if (SvdUtils.chown(gitHomeDir / name, account.uid))
+                if (SvdUtils.chown(gitHomeDir / name + ".git", account.uid))
                     log.debug("Chowning created git repository.")
                 else
                     log.warn("Couldn't chown created git repository.")

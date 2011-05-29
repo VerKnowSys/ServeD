@@ -14,7 +14,7 @@ object SvdConfig {
      
     final val version = "0.1.2"
     final val served = "ServeD v" + version
-    final val configurationFilesPrefix = if(environment == "test") "/tmp/config" else ""
+    final val configurationFilesPrefix = if(environment == "test") "/tmp/config" else "/"
     
     final val mainPropertiesFilename = configurationFilesPrefix / "served-%s.properties".format(version)
     final val loggerPropertiesFilename = configurationFilesPrefix / "served-%s-logger.properties".format(version)
@@ -65,7 +65,7 @@ object SvdConfig {
     def terminalLanguageLCTYPE =        props("served.system.terminal.environment.lc_ctype") or "en_US.UTF-8"
     def terminalLanguageLCMESSAGES =    props("served.system.terminal.environment.lc_messages") or "en_US.UTF-8"
     
-    def gatherTimeout =                 props("served.system.gatherer.timeout") or 10000
+    def gatherTimeout =                 props("served.system.gatherer.timeout") or 1000
     def servedUserName =                props("served.system.username") or "served"
     def systemPasswdFile =              props("served.system.password.filename") or homePath / vendorDir / "etc" / "passwd"
 

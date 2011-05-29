@@ -19,26 +19,19 @@ case class GetAccountManager(username: String)
 
 
 class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExceptionHandler {
-
     log.info("SvdAccountsManager is loading")
     // case object ReloadUsers
     // case class CheckUser(val username: String)
     
-
-    override def preStart {
-        respawnUsersActors
-        registerFileEventFor(SvdConfig.systemPasswdFile, Modified)
-    }
-        
+    val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
 
     def receive = {
         case Init =>
             log.debug("SvdAccountsManager received Init. Running default task..")
-            self ! SvdFileEvent("/var/log/system.log", Modified) // 2011-02-01 21:21:20 - dmilith - NOTE: this is intended: one entry will work on fBSD, one on Mac
-            self ! SvdFileEvent("/var/log/messages", Modified)
-            
+            registerFileEventFor(SvdConfig.systemPasswdFile, Modified)
+            respawnUsersActors
         
-        case SvdFileEvent(path, Modified) => 
+        case SvdFileEvent(systemPasswdFilePath, Modified) => 
             log.trace("Passwd file modified")
             respawnUsersActors
             
@@ -52,73 +45,6 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
                         
         case msg => log.warn("Message not recognized: %s", msg)
     }
-        
-
-    // def act {
-    //     // TODO: Catch java.io.FileNotFoundException and exit. ServeD can`t run withour passwd file
-    //     val watchPasswdFile = SvdKqueue.watch(SvdConfig.systemPasswdFile, modified = true) {
-    //         trace("Triggered (modified/created) system password file: %s".format(SvdConfig.systemPasswdFile))
-    //         SvdAccountsManager ! ReloadUsers
-    //     }    
-    //     
-    //     trace("Initialized watch for " + SvdConfig.systemPasswdFile)
-    //     trace("watchPasswordFile: " + watchPasswdFile)
-    //     
-    //     loop {
-    //         receive {
-    //             case Init =>
-    //                 SvdAccountsManager ! ReloadUsers            
-    //                 info("SvdAccountsManager ready")
-    //                 
-    //             case Quit =>
-    //                 info("Quitting SvdAccountsManager")
-    //                 watchPasswdFile.stop
-    //                 exit
-    //                 
-    //             case ReloadUsers =>
-    //                 trace("Reloading users list")
-    //                 // How does it work
-    //                 //
-    //                 // <managers> = ListBuffer[SvdAccountManager]
-    //                 // 1. Start
-    //                 //  - loadSvdAccounts from /etc/passwd
-    //                 //  - for each SvdAccount spawn SvdAccountManager and add it to <managers>
-    //                 //  - setup SvdFileWatcher on /etc/passwd
-    //                 //
-    //                 // 2. /etc/passwd changed
-    //                 // - read SvdAccounts list form /etc/passwd
-    //                 // - for every SvdAccount 
-    //                 //   - check if there is existing SvdAccountManager
-    //                 //     if not, spawn SvdAccountManager and add it to <managers>
-    //                 // - for every SvdAccountManager from <managers>
-    //                 //   - check if it`s SvdAccount is in new accounts list
-    //                 //     - if not, send Quit to manager and remove it from list
-    //                 //
-    //                 // TODO: Update user`s shell path
-    //                 
-    //                 val accounts = userSvdAccounts
-    //                                                         
-    //                 accounts foreach { a =>
-    //                     if(!managers.exists(_.account == a)) managers += new SvdAccountManager(a)
-    //                 }
-    //                 
-    //                 managers.foreach { m =>
-    //                     if(!accounts.exists(_ == m.account)){
-    //                         m ! Quit
-    //                         managers -= m
-    //                     }
-    //                 }
-    //                 
-    //             case CheckUser(username) =>
-    //                 // trace("Checking if user %s exist" % username)
-    //                 reply(managers.find(_.account.userName == username))
-    //             
-    //             case _ => messageNotRecognized(_)
-    //                 
-    //         }
-    //     }
-    // }
-
 
     private def respawnUsersActors {
         // kill all Account Managers

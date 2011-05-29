@@ -19,7 +19,6 @@ case object GetAccount
  * @author teamon
  */
 class SvdAccountManager(val account: SvdAccount) extends Actor with SvdExceptionHandler {
-
     log.info("Starting AccountManager for account: " + account)
     
     val gitManager = Actor.actorOf(new SvdGitManager(account))

@@ -28,7 +28,7 @@ object LoggerCommands extends Commands {
                 
             
             
-            case _ => println("logger [list|add|remove]")
+            case _ => println("logger [list|remove]")
             
         }
     }

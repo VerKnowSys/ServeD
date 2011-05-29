@@ -16,7 +16,7 @@ import akka.actor.{Actor, ActorRef, SupervisorActor}
  *  @author teamon
  */
 class SvdSystemInfo extends Actor with Logging {
-    log.trace("Started SvdSystemInfo")
+    log.info("Starting SvdSystemInfo")
     
     def receive = {
         case ListTreeActors =>
