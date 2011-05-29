@@ -2,6 +2,7 @@ package com.verknowsys.served.systemmanager.storage;
 
 import java.sql.*;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Date;
 import java.sql.Timestamp;
 import java.io.File;
@@ -11,6 +12,9 @@ import java.io.File;
 public class Storage {
     private Connection conn = null;
     private PreparedStatement insertStatement = null;
+    
+    private PreparedStatement getByPIDStatement = null;
+    private PreparedStatement getByPIDAndTimeStatement = null;
     
     private PreparedStatement sumCpuByPIDStatement = null;
     private PreparedStatement sumCpuByPIDAndTimeStatement = null;
@@ -39,39 +43,47 @@ public class Storage {
     
     public Storage(String databaseFilePath) throws SQLException {
         // Check if database file exist, if not, setup processinfo table
-        boolean doSetup = !(new File(databaseFilePath)).exists();
+        boolean doSetup = !(new File(databaseFilePath + ".h2.db")).exists();
         conn = DriverManager.getConnection("jdbc:h2:" + databaseFilePath);
         if(doSetup) setupTable();
+                
+        insertStatement                 = conn.prepareStatement("INSERT INTO processinfo VALUES (?, ?, ?, ?, ?);");
         
-        insertStatement = conn.prepareStatement("INSERT INTO processinfo VALUES (?, ?, ?, ?, ?);");
+        getByPIDStatement               = conn.prepareStatement("SELECT * FROM processinfo WHERE pid = ?");
+        getByPIDAndTimeStatement        = conn.prepareStatement("SELECT * FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?");
         
-        sumCpuByPIDStatement = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE pid = ?;");
-        sumCpuByPIDAndTimeStatement = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
-        sumCpuByNameStatement = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE name = ?;");
-        sumCpuByNameAndTimeStatement = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
-        sumCpuByTimeStatement = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE time BETWEEN ? AND ?;");
+        sumCpuByPIDStatement            = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE pid = ?;");
+        sumCpuByPIDAndTimeStatement     = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
+        sumCpuByNameStatement           = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE name = ?;");
+        sumCpuByNameAndTimeStatement    = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
+        sumCpuByTimeStatement           = conn.prepareStatement("SELECT SUM(cpu) AS sum_cpu FROM processinfo WHERE time BETWEEN ? AND ?;");
         
-        avgCpuByPIDStatement = conn.prepareStatement("SELECT AVG(cpu) AS avg_cpu FROM processinfo WHERE pid = ?;");
-        avgCpuByPIDAndTimeStatement = conn.prepareStatement("SELECT AVG(cpu) AS avg_cpu FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
-        avgCpuByNameStatement = conn.prepareStatement("SELECT AVG(cpu) AS avg_cpu FROM processinfo WHERE name = ?;");
-        avgCpuByNameAndTimeStatement = conn.prepareStatement("SELECT AVG(cpu) AS avg_cpu FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
-        avgCpuByTimeStatement = conn.prepareStatement("SELECT AVG(cpu) AS avg_cpu FROM processinfo WHERE time BETWEEN ? AND ?;");
+        avgCpuByPIDStatement            = conn.prepareStatement("SELECT AVG(CAST(cpu AS FLOAT)) AS avg_cpu FROM processinfo WHERE pid = ?;");
+        avgCpuByPIDAndTimeStatement     = conn.prepareStatement("SELECT AVG(CAST(cpu AS FLOAT)) AS avg_cpu FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
+        avgCpuByNameStatement           = conn.prepareStatement("SELECT AVG(CAST(cpu AS FLOAT)) AS avg_cpu FROM processinfo WHERE name = ?;");
+        avgCpuByNameAndTimeStatement    = conn.prepareStatement("SELECT AVG(CAST(cpu AS FLOAT)) AS avg_cpu FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
+        avgCpuByTimeStatement           = conn.prepareStatement("SELECT AVG(CAST(cpu AS FLOAT)) AS avg_cpu FROM processinfo WHERE time BETWEEN ? AND ?;");
 
-        sumMemByPIDStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE pid = ?;");
-        sumMemByPIDAndTimeStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
-        sumMemByNameStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE name = ?;");
-        sumMemByNameAndTimeStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
-        sumMemByTimeStatement = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE time BETWEEN ? AND ?;");
+        sumMemByPIDStatement            = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE pid = ?;");
+        sumMemByPIDAndTimeStatement     = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
+        sumMemByNameStatement           = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE name = ?;");
+        sumMemByNameAndTimeStatement    = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
+        sumMemByTimeStatement           = conn.prepareStatement("SELECT SUM(mem) AS sum_mem FROM processinfo WHERE time BETWEEN ? AND ?;");
 
-        avgMemByPIDStatement = conn.prepareStatement("SELECT AVG(mem) AS avg_mem FROM processinfo WHERE pid = ?;");
-        avgMemByPIDAndTimeStatement = conn.prepareStatement("SELECT AVG(mem) AS avg_mem FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
-        avgMemByNameStatement = conn.prepareStatement("SELECT AVG(mem) AS avg_mem FROM processinfo WHERE name = ?;");
-        avgMemByNameAndTimeStatement = conn.prepareStatement("SELECT AVG(mem) AS avg_mem FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
-        avgMemByTimeStatement = conn.prepareStatement("SELECT AVG(mem) AS avg_mem FROM processinfo WHERE time BETWEEN ? AND ?;");
+        avgMemByPIDStatement            = conn.prepareStatement("SELECT AVG(CAST(mem AS FLOAT)) AS avg_mem FROM processinfo WHERE pid = ?;");
+        avgMemByPIDAndTimeStatement     = conn.prepareStatement("SELECT AVG(CAST(mem AS FLOAT)) AS avg_mem FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?;");
+        avgMemByNameStatement           = conn.prepareStatement("SELECT AVG(CAST(mem AS FLOAT)) AS avg_mem FROM processinfo WHERE name = ?;");
+        avgMemByNameAndTimeStatement    = conn.prepareStatement("SELECT AVG(CAST(mem AS FLOAT)) AS avg_mem FROM processinfo WHERE name = ? AND time BETWEEN ? AND ?;");
+        avgMemByTimeStatement           = conn.prepareStatement("SELECT AVG(CAST(mem AS FLOAT)) AS avg_mem FROM processinfo WHERE time BETWEEN ? AND ?;");
 
     }
     
+    public void close() throws SQLException {
+        conn.close();
+    }
+    
     private void setupTable() throws SQLException {
+        System.out.println("Setting up tables");
         conn.createStatement().executeUpdate("SET CACHE_SIZE 0;");
         conn.createStatement().executeUpdate("DROP TABLE IF EXISTS processinfo;");
         conn.createStatement().executeUpdate("CREATE TABLE processinfo (" +
@@ -81,7 +93,6 @@ public class Storage {
             "mem INTEGER NOT NULL," +
             "time TIMESTAMP NOT NULL" +
         ");");
-        conn.commit();
     }
     
     public void save(ProcessInfo processInfo) throws SQLException {
@@ -93,8 +104,41 @@ public class Storage {
         insertStatement.execute();
     }
     
+    // TODO: For generating charts we must predict maximum number of data points that will be visible
+    // then devide list of records by that number, calculate average of every chunk and then put it together.
+    // It might be better to write in in sacla using parallel collections, but it must be checked if that
+    // gives any perfornamce boos or scala overhead (with collection conversion etc) is too big and it is 
+    // better to just return pure java array and calculate it in linear time. We do not need any lists, since
+    // every array size can be determined before creation
     
-    // public List<ProcessInfo> getByPID(int pid);
+    
+    public List<ProcessInfo> getByPID(int pid) throws SQLException {
+        getByPIDStatement.setInt(1, pid);
+        return resultsToList(getByPIDStatement.executeQuery());
+    }
+    
+    
+    public List<ProcessInfo> getByPIDAndTime(int pid, Timestamp from, Timestamp to) throws SQLException {
+        getByPIDAndTimeStatement.setInt(1, pid);
+        getByPIDAndTimeStatement.setTimestamp(2, from);
+        getByPIDAndTimeStatement.setTimestamp(3, to);
+        return resultsToList(getByPIDAndTimeStatement.executeQuery());
+    }
+    
+    protected List<ProcessInfo> resultsToList(ResultSet results) throws SQLException {
+        List<ProcessInfo> list = new ArrayList<ProcessInfo>();
+        while(results.next()){
+            list.add(new ProcessInfo(
+                results.getInt("pid"),
+                results.getString("name"),
+                results.getInt("cpu"),
+                results.getInt("mem"),
+                results.getTimestamp("time")
+            ));
+        }
+        return list;
+    }
+    
     // public List<ProcessInfo> getByPIDAndTime(int pid, Timestamp from, Timestamp to);
     // public List<ProcessInfo> getByName(String name);
     // public List<ProcessInfo> getByNameAndTime(String name, Timestamp from, Timestamp to);
@@ -179,6 +223,8 @@ public class Storage {
         avgCpuByPIDAndTimeStatement.setInt(1, pid);
         avgCpuByPIDAndTimeStatement.setTimestamp(2, from);
         avgCpuByPIDAndTimeStatement.setTimestamp(3, to);
+        System.out.println(avgCpuByPIDAndTimeStatement.toString());
+        
         ResultSet results = avgCpuByPIDAndTimeStatement.executeQuery();
         results.next();
         return results.getFloat("avg_cpu");

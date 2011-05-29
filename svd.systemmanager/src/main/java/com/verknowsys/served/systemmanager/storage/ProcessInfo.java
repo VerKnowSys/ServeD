@@ -21,4 +21,8 @@ public class ProcessInfo {
     public ProcessInfo(int pid, String name, int cpu, int mem) {
         this(pid, name, cpu, mem, new Timestamp(new Date().getTime()));
     }
+    
+    public String toString(){
+        return "ProcessInfo(" + pid + "," + name + "," + cpu + "," + mem + "," + time + ")";
+    }
 }
