@@ -1,5 +1,5 @@
-$(document).ready(function(){
-    var Renderer = function(canvas){
+var AkkaActors = function(){
+    function Renderer(canvas){
         var canvas = $(canvas).get(0)
         var ctx = canvas.getContext("2d")
         var particleSystem
@@ -10,7 +10,6 @@ $(document).ready(function(){
                 particleSystem.screenSize(canvas.width, canvas.height)
                 particleSystem.screenPadding(80)
             },
-            
 
             colors: {
                 "SupervisorActor": "#A71717",
@@ -59,62 +58,29 @@ $(document).ready(function(){
         
         return that
     }
+        
+    function parseActors(list, parent){
+        $.each(list, function(i,e){
+            var node = sys.addNode(e.uuid, {name: shortClassName(e.className)})
+            if(parent){
+                sys.addEdge(node, parent)
+            }
+            parseActors(e.linkedActors, node)
+        })
+    }
     
+    function shortClassName(className){
+        return className.split(".").reverse()[0];
+    }
     
     var sys = arbor.ParticleSystem(2000, 600, 0.2)
     sys.parameters({gravity: true})
     sys.renderer = Renderer("#graph")
-    
-    var current_state = 0
-    
-    
-    function nextEvent(){
-        if(current_state == LogData.length) {
-            return null
-        }
-        
-        var ev = LogData[current_state]
-        
-        if(ev.ev == "started"){
-            console.log("started " + ev.id)
-            
-            var node = sys.getNode(ev.id)
-            if(node) node.data.state = "run"
-            else sys.addNode(ev.id, {name: ev.cls, state: "run"})
-        } else if(ev.ev == "linked"){
-            console.log("linked " + ev.aid + " to " + ev.bid)
-            sys.addEdge(ev.aid, ev.bid)
-            sys.getNode(ev.aid).data.name = ev.acls
-            sys.getNode(ev.bid).data.name = ev.bcls
-        }
-        
-        current_state++
-        return ev
-    }
-    
-    
 
-    
-    // sys.addEdge('a', 'b')
-    // sys.addEdge('a', 'c')
-    // sys.addEdge('a', 'd')
-    // sys.addNode('f', {alone: true})
-    
-    $("#next_state").click(function(){
-        if(current_state == 0){
-        //     for(;;){
-                var event = nextEvent()
-        //         if(event == null) break;
-                console.log(event)
-        //         // if(event.acls == "SupervisorActor" || event.bcls == "SupervisorActor" || event.cls == "SupervisorActor") break
-        //     }
-        }
-        
-        nextEvent()
-    })
-    
-    $("#full_state").click(function(){
-        while(nextEvent()){}
-    })
-    
+    parseActors(LogData)
+}
+
+
+$(document).ready(function(){
+   AkkaActors();
 })

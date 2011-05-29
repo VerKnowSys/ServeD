@@ -11,7 +11,7 @@ object Session {
     object Username extends SessionVar[String]("")
     
     object api {
-        final val host = "localhost"
+        final val host = "localhost" // TODO: Use some configuration
         final val port = 5555
 
         object svd extends SessionVar[ActorRef](service)
@@ -38,6 +38,13 @@ object Session {
     
     def logout = Username.set("")
     
-    def authorized = Username.get != "" // change me!
+    def authorized = {
+        // TODO: Add some real validation. Temporary code so there is no need to log in on every code reload 
+        // (jetty restarts app and session vars are gone)
+        if(Username.get == ""){
+            login("teamon", "")
+        }
+        Username.get != "" // change me!
+    }
 }
 

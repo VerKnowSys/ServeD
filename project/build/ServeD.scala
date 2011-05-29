@@ -160,17 +160,19 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
     
     class SvdWeb(info: ProjectInfo) extends DefaultWebProject(info){
-        val liftVersion = "2.3"
+        val liftVersion = "2.4-SNAPSHOT"
+        
+        val snapshotRepo = "ScalaTools Snapshots" at "http://scala-tools.org/repo-snapshots"
         
         override def jettyWebappPath  = webappPath
         
         override def libraryDependencies = Set(
-          "net.liftweb" % "lift-webkit_2.8.1" % liftVersion % "compile->default",
+          "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
           // "net.liftweb" % "lift-mapper_2.8.1" % liftVersion % "compile->default",
           "org.mortbay.jetty" % "jetty" % "6.1.22" % "test->default",
           "junit" % "junit" % "4.5" % "test->default",
-          "org.scala-tools.testing" % "specs" % "1.6.2.1" % "test->default",
-          "com.h2database" % "h2" % "1.2.138"
+          "org.scala-tools.testing" % "specs" % "1.6.2.1" % "test->default"
+          // "com.h2database" % "h2" % "1.2.138"
         ) ++ super.libraryDependencies
     }
     
