@@ -34,6 +34,9 @@ class Boot {
             Menu(S ? "Akka actors") / "monitoring" / "akka_actors",
             Menu(S ? "CPU usage")   / "monitoring" / "cpu"
         ),
+        Menu(S ? "Configuration") / "configuration" >> Authorized submenus (
+            Menu(S ? "Logging") / "configuration" / "logging"
+        ),
 
         Menu(S ? "Log in") / "login" >> Unauthorized,
         Menu(Loc("logout", "logout" :: Nil, "Log out", EarlyResponse(() => {

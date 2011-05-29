@@ -55,6 +55,7 @@ a:hover {
     float: left;
     border-right: 1px solid #e8e8e8;
     width:199px;
+    padding-bottom: 100px;
 }
 
 #nav ul {
