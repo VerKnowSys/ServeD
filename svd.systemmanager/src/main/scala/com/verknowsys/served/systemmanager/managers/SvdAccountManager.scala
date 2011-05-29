@@ -36,8 +36,6 @@ class SvdAccountManager(val account: SvdAccount) extends Actor with SvdException
             self reply account
             
         case msg: Git.Base => gitManager forward msg
-            
-        case msg => log.warn("Message not recoginzed: %s", msg)
     }
 
     

@@ -52,9 +52,6 @@ class SvdMaintainer extends Actor with SvdExceptionHandler {
             // registry.actorFor[SvdSystemManager] foreach { _ ! SpawnProcess("echo 'dupa'") }
             // registry.actorFor[SvdSystemManager] foreach { _ ! Kill(435343, SIGINT) }
             // 2011-01-23 05:29:52 - dmilith - NOTE: EOF temporary code.
-
-        case x => 
-            log.warn("not recognized message %s", x)
     }
     
     

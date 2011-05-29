@@ -32,9 +32,6 @@ class SvdNotificationCenter extends Actor with SvdExceptionHandler {
         case Message(msg) =>
             log.info("Sending message %s", msg)
             gates.foreach(_ send msg)
-        
-        case msg => 
-            log.warn("Message not recoginzed: %s", msg)
     }
     
     override def postStop {

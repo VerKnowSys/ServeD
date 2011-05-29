@@ -16,8 +16,5 @@ class SvdApiConnection extends Actor with SvdExceptionHandler {
         case General.CreateSession =>
             log.trace("Create new session for remote client")
             self.reply(toRemoteActorRefProtocol(self.spawnLink[SvdApiSession]))
-
-       case msg =>
-            log.warn("Message " + msg + " not recognized")
     }
 }

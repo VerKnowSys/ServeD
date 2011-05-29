@@ -42,8 +42,6 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
                 case Some(ref: ActorRef) => self reply ref
                 case _ => self reply Error("AccountManeger for username %s not found".format(username))
             }
-                        
-        case msg => log.warn("Message not recognized: %s", msg)
     }
 
     private def respawnUsersActors {

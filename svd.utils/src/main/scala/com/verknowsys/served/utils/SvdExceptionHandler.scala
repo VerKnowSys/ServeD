@@ -61,6 +61,9 @@ trait SvdExceptionHandler extends Actor with Logging {
     override def postStop = {
         log.trace("postStop executed in %s".format(this.getClass))
     }
-    
+   
+    override def unhandled(msg: Any){
+        log.warn("Message send to %s was not recoginzed: %s", this.getClass, msg)
+    }
     
 }

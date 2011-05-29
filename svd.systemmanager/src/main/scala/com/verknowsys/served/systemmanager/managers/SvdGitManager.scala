@@ -47,8 +47,6 @@ class SvdGitManager(account: SvdAccount) extends SvdManager(account) {
             } else {
                 self reply Git.RepositoryDoesNotExistError
             }
-        
-        case msg => log.warn("Message not recoginzed: %s", msg)
     }
 
     
