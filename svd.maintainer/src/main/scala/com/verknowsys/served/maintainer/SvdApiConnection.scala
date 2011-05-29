@@ -10,7 +10,7 @@ import com.verknowsys.served.api._
 
 
 class SvdApiConnection extends Actor with SvdExceptionHandler {
-    log.trace("Starting new API connection")
+    log.info("Starting new API connection")
 
     def receive = {
         case General.CreateSession =>

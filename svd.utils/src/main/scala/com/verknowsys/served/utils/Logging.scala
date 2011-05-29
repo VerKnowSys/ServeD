@@ -41,7 +41,7 @@ object LoggerUtils {
     
     def levels = _levels
     
-    def levelFor(className: String) = _level(className.split("\\.").reverse.toList) getOrElse Logger.Levels.Debug
+    def levelFor(className: String) = _level(className.split("\\.").reverse.toList) getOrElse Logger.Levels.Trace
     
     def loggerConfig = new SvdProperties(SvdConfig.loggerPropertiesFilename)
     

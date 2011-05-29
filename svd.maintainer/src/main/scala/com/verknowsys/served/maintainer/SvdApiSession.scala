@@ -13,6 +13,7 @@ import com.verknowsys.served.systemmanager.managers._
 
 
 class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
+    log.info("Starting new API session")
 
     private var manager: Option[ActorRef] = None // XXX: Var
 
