@@ -102,4 +102,26 @@ class StorageTest extends Specification {
             db.sumMemByNameAndTime("Foo", time(150), time(400)) must_== 151
         }
     }
+    
+    "Storage buffering" should {
+        "delay save" in {
+            if(db != null) db.close
+            rmdir("/tmp/served_tests")
+            mkdir("/tmp/served_tests")
+            reconnect
+            
+            db.getAll.size must_== 0
+            db.getBufferSize must_== 0
+            
+            (1 to Storage.MAX_BUFFER_SIZE) foreach { i =>
+                db.add(new ProcessInfo(i, "tmp", 10, 20))
+                db.getAll.size must_== 0
+                db.getBufferSize must_== i
+            }
+            
+            db.add(new ProcessInfo(0, "tmp", 10, 20))
+            db.getAll.size must_== Storage.MAX_BUFFER_SIZE
+            db.getBufferSize must_== 1
+        }
+    }
 }

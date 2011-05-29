@@ -1,8 +1,10 @@
 package com.verknowsys.served.systemmanager.storage;
 
 import java.sql.*;
+import java.util.Queue;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Date;
 import java.sql.Timestamp;
 import java.io.File;
@@ -10,9 +12,13 @@ import java.io.File;
 // TODO: Add parent pid field to ProcessInfo
 
 public class Storage {
+    public static final int MAX_BUFFER_SIZE = 60;
+    private Queue<ProcessInfo> buffer;
+    
     private Connection conn = null;
     private PreparedStatement insertStatement = null;
     
+    private PreparedStatement getAllStatement = null;
     private PreparedStatement getByPIDStatement = null;
     private PreparedStatement getByPIDAndTimeStatement = null;
     private PreparedStatement getByNameStatement = null;
@@ -45,6 +51,7 @@ public class Storage {
     
     
     public Storage(String databaseFilePath) throws SQLException {
+        buffer = new LinkedList<ProcessInfo>();
         // Check if database file exist, if not, setup processinfo table
         boolean doSetup = !(new File(databaseFilePath + ".h2.db")).exists();
         conn = DriverManager.getConnection("jdbc:h2:" + databaseFilePath);
@@ -52,6 +59,7 @@ public class Storage {
                 
         insertStatement                 = conn.prepareStatement("INSERT INTO processinfo VALUES (?, ?, ?, ?, ?);");
         
+        getAllStatement                 = conn.prepareStatement("SELECT * FROM processinfo");
         getByPIDStatement               = conn.prepareStatement("SELECT * FROM processinfo WHERE pid = ?");
         getByPIDAndTimeStatement        = conn.prepareStatement("SELECT * FROM processinfo WHERE pid = ? AND time BETWEEN ? AND ?");
         getByNameStatement              = conn.prepareStatement("SELECT * FROM processinfo WHERE name = ?");
@@ -100,6 +108,14 @@ public class Storage {
         ");");
     }
     
+    public int getBufferSize(){
+        return buffer.size();
+    }
+    
+    /**
+     * Immediately saves record in database
+     * @author teamon
+     */
     public void save(ProcessInfo processInfo) throws SQLException {
         insertStatement.setInt(1, processInfo.pid);
         insertStatement.setString(2, processInfo.name);
@@ -109,6 +125,27 @@ public class Storage {
         insertStatement.execute();
     }
     
+    /**
+     * Adds record for buffer for futher processing
+     * @author teamon
+     */
+    public void add(ProcessInfo processInfo) throws SQLException {
+        if(buffer.size() >= MAX_BUFFER_SIZE){
+            // save buffer
+            while(!buffer.isEmpty()){
+                ProcessInfo pi = buffer.poll();
+                insertStatement.setInt(1, processInfo.pid);
+                insertStatement.setString(2, processInfo.name);
+                insertStatement.setInt(3, processInfo.cpu);
+                insertStatement.setInt(4, processInfo.mem);
+                insertStatement.setTimestamp(5, processInfo.time);
+                insertStatement.addBatch();
+            }
+            insertStatement.executeBatch();
+        }
+        buffer.add(processInfo);
+    }
+    
     // TODO: For generating charts we must predict maximum number of data points that will be visible
     // then devide list of records by that number, calculate average of every chunk and then put it together.
     // It might be better to write in in sacla using parallel collections, but it must be checked if that
@@ -116,6 +153,10 @@ public class Storage {
     // better to just return pure java array and calculate it in linear time. We do not need any lists, since
     // every array size can be determined before creation
     
+    
+    public List<ProcessInfo> getAll() throws SQLException {
+        return resultsToList(getAllStatement.executeQuery());
+    }
     
     /**
      * Returns list of records with specified PID
