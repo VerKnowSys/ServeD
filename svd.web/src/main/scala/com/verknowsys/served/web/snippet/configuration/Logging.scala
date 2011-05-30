@@ -1,4 +1,4 @@
-package com.verknowsys.served.web.snippet
+package com.verknowsys.served.web.snippet.configuration
 
 import net.liftweb.util._
 import net.liftweb.util.Helpers._

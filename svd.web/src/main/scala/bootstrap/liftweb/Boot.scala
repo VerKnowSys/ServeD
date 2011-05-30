@@ -59,5 +59,8 @@ class Boot {
 
         // Force the request to be UTF-8
         LiftRules.early.append(_.setCharacterEncoding("UTF-8"))
+        
+        // Use scoped snippets
+        LiftRules.snippetNamesToSearch.default.set((s: String) => LiftRules.searchSnippetsWithRequestPath(s))
     }
 }

@@ -1,4 +1,4 @@
-package com.verknowsys.served.web.snippet
+package com.verknowsys.served.web.snippet.monitoring
 
 import com.verknowsys.served.web.lib.Session
 import com.verknowsys.served.api.Admin
