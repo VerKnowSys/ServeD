@@ -3,6 +3,8 @@ import growl._
 import extract._
 import java.io.File
 import reaktor.scct.ScctProject
+import org.coffeescript.CoffeeScriptCompile
+
 
 
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
@@ -159,12 +161,14 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         override def mainClass = Some("com.verknowsys.served.boot")
     }
     
-    class SvdWeb(info: ProjectInfo) extends DefaultWebProject(info){
+    class SvdWeb(info: ProjectInfo) extends DefaultWebProject(info) with CoffeeScriptCompile {
         val liftVersion = "2.4-SNAPSHOT"
         
         val snapshotRepo = "ScalaTools Snapshots" at "http://scala-tools.org/repo-snapshots"
         
         override def jettyWebappPath  = webappPath
+        
+        override def compileAction = super.compileAction dependsOn(compileCoffeeScript)
         
         override def libraryDependencies = Set(
           "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
