@@ -6,6 +6,8 @@ class Plugins(info: ProjectInfo) extends PluginDefinition(info) {
     val lessRepo = "lessis repo" at "http://repo.lessis.me"
     val akkaRepo = "akka repo" at "http://akka.io/repository"
     val coffeeScriptSbtRepo = "coffeeScript sbt repo" at "http://repo.coderlukes.com"
+    val vksRepo = "VerKnowSys Repo" at "http://mvn.verknowsys.com"
+    // XXX: This shouldn't be needed. coffee-script-sbt-plugin has broken pom file, there is no repository for jcoffeescript
 
     val scctPlugin  = "reaktor" % "sbt-scct-for-2.8" % "0.1-SNAPSHOT"
     val assemblySBT = "com.codahale" % "assembly-sbt" % "0.1.1"
