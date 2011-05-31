@@ -18,12 +18,14 @@ import com.verknowsys.served.notifications.SvdNotificationCenter
 
 import com.verknowsys.served.utils.signals._
 
+import sun.misc.SignalHandler
+import sun.misc.Signal
 
 
 object boot extends Logging {
 
 
-    def apply(){
+    def apply() {
         val list = (
             actorOf[SvdFileEventsManager] ::
             actorOf[LoggingManager] ::
@@ -52,6 +54,22 @@ object boot extends Logging {
     
     def main(args: Array[String]) {
         SvdConfig.environment = "production"
+
+        // NOTE: signal handling:
+        Signal.handle(new Signal("USR1"), new SignalHandler {
+            def handle(sig: Signal) {
+                log.warn("Received SIGUSR1 called")
+                SvdUtils.getAllLiveThreads
+            }
+        })
+        
+        Signal.handle(new Signal("USR2"), new SignalHandler {
+            def handle(sig: Signal) {
+                log.warn("Received SIGUSR2 called")
+                log.warn("TODO: implement USR2 handling (show svd config values)")
+            }
+        })
+        
         
         SvdUtils.checkOrCreateVendorDir
         
