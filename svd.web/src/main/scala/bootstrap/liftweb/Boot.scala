@@ -30,6 +30,7 @@ class Boot {
 
     def siteMap = SiteMap(
         Menu(S ? "Home") / "index" >> Authorized,
+        Menu(S ? "Git") / "git" >> Authorized,
         Menu(S ? "Monitoring") / "monitoring" >> Authorized submenus (
             Menu(S ? "Akka actors") / "monitoring" / "akka_actors",
             Menu(S ? "CPU usage")   / "monitoring" / "cpu"
