@@ -52,24 +52,33 @@ object boot extends Logging {
         remote.registerPerSession("service:api", actorOf[SvdApiConnection])
     }
     
+    
+    def handleSignal(name: String, block: => Unit) {
+        Signal.handle(new Signal(name), new SignalHandler {
+            def handle(sig: Signal) {
+                log.debug("Signal called: " + name)
+                block
+            }
+        })
+    }
+    
+    
+    def handleTrapsOnSignals {
+        // NOTE: signal handling:
+        handleSignal("USR1", { SvdUtils.getAllLiveThreads })
+        handleSignal("USR2", { log.warn("TODO: implement USR2 handling (show svd config values)") })
+        
+        handleSignal("INT", { sys.exit })
+        handleSignal("QUIT", { sys.exit })
+        handleSignal("TERM", { sys.exit })
+        handleSignal("HUP", { sys.exit })
+    }
+    
+    
     def main(args: Array[String]) {
         SvdConfig.environment = "production"
 
-        // NOTE: signal handling:
-        Signal.handle(new Signal("USR1"), new SignalHandler {
-            def handle(sig: Signal) {
-                log.warn("Received SIGUSR1 called")
-                SvdUtils.getAllLiveThreads
-            }
-        })
-        
-        Signal.handle(new Signal("USR2"), new SignalHandler {
-            def handle(sig: Signal) {
-                log.warn("Received SIGUSR2 called")
-                log.warn("TODO: implement USR2 handling (show svd config values)")
-            }
-        })
-        
+        handleTrapsOnSignals
         
         SvdUtils.checkOrCreateVendorDir
         
