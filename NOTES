@@ -13,9 +13,6 @@
 	http://www.scala-lang.org/docu/files/actors-api/actors_api_guide.html#
 	http://www.scala-lang.org/docu/files/collections-api/collections.html
 	
-	== Mongodb ==
-	http://api.mongodb.org/scala/casbah/2.0.2/scaladoc/
-
 
 /** 
 *   This is closed code project. You may not redistribute it without permission of author.
