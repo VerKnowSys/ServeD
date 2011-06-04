@@ -56,31 +56,20 @@ object boot extends Logging {
     def handleSignal(name: String, block: => Unit) {
         Signal.handle(new Signal(name), new SignalHandler {
             def handle(sig: Signal) {
-                log.debug("Signal called: " + name)
+                log.warn("Signal called: " + name)
                 block
             }
         })
     }
     
     
-    def handleTrapsOnSignals {
-        // NOTE: signal handling:
-        handleSignal("USR1", { SvdUtils.getAllLiveThreads })
-        handleSignal("USR2", { log.warn("TODO: implement USR2 handling (show svd config values)") })
-        
-        handleSignal("INT", { sys.exit })
-        handleSignal("QUIT", { sys.exit })
-        handleSignal("TERM", { sys.exit })
-        handleSignal("HUP", { sys.exit })
-    }
-    
-    
     def main(args: Array[String]) {
         SvdConfig.environment = "production"
-
-        handleTrapsOnSignals
-        
         SvdUtils.checkOrCreateVendorDir
+
+        // handle signals
+        handleSignal("ABRT", { SvdUtils.getAllLiveThreads })
+        handleSignal("USR2", { log.warn("TODO: implement USR2 handling (show svd config values)") })
         
         if (SvdUtils.isLinux) {
             log.error("Linux systems aren't supported yet!")
