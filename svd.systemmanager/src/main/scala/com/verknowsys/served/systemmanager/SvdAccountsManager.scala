@@ -23,7 +23,9 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
     // case object ReloadUsers
     // case class CheckUser(val username: String)
     
-    val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
+    protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
+    
+    protected var accountManagers: Option[Map[String, ActorRef]] = None
 
     def receive = {
         case Init =>
@@ -36,12 +38,15 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             respawnUsersActors
             
         case GetAccountManager(username) =>
-            registry.actorsFor[SvdAccountManager].find { e => 
-                (e !! GetAccount) collect { case a: SvdAccount => a.userName == username } getOrElse false 
-            } match {
-                case Some(ref: ActorRef) => self reply ref
-                case _ => self reply Error("AccountManeger for username %s not found".format(username))
-            }
+            self reply accountManagers.get(username)
+        
+        
+            // registry.actorsFor[SvdAccountManager].find { e => 
+            //     (e !! GetAccount) collect { case a: SvdAccount => a.userName == username } getOrElse false 
+            // } match {
+            //     case Some(ref: ActorRef) => self reply ref
+            //     case _ => self reply Error("AccountManeger for username %s not found".format(username))
+            // }
     }
 
     private def respawnUsersActors {
@@ -50,11 +55,12 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
         registry.actorsFor[SvdAccountManager] foreach { _.stop }
         
         // spawn Account Manager for each account entry in passwd file
-        userAccounts foreach { account =>
+        accountManagers = Some(userAccounts.map { account =>
             val manager = actorOf(new SvdAccountManager(account))
             self.link(manager)
             manager.start
-        }
+            (account.userName, manager)
+        }.toMap)
         log.trace("Actor.registry size after: %d", registry.actors.size)
     }
 
