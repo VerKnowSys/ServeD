@@ -1,0 +1,48 @@
+A) System wide assumptions:
+
+	STABILITY STATES:
+		- normal usage
+		- suspicious
+		- alert
+
+	MEM - system memory usage
+	CPU - system cpu usage
+	IO  - system load
+	SWAP - system swap usage
+	
+
+System wide constants:
+	MEMLIMIT	=>	memory amount per system
+	CPULIMIT	=>	number of cpu cores
+	DISKLIMIT	=>	disk space available for system
+
+
+System wide rules:
+	 1. MEM usage	> 75%							=> admin alert
+	 2. MEM usage	> 85%							=> app restart
+	 3. IO load		> 10							=> admin alert
+	 4. SWAP usage	> 20%							=> generate memory statistic usage, admin alert
+	 5. SWAP usage	> 50%							=> check which app is using lots of RSS, inform user, restart app
+	 6. CPU usage	>= CPULIMIT -10% in 10 minutes	=> check which app is generating load, admin alert
+	 7. CPU usage	>= CPULIMIT -10% in 60 minutes	=> check which app is generating load, inform user of app
+	 8. Disk usage	>= DISKLIMIT -50GiB				=> generate disk usage report, admin alert
+
+
+
+B) User wide assumptions:
+	
+	RANGE OF TIME: (for working apps)
+		|.. last 30 days ..|.. last 24 hours ..|.. last 60 minutes ..|.. last 60s ..|
+		|   count average  |   count average   |  count average 	 | ... |
+
+	DATA - specified range of time (logarithmic) of usages:
+	DATA[mem] - memory usage in time
+	DATA[cpu] - cpu usage in time
+	
+
+User wide rules (according to DATA):
+	0. unless user app has amount of 5*60s records (or no usage records available) then don't apply rules on such app yet
+	1. 60s app memory usage average > 140% overall usage					=> alert user, alert admin
+	2. 10min Quota usage average > 120% overall usage (of app lifetime) 	=> alert user, alert admin
+	
+
