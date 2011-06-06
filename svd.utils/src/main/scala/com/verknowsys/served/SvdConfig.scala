@@ -12,7 +12,7 @@ object SvdConfig {
      *
      */
      
-    final val version = "0.1.2"
+    final val version = "0.2.0"
     final val served = "ServeD v" + version
     final val configurationFilesPrefix = if(environment == "test") "/tmp/config" else "/"
     

@@ -15,4 +15,7 @@ class Plugins(info: ProjectInfo) extends PluginDefinition(info) {
     val growl       = "me.lessis" % "sbt-growl-plugin" % "0.0.5"
     val akkaPlugin  = "se.scalablesolutions.akka" % "akka-sbt-plugin" % "1.1"
     val coffeeScript = "org.coffeescript" % "coffee-script-sbt-plugin" % "1.0"
+    
+    // Don't use Ivy cache. Use maven local repository. (it comes from codaRepo)
+    val mavenSBT = "com.codahale" % "maven-sbt" % "0.1.1"
 }
