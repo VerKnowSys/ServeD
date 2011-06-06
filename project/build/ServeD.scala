@@ -16,7 +16,9 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     lazy val web            = project("svd.web", "Svd Web", new SvdWeb(_), api, utils)
     
     
-    class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject {
+    class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject with maven.MavenDependencies {
+        
+        val mavenVKS = "maven.verknowsys.com" at "http://maven.verknowsys.com/repository/"
         
         override def parallelExecution = true
         override def compileOrder = CompileOrder.JavaThenScala
@@ -42,13 +44,10 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             Some("project/growl_images/fail.png")
         )
 
-        val scalaToolsSnapshots = "scala-tools snapshots" at "http://scala-tools.org/repo-snapshots/"
-        val specsTest = "org.scala-tools.testing" % "specs_2.9.0.RC5" % "1.6.8-SNAPSHOT" % "test"
     }
     
     
-    class SvdUtils(info: ProjectInfo) extends SvdProject(info) {
-        val mavenLocal = "teamon.eu" at "http://maven.teamon.eu"
+    class SvdUtils(info: ProjectInfo) extends SvdProject(info) with maven.MavenDependencies {
         val javaNet    = "java.net" at "http://download.java.net/maven/2"
         val commonsio = "commons-io" % "commons-io" % "1.4"
         val messadmin = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
@@ -56,12 +55,12 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
 
 
-    class SvdApi(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
+    class SvdApi(info: ProjectInfo) extends SvdProject(info) with AkkaProject with maven.MavenDependencies {
         val akkaRemote = akkaModule("remote")
     }
 
 
-    class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {
+    class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder with maven.MavenDependencies {
         val jlineRepo = "JLine Project Repository" at "http://jline.sourceforge.net/m2rep"
         val jline = "jline" % "jline" % "0.9.9"
         
@@ -74,15 +73,16 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
     
     
-    class SvdWeb(info: ProjectInfo) extends DefaultWebProject(info) with CoffeeScriptCompile {
+    class SvdWeb(info: ProjectInfo) extends DefaultWebProject(info) with CoffeeScriptCompile with maven.MavenDependencies {
+        val scalaToolsSnapshots = "scala-tools snapshots" at "http://scala-tools.org/repo-snapshots/"
+        val specsTest = "org.scala-tools.testing" % "specs_2.9.0.RC5" % "1.6.8-SNAPSHOT" % "test"
         val liftVersion = "2.4-SNAPSHOT"
-        val snapshotRepo = "ScalaTools Snapshots" at "http://scala-tools.org/repo-snapshots"
         
         override def jettyWebappPath  = webappPath
         override def compileAction = super.compileAction dependsOn(compileCoffeeScript)
         override def libraryDependencies = Set(
           "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
-          // "net.liftweb" % "lift-mapper_2.8.1" % liftVersion % "compile->default",
+          "net.liftweb" % "lift-mapper_2.9.0-1" % liftVersion % "compile->default",
           "org.mortbay.jetty" % "jetty" % "6.1.22" % "test->default",
           "junit" % "junit" % "4.5" % "test->default",
           "org.scala-tools.testing" % "specs" % "1.6.2.1" % "test->default"
@@ -91,10 +91,10 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
 
     
-    class SvdCore(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
+    class SvdCore(info: ProjectInfo) extends SvdProject(info) with AkkaProject with maven.MavenDependencies {
+        val akkaRepo = "Akka Repo" at "http://akka.io/repository"
+        val javaNet = "java.net" at "http://download.java.net/maven/2"
         // val jgitRepository = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
-        val mavenLocal = "teamon.eu" at "http://maven.teamon.eu"
-        val javaNet    = "java.net" at "http://download.java.net/maven/2"
         // val pircbot     = "pircbot" % "pircbot" % "1.4.2"
         // val smackx      = "jivesoftware" % "smackx" % "3.0.4"
         // val j2sshcommon = "sshtools" % "j2ssh-common" % "0.2.2"
