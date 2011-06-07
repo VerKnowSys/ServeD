@@ -1,23 +1,11 @@
 package com.verknowsys.served.db
 
 import org.specs._
-import com.verknowsys.served.SvdSpecHelpers._
 
-class DBTest extends Specification {
-    var server: DBServer = null
-    var db: DBClient = null
-
+class DBTest extends DatabaseTest {
     "DB" should {
-        doBefore {
-            rmdir("/tmp/svd_db_test")
-            mkdir("/tmp/svd_db_test")
-            server = new DBServer(9000, "/tmp/svd_db_test/dbservertest")
-            db = server.openClient
-        }
-        
-        doAfter {
-            server.close
-        }
+        doBefore { connect }
+        doAfter { disconnect }
         
         "Data model" in {
             val teamon = new User("teamon")
@@ -31,6 +19,8 @@ class DBTest extends Specification {
             
             db << teamon
             db << dmilith
+            
+            reconnect
             
             Users(db).count must_== 2
             
@@ -51,6 +41,8 @@ class DBTest extends Specification {
             db << dmilith
             db << cig
             db << joint
+            
+            reconnect
             
             val users1 = Users(db)
             users1 must haveSize(2)
@@ -74,6 +66,8 @@ class DBTest extends Specification {
             db << Drug("a")
             db << Drug("b")
             db << Drug("c")
+            
+            reconnect
             
             val users1 = Users(db)(e => true)
             users1 must haveSize(3)
@@ -106,6 +100,8 @@ class DBTest extends Specification {
             db << teamon
             db << dmilith
             
+            reconnect
+            
             Users(db)(uuid1) must beSome(teamon)
             Users(db)(uuid2) must beSome(dmilith)
             Users(db)(uuid3) must beNone
@@ -122,6 +118,8 @@ class DBTest extends Specification {
             db << teamon
             db << dmilith
             
+            reconnect
+            
             Users(db) must haveSize(2)
             Users(db).historyFor(uuid1) must beEmpty
             Users(db).historyFor(uuid2) must beEmpty
@@ -132,6 +130,8 @@ class DBTest extends Specification {
             val dmilith2 = dmilith.copy(name = "dmilith2")
             
             db << teamon2
+            
+            reconnect
             
             Users(db) must haveSize(2)
             Users(db)(uuid1) must beSome(teamon2)
@@ -145,6 +145,8 @@ class DBTest extends Specification {
             
             db << teamon3
             
+            reconnect
+            
             Users(db) must haveSize(2)
             Users(db)(uuid1) must beSome(teamon3)
             Users(db)(uuid2) must beSome(dmilith)
@@ -156,6 +158,8 @@ class DBTest extends Specification {
             Users(db).historyFor(uuid3) must beEmpty
             
             db << dmilith2
+            
+            reconnect
             
             Users(db) must haveSize(2)
             Users(db)(uuid1) must beSome(teamon3)
@@ -176,11 +180,15 @@ class DBTest extends Specification {
             db << teamon
             db << teamon
             
+            reconnect
+            
             Users(db) must haveSize(1)
             Users(db).historyFor(teamon) must beEmpty
             
             val teamon2 = teamon.copy()
             db << teamon2
+            
+            reconnect
             
             Users(db) must haveSize(1)
             Users(db).historyFor(teamon) must beEmpty
@@ -197,6 +205,8 @@ class DBTest extends Specification {
             db << teamon4
             val teamon5 = teamon1.copy(name = "teamon 5")
             db << teamon5
+            
+            reconnect
 
             Users(db).historyFor(teamon1) must haveSize(4)
             Users(db).historyFor(teamon1).toList must_== teamon4 :: teamon3 :: teamon2 :: teamon1 :: Nil
