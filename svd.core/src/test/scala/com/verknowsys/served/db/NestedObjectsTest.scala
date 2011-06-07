@@ -7,13 +7,22 @@ class NestedObjectsTest extends DatabaseTest {
         doBefore { connect }
         doAfter { disconnect }
         
-        "Persist with empty list" in {
-            val first = EmbeddedList("first", Nil)
-            db << first
+        "Persist object with empty list embedded" in {
+            val obj = EmbeddedList("first", Nil)
+            db << obj
             
             reconnect
             
-            EmbeddedList(db)(first.uuid) must beSome(first)
+            EmbeddedList(db)(obj.uuid) must beSome(obj)
+        }
+        
+        "Persist object with empty list embedded" in {
+            val obj = EmbeddedList("first", List(1,2,3))
+            db << obj
+            
+            reconnect
+            
+            EmbeddedList(db)(obj.uuid) must beSome(obj)
         }
     }
 }

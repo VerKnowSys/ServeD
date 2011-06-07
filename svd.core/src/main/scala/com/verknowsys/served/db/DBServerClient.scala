@@ -55,6 +55,8 @@ class DBClient(val currentODB: ODB, val historyODB: ODB){
 }
 
 class DBServer(port: Int, path: String){
+    OdbConfiguration.setLogServerStartupAndShutdown(false)
+    
     protected val server = ODBFactory.openServer(port)
     
     ("current" :: "history" :: Nil) foreach { suffix => 
