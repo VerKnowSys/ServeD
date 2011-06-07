@@ -28,6 +28,7 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
     
     protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
     
+    // Safe map for fast access to AccountManagers
     protected var accountManagers: Option[Map[String, ActorRef]] = None
 
     def receive = {
@@ -43,14 +44,6 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             
         case GetAccountManager(username) =>
             self reply accountManagers.get(username)
-        
-        
-            // registry.actorsFor[SvdAccountManager].find { e => 
-            //     (e !! GetAccount) collect { case a: SvdAccount => a.userName == username } getOrElse false 
-            // } match {
-            //     case Some(ref: ActorRef) => self reply ref
-            //     case _ => self reply Error("AccountManeger for username %s not found".format(username))
-            // }
     }
 
     private def respawnUsersActors {
