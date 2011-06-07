@@ -1,23 +1,11 @@
 package com.verknowsys.served.db
 
 import org.specs._
-import com.verknowsys.served.SvdSpecHelpers._
 
-class DBObjectTest extends Specification {
-    var server: DBServer = null
-    var db: DBClient = null
-
+class DBObjectTest extends DatabaseTest {
     "DBObject" should {
-        doBefore {
-            rmdir("/tmp/svd_db_test")
-            mkdir("/tmp/svd_db_test")
-            server = new DBServer(9000, "/tmp/svd_db_test/dbobjecttest")
-            db = server.openClient
-        }
-        
-        doAfter {
-            server.close
-        }
+        doBefore { connect }
+        doAfter { disconnect }
         
         "set createdAt timestamp when created" in {
             val teamon  = User("teamon")
