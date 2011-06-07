@@ -28,19 +28,21 @@ class DBClient(val currentODB: ODB, val historyODB: ODB){
     
     def <<[T <: DBObject : ClassManifest](newObj: T) = {
         // TODO: Hash neodatis internal oid when updating (relation consistency)
-        // TODO: Update timestamp
         find(newObj.uuid) match {
             case Some(oldObj) if oldObj != newObj =>
                 historyODB.store(oldObj)
                 historyODB.commit
-                currentODB.delete(oldObj)
                 currentODB.store(newObj)
+                currentODB.delete(oldObj)
+                currentODB.commit
+            
             case Some(oldObj) =>
+                // TODO: Update timestamp
+            
             case None =>
                 currentODB.store(newObj)
-            
+                currentODB.commit
         }
-        currentODB.commit
     }
     
     protected[db] def find[T <: DBObject : ClassManifest](uuid: UUID) = {
