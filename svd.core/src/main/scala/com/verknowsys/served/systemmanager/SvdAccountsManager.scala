@@ -3,7 +3,7 @@ package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.utils.signals.Init
 import com.verknowsys.served.utils.events.SvdFileEvent
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager.managers._
@@ -35,6 +35,7 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             log.debug("SvdAccountsManager received Init. Running default task..")
             registerFileEventFor(SvdConfig.systemPasswdFile, Modified)
             respawnUsersActors
+            self reply Success
         
         case SvdFileEvent(systemPasswdFilePath, Modified) => 
             log.trace("Passwd file modified")

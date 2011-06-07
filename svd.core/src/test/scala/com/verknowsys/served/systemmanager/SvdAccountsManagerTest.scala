@@ -7,9 +7,10 @@ import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.utils.SvdFileEventsManager
 import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.SvdConfig
+import com.verknowsys.served.utils.signals.Init
+import com.verknowsys.served.api._
 import org.specs._
 import akka.testkit.TestKit
-
 
 import akka.actor._
 import akka.actor.Actor._
@@ -44,6 +45,9 @@ class SvdAccountsManagerTest extends Specification with TestKit {
             
             registry.actorsFor[SvdAccountManager] must haveSize(0)
             am = actorOf[SvdAccountsManager].start
+            am ! Init
+            expectMsg(Success)
+            
             registry.actorsFor[SvdAccountManager] must haveSize(0)
         }
         
@@ -52,6 +56,8 @@ class SvdAccountsManagerTest extends Specification with TestKit {
             
             registry.actorsFor[SvdAccountManager] must haveSize(0)
             am = actorOf[SvdAccountsManager].start
+            am ! Init
+            expectMsg(Success)
             
             val managers = registry.actorsFor[SvdAccountManager]
             managers must haveSize(1)
@@ -64,6 +70,8 @@ class SvdAccountsManagerTest extends Specification with TestKit {
             
             registry.actorsFor[SvdAccountManager] must haveSize(0)
             am = actorOf[SvdAccountsManager].start
+            am ! Init
+            expectMsg(Success)
             
             val managers = registry.actorsFor[SvdAccountManager]
             managers must haveSize(5)
