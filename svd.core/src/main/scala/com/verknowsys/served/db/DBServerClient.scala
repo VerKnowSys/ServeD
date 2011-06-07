@@ -25,7 +25,14 @@ class DBClient(val currentODB: ODB, val historyODB: ODB){
     currentODB.getClassRepresentation(classOf[UUID].getName(), false).persistAttribute("variant")
     historyODB.getClassRepresentation(classOf[UUID].getName(), false).persistAttribute("variant")
     
-    
+    /**
+     * Save object in database
+     * 
+     * If object with the same uuid already exists in database it will be moved to history
+     * database and replaced in current database with current one.
+     *
+     * @author teamon
+     */
     def <<[T <: DBObject : ClassManifest](newObj: T) = {
         // TODO: Hash neodatis internal oid when updating (relation consistency)
         find(newObj.uuid) match {
@@ -50,12 +57,27 @@ class DBClient(val currentODB: ODB, val historyODB: ODB){
         col(uuid)
     }
     
+    /**
+     * Close database connection
+     *
+     * @author teamon
+     */
     def close {
         currentODB.close
         historyODB.close
     }
 }
 
+/**
+ * Server instance.
+ * 
+ * It requires port and path to database directory.
+ * When given path = "/db/mybase" it will create two databases:
+ *  - "/db/mybase_current.neodatis" for the most up-to-date objects
+ *  - "/db/mybase_history.neodatis" for history of changes
+ *
+ * @author teamon
+ */
 class DBServer(port: Int, path: String){
     OdbConfiguration.setLogServerStartupAndShutdown(false)
     
@@ -67,17 +89,37 @@ class DBServer(port: Int, path: String){
     
     server.startServer(true)
     
+    /**
+     * Returns new client instance for this server
+     *
+     * @author teamon
+     */
     def openClient = new DBClient(currentClient, historyClient)
     
-    def currentClient = server.openClient(dbpath("current"))
-    
-    def historyClient = server.openClient(dbpath("history"))
+    /**
+     * Shutdown server
+     *
+     * @author teamon
+     */
     
     def close = server.close
+    
+    protected def currentClient = server.openClient(dbpath("current"))
+    
+    protected def historyClient = server.openClient(dbpath("history"))
     
     protected def dbpath(suffix: String) = path + "_" + suffix
 }
 
+/**
+ * Factory object for type-safe manipulation on database
+ *
+ * @example
+ *    object Foo extends DB[Foo]
+ *    Foo(db) // provides access to query operations on `Foo` objects
+ *
+ * @author teamon
+ */
 class DB[T <: DBObject : ClassManifest] {
     def apply(db: DBClient) = new TopLevelCollection[T](db)
 }
