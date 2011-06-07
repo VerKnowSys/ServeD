@@ -16,9 +16,10 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     lazy val web            = project("svd.web", "Svd Web", new SvdWeb(_), api, utils)
     
     
-    class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject with maven.MavenDependencies {
+    class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject {
         
         val mavenVKS = "maven.verknowsys.com" at "http://maven.verknowsys.com/repository/"
+        val specsTest = "org.scala-tools.testing" % "specs_2.9.0.RC5" % "1.6.8-SNAPSHOT" % "test"
         
         override def parallelExecution = true
         override def compileOrder = CompileOrder.JavaThenScala
@@ -27,7 +28,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             javaCompileOptions("-encoding", "UTF-8") ++
             javaCompileOptions("-source", "1.6") ++
             javaCompileOptions("-target", "1.6") ++
-            javaCompileOptions("-Xlint:unchecked") ++
+            // javaCompileOptions("-Xlint:unchecked") ++
             javaCompileOptions("-Xlint:deprecation")
 
         override def compileOptions = super.compileOptions ++
@@ -47,20 +48,20 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
     
     
-    class SvdUtils(info: ProjectInfo) extends SvdProject(info) with maven.MavenDependencies {
-        val javaNet    = "java.net" at "http://download.java.net/maven/2"
+    class SvdUtils(info: ProjectInfo) extends SvdProject(info) {
+        val javaNet = "java.net" at "http://download.java.net/maven/2"
         val commonsio = "commons-io" % "commons-io" % "1.4"
         val messadmin = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
         val jna = "net.java.dev.jna" % "jna" % "3.2.5"
     }
 
 
-    class SvdApi(info: ProjectInfo) extends SvdProject(info) with AkkaProject with maven.MavenDependencies {
+    class SvdApi(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
         val akkaRemote = akkaModule("remote")
     }
 
 
-    class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder with maven.MavenDependencies {
+    class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {
         val jlineRepo = "JLine Project Repository" at "http://jline.sourceforge.net/m2rep"
         val jline = "jline" % "jline" % "0.9.9"
         
@@ -73,9 +74,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
     
     
-    class SvdWeb(info: ProjectInfo) extends DefaultWebProject(info) with CoffeeScriptCompile with maven.MavenDependencies {
+    class SvdWeb(info: ProjectInfo) extends DefaultWebProject(info) with CoffeeScriptCompile {
         val scalaToolsSnapshots = "scala-tools snapshots" at "http://scala-tools.org/repo-snapshots/"
-        val specsTest = "org.scala-tools.testing" % "specs_2.9.0.RC5" % "1.6.8-SNAPSHOT" % "test"
         val liftVersion = "2.4-SNAPSHOT"
         
         override def jettyWebappPath  = webappPath
@@ -83,30 +83,26 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         override def libraryDependencies = Set(
           "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
           "net.liftweb" % "lift-mapper_2.9.0-1" % liftVersion % "compile->default",
-          "org.mortbay.jetty" % "jetty" % "6.1.22" % "test->default",
-          "junit" % "junit" % "4.5" % "test->default",
-          "org.scala-tools.testing" % "specs" % "1.6.2.1" % "test->default"
+          "org.mortbay.jetty" % "jetty" % "6.1.26" % "test->default"
+          // "org.scala-tools.testing" % "specs" % "1.6.2.1" % "test->default"
+          // "junit" % "junit" % "4.5" % "test->default",
           // "com.h2database" % "h2" % "1.2.138"
         ) ++ super.libraryDependencies
     }
 
     
-    class SvdCore(info: ProjectInfo) extends SvdProject(info) with AkkaProject with maven.MavenDependencies {
+    class SvdCore(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
         val akkaRepo = "Akka Repo" at "http://akka.io/repository"
         val javaNet = "java.net" at "http://download.java.net/maven/2"
         // val jgitRepository = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
         // val pircbot     = "pircbot" % "pircbot" % "1.4.2"
         // val smackx      = "jivesoftware" % "smackx" % "3.0.4"
-        // val j2sshcommon = "sshtools" % "j2ssh-common" % "0.2.2"
-        // val j2sshcore   = "sshtools" % "j2ssh-core" % "0.2.2"
-        val smack       = "jivesoftware" % "smack" % "3.0.4"
-        val jgit        = "org.eclipse.jgit" % "org.eclipse.jgit" % "0.11.1-SNAPSHOT" // Move it out
-        val swing       = "org.scala-lang" % "scala-swing" % "2.8.1"
-        val akkaRemote  = akkaModule("remote")
+        val smack = "jivesoftware" % "smack" % "3.0.4"
+        val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "0.11.1-SNAPSHOT" // Move it out
+        val akkaRemote = akkaModule("remote")
         val akkaTestKit = akkaModule("testkit")
         val neodatis = "org.neodatis.odb" % "neodatis-odb" % "1.9.30.689"
-        val h2          = "com.h2database" % "h2" % "1.3.154"
-        val specs = "org.scala-tools.testing" % "specs_2.9.0.RC5" % "1.6.8-SNAPSHOT"
+        val h2 = "com.h2database" % "h2" % "1.3.154"
 
         lazy val served = task { None } dependsOn(run(Array()))
         lazy val svd = served

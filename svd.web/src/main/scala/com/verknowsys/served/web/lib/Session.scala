@@ -42,7 +42,7 @@ object Session {
         // TODO: Add some real validation. Temporary code so there is no need to log in on every code reload 
         // (jetty restarts app and session vars are gone)
         if(Username.get == ""){
-            login("teamon", "")
+            login(System.getProperty("user.name"), "")
         }
         Username.get != "" // change me!
     }

@@ -1,7 +1,6 @@
 package com.verknowsys.served.utils.git
 
 import java.io.File
-import com.verknowsys.served.spechelpers._
 import com.verknowsys.served.SvdSpecHelpers._
 import org.specs._
 

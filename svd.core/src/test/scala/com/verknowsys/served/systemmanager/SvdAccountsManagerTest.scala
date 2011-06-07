@@ -6,7 +6,6 @@ import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.utils.SvdFileEventsManager
 import com.verknowsys.served.SvdSpecHelpers._
-import com.verknowsys.served.spechelpers._
 import com.verknowsys.served.SvdConfig
 import org.specs._
 import akka.testkit.TestKit
