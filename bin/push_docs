@@ -1,4 +1,4 @@
 #!/usr/bin/env zsh
 
 bin/generate_docs
-scp -r target/docs/modules dracore:~/web/svd/
+scp -r target/_site dracore:~/web/svd

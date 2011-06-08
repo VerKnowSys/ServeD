@@ -6,16 +6,11 @@ else
     easy_install pygments
 fi
 
-if gem list rocco | grep rocco > /dev/null;
+if gem list jekyll | grep jekyll > /dev/null;
 then
 else
-    p=`pwd`
-    cd /tmp
-    rm -rf /tmp/rocco
-    git clone git://github.com/VerKnowSys/rocco.git
-    cd rocco
-    rake install
-    cd $p
+    gem install jekyll
 fi
 
-rocco docs/**/*.scala -o target
+echo "Generating site"
+jekyll --pygments docs/site target/_site
