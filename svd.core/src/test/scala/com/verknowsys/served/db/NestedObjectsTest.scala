@@ -48,7 +48,7 @@ class NestedObjectsTest extends DatabaseTest {
             EmbeddedList(db).historyFor(obj.uuid) must haveSize(1)
             EmbeddedList(db).historyFor(obj.uuid) must contain(obj)
             
-            Console.readLine("press enter")
+            // Console.readLine("press enter")
         }
     }
 }
