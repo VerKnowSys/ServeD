@@ -79,10 +79,6 @@ public abstract class ShellBase
         this.gl.initHistoryFile(file);
     }
 
-    public void registerSigIntHandler() {
-        ShellIntHandler.register(this); //catch ctrl-c
-    }
-
     public void init (String applicationName, 
                       PrintStream out,
                       PrintStream err) {
@@ -131,8 +127,6 @@ public abstract class ShellBase
         setHandlerHidden(".", true);
         setHandlerHidden("q", true);
         setHandlerHidden("exit", true);
-
-        registerSigIntHandler();
 
         this.completer = new CollectionCompleter(this) {
             public Iterator getIterator() {
