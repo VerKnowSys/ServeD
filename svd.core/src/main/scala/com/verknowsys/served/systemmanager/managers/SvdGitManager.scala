@@ -35,7 +35,7 @@ class SvdGitManager(account: SvdAccount) extends SvdManager(account) {
             } else {
                 log.trace("Creating new git repository: %s for account: %s".format(name, account.userName))
                 git.Git.init(gitHomeDir / name, bare = true)
-                if (SvdSystemManagerUtils.chown(gitHomeDir / name + ".git", account.uid))
+                if (SvdSystemManagerUtils.chown(gitHomeDir / name + ".git", account.uid, account.gid))
                     log.debug("Chowning created git repository.")
                 else
                     log.warn("Couldn't chown created git repository.")
