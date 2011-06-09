@@ -19,7 +19,10 @@ object SvdSpecHelpers {
     
     def mkdir(path: String) = FileUtils.forceMkdir(path)
     
-    def rmdir(path: String) = try { FileUtils.forceDelete(path) } catch { case _ => }
+    def rmdir(path: String) = try {
+        if (path.startsWith(SvdConfig.systemTmpDir))
+            FileUtils.forceDelete(path)
+    } catch { case _ => }
     
     final val TEST_DIR = "/tmp/served"
     var count = 0
