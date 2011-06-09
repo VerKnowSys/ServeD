@@ -41,6 +41,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             val net = core.getNetInfo
             val netstat = new NetStat
             netstat.stat(core)
+            val ps = self !! GetAllProcesses
             
             // net.gather(new Sigar)
             
@@ -62,7 +63,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
                 net.getDefaultGateway, net.getDomainName, net.getHostName, net.getPrimaryDns, net.getSecondaryDns
             )
             log.warn("Network usage: IN: %s, OUT: %s".format(netstat.getTcpInboundTotal, netstat.getTcpOutboundTotal))
-            
+            log.debug("Processes of system: %s".format(ps))
 
             // val a = new SvdProcess(command = "dig +trace arka.gdynia.pl", user = "root", stdOut = "/tmp/served_nobody_memcached.log")
             // log.debug("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
