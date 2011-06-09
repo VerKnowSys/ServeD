@@ -23,7 +23,7 @@ object SvdConfig {
     final val defaultEncoding = "UTF-8"
     final val remoteApiServerHost = "localhost" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
     final val remoteApiServerPort = 10
-    final val defaultUserGroup = 1000 // 2011-06-09 01:06:59 - dmilith - TODO: XXX: switch to user groups and remove this value
+    final val defaultUserGroup = 20 // 2011-06-09 01:06:59 - dmilith - NOTE: default GID for "staff" group both on Darwin and FreeBSD
     
     val kqueueWaitInterval = 500
     val sleepDefaultPause = 1000
