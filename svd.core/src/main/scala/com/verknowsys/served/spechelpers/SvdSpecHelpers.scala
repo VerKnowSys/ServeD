@@ -11,27 +11,39 @@ object SvdSpecHelpers {
 	implicit def StringToFile(s: String) = new File(s)
     implicit def ItemToSeq[T](a: T) = a :: Nil
     
-    def touch(file: File) = FileUtils.touch(file)
+    def touch(file: File) = {
+        if (file.startsWith("/var/tmp"))
+            FileUtils.touch(file)
+    }
     
-    def readFile(path: String) = FileUtils.readFileToString(path)
+    def readFile(path: String) = {
+        if (path.startsWith("/var/tmp"))
+            FileUtils.readFileToString(path)
+    }
 
-    def writeFile(path: String, data: String) = FileUtils.writeStringToFile(path, data)
+    def writeFile(path: String, data: String) = {
+        if (path.startsWith("/var/tmp"))
+            FileUtils.writeStringToFile(path, data)
+    }
     
-    def mkdir(path: String) = FileUtils.forceMkdir(path)
+    def mkdir(path: String) = {
+        if (path.startsWith("/var/tmp"))
+            FileUtils.forceMkdir(path)
+    }
     
     def rmdir(path: String) = try {
-        if (path.startsWith(SvdConfig.systemTmpDir))
+        if (path.startsWith("/var/tmp"))
             FileUtils.forceDelete(path)
     } catch { case _ => }
     
-    final val TEST_DIR = "/tmp/served"
+    final val TEST_DIR = "/var/tmp/served"
     var count = 0
     def randomPath = {
         count += 1
-        TEST_DIR + "/dir_" + count + "_" + System.currentTimeMillis
+        TEST_DIR / "/dir_" + count + "_" + System.currentTimeMillis
     }
     
-    def testPath(path: String) = TEST_DIR + "/" + path
+    def testPath(path: String) = TEST_DIR / path
     
     def removeTestDir = rmdir(TEST_DIR)
     def createTestDir = mkdir(TEST_DIR)
