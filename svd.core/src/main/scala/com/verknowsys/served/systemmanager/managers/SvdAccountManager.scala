@@ -3,8 +3,7 @@ package com.verknowsys.served.systemmanager.managers
 
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.SvdExceptionHandler
-import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.api.Git
+import com.verknowsys.served.api._
 import com.verknowsys.served.utils.Logging
 
 import akka.actor.Actor

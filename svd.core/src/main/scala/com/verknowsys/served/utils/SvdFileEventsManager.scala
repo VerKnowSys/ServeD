@@ -1,7 +1,7 @@
 package com.verknowsys.served.utils
 
 
-import com.verknowsys.served.utils.signals.{Success, Failure}
+import com.verknowsys.served.api._
 
 import com.sun.jna.NativeLong
 import scala.collection.mutable.{HashMap => MutableMap, ListBuffer}

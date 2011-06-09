@@ -16,7 +16,7 @@ import com.verknowsys.served.systemmanager.SvdAccountsManager
 import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.notifications.SvdNotificationCenter
 
-import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.api._
 
 import sun.misc.SignalHandler
 import sun.misc.Signal

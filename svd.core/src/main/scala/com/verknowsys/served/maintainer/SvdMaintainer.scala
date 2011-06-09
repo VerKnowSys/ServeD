@@ -9,7 +9,7 @@ import com.verknowsys.served.boot
 import com.verknowsys.served.notifications._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils.{SvdUtils, SvdFileEventsManager, SvdExceptionHandler}
-import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.api._
 import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.systemmanager.ProcessesList
 import com.verknowsys.served.utils.Logging
@@ -43,7 +43,7 @@ class SvdMaintainer extends Actor with SvdExceptionHandler {
             registry.actorFor[SvdSystemManager] foreach { _ ! GetAllProcesses }
         
         case ProcessesList(pids) =>
-            import SvdPOSIX._
+            // import SvdPOSIX._
             log.trace("Got pids: %s", pids)
             Thread.sleep(SvdConfig.sleepDefaultPause)
             

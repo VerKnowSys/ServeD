@@ -6,7 +6,7 @@ package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.api._
 import com.verknowsys.served.utils.monitor.SvdMonitored
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.Logging
@@ -31,8 +31,6 @@ case class ProcessesList(pids: List[Long])
 */
 class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
 
-    import SvdPOSIX._
-    
     log.info("SvdSystemManager is loading")
     
 

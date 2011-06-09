@@ -3,7 +3,6 @@ package com.verknowsys.served.systemmanager
 
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.signals.Init
 import com.verknowsys.served.utils.events.SvdFileEvent
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager.managers._

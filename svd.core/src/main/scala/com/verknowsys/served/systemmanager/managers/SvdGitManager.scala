@@ -7,6 +7,9 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.git
 import com.verknowsys.served.api._
 
+import akka.actor._
+import akka.config.Supervision._
+import akka.actor.Actor.{remote, actorOf, registry}
 
 /**
  * Git Manager
