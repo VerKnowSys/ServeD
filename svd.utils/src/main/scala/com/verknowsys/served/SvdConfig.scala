@@ -19,7 +19,7 @@ object SvdConfig {
     final val systemLogDir = "/var/log"
     final val systemTmpDir = "/var/tmp"
     // final val systemPasswdFile = systemConfDir / "passwd"
-    final val systemPasswdFile = System.getProperty("user.dir") + "/svd.core/src/test/resources/etc/standardPasswd" // 2011-06-09 01:25:40 - dmilith - XXX: temporary for tests
+    final val systemPasswdFile = systemTmpDir / "passwd" // 2011-06-09 01:25:40 - dmilith - FIXME: PENDING: XXX: temporary for tests: IT REQUIRES /VAR/TMP/PASSWD FILE TO RUN!!
     final val defaultEncoding = "UTF-8"
     final val remoteApiServerHost = "localhost" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
     final val remoteApiServerPort = 10
