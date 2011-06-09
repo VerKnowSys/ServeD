@@ -9,11 +9,11 @@ import org.coffeescript.CoffeeScriptCompile
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
     
     // Projects
-    lazy val api            = project("svd.api", "Svd API", new SvdApi(_))
-    lazy val cli            = project("svd.cli", "Svd CLI", new SvdCli(_), api)
-    lazy val utils          = project("svd.utils", "Svd Utils", new SvdUtils(_), api)
-    lazy val core           = project("svd.core", "Svd Core", new SvdCore(_), api, utils)
-    lazy val web            = project("svd.web", "Svd Web", new SvdWeb(_), api, utils)
+    lazy val api            = project("svd.api", "api", new SvdApi(_))
+    lazy val cli            = project("svd.cli", "cli", new SvdCli(_), api)
+    lazy val utils          = project("svd.utils", "utils", new SvdUtils(_), api)
+    lazy val core           = project("svd.core", "core", new SvdCore(_), api, utils)
+    lazy val web            = project("svd.web", "web", new SvdWeb(_), api, utils)
     
     
     class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject {
