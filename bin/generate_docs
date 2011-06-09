@@ -1,13 +1,16 @@
-#!/bin/zsh
+#!/bin/sh
 
-if which pygmentize > /dev/null; 
-then
+# 2011-06-09 21:50:18 - dmilith - NOTE: absolute path to avoid using zsh built in which command:
+tst=$(/usr/bin/which pygmentize > /dev/null)
+if [ "$?" = "0" ]; then
+    echo "Found pygments"
 else
     easy_install pygments
 fi
 
-if gem list jekyll | grep jekyll > /dev/null;
-then
+tst=$(gem list jekyll | grep jekyll > /dev/null)
+if [ "$?" = "0" ]; then
+    echo "Found jekyll"
 else
     gem install jekyll
 fi
