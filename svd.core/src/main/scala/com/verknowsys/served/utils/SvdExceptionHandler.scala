@@ -63,7 +63,7 @@ trait SvdExceptionHandler extends Actor with Logging {
     }
    
     override def unhandled(msg: Any){
-        log.warn("Message send to %s was not recoginzed: %s", this.getClass, msg)
+        log.warn("Message sent to %s was not recognized: %s", this.getClass, msg)
     }
     
 }
