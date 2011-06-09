@@ -1,7 +1,8 @@
-#!/usr/bin/env zsh
+#!/bin/sh
 
-if which cloc > /dev/null; 
-then
+tst=$(which cloc > /dev/null)
+if [ "$?" = "0" ]; then
+    echo "Found cloc"
 else
     brew install cloc
 fi
