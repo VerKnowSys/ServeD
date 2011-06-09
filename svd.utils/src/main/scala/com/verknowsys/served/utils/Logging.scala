@@ -5,7 +5,7 @@ import akka.event.EventHandler
 import java.io.FileWriter
 
 import com.verknowsys.served.SvdConfig
-import com.verknowsys.served.api.{Success, Logger}
+import com.verknowsys.served.api._
 
 
 trait Logging {
@@ -72,7 +72,7 @@ class ConsoleLogger(klazz: String) extends AbstractLogger(klazz){
             case Logger.Levels.Error =>
                 val fw = new FileWriter(SvdConfig.systemLogDir / "svd.error.log")
                 message.split("\n").foreach(line =>
-                    fw.write("[%s%s%s] <%s%s%s> %s%s%s\n".format(
+                    fw.write("%s%s%s <%s%s%s> [%s%s%s]\n".format(
                         Colors(level), fmt.format(dte), Console.RESET,
                         Colors(level), formatClassName(className), Console.RESET,
                         Colors(level), line, Console.RESET))
@@ -81,7 +81,7 @@ class ConsoleLogger(klazz: String) extends AbstractLogger(klazz){
             case x =>
         }
         message.split("\n").foreach(line =>
-            println("[%s%s%s] <%s%s%s> %s%s%s".format(
+            println("%s%s%s <%s%s%s> [%s%s%s]".format(
                 Colors(level), fmt.format(dte), Console.RESET,
                 Colors(level), formatClassName(className), Console.RESET,
                 Colors(level), line, Console.RESET)
