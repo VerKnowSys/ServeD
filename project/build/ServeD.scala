@@ -91,7 +91,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
 
     
-    class SvdCore(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
+    class SvdCore(info: ProjectInfo) extends SvdProject(info) with AkkaProject with assembly.AssemblyBuilder {
         val akkaRepo = "Akka Repo" at "http://akka.io/repository"
         val javaNet = "java.net" at "http://download.java.net/maven/2"
         // val jgitRepository = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
@@ -103,6 +103,11 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val akkaTestKit = akkaModule("testkit")
         val neodatis = "org.neodatis.odb" % "neodatis-odb" % "1.9.30.689"
         val h2 = "com.h2database" % "h2" % "1.3.154"
+        
+        lazy val assemblyFast = assemblyTask(assemblyTemporaryPath, assemblyClasspath,
+                                              assemblyExtraJars, assemblyExclude
+                              ) dependsOn(compile) describedAs("Builds an optimized, single-file deployable JAR without running tests, just compile")
+        
 
         lazy val served = task { None } dependsOn(run(Array()))
         lazy val svd = served
