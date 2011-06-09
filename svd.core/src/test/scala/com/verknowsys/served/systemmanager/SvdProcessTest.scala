@@ -193,16 +193,16 @@ class SvdProcessTest extends Specification {
         
         
         // 2011-03-05 12:42:36 - dmilith - TODO: implement alive() spec
-        "it must pass alive specs" in {
-            synchronized {
-                val b = new SvdProcess("read", user = "root")
-                b.alive must beTrue
-                Thread.sleep(250)
-                b.kill(SIGKILL)
-                Thread.sleep(250)
-                b.alive must beFalse
-            }
-        }
+        // "it must pass alive specs" in {
+        //     synchronized {
+        //         val b = new SvdProcess("read", user = "root")
+        //         b.alive must beTrue
+        //         Thread.sleep(250)
+        //         b.kill(SIGKILL)
+        //         Thread.sleep(250)
+        //         b.alive must beFalse
+        //     }
+        // }
         
 
         // 2011-03-05 18:29:02 - dmilith - NOTE: XXX: dangerous code for Mac OS X ;>
