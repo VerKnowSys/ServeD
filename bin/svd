@@ -1,0 +1,11 @@
+#!/bin/sh
+
+pwd=$(pwd)
+jar="${pwd}/svd.core/target/scala_2.9.0/core-assembly-1.0.jar"
+
+if [ -e "${jar}" ]; then
+    echo "Executing: ${jar}"
+    sudo java -XX:MaxPermSize=512M -XX:+UseParallelGC -Xms128m -Xmx768m -Dfile.encoding=UTF-8 -noverify -XX:NewRatio=1 -jar "${jar}"
+else
+    echo "Assembly not found. Use cleanAndBuild script!"
+fi
