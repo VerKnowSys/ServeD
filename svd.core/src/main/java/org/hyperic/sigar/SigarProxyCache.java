@@ -37,8 +37,6 @@ public class SigarProxyCache
     private Map cache = ReferenceMap.newInstance();
     public static final int EXPIRE_DEFAULT = 30 * 1000; //30 seconds
     private int expire;
-    private static final boolean debugEnabled =
-        "debug".equals(System.getProperty("sigar.log"));
 
     public SigarProxyCache(Sigar sigar, int expire) {
         this.sigar = sigar;
@@ -64,11 +62,6 @@ public class SigarProxyCache
                                    handler);
 
         return proxy;
-    }
-
-    //poor mans logging
-    private void debug(String msg) {
-        // SigarLog.getLogger("SigarProxyCache").debug(msg);
     }
 
     /**
@@ -158,34 +151,12 @@ public class SigarProxyCache
             cacheVal = new SigarCacheObject();
         }
 
-        String argDebug = "";
-        if (debugEnabled) {
-            if ((args != null) && (args.length != 0)) {
-                argDebug = " with args=" +
-                    getDebugArgs(args, argKey);
-            }
-        }
-
         if (cacheVal.value != null) {
-            if (debugEnabled) {
-                debug("found " + method.getName() +
-                      " in cache" + argDebug);
-            }
-
             if ((timeNow - cacheVal.timestamp) > this.expire) {
-                if (debugEnabled) {
-                    debug("expiring " + method.getName() +
-                          " from cache" + argDebug);
-                }
-
                 cacheVal.value = null;
             }
         }
         else {
-            if (debugEnabled) {
-                debug(method.getName() +
-                      " NOT in cache" + argDebug);
-            }
         }
 
         if (cacheVal.value == null) {

@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2006-2009 Hyperic, Inc.
- * Copyright (c) 2010 VMware, Inc.
+ * Copyright (c) 2006-2008 Hyperic, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +46,7 @@ public class Sigar implements SigarProxy {
      * The Sigar java version.
      */
     public static final String VERSION_STRING =
-        Version.VERSION_STRING;
+        SigarVersion.VERSION_STRING;
 
     /**
      * The Sigar native version.
@@ -58,7 +57,7 @@ public class Sigar implements SigarProxy {
      * The scm (svn) revision from which sigar.jar was built.
      */
     public static final String SCM_REVISION =
-        Version.SCM_REVISION;
+        SigarVersion.SCM_REVISION;
 
     /**
      * The scm (svn) revision from which the sigar native binary was built.
@@ -69,7 +68,7 @@ public class Sigar implements SigarProxy {
      * The date on which sigar.jar was built.
      */
     public static final String BUILD_DATE =
-        Version.BUILD_DATE;
+        SigarVersion.BUILD_DATE;
 
     /**
      * The date on which the sigar native binary was built.
@@ -105,13 +104,8 @@ public class Sigar implements SigarProxy {
             checkVersion(nativeVersion);
         } catch (SigarException e) {
             loadError = e.getMessage();
-            try {
-                SigarLog.debug(loadError, e);
-            } catch (NoClassDefFoundError ne) {
-                //no log4j.jar
-                System.err.println(loadError);
-                e.printStackTrace();
-            }
+            System.err.println(loadError);
+            e.printStackTrace();
         }
 
         NATIVE_VERSION_STRING = nativeVersion;
@@ -157,6 +151,7 @@ public class Sigar implements SigarProxy {
     private static void loadLibrary() throws SigarException {
         try {
             loader.load();
+            
         } catch (ArchNotSupportedException e) {
             throw new SigarException(e.getMessage());
         } catch (ArchLoaderException e) {
@@ -190,16 +185,9 @@ public class Sigar implements SigarProxy {
             open();
             this.open = true;
         } catch (SigarException e) {
-            if (enableLogging) {
-                e.printStackTrace();
-            }
+            e.printStackTrace();
         } catch (UnsatisfiedLinkError e) {
-            if (enableLogging) {
-                e.printStackTrace();
-            }
-        }
-        if (enableLogging) {
-            enableLogging(true);
+            e.printStackTrace();
         }
     }
 
@@ -366,7 +354,7 @@ public class Sigar implements SigarProxy {
         CpuPerc[] perc =
             new CpuPerc[curLen < oldLen ? curLen : oldLen];
         
-        for (int i=0; i<perc.length; i++) {
+        for (int i=0; i<curLen; i++) {
             perc[i] =
                 CpuPerc.fetch(this, oldCpuList[i],
                               this.lastCpuList[i]);
@@ -577,7 +565,7 @@ public class Sigar implements SigarProxy {
      * @return Environment variable value.
      * @exception SigarException on failure.
      */
-    public String getProcEnv(long pid, String key) throws SigarException {
+    public String getProcEnv( long pid, String key) throws SigarException {
         return ProcEnv.getValue(this, pid, key);
     }
 
@@ -795,9 +783,6 @@ public class Sigar implements SigarProxy {
         return netstat;
     }
 
-    public native Arp[] getArpList()
-        throws SigarException;
-
     public native Who[] getWhoList()
         throws SigarException;
 
@@ -949,23 +934,4 @@ public class Sigar implements SigarProxy {
      */
     public native String getFQDN() throws SigarException;
 
-    public SigarVersion getSigarVersion() {
-        return new SigarVersion();
-    }
-
-    /**
-     * Enabling logging in the native Sigar code.
-     * This method will hook log4j into the Sigar
-     * native logging methods.  Note that the majority
-     * of logging in the native code is only at the DEBUG
-     * level.
-     */
-    public void enableLogging(boolean value) {
-        if (value) {
-            SigarLog.enable(this);
-        }
-        else {
-            SigarLog.disable(this);
-        }
-    }
 }

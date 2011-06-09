@@ -43,7 +43,7 @@ import org.hyperic.sigar.pager.PageFetcher;
 import org.hyperic.sigar.pager.PageList;
 
 public abstract class ShellBase
-    implements ShellCommandMapper, GetlineCompleter, SIGINT {
+    implements ShellCommandMapper, GetlineCompleter {
     // Default size for pages when doing list commands
     public  static final String PROP_PAGE_SIZE    = "page.size";
     private static final int    DEFAULT_PAGE_SIZE = 20;
@@ -80,7 +80,7 @@ public abstract class ShellBase
     }
 
     public void registerSigIntHandler() {
-        // ShellIntHandler.register(this); //catch ctrl-c
+        ShellIntHandler.register(this); //catch ctrl-c
     }
 
     public void init (String applicationName, 
@@ -259,8 +259,6 @@ public abstract class ShellBase
 
     public void run() {
         String input = null;
-
-        // ShellIntHandler.push(this);
 
         while (true) {
             try {

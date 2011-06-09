@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2009 Hyperic, Inc.
+ * Copyright (c) 2006-2007 Hyperic, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package org.hyperic.sigar.jmx;
 import org.hyperic.sigar.ProcCpu;
 import org.hyperic.sigar.ProcFd;
 import org.hyperic.sigar.ProcMem;
-import org.hyperic.sigar.ProcUtil;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
@@ -32,24 +31,20 @@ import org.hyperic.sigar.SigarProxyCache;
 
 public class SigarProcess implements SigarProcessMBean {
 
-    private static final Long NOTIMPL = new Long(Sigar.FIELD_NOTIMPL);
     private Sigar sigarImpl;
     private SigarProxy sigar;
-    private long pid = -1;
 
     public SigarProcess() {
-        this.sigarImpl = new Sigar();
+        this(new Sigar());
+    }
+
+    public SigarProcess(Sigar sigar) {
+        this.sigarImpl = sigar;
         this.sigar = SigarProxyCache.newInstance(sigarImpl);
     }
 
-    public SigarProcess(SigarProxy sigar) {
-        this.sigar = sigar;
-    }
-
     public void close() {
-        if (this.sigarImpl != null) {
-            this.sigarImpl.close();
-        }
+        this.sigarImpl.close();
     }
 
     private RuntimeException unexpectedError(String type,
@@ -62,7 +57,8 @@ public class SigarProcess implements SigarProcessMBean {
                                    
     private synchronized ProcMem getMem() {
         try {
-            return this.sigar.getProcMem(getPid());
+            long pid = this.sigar.getPid();
+            return this.sigar.getProcMem(pid);
         } catch (SigarException e) {
             throw unexpectedError("Mem", e);
         }
@@ -70,46 +66,22 @@ public class SigarProcess implements SigarProcessMBean {
 
     private synchronized ProcCpu getCpu() {
         try {
-            return this.sigar.getProcCpu(getPid());
+            long pid = this.sigar.getPid();
+            return this.sigar.getProcCpu(pid);
         } catch (SigarException e) {
             throw unexpectedError("Cpu", e);
         }   
     }
 
-    private synchronized ProcFd getFd() throws SigarException {
-        return this.sigar.getProcFd(getPid());
+    private synchronized ProcFd getFd() {
+        try {
+            long pid = this.sigar.getPid();
+            return this.sigar.getProcFd(pid);
+        } catch (SigarException e) {
+            throw unexpectedError("Fd", e);
+        }   
     }
-
-    public String getObjectName() throws SigarException {
-        long pid = getPid();
-        String name = this.sigar.getProcState(pid).getName();
-        String cls = "unknown";
-        if (name.startsWith("java")) {
-            try {
-                cls = ProcUtil.getJavaMainClass(this.sigar, pid);
-            } catch (SigarException e) {}
-        } //else XXX
-        return
-            AbstractMBean.MBEAN_DOMAIN + ":" +
-            AbstractMBean.MBEAN_ATTR_TYPE + "=" + "Process" + "," +
-            "Name" + "=" + name + "," +
-            "Class" + "=" + cls + "," +
-            "Pid" + "=" + pid;
-    }
-
-    public long getPid() {
-        if (this.pid < 0) {
-            return this.sigar.getPid();
-        }
-        else {
-            return this.pid;
-        }
-    }
-
-    public void setPid(long pid) {
-        this.pid = pid;
-    }
-
+    
     public Long getMemSize() {
         return new Long(getMem().getSize());
     }
@@ -147,10 +119,17 @@ public class SigarProcess implements SigarProcessMBean {
     }
 
     public Long getOpenFd() {
-        try {
-            return new Long(getFd().getTotal());
-        } catch (SigarException e) {
-            return NOTIMPL;
-        }
+        return new Long(getFd().getTotal());
+    }
+
+    public static void main(String args[]) {
+        SigarProcessMBean proc = new SigarProcess();
+        System.out.println("MemSize=" + proc.getMemSize());
+        System.out.println("MemResident=" + proc.getMemResident());
+        System.out.println("MemShared=" + proc.getMemShare());
+        System.out.println("MemPageFaults=" + proc.getMemPageFaults());
+        System.out.println("TimeUser=" + proc.getTimeUser());
+        System.out.println("TimeSys=" + proc.getTimeSys());
+        System.out.println("OpenFd=" + proc.getOpenFd());
     }
 }

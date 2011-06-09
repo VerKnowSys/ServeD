@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006, 2008-2009 Hyperic, Inc.
+ * Copyright (c) 2006 Hyperic, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,13 @@
 
 package org.hyperic.sigar.jmx;
 
-import java.lang.reflect.InvocationHandler;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarInvoker;
 import org.hyperic.sigar.SigarNotImplementedException;
 import org.hyperic.sigar.SigarProxy;
-import org.hyperic.sigar.SigarProxyCache;
 import org.hyperic.sigar.util.ReferenceMap;
 
 /**
@@ -37,7 +34,6 @@ public class SigarInvokerJMX extends SigarInvoker {
     public static final String DOMAIN_NAME = "sigar";
 
     public static final String PROP_TYPE = "Type";
-    public static final String PROP_NAME = "Name"; //prefer Name (Arg for compat)
     public static final String PROP_ARG  = "Arg";
 
     private String arg = null;
@@ -61,10 +57,6 @@ public class SigarInvokerJMX extends SigarInvoker {
                                               String name) {
 
         SigarInvokerJMX invoker;
-
-        if (!(proxy instanceof InvocationHandler) && (proxy instanceof Sigar)) {
-            proxy = SigarProxyCache.newInstance((Sigar)proxy);
-        }
 
         int ix = name.indexOf(":");
         if (ix > 0) {
@@ -90,12 +82,10 @@ public class SigarInvokerJMX extends SigarInvoker {
             String key = attr.substring(0, ix);
             String val = attr.substring(key.length()+1);
 
-            if (key.equalsIgnoreCase(PROP_TYPE)) {
+            if (key.equals(PROP_TYPE)) {
                 invoker.setType(val);
             }
-            else if (key.equalsIgnoreCase(PROP_NAME) ||
-                     key.equalsIgnoreCase(PROP_ARG))
-            {
+            else if (key.equals(PROP_ARG)) {
                 //need to decode value, e.g. Arg=C%3D\ => Arg=C:\
                 invoker.setArg(decode(val));
             }

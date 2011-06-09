@@ -1,7 +1,5 @@
 /*
  * Copyright (c) 2006-2007 Hyperic, Inc.
- * Copyright (c) 2009 SpringSource, Inc.
- * Copyright (c) 2009 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,16 +95,6 @@ public class NetFlags {
 
     public final static int IFF_SLAVE = 0x1000;
 
-    /**
-     * Master of a load balancer
-     */
-    public static final int IFF_MASTER = 0x2000;
-
-    /**
-     * Dialup device with changing addresses
-     */
-    public static final int IFF_DYNAMIC = 0x4000;
-
     public static final int RTF_UP = 0x1;
 
     public static final int RTF_GATEWAY = 0x2;
@@ -166,13 +154,6 @@ public class NetFlags {
      * @see org.hyperic.sigar.NetInterfaceConfig#getFlags
      */
     public static native String getIfFlagsString(long flags);
-
-    /**
-     * @param network interface ipv6 address scope.
-     * @return String representation of ipv6 address scope.
-     * @see org.hyperic.sigar.NetInterfaceConfig#getScope6
-     */
-    public static native String getScopeString(int scope);
 
     public static boolean isAnyAddress(String address) {
         return

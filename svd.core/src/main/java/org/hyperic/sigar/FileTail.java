@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-// import org.apache.log4j.Logger;
 
 public abstract class FileTail extends FileWatcher {
 
@@ -32,11 +31,6 @@ public abstract class FileTail extends FileWatcher {
 
     private boolean useSudo = 
         "true".equals(System.getProperty(PROP_USE_SUDO));
-
-    // private static final Logger log = 
-        // SigarLog.getLogger(FileTail.class.getName());
-
-    private static final boolean isDebug = false; //log.isDebugEnabled();
 
     public abstract void tail(FileInfo info, Reader reader);
 
@@ -50,7 +44,6 @@ public abstract class FileTail extends FileWatcher {
 
     static void error(String name, Throwable exc) {
         String msg = name + ": " + exc.getMessage(); 
-        // log.error(msg, exc);
     }
 
     public void onChange(FileInfo info) {
@@ -88,9 +81,6 @@ public abstract class FileTail extends FileWatcher {
     public FileInfo add(String file)
         throws SigarException {
         FileInfo info = super.add(file);
-        if (isDebug) {
-            // log.debug("add: " + file + "=" + info);
-        }
         return info;
     }
 
@@ -107,29 +97,15 @@ public abstract class FileTail extends FileWatcher {
         FileInfo previous = current.getPreviousInfo();
 
         if (previous == null) {
-            if (isDebug) {
-                // log.debug(current.getName() + ": first stat");
-            }
             return current.size;
         }
 
         if (current.inode != previous.inode) {
-            if (isDebug) {
-                // log.debug(current.getName() + ": file inode changed");
-            }
             return -1;
         }
 
         if (current.size < previous.size) {
-            if (isDebug) {
-                // log.debug(current.getName() + ": file truncated");
-            }
             return -1;
-        }
-
-        if (isDebug) {
-            long diff = current.size - previous.size;
-            // log.debug(current.getName() + ": " + diff + " new bytes");
         }
 
         return previous.size;

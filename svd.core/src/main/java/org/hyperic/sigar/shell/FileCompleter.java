@@ -103,9 +103,9 @@ public class FileCompleter
         else {
             this.name = file.getName();
             dir = file.getParentFile();
-            if (dir == null)
+            if (dir == null) {
                 return line;
-
+            }
             if (!(dir.exists() && dir.isDirectory())) {
                 return line;
             }

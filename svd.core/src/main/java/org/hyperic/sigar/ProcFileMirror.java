@@ -21,7 +21,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-// import org.apache.log4j.Logger;
 
 //intended for use on systems with very large connection tables
 //where processing /proc/net/tcp may block or otherwise take much longer
@@ -30,11 +29,6 @@ public class ProcFileMirror extends FileWatcher {
 
     private String proc;
     private long expire;
-
-    // private static final Logger log = 
-    //     SigarLog.getLogger(ProcFileMirror.class.getName());
-
-    private static final boolean isDebug = false; // log.isDebugEnabled();
 
     public ProcFileMirror(Sigar sigar, String proc) {
         super(sigar);
@@ -109,9 +103,6 @@ public class ProcFileMirror extends FileWatcher {
             }
         }
 
-        if (isDebug) {
-            // log.debug(mirrorToString(source, dest));
-        }
     }
 
     public FileInfo add(String name)

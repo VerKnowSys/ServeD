@@ -29,7 +29,6 @@ public class ArchLoader {
 
     private final static String osName = System.getProperty("os.name");
 
-    public final static boolean IS_WIN32   = osName.startsWith("Windows");
     public final static boolean IS_AIX     = osName.equals("AIX");
     public final static boolean IS_HPUX    = osName.equals("HP-UX");
     public final static boolean IS_SOLARIS = osName.equals("SunOS");
@@ -150,18 +149,10 @@ public class ArchLoader {
     }
 
     public static String getLibraryPrefix() {
-        if (IS_WIN32 || IS_NETWARE) {
-            return "";
-        }
-
         return "lib";
     }
 
     public static String getLibraryExtension() {
-        if (IS_WIN32) {
-            return ".dll";
-        }
-
         if (IS_NETWARE) {
             return ".nlm";
         }
@@ -315,15 +306,13 @@ public class ArchLoader {
         if ((file != null) &&
             ((file = file.getParentFile()) != null))
         {
-            String defaultEncoding = "UTF-8"; // 2011-06-06 03:35:19 - dmilith - TODO: consider moving it to different place
+            String dir = "";
             try {
-                String dir = URLDecoder.decode(file.toString(), defaultEncoding);
-                if (findNativeLibrary(dir, libName)) {
-                    return dir;
-                }
+                dir = URLDecoder.decode(file.toString(), "UTF-8"); 
             } catch (java.io.UnsupportedEncodingException e) {
-                System.out.println("Unsupported encoding: " + defaultEncoding + ". Exception: " + e);
-                System.exit(1);
+            }
+            if (findNativeLibrary(dir, libName)) {
+                return dir;
             }
         }
 

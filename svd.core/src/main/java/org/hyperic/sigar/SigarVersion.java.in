@@ -1,6 +1,6 @@
 package org.hyperic.sigar;
 
-class Version {
+class SigarVersion {
 
     static final String BUILD_DATE = "@@BUILD_DATE@@";
 

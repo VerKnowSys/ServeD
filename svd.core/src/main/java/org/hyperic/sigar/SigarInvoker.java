@@ -94,7 +94,7 @@ public class SigarInvoker {
         this.sigarProxy = proxy;
     }
 
-    public void setType(String val) {
+    protected void setType(String val) {
         String alias = (String)compatTypes.get(val);
         if (alias != null) {
             val = alias;
