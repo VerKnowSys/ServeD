@@ -15,8 +15,12 @@ import org.specs._
 
 class SvdGitManagerTest extends Specification with TestKit {
 
-    val homeDir = testPath("home/teamon")
-    val account = new SvdAccount(userName = "teamon", homeDir = homeDir)
+    // val homeDir = testPath("home/teamon")
+    // val account = new SvdAccount(userName = "teamon", homeDir = homeDir)
+    
+    val account = currentAccount
+    val homeDir = account.homeDir
+    
     var gitm: ActorRef = null
     
     "SvdGitManager" should {

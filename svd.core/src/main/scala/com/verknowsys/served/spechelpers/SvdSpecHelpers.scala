@@ -3,6 +3,8 @@ package com.verknowsys.served
 import org.apache.commons.io.FileUtils
 import java.io.File
 import akka.actor.ActorRef
+import com.verknowsys.served.systemmanager.native.SvdAccount
+import scala.io.Source
 
 
 object SvdSpecHelpers {
@@ -42,5 +44,13 @@ object SvdSpecHelpers {
     }
 
     def waitFor(time: Int) = Thread.sleep(time)
+    
+    def currentAccount = {
+        val rawData = Source.fromFile(SvdConfig.systemPasswdFile, SvdConfig.defaultEncoding).getLines.toList
+        val accounts: List[SvdAccount] = rawData collect {
+            case SvdAccount(account) => account
+        }
+        accounts.find(_.userName == System.getProperty("user.name")).get
+    }
 
 }
