@@ -26,12 +26,10 @@ class SvdGitManagerTest extends Specification with TestKit {
     "SvdGitManager" should {
         doBefore {
             gitm = actorOf(new SvdGitManager(account)).start
-            mkdir(homeDir)
         }
         
         doAfter {
             registry.shutdownAll
-            rmdir(homeDir)
         }
         
         "return empty repository list" in {
