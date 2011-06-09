@@ -54,6 +54,14 @@ class SvdGitManager(account: SvdAccount) extends SvdManager(account) {
     }
 
     
-    protected lazy val gitHomeDir = account.homeDir / "git"
+    protected lazy val gitHomeDir = {
+        def gitdir = SvdUtils.checkOrCreateDir(account.homeDir / "git")
+        registry.actorFor[SvdSystemManager].foreach { systemmanager =>
+            systemmanager ! Chown(gitdir, account.uid, account.gid, false)
+            systemmanager ! Chmod(gitdir, 0751, false)
+        }
+        gitdir
+    }
+    
     
 }

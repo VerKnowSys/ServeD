@@ -115,6 +115,14 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             log.info("Quitting SvdSystemManager")
             sys.exit(0)
             
+        case Chown(what, userId, groupId, recursive) =>
+            log.debug("Chown called on location: '%s' with uid: %s, gid: %s (recursively: %s)".format(what, userId, groupId, recursive))
+            SvdSystemManagerUtils.chown(what, userId, SvdConfig.defaultUserGroup, recursive)
+            
+        case Chmod(what, mode, recursive) =>
+            log.debug("Chmod called on location: '%s' with mode: %s (recursively: %s)".format(what, mode, recursive))
+            SvdSystemManagerUtils.chmod(what, mode, recursive)
+            
     }
     
     
