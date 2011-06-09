@@ -42,7 +42,7 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             respawnUsersActors
             
         case GetAccountManager(username) =>
-            self reply accountManagers.get(username)
+            self reply accountManagers.flatMap(_.get(username))
     }
 
     private def respawnUsersActors {
