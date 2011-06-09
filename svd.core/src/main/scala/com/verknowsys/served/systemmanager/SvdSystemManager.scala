@@ -11,6 +11,7 @@ import com.verknowsys.served.utils.monitor.SvdMonitored
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.Logging
 
+import org.hyperic.sigar.{NetInfo, Sigar}
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -38,13 +39,15 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
     def receive = {
         case Init =>
             val nrs = new SvdSystemResources
+            val net = new NetInfo
+            net.gather(new Sigar)
             
-            log.info("Starting main MongoDB instance..")
-            val db = new SvdProcess(
-                "mongod --logpath %s --dbpath %s --bind_ip 127.0.0.1 --noauth --noscripting --nounixsocket".format(
-                SvdConfig.homePath / SvdConfig.vendorDir / "mongo_gather.log",
-                SvdUtils.checkOrCreateDir(SvdConfig.homePath / SvdConfig.vendorDir / "mongo_gather.db")
-            ), user = "root")
+            // log.info("Starting main MongoDB instance..")
+            // val db = new SvdProcess(
+            //                 "mongod --logpath %s --dbpath %s --bind_ip 127.0.0.1 --noauth --noscripting --nounixsocket".format(
+            //                 SvdConfig.homePath / SvdConfig.vendorDir / "mongo_gather.log",
+            //                 SvdUtils.checkOrCreateDir(SvdConfig.homePath / SvdConfig.vendorDir / "mongo_gather.db")
+            //             ), user = "root")
             
             // log.info("Starting main Memcached instance..")
             // val mc = new SvdProcess("memcached -u root -l 127.0.0.1 -p 50001", user = "root")
@@ -52,6 +55,9 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             log.info("SvdSystemManager ready")
             log.info("System Resources Availability: [%s]".format(nrs))
             log.info("Current PID: %d. System Information:\n%s".format(SvdProcess.getCurrentProcessPid, SvdProcess.getProcessInfo(SvdProcess.getCurrentProcessPid)))
+            log.info("Network configuration: GW: %s, DOMAIN: %s, HOST: %s, DNS1: %s, DNS2: %s",
+                net.getDefaultGateway, net.getDomainName, net.getHostName, net.getPrimaryDns, net.getSecondaryDns
+            )
             
 
             // val a = new SvdProcess(command = "dig +trace arka.gdynia.pl", user = "root", stdOut = "/tmp/served_nobody_memcached.log")
@@ -110,6 +116,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
         case Quit =>
             log.info("Quitting SvdSystemManager")
             sys.exit(0)
+            
     }
     
     
