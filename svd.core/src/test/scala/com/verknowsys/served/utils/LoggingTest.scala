@@ -12,6 +12,7 @@ import com.verknowsys.served.systemmanager.managers.LoggingManager
 
 
 class LoggingTest extends Specification with TestKit {
+    
     "LoggerUtils" should {
         doBefore { 
             setupConfigFile
@@ -94,11 +95,11 @@ class LoggingTest extends Specification with TestKit {
                 "com.verknowsys.served=error" ::
                 Nil mkString "\n"
                 
-        writeFile(SvdConfig.loggerPropertiesFilename, content)
+        writeFile(SvdConfig.systemTmpDir / "svd.logger", content)
     }
     
     private def removeConfigFile {
-        writeFile(SvdConfig.loggerPropertiesFilename, "")
+        writeFile(SvdConfig.systemTmpDir / "svd.logger", "")
     }
 }
        
