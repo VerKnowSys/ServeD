@@ -66,7 +66,7 @@ class ConsoleLogger(klazz: String) extends AbstractLogger(klazz){
     
     protected[utils] def display(level: Logger.Levels.Value, message: String, className: String) {
         import java.text.SimpleDateFormat
-        val fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+        val fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         val dte = new java.util.Date
         level match {
             case Logger.Levels.Error =>
