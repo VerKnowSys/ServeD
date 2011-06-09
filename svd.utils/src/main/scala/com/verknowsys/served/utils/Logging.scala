@@ -2,6 +2,7 @@ package com.verknowsys.served.utils
 
 import akka.actor.Actor
 import akka.event.EventHandler
+import java.io.FileWriter
 
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.api.{Success, Logger}
@@ -64,7 +65,25 @@ class ConsoleLogger(klazz: String) extends AbstractLogger(klazz){
     )
     
     protected[utils] def display(level: Logger.Levels.Value, message: String, className: String) {
-        message.split("\n").foreach(line => println("[%s%-5s%s] <%s%s%s> %s%s%s".format(Colors(level), level.toString.toLowerCase, Console.RESET, Colors(level), formatClassName(className), Console.RESET, Colors(level), line, Console.RESET)))
+        level match {
+            case Logger.Levels.Error =>
+                val fw = new FileWriter(SvdConfig.systemLogDir / "svd.error.log")
+                message.split("\n").foreach(line =>
+                    fw.write("[%s%-5s%s] <%s%s%s> %s%s%s\n".format(
+                        Colors(level), level.toString.toLowerCase, Console.RESET,
+                        Colors(level), formatClassName(className), Console.RESET,
+                        Colors(level), line, Console.RESET))
+                )
+                fw.close
+            case x =>
+        }
+        message.split("\n").foreach(line =>
+            println("[%s%-5s%s] <%s%s%s> %s%s%s".format(
+                Colors(level), level.toString.toLowerCase, Console.RESET,
+                Colors(level), formatClassName(className), Console.RESET,
+                Colors(level), line, Console.RESET)
+            )
+        )
     }
     
     protected[utils] def formatClassName(className: String) = className.replace("com.verknowsys.served", "svd")
