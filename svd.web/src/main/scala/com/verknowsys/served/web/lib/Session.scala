@@ -12,7 +12,7 @@ object Session {
     
     object api {
         final val host = "localhost" // TODO: Use some configuration
-        final val port = 5555
+        final val port = 10 // 2011-06-09 02:01:28 - dmilith - TODO: XXX: should use config value for standard value of API port
 
         object svd extends SessionVar[ActorRef](service)
 

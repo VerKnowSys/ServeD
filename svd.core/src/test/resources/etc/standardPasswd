@@ -21,4 +21,5 @@ uucp:*:66:66:UUCP pseudo-user:/var/spool/uucppublic:/usr/local/libexec/uucp/uuci
 pop:*:68:6:Post Office Owner:/nonexistent:/usr/sbin/nologin
 www:*:80:80:World Wide Web Owner:/nonexistent:/usr/sbin/nologin
 nobody:*:65534:65534:Unprivileged user:/nonexistent:/usr/sbin/nologin
-teamon:*:1001:1001:User &:/home/teamon:/usr/local/bin/zsh
+teamon:*:1337:1337:User &:/Users/teamon:/usr/local/bin/zsh
+dmilith:*:666:666:User &:/Users/dmilith:/usr/local/bin/zsh

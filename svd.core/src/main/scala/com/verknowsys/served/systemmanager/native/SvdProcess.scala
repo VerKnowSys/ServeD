@@ -30,8 +30,8 @@ class ProcessException(x: String) extends Exception(x)
 
 class SvdProcess(
     val command: String,
-    val user: String = SvdConfig.noUser,
-    val workDir: String = SvdConfig.tmp,
+    val user: String = "nouser",
+    val workDir: String = SvdConfig.systemTmpDir,
     val waitFor: Boolean = false,
     val shutdownHook: Unit = {})
         extends Logging {
@@ -74,7 +74,7 @@ class SvdProcess(
                 shutdownHook
             }
         })
-        val env = SvdConfig.env
+        val env = Array("")  //SvdConfig.env 2011-06-09 01:09:01 - dmilith - TODO: fix issue with spawner
         val proc = rt.exec(cmd, env)
         log.trace("CMD: %s".format(cmd.mkString(" ")))
         rt.traceMethodCalls(true)

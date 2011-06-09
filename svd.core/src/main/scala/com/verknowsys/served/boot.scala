@@ -64,22 +64,17 @@ object boot extends Logging {
     
     
     def main(args: Array[String]) {
-        SvdConfig.environment = "production"
-        SvdUtils.checkOrCreateVendorDir
+
+        if (SvdUtils.isLinux) {
+            log.error("Linux systems aren't supported yet!")
+            sys.exit(1)
+        }
 
         // handle signals
         handleSignal("ABRT", { SvdUtils.getAllLiveThreads })
         handleSignal("USR2", { log.warn("TODO: implement USR2 handling (show svd config values)") })
         
-        if (SvdUtils.isLinux) {
-            log.error("Linux systems aren't supported yet!")
-            sys.exit(1)
-        }
-        
-        log.debug("Home dir: " + (SvdConfig.homePath + "/" + SvdConfig.vendorDir))
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
-        
-        log.info("Starting %s (env: %s)", SvdConfig.served, SvdConfig.environment)
         boot()
     }
     

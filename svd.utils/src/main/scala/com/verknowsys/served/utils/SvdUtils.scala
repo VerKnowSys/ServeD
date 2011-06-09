@@ -31,15 +31,6 @@ object SvdUtils extends Logging {
     /**
     *   @author dmilith
     *   
-    *   Get and spread props for all believers..
-    *   
-    */   
-    lazy val props = SvdConfig.props
-    
-    
-    /**
-    *   @author dmilith
-    *   
     *   check and inform when current user isn't superuser (root)
     *   
     */   
@@ -174,15 +165,6 @@ object SvdUtils extends Logging {
             calendar.get(Calendar.SECOND))
     }
     
-    
-    /**
-     *  @author dmilith
-     *
-     *  Checks and creates (if missing) ServeD vendor dir
-     *
-     */
-    def checkOrCreateVendorDir = checkOrCreateDir(SvdConfig.homePath + SvdConfig.vendorDir)
-
     
     /**
      *  @author dmilith

@@ -19,7 +19,7 @@ object LoggerUtils {
     
     def levelFor(className: String) = _level(className.split("\\.").reverse.toList) getOrElse Logger.Levels.Trace
     
-    def loggerConfig = new SvdProperties(SvdConfig.loggerPropertiesFilename)
+    def loggerConfig = new SvdProperties(SvdConfig.systemTmpDir / "svd.logger")
     
     def readConfig = loggerConfig.data.map(_.mapValues { e => e.toLowerCase match {
         case "error" => Logger.Levels.Error
