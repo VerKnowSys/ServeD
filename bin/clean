@@ -1,0 +1,14 @@
+#!/bin/sh
+
+sudo rm -rf ~/.ivy2
+
+for i in *; do
+    if [ -d "$i" ]; then
+        sudo rm -rf "$i/lib_managed"
+        rm -rf "$i/target"
+    fi
+done
+
+sbt clean
+
+echo "Clean done."
