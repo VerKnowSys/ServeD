@@ -9,7 +9,6 @@ import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.utils.SvdUtils
 import com.verknowsys.served.utils.SvdFileEventsManager
 import com.verknowsys.served.systemmanager.managers.LoggingManager
-import com.verknowsys.served.maintainer.SvdMaintainer
 import com.verknowsys.served.maintainer.SvdSystemInfo
 import com.verknowsys.served.maintainer.SvdApiConnection
 import com.verknowsys.served.systemmanager.SvdAccountsManager
@@ -31,7 +30,6 @@ object boot extends Logging {
             actorOf[LoggingManager] ::
             actorOf[SvdSystemManager] ::
             actorOf[SvdAccountsManager] :: 
-            actorOf[SvdMaintainer] ::
             actorOf[SvdSystemInfo] ::
             // actorOf[SvdNotificationCenter] :: 
             Nil).map(Supervise(_, Permanent))
@@ -42,8 +40,6 @@ object boot extends Logging {
             list))
 
 
-        // 2011-02-01 21:13:24 - dmilith - NOTE: this is default order of starting Managers and Maintainer:
-        registry.actorFor[SvdMaintainer].foreach { _ ! Init }
         registry.actorFor[SvdSystemManager].foreach { _ ! Init }
         registry.actorFor[SvdAccountsManager].foreach { _ ! Init }
         
