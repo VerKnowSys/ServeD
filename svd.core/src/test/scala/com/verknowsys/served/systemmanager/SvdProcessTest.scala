@@ -1,17 +1,18 @@
 package com.verknowsys.served.systemmanager
 
-import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.signals._
-import SvdPOSIX._
-import com.verknowsys.served.systemmanager._
+
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager._
+import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.utils._
+import com.verknowsys.served._
+import SvdPOSIX._
 
+import org.apache.commons.io.FileUtils
 import org.hyperic.sigar._
 import org.specs._
-import java.io._
 import java.lang._
-import org.apache.commons.io.FileUtils
+import java.io._
 
 
 // 2011-01-22 17:57:49 - dmilith - TODO: extend tests for some critical moments: segvs, ooms and similar app behaviour
@@ -46,12 +47,12 @@ class SvdProcessTest extends Specification {
             val cw = new File("/dev/null").canWrite
             cw must beTrue
             
-            FileUtils.touch("/tmp/DUPA3")
-            val dd = new File("/tmp/DUPA3").canWrite
+            FileUtils.touch(SvdConfig.systemTmpDir / "DUPA3")
+            val dd = new File(SvdConfig.systemTmpDir / "DUPA3").canWrite
             dd must beTrue
             
-            FileUtils.touch("/tmp/DUPA2")
-            val cw2 = new File("/tmp/DUPA2").canWrite
+            FileUtils.touch(SvdConfig.systemTmpDir / "DUPA2")
+            val cw2 = new File(SvdConfig.systemTmpDir / "DUPA2").canWrite
             cw2 must beTrue
         }
         
@@ -83,7 +84,7 @@ class SvdProcessTest extends Specification {
                     fail("'Exploit' shouldn't be detected (Shell)! Exception: %s".format(x))
             }
             try { 
-                exploit = new SvdProcess("dupa", workDir = "/kozaczek.pel")
+                exploit = new SvdProcess("dupa", workDir = SvdConfig.systemTmpDir / "kozaczek.pel")
                 fail("Non existant workDir shouldn't be allowed!")
             } catch {
                 case _ =>

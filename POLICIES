@@ -15,6 +15,7 @@
 	§7.	Be helpful for others. Be useful with Your knowlege. Share with your experience.
 	§8.	Don't afraid to tell teammate that (s)he did wrong. Explain yourself, then goto: §9
 	§9.	If you have right, then You're the winner. If your solution is better - we love you, let's use it.
+	§10. Always use SvdConfig.systemTmpDir in destructive operations in tests/specs.
 
 	
 /** 

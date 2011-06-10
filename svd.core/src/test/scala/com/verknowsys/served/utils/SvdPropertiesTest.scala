@@ -1,11 +1,15 @@
 package com.verknowsys.served.utils
 
-import org.specs._
+
 import com.verknowsys.served.SvdSpecHelpers._
+import com.verknowsys.served.utils._
+import com.verknowsys.served._
+
+import org.specs._
 
 
 class SvdPropertiesTest extends Specification {
-    final val configFilename = "/tmp/config.properties"
+    final val configFilename = SvdConfig.systemTmpDir / "config.properties"
     
     "SvdProperties" should {
         doBefore { setupSvdConfigFile }

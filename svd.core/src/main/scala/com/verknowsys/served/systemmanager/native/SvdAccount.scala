@@ -3,7 +3,9 @@ package com.verknowsys.served.systemmanager.native
 
 import com.verknowsys.served.systemmanager.acl._
 import com.verknowsys.served.utils.git.GitRepository
-import com.verknowsys.served.utils.Logging
+import com.verknowsys.served.utils._
+import com.verknowsys.served._
+
 
 import java.io.File
 import org.apache.commons.io.FileUtils
@@ -22,7 +24,7 @@ case class SvdAccount (
         val uid: Int = 1000,
         val gid: Int = 1000,
         val information: String = "No information",
-        val homeDir: String = "/tmp",
+        val homeDir: String = SvdConfig.systemTmpDir,
         val shell: String = "/bin/sh",
         val acls: List[Any] = Nil
         ) extends Logging {

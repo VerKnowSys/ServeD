@@ -4,6 +4,7 @@ package com.verknowsys.served.systemmanager
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager.acl._
 import com.verknowsys.served.utils.Logging
+import com.verknowsys.served.SvdConfig
 
 import org.specs._
 
@@ -22,7 +23,7 @@ class SvdAccountTest extends Specification with Logging {
             a.uid must beEqual(1000)
             a.gid must beEqual(1000)
             a.information must beEqual("No information")
-            a.homeDir must beEqual("/tmp")
+            a.homeDir must beEqual(SvdConfig.systemTmpDir)
             a.shell must beEqual("/bin/sh")
         }
         

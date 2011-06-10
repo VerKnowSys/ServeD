@@ -2,6 +2,8 @@ package com.verknowsys.served.systemmanager.storage
 
 import org.specs._
 import com.verknowsys.served.SvdSpecHelpers._
+import com.verknowsys.served.utils._
+import com.verknowsys.served._
 
 
 class StorageTest extends Specification {
@@ -13,12 +15,12 @@ class StorageTest extends Specification {
     
     def reconnect {
         if(db != null) db.close
-        db = new Storage("/tmp/served_tests/storage_test")
+        db = new Storage(SvdConfig.systemTmpDir / "served_tests/storage_test")
     }
     
     "Storage" should {
         doBefore {
-            mkdir("/tmp/served_tests")
+            mkdir(SvdConfig.systemTmpDir / "served_tests")
             reconnect
             
             db.save(new ProcessInfo(120, "Foo", 1, 20, time()))
@@ -35,7 +37,7 @@ class StorageTest extends Specification {
         
         doAfter {
             db.close
-            rmdir("/tmp/served_tests")
+            rmdir(SvdConfig.systemTmpDir / "served_tests")
         }
         
         "calculate average CPU by PID" in {
@@ -106,8 +108,8 @@ class StorageTest extends Specification {
     "Storage buffering" should {
         "delay save" in {
             if(db != null) db.close
-            rmdir("/tmp/served_tests")
-            mkdir("/tmp/served_tests")
+            rmdir(SvdConfig.systemTmpDir / "served_tests")
+            mkdir(SvdConfig.systemTmpDir / "served_tests")
             reconnect
             
             db.getAll.size must_== 0

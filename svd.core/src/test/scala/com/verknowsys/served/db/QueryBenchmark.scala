@@ -2,17 +2,22 @@ package com.verknowsys.served.db
 
 import com.verknowsys.served.utils.Benchmark._
 import com.verknowsys.served.SvdSpecHelpers._
+import com.verknowsys.served.utils._
+import com.verknowsys.served._
+
 import org.neodatis.odb._
 import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery
 import org.neodatis.odb.core.query.criteria.Where
 import org.neodatis.odb.core.query.nq.SimpleNativeQuery
 
+
 case class Foo(val uuid: UUID = randomUUID)
+
 
 object QueryBenchmark {
     def main(args: Array[String]): Unit = {
-        val dbname = "/tmp/svd_bench/svd_db_query_benchmark.neodatis"
-        rmdir("/tmp/svd_bench")
+        val dbname = SvdConfig.systemTmpDir / "svd_bench/svd_db_query_benchmark.neodatis"
+        rmdir(SvdConfig.systemTmpDir / "svd_bench")
         
         val server = ODBFactory.openServer(8989)
 
