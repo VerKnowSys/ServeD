@@ -43,7 +43,7 @@ object SvdSpecHelpers {
     var count = 0
     def randomPath = {
         count += 1
-        TEST_DIR / "dir_" + count + "_" + System.currentTimeMillis
+        TEST_DIR / "dir_" + count + "_" + java.util.UUID.randomUUID.toString
     }
     
     def testPath(path: String) = TEST_DIR / path
