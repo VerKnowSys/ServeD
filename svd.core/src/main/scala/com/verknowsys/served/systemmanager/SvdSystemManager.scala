@@ -139,6 +139,9 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
         case Chmod(what, mode, recursive) =>
             log.debug("Chmod called on location: '%s' with mode: %s (recursively: %s)".format(what, mode, recursive))
             SvdSystemManagerUtils.chmod(what, mode, recursive)
+        
+        case x: Any =>
+            log.warn("%s has received unknown signal: %s".format(this.getClass, x))
             
     }
     

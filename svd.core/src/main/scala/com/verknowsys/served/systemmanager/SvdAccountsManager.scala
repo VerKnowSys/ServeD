@@ -43,6 +43,10 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             
         case GetAccountManager(username) =>
             self reply accountManagers.flatMap(_.get(username))
+        
+        case x: Any =>
+            log.warn("%s has received unknown signal: %s".format(this.getClass, x))
+            
     }
 
     private def respawnUsersActors {

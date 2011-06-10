@@ -171,6 +171,10 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
                     case ((fl, ref)) if (fl & flags) > 0 => ref ! SvdFileEvent(path, flags)
                 }
             }
+        
+        case x: Any =>
+            log.warn("%s has received unknown signal: %s".format(this.getClass, x))
+
     }
     
     
