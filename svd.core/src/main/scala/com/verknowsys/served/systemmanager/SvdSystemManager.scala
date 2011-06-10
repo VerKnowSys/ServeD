@@ -33,18 +33,9 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
 
     log.info("SvdSystemManager is loading")
     
-    val res = new SvdSystemResources
-    val core = new Sigar
-    val net = core.getNetInfo
-    val netstat = new NetStat
-    
 
     def receive = {
         case Init =>
-            
-            // log.debug("Processes of system: %s".format(ps))
-            
-            // net.gather(new Sigar)
             
             // log.info("Starting main MongoDB instance..")
             // val db = new SvdProcess(
@@ -58,17 +49,17 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             
             log.debug("SvdSystemManager ready")
             // log.info("Sigar version loaded: %s".format(core.getVersion))
-            log.debug("System Resources Availability: [%s]".format(res))
+            log.debug("System Resources Availability: [%s]".format(SvdLowLevelSystemAccess))
             log.debug("Current PID: %d. System Information:\n%s".format(SvdProcess.getCurrentProcessPid, SvdProcess.getProcessInfo(SvdProcess.getCurrentProcessPid)))
             log.debug("Network configuration: GW: %s, DOMAIN: %s, HOST: %s, DNS1: %s, DNS2: %s",
-                net.getDefaultGateway, net.getDomainName, net.getHostName, net.getPrimaryDns, net.getSecondaryDns
+                SvdLowLevelSystemAccess.net.getDefaultGateway, SvdLowLevelSystemAccess.net.getDomainName, SvdLowLevelSystemAccess.net.getHostName, SvdLowLevelSystemAccess.net.getPrimaryDns, SvdLowLevelSystemAccess.net.getSecondaryDns
             )
             
             // 2011-06-10 18:30:44 - dmilith - NOTE: testing purposes:
             self ! GetAllProcesses
             self ! GetNetstat
             Thread.sleep(SvdConfig.sleepDefaultPause)
-            self ! Init            
+            self ! Init
 
             // val a = new SvdProcess(command = "dig +trace arka.gdynia.pl", user = "root", stdOut = "/tmp/served_nobody_memcached.log")
             // log.debug("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))
@@ -124,8 +115,8 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             // self reply ProcessesList(psAll)
         
         case GetNetstat =>
-            netstat.stat(core)
-            log.warn("Network usage (bytes): IN: %s, OUT: %s".format(netstat.getTcpInboundTotal, netstat.getTcpOutboundTotal))
+            SvdLowLevelSystemAccess.netstat.stat(SvdLowLevelSystemAccess.core.get)
+            log.warn("Network usage (bytes): IN: %s, OUT: %s".format(SvdLowLevelSystemAccess.netstat.getTcpInboundTotal, SvdLowLevelSystemAccess.netstat.getTcpOutboundTotal))
             // self reply Success
             
         case Quit =>

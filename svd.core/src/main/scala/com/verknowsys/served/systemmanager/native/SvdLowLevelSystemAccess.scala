@@ -1,22 +1,36 @@
 package com.verknowsys.served.systemmanager.native
 
+
+import com.verknowsys.served._
+import com.verknowsys.served.utils._
+import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.utils.monitor._
+import com.verknowsys.served.systemmanager.native._
+import com.verknowsys.served.systemmanager.acl._
+import com.verknowsys.served.utils.Logging
+import SvdPOSIX._
+
 import org.hyperic.sigar._
-import scala.collection.JavaConversions._
+import com.sun.jna.{Native, Library}
 
 
-/**
- * Class which describe any system process
- * 
- * @author dmilith
-*/
-class SvdSystemResources {
+object SvdLowLevelSystemAccess extends Logging {
     
-    private val core = new Sigar
-    private val mem = core.getMem
-    private val swp = core.getSwap
-    private val tcp = core.getTcp
-
-   
+    val core: Option[Sigar] = core match {
+        case Some(x: Sigar) =>
+            log.debug("Sigar already defined. Passing current value.")
+            Some(x)
+        case _ =>
+            log.debug("No Sigar defined. Defining new one.")
+            Some(new Sigar)
+    }
+        
+    val netstat = core.get.getNetStat
+    val net = core.get.getNetInfo
+    val mem = core.get.getMem
+    val swp = core.get.getSwap
+    val tcp = core.get.getTcp
+    
     val swapUsed = swp.getUsed
     val swapFree = swp.getFree
     val swapTotal = swp.getTotal
@@ -44,5 +58,8 @@ class SvdSystemResources {
         "TCP_FAILED_ATT:[%d], " +
         "TCP_IN_ERROR:[%d] ")
             .format(memUsed, memFree, memTotal, memUsagePercentage, swapUsed, swapFree, swapTotal, tcpConnections, tcpFailedAttempts, tcpInError)
+
+            
+    log.debug("%s has been initialized".format(this.getClass))
     
 }
