@@ -26,6 +26,7 @@ case object RevertBackup
 // SvdSystemManager
 case object GetAllProcesses
 case object GetRunningProcesses
+case object GetNetstat
 
 case class SpawnProcess(cmd: String)
 case class Kill(what: Int, signal: Any)
