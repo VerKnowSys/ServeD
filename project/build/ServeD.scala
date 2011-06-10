@@ -82,7 +82,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         override def compileAction = super.compileAction dependsOn(compileCoffeeScript)
         override def libraryDependencies = Set(
           "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
-          "net.liftweb" % "lift-mapper_2.9.0-1" % liftVersion % "compile->default",
+          // "net.liftweb" % "lift-mapper_2.9.0-1" % liftVersion % "compile->default",
           "org.mortbay.jetty" % "jetty" % "6.1.26" % "test->default"
           // "org.scala-tools.testing" % "specs" % "1.6.2.1" % "test->default"
           // "junit" % "junit" % "4.5" % "test->default",
