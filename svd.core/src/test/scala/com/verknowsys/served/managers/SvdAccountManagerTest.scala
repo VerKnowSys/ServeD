@@ -21,6 +21,7 @@ class SvdAccountManagerTest extends Specification with TestKit {
             am = actorOf(new SvdAccountManager(account)).start
             am ! GetAccount
             expectMsg(account)
+            am.stop
         }
      }
 }
