@@ -8,6 +8,7 @@ import com.verknowsys.served._
 
 class StorageTest extends Specification {
     val now = new java.util.Date
+    var path = randomPath
     
     def time(sec: Int = 0) = new java.sql.Timestamp(now.getTime() + sec*1000);
      
@@ -15,12 +16,13 @@ class StorageTest extends Specification {
     
     def reconnect {
         if(db != null) db.close
-        db = new Storage(SvdConfig.systemTmpDir / "served_tests/storage_test")
+        db = new Storage(path / "db")
     }
     
     "Storage" should {
         doBefore {
-            mkdir(SvdConfig.systemTmpDir / "served_tests")
+            path = randomPath
+            mkdir(path)
             reconnect
             
             db.save(new ProcessInfo(120, "Foo", 1, 20, time()))
@@ -37,7 +39,7 @@ class StorageTest extends Specification {
         
         doAfter {
             db.close
-            rmdir(SvdConfig.systemTmpDir / "served_tests")
+            rmdir(path)
         }
         
         "calculate average CPU by PID" in {
@@ -107,9 +109,10 @@ class StorageTest extends Specification {
     
     "Storage buffering" should {
         "delay save" in {
+            path = randomPath
             if(db != null) db.close
-            rmdir(SvdConfig.systemTmpDir / "served_tests")
-            mkdir(SvdConfig.systemTmpDir / "served_tests")
+            rmdir(path)
+            mkdir(path)
             reconnect
             
             db.getAll.size must_== 0

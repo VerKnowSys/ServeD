@@ -9,7 +9,7 @@ import org.specs._
 
 
 class SvdPropertiesTest extends Specification {
-    final val configFilename = SvdConfig.systemTmpDir / "config.properties"
+    final val configFilename = randomPath / "config.properties"
     
     "SvdProperties" should {
         doBefore { setupSvdConfigFile }
