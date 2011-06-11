@@ -86,9 +86,9 @@ object SvdAccount extends Logging {
     /**
      *  @author dmilith
      *  
-     *  Returns ACLs of given user
+     *  Returns ACLs of given uid
      */
-    def aclFor(name: String) = {
+    def aclFor(uid: Int) = {
         // 2011-02-01 07:03:11 - dmilith - TODO: implement ACL mangling
         
         true
