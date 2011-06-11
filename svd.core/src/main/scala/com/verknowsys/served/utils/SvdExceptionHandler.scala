@@ -27,18 +27,18 @@ trait SvdExceptionHandler extends Actor with Logging {
         log.trace("preRestart executed in %s".format(this.getClass))
         log.error(
             """
-    Restarting Actor: (%s) cause of %s.
-    Throwable details: (%s).
+Restarting Actor: (%s) cause of %s.
+Throwable details: (%s).
             """.format(
                 this.getClass.getName, reason.getMessage,
                 reason.getStackTrace.map {
                     traceElement =>
                         """
-        url             - %s
-        class name      - %s
-        method name     - %s
-        file name       - %s:%s
-        native method   - %s
+    url             - %s
+    class name      - %s
+    method name     - %s
+    file name       - %s:%s
+    native method   - %s
                         """.format(
                                 if (traceElement.getFileName.contains("Svd")) // 2011-01-30 03:34:13 - dmilith - NOTE: all project files will include Svd prefix
                                     "txmt://open/?url=file://%s&line=%s".format(
