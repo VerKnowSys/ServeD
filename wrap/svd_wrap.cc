@@ -64,7 +64,7 @@ string spawn(int user_uid, string command, string output_file) {
 
 /* example in case of standalone building (no dylib/so mode) */
 int main() {
-    cout << spawn(75, "/bin/cat /var/log/kernel.log", "/tmp/dupaout") << endl;
+    // cout << spawn(75, "/bin/cat /var/log/kernel.log", "/tmp/dupaout") << endl; // NOTE: this wont work cause uid 75 don't have access to /var/log/kernel.log
     cout << spawn(75, "/bin/sleep 50", "/dev/null") << endl;
     return 0;
 }
