@@ -19,7 +19,7 @@ extern "C" {
         pid_t           ppid = getppid();
         char            line[256];
         
-        if (child = false) 
+        if (child == false) 
             pid = fork();
             
         if (pid == 0) { /* child */
@@ -52,7 +52,6 @@ extern "C" {
                 ret << CHILD_EXCEPTION;
                 return (char*)(ret.str()).c_str();
             }
-            cout << "Child finished" << endl;
         
         } else if (pid < 0) {
             ret << FORK_EXCEPTION;
