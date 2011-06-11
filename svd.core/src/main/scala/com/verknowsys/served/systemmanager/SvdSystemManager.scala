@@ -59,6 +59,10 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             self ! GetAllProcesses
             self ! GetNetstat
             Thread.sleep(SvdConfig.sleepDefaultPause)
+            
+            new SvdProcess("/bin/cat /private/var/log/AvConnect.log >> /var/tmp/OUT_TEST_LOG")
+            log.debug("After running process.")
+            
             self ! Init
 
             // val a = new SvdProcess(command = "dig +trace arka.gdynia.pl", user = "root", stdOut = "/tmp/served_nobody_memcached.log")

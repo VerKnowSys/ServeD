@@ -30,7 +30,8 @@ class ProcessException(x: String) extends Exception(x)
 
 class SvdProcess(
     val command: String,
-    val user: String = "nouser",
+    val user: String = "dmilith",
+    val userId: Int = -1,
     val workDir: String = SvdConfig.systemTmpDir,
     val waitFor: Boolean = false,
     val shutdownHook: Unit = {})
@@ -38,8 +39,17 @@ class SvdProcess(
 
     
     log.debug("Spawning SvdProcess: (%s)".format(command))
-
-    import SvdProcess._
+    
+    val spawnerThread = new Thread {
+        override def run = {
+            val wrapper = SvdWrapLibrary.instance
+            wrapper.spawn(501, command, "/tmp/_output.txt")
+        }
+    }
+    log.trace("Spawning SvdProcess Thread")
+    spawnerThread.setDaemon(true)
+    spawnerThread.start
+    log.trace("SvdProcess spawned.")
 
     // 2011-01-26 12:36:06 - dmilith - NOTE: TODO: check low level way of launching processes
     // val pid = {
