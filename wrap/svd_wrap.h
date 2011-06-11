@@ -17,5 +17,9 @@
 
 using namespace std;
 
+const int SETUID_EXCEPTION = 251;
+const int EXECVP_EXCEPTION = 252;
+const int FORK_EXCEPTION = 253;
+
 /* function prototypes */
 string spawn(int user_uid, string command, string output_file);

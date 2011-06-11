@@ -15,7 +15,8 @@ string spawn(int user_uid, string command, string output_file) {
     
     /* set effective user to spawn process as */
     if (setuid(user_uid) != 0) {
-        exit(-2);
+        ret << SETUID_EXCEPTION;
+        return ret.str();
     }
     
     if (pid == 0) { /* child */
@@ -26,7 +27,7 @@ string spawn(int user_uid, string command, string output_file) {
         open(output_file.c_str(), O_WRONLY);
         open(output_file.c_str(), O_WRONLY);
         
-        /* touch file */
+        /* touch output file */
         ofstream of(output_file.c_str());
         of.close();
         
@@ -43,11 +44,13 @@ string spawn(int user_uid, string command, string output_file) {
         execvp(cmd[0].c_str(), (char**)(&cmd[0])); /* execvp will use PATH environment defined for user spawing process */
         
         /* execvp will never reach this code if everything is fine */
-        _exit(-1);
+        ret << EXECVP_EXCEPTION;
+        return ret.str();
         
     } else if (pid < 0) {
         cerr << "Failed to fork" << endl;
-        exit(-1);
+        ret << FORK_EXCEPTION;
+        return ret.str();
         
     } else {
         /* do nothing in parent */
