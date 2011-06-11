@@ -60,7 +60,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             self ! GetNetstat
             Thread.sleep(SvdConfig.sleepDefaultPause)
             
-            new SvdProcess("/bin/cat /private/var/log/AvConnect.log >> /var/tmp/OUT_TEST_LOG")
+            new SvdProcess(command = "/bin/cat /etc/passwd >> /var/tmp/500.log", uid = 501)
             log.debug("After running process.")
             
             self ! Init
@@ -110,7 +110,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             
         case SpawnProcess(cmd) =>
             log.debug("Requested process spawn: %s", cmd)
-            val spawn = new SvdProcess(cmd, user = "root") // 2011-01-23 05:27:11 - dmilith - XXX: temporary, that should be user's account name
+            val spawn = new SvdProcess(cmd, 25) // 2011-01-23 05:27:11 - dmilith - PENDING: XXX: temporary, that should be user's account id
             log.trace("Spawned: %s", spawn)
             
         case GetAllProcesses =>
