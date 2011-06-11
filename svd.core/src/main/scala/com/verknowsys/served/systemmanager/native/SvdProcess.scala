@@ -42,16 +42,44 @@ class SvdProcess(
             // PENDING: TODO: XXX: perform chdir(workDir) before spawning process (add additional param to native spawn())
             log.trace("Spawning SvdProcess Thread")
             val wrapper = SvdWrapLibrary.instance
-            val returned = wrapper.spawn(uid, command, outputDir / uid.toString + ".log")
-            taken = returned
-            log.warn(returned)
+            taken = wrapper.spawn(uid, command, outputDir / "%s.log".format(uid))
         }
     }
     spawnerThread.start
+    spawnerThread.join
+    
     log.trace("SvdProcess spawned (%s)".format(taken))
     
-    val ppid = taken.split(";")(0).toInt
-    val pid = taken.split(";")(1).toInt
+    private val tt = taken.split(";")
+    tt.head.toInt match {
+        case 250 | 251 | 252 | 253 | 254 =>
+            log.error("Exception executing process: %s".format(this))
+            throw new Exception("Process with command: '%s' failed: %s".format(command, this))
+            
+        case x: Any =>
+            
+    }
+
+    log.trace("Taken output of spawn(): %s".format(tt))
+
+    val ppid: Int = tt.headOption match {
+        case None | Some("") =>
+            -1
+            
+        case Some(x) =>
+            log.trace("PPID: %s".format(ppid))
+            x.toInt
+        
+    }
+    val pid: Int = tt.tail.headOption match {
+        case None | Some("") =>
+            -1
+            
+        case Some(x) =>
+            log.trace("PID: %s".format(ppid))
+            x.toInt
+        
+    }
 
     
     /**
