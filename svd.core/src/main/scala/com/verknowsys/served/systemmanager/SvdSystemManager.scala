@@ -50,11 +50,11 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             log.debug("SvdSystemManager ready")
             // log.info("Sigar version loaded: %s".format(core.getVersion))
             log.debug("System Resources Availability: [%s]".format(SvdLowLevelSystemAccess))
-            log.debug("Current PID: %d. System Information:\n%s".format(SvdProcess.getCurrentProcessPid, SvdProcess.getProcessInfo(SvdProcess.getCurrentProcessPid)))
+            log.debug("Current PID: %d. System Information:\n%s".format(SvdLowLevelSystemAccess.getCurrentProcessPid, SvdLowLevelSystemAccess.getProcessInfo(SvdLowLevelSystemAccess.getCurrentProcessPid)))
             log.debug("Network configuration: GW: %s, DOMAIN: %s, HOST: %s, DNS1: %s, DNS2: %s",
                 SvdLowLevelSystemAccess.net.getDefaultGateway, SvdLowLevelSystemAccess.net.getDomainName, SvdLowLevelSystemAccess.net.getHostName, SvdLowLevelSystemAccess.net.getPrimaryDns, SvdLowLevelSystemAccess.net.getSecondaryDns
             )
-            
+
             // 2011-06-10 18:30:44 - dmilith - NOTE: testing purposes:
             self ! GetAllProcesses
             self ! GetNetstat
@@ -94,7 +94,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             
         case Kill(pid, signal) => // 2011-01-23 04:13:34 - dmilith - NOTE: send standard SIGINT signal to app with some pid
             // log.info("Kill request for native application with Pid: %s. Sending signal: %s", pid, signal)
-            // SvdProcess.kill(pid.asInstanceOf[Long], signal.asInstanceOf[SvdPOSIX.Value])
+            // SvdSystemManagerUtils.kill(pid.asInstanceOf[Long], signal.asInstanceOf[SvdPOSIX.Value])
             
             // SvdUtils.chown("/tmp/dupa007", user = 666, group = 6666)
             // SvdUtils.chown("/tmp/dupa_32745923", user = 666, group = 6666)
@@ -110,7 +110,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             log.trace("Spawned: %s", spawn)
             
         case GetAllProcesses =>
-            val psAll = SvdProcess.processList(true)
+            val psAll = SvdLowLevelSystemAccess.processList(true)
             log.debug("All process IDs: %s".format(psAll.mkString(", ")))
             // self reply ProcessesList(psAll)
         

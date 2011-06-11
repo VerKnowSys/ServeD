@@ -1,11 +1,32 @@
 package com.verknowsys.served.systemmanager
 
+import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils._
 import com.verknowsys.served._
 import java.io.File
+import SvdPOSIX._
 
 
 object SvdSystemManagerUtils extends Logging {
+    
+
+    /**
+      * Kills system process with given pid and signal
+      *
+      * @author dmilith
+      *
+      * @return true if succeeded, false if failed
+      *
+      */
+    def kill(pid: Long, signal: SvdPOSIX.Value = SIGINT) = {
+        import CLibrary._
+        val clib = CLibrary.instance
+        if (clib.kill(pid, signal.id) == 0)
+            true
+        else
+            false
+    }
+    
 
     /** 
      * Changes owner of file at given path

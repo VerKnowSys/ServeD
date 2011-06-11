@@ -59,7 +59,79 @@ object SvdLowLevelSystemAccess extends Logging {
         "TCP_IN_ERROR:[%d] ")
             .format(memUsed, memFree, memTotal, memUsagePercentage, swapUsed, swapFree, swapTotal, tcpConnections, tcpFailedAttempts, tcpInError)
 
-            
+    
+    /**
+    *   @author dmilith
+    *   
+    *   Returns System Process count.
+    *
+    *   Arguments:
+    *       sort: Boolean. Default: false
+    *
+    */
+    def processCount(sort: Boolean = false) = processList(sort).size
+
+
+    /**
+     *  @author dmilith
+     *
+     *  Returns process info of given pid
+     */
+    def getProcessInfo(apid: Long) = {
+        try {
+         val an = SvdLowLevelSystemAccess.core.get.getProcState(apid)
+             (
+                "PNAME:[%s] " +
+                "USER:[%s] " +
+                "RES:[%s] " +
+                "SHR:[%s] " +
+                "PID:[%s] " +
+                "PPID:[%s] " +
+                "THREADS:[%s] " +
+                "PRIO:[%s] " +
+                "NICE:[%s] " +
+                "COMMAND:[%s] " +
+                "TIME_START:[%s] " +
+                "TIME_KERNEL:[%s] " +
+                "TIME_TOTAL:[%s] " +
+                "TIME_USER:[%s] " +
+                "\n")
+                    .format(an.getName, SvdLowLevelSystemAccess.core.get.getProcCredName(apid).getUser, SvdLowLevelSystemAccess.core.get.getProcMem(apid).getResident, SvdLowLevelSystemAccess.core.get.getProcMem(apid).getShare, apid, an.getPpid, an.getThreads, an.getPriority, an.getNice, SvdLowLevelSystemAccess.core.get.getProcArgs(apid).mkString(" "), SvdLowLevelSystemAccess.core.get.getProcCpu(apid).getStartTime, SvdLowLevelSystemAccess.core.get.getProcCpu(apid).getSys, SvdLowLevelSystemAccess.core.get.getProcCpu(apid).getTotal, SvdLowLevelSystemAccess.core.get.getProcCpu(apid).getUser)
+
+        } catch { 
+            case _ =>
+                "NONE"
+        }
+    }
+
+
+    /**
+     *  @author dmilith
+     *
+     *  Returns current process pid
+     */
+    def getCurrentProcessPid = core.get.getPid
+
+
+    /**
+    *   @author dmilith
+    *   
+    *   Gets List of pids of whole system processes.
+    *   
+    *   Arguments: 
+    *       sort: Boolean. Default: false.
+    *           If true then it will return sorted alphabetically list of processes.
+    *
+    */
+    def processList(sort: Boolean = false) = {
+        val preList = SvdLowLevelSystemAccess.core.get.getProcList.toList // 2010-10-24 01:09:51 - dmilith - Java "Array" here.
+        val sourceList = if (sort) preList.sortWith(_.toInt < _.toInt) else preList
+        log.trace("unsorted    : " + preList)
+        log.debug("processList : " + sourceList)
+        sourceList
+    }
+    
+    
     log.debug("%s has been initialized".format(this.getClass))
     
 }
