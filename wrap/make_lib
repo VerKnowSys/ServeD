@@ -1,0 +1,24 @@
+#!/bin/sh
+
+system="$(uname)"
+rm -rf *.o *.so *.dylib
+
+echo "$system build"
+g++ -c -g -O2 -fstack-check -pipe -shared -fPIC -fno-common svd_wrap.cc
+
+
+case $system in
+
+    Darwin)
+        gcc -Wl -dynamic -dylib -shared -flat_namespace -undefined suppress -o libsvdwrap.dylib svd_wrap.o
+        file libsvdwrap.dylib
+        echo "Ready"
+        ;;
+        
+    FreeBSD)
+        gcc -Wl -dynamic -shared -o libsvdwrap.so svd_wrap.o
+        file libsvdwrap.so
+        echo "Ready"
+        ;;
+        
+esac
