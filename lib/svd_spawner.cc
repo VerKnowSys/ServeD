@@ -173,10 +173,6 @@ int main(int argc, char const *argv[]) {
     
     backgroundTask();
     
-    while(1) {
-        sleep(1);
-    } 
-    
     return 0;
     
 }
