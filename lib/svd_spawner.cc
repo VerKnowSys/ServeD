@@ -17,8 +17,8 @@
 #include <unistd.h>
 
 
-#define LOCK_FILE	"core-served.lock"
-#define LOG_FILE	"core-served.log"
+#define LOCK_FILE	"/var/run/svd-core.lock"
+#define LOG_FILE	"/var/log/svd-core-served.log"
 #define MAXPATHLEN  512
 
 
@@ -32,6 +32,20 @@ string currentDir() {
 }
 
 
+string jarFile = currentDir() + "/svd.core/target/scala_2.9.0/core-assembly-1.0.jar";
+
+
+void log_message(string message) {
+    FILE *logfile;
+	logfile = fopen(LOG_FILE, "a+");
+	if (!logfile) {
+	    return;
+	}
+	fprintf(logfile, (char*)"%s\n", message.c_str());
+	fclose(logfile);
+}
+
+
 void load_svd(string java_path, string jar, string svd_arg, string mainClass) {
     
     // string javalp = "-Djava.library.path=" + currentDir() + "/lib";
@@ -40,10 +54,10 @@ void load_svd(string java_path, string jar, string svd_arg, string mainClass) {
     char *args[] = {
         (char*)"java",
         (char*)"-XX:+UseCompressedOops",
-        (char*)"-XX:MaxPermSize=512M",
+        (char*)"-XX:MaxPermSize=256M",
         (char*)"-XX:+UseParallelGC",
         (char*)"-Xms64m",
-        (char*)"-Xmx768m",
+        (char*)"-Xmx512m",
         (char*)"-Dfile.encoding=UTF-8",
         // (char*)javalp.c_str(),
         (char*)jnalp.c_str(),
@@ -54,6 +68,7 @@ void load_svd(string java_path, string jar, string svd_arg, string mainClass) {
         (char*)0
     };
     
+    log_message("loading svd from jar: " + jar);
     execv((char*)java_path.c_str(), args);
     
 }
@@ -75,25 +90,13 @@ bool fileExists(string strFilename) {
 }
 
 
-void log_message(char *filename, char *message) {
-    FILE *logfile;
-	logfile = fopen(filename, "a+");
-	if (!logfile) {
-        cout << "Error opening log file!" << endl;
-	    return;
-	}
-	fprintf(logfile, (char*)"%s\n", message);
-	fclose(logfile);
-}
-
-
 void signal_handler(int sig) {
 	switch(sig) {
 	case SIGHUP:
-		log_message((char*)LOG_FILE, (char*)"hangup signal catched");
+		log_message("hangup signal catched");
 		break;
 	case SIGTERM:
-		log_message((char*)LOG_FILE, (char*)"terminate signal catched");
+		log_message("terminate signal catched");
 		exit(0);
 		break;
 	}
@@ -109,18 +112,18 @@ void backgroundTask() {
 	    
 	i = fork();
 	if (i < 0) {
-        cout << "Fork error!" << endl;
+        log_message("Fork error!");
         exit(1); /* fork error */
 	}
 	    
     if (i > 0) {
-        cout << "Parent exits. Process spawned in background." << endl;
+        log_message("Parent exits.");
         exit(0); /* parent exits */
     } 
 	
 	/* child (daemon) continues */
 	setsid(); /* obtain a new process group */
-	for (i = getdtablesize(); i>=0; --i)
+	for (i = getdtablesize(); i >= 0; --i)
 	    close(i); /* close all descriptors */
     i = open("/dev/null", O_RDWR);
     dup(i);
@@ -129,16 +132,15 @@ void backgroundTask() {
 	chdir(currentDir().c_str()); /* change running directory */
 	lfp = open(LOCK_FILE, O_RDWR | O_CREAT, 0640);
 	if (lfp < 0) {
-        cout << "Cannot open!" << endl;
+        log_message("Cannot open!");
 	    exit(1); /* can not open */
 	}
 	    
 	if (lockf(lfp, F_TLOCK, 0) < 0) {
-	    cout << "Cannot lock!" << endl;
-	    exit(0); /* can not lock */
+        log_message("Cannot lock! Already spawned?");
+	    exit(1); /* can not lock */
 	}
 
-    cout << "Looking for blue almonds.." << endl;	    
 	/* first instance continues */
 	sprintf(str, "%d\n", getpid());
 	write(lfp, str, strlen(str)); /* record pid to lockfile */
@@ -150,18 +152,17 @@ void backgroundTask() {
 	signal(SIGTERM, signal_handler); /* catch kill signal */
 	
 	/* spawn svd */
-    string jarFile = currentDir() + "/svd.core/target/scala_2.9.0/core-assembly-1.0.jar";
-    if (!fileExists(jarFile)) {
-        cout << "No ServeD Core available. Rebuild svd.core first." << endl;
-        exit(0);
-    }
-	
 	load_svd("/usr/bin/java", jarFile, "com.verknowsys.served.boot", "core");
     
 }
 
 
 int main(int argc, char const *argv[]) {
+
+    if (!fileExists(jarFile)) {
+        cout << "No ServeD Core available. Rebuild svd.core first." << endl;
+        exit(0);
+    }
     
     uid_t uid = getuid();
     
@@ -170,8 +171,6 @@ int main(int argc, char const *argv[]) {
         exit(0);
     }
     
-    
-    cout << "Spawning in " << currentDir() << endl;
     backgroundTask();
     
     while(1) {
