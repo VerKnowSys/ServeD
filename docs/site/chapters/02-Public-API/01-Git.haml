@@ -6,7 +6,7 @@
 
 %h4 Repository
 :code
-  case class Respository(
+  Respository(
       uuid: UUID,   // java.util.UUID object, used for storing configuration
       name: String  // name of repository
   )
@@ -30,11 +30,11 @@
 
 .api
   :request
-    case class RemoveRepository(uuid: UUID)
+    RemoveRepository(uuid: UUID)
 
   :response
-    case object Success
-    case object RepositoryDoesNotExistError
+    Success
+    RepositoryDoesNotExistError
     
     
     
@@ -44,8 +44,8 @@
 
 .api
   :request
-    case object ListRepositories
+    ListRepositories
     
   :response
-    case class Repositories(list: List[Repository])
+    Repositories(list: List[Repository])
 

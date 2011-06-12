@@ -1,0 +1,46 @@
+%h2 Logger API
+
+%p This section is related to logger levels configuration.
+
+%h3 Data structures
+
+%h4 Levels
+:code
+  Levels extends Enumeration {
+      val Error, Warn, Info, Debug, Trace = Value
+  }
+
+
+%h3 Adding entry
+
+%p In order to create new git repository one need to provide its name. If suc- cessful API will reply with Repository object for created reporitory.
+
+.api
+  :request
+    AddEntry(className: String, level: Levels.Value)
+    
+  :response
+    Success
+
+%h3 Removing entry
+
+.api
+  :request
+    RemoveEntry(className: String)
+    
+  :response
+    Success
+
+
+
+%h3 Listing logger entries
+
+%p Returns map: 'class name' -> 'logger level'
+
+.api
+  :request
+    ListEntries
+    
+  :response
+    Entries(entries: Map[String, Levels.Value])
+
