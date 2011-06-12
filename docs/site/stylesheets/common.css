@@ -77,6 +77,15 @@ a:hover { text-decoration:underline; }
 .content {
 	color: #333;
 	font-size: 14px;
+	float: left;
+}
+
+#main {
+    overflow: hidden;
+}
+
+#sidebar {
+    float: left;
 }
 
 .content h2 {

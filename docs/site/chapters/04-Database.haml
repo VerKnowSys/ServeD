@@ -1,0 +1,134 @@
+:markdown
+  # Database
+
+  Solution for persistence based on JVM oodb [NeoDatis](http://neodatis.org). It allows storing objects with full history of changes.
+
+
+  ### Package and necessary imports
+
+:code
+  import com.verknowsys.served.db._
+:markdown
+
+
+  ### Data model
+  Every object needs its own UUID
+
+
+  Create case class that extends `DBObject`
+  
+:code
+  case class User(val name: String, id: UUID = randomUUID) extends DBObject(id)
+
+:markdown
+  Create collection object
+:code
+  object Users extends DB[User]
+:markdown
+
+
+  ### Database connection
+
+  Only Client - Server mode is supported (on the same VM)
+
+
+  Start server. It requires `port` and `filepath`
+:code
+  val server = new DBServer(9000, "/path/to/datafile.db")
+:markdown
+
+  Open new client for that server. 
+  From now all operations will require `db` value
+:code
+  val db = server.openClient
+:markdown
+
+
+  ### Insert
+
+  Create an object (UUID is automaticly generated with random value)
+:code
+  val user = User("teamon")
+:markdown
+
+  ### Save object
+:code
+  db << user
+:markdown
+
+  #### Insert many objects at once
+:code
+  val users = User("teamon") :: User("dmilith") :: User("lopex") :: Nil
+  db << users
+:markdown
+
+  ### Update
+
+  Asuming `user` was saved, it will store new record in database with the same UUID and move existing one into history. 
+  Note that `newUser` and `user` are two different immutable objects. 
+  That's why every object stored in database has own UUID.
+
+  Update is albo possible for a list of objects (same API as insert)
+:code
+  val newUser = user.copy(name = "modified teamon")
+  db << newUser
+:markdown
+
+
+  ### Select
+
+  #### Select by UUID
+
+  With some UUID given it is possible to select one record from database.
+  The result will be `Option[T]`
+:code
+  Users(db)(uuid)                 // => Some(User("teamon"))
+  Users(db)(someNotExistingUuid)  // => None
+:markdown
+
+  The `User(db)` method returns `DBCollection` object dedicated to `User` type objects.
+
+  #### Find records by query
+
+  `DBCollection` allows to find objects using pure scala syntax.
+  The `apply` method takes `T => Boolean` argument
+:code
+  Users(db)(_.name == "teamon")           // => List(User("teamon"))
+  Users(db)(_.name.indexOf("e") != -1)    // => List(User("teamon"), User("lopex"))
+  Users(db)(_.name == "nosuchuser")       // => Nil
+:markdown
+
+  `Users(db)` is already collection of all object of type `Uses`
+:code
+  Users(db)   // => List(User("teamon"), User("lopex"), User("dmilith"))
+:markdown
+
+  ### History of changes
+
+  As mentioned above, object update does not modify already stored object but moves it to *history*.
+  To access history you need an object or its uuid.
+  The `historyFor` method returns `List[T]` of all previos versions of object, without current
+  in order from the newset to oldest.
+:code
+  val user = User("teamon")
+  db << user
+  db << user.copy(name = "teamon 2")
+  db << user.copy(name = "teamon 3")
+
+  Users(db).historyFor(user)  // => List(User("teamon 2"), User("teamon"))
+:markdown
+
+  Each object has a saving timestamp. You can access it with `savedAt` method.
+:code
+  user.savedAt // => Time of save action
+:markdown
+
+
+  The `Users` object is stateless and must be initialized with `db` argument.
+  Unline other database systems it has the save scope as `db` client.
+  To make life easier and more DRY it is possible to assign it to value.
+:code
+  val users = Users(db)
+  users(someUid)                  // => Some(...)
+  users.historyFor(otherUuid)     // => List(...)
+:markdown

@@ -1,0 +1,136 @@
+:markdown
+  # ServeD eclipse JGit wrapper
+
+  ## General information
+  This library is placed inside `com.verknowsys.served.utils.git` package and includes API for manipulating git repositories.
+  See [tests](https://github.com/teamon/svd/tree/master/svd.utils/src/test/scala/com/verknowsys/served/utils/git) for more examples
+
+  ### Creating git repository
+  Create new normal repository (`git init`)
+:code
+  val repo = Git.init("/path/to/repo")
+:markdown
+
+  Create new bare repository (`git init --bare`)
+:code
+  val repo = Git.init("/path/to/bare/repo.git", bare = true)
+:markdown
+
+  Clone repository (`git clone`)
+:code
+  val repo = Git.clone("/path/to/repo", "remote_repo_uri.git")
+:markdown
+
+  ### Getting information about repository
+  Basic information
+:code
+  val repo = new GitRepository("/path/to/repo")
+  repo.name     // name of repository (the last part of path)
+  repo.path     // full path
+  repo.isBare   // check if repository was created with `--bare` option
+:markdown
+
+  `HEAD` reference
+:code
+  repo.head
+:markdown
+
+  ### Making changes
+  Commit file (`git add`, `git commit -m`)
+:code
+  // create a file with name README
+  repo.add("README")  // add file to index
+  repo.commit("Added README")
+:markdown
+
+  Provide author and committer
+:code
+  val someone = new Author("J. Author", "a@example.com")
+  val me = new Author("J. Committer","c@example.com")
+  repo.commit("Some changes", author = someone, committer = me)
+:markdown
+
+  ### Branches
+  Current branch name
+:code
+  repo.currentBranch
+:markdown
+
+  Branch list
+:code
+  repo.branchList
+:markdown
+
+  Create new branch (`git branch`)
+:code
+  repo.branch("feature")
+:markdown
+
+  Checkout branch (`git checkout`)
+:code
+  repo.checkout("master")
+:markdown
+
+  ### Commits
+  Full history (`git log`)
+:code
+  repo.history
+  repo.history.take(10) // last 10 commits
+:markdown
+
+  Partial history
+:code
+  repo.history("fe134..123413") // from provided sha to HEAD
+  repo.history("fe134..123413", "efda3413...4314") // commits between this two refs
+:markdown
+
+  Commit details
+:code
+  val commit = repo.history.next // first commit form history
+  commit.date
+  commit.sha
+  commit.message
+  commit.author    // Author object
+  commit.committer // Author object
+:markdown
+
+  Author object
+:code
+  author.name
+  author.email
+:markdown
+
+  ### Remote
+  List remotes
+:code
+  repo.remotes
+:markdown
+
+  Add remote (`git remote add`)
+:code
+  repo.addRemote("origin", "path/to/remote")
+:markdown
+
+  Push changes to remote (`git push`)
+:code
+  repo.push
+:markdown
+
+  Pull changes from remote (`git pull`)
+:code
+  repo.pull
+:markdown
+
+  ### Other
+  List repositories in directory
+:code
+  Git.list("some/directory") // List[GitRepository]
+:markdown
+
+  ## GitStats - various statistics for repository
+  Get all commits grouped by author
+:code
+  val stats = new GitStats(repo)
+  stats.authors
+:markdown
+  

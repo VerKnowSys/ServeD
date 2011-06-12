@@ -1,0 +1,51 @@
+%h2 Git API
+
+%p This section is related to operations on git repositories.
+
+%h3 Data structures
+
+%h4 Repository
+:code
+  case class Respository(
+      uuid: UUID,   // java.util.UUID object, used for storing configuration
+      name: String  // name of repository
+  )
+
+
+%h3 Creating repository
+
+%p In order to create new git repository one need to provide its name. If suc- cessful API will reply with Repository object for created reporitory.
+
+.api
+  :request
+    CreateRepository(
+        name: String  // name of new repository
+    )
+  
+  :response
+    Success
+    RespositoryExistsError
+
+%h3 Removing repository
+
+.api
+  :request
+    case class RemoveRepository(uuid: UUID)
+
+  :response
+    case object Success
+    case object RepositoryDoesNotExistError
+    
+    
+    
+%h3 Listing repositories
+
+%p Returns list of Repository objects.
+
+.api
+  :request
+    case object ListRepositories
+    
+  :response
+    case class Repositories(list: List[Repository])
+

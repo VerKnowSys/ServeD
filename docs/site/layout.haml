@@ -1,0 +1,36 @@
+!!!
+%html{:lang => "en", "xml:lang" => "en", :xmlns => "http://www.w3.org/1999/xhtml"}
+  %head
+    %meta{:content => "text/html;charset=UTF-8", "http-equiv" => "content-type"}/
+    %title
+      ServeD - 
+      = @title
+    %link{:href => "stylesheets/common.css", :media => "screen", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "stylesheets/syntax.css", :media => "screen", :rel => "stylesheet", :type => "text/css"}/
+    / %script{:src => "javascripts/jquery.js", :type => "text/javascript"}
+    / %script{:src => "javascripts/app.js", :type => "text/javascript"}
+  %body
+    #header{:style => "margin-bottom:20px"}
+      .site
+        .logo
+          %a{:href => "/"}
+            %img{:src => "images/logo.png"}
+        .menu
+          %ul{:style => "margin-top:20px"}
+            %li
+              %a{:href => "http://svd.verknowsys.com"} Home
+            %li
+              %a{:href => "http://vks.lighthouseapp.com"} Issues
+            %li
+              %a{:href => "http://github.com/teamon/svd"} Source
+    #main
+      #sidebar
+        = @toc
+      #content.site
+        = @content
+    #footer
+      .site
+        %p
+          \&copy; Copyright 2009-2011 VerKnowSys. Daniel Dettlaff and Tymon Tobolski.
+          %br/
+          This Software is a close code project. You may not redistribute this code or documentation without permission of author.
