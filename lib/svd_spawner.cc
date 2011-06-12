@@ -46,7 +46,7 @@ void log_message(string message) {
 }
 
 
-void load_svd(string java_path, string jar, string svd_arg, string mainClass) {
+void load_svd(string java_path, string jar, string mainClass, string svd_arg) {
     
     // string javalp = "-Djava.library.path=" + currentDir() + "/lib";
     string jnalp = "-Djna.library.path=" + currentDir() + "/lib";
@@ -61,14 +61,21 @@ void load_svd(string java_path, string jar, string svd_arg, string mainClass) {
         (char*)"-Dfile.encoding=UTF-8",
         // (char*)javalp.c_str(),
         (char*)jnalp.c_str(),
-        (char*)"-jar",
+        (char*)"-cp",
         (char*)jar.c_str(),
         (char*)mainClass.c_str(),
         (char*)svd_arg.c_str(),
         (char*)0
     };
     
-    log_message("loading svd from jar: " + jar);
+    stringstream    ret;
+    ret << "loading svd, with opts: [";
+    for (int i = 0; i < 13; i++) {
+        ret << args[i] << " ";
+    }
+    ret << "]";
+    log_message(ret.str());
+    
     execv((char*)java_path.c_str(), args);
     
 }
@@ -174,5 +181,4 @@ int main(int argc, char const *argv[]) {
     backgroundTask();
     
     return 0;
-    
 }
