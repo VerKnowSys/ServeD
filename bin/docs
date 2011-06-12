@@ -1,20 +1,46 @@
 #!/usr/bin/env ruby
 
+# Usage: pass --color argument to colorize code with pygmentize
+
 require "rubygems"
 require "haml"
 require "fileutils"
 
 class CodeFilter
   def render(text)
-    %Q{
-      <div class="highlight">
-        <pre><code class="scala">#{text.strip}</code></pre>
-      </div>
-    }
+    colorize(text.strip)
+  end
+  
+  def colorize(code)
+    if $colorize
+      print "."
+      code_html = nil
+      open("|pygmentize -l scala -O encoding=utf-8 -f html", 'r+') do |fd|
+        pid =
+          fork {
+            fd.close_read
+            fd.write code
+            fd.close_write
+            exit!
+          }
+        fd.close_write
+        code_html = fd.read
+        fd.close_read
+        Process.wait(pid)
+      end
+
+      code_html
+    else
+      %Q{
+        <div class="highlight">
+          <pre>#{code}</pre>
+        </div>
+      }
+    end
   end
 end
 
-class SideCodeFilter
+class SideCodeFilter < CodeFilter
   def initialize(header)
     @header = header
   end
@@ -23,9 +49,7 @@ class SideCodeFilter
     %Q{
       <div class="side">
         <h4>#@header</h4>
-        <div class="highlight">
-          <pre><code class="scala">#{text.strip}</code></pre>
-        </div>
+        #{colorize(text.strip)}
       </div>
     }
   end
@@ -65,7 +89,7 @@ end
 @chapters = []
 
 def generate(src_path, target_path, title = "")
-  puts "Processing #{target_path}"
+  print "Processing #{target_path}"
   
   FileUtils.mkdir_p(File.dirname(File.join(@target_dir, target_path)))
   
@@ -86,6 +110,7 @@ def generate(src_path, target_path, title = "")
   File.open(File.join(@target_dir, target_path.sub("/chapters/", "").sub(".haml", ".html").gsub("/", "-")), "w") do |f|
     f.write content
   end
+  puts
 end
 
 def generate_all(root, prefix = "")
@@ -123,6 +148,8 @@ def list(root)
   end.join("\n") +
   "</ul>"
 end
+
+$colorize = ARGV.include?("--color")
 
 chapters = tree(File.join(@src_dir, "chapters"))
 @toc = list(chapters)
