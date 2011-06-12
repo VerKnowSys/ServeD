@@ -35,7 +35,7 @@ extern "C" {
         
         // setbuf(stdout, NULL);
         // setbuf(stderr, NULL);
-        
+        pid = getpid();
         /* return string with "ParentPid;ChildProcessPid;UserID;CommandOutputFile" */
         ret << ppid << ";" << pid << endl;
         return (char*)(ret.str()).c_str();
