@@ -168,7 +168,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         }
         lazy val todo = notes
 
-        override def mainClass = Some("com.verknowsys.served.boot")
+        // override def mainClass = Some("com.verknowsys.served.boot")
     }
         
     

@@ -5,7 +5,7 @@ jar="${pwd}/svd.core/target/scala_2.9.0/core-assembly-1.0.jar"
 
 if [ -e "${jar}" ]; then
     echo "Executing: ${jar}"
-    sudo java -XX:+UseCompressedOops -XX:MaxPermSize=512M -XX:+UseParallelGC -Xms64m -Xmx768m -Dfile.encoding=UTF-8 -noverify -server -Djna.library.path=$(pwd)/wrap -jar "${jar}" "$@"
+    sudo java -XX:+UseCompressedOops -XX:MaxPermSize=512M -XX:+UseParallelGC -Xms64m -Xmx768m -Dfile.encoding=UTF-8 -noverify -server -Djna.library.path=$(pwd)/wrap -cp "${jar}" com.verknowsys.served.boot "$@"
 else
     echo "Assembly not found. Use build script!"
 fi

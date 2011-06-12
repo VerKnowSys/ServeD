@@ -9,7 +9,7 @@ import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.api._
 
 import akka.actor.{Actor, ActorRef}
-import akka.actor.Actor.{actorOf, registry}
+import akka.actor.Actor.{remote, actorOf, registry}
 import scala.io.Source
 
 
@@ -50,18 +50,28 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
     }
 
     private def respawnUsersActors {
-        // kill all Account Managers
-        log.trace("Actor.registry size before: %d", registry.actors.size)
-        registry.actorsFor[SvdAccountManager] foreach { _.stop }
+        // // kill all Account Managers
+        // log.trace("Actor.registry size before: %d", registry.actors.size)
+        // registry.actorsFor[SvdAccountManager] foreach { _.stop }
+        // 
+        // // spawn Account Manager for each account entry in passwd file
+        // accountManagers = Some(userAccounts.map { account =>
+        //     val manager = actorOf(new SvdAccountManager(account))
+        //     self.link(manager)
+        //     manager.start
+        //     (account.userName, manager)
+        // }.toMap)
+        // log.trace("Actor.registry size after: %d", registry.actors.size)
         
-        // spawn Account Manager for each account entry in passwd file
-        accountManagers = Some(userAccounts.map { account =>
-            val manager = actorOf(new SvdAccountManager(account))
-            self.link(manager)
-            manager.start
-            (account.userName, manager)
-        }.toMap)
-        log.trace("Actor.registry size after: %d", registry.actors.size)
+        val map = Map(
+            "teamon" -> ("localhost", 8000)
+        )
+        
+        accountManagers = Some(map.mapValues { case(host, port) =>
+            val am = remote.actorFor("service:account-manager", host, port)
+            self link am
+            am
+        })
     }
 
     

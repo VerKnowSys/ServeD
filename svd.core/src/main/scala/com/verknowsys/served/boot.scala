@@ -14,11 +14,26 @@ import com.verknowsys.served.maintainer.SvdApiConnection
 import com.verknowsys.served.systemmanager.SvdAccountsManager
 import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.notifications.SvdNotificationCenter
+import com.verknowsys.served.systemmanager.managers.SvdAccountManager
+import com.verknowsys.served.systemmanager.native.SvdAccount
 
 import com.verknowsys.served.api._
 
 import sun.misc.SignalHandler
 import sun.misc.Signal
+
+
+object userboot extends Logging {
+    def apply(userName: String){
+        val am = actorOf(new SvdAccountManager(SvdAccount(userName = userName)))
+        remote.start("localhost", 8000)
+        remote.register("service:account-manager", am)
+    }
+    
+    def main(args: Array[String]): Unit = {
+        userboot("teamon")
+    }
+}
 
 
 object boot extends Logging {
