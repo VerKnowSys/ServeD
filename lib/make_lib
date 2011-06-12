@@ -1,7 +1,7 @@
 #!/bin/sh
 
 system="$(uname)"
-rm -rf *.o *.so *.dylib
+rm -rf *.o *.so *.dylib ../svd-spawner
 
 echo "$system build"
 g++ -c -g -O2 -fstack-check -pipe -shared -fPIC -fno-common svd_wrap.cc
@@ -12,7 +12,8 @@ case $system in
     Darwin)
         gcc -Wl -dynamic -dylib -shared -flat_namespace -undefined suppress -o libsvdwrap.dylib svd_wrap.o
         file libsvdwrap.dylib
-        echo "Ready"
+        g++ -pipe -g -O2 -fstack-check -fPIC svd_spawner.cc -o ../respawn
+        file ../respawn
         ;;
         
     FreeBSD)

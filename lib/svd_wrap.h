@@ -27,6 +27,6 @@ extern "C" {
     const int EXIT_FAILURE_EXCEPTION = 254;
 
     /* function prototypes */
-    char* spawn(int user_uid, char* _command, char* _output_file);
+    char* spawn(char* _command);
 
 }

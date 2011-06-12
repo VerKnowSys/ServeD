@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cd lib
+./make_lib
+cd ..

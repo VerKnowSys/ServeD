@@ -1,7 +1,3 @@
 #!/bin/sh
 
-cd wrap
-./make_lib
-cd ..
-
 sbt assembly
