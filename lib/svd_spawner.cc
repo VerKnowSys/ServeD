@@ -75,7 +75,7 @@ void load_svd(string java_path, string jar, string mainClass, string svd_arg) {
     }
     ret << "]";
     log_message(ret.str());
-    
+
     execv((char*)java_path.c_str(), args);
     
 }
@@ -130,13 +130,17 @@ void backgroundTask() {
 	
 	/* child (daemon) continues */
 	setsid(); /* obtain a new process group */
-	for (i = getdtablesize(); i >= 0; --i)
-	    close(i); /* close all descriptors */
-    i = open("/dev/null", O_RDWR);
-    dup(i);
-    dup(i); /* handle standart I/O */
+    for (i = getdtablesize(); i >= 0; --i)
+        close(i); /* close all descriptors */
+	    
+    // i = open("/dev/null", O_RDWR);
+    // dup(i);
+    // dup(i); /* handle standart I/O */
+    freopen ("/dev/null", "a+", stdout);
+    freopen ("/var/log/svd.log", "a+", stderr);
 	umask(027); /* set newly created file permissions */
 	chdir(currentDir().c_str()); /* change running directory */
+
 	lfp = open(LOCK_FILE, O_RDWR | O_CREAT, 0640);
 	if (lfp < 0) {
         log_message("Cannot open!");

@@ -68,18 +68,6 @@ class ConsoleLogger(klazz: String) extends AbstractLogger(klazz){
         import java.text.SimpleDateFormat
         val fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         val dte = new java.util.Date
-        level match {
-            case Logger.Levels.Error =>
-                val fw = new FileWriter(SvdConfig.systemLogDir / "svd.error.log")
-                message.split("\n").foreach(line =>
-                    fw.write("%s%s%s <%s%s%s> [%s%s%s]\n".format(
-                        Colors(level), fmt.format(dte), Console.RESET,
-                        Colors(level), formatClassName(className), Console.RESET,
-                        Colors(level), line, Console.RESET))
-                )
-                fw.close
-            case x =>
-        }
         message.split("\n").foreach(line =>
             println("%s%s%s <%s%s%s> [%s%s%s]".format(
                 Colors(level), fmt.format(dte), Console.RESET,

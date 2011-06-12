@@ -14,6 +14,7 @@ case $system in
         file libsvdwrap.dylib
         g++ -pipe -g -O2 -fstack-check -fPIC svd_spawner.cc -o ../respawn
         file ../respawn
+        echo "Ready"
         ;;
         
     FreeBSD)
