@@ -64,12 +64,9 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {
         val jlineRepo = "JLine Project Repository" at "http://jline.sourceforge.net/m2rep"
         val jline = "jline" % "jline" % "0.9.9"
-        
+
         lazy val cli = task { None; } dependsOn(run(Array("127.0.0.1", "5555")))
-        lazy val assemblyFast = assemblyTask(assemblyTemporaryPath, assemblyClasspath,
-                                              assemblyExtraJars, assemblyExclude
-                              ) dependsOn(compile) describedAs("Builds an optimized, single-file deployable JAR without running tests, just compile")
-        
+
         override def mainClass = Some("com.verknowsys.served.cli.Runner")
     }
     
@@ -104,11 +101,6 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val neodatis = "org.neodatis.odb" % "neodatis-odb" % "1.9.30.689"
         val h2 = "com.h2database" % "h2" % "1.3.154"
         
-        lazy val assemblyFast = assemblyTask(assemblyTemporaryPath, assemblyClasspath,
-                                              assemblyExtraJars, assemblyExclude
-                              ) dependsOn(compile) describedAs("Builds an optimized, single-file deployable JAR without running tests, just compile")
-        
-
         lazy val served = task { None } dependsOn(run(Array()))
         lazy val svd = served
         lazy val stress = task {
