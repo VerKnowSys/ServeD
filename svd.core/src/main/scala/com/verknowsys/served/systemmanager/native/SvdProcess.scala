@@ -50,36 +50,36 @@ class SvdProcess(
     
     log.trace("SvdProcess spawned (%s)".format(taken))
     
-    private val tt = taken.split(";")
-    tt.head.toInt match {
-        case 250 | 251 | 252 | 253 | 254 =>
-            log.error("Exception executing process: %s".format(this))
-            throw new Exception("Process with command: '%s' failed: %s".format(command, this))
-            
-        case x: Any =>
-            
-    }
-
-    log.trace("Taken output of spawn(): %s".format(tt))
-
-    val ppid: Int = tt.headOption match {
-        case None | Some("") =>
-            -1
-            
-        case Some(x) =>
-            log.trace("PPID: %s".format(ppid))
-            x.toInt
-        
-    }
-    val pid: Int = tt.tail.headOption match {
-        case None | Some("") =>
-            -1
-            
-        case Some(x) =>
-            log.trace("PID: %s".format(ppid))
-            x.toInt
-        
-    }
+    // private val tt = taken.split(";")
+    // tt.head.toInt match {
+    //     case 250 | 251 | 252 | 253 | 254 =>
+    //         log.error("Exception executing process: %s".format(this))
+    //         throw new Exception("Process with command: '%s' failed: %s".format(command, this))
+    //         
+    //     case x: Any =>
+    //         
+    // }
+    // 
+    // log.trace("Taken output of spawn(): %s".format(tt))
+    // 
+    // val ppid: Int = tt.headOption match {
+    //     case None | Some("") =>
+    //         -1
+    //         
+    //     case Some(x) =>
+    //         log.trace("PPID: %s".format(ppid))
+    //         x.toInt
+    //     
+    // }
+    // val pid: Int = tt.tail.headOption match {
+    //     case None | Some("") =>
+    //         -1
+    //         
+    //     case Some(x) =>
+    //         log.trace("PID: %s".format(ppid))
+    //         x.toInt
+    //     
+    // }
 
     
     /**
@@ -91,9 +91,9 @@ class SvdProcess(
     require(commandNotEmpty, "SvdProcess require non-empty command to execute!")
     require(workDirExists, "SvdProcess working dir must exist! Given: %s".format(workDir))
     require(passACLs, "SvdProcess didn't pass ACL requirements! Failed process: %s".format(command))
-    require(pid > 0, "SvdProcess PID always should be > 0!")
-    require(ppid > 0, "SvdProcess Parent PID always should be > 0!")
-    require(pid != 1, "SvdProcess cannot turn to ZOMBIE!!")
+    // require(pid > 0, "SvdProcess PID always should be > 0!")
+    // require(ppid > 0, "SvdProcess Parent PID always should be > 0!")
+    // require(pid != 1, "SvdProcess cannot turn to ZOMBIE!!")
     
     
     // 2011-01-20 02:42:12 - dmilith - TODO: implement SvdProcess requirements
