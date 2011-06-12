@@ -64,7 +64,8 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
         // log.trace("Actor.registry size after: %d", registry.actors.size)
         
         val map = Map(
-            "teamon" -> ("localhost", 8000)
+            "teamon" -> ("localhost", 8000),
+            "dmilith" -> ("localhost", 8000)
         )
         
         accountManagers = Some(map.mapValues { case(host, port) =>

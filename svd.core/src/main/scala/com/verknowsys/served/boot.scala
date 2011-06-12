@@ -31,7 +31,7 @@ object userboot extends Logging {
     }
     
     def main(args: Array[String]): Unit = {
-        userboot("teamon")
+        userboot(System.getProperty("user.name"))
     }
 }
 
