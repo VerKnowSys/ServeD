@@ -167,19 +167,17 @@ extern "C" {
             ret << string(line);
         }
 
-        childExitStatus = pclose(fpipe);
-        fpipe = NULL;
-
-        if (childExitStatus == -1) {
-            ret << CHILD_EXCEPTION;
-            return (char*)(ret.str()).c_str();
-        }
+        // fpipe = NULL;
+        // if (childExitStatus == -1) {
+        //     ret << CHILD_EXCEPTION;
+        //     return (char*)(ret.str()).c_str();
+        // }
 
         // setbuf(stdout, NULL);
         // setbuf(stderr, NULL);
         pid = getpid();
-        /* return string with "ParentPid;ChildProcessPid;UserID;CommandOutputFile" */
-        ret << ppid << ";" << pid << endl;
+        pclose(fpipe);
+        ret << ppid << ";" << pid;
         return (char*)(ret.str()).c_str();
     }
 

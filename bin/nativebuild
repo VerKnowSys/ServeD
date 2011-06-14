@@ -16,6 +16,7 @@ case $system in
         g++ -c -g -O2 -pipe -shared -fPIC lib/spawnlib_src/core.cc -o lib/core.o
         g++ -g -O2 -pipe -fPIC lib/spawnlib_src/spawn.cc -o spawn lib/core.o
         g++ -Wl -dynamic -dylib -shared -flat_namespace -undefined suppress -o lib/libsvdwrap.dylib lib/core.o
+        rm lib/core.o
         file lib/libsvdwrap.dylib
         echo "Ready"
         ;;
@@ -24,6 +25,7 @@ case $system in
         g++ -c -g -O2 -pipe -shared -fPIC lib/spawnlib_src/core.cc -o lib/core.o
         g++ -g -O2 -pipe -fPIC lib/spawnlib_src/spawn.cc -o spawn lib/core.o
         g++ -Wl -dynamic -shared -o lib/libsvdwrap.dylib lib/core.o
+        rm lib/core.o
         file lib/libsvdwrap.so
         echo "Ready"
         ;;
