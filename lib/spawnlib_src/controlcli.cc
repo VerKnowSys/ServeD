@@ -13,6 +13,6 @@ int main(int argc, char *argv[]) {
         cout << "No message to send? (first param)" << endl;
         exit(1);
     }
-    send_socket_message(argv[1]);
+    sendSocketMessage(argv[1]);
     return 0;
 }

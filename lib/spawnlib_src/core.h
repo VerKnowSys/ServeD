@@ -34,9 +34,9 @@
 #define EXIT_FAILURE_EXCEPTION 254
 #define LOCK_FILE	"svd-core.lock"
 #define JAR_FILE    "/svd.core/target/scala_2.9.0/core-assembly-1.0.jar"
-#define LOG_FILE    "/var/log/svd.log"
-#define INTERNAL_LOG_FILE "/var/log/svd.diagnostic.log"
-#define SOCK_FILE   "/tmp/svd.sock"
+#define LOG_FILE    "svd.log"
+#define INTERNAL_LOG_FILE "svd.diagnostic.log"
+#define SOCK_FILE   "svd.sock"
 #define SOCK_DATA_PACKET_SIZE 1024
 
 using namespace std;
@@ -48,10 +48,10 @@ extern "C" {
     char*   spawn(char* _command);
     void    log_message(string message);
     bool    fileExists(string strFilename);
-    void    spawnBackgroundTask(string abs_java_bin_path, string main_starting_class, string cmdline_param, bool bindSocket);
+    void    spawnBackgroundTask(string abs_java_bin_path, string main_starting_class, string cmdline_param, bool bindSocket, string lockFileName);
     string  currentDir();
     
-    void create_socket_server();
-    void send_socket_message(char* content);
+    void    createSocketServer();
+    void    sendSocketMessage(char* content);
 
 }

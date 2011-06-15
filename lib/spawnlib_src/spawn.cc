@@ -15,12 +15,16 @@ int main(int argc, char const *argv[]) {
     }
     
     uid_t uid = getuid();
+    stringstream ret;
+    ret << "Spawn uid: " << uid << endl;
+    
     if (uid != 0) {
-        cout << "Respawn requires root privileges to run." << endl;
+        cout << "Spawn requires root privileges to run." << endl;
         exit(1);
     }
     
-    spawnBackgroundTask("/usr/bin/java", "com.verknowsys.served.boot", "params", true);
+    log_message(ret.str());
+    spawnBackgroundTask("/usr/bin/java", "com.verknowsys.served.boot", "boot", true, LOCK_FILE);
     
     return 0;
 }

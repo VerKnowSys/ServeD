@@ -36,7 +36,7 @@ extern "C" {
 
         char *args[] = {
             (char*)"java",
-            (char*)"-XX:+UseCompressedOops",
+            // (char*)"-XX:+UseCompressedOops",
             (char*)"-XX:MaxPermSize=256M",
             (char*)"-XX:+UseParallelGC",
             (char*)"-Xms64m",
@@ -53,7 +53,7 @@ extern "C" {
 
         stringstream    ret;
         ret << "loading svd, with opts: [";
-        for (int i = 0; i < 13; i++) {
+        for (int i = 0; i < 12; i++) {
             ret << args[i] << " ";
         }
         ret << "]";
@@ -93,13 +93,13 @@ extern "C" {
     }
 
 
-    void spawnBackgroundTask(string abs_java_bin_path, string main_starting_class, string cmdline_param, bool bindSocket) {
+    void spawnBackgroundTask(string abs_java_bin_path, string main_starting_class, string cmdline_param, bool bindSocket, string lockFileName) {
         int i,lfp;
         char str[32];
 
-    	if(getppid()==1)
-    	    return; /* already a daemon */
-
+        if(getppid()==1)
+            return; /* already a daemon */
+        
     	i = fork();
     	if (i < 0) {
             log_message("Fork error!");
@@ -107,12 +107,13 @@ extern "C" {
     	}
 
         if (i > 0) {
-            log_message("Parent exits.");
-            
             /* blocking function for parent */
             if (bindSocket) {
                 log_message("Spawning socket listener");
-                create_socket_server();
+                createSocketServer();
+            } else {
+                log_message("Parent exits.");
+                exit(0);
             }
         } 
 
@@ -124,12 +125,14 @@ extern "C" {
         // i = open("/dev/null", O_RDWR);
         // dup(i);
         // dup(i); /* handle standart I/O */
-        freopen ("/dev/null", "a+", stdout);
-        freopen (LOG_FILE, "a+", stderr);
+        
+        string logFileName = cmdline_param + "-" + string(LOG_FILE);
+        freopen (logFileName.c_str(), "a+", stdout);
+        freopen (logFileName.c_str(), "a+", stderr);
     	umask(027); /* set newly created file permissions */
     	chdir(currentDir().c_str()); /* change running directory */
 
-    	lfp = open(LOCK_FILE, O_RDWR | O_CREAT, 0640);
+    	lfp = open(lockFileName.c_str(), O_RDWR | O_CREAT, 0640);
     	if (lfp < 0) {
             log_message("Cannot open!");
     	    exit(1); /* can not open */
@@ -187,7 +190,7 @@ extern "C" {
     }
     
     
-    void create_socket_server() {
+    void createSocketServer() {
         int sockfd, newsockfd, servlen, n;
         socklen_t clilen;
         struct sockaddr_un  cli_addr, serv_addr;
@@ -222,16 +225,16 @@ extern "C" {
             log_message("BUF: " + string(buf));
             close(newsockfd);
             
-            log_message("TODO: Spawning userland ServeD");
-            // spawnBackgroundTask("/usr/bin/java", "com.verknowsys.served.userboot", "dmilith", false);
-            
+            /* spawn userland served */
+            string cmd = currentDir() + "/userspawn " + string(buf);
+            spawn((char*)cmd.c_str());
         }
 
         close(sockfd);
     }
     
     
-    void send_socket_message(char* content) {
+    void sendSocketMessage(char* content) {
         int sockfd, servlen,n;
         struct sockaddr_un  serv_addr;
         char buffer[SOCK_DATA_PACKET_SIZE];
