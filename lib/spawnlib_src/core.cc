@@ -93,7 +93,7 @@ extern "C" {
     }
 
 
-    void spawnBackgroundTask(string abs_java_bin_path, string main_starting_class, string cmdline_param) {
+    void spawnBackgroundTask(string abs_java_bin_path, string main_starting_class, string cmdline_param, bool bindSocket) {
         int i,lfp;
         char str[32];
 
@@ -108,7 +108,12 @@ extern "C" {
 
         if (i > 0) {
             log_message("Parent exits.");
-            exit(0); /* parent exits */
+            
+            /* blocking function for parent */
+            if (bindSocket) {
+                log_message("Spawning socket listener");
+                create_socket_server();
+            }
         } 
 
     	/* child (daemon) continues */
@@ -179,6 +184,73 @@ extern "C" {
         pclose(fpipe);
         ret << ppid << ";" << pid;
         return (char*)(ret.str()).c_str();
+    }
+    
+    
+    void create_socket_server() {
+        int sockfd, newsockfd, servlen, n;
+        socklen_t clilen;
+        struct sockaddr_un  cli_addr, serv_addr;
+        char buf[SOCK_DATA_PACKET_SIZE];
+
+        if ((sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
+            log_message("exception while creating socket");
+
+        bzero((char *) &serv_addr, sizeof(serv_addr));
+        serv_addr.sun_family = AF_UNIX;
+        strcpy(serv_addr.sun_path, SOCK_FILE);
+        servlen = strlen(serv_addr.sun_path) + sizeof(serv_addr.sun_path) + sizeof(serv_addr.sun_family);
+
+        /* cleaning old socket files */
+        string rmSocket = ("/bin/rm " + string(SOCK_FILE)); // 2011-06-15 03:34:40 - dmilith - XXX: might be hacky but works?
+        system(rmSocket.c_str());
+
+        if (bind(sockfd, (struct sockaddr *)&serv_addr, servlen) < 0) {
+            log_message("exception while binding socket"); 
+        }
+
+        listen(sockfd, 5);
+        clilen = sizeof(cli_addr);
+        
+        /* main listening group */
+        while (1) {
+            newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
+            if (newsockfd < 0)
+                 log_message("exception on accepting socket");
+
+            n = read(newsockfd, buf, SOCK_DATA_PACKET_SIZE);
+            log_message("BUF: " + string(buf));
+            close(newsockfd);
+            
+            log_message("TODO: Spawning userland ServeD");
+            // spawnBackgroundTask("/usr/bin/java", "com.verknowsys.served.userboot", "dmilith", false);
+            
+        }
+
+        close(sockfd);
+    }
+    
+    
+    void send_socket_message(char* content) {
+        int sockfd, servlen,n;
+        struct sockaddr_un  serv_addr;
+        char buffer[SOCK_DATA_PACKET_SIZE];
+
+        bzero((char *)&serv_addr, sizeof(serv_addr));
+        serv_addr.sun_family = AF_UNIX;
+        strncpy(serv_addr.sun_path, SOCK_FILE, strlen(SOCK_FILE) + 1);
+        servlen = strlen(serv_addr.sun_path) + sizeof(serv_addr.sun_path) + sizeof(serv_addr.sun_family);
+        
+        if ((sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
+            log_message("Exception while creating socket");
+
+        if (connect(sockfd, (struct sockaddr *)&serv_addr, servlen) < 0)
+            log_message("Exception while connecting to socket server");
+
+        bzero(buffer, SOCK_DATA_PACKET_SIZE);
+        strncpy(buffer, content, strlen(content));
+        write(sockfd, buffer, sizeof(buffer));
+        close(sockfd);
     }
 
     

@@ -20,7 +20,7 @@ int main(int argc, char const *argv[]) {
         exit(1);
     }
     
-    spawnBackgroundTask("/usr/bin/java", "com.verknowsys.served.boot", "params");
+    spawnBackgroundTask("/usr/bin/java", "com.verknowsys.served.boot", "params", true);
     
     return 0;
 }
