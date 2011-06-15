@@ -34,11 +34,13 @@
 #define FORK_EXCEPTION 253
 #define EXIT_FAILURE_EXCEPTION 254
 #define LOCK_FILE	"svd-core.lock"
+#define SOCKET_LOCK_FILE "svd-ss.lock"
 #define JAR_FILE    "/svd.core/target/scala_2.9.0/core-assembly-1.0.jar"
 #define LOG_FILE    "svd.log"
 #define INTERNAL_LOG_FILE "svd.diagnostic.log"
 #define SOCK_FILE   "svd.sock"
 #define SOCK_DATA_PACKET_SIZE 128
+
 
 using namespace std;
 
@@ -55,6 +57,7 @@ extern "C" {
     
     void    createSocketServer();
     void    sendSocketMessage(char* content);
+    void    performCleanup();
 
     void    log_message(string message);
 

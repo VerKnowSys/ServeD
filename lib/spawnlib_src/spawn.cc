@@ -20,6 +20,28 @@ int main(int argc, char const *argv[]) {
         exit(1);
     }
 
+    /* stop action */
+    if (argc != 1) {
+        string arg = string(argv[1]);
+        if (arg == "stop") {
+            /* kill pid under LOCK_FILE */
+            ifstream ifs(LOCK_FILE, ios::in);
+            pid_t pid;
+            ifs >> pid;
+            kill(pid, SIGTERM);
+            cout << "Spawn stopped." << endl;
+            ifs.close();
+            /* also kill socket server process with pid in SOCKET_LOCK_FILE */
+            ifstream ifs1(SOCKET_LOCK_FILE, ios::in);
+            ifs1 >> pid;
+            kill(pid, SIGTERM);
+            cout << "Spawn Socket-Server stopped." << endl;
+            ifs1.close();
+            performCleanup();
+            exit(0);
+        }
+    }
+    
     if (fileExists(LOCK_FILE)) {
         ifstream ifs(LOCK_FILE, ios::in);
         pid_t pid;
@@ -27,13 +49,10 @@ int main(int argc, char const *argv[]) {
         if (processAlive(pid)) {
             cout << "Process still alive for core svd (pid: " << pid << "). Aborting." << endl;
             exit(1);
-        } else { /* process isn't alive but socket file still exists? */
-            if (fileExists(SOCK_FILE)) {
-                log_message("Removing socket file (process is dead but file is still there).");
-                string rmCmd = "/bin/rm " + string(SOCK_FILE);
-        		system(rmCmd.c_str());
-            }
+        } else { /* process isn't alive but socket/lock file still exist? */
+            performCleanup();
         }
+        ifs.close();
     }
     
     stringstream ret;

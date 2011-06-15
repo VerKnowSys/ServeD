@@ -206,6 +206,25 @@ extern "C" {
     }
     
     
+    void performCleanup() {
+        if (fileExists(LOCK_FILE)) {
+            log_message("Removing lock file (process is dead but file is still there).");
+            string rmCmd = "/bin/rm " + string(LOCK_FILE);
+    		system(rmCmd.c_str());
+        }
+        if (fileExists(SOCK_FILE)) {
+            log_message("Removing socket file (process is dead but file is still there).");
+            string rmCmd = "/bin/rm " + string(SOCK_FILE);
+    		system(rmCmd.c_str());
+        }
+        if (fileExists(SOCKET_LOCK_FILE)) {
+            log_message("Removing socket server lock file (process is dead but file is still there).");
+            string rmCmd = "/bin/rm " + string(SOCKET_LOCK_FILE);
+    		system(rmCmd.c_str());
+        }
+    }
+    
+    
     void createSocketServer() {
         int sockfd, newsockfd, servlen, n;
         socklen_t clilen;
@@ -223,7 +242,28 @@ extern "C" {
         if (bind(sockfd, (struct sockaddr *)&serv_addr, servlen) < 0) {
             log_message("exception while binding socket"); 
         }
-
+        
+        /* we also need to take care of socket server which spawns with own pid */
+        pid_t sockPid = getpid();
+        stringstream s;
+        s << "Socket process pid: " << sockPid << endl;
+        log_message(s.str());
+        umask(027); /* set newly created file permissions */
+    	chdir(currentDir().c_str()); /* change running directory */
+        char str[32];
+    	int lfp = open(SOCKET_LOCK_FILE, O_RDWR | O_CREAT, 0640);
+    	if (lfp < 0) {
+            log_message("Cannot open!");
+    	    exit(1); /* can not open */
+    	}
+    	if (lockf(lfp, F_TLOCK, 0) < 0) {
+            log_message("Cannot lock! Already spawned?");
+    	    exit(1); /* can not lock */
+    	}
+    	sprintf(str, "%d\n", sockPid);
+        write(lfp, str, strlen(str)); /* record pid to lockfile */
+        
+        /* prepare listen on socket addr */
         listen(sockfd, 5);
         clilen = sizeof(cli_addr);
         
