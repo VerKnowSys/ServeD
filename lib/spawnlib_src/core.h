@@ -8,6 +8,7 @@
 #include <string>
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
 #include <sstream>
 #include <algorithm>
 #include <iterator>
@@ -46,12 +47,15 @@ extern "C" {
     
     /* function prototypes */
     char*   spawn(char* _command);
-    void    log_message(string message);
-    bool    fileExists(string strFilename);
     void    spawnBackgroundTask(string abs_java_bin_path, string main_starting_class, string cmdline_param, bool bindSocket, string lockFileName);
+
     string  currentDir();
+    bool    fileExists(string strFilename);
+    bool    processAlive(pid_t pid);
     
     void    createSocketServer();
     void    sendSocketMessage(char* content);
+
+    void    log_message(string message);
 
 }

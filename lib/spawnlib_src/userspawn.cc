@@ -7,6 +7,9 @@
 #include "core.h"
 
 
+using namespace std;
+
+
 int main(int argc, char const *argv[]) {
 
     if (!fileExists(currentDir() + JAR_FILE)) {
@@ -18,12 +21,20 @@ int main(int argc, char const *argv[]) {
         cout << "First argument must be uid of user to run ServeD userspace" << endl;
         exit(1);
     }
-    
-    /* hacky way to remove old lock file */
-    string lockName = string(argv[1]) + "-" + string(LOCK_FILE);
-    string rmCmd = "/bin/rm " + lockName;
-    system(rmCmd.c_str());
 
+    string arg = string(argv[1]);
+    string lockName = arg + "-" + string(LOCK_FILE);
+    
+    if (fileExists(lockName)) {
+        ifstream ifs(lockName.c_str(), ios::in);
+        pid_t pid;
+        ifs >> pid;
+        if (processAlive(pid)) {
+            log_message("Process still alive for uid: " + arg + ". Aborting.");
+            exit(1);
+        }    
+    }
+    
     uid_t uid = atoi(argv[1]);
     // setsid(); /* obtain a new process group */
     setuid(uid);

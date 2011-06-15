@@ -12,6 +12,14 @@ using namespace std;
 /* spawner core library functions */
 extern "C" {
     
+    
+    bool processAlive(pid_t pid) {
+        if (kill(pid, 0) != -1) { /* pid as first param, signal 0 determines no real action, but error checking is still performed */
+            return true;
+        }
+        return false;
+    }
+    
 
     string currentDir() {
        char temp[MAXPATHLEN];
@@ -80,15 +88,19 @@ extern "C" {
     }
 
 
-    void signal_handler(int sig) {
+    void defaultSignalHandler(int sig) {
     	switch(sig) {
     	case SIGHUP:
-    		log_message("SIGHUP (hangup) signal catched");
+    		log_message("SIGHUP (hangup) signal catched. Not removing lock");
     		break;
+    		
     	case SIGTERM:
-    		log_message("SIGTERM (terminate) signal catched");
+    		log_message("SIGTERM/INT (terminate) signal catched. Removing lock");
+    		string rmCmd = "/bin/rm " + string(LOCK_FILE);
+    		system(rmCmd.c_str());
     		exit(0);
     		break;
+    		
     	}
     }
 
@@ -112,8 +124,11 @@ extern "C" {
                 log_message("Spawning socket listener");
                 createSocketServer();
             } else {
-                log_message("Parent exits.");
-                exit(0);
+                // while (true)
+                    // sleep(100);
+                // log_message("Parent exits.");
+                // exit(0);
+                return;
             }
         } 
 
@@ -150,8 +165,9 @@ extern "C" {
     	signal(SIGTSTP, SIG_IGN); /* ignore tty signals */
     	signal(SIGTTOU, SIG_IGN);
     	signal(SIGTTIN, SIG_IGN);
-    	signal(SIGHUP, signal_handler); /* catch hangup signal */
-    	signal(SIGTERM, signal_handler); /* catch kill signal */
+    	signal(SIGHUP, defaultSignalHandler); /* catch hangup signal */
+    	signal(SIGTERM, defaultSignalHandler); /* catch kill signal */
+        signal(SIGINT, defaultSignalHandler);
 
     	/* spawn svd */
     	load_svd(abs_java_bin_path, (currentDir() + JAR_FILE), main_starting_class, cmdline_param);
@@ -203,10 +219,6 @@ extern "C" {
         serv_addr.sun_family = AF_UNIX;
         strcpy(serv_addr.sun_path, SOCK_FILE);
         servlen = strlen(serv_addr.sun_path) + sizeof(serv_addr.sun_path) + sizeof(serv_addr.sun_family);
-
-        /* cleaning old socket files */
-        string rmSocket = ("/bin/rm " + string(SOCK_FILE)); // 2011-06-15 03:34:40 - dmilith - XXX: might be hacky but works?
-        system(rmSocket.c_str());
 
         if (bind(sockfd, (struct sockaddr *)&serv_addr, servlen) < 0) {
             log_message("exception while binding socket"); 
