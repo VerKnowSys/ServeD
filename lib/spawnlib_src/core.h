@@ -37,7 +37,7 @@
 #define LOG_FILE    "svd.log"
 #define INTERNAL_LOG_FILE "svd.diagnostic.log"
 #define SOCK_FILE   "svd.sock"
-#define SOCK_DATA_PACKET_SIZE 1024
+#define SOCK_DATA_PACKET_SIZE 128
 
 using namespace std;
 
