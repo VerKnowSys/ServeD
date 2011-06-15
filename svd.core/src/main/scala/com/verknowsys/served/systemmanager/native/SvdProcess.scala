@@ -42,13 +42,14 @@ class SvdProcess(
             // PENDING: TODO: XXX: perform chdir(workDir) before spawning process (add additional param to native spawn())
             log.trace("Spawning SvdProcess Thread")
             val wrapper = SvdWrapLibrary.instance
-            taken = wrapper.spawn(uid, command, outputDir / "%s.log".format(uid))
+            taken = wrapper.spawn(command)
+            log.trace("SvdProcess spawned (%s)".format(taken))
         }
     }
+    spawnerThread.setDaemon(true)
     spawnerThread.start
-    spawnerThread.join
+    // spawnerThread.join
     
-    log.trace("SvdProcess spawned (%s)".format(taken))
     
     // private val tt = taken.split(";")
     // tt.head.toInt match {
