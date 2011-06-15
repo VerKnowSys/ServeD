@@ -24,14 +24,20 @@ import sun.misc.Signal
 
 
 object userboot extends Logging {
-    def apply(userName: String){
-        val am = actorOf(new SvdAccountManager(SvdAccount(userName = userName)))
+    def apply(userUID: Int){
+        val am = actorOf(new SvdAccountManager(SvdAccount(uid = userUID)))
         remote.start("localhost", 8000)
         remote.register("service:account-manager", am)
+        log.info("Spawned UserBoot for UID: %s".format(userUID))
     }
     
     def main(args: Array[String]): Unit = {
-        userboot(System.getProperty("user.name"))
+        try {
+            userboot(args(0).toInt)
+        } catch {
+            case a: Exception => log.error("Exception occured while spawning UserBoot: %s".format(a))
+            sys.exit(1)
+        }
     }
 }
 

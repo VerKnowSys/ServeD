@@ -3,32 +3,33 @@
 
 system="$(uname)"
 
-echo "System: $system"
-
 echo "Cleaning"
-rm -rf lib/*.o lib/*.so lib/*.dylib spawn
+rm -rf lib/*.o lib/*.so lib/*.dylib *.dSYM spawn ctrlcli userspawn
 
 
 echo "Compiling library and binaries"
 case $system in
 
     Darwin)
-        g++ -c -g -O2 -pipe -shared -fPIC lib/spawnlib_src/core.cc -o lib/core.o
-        g++ -g -O2 -pipe -fPIC lib/spawnlib_src/spawn.cc -o spawn lib/core.o
+        g++ -c -O2 -pipe -shared -fPIC lib/spawnlib_src/core.cc -o lib/core.o
+        g++ -O2 -pipe -fPIC lib/spawnlib_src/spawn.cc -o spawn lib/core.o
+        g++ -O2 -pipe -fPIC lib/spawnlib_src/userspawn.cc -o userspawn lib/core.o
+        g++ -O2 -pipe -fPIC lib/spawnlib_src/controlcli.cc -o ctrlcli lib/core.o
         g++ -Wl -dynamic -dylib -shared -flat_namespace -undefined suppress -o lib/libsvdwrap.dylib lib/core.o
         rm lib/core.o
         file lib/libsvdwrap.dylib
         echo "Ready"
         ;;
-        
-    FreeBSD)
-        g++ -c -g -O2 -pipe -shared -fPIC lib/spawnlib_src/core.cc -o lib/core.o
-        g++ -g -O2 -pipe -fPIC lib/spawnlib_src/spawn.cc -o spawn lib/core.o
-        g++ -Wl -dynamic -shared -o lib/libsvdwrap.dylib lib/core.o
-        rm lib/core.o
-        file lib/libsvdwrap.so
-        echo "Ready"
-        ;;
+
+    # 2011-06-15 03:53:11 - dmilith - TODO: check FreeBSD side:
+    # FreeBSD)
+    #     g++ -c -g -O2 -pipe -shared -fPIC lib/spawnlib_src/core.cc -o lib/core.o
+    #     g++ -g -O2 -pipe -fPIC lib/spawnlib_src/spawn.cc -o spawn lib/core.o
+    #     g++ -Wl -dynamic -shared -o lib/libsvdwrap.dylib lib/core.o
+    #     rm lib/core.o
+    #     file lib/libsvdwrap.so
+    #     echo "Ready"
+    #     ;;
         
 esac
 

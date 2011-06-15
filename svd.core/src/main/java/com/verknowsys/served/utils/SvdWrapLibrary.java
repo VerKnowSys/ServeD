@@ -11,7 +11,8 @@ public interface SvdWrapLibrary extends Library {
     
     public static final SvdWrapLibrary instance = (SvdWrapLibrary) Native.loadLibrary("svdwrap", SvdWrapLibrary.class);
 
-    public String spawn(int user_uid, String command, String output_file);
+    public String spawn(String command);
+    public String sendSocketMessage(String message);
     
 }
 

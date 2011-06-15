@@ -58,12 +58,21 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             // 2011-06-10 18:30:44 - dmilith - NOTE: testing purposes:
             self ! GetAllProcesses
             self ! GetNetstat
-            Thread.sleep(SvdConfig.sleepDefaultPause)
+
+            // new SvdProcess(command = "echo dupadupa > /tmp/555556666777", uid = 501)
+            Thread.sleep(SvdConfig.sleepDefaultPause + 5000)
             
-            new SvdProcess(command = "/bin/cat /etc/passwd >> /var/tmp/500.log", uid = 501)
-            log.debug("After running process.")
+            val wrapper = SvdWrapLibrary.instance
+            wrapper.sendSocketMessage("501")
             
-            self ! Init
+            
+            
+            // 
+            // log.debug("After running process.")
+            
+            // new SvdProcess(command = "/bin/cat /etc/passwd >> /var/tmp/%s.log".format(501), uid = 501)
+            
+            // self ! Init
 
             // val a = new SvdProcess(command = "dig +trace arka.gdynia.pl", user = "root", stdOut = "/tmp/served_nobody_memcached.log")
             // log.debug("%s, status: %s".format(a, if (a.alive) "RUNNING" else "DEAD"))

@@ -70,7 +70,7 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
         
         accountManagers = Some(map.mapValues { case(host, port) =>
             val am = remote.actorFor("service:account-manager", host, port)
-            self link am
+            // self link am
             am
         })
     }
