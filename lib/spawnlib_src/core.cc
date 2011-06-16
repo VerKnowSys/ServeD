@@ -252,7 +252,7 @@ extern "C" {
         /* we also need to take care of socket server which spawns with own pid */
         pid_t sockPid = getpid();
         stringstream s;
-        s << "Socket process pid: " << sockPid << endl;
+        s << "Socket process pid: " << sockPid;
         log_message(s.str());
         umask(027); /* set newly created file permissions */
     	chdir(currentDir().c_str()); /* change running directory */
@@ -285,7 +285,8 @@ extern "C" {
             
             /* spawn userland served */
             string cmd = currentDir() + "/userspawn " + string(buf);
-            spawn((char*)cmd.c_str());
+            string result = spawn((char*)cmd.c_str());
+            log_message("Result from spawn: " + result);
         }
         close(sockfd);
     }
