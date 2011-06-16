@@ -81,6 +81,13 @@ object boot extends Logging {
     
     
     def main(args: Array[String]) {
+        println()
+        println()
+        println("==================")
+        println("===   ServeD   ===")
+        println("==================")
+        println()
+        println()
 
         if (SvdUtils.isLinux) {
             log.error("Linux systems aren't supported yet!")
