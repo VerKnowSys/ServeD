@@ -7,6 +7,12 @@
 #include "core.h"
 
 
+void usage(const char* scriptName) {
+    cout << "Usage: " << string(scriptName) << " [start | stop]" << endl;
+    exit(0);
+}
+
+
 int main(int argc, char const *argv[]) {
 
     uid_t uid = getuid();
@@ -20,7 +26,7 @@ int main(int argc, char const *argv[]) {
         exit(1);
     }
 
-    /* stop action */
+    /* stop & start action */
     if (argc != 1) {
         string arg = string(argv[1]);
         if (arg == "stop") {
@@ -39,8 +45,10 @@ int main(int argc, char const *argv[]) {
             ifs1.close();
             performCleanup();
             exit(0);
-        }
-    }
+        } else
+            if (arg != "start") usage(argv[0]);
+    } else
+        usage(argv[0]);
     
     if (fileExists(LOCK_FILE)) {
         ifstream ifs(LOCK_FILE, ios::in);
