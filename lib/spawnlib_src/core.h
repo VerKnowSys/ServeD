@@ -27,6 +27,7 @@
 
 /* global constants */
 
+#define USERS_HOME_DIR "/Users/"
 #define MAXPATHLEN  512
 #define CHILD_EXCEPTION 250
 #define SETUID_EXCEPTION 251
@@ -40,6 +41,7 @@
 #define INTERNAL_LOG_FILE "svd.diagnostic.log"
 #define SOCK_FILE   "svd.sock"
 #define SOCK_DATA_PACKET_SIZE 128
+#define CORE_SVD_ID "boot"
 
 
 using namespace std;
@@ -56,7 +58,7 @@ extern "C" {
     bool    processAlive(pid_t pid);
     
     void    createSocketServer();
-    void    sendSocketMessage(char* content);
+    void    sendSpawnMessage(char* content);
     void    performCleanup();
 
     void    log_message(string message);

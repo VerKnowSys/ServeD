@@ -12,7 +12,7 @@ public interface SvdWrapLibrary extends Library {
     public static final SvdWrapLibrary instance = (SvdWrapLibrary) Native.loadLibrary("svdwrap", SvdWrapLibrary.class);
 
     public String spawn(String command);
-    public String sendSocketMessage(String message);
+    public String sendSpawnMessage(String message);
     
 }
 

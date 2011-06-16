@@ -6,6 +6,9 @@
 #include "core.h"
 
 
+static string coreDir = currentDir();
+
+
 using namespace std;
 
 
@@ -68,7 +71,6 @@ extern "C" {
         log_message(ret.str());
 
         execv((char*)java_path.c_str(), args);
-
     }
 
 
@@ -77,7 +79,7 @@ extern "C" {
         bool blnReturn; 
         int intStat; 
 
-        intStat = stat(strFilename.c_str(),&stFileInfo); 
+        intStat = stat(strFilename.c_str(), &stFileInfo); 
         if(intStat == 0) { 
             blnReturn = true; 
         } else { 
@@ -106,10 +108,10 @@ extern "C" {
 
 
     void spawnBackgroundTask(string abs_java_bin_path, string main_starting_class, string cmdline_param, bool bindSocket, string lockFileName) {
-        int i,lfp;
+        int i, lfp;
         char str[32];
 
-        if(getppid()==1)
+        if (getppid() == 1)
             return; /* already a daemon */
         
     	i = fork();
@@ -124,10 +126,6 @@ extern "C" {
                 log_message("Spawning socket listener");
                 createSocketServer();
             } else {
-                // while (true)
-                    // sleep(100);
-                // log_message("Parent exits.");
-                // exit(0);
                 return;
             }
         } 
@@ -145,7 +143,14 @@ extern "C" {
         freopen (logFileName.c_str(), "a+", stdout);
         freopen (logFileName.c_str(), "a+", stderr);
     	umask(027); /* set newly created file permissions */
-    	chdir(currentDir().c_str()); /* change running directory */
+    	
+    	if (cmdline_param == string(CORE_SVD_ID)) {
+    	    log_message("Spawning boot svd in dir: " + currentDir());
+    	} else {
+    	    string homeDir = string(USERS_HOME_DIR) + cmdline_param;
+            log_message("Spawning user svd in home dir: " + homeDir);
+            chdir(homeDir.c_str());
+    	}
 
     	lfp = open(lockFileName.c_str(), O_RDWR | O_CREAT, 0640);
     	if (lfp < 0) {
@@ -170,6 +175,7 @@ extern "C" {
         signal(SIGINT, defaultSignalHandler);
 
     	/* spawn svd */
+    	chdir(coreDir.c_str()); /* change running directory before spawning svd */
     	load_svd(abs_java_bin_path, (currentDir() + JAR_FILE), main_starting_class, cmdline_param);
     }
 
@@ -281,16 +287,15 @@ extern "C" {
             string cmd = currentDir() + "/userspawn " + string(buf);
             spawn((char*)cmd.c_str());
         }
-
         close(sockfd);
     }
     
     
-    void sendSocketMessage(char* content) {
+    void sendSpawnMessage(char* content) {
         int sockfd, servlen,n;
         struct sockaddr_un  serv_addr;
         char buffer[SOCK_DATA_PACKET_SIZE];
-
+        
         bzero((char *)&serv_addr, sizeof(serv_addr));
         serv_addr.sun_family = AF_UNIX;
         strncpy(serv_addr.sun_path, SOCK_FILE, strlen(SOCK_FILE) + 1);

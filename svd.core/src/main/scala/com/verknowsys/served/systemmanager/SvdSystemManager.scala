@@ -63,7 +63,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             Thread.sleep(SvdConfig.sleepDefaultPause + 5000)
             
             val wrapper = SvdWrapLibrary.instance
-            wrapper.sendSocketMessage("501")
+            wrapper.sendSpawnMessage("501")
             
             
             

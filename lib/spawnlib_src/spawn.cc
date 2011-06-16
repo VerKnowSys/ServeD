@@ -59,7 +59,7 @@ int main(int argc, char const *argv[]) {
     ret << "Spawn uid: " << uid << endl;
     
     log_message(ret.str());
-    spawnBackgroundTask("/usr/bin/java", "com.verknowsys.served.boot", "boot", true, LOCK_FILE);
+    spawnBackgroundTask("/usr/bin/java", "com.verknowsys.served.boot", string(CORE_SVD_ID), true, LOCK_FILE);
     
     return 0;
 }
