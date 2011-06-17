@@ -5,6 +5,7 @@ import akka.actor._
 import akka.config.Supervision._
 import akka.actor.Actor.{remote, actorOf, registry}
 
+import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.utils.SvdUtils
 import com.verknowsys.served.utils.SvdFileEventsManager
@@ -25,13 +26,24 @@ import sun.misc.Signal
 
 object userboot extends Logging {
     def apply(userUID: Int){
-        val am = actorOf(new SvdAccountManager(SvdAccount(uid = userUID)))
+        val am = actorOf(new SvdAccountManager(SvdAccount(
+            uid = userUID,
+            homeDir = "/Users" / userUID.toString
+        )))
         remote.start("localhost", 8000)
         remote.register("service:account-manager", am)
         log.info("Spawned UserBoot for UID: %s".format(userUID))
     }
     
     def main(args: Array[String]): Unit = {
+        println()
+        println()
+        println("=========================")
+        println("===   ServeD - user   ===")
+        println("=========================")
+        println()
+        println()
+        
         try {
             userboot(args(0).toInt)
         } catch {
@@ -83,9 +95,9 @@ object boot extends Logging {
     def main(args: Array[String]) {
         println()
         println()
-        println("==================")
-        println("===   ServeD   ===")
-        println("==================")
+        println("=========================")
+        println("===   ServeD - core   ===")
+        println("=========================")
         println()
         println()
 
