@@ -2,28 +2,29 @@
 
 
 system="$(uname)"
+# debug case: export CXX="ccache g++ -g"
+export CXX="ccache g++"
 
 echo "Cleaning"
 rm -rf lib/*.o lib/*.so lib/*.dylib *.dSYM spawn ctrlcli userspawn
 
 
 echo "Compiling library and binaries"
-g++ -c -O2 -pipe -shared -fPIC lib/spawnlib_src/core.cc -o lib/core.o
-g++ -O2 -pipe -fPIC lib/spawnlib_src/spawn.cc -o spawn lib/core.o
-g++ -O2 -pipe -fPIC lib/spawnlib_src/userspawn.cc -o userspawn lib/core.o
-g++ -O2 -pipe -fPIC lib/spawnlib_src/controlcli.cc -o ctrlcli lib/core.o
+$CXX -c -O2 -pipe -shared -fPIC lib/spawnlib_src/core.cc -o lib/core.o
+$CXX -O2 -pipe -fPIC lib/spawnlib_src/spawn.cc -o spawn lib/core.o
+$CXX -O2 -pipe -fPIC lib/spawnlib_src/userspawn.cc -o userspawn lib/core.o
+$CXX -O2 -pipe -fPIC lib/spawnlib_src/controlcli.cc -o ctrlcli lib/core.o
 
 case $system in
 
     Darwin)
-        g++ -Wl -dynamic -dylib -shared -flat_namespace -undefined suppress -o lib/libsvdwrap.dylib lib/core.o
+        $CXX -Wl -dynamic -dylib -shared -flat_namespace -undefined suppress -o lib/libsvdwrap.dylib lib/core.o
         file lib/libsvdwrap.dylib
         echo "Ready"
         ;;
 
-    # 2011-06-15 03:53:11 - dmilith - TODO: check FreeBSD side:
     FreeBSD)
-        g++ -Wl -dynamic -shared -flat_namespace -o lib/libsvdwrap.so lib/core.o
+        $CXX -Wl -dynamic -shared -flat_namespace -o lib/libsvdwrap.so lib/core.o
         file lib/libsvdwrap.so
         echo "Ready"
         ;;
