@@ -288,7 +288,7 @@ extern "C" {
             
             default:
                 string cmdPrintable = escape(string(_command));
-                logFile << string(USERS_HOME_DIR) << userUid << "/" << cmdPrintable << ".log";
+                logFile << string(USERS_HOME_DIR) << userUid << "/" << pid << "--" << cmdPrintable << ".log";
                 break;
         }
         log_message("Logfile of spawn: " + logFile.str());
