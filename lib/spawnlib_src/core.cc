@@ -15,6 +15,60 @@ using namespace std;
 /* spawner core library functions */
 extern "C" {
     
+
+#ifdef DEVEL
+    
+    int getdir (string dir, vector<string> &files) {
+        DIR *dp;
+        struct dirent *dirp;
+        if((dp = opendir(dir.c_str())) == NULL) {
+            cout << "Error(" << errno << ") opening " << dir << endl;
+            return errno;
+        }
+
+        while ((dirp = readdir(dp)) != NULL) {
+            files.push_back(string(dirp->d_name));
+        }
+        closedir(dp);
+        return 0;
+    }
+    
+    
+    string getClassPath() {
+        vector<string> modules;
+        vector<string> libPaths;
+        
+        string postfixManaged = "/lib_managed/scala_2.9.0/compile/";
+        string postfixTarget = "/target/scala_2.9.0/classes/";
+
+        modules.push_back("svd.api");
+        modules.push_back("svd.core");
+        modules.push_back("svd.cli");
+        modules.push_back("svd.utils");
+
+        vector<string>::iterator it;
+        for (unsigned int ind = 0; ind < modules.size(); ind++) {
+            string prefix = modules[ind] + postfixManaged;
+            vector<string> files = vector<string>();
+            getdir(prefix, files);
+            for (unsigned int i = 0; i < files.size(); i++) {
+                libPaths.push_back(prefix + files[i]);
+            }
+            libPaths.push_back(modules[ind] + postfixTarget);
+        }
+        
+        /* also include scala */
+        libPaths.push_back(currentDir() + "/project/boot/scala-2.9.0/lib/scala-library.jar");
+        
+        stringstream ret;
+        for (it = libPaths.begin(); it < libPaths.end(); it++) {
+            ret << *it << ":";
+        }
+        ret << ".";
+        return ret.str();
+    }
+#endif
+    
     
     bool processAlive(pid_t pid) {
         if (kill(pid, 0) != -1) { /* pid as first param, signal 0 determines no real action, but error checking is still performed */
@@ -56,7 +110,13 @@ extern "C" {
             // (char*)javalp.c_str(),
             (char*)jnalp.c_str(),
             (char*)"-cp",
+#ifndef DEVEL
+            /* when not devel, use classes from assembly jar */
             (char*)jar.c_str(),
+#else
+            /* when devel, use classes from compile folders */
+            (char*)getClassPath().c_str(),
+#endif
             (char*)mainClass.c_str(),
             (char*)svd_arg.c_str(),
             (char*)0

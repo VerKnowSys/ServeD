@@ -21,10 +21,14 @@ int main(int argc, char const *argv[]) {
         exit(1);
     }
 
+#ifndef DEVEL
     if (!fileExists(currentDir() + JAR_FILE)) {
         cout << "No ServeD Core available! Rebuild svd.core first!" << endl;
         exit(1);
     }
+#else
+    cout << "Devel mode enabled" << endl;
+#endif
 
     /* stop & start action */
     if (argc != 1) {

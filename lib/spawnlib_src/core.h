@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <vector>
 #include <sys/wait.h>
 #include <limits.h>
 #include <sys/stat.h> 
@@ -23,10 +24,12 @@
 #include <signal.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-
+#include <dirent.h>
+#include <errno.h>
 
 /* global constants */
 
+#define DEVEL true
 #define USERS_HOME_DIR "/Users/"
 #define MAXPATHLEN  512
 #define CHILD_EXCEPTION 250
@@ -38,7 +41,7 @@
 #define SOCKET_LOCK_FILE "svd-ss.lock"
 #define JAR_FILE    "/svd.core/target/scala_2.9.0/core-assembly-1.0.jar"
 #define LOG_FILE    "svd.log"
-#define INTERNAL_LOG_FILE "svd.diagnostic.log"
+#define INTERNAL_LOG_FILE "svd.diagnostics.log"
 #define SOCK_FILE   "svd.sock"
 #define SOCK_DATA_PACKET_SIZE 128
 #define CORE_SVD_ID "boot"
@@ -62,5 +65,11 @@ extern "C" {
     void    performCleanup();
 
     void    log_message(string message);
+    
+#ifdef DEVEL
+
+    string getClassPath();
+    
+#endif
 
 }
