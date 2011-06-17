@@ -1,0 +1,53 @@
+\documentclass[11pt,a4paper]{report}
+
+% NOTE: packages used
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{epstopdf}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{xcolor, listings}
+\usepackage{caption}
+
+
+% NOTE: declarations and definitions document wide:
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\setlength{\parskip}{1.2ex}
+\setlength{\parindent}{2em}
+
+% dark green:
+\definecolor{green2}{HTML}{347235}
+
+\title{Spawn explanation - HOW IT WORKS}
+\author{\href{mailto:dmilith@verknowsys.com}{Daniel (dmilith) Dettlaff}}
+\date{2011-06-17}
+
+
+% NOTE: document content:
+\begin{document}
+\maketitle
+
+\section{Steps}\label{sec:steps}
+	\begin{itemize}
+		\item bin/nativebuild - will build native binaries (spawn \& userspawn) and will create dylib/so library for JNA (for svd)
+		\item spawn start\& - will spawn core svd and socket server in background
+		\item spawn stop - will stop socket server and core svd running in background
+		\item userspawn 501 - will send message to socket server and spawn user svd with uid 501
+		\item userspawn 501 stop - will stop user svd with uid 501
+	\end{itemize}
+
+\section{Scala/Java API}\label{sec:steps}
+	SvdWrapLibrary.java - contains definition of public used methods:
+	\begin{itemize}
+		\item public String spawn(String command); - used to spawn external processes (SvdProcess)
+		\item public String sendSpawnMessage(String message); - used to spawn userspawn from core svd. message is uid of user to be run as
+	\end{itemize}
+
+	
+\end{document}

@@ -80,3 +80,8 @@ svd.torturemachine/src/posix_signals/disk_load_gen
 spawn
 userspawn
 ctrlcli
+
+/docs/SpawnLib.aux
+/docs/SpawnLib.out
+/docs/SpawnLib.pdf
+/docs/SpawnLib.synctex.gz
