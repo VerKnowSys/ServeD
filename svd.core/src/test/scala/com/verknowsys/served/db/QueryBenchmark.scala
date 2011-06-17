@@ -19,7 +19,7 @@ object QueryBenchmark {
         val dbname = SvdConfig.systemTmpDir / "svd_bench/svd_db_query_benchmark.neodatis"
         rmdir(SvdConfig.systemTmpDir / "svd_bench")
         
-        val server = ODBFactory.openServer(8989)
+        val server = ODBFactory.openServer(randomPort)
 
         server.addBase("base", dbname)
         server.startServer(true)

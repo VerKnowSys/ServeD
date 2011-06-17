@@ -46,6 +46,17 @@ object SvdSpecHelpers {
         TEST_DIR / "dir_" + count + "_" + java.util.UUID.randomUUID.toString
     }
     
+    val usedPorts = scala.collection.mutable.ListBuffer[Int]()
+    def randomPort: Int = {
+        val port = util.Random.nextInt(40000) + 2000
+        if(usedPorts.contains(port)) {
+            randomPort
+        } else {
+            usedPorts += port
+            port
+        }
+    }
+    
     def testPath(path: String) = TEST_DIR / path
     
     def removeTestDir = rmdir(TEST_DIR)

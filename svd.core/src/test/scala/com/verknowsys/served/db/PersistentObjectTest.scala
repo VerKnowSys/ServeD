@@ -2,8 +2,8 @@ package com.verknowsys.served.db
 
 import org.specs._
 
-class DBObjectTest extends DatabaseTest {
-    "DBObject" should {
+class PersistentObjectTest extends DatabaseTest {
+    "Persistent object" should {
         doBefore { connect }
         doAfter { disconnect }
         

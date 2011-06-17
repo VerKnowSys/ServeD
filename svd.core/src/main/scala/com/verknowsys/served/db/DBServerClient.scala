@@ -33,7 +33,7 @@ class DBClient(val currentODB: ODB, val historyODB: ODB){
      *
      * @author teamon
      */
-    def <<[T <: DBObject : ClassManifest](newObj: T) = {
+    def <<[T <: Persistent : ClassManifest](newObj: T) = {
         // TODO: Hash neodatis internal oid when updating (relation consistency)
         find(newObj.uuid) match {
             case Some(oldObj) if oldObj != newObj =>
@@ -52,7 +52,7 @@ class DBClient(val currentODB: ODB, val historyODB: ODB){
         }
     }
     
-    protected[db] def find[T <: DBObject : ClassManifest](uuid: UUID) = {
+    protected[db] def find[T <: Persistent : ClassManifest](uuid: UUID) = {
         val col = new TopLevelCollection[T](this)
         col(uuid)
     }
@@ -120,6 +120,6 @@ class DBServer(port: Int, path: String){
  *
  * @author teamon
  */
-class DB[T <: DBObject : ClassManifest] {
+class DB[T <: Persistent : ClassManifest] {
     def apply(db: DBClient) = new TopLevelCollection[T](db)
 }

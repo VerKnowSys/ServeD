@@ -14,7 +14,7 @@ abstract class DatabaseTest extends Specification {
     def reconnect {
         if(db != null) db.close
         if(server != null) server.close
-        server = new DBServer(9000, path)
+        server = new DBServer(randomPort, path)
         db = server.openClient
     }
     
