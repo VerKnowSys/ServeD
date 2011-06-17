@@ -1,4 +1,4 @@
-package com.verknowsys.served.utils.git
+package com.verknowsys.served.git
 
 import com.verknowsys.served.utils._
 import scala.collection.JavaConversions._

@@ -2,7 +2,6 @@ package com.verknowsys.served.systemmanager.native
 
 
 import com.verknowsys.served.systemmanager.acl._
-import com.verknowsys.served.utils.git.GitRepository
 import com.verknowsys.served.utils._
 import com.verknowsys.served._
 

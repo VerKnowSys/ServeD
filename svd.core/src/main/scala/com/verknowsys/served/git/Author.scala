@@ -1,4 +1,4 @@
-package com.verknowsys.served.utils.git
+package com.verknowsys.served.git
 
 import org.eclipse.jgit.lib.PersonIdent
 

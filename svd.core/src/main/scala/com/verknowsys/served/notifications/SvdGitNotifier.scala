@@ -6,7 +6,7 @@ import scala.collection.JavaConversions._
     
 import com.verknowsys.served._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.git._
+import com.verknowsys.served.git.GitRepository
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.Logging
 

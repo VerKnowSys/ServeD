@@ -1,4 +1,4 @@
-package com.verknowsys.served.utils.git
+package com.verknowsys.served.git
 
 import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.utils._
