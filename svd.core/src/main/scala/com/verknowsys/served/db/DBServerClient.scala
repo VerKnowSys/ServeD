@@ -1,8 +1,10 @@
 package com.verknowsys.served.db
 
 import org.neodatis.odb._
+import org.neodatis.odb.core.NeoDatisError
+import com.verknowsys.served.utils.Logging
 
-class DBClient(val currentODB: ODB, val historyODB: ODB){
+class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
     /**
      * This two lines are required to make java.util.UUID work correctly with NeoDatis.
      * Because of implementation of `equals` method in java.util.UUID class which compares
@@ -63,8 +65,13 @@ class DBClient(val currentODB: ODB, val historyODB: ODB){
      * @author teamon
      */
     def close {
-        currentODB.close
-        historyODB.close
+        try {
+            if(!currentODB.isClosed()) currentODB.close
+            if(!historyODB.isClosed()) historyODB.close
+        } catch {
+            case ex: NeoDatisError => 
+                log.warn("NeoDatisError: %s", ex.toString)// XXX: Should we do something with it?
+        }
     }
 }
 
