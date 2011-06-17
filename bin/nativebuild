@@ -2,31 +2,55 @@
 
 
 system="$(uname)"
-# debug case: export CXX="ccache g++ -g"
-export CXX="ccache g++"
+ccache="$(which ccache)"
 
-echo "Cleaning"
-rm -rf lib/*.o lib/*.so lib/*.dylib *.dSYM spawn ctrlcli userspawn
+if [ "$ccache" != "" ]; then
+    echo "ccache found"
+    export CXX="ccache g++"
+else
+    echo "no ccache found"
+    export CXX="g++"
+fi
 
+rm -rf lib/*.dylib *.dSYM spawn ctrlcli userspawn
 
-echo "Compiling library and binaries"
+check() {
+    if [ "$1" = "0" ]; then
+        echo "$2 compiled sucessfully"
+    else
+        echo "Failure"
+        exit 1
+    fi
+}
+
 $CXX -c -O2 -pipe -shared -fPIC lib/spawnlib_src/core.cc -o lib/core.o
+check $? "Core"
+
 $CXX -O2 -pipe -fPIC lib/spawnlib_src/spawn.cc -o spawn lib/core.o
+check $? "Spawn"
+
 $CXX -O2 -pipe -fPIC lib/spawnlib_src/userspawn.cc -o userspawn lib/core.o
-$CXX -O2 -pipe -fPIC lib/spawnlib_src/controlcli.cc -o ctrlcli lib/core.o
+check $? "UserSpawn"
+
+# $CXX -O2 -pipe -fPIC lib/spawnlib_src/controlcli.cc -o ctrlcli lib/core.o
 
 case $system in
 
     Darwin)
         $CXX -Wl -dynamic -dylib -shared -flat_namespace -undefined suppress -o lib/libsvdwrap.dylib lib/core.o
-        file lib/libsvdwrap.dylib
-        echo "Ready"
+        check $? "Library"
         ;;
 
     FreeBSD)
         $CXX -Wl -dynamic -shared -flat_namespace -o lib/libsvdwrap.so lib/core.o
-        file lib/libsvdwrap.so
-        echo "Ready"
+        result=$?
+        if [ "$result" = "0" ]; then
+            echo "Native library compiled sucessfully"
+        else
+            echo "Failure"
+        fi
         ;;
         
 esac
+
+rm -rf lib/*.o
