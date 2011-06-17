@@ -61,8 +61,17 @@ int main(int argc, char const *argv[]) {
                 string arg2 = string(argv[2]);
                 if (arg2 == "stop") {
                     kill(pid, SIGTERM);
-                    lm << "UserSpawn (uid: " << uid << ", pid: " << pid << ") stopped.";
+                    lm << "UserSpawn (uid: " << uid << ", pid: " << pid << ") stopped." << endl;
                     log_message(lm.str());
+                    
+                    /* also remove lock file after stopping service */
+                    if (fileExists(lockName)) {
+                        lm << "Removing userspawn lock file: " << lockName << " (process is dead but file is still there)." << endl;
+                        log_message(lm.str());
+                        string rmCmd = "/bin/rm " + string(lockName);
+                		system(rmCmd.c_str());
+                    }
+                    
                     exit(0);
                 }
             }
