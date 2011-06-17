@@ -19,13 +19,13 @@
 #include <sys/wait.h>
 #include <limits.h>
 #include <sys/stat.h> 
-// #include <stdio.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <dirent.h>
 #include <errno.h>
+
 
 /* global constants */
 
@@ -64,23 +64,24 @@
 
 using namespace std;
 
+extern bool fileExists(string strFilename);
+extern string currentDir();
+extern bool processAlive(pid_t pid);
+extern void log_message(string message);
+extern void defaultSignalHandler(int sig);
+extern string escape(string input);
+extern int getdir (string dir, vector<string> &files);
 
 extern "C" {
     
     /* function prototypes */
     char*   spawn(char* _command);
     void    spawnBackgroundTask(string abs_java_bin_path, string main_starting_class, string cmdline_param, bool bindSocket, string lockFileName);
-
-    string  currentDir();
-    bool    fileExists(string strFilename);
-    bool    processAlive(pid_t pid);
     
     void    createSocketServer();
     void    sendSpawnMessage(char* content);
     void    performCleanup();
 
-    void    log_message(string message);
-    
 #ifdef DEVEL
 
     string getClassPath();
