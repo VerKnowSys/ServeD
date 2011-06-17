@@ -70,7 +70,7 @@ object boot extends Logging {
     }
     
     
-    def handleSignal(name: String, block: => Unit) {
+    def handleSignal(name: String)(block: => Unit) {
         Signal.handle(new Signal(name), new SignalHandler {
             def handle(sig: Signal) {
                 log.warn("Signal called: " + name)
@@ -81,6 +81,13 @@ object boot extends Logging {
     
     
     def main(args: Array[String]) {
+        println()
+        println()
+        println("==================")
+        println("===   ServeD   ===")
+        println("==================")
+        println()
+        println()
 
         if (SvdUtils.isLinux) {
             log.error("Linux systems aren't supported yet!")
@@ -88,8 +95,8 @@ object boot extends Logging {
         }
 
         // handle signals
-        handleSignal("ABRT", { SvdUtils.getAllLiveThreads })
-        handleSignal("USR2", { log.warn("TODO: implement USR2 handling (show svd config values)") })
+        handleSignal("ABRT") { SvdUtils.getAllLiveThreads }
+        handleSignal("USR2") { log.warn("TODO: implement USR2 handling (show svd config values)") }
         
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
         boot()
