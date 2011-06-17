@@ -32,15 +32,17 @@ class SvdGitManager(val account: SvdAccount, val db: DBClient) extends SvdManage
         //     self reply NotImplementedError
         //     
         case CreateRepository(name) =>
-            if(SvdUtils.fileExists(gitHomeDir / name + ".git")) {
-                self reply RepositoryExistsError
-            } else {
-                log.trace("Creating new git repository: %s for account: %s".format(name, account.userName))
-                val repo = Repository(name)
-                Git.init(gitHomeDir / name, bare = true)
-                db << repo
-                self reply repo
+            RepositoryDB(db)(_.name == name).headOption match {
+                case Some(repo) =>
+                    self reply RepositoryExistsError
+                case None =>
+                    log.trace("Creating new git repository: %s for account: %s".format(name, account.userName))
+                    val repo = Repository(name)
+                    Git.init(gitHomeDir / name, bare = true)
+                    db << repo
+                    self reply repo
             }
+
         //     
         // case Git.RemoveRepository(name) =>
         //     if(SvdUtils.fileExists(gitHomeDir / name + ".git")) {

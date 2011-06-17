@@ -50,10 +50,11 @@ class SvdGitManagerTest extends Specification with TestKit {
         
         "create new bare repository under git directory" in {
             manager ! CreateRepository("foo")
-            within(1 second){
+            val repo = within(1 second){
                 val repo = expectMsgClass(classOf[Repository])
                 repo.name must_== "foo"
                 repo.authorizedKeys must beEmpty
+                repo
             }
             
             homeDir / "git" must beADirectoryPath
@@ -63,21 +64,22 @@ class SvdGitManagerTest extends Specification with TestKit {
             
             manager ! ListRepositories
             within(1 second){
-                val msg = expectMsgClass(classOf[Repositories])
-                msg.repositories must haveSize(1)
-                msg.repositories.head.name must_== "foo"
-                    // case Repositories(repos) =>
-                // } //(Repositories(Repository("foo") :: Nil))
+                expectMsg(Repositories(repo :: Nil))
             }
         }
-        // 
-        // "do not allow creating repository with existing name" in {
-        //     gitm ! Git.CreateRepository("foo")
-        //     expectMsg(Success)
-        //     
-        //     gitm ! Git.CreateRepository("foo")
-        //     expectMsg(Git.RepositoryExistsError)
-        // }
+        
+        "do not allow creating repository with existing name" in {
+            manager ! CreateRepository("foo")
+            within(1 second){
+                val repo = expectMsgClass(classOf[Repository])
+                repo.name must_== "foo"
+                repo.authorizedKeys must beEmpty
+                repo
+            }
+            
+            manager ! CreateRepository("foo")
+            expectMsg(RepositoryExistsError)
+        }
         // 
         // "remove repository" in {
         //     gitm ! Git.CreateRepository("foo")
