@@ -242,32 +242,61 @@ extern "C" {
     }
 
 
+    string escape(string input) {
+        vector<string> toBeEscaped;
+        toBeEscaped.push_back(" ");
+        toBeEscaped.push_back(":");
+        toBeEscaped.push_back("/");
+        toBeEscaped.push_back("#");
+        toBeEscaped.push_back("\\");
+        toBeEscaped.push_back("'");
+        toBeEscaped.push_back("\"");
+        for (unsigned int ind = 0; ind < toBeEscaped.size(); ind++) {
+            int position = input.find(toBeEscaped[ind]);
+            while (position != string::npos) {
+                input.replace(position, 1, "_");
+                position = input.find(toBeEscaped[ind], position + 1);
+            }  
+        }
+        return input;
+    }
+
+
     char* spawn(char* _command) {
+        ofstream        ofs;
         FILE            *fpipe = NULL;
-        stringstream    ret;
+        stringstream    ret, logFile;
         int             childExitStatus = 0;
         pid_t           pid = 0;
         pid_t           ppid = getppid();
-        char            line[256];
+        char            line[1024];
+        uid_t           userUid;
 
         log_message("Spawning command: " + string(_command));
         if (!(fpipe = (FILE*)popen(_command, "r"))) {
             ret << POPEN_EXCEPTION;
             return (char*)(ret.str()).c_str();
         }
-        while (fgets(line, sizeof(line), fpipe)) {
-            ret << string(line);
-        }
-
-        // fpipe = NULL;
-        // if (childExitStatus == -1) {
-        //     ret << CHILD_EXCEPTION;
-        //     return (char*)(ret.str()).c_str();
-        // }
-
-        // setbuf(stdout, NULL);
-        // setbuf(stderr, NULL);
         pid = getpid();
+        userUid = getuid();
+        
+        switch (userUid) {
+            case 0:
+                logFile << "/dev/null"; /* we're already handling log files for root */
+                break;
+            
+            default:
+                string cmdPrintable = escape(string(_command));
+                logFile << string(USERS_HOME_DIR) << userUid << "/" << cmdPrintable << ".log";
+                break;
+        }
+        log_message("Logfile of spawn: " + logFile.str());
+        
+        ofs.open(logFile.str().c_str());
+        while (fgets(line, sizeof(line), fpipe)) {
+            ofs << line;
+        }
+        ofs.close();
         pclose(fpipe);
         ret << ppid << ";" << pid;
         return (char*)(ret.str()).c_str();
