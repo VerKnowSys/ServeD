@@ -59,6 +59,9 @@ extern "C" {
         /* also include scala */
         libPaths.push_back(currentDir() + string(SCALA_LIBRARY));
         
+        /* include akka.conf to classpath */
+        libPaths.push_back(currentDir() + string(AKKA_CONF));
+        
         stringstream ret;
         for (it = libPaths.begin(); it < libPaths.end(); it++) {
             ret << *it << ":";

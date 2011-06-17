@@ -57,6 +57,7 @@
 #define POSTFIX_MANAGED_JARS "/lib_managed/scala_2.9.0/compile/"
 #define POSTFIX_TARGET_CLASSES "/target/scala_2.9.0/classes/"
 #define SCALA_LIBRARY "/project/boot/scala-2.9.0/lib/scala-library.jar"
+#define AKKA_CONF "/svd.core/src/main/resources/"
 
 #endif
 
