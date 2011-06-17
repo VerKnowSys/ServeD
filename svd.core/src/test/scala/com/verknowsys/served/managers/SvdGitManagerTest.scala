@@ -51,7 +51,9 @@ class SvdGitManagerTest extends Specification with TestKit {
         "create new bare repository under git directory" in {
             manager ! CreateRepository("foo")
             within(1 second){
-                expectMsg(Success)
+                val repo = expectMsgClass(classOf[Repository])
+                repo.name must_== "foo"
+                repo.authorizedKeys must beEmpty
             }
             
             homeDir / "git" must beADirectoryPath

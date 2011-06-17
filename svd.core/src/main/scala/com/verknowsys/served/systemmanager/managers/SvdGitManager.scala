@@ -39,7 +39,7 @@ class SvdGitManager(val account: SvdAccount, val db: DBClient) extends SvdManage
                 val repo = Repository(name)
                 Git.init(gitHomeDir / name, bare = true)
                 db << repo
-                self reply Success
+                self reply repo
             }
         //     
         // case Git.RemoveRepository(name) =>

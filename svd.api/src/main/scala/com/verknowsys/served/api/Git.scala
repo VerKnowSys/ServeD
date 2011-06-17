@@ -21,7 +21,7 @@ package git {
     
     // @messages
     case class CreateRepository(name: String) extends Base
-        // Success
+        // Repository
         case object RepositoryExistsError
     
     
