@@ -14,11 +14,13 @@ int main(int argc, char const *argv[]) {
     
     stringstream lm;
     
+#ifndef DEVEL
     if (!fileExists(currentDir() + JAR_FILE)) {
         lm << "No ServeD Core available! Rebuild svd.core first!";
         log_message(lm.str());
         exit(1);
     }
+#endif
     
     if (argc == 1) {
         lm << "First argument must be uid of user to run ServeD userspace";
@@ -46,7 +48,7 @@ int main(int argc, char const *argv[]) {
     string lockName = homeDir + "/" + string(LOCK_FILE);
     pid_t pid;
     
-    chdir(homeDir.c_str());    
+    chdir(homeDir.c_str());
 
     uid_t uid = atoi(argv[1]);
     
@@ -55,18 +57,21 @@ int main(int argc, char const *argv[]) {
         ifs >> pid;
         if (processAlive(pid)) {
             /* stop action */
-            string arg2 = string(argv[2]);
-            if (arg2 == "stop") {
-                kill(pid, SIGTERM);
-                lm << "UserSpawn (uid: " << uid << "pid: " << pid << ") stopped.";
-                log_message(lm.str());
-                exit(0);
+            if (argv[2] != NULL) {
+                string arg2 = string(argv[2]);
+                if (arg2 == "stop") {
+                    kill(pid, SIGTERM);
+                    lm << "UserSpawn (uid: " << uid << ", pid: " << pid << ") stopped.";
+                    log_message(lm.str());
+                    exit(0);
+                }
             }
-            log_message("Process still alive for uid: " + arg + ". Aborting.");
+            lm << "Process still alive for uid: " << uid << ". Aborting.";
+            log_message(lm.str());
             exit(1);
         } else { /* process isn't alive but socket/lock file still exist? */
             if (fileExists(lockName)) {
-                lm << "Removing userspawn lock file: " << lockName << " (process is dead but file is still there).";
+                lm << "Removing userspawn lock file: " << lockName << " (process is dead but file is still there)." << endl;
                 log_message(lm.str());
                 string rmCmd = "/bin/rm " + string(lockName);
         		system(rmCmd.c_str());
@@ -74,7 +79,6 @@ int main(int argc, char const *argv[]) {
         }
         ifs.close();
     }
-    
     
     setuid(uid);
     lm << "Given param uid: " << uid;
