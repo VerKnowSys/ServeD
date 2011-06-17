@@ -246,6 +246,7 @@ extern "C" {
         vector<string> toBeEscaped;
         toBeEscaped.push_back(" ");
         toBeEscaped.push_back(":");
+        toBeEscaped.push_back(";");
         toBeEscaped.push_back("/");
         toBeEscaped.push_back("#");
         toBeEscaped.push_back("\\");
