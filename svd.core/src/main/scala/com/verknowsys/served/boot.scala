@@ -5,9 +5,7 @@ import akka.actor._
 import akka.config.Supervision._
 import akka.actor.Actor.{remote, actorOf, registry}
 
-import com.verknowsys.served.utils.Logging
-import com.verknowsys.served.utils.SvdUtils
-import com.verknowsys.served.utils.SvdFileEventsManager
+import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.managers.LoggingManager
 import com.verknowsys.served.maintainer.SvdSystemInfo
 import com.verknowsys.served.maintainer.SvdApiConnection
@@ -29,9 +27,20 @@ object userboot extends Logging {
         remote.start("localhost", 8000)
         remote.register("service:account-manager", am)
         log.info("Spawned UserBoot for UID: %s".format(userUID))
+        
+        val wrapper = SvdWrapLibrary.instance
+        wrapper.spawn("env");
+        wrapper.spawn("initdb -D /Users/501/database_of_501");
     }
     
     def main(args: Array[String]): Unit = {
+        println()
+        println()
+        println("==================")
+        println("===   ServeD   ===")
+        println("==================")
+        println()
+        println()
         try {
             userboot(args(0).toInt)
         } catch {
