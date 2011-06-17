@@ -32,7 +32,6 @@
 #define DEVEL true
 #define USERS_HOME_DIR "/Users/"
 #define MAXPATHLEN  512
-#define CHILD_EXCEPTION 250
 #define SETUID_EXCEPTION 251
 #define POPEN_EXCEPTION 252
 #define FORK_EXCEPTION 253
@@ -45,6 +44,21 @@
 #define SOCK_FILE   "svd.sock"
 #define SOCK_DATA_PACKET_SIZE 128
 #define CORE_SVD_ID "boot"
+
+
+#ifdef DEVEL
+
+/* svd modules definitions */
+#define API_MODULE "svd.api"
+#define CORE_MODULE "svd.core"
+#define CLI_MODULE "svd.cli"
+#define UTILS_MODULE "svd.utils"
+
+#define POSTFIX_MANAGED_JARS "/lib_managed/scala_2.9.0/compile/"
+#define POSTFIX_TARGET_CLASSES "/target/scala_2.9.0/classes/"
+#define SCALA_LIBRARY "/project/boot/scala-2.9.0/lib/scala-library.jar"
+
+#endif
 
 
 using namespace std;

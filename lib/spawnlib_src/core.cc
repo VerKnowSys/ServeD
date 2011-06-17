@@ -37,16 +37,15 @@ extern "C" {
     string getClassPath() {
         vector<string> modules;
         vector<string> libPaths;
-        
-        string postfixManaged = "/lib_managed/scala_2.9.0/compile/";
-        string postfixTarget = "/target/scala_2.9.0/classes/";
-
-        modules.push_back("svd.api");
-        modules.push_back("svd.core");
-        modules.push_back("svd.cli");
-        modules.push_back("svd.utils");
+        string postfixManaged = string(POSTFIX_MANAGED_JARS);
+        string postfixTarget = string(POSTFIX_TARGET_CLASSES);
+        modules.push_back(API_MODULE);
+        modules.push_back(CORE_MODULE);
+        modules.push_back(CLI_MODULE);
+        modules.push_back(UTILS_MODULE);
 
         vector<string>::iterator it;
+        /* list and create jar file list to pass to java */
         for (unsigned int ind = 0; ind < modules.size(); ind++) {
             string prefix = modules[ind] + postfixManaged;
             vector<string> files = vector<string>();
@@ -58,7 +57,7 @@ extern "C" {
         }
         
         /* also include scala */
-        libPaths.push_back(currentDir() + "/project/boot/scala-2.9.0/lib/scala-library.jar");
+        libPaths.push_back(currentDir() + string(SCALA_LIBRARY));
         
         stringstream ret;
         for (it = libPaths.begin(); it < libPaths.end(); it++) {
