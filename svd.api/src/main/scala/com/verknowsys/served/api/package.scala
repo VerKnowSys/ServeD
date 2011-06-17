@@ -12,4 +12,7 @@ package object api {
                 fromBinaryToRemoteActorRef(protocol.toByteArray)
         }
     }
+    
+    type UUID = java.util.UUID
+    def randomUUID = java.util.UUID.randomUUID
 }
