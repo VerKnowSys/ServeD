@@ -25,19 +25,18 @@ class SvdGitManager(val account: SvdAccount, val db: DBClient) extends SvdManage
     def receive = {
         case ListRepositories =>
             log.trace("Listing git repositories in %s", gitHomeDir)
-            self reply Repositories(RepositoryDB(db).toList)
-            
-        // case Git.ShowRepository(name) =>
-        //     log.warn("Unimplemented yet!") // TODO: NIY
-        //     self reply NotImplementedError
-        //     
+            val repos = RepositoryDB(db).toList
+            log.trace(repos.toString)
+            self reply Repositories(repos)
+            // self reply Repositories(Nil)
+
         case CreateRepository(name) =>
             RepositoryDB(db)(_.name == name).headOption match {
                 case Some(repo) =>
                     self reply RepositoryExistsError
                 case None =>
                     log.trace("Creating new git repository: %s for account: %s".format(name, account.userName))
-                    val repo = Repository(name)
+                    val repo = Repo(name)
                     Git.init(gitHomeDir / repo.name, bare = true)
                     db << repo
                     self reply repo
