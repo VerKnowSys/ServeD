@@ -1,11 +1,10 @@
 #!/bin/sh
 
-
 pwd=$(pwd)
-jar="${pwd}/svd.cli/target/scala_2.9.0/cli_2.9.0-1.0-onejar.jar"
+jar="${pwd}/svd.web/target/scala_2.9.0/web_2.9.0-1.0.war"
 
 rm $jar
-sbt "project cli" compile package assembly
+sbt "project web" compile package
 
 if [ -e "${jar}" ]; then
     echo "Executing: ${jar}"
