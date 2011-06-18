@@ -31,7 +31,7 @@ package git {
     
     case class RemoveRepository(uuid: UUID) extends Base
         // Success
-        case object RepositoryDoesNotExistsError
+        case object RepositoryDoesNotExistError
     
     
     case object ListRepositories extends Base

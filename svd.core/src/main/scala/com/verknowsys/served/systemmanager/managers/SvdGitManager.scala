@@ -21,7 +21,7 @@ import akka.actor.Actor.{remote, actorOf, registry}
 class SvdGitManager(val account: SvdAccount, val db: DBClient) extends SvdManager(account) with DatabaseAccess {
     log.info("Starting GitManager for account: " + account)
 
-    
+
     def receive = {
         case ListRepositories =>
             log.trace("Listing git repositories in %s", gitHomeDir)
@@ -38,20 +38,21 @@ class SvdGitManager(val account: SvdAccount, val db: DBClient) extends SvdManage
                 case None =>
                     log.trace("Creating new git repository: %s for account: %s".format(name, account.userName))
                     val repo = Repository(name)
-                    Git.init(gitHomeDir / name, bare = true)
+                    Git.init(gitHomeDir / repo.name, bare = true)
                     db << repo
                     self reply repo
             }
 
-        //     
-        // case Git.RemoveRepository(name) =>
-        //     if(SvdUtils.fileExists(gitHomeDir / name + ".git")) {
-        //         log.trace("Removing git repository: %s for account: %s".format(name, account.userName))
-        //         SvdUtils.rmdir(gitHomeDir / name + ".git")
-        //         self reply Success
-        //     } else {
-        //         self reply Git.RepositoryDoesNotExistError
-        //     }
+        case RemoveRepository(uuid) =>
+            RepositoryDB(db)(uuid) match {
+                case Some(repo) =>
+                    log.trace("Removing git repository: %s for account: %s".format(repo.name, account.userName))
+                    db ~ repo
+                    SvdUtils.rmdir(gitHomeDir / repo.name + ".git")
+                    self reply Success
+                case None =>
+                    self reply RepositoryDoesNotExistError
+            }
     }
 
     

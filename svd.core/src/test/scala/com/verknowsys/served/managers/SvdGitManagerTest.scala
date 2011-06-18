@@ -17,7 +17,6 @@ import org.specs._
 
 
 class SvdGitManagerTest extends Specification with TestKit {
-
     val account = currentAccount
     val homeDir = account.homeDir
     
@@ -80,24 +79,31 @@ class SvdGitManagerTest extends Specification with TestKit {
             manager ! CreateRepository("foo")
             expectMsg(RepositoryExistsError)
         }
-        // 
-        // "remove repository" in {
-        //     gitm ! Git.CreateRepository("foo")
-        //     expectMsg(Success)
-        //     
-        //     gitm ! Git.ListRepositories
-        //     expectMsg(Git.Repositories("foo" :: Nil))
-        //     
-        //     gitm ! Git.RemoveRepository("foo")
-        //     expectMsg(Success)
-        //     
-        //     gitm ! Git.ListRepositories
-        //     expectMsg(Git.Repositories(Nil))
-        // }
-        // 
-        // "raise error when removing non existing repository" in {
-        //     gitm ! Git.RemoveRepository("foo")
-        //     expectMsg(Git.RepositoryDoesNotExistError)
-        // }
+
+        "remove repository" in {
+            manager ! CreateRepository("foo")
+            val foo = within(1 second){
+                expectMsgClass(classOf[Repository])
+            }
+            
+            manager ! RemoveRepository(foo.uuid)
+            
+            within(1 second){
+                expectMsg(Success)
+            }
+            homeDir / "git" / "foo.git" mustNot beADirectoryPath
+            
+            manager ! ListRepositories
+            within(1 second){
+                expectMsg(Repositories(Nil))
+            }
+        }
+
+        "raise error when removing non existing repository" in {
+            manager ! RemoveRepository(java.util.UUID.randomUUID)
+            within(1 second){
+                expectMsg(RepositoryDoesNotExistError)
+            }
+        }
     }
 }
