@@ -26,7 +26,6 @@ extern "C" {
         string postfixTarget = string(POSTFIX_TARGET_CLASSES);
         modules.push_back(API_MODULE);
         modules.push_back(CORE_MODULE);
-        modules.push_back(CLI_MODULE);
         modules.push_back(UTILS_MODULE);
 
         vector<string>::iterator it;

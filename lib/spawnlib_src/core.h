@@ -51,7 +51,6 @@
 /* svd modules definitions */
 #define API_MODULE "svd.api"
 #define CORE_MODULE "svd.core"
-#define CLI_MODULE "svd.cli"
 #define UTILS_MODULE "svd.utils"
 
 #define POSTFIX_MANAGED_JARS "/lib_managed/scala_2.9.0/compile/"
