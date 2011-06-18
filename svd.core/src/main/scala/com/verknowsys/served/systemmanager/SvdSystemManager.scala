@@ -10,6 +10,7 @@ import com.verknowsys.served.api._
 import com.verknowsys.served.utils.monitor.SvdMonitored
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.Logging
+import com.verknowsys.served.utils.GlobalActorRef
 
 import org.hyperic.sigar._
 import java.io.FileNotFoundException
@@ -22,6 +23,8 @@ import scala.collection.JavaConversions._
 
 
 case class ProcessesList(pids: List[Long])
+
+object SvdSystemManager extends GlobalActorRef(Actor.registry.actorFor[SvdSystemManager])
 
 
 /**
