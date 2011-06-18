@@ -29,9 +29,6 @@ class SvdAccountManager(val account: SvdAccount) extends Actor with SvdException
     val gitManager = Actor.actorOf(new SvdGitManager(account, dbServer.openClient))
     self startLink gitManager
     
-    
-    def sm = registry.actorFor[SvdSystemManager]
-    
     // val gatherer = Actor.actorOf(new SvdGatherer(account))
     // self startLink gatherer
 
@@ -39,20 +36,22 @@ class SvdAccountManager(val account: SvdAccount) extends Actor with SvdException
     def receive = {
         case Init =>
             log.info("SvdAccountManager received Init.")
-            sm.foreach{ _ ! GetAllProcesses}
-            sm.foreach{ _ ! GetNetstat}
+            SvdSystemManager ! GetAllProcesses
+            SvdSystemManager ! GetNetstat
             
             // Create a new ExpectJ object with a timeout of 5s
             val expectinator = new ExpectJ(5) 
 
             // Fork the process
             val shell = expectinator.spawn("/bin/sh")
+            shell.send("export USER=%s\n".format(account.userName))
+            
             // shell.send("set -v off")
             shell.send("echo Chunder\n")
             shell.expect("Chunder")
-            shell.send("export USER=%s\n".format(account.userName))
             shell.send("echo $USER\n")
             // shell.expect("dmilith")
+            shell.send("rm -rf /Users/501/THE_DB_by_initdb\n")
             shell.send("initdb -D /Users/501/THE_DB_by_initdb\n")
             shell.expect("Success. You can now start the database server using:")
 
