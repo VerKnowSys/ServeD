@@ -5,6 +5,7 @@ import java.io.File
 import reaktor.scct.ScctProject
 import org.coffeescript.CoffeeScriptCompile
 import com.github.retronym.OneJarProject
+import net.usersource.jettyembed._
 
 
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
@@ -73,7 +74,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
     
     
-    class SvdWeb(info: ProjectInfo) extends DefaultWebProject(info) with CoffeeScriptCompile {
+    class SvdWeb(info: ProjectInfo) extends JettyEmbedWebProject(info) with CoffeeScriptCompile {
         val scalaToolsSnapshots = "scala-tools snapshots" at "http://scala-tools.org/repo-snapshots/"
         val liftVersion = "2.4-SNAPSHOT"
         
@@ -82,7 +83,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         override def libraryDependencies = Set(
           "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
           // "net.liftweb" % "lift-mapper_2.9.0-1" % liftVersion % "compile->default",
-          "org.mortbay.jetty" % "jetty" % "6.1.26" % "test->default"
+          // "org.mortbay.jetty" % "jetty" % "6.1.26" % "test->default"
           // "org.scala-tools.testing" % "specs" % "1.6.2.1" % "test->default"
           // "junit" % "junit" % "4.5" % "test->default",
           // "com.h2database" % "h2" % "1.2.138"
