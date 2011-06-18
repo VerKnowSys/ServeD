@@ -47,7 +47,7 @@ int main(int argc, char const *argv[]) {
             kill(pid, SIGTERM);
             cout << "Spawn Socket-Server stopped." << endl;
             ifs1.close();
-            performCleanup();
+            cleanupLockAndSockFIles();
             exit(0);
         } else
             if (arg != "start") usage(argv[0]);
@@ -62,7 +62,7 @@ int main(int argc, char const *argv[]) {
             cout << "Process still alive for core svd (pid: " << pid << "). Aborting." << endl;
             exit(1);
         } else { /* process isn't alive but socket/lock file still exist? */
-            performCleanup();
+            cleanupLockAndSockFIles();
         }
         ifs.close();
     }

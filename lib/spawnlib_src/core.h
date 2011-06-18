@@ -71,6 +71,7 @@ extern void log_message(string message);
 extern void defaultSignalHandler(int sig);
 extern string escape(string input);
 extern int getdir (string dir, vector<string> &files);
+extern void cleanupLockAndSockFIles();
 
 extern "C" {
     
@@ -80,7 +81,6 @@ extern "C" {
     
     void    createSocketServer();
     void    sendSpawnMessage(char* content);
-    void    performCleanup();
 
 #ifdef DEVEL
 
