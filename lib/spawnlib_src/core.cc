@@ -56,7 +56,7 @@ extern "C" {
 #endif
 
 
-    void load_svd(string java_path, string jar, string mainClass, string svd_arg) {
+    void load_svd(string java_path, string jar, string mainClassParam, string svd_arg) {
         // string javalp = "-Djava.library.path=" + currentDir() + "/lib";
         string jnalp = "-Djna.library.path=" + currentDir() + "/lib";
 
@@ -71,15 +71,17 @@ extern "C" {
             (char*)"-Dfile.encoding=UTF-8",
             // (char*)javalp.c_str(),
             (char*)jnalp.c_str(),
-            (char*)"-jar",
 #ifndef DEVEL
             /* when not devel, use classes from assembly jar */
+            (char*)"-jar",
             (char*)jar.c_str(),
 #else
             /* when devel, use classes from compile folders */
+            (char*)"-cp",
             (char*)getClassPath().c_str(),
+            (char*)MAIN_CLASS,
 #endif
-            (char*)mainClass.c_str(),
+            (char*)mainClassParam.c_str(),
             (char*)svd_arg.c_str(),
             (char*)0
         };
@@ -96,7 +98,7 @@ extern "C" {
     }
 
 
-    void spawnBackgroundTask(string abs_java_bin_path, string main_starting_class, string cmdline_param, bool bindSocket, string lockFileName) {
+    void spawnBackgroundTask(string abs_java_bin_path, string main_starting_class_param, string cmdline_param, bool bindSocket, string lockFileName) {
         int i, lfp;
         char str[32];
 
@@ -161,7 +163,7 @@ extern "C" {
 
     	/* spawn svd */
     	chdir(coreDir.c_str()); /* change running directory before spawning svd */
-    	load_svd(abs_java_bin_path, (currentDir() + JAR_FILE), main_starting_class, cmdline_param);
+    	load_svd(abs_java_bin_path, (currentDir() + JAR_FILE), main_starting_class_param, cmdline_param);
     }
 
 

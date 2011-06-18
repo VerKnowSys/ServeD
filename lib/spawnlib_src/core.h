@@ -29,7 +29,7 @@
 
 /* global constants */
 
-// #define DEVEL true
+#define DEVEL true
 #define USERS_HOME_DIR "/Users/"
 #define MAXPATHLEN  512
 #define SETUID_EXCEPTION 251
@@ -49,6 +49,8 @@
 #ifdef DEVEL
 
 /* svd modules definitions */
+
+#define MAIN_CLASS "com.verknowsys.served.boot"
 #define API_MODULE "svd.api"
 #define CORE_MODULE "svd.core"
 #define UTILS_MODULE "svd.utils"
