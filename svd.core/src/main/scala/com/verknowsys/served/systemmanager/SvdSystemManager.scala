@@ -56,15 +56,14 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             )
 
             // 2011-06-10 18:30:44 - dmilith - NOTE: testing purposes:
-            self ! GetAllProcesses
-            self ! GetNetstat
+            // self ! GetAllProcesses
+            // self ! GetNetstat
 
             // new SvdProcess(command = "echo dupadupa > /tmp/555556666777", uid = 501)
-            Thread.sleep(SvdConfig.sleepDefaultPause + 5000)
+            // Thread.sleep(SvdConfig.sleepDefaultPause + 3000)
             
             val wrapper = SvdWrapLibrary.instance
             wrapper.sendSpawnMessage("501")
-            
             
             
             // 

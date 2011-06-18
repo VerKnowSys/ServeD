@@ -14,7 +14,6 @@ import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.systemmanager.managers.SvdAccountManager
 import com.verknowsys.served.systemmanager.native.SvdAccount
-
 import com.verknowsys.served.api._
 
 import sun.misc.SignalHandler
@@ -29,18 +28,15 @@ object userboot extends Logging {
         )))
         remote.start("localhost", 8000)
         remote.register("service:account-manager", am)
+        am ! Init
         log.info("Spawned UserBoot for UID: %s".format(userUID))
-        
-        val wrapper = SvdWrapLibrary.instance
-        wrapper.spawn("env");
-        wrapper.spawn("initdb -D /Users/501/database_of_501");
     }
     
     def main(args: Array[String]): Unit = {
         println()
         println()
         println("=========================")
-        println("===   ServeD - user   ===")
+        println("===   ServeD - %4s   ===".format(args(0)))
         println("=========================")
         println()
         println()
