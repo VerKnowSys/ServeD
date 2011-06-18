@@ -44,6 +44,10 @@ class LoggingTest extends Specification with TestKit {
             LoggerUtils.update
             ref = Actor.actorOf[LoggingManager].start()
         }
+
+        doAfter {
+            Actor.registry.shutdownAll
+        }
         
         "List logger entries" in {
             val res = ref !! Logger.ListEntries
