@@ -94,6 +94,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         // val jgitRepository = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
         // val pircbot     = "pircbot" % "pircbot" % "1.4.2"
         // val smackx      = "jivesoftware" % "smackx" % "3.0.4"
+        val expect4j = "net.sourceforge.expectj" % "expectj" % "2.0.1"
         val smack = "jivesoftware" % "smack" % "3.0.4"
         val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "0.11.1-SNAPSHOT" // Move it out
         val akkaRemote = akkaModule("remote")
