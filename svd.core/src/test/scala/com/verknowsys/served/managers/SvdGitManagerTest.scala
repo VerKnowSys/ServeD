@@ -42,14 +42,14 @@ class SvdGitManagerTest extends Specification with TestKit {
         "return empty repository list" in {
             manager ! ListRepositories
             
-            within(1 second){
+            within(3 seconds){
                 expectMsg(Repositories(Nil))
             }
         }
         
         "create new bare repository under git directory" in {
             manager ! CreateRepository("foo")
-            val repo = within(1 second){
+            val repo = within(3 seconds){
                 val repo = expectMsgClass(classOf[Repository])
                 repo.name must_== "foo"
                 repo.authorizedKeys must beEmpty
@@ -62,14 +62,14 @@ class SvdGitManagerTest extends Specification with TestKit {
             new GitRepository(homeDir / "git" / "foo.git").isBare must beTrue
             
             manager ! ListRepositories
-            within(1 second){
+            within(3 seconds){
                 expectMsg(Repositories(repo :: Nil))
             }
         }
         
         "do not allow creating repository with existing name" in {
             manager ! CreateRepository("foo")
-            within(1 second){
+            within(3 seconds){
                 val repo = expectMsgClass(classOf[Repository])
                 repo.name must_== "foo"
                 repo.authorizedKeys must beEmpty
@@ -82,26 +82,26 @@ class SvdGitManagerTest extends Specification with TestKit {
 
         "remove repository" in {
             manager ! CreateRepository("foo")
-            val foo = within(1 second){
+            val foo = within(3 second){
                 expectMsgClass(classOf[Repository])
             }
             
             manager ! RemoveRepository(foo.uuid)
             
-            within(1 second){
+            within(3 second){
                 expectMsg(Success)
             }
             homeDir / "git" / "foo.git" mustNot beADirectoryPath
             
             manager ! ListRepositories
-            within(1 second){
+            within(3 second){
                 expectMsg(Repositories(Nil))
             }
         }
 
         "raise error when removing non existing repository" in {
             manager ! RemoveRepository(java.util.UUID.randomUUID)
-            within(1 second){
+            within(3 seconds){
                 expectMsg(RepositoryDoesNotExistError)
             }
         }

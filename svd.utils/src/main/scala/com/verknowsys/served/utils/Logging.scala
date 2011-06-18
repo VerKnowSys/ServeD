@@ -1,6 +1,6 @@
 package com.verknowsys.served.utils
 
-import akka.actor.Actor
+import akka.actor.{Actor, ActorRef}
 import akka.event.EventHandler
 import java.io.FileWriter
 
@@ -87,6 +87,7 @@ abstract class AbstractLogger(klazz: String) {
     def error(msg: => String) = log(Error, msg)
     def error(msg: String, arg: Any, args: Any*): Unit = error(msg.format((arg :: args.toList):_*))
     
+    
     def warn(msg: => String) = log(Warn, msg)
     def warn(msg: String, arg: Any, args: Any*): Unit = warn(msg.format((arg :: args.toList):_*))
     
@@ -112,19 +113,29 @@ class LoggingEventHandler extends Actor with Logging {
     self.dispatcher = EventHandler.EventHandlerDispatcher
     
     def receive = {
-        case EventHandler.Error(cause, instance, message) => 
-            log.log(Error, message.toString, instance.getClass.getName)
+        case EventHandler.Error(cause, instance, message) =>
+            log.log(Error, message.toString, resolveClassName(instance))
+            log.log(Error, cause.toString, resolveClassName(instance))
+            cause.printStackTrace(System.out)
         
         case EventHandler.Warning(instance, message) =>  
-            log.log(Warn, message.toString, instance.getClass.getName)
+            log.log(Warn, message.toString, resolveClassName(instance.getClass.getName))
         
         case EventHandler.Info(instance, message) =>
-            log.log(Info, message.toString, instance.getClass.getName)
+            log.log(Info, message.toString, resolveClassName(instance.getClass.getName))
             
         case EventHandler.Debug(instance, message) =>
-            log.log(Debug, message.toString, instance.getClass.getName)
+            log.log(Debug, message.toString, resolveClassName(instance.getClass.getName))
             
         case event => 
             log.debug(event.toString)
+    }
+    
+    def resolveClassName(x: AnyRef) = {
+        val name = x match {
+            case ar: ActorRef => ar.actorClassName
+            case _ => x.getClass.getName
+        }
+        name + "(akka)"
     }
 }

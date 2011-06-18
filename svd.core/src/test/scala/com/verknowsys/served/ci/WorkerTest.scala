@@ -25,6 +25,10 @@ case class TestTask(name: String) extends Task(name)
 
 class WorkerTest extends Specification with TestKit {
     "Worker" should {
+        doAfter {
+            registry.shutdownAll
+        }
+        
         "return Success with empty history when given empty task list" in {
             val worker = actorOf(new TestWorker(Nil)).start
             worker ! Build

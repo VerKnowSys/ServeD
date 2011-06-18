@@ -20,8 +20,8 @@ import org.specs._
 
 class SvdGathererTest extends Specification with TestKit {
 
-    val homeDir1 = testPath("home/teamon")
-    val homeDir2 = testPath("home/dmilith")
+    val homeDir1 = randomPath //testPath("home/teamon")
+    val homeDir2 = randomPath //testPath("home/dmilith")
     
     val account1 = new SvdAccount(userName = "teamon", homeDir = homeDir1)
     val account2 = new SvdAccount(userName = "dmilith", homeDir = homeDir2)

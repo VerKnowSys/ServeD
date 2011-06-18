@@ -8,5 +8,5 @@ import com.verknowsys.served.db.DB
  */
 
 package git {
-    object RepositoryDB extends DB[Repository]
+    object RepositoryDB extends DB[Repo]
 }
