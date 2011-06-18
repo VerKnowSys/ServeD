@@ -29,7 +29,7 @@
 
 /* global constants */
 
-#define DEVEL true
+// #define DEVEL true
 #define USERS_HOME_DIR "/Users/"
 #define MAXPATHLEN  512
 #define SETUID_EXCEPTION 251
@@ -38,7 +38,7 @@
 #define EXIT_FAILURE_EXCEPTION 254
 #define LOCK_FILE	"svd-core.lock"
 #define SOCKET_LOCK_FILE "svd-ss.lock"
-#define JAR_FILE    "/svd.core/target/scala_2.9.0/core-assembly-1.0.jar"
+#define JAR_FILE    "/svd.core/target/scala_2.9.0/core_2.9.0-1.0-onejar.jar"
 #define LOG_FILE    "svd.log"
 #define INTERNAL_LOG_FILE "svd.diagnostics.log"
 #define SOCK_FILE   "svd.sock"

@@ -41,20 +41,6 @@ object userboot extends Logging {
         println()
         println()
         
-        try {
-            userboot(args(0).toInt)
-        } catch {
-            case a: Exception => log.error("Exception occured while spawning UserBoot: %s".format(a))
-            sys.exit(1)
-        }
-    }
-}
-
-
-object boot extends Logging {
-
-
-    def apply() {
         val list = (
             actorOf[SvdFileEventsManager] ::
             actorOf[LoggingManager] ::
@@ -78,6 +64,28 @@ object boot extends Logging {
         remote.registerPerSession("service:api", actorOf[SvdApiConnection])
     }
     
+    def user(userUID: Int){
+        println()
+        println()
+        println("=========================")
+        println("===   ServeD - user   ===")
+        println("=========================")
+        println()
+        println()
+        
+        val am = actorOf(new SvdAccountManager(SvdAccount(
+            uid = userUID,
+            homeDir = "/Users" / userUID.toString
+        )))
+        remote.start("localhost", 8000)
+        remote.register("service:account-manager", am)
+        log.info("Spawned UserBoot for UID: %s".format(userUID))
+        
+        val wrapper = SvdWrapLibrary.instance
+        wrapper.spawn("env");
+        wrapper.spawn("initdb -D /Users/501/database_of_501");
+    }
+    
     
     def handleSignal(name: String)(block: => Unit) {
         Signal.handle(new Signal(name), new SignalHandler {
@@ -90,14 +98,6 @@ object boot extends Logging {
     
     
     def main(args: Array[String]) {
-        println()
-        println()
-        println("=========================")
-        println("===   ServeD - core   ===")
-        println("=========================")
-        println()
-        println()
-
         if (SvdUtils.isLinux) {
             log.error("Linux systems aren't supported yet!")
             sys.exit(1)
@@ -108,8 +108,19 @@ object boot extends Logging {
         handleSignal("USR2") { log.warn("TODO: implement USR2 handling (show svd config values)") }
         
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
-        boot()
+        
+        args.toList match {
+            case "user" :: userid :: xs =>
+                log.info("Spawning user (%d)", userid.toInt)
+                user(userid.toInt)
+            case "svd" :: xs =>
+                log.info("Spawning svd")
+                svd()
+            case _ =>
+                log.error("Invalid arguments.")
+                log.error("Usage: [jar] svd             - ServeD root")
+                log.error("       [jar] user [userid]   - ServeD user")
+                sys.exit(1)
+        }
     }
-    
-    
 }

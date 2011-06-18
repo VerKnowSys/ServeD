@@ -71,7 +71,7 @@ extern "C" {
             (char*)"-Dfile.encoding=UTF-8",
             // (char*)javalp.c_str(),
             (char*)jnalp.c_str(),
-            (char*)"-cp",
+            (char*)"-jar",
 #ifndef DEVEL
             /* when not devel, use classes from assembly jar */
             (char*)jar.c_str(),
