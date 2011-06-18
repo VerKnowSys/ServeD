@@ -10,6 +10,7 @@ import scala.xml._
 import com.verknowsys.served.web.lib.Session
 import com.verknowsys.served.api.git._
 import com.verknowsys.served.api.Success
+import com.verknowsys.served.utils.Logging
 
 object AddRepository extends LiftScreen {
     val name = field("Name", "", trim, valMinLen(1, "Name can not be blank"))
@@ -18,23 +19,24 @@ object AddRepository extends LiftScreen {
     
     def finish() {
         Session.api.request(CreateRepository(name.is)){
-            case repo: Repo => S.notice("Repository " + repo.name + " created")
+            case repo: Repository => S.notice("Repository " + repo.name + " created")
         }
     }
 }
 
-class GitSnippet {
+class GitSnippet extends Logging {
     def listRepositories = {
+        log.trace("Listing repositories")
         val repositories = Session.api.request(ListRepositories){ case Repositories(repositories) => repositories }.getOrElse(Nil)
         ".row *" #> repositories.map { repo =>
             val id = nextFuncName
             ".name [id]" #> id &
             ".name *"  #> repo.name &
-            ".remove *"     #> SHtml.ajaxButton(Text("Remove"), () => {
+            ".remove *"     #> SHtml.a(() => {
                 Session.api.request(RemoveRepository(repo.uuid)){
                     case Success => JE.JsRaw("$('#"+id+"').parent().remove()").cmd
                 }.getOrElse(JsCmds.Noop)
-            })
+            }, Text("Remove"))
         }
     }
 }
