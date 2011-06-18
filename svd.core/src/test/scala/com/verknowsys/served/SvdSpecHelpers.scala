@@ -80,7 +80,7 @@ object SvdSpecHelpers {
             case SvdAccount(account) => account
         }
         val account = accounts.find(_.userName == System.getProperty("user.name")).get
-        account.copy(homeDir = SvdConfig.systemTmpDir / account.homeDir)
+        account.copy(homeDir = randomPath)
     }
 
 }

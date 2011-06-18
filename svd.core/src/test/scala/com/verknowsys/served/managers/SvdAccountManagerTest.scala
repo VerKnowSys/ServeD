@@ -17,7 +17,7 @@ class SvdAccountManagerTest extends Specification with TestKit {
     
     "SvdAccountManager" should {
         "respond to GetAccount" in {
-            val account = new SvdAccount(userName = "teamon")
+            val account = currentAccount
             am = actorOf(new SvdAccountManager(account)).start
             am ! GetAccount
             expectMsg(account)
