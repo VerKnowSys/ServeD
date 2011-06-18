@@ -63,7 +63,8 @@ extern "C" {
 
         char *args[] = {
             (char*)"java",
-            // (char*)"-XX:+UseCompressedOops",
+            (char*)"-d64",
+            (char*)"-XX:+UseCompressedOops",
             (char*)"-XX:MaxPermSize=256M",
             (char*)"-XX:+UseParallelGC",
             (char*)"-Xms64m",
@@ -91,7 +92,7 @@ extern "C" {
         }
         ret << "]";
         log_message(ret.str());
-
+        
         execv((char*)java_path.c_str(), args);
     }
 
