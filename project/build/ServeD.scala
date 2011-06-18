@@ -4,6 +4,7 @@ import extract._
 import java.io.File
 import reaktor.scct.ScctProject
 import org.coffeescript.CoffeeScriptCompile
+import com.github.retronym.OneJarProject
 
 
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
@@ -61,12 +62,13 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
 
 
-    class SvdCli(info: ProjectInfo) extends SvdProject(info) with assembly.AssemblyBuilder {
+    class SvdCli(info: ProjectInfo) extends SvdProject(info) with OneJarProject {
         val jlineRepo = "JLine Project Repository" at "http://jline.sourceforge.net/m2rep"
         val jline = "jline" % "jline" % "0.9.9"
 
         lazy val cli = task { None; } dependsOn(run(Array("127.0.0.1", "5555")))
-
+        lazy val assembly = onejar
+        
         override def mainClass = Some("com.verknowsys.served.cli.Runner")
     }
     
@@ -88,7 +90,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
 
     
-    class SvdCore(info: ProjectInfo) extends SvdProject(info) with AkkaProject with assembly.AssemblyBuilder {
+    class SvdCore(info: ProjectInfo) extends SvdProject(info) with AkkaProject with OneJarProject {
         val akkaRepo = "Akka Repo" at "http://akka.io/repository"
         val javaNet = "java.net" at "http://download.java.net/maven/2"
         // val jgitRepository = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
@@ -100,6 +102,10 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val akkaTestKit = akkaModule("testkit")
         val neodatis = "org.neodatis.odb" % "neodatis-odb" % "1.9.30.689"
         val h2 = "com.h2database" % "h2" % "1.3.154"
+        
+        lazy val assembly = onejar
+        override def mainClass = Some("com.verknowsys.served.boot")
+        
         
         lazy val served = task { None } dependsOn(run(Array()))
         lazy val svd = served
@@ -167,8 +173,6 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             None
         }
         lazy val todo = notes
-
-        // override def mainClass = Some("com.verknowsys.served.boot")
     }
         
     

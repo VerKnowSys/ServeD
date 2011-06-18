@@ -93,7 +93,7 @@ int main(int argc, char const *argv[]) {
     lm << "Given param uid: " << uid;
     log_message(lm.str());
 
-    spawnBackgroundTask("/usr/bin/java", "com.verknowsys.served.userboot", string(argv[1]), false, lockName);
+    spawnBackgroundTask("/usr/bin/java", "user", string(argv[1]), false, lockName);
     
     return 0;
 }
