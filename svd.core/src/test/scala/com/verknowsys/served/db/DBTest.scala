@@ -31,6 +31,28 @@ class DBTest extends DatabaseTest {
             users1 must contain(dmilith)
         }
         
+        "delete user by object" in {
+            val teamon = new User("teamon")
+            val dmilith = new User("dmilith")
+            
+            db << teamon
+            db << dmilith
+            
+            reconnect
+            
+            db ~ teamon
+            
+            Users(db).count must_== 1
+            val users1 = Users(db)
+            users1 must haveSize(1)
+            users1 mustNot contain(teamon)
+            users1 must contain(dmilith)
+            
+            users1.historyFor(teamon.uuid) must haveSize(1)
+            users1.historyFor(teamon.uuid) must contain(teamon)
+            users1.historyFor(dmilith.uuid) must beEmpty
+        }
+        
         "store Users and Drugs" in {
             val teamon  = new User("teamon")
             val dmilith = new User("dmilith")
