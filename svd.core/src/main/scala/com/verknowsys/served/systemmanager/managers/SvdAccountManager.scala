@@ -45,6 +45,12 @@ class SvdAccountManager(val account: SvdAccount) extends Actor with SvdException
             // Fork the process
             val shell = expectinator.spawn("/bin/sh")
             shell.send("export USER=%s\n".format(account.userName))
+            shell.send("export USERNAME=%s\n".format(account.userName))
+            shell.send("export EDITOR=true\n")
+            shell.send("cd %s\n".format(account.homeDir))
+            
+            shell.send("env\n")
+            shell.send("pwd\n")
             
             // shell.send("set -v off")
             shell.send("echo Chunder\n")
