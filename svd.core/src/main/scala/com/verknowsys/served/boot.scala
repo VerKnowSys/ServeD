@@ -67,8 +67,13 @@ object boot extends Logging {
             uid = userUID,
             homeDir = "/Users" / userUID.toString
         )))
+        
+        val loggingManager = actorOf[LoggingManager]
+        
         remote.start("localhost", 8000)
         remote.register("service:account-manager", am)
+        remote.register("service:logging-manager", loggingManager)
+        
         am ! Init
         log.info("Spawned UserBoot for UID: %s".format(userUID))
     }
