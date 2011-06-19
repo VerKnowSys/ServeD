@@ -89,7 +89,7 @@ int main(int argc, char const *argv[]) {
     
     setuid(uid);
     chdir(homeDir.c_str());
-    lm << "Given param uid: " << uid;
+    lm << "Starting UserSpawn for uid: " << uid << " in homeDir: " << homeDir;
     log_message(lm.str());
 
     spawnBackgroundTask("/usr/bin/java", "user", string(argv[1]), false, lockName);
