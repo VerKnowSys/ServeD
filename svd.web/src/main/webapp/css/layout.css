@@ -173,9 +173,7 @@ table th {
 	color: #000;
 }
 
-table tr th {
-	background: #f9f9f9;
-}
+
 table tr:first-child, #content table tr:hover:first-child {
 	background: none;
 }

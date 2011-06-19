@@ -23,7 +23,7 @@ case class Repository(
 // messages
 
 case class CreateRepository(name: String) extends Base
-    // Repo
+    // Repository
     case object RepositoryExistsError
 
 
