@@ -64,8 +64,11 @@ int main(int argc, char const *argv[]) {
             lm << "Removing userspawn lock file: " << lockName << " (process is dead but file is still there)." << endl;
             log_message(lm.str());
             spawn("/bin/rm " + string(lockName));
+            exit(0);
+        } else {
+            exit(1);
         }
-        exit(0);
+        
     }
 
     if (fileExists(lockName)) {
