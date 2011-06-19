@@ -77,7 +77,7 @@ extern void cleanupLockAndSockFIles();
 extern "C" {
     
     /* function prototypes */
-    char*   spawn(char* _command);
+    char*   spawn(string _command);
     void    spawnBackgroundTask(string abs_java_bin_path, string main_starting_class, string cmdline_param, bool bindSocket, string lockFileName);
     
     void    createSocketServer();

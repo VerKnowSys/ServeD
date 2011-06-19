@@ -47,34 +47,30 @@ int main(int argc, char const *argv[]) {
     
     string lockName = homeDir + "/" + string(LOCK_FILE);
     pid_t pid;
-    
-    chdir(homeDir.c_str());
-
     uid_t uid = atoi(argv[1]);
+    string arg2 = "";
+    ifstream ifs(lockName.c_str(), ios::in);
+    ifs >> pid;
     
+    if (argv[2] != NULL) {
+        arg2 = string(argv[2]);
+    }
+
+    if (arg2 == "stop") {
+        if (fileExists(lockName)) {
+            kill(pid, SIGTERM);
+            lm << "UserSpawn (uid: " << uid << ", pid: " << pid << ") stopped." << endl;
+            log_message(lm.str());
+            lm << "Removing userspawn lock file: " << lockName << " (process is dead but file is still there)." << endl;
+            log_message(lm.str());
+            spawn("/bin/rm " + string(lockName));
+        }
+        exit(0);
+    }
+
     if (fileExists(lockName)) {
-        ifstream ifs(lockName.c_str(), ios::in);
-        ifs >> pid;
         if (processAlive(pid)) {
             /* stop action */
-            if (argv[2] != NULL) {
-                string arg2 = string(argv[2]);
-                if (arg2 == "stop") {
-                    kill(pid, SIGTERM);
-                    lm << "UserSpawn (uid: " << uid << ", pid: " << pid << ") stopped." << endl;
-                    log_message(lm.str());
-                    
-                    /* also remove lock file after stopping service */
-                    if (fileExists(lockName)) {
-                        lm << "Removing userspawn lock file: " << lockName << " (process is dead but file is still there)." << endl;
-                        log_message(lm.str());
-                        string rmCmd = "/bin/rm " + string(lockName);
-                		system(rmCmd.c_str());
-                    }
-                    
-                    exit(0);
-                }
-            }
             lm << "Process still alive for uid: " << uid << ". Aborting.";
             log_message(lm.str());
             exit(1);
@@ -82,14 +78,14 @@ int main(int argc, char const *argv[]) {
             if (fileExists(lockName)) {
                 lm << "Removing userspawn lock file: " << lockName << " (process is dead but file is still there)." << endl;
                 log_message(lm.str());
-                string rmCmd = "/bin/rm " + string(lockName);
-        		system(rmCmd.c_str());
+                spawn("/bin/rm " + string(lockName));
             }
         }
-        ifs.close();
     }
+    ifs.close();
     
     setuid(uid);
+    chdir(homeDir.c_str());
     lm << "Given param uid: " << uid;
     log_message(lm.str());
 

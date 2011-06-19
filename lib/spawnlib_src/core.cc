@@ -167,7 +167,7 @@ extern "C" {
     }
 
 
-    char* spawn(char* _command) {
+    char* spawn(string _command) {
         ofstream        ofs;
         FILE            *fpipe = NULL;
         stringstream    ret, logFile;
@@ -177,8 +177,8 @@ extern "C" {
         char            line[1024];
         uid_t           userUid;
 
-        log_message("Spawning command: " + string(_command));
-        if (!(fpipe = (FILE*)popen(_command, "r"))) {
+        log_message("Spawning command: " + _command);
+        if (!(fpipe = (FILE*)popen(_command.c_str(), "r"))) {
             ret << POPEN_EXCEPTION;
             return (char*)(ret.str()).c_str();
         }
@@ -191,7 +191,7 @@ extern "C" {
                 break;
             
             default:
-                string cmdPrintable = escape(string(_command));
+                string cmdPrintable = escape(_command);
                 logFile << string(USERS_HOME_DIR) << userUid << "/" << pid << "--" << cmdPrintable << ".log";
                 break;
         }

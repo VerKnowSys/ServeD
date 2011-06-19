@@ -28,18 +28,15 @@
 void cleanupLockAndSockFIles() {
     if (fileExists(LOCK_FILE)) {
         log_message("Removing lock file (process is dead but file is still there).");
-        string rmCmd = "/bin/rm " + string(LOCK_FILE);
-		system(rmCmd.c_str());
+        spawn("/bin/rm " + string(LOCK_FILE));
     }
     if (fileExists(SOCK_FILE)) {
         log_message("Removing socket file (process is dead but file is still there).");
-        string rmCmd = "/bin/rm " + string(SOCK_FILE);
-		system(rmCmd.c_str());
+        spawn("/bin/rm " + string(SOCK_FILE));
     }
     if (fileExists(SOCKET_LOCK_FILE)) {
         log_message("Removing socket server lock file (process is dead but file is still there).");
-        string rmCmd = "/bin/rm " + string(SOCKET_LOCK_FILE);
-		system(rmCmd.c_str());
+        spawn("/bin/rm " + string(SOCKET_LOCK_FILE));
     }
 }
 
