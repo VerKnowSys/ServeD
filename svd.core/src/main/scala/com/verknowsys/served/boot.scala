@@ -1,10 +1,6 @@
 package com.verknowsys.served
 
 
-import akka.actor._
-import akka.config.Supervision._
-import akka.actor.Actor.{remote, actorOf, registry}
-
 import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.managers.LoggingManager
 import com.verknowsys.served.maintainer.SvdSystemInfo
@@ -14,13 +10,17 @@ import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.systemmanager.managers.SvdAccountManager
 import com.verknowsys.served.systemmanager.native.SvdAccount
-
 import com.verknowsys.served.api._
 
+import akka.actor._
+import akka.config.Supervision._
+import akka.actor.Actor.{remote, actorOf, registry}
 import sun.misc.SignalHandler
 import sun.misc.Signal
 
+
 object boot extends Logging {
+
 
     def svd() {
         println()
@@ -54,6 +54,7 @@ object boot extends Logging {
         remote.registerPerSession("service:api", actorOf[SvdApiConnection])
     }
     
+    
     def user(userUID: Int){
         println()
         println()
@@ -65,7 +66,7 @@ object boot extends Logging {
         
         val am = actorOf(new SvdAccountManager(SvdAccount(
             uid = userUID,
-            homeDir = "/Users" / userUID.toString
+            homeDir = SvdConfig.userHomeDir / userUID.toString
         )))
         
         val loggingManager = actorOf[LoggingManager]
