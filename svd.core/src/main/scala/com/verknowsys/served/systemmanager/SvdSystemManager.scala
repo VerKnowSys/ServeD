@@ -65,10 +65,6 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             // new SvdProcess(command = "echo dupadupa > /tmp/555556666777", uid = 501)
             // Thread.sleep(SvdConfig.sleepDefaultPause + 3000)
             
-            val wrapper = SvdWrapLibrary.instance
-            wrapper.sendSpawnMessage("501")
-            
-            
             // 
             // log.debug("After running process.")
             
@@ -117,12 +113,6 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             // throw new Exception("Dupa zbladła")
             // throw new RuntimeException("Dupa zbladła bardzo")
             // throw new Throwable("Dupa biała jak ściana")
-            
-            
-        case SpawnProcess(cmd) =>
-            log.debug("Requested process spawn: %s", cmd)
-            val spawn = new SvdProcess(cmd, 25) // 2011-01-23 05:27:11 - dmilith - PENDING: XXX: temporary, that should be user's account id
-            log.trace("Spawned: %s", spawn)
             
         case GetAllProcesses =>
             val psAll = SvdLowLevelSystemAccess.processList(true)
