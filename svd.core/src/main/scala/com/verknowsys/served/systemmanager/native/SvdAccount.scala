@@ -27,13 +27,6 @@ case class SvdAccount (
         val shell: String = "/bin/sh",
         val acls: List[Any] = Nil
         ) extends Logging {
-
-    
-    /**
-     * Checks if account is for normal user
-     * @author teamon
-     */
-    def isUser = SvdAccount.isUser(this)
     
     
     /**
@@ -63,24 +56,7 @@ case class SvdAccount (
  * @author teamon
  */
 object SvdAccount extends Logging {
-    
-    
-    /**
-     * Checks if account is for normal user
-     * @author teamon, dmilith
-     */
-    def isUser(account: SvdAccount) = {
-        val unixLikeHome = "/home/.*".r
-        val macLikeHome = "/Users/.*".r
-        account.homeDir match {
-            case unixLikeHome() => true
-            case macLikeHome() => true
-            case x =>
-                log.debug("Value of 'homeDir' for user '%s' is: '%s'. It's system user.".format(account.userName, x, false))
-                false
-        }
-    }
-    
+        
     
     /**
      *  @author dmilith
