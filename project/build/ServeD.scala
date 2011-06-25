@@ -58,14 +58,6 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val commonsio = "commons-io" % "commons-io" % "1.4"
         val messadmin = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
         val jna = "net.java.dev.jna" % "jna" % "3.2.5"
-        
-        val specs2 = "org.specs2" %% "specs2" % "1.4-SNAPSHOT" % "test"
-        
-        def specs2Framework = new TestFramework("org.specs2.runner.SpecsFramework")
-        override def testFrameworks = super.testFrameworks ++ Seq(specs2Framework)
-
-        override def includeTest(s: String) = s.endsWith("Spec")
-        override def testOptions = super.testOptions ++ Seq(TestArgument("html"), TestArgument("console"))
     }
 
 
