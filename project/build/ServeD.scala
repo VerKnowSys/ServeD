@@ -25,6 +25,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val releases  = "releases" at "http://scala-tools.org/repo-releases"
          
         val specsTest = "org.scala-tools.testing" % "specs_2.9.0.RC5" % "1.6.8-SNAPSHOT" % "test"
+        val scalatest = "org.scalatest" %% "scalatest" % "1.6.1.RC1"
         
         override def parallelExecution = true
         override def compileOrder = CompileOrder.JavaThenScala
@@ -49,7 +50,6 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             Some("project/growl_images/fail.png"),
             Some("project/growl_images/fail.png")
         )
-
     }
     
     
