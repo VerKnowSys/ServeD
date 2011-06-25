@@ -1,19 +1,18 @@
 package com.verknowsys.served.systemmanager.managers
 
-import com.verknowsys.served.systemmanager.native._
-import com.verknowsys.served.utils.SvdExceptionHandler
+import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.api._
-import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
+import com.verknowsys.served.systemmanager.native._
 
 import akka.actor.Actor.{remote, actorOf, registry}
 import akka.actor.Actor
 import com.verknowsys.served.systemmanager.SvdSystemManager
-import expectj._
+import com.verknowsys.served.systemmanager.SvdAccountsManager
 
 
-case object GetAccount
+object Accounts extends DB[SvdAccount]
 
 
 /**
@@ -21,62 +20,47 @@ case object GetAccount
  * 
  * @author teamon
  */
-class SvdAccountManager(val account: SvdAccount) extends Actor with SvdExceptionHandler {
-    log.info("Starting AccountManager for account: " + account)
+class SvdAccountManager(val uid: Int) extends Actor with SvdExceptionHandler {
     
-    val dbServer = new DBServer(9000, account.homeDir / "config")
+    log.info("Starting AccountManager for uid: %s".format(uid))
     
+    val server = new DBServer(9009, SvdConfig.userHomeDir / "%s".format(uid) / "%s.userdb".format(uid)) // 2011-06-26 00:20:59 - dmilith - XXX: hardcoded port name
+    val db = server.openClient
+    val account = Accounts(db)(_.uid == uid).headOption.getOrElse {
+        val newAccount = new SvdAccount(uid = uid, gid = uid)
+        db << newAccount
+        newAccount
+    }
+    log.debug("Got user account: %s".format(account))
+    
+    val sh = new SvdShell(account)
     val gitManager = Actor.actorOf(new SvdGitManager(account, dbServer.openClient))
     self startLink gitManager
     
-    // val gatherer = Actor.actorOf(new SvdGatherer(account))
-    // self startLink gatherer
-
 
     def receive = {
         case Init =>
             log.info("SvdAccountManager received Init.")
-            SvdSystemManager ! GetAllProcesses
-            SvdSystemManager ! GetNetstat
+            // SvdSystemManager ! GetAllProcesses
+            // SvdSystemManager ! GetNetstat
             
-            // Create a new ExpectJ object with a timeout of 5s
-            val expectinator = new ExpectJ(5) 
-
-            // Fork the process
-            val shell = expectinator.spawn("/bin/sh")
-            shell.send("export USER=%s\n".format(account.userName))
-            shell.send("export USERNAME=%s\n".format(account.userName))
-            shell.send("export EDITOR=true\n")
-            shell.send("cd %s\n".format(account.homeDir))
+            sh.exec("rm -rf /Users/501/THE_DB_by_initdb && initdb -D /Users/501/THE_DB_by_initdb && pg_ctl -D /Users/501/THE_DB_by_initdb start && sleep 45 && pg_ctl -D /Users/501/THE_DB_by_initdb stop")
+            log.debug("OUTPUT: " + sh.output(0).head)
+            sh.close(0)
+            sh.exec("ls -lam /usr")
             
-            shell.send("env\n")
-            shell.send("pwd\n")
-            
-            // shell.send("set -v off")
-            shell.send("echo Chunder\n")
-            shell.expect("Chunder")
-            shell.send("echo $USER\n")
-            // shell.expect("dmilith")
-            shell.send("rm -rf /Users/501/THE_DB_by_initdb\n")
-            shell.send("initdb -D /Users/501/THE_DB_by_initdb\n")
-            shell.expect("Success. You can now start the database server using:")
-
-            log.warn(shell.getCurrentStandardOutContents)
-            log.warn(shell.getCurrentStandardErrContents)
-
-            shell.send("exit\n")
-            shell.expectClose
-        
-        
-        case GetAccount => 
-            self reply account
+            val psAll = SvdLowLevelSystemAccess.processList(true)
+            log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
             
         case msg: git.Base => 
             gitManager forward msg
     }
     
+    
     override def postStop {
-        dbServer.close
+        sh.closeAll
+        db.close
+        server.close
     }
     
 }

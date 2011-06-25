@@ -9,7 +9,6 @@ import com.verknowsys.served.systemmanager.SvdAccountsManager
 import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.systemmanager.managers.SvdAccountManager
-import com.verknowsys.served.systemmanager.native.SvdAccount
 import com.verknowsys.served.api._
 
 import akka.actor._
@@ -64,14 +63,10 @@ object boot extends Logging {
         println()
         println()
         
-        val am = actorOf(new SvdAccountManager(SvdAccount(
-            uid = userUID,
-            homeDir = SvdConfig.userHomeDir / userUID.toString
-        )))
-        
+        val am = actorOf(new SvdAccountManager(userUID))
         val loggingManager = actorOf[LoggingManager]
         
-        remote.start("localhost", 8000)
+        remote.start("localhost", 8000) // 2011-06-26 00:25:24 - dmilith - XXX: HARDCODE: port and host
         remote.register("service:account-manager", am)
         remote.register("service:logging-manager", loggingManager)
         
