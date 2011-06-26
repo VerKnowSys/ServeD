@@ -102,6 +102,7 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
  */
 class DBServer(port: Int, path: String){
     OdbConfiguration.setLogServerStartupAndShutdown(false)
+    OdbConfiguration.setDatabaseCharacterEncoding("UTF-8");
     
     protected val server = ODBFactory.openServer(port)
     
