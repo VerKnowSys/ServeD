@@ -23,9 +23,6 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
     
     log.info("SvdAccountsManager is loading")
     
-    // case object ReloadUsers
-    // case class CheckUser(val username: String)
-    
     // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
     
     // Safe map for fast access to AccountManagers
@@ -87,6 +84,18 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
     }
 
     
+    
+    private def getAccountList(place: File) = {
+        val systemHomeDir = place.listFiles.toList
+        val accounts = systemHomeDir.map{
+            hd =>
+                log.warn("HD: %s".format(hd))
+                hd
+        }
+        accounts
+    }
+    
+    
     /**
      * Function to read user account uids from filesystem
      * @author dmilith
@@ -94,21 +103,12 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
     protected def userAccounts = {
         val shd = new File(SvdConfig.systemHomeDir)
         if (shd.exists) {
-            val systemHomeDir = shd.listFiles.toList
-            val accounts = systemHomeDir.map{
-                hd =>
-                    log.warn("HD: %s".format(hd))
-                    hd
-            }
-            log.debug("allAccounts(), systemHomeDir: %s".format(systemHomeDir))
-            accounts
+            getAccountList(shd)
         } else {
             new File(SvdConfig.systemHomeDir).mkdirs
             log.trace("Created %s. No users in system!".format(SvdConfig.systemHomeDir))
-            
-            new File(SvdConfig.systemHomeDir / "501") // 2011-06-22 17:00:15 - dmilith - HACK: HARDCODE: XXX: FIXME: auto "add" default user
-            
-            Nil
+            new File(SvdConfig.systemHomeDir / "501").mkdirs // 2011-06-22 17:00:15 - dmilith - HACK: HARDCODE: XXX: FIXME: auto "add" default user
+            getAccountList(shd)
         }
     }
      
