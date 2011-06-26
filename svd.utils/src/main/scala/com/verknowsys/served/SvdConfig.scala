@@ -23,6 +23,7 @@ object SvdConfig {
     @deprecated def systemTmpDir    = "/var/tmp" // DEPRECATED
     def systemHomeDir               = "/SystemUsers/"
     def userHomeDir                 = "/Users/"
+    def defaultShell                = "/bin/sh"
     def defaultEncoding             = "UTF-8"
     def remoteApiServerHost         = "localhost" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
     def remoteApiServerPort     = 10
