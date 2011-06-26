@@ -18,7 +18,7 @@ case class GetAccountManager(username: String)
 
 
 class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExceptionHandler with Logging {
-    
+
     import events._
     
     log.info("SvdAccountsManager is loading")
@@ -69,8 +69,8 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
         val wrapper = SvdWrapLibrary.instance
         userAccounts.foreach{
             ua =>
-                log.warn("Sending spawn message for account: %s".format(ua))
-                wrapper.sendSpawnMessage(ua.uid.toString)
+                log.warn("Sending spawn message for uid: %s".format(ua))
+                wrapper.sendSpawnMessage(ua.toString.split("/").last)
                 
         }
         
@@ -88,7 +88,7 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
 
     
     /**
-     * Function to read user accounts from filesystem
+     * Function to read user account uids from filesystem
      * @author dmilith
      */
     protected def userAccounts = {
@@ -98,7 +98,7 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             val accounts = systemHomeDir.map{
                 hd =>
                     log.warn("HD: %s".format(hd))
-                    new SvdAccount(uid = hd.getPath.split("/").reverse.head.toInt)
+                    hd
             }
             log.debug("allAccounts(), systemHomeDir: %s".format(systemHomeDir))
             accounts
