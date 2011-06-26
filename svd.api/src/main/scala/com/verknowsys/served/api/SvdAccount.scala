@@ -17,7 +17,7 @@ case class SvdAccount (
         uid: Int,
         gid: Int,
         information: String = "",
-        shell: String = "/bin/sh",
+        shell: String = "",
         uuid: UUID = randomUUID
     ) extends Persistent {
     
