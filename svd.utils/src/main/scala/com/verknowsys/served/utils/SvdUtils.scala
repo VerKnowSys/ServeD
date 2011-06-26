@@ -10,6 +10,7 @@ import scala.util.matching.Regex
 import scala.io._
 import com.sun.jna.Native
 import java.io._
+import java.net._
 import java.util.UUID
 import java.util.{Calendar, GregorianCalendar}
 import java.util.zip.DataFormatException
@@ -299,5 +300,29 @@ object SvdUtils extends Logging {
     }
     
     
+    /**
+    * @author dmilith
+    *
+    *   Checks if a specific port is available for user
+    */
+    def portAvailable(port: Int): Boolean = {
+        try {
+            val ss = new ServerSocket(port)
+            ss.setReuseAddress(true)
+            val ds = new DatagramSocket(port)
+            ds.setReuseAddress(true)
+            if (ds != null)
+                ds.close
+            if (ss != null)
+                ss.close
+            return true
+        } catch {
+            case e: IOException =>
+                println("ERROR: IOException: %s".format(e))
+        }
+        false
+    }
+    
+
 }
 
