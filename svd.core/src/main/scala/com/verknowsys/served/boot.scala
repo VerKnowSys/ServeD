@@ -72,20 +72,21 @@ object boot extends Logging {
         
         // Get account form remote service
         
+        log.debug("Getting account for uid %d", userUID)
         val remoteAccountsManager = remote.actorFor("service:accounts-manager", SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
         (remoteAccountsManager !! GetAccount(userUID)) collect {
             case Some(account: SvdAccount) => account
         } match {
             case Some(account) =>
-                val am = actorOf(new SvdAccountManager(account))
-                
+                log.debug("Got account, starting AccountManager for %s", account)
+                val am = actorOf(new SvdAccountManager(account)).start
                 val loggingManager = actorOf[LoggingManager]
+                am ! Init
                 
                 remote.start("localhost", account.servicePort)
                 remote.register("service:account-manager", am)
                 remote.register("service:logging-manager", loggingManager)
 
-                am ! Init
                 log.info("Spawned UserBoot for UID: %d", userUID)
                 
             case None =>
