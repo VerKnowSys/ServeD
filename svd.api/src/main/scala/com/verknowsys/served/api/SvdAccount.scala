@@ -2,7 +2,6 @@ package com.verknowsys.served.api
 
 
 import com.verknowsys.served.api.pools._
-import SvdPoolRandomized._
 
 
 /**
@@ -36,9 +35,11 @@ case class GetAccount(uid: Int)
  *   SvdUserPort describes one of port from user pool (defined in SvdPools)
  */
 case class SvdUserPort(
-        number: Int = randomUserPort,
+        number: Int,
         uuid: UUID = randomUUID
-    ) extends Persistent
+    ) extends Persistent {
+        override def toString = "SvdUSerPort(" + number + ")"
+    }
 
 
 /**
@@ -47,9 +48,11 @@ case class SvdUserPort(
  *   SvdSystemPort describes one of port from system pool (defined in SvdPools)
  */
 case class SvdSystemPort(
-        number: Int = randomSystemPort,
+        number: Int,
         uuid: UUID = randomUUID
-    ) extends Persistent
+    ) extends Persistent {
+        override def toString = "SvdSystemPort(" + number + ")"
+    }
 
 
 /**
@@ -57,11 +60,13 @@ case class SvdSystemPort(
  *
  *   SvdUID stores system uid and human readable name related to it
  */
-case class SvdUID(
-        number: Int = randomUserUid,
+case class SvdUserUID(
+        number: Int,
         name: String = "",
         uuid: UUID = randomUUID
-    ) extends Persistent
+    ) extends Persistent {
+        override def toString = "SvdUSerUID(" + number + ")"
+    }
 
 
 /**
@@ -69,11 +74,13 @@ case class SvdUID(
  *
  *   SvdGID stores system gid and human readable name related to it
  */
-case class SvdGID(
-        number: Int = randomUserGid,
+case class SvdUserGID(
+        number: Int,
         name: String = "",
         uuid: UUID = randomUUID
-    ) extends Persistent
+    ) extends Persistent {
+        override def toString = "SvdUSerGID(" + number + ")"
+    }
 
 
 // 2011-06-25 23:13:38 - dmilith - PENDING: user domain issues
