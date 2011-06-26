@@ -80,8 +80,8 @@ object boot extends Logging {
                 val am = actorOf(new SvdAccountManager(account))
                 
                 val loggingManager = actorOf[LoggingManager]
-
-                remote.start("localhost", 8000) // 2011-06-26 00:25:24 - dmilith - XXX: HARDCODE: port and host
+                
+                remote.start("localhost", account.servicePort)
                 remote.register("service:account-manager", am)
                 remote.register("service:logging-manager", loggingManager)
 
