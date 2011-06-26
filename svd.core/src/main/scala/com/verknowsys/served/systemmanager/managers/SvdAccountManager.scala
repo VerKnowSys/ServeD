@@ -12,9 +12,6 @@ import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.systemmanager.SvdAccountsManager
 
 
-object Accounts extends DB[SvdAccount]
-
-
 /**
  * Account Manager - owner of all managers
  * 
@@ -24,9 +21,8 @@ class SvdAccountManager(val account: SvdAccount) extends Actor with SvdException
     
     log.info("Starting AccountManager for uid: %s".format(account.uid))
     
-    val server = new DBServer(9009, SvdConfig.userHomeDir / "%s".format(account.uid) / "%s.db".format(account.uid)) // 2011-06-26 00:20:59 - dmilith - XXX: hardcoded port name
+    val server = new DBServer(account.servicePort, SvdConfig.userHomeDir / "%s".format(account.uid) / "%s.db".format(account.uid)) // 2011-06-26 00:20:59 - dmilith - XXX: hardcoded port name
     val db = server.openClient
-    
     
     val sh = new SvdShell(account)
     val gitManager = Actor.actorOf(new SvdGitManager(account, db))

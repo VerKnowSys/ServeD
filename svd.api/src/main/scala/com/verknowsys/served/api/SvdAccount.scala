@@ -16,6 +16,7 @@ case class SvdAccount (
         pass: String = "",
         uid: Int,
         gid: Int,
+        servicePort: Int,
         information: String = "",
         shell: String = "",
         uuid: UUID = randomUUID
