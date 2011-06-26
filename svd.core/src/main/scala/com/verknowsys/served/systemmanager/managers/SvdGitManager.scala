@@ -1,5 +1,6 @@
 package com.verknowsys.served.systemmanager.managers
 
+import com.verknowsys.served._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager._
 import com.verknowsys.served.utils._
@@ -52,5 +53,5 @@ class SvdGitManager(val account: SvdAccount, val db: DBClient) extends SvdManage
     }
 
     
-    protected lazy val gitHomeDir = SvdUtils.checkOrCreateDir(account.homeDir / "git")
+    protected lazy val gitHomeDir = SvdUtils.checkOrCreateDir(SvdConfig.userHomeDir / account.uid.toString / "git")
 }

@@ -6,7 +6,7 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.monitor._
 import com.verknowsys.served.systemmanager.native._
-import com.verknowsys.served.systemmanager.acl._
+import com.verknowsys.served.api.acl._
 import com.verknowsys.served.utils.Logging
 import SvdPOSIX._
 

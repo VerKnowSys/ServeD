@@ -34,7 +34,7 @@ class SvdAccountManager(val uid: Int) extends Actor with SvdExceptionHandler {
     log.debug("Got user account: %s".format(account))
     
     val sh = new SvdShell(account)
-    val gitManager = Actor.actorOf(new SvdGitManager(account, dbServer.openClient))
+    val gitManager = Actor.actorOf(new SvdGitManager(account, db))
     self startLink gitManager
     
 
