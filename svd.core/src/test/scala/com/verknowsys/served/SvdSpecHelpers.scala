@@ -43,7 +43,9 @@ object SvdSpecHelpers {
     var count = 0
     def randomPath = {
         count += 1
-        TEST_DIR / "dir_" + count + "_" + java.util.UUID.randomUUID.toString
+        val dir = TEST_DIR / "dir_" + count + "_" + java.util.UUID.randomUUID.toString
+        mkdir(dir)
+        dir
     }
     
     val usedPorts = scala.collection.mutable.ListBuffer[Int]()
