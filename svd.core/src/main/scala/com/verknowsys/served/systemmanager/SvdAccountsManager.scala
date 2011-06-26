@@ -192,12 +192,18 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
      *   registers user UID with given number and name in svd database
      */
     def registerUserAccount(uid: Int, nam: String) = {
+        val port = randomUserPort
+        val dbP = randomUserPort
+        registerUserPort(port)
+        registerUserPort(dbP)
         registerUserUID(uid, nam)
         registerUserGID(uid, nam)
         db << SvdAccount(
             userName = nam,
             uid = uid,
-            gid = uid
+            gid = uid,
+            servicePort = port,
+            dbPort = dbP
             )
     }
 
