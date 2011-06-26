@@ -14,17 +14,20 @@ object SvdConfig {
      *
      */
      
-    def version               = "0.2.0"
-    def served                = "ServeD v" + version
-    def systemConfDir         = "/etc"
-    def systemLogDir          = "/var/log"
-    def systemTmpDir          = "/var/tmp"
-    def systemHomeDir         = "/SystemUsers/"
-    def userHomeDir           = "/Users/"
-    def defaultEncoding       = "UTF-8"
-    def remoteApiServerHost   = "localhost" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
-    def remoteApiServerPort   = 10
-    def defaultUserGroup      = 20 // 2011-06-09 01:06:59 - dmilith - NOTE: default GID for "staff" group both on Darwin and FreeBSD
+    def version                     = "0.2.0"
+    def coreSvdDatabaseName         = "svd.db"
+    def coreSvdAccountsDatabaseName = "accounts.db"
+    def served                      = "ServeD v" + version
+    def systemConfDir               = "/etc"
+    @deprecated def systemLogDir    = "/var/log" // DEPRECATED
+    @deprecated def systemTmpDir    = "/var/tmp" // DEPRECATED
+    def systemHomeDir               = "/SystemUsers/"
+    def userHomeDir                 = "/Users/"
+    def defaultEncoding             = "UTF-8"
+    def remoteApiServerHost         = "localhost" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
+    def remoteApiServerPort     = 10
+    def remoteAccountServerPort = 12
+    def defaultUserGroup        = 20 // 2011-06-09 01:06:59 - dmilith - NOTE: default GID for "staff" group both on Darwin and FreeBSD
     
     def kqueueWaitInterval          = 500
     def sleepDefaultPause           = 1000
