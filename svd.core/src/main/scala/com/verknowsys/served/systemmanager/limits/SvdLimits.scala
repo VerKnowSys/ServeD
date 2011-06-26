@@ -1,4 +1,4 @@
-package com.verknowsys.served.systemmanager.acl
+package com.verknowsys.served.systemmanager.limits
 
 
 // 2011-01-25 20:41:51 - dmilith - TODO: implement checking connected users/ sockets to given process
