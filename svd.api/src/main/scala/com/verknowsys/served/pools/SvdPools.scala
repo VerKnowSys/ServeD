@@ -16,7 +16,7 @@ object SvdPools {
      *
      *   svdPortPool describes a range of root allowed pool of TCP ports
      */
-    def svdPortPool = 0 until 1024
+    def systemPortPool = 0 until 1024
     
     
     /**
@@ -34,14 +34,4 @@ object SvdPools {
      */
     def userGidPool = 10000 until 60000
 
-}
-
-
-object SvdPoolRandomized {
-    // PENDING
-    def randomUserPort = 12
-    def randomSystemPort = 13
-    def randomUserUid = 14
-    def randomUserGid = 15
-    
 }
