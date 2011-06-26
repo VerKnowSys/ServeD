@@ -1,8 +1,7 @@
-package com.verknowsys.served.systemmanager.acl
+package com.verknowsys.served.api.acl
 
 
 import com.verknowsys.served.api._
-import com.verknowsys.served.utils._
 
 
 /**
@@ -10,7 +9,7 @@ import com.verknowsys.served.utils._
  *
  *   Describes general ACL (all defined ACLs should inherit from it)
  */
-case class SvdACL(uuid: UUID = randomUUID) extends Persistent
+trait SvdACL extends Persistent
 
     
 /**
@@ -18,7 +17,10 @@ case class SvdACL(uuid: UUID = randomUUID) extends Persistent
  *
  *   Include this ACL to grant permission for execution of processes given as param list
  */
-case class ExecutionAllowed(of: List[String]) extends SvdACL
+case class ExecutionAllowed(
+        of: List[String],
+        uuid: UUID = randomUUID
+    ) extends SvdACL
 
 
 /**
@@ -26,7 +28,9 @@ case class ExecutionAllowed(of: List[String]) extends SvdACL
 *
 *   Include this ACL to allow to use root account to spawn/ access to file
 */
-case object RootAllowed extends SvdACL
+case class RootAllowed(
+        uuid: UUID = randomUUID
+    ) extends SvdACL
 
 
 /**
@@ -34,7 +38,10 @@ case object RootAllowed extends SvdACL
 *
 *   Include this ACL when user is allowed to log in on some services
 */
-case class LoginAllowed(to: List[String]) extends SvdACL
+case class LoginAllowed(
+        to: List[String],
+        uuid: UUID = randomUUID
+    ) extends SvdACL
 
 
 /**
@@ -42,7 +49,10 @@ case class LoginAllowed(to: List[String]) extends SvdACL
 *
 *   Include this ACL to start "one-process-account"
 */
-case class OneProcAllowed(name: String) extends SvdACL
+case class OneProcAllowed(
+        name: String,
+        uuid: UUID = randomUUID
+    ) extends SvdACL
 
 
 /**
@@ -50,4 +60,6 @@ case class OneProcAllowed(name: String) extends SvdACL
 *
 *   Include this ACL to allow user to login with ssh 2
 */
-case object SSHAllowed extends SvdACL
+case class SSHAllowed(
+        uuid: UUID = randomUUID
+    ) extends SvdACL
