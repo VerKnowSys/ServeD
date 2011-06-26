@@ -12,42 +12,28 @@ trait Logging {
     @transient lazy val log = new ConsoleLogger(this.getClass.getName)
 }
 
-
 object LoggerUtils {
-    protected var _levels = readConfig
+    protected var config = Map[String, Logger.Levels.Value]()
     
-    def levels = _levels
-    
+    def levels = config.toMap
+        
     def levelFor(className: String) = _level(className.split("\\.").reverse.toList) getOrElse Logger.Levels.Trace
     
-    def loggerConfig = new SvdProperties(SvdConfig.systemTmpDir / "svd.logger")
-    
-    def readConfig = loggerConfig.data.map(_.mapValues { e => e.toLowerCase match {
-        case "error" => Logger.Levels.Error
-        case "warn"  => Logger.Levels.Warn
-        case "info"  => Logger.Levels.Info
-        case "debug" => Logger.Levels.Debug
-        case "trace" => Logger.Levels.Trace
-        case _ => Logger.Levels.Debug
-    } }.toMap) getOrElse Map()
-    
-    def update {
-        _levels = readConfig
-    }
-    
     def addEntry(className: String, level: Logger.Levels.Value){
-        loggerConfig(className) = level.toString
-        update
+        config = config + (className -> level)
     }
     
     def removeEntry(className: String){
-        loggerConfig.remove(className)
-        update
+        config = config - className
+    }
+    
+    def clear {
+        config = Map[String, Logger.Levels.Value]()
     }
     
     // Serach for matching class entry
     protected def _level(parts: List[String]): Option[Logger.Levels.Value] = parts match {
-        case x :: xs => _levels.get(parts.reverse.mkString(".")) orElse _level(xs)
+        case x :: xs => config.get(parts.reverse.mkString(".")) orElse _level(xs)
         case Nil => None
     }
 }

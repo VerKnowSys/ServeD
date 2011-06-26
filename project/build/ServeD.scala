@@ -11,17 +11,21 @@ import net.usersource.jettyembed._
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
     
     // Projects
-    lazy val api            = project("svd.api", "api", new SvdApi(_))
-    lazy val cli            = project("svd.cli", "cli", new SvdCli(_), api)
-    lazy val utils          = project("svd.utils", "utils", new SvdUtils(_), api)
-    lazy val core           = project("svd.core", "core", new SvdCore(_), api, utils)
-    lazy val web            = project("svd.web", "web", new SvdWeb(_), api, utils)
+    lazy val api   = project("svd.api", "api", new SvdApi(_))
+    lazy val cli   = project("svd.cli", "cli", new SvdCli(_), api)
+    lazy val utils = project("svd.utils", "utils", new SvdUtils(_), api)
+    lazy val core  = project("svd.core", "core", new SvdCore(_), api, utils)
+    lazy val web   = project("svd.web", "web", new SvdWeb(_), api, utils)
     
     
     class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject {
         
         val mavenVKS = "maven.verknowsys.com" at "http://maven.verknowsys.com/repository/"
+        val snapshots = "snapshots" at "http://scala-tools.org/repo-snapshots"
+        val releases  = "releases" at "http://scala-tools.org/repo-releases"
+         
         val specsTest = "org.scala-tools.testing" % "specs_2.9.0.RC5" % "1.6.8-SNAPSHOT" % "test"
+        val scalatest = "org.scalatest" %% "scalatest" % "1.6.1.RC1"
         
         override def parallelExecution = true
         override def compileOrder = CompileOrder.JavaThenScala
@@ -46,7 +50,6 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             Some("project/growl_images/fail.png"),
             Some("project/growl_images/fail.png")
         )
-
     }
     
     
