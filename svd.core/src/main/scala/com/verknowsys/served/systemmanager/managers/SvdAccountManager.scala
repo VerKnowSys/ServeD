@@ -20,28 +20,13 @@ object Accounts extends DB[SvdAccount]
  * 
  * @author teamon
  */
-class SvdAccountManager(val uid: Int) extends Actor with SvdExceptionHandler {
+class SvdAccountManager(val account: SvdAccount) extends Actor with SvdExceptionHandler {
     
-    log.info("Starting AccountManager for uid: %s".format(uid))
+    log.info("Starting AccountManager for uid: %s".format(account.uid))
     
-    val server = new DBServer(9009, SvdConfig.userHomeDir / "%s".format(uid) / "%s.db".format(uid)) // 2011-06-26 00:20:59 - dmilith - XXX: hardcoded port name
+    val server = new DBServer(9009, SvdConfig.userHomeDir / "%s".format(account.uid) / "%s.db".format(account.uid)) // 2011-06-26 00:20:59 - dmilith - XXX: hardcoded port name
     val db = server.openClient
-    val accountsManager = remote.actorOf[SvdAccountsManager](SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
-    log.warn(accountsManager.toString)
-    val account: SvdAccount = (accountsManager !! GetAccount(uid)).headOption match {
-        case Some(acct: SvdAccount) =>
-            acct
-        case None =>
-            null
-    }
     
-    // 2011-06-26 21:47:49 - dmilith - HACK: FIXME: PENDING: do it via remote actors with GetAccount(uid)
-    if (account == null) {
-        log.error("Unregistered UID: %s".format(uid))
-        sys.exit(1)
-    }
-    
-    log.debug("Got user account: %s".format(account))
     
     val sh = new SvdShell(account)
     val gitManager = Actor.actorOf(new SvdGitManager(account, db))

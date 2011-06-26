@@ -30,27 +30,34 @@ object boot extends Logging {
         println()
         println()
         
+        val accountsManager = actorOf[SvdAccountsManager]
+        val systemManager = actorOf[SvdSystemManager]
+
         val list = (
             actorOf[SvdFileEventsManager] ::
             actorOf[LoggingManager] ::
-            actorOf[SvdSystemManager] ::
-            actorOf[SvdAccountsManager] :: 
+            systemManager ::
+            accountsManager :: 
             actorOf[SvdSystemInfo] ::
             // actorOf[SvdNotificationCenter] :: 
             Nil).map(Supervise(_, Permanent))
+
         // supervise and autostart
         Supervisor(
-          SupervisorConfig(
-            OneForOneStrategy(List(classOf[Exception], classOf[RuntimeException], classOf[NullPointerException]), 50, 1000),
-            list))
+            SupervisorConfig(
+                OneForOneStrategy(List(classOf[Exception], classOf[RuntimeException], classOf[NullPointerException]), 50, 1000),
+                list
+          )
+        )
 
 
-        registry.actorFor[SvdSystemManager].foreach { _ ! Init }
-        registry.actorFor[SvdAccountsManager].foreach { _ ! Init }
-        
-        // ApiServer
+        systemManager ! Init
+        accountsManager ! Init
+
+        // Remote services
         remote.start(SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
         remote.registerPerSession("service:api", actorOf[SvdApiConnection])
+        remote.register("service:accounts-manager", accountsManager)
     }
     
     
@@ -63,15 +70,28 @@ object boot extends Logging {
         println()
         println()
         
-        val am = actorOf(new SvdAccountManager(userUID))
-        val loggingManager = actorOf[LoggingManager]
+        // Get account form remote service
         
-        remote.start("localhost", 8000) // 2011-06-26 00:25:24 - dmilith - XXX: HARDCODE: port and host
-        remote.register("service:account-manager", am)
-        remote.register("service:logging-manager", loggingManager)
-        
-        am ! Init
-        log.info("Spawned UserBoot for UID: %s".format(userUID))
+        val remoteAccountsManager = remote.actorFor("service:accounts-manager", SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
+        (remoteAccountsManager !! GetAccount(userUID)) collect {
+            case Some(account: SvdAccount) => account
+        } match {
+            case Some(account) =>
+                val am = actorOf(new SvdAccountManager(account))
+                
+                val loggingManager = actorOf[LoggingManager]
+
+                remote.start("localhost", 8000) // 2011-06-26 00:25:24 - dmilith - XXX: HARDCODE: port and host
+                remote.register("service:account-manager", am)
+                remote.register("service:logging-manager", loggingManager)
+
+                am ! Init
+                log.info("Spawned UserBoot for UID: %d", userUID)
+                
+            case None =>
+                log.error("Account for uid %d does not exist", userUID)
+                sys.exit(1)
+        }
     }
     
     

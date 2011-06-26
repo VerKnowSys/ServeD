@@ -78,9 +78,9 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             self reply_? Success
         
         case GetAccount(uid) =>
-            val ret = SvdAccounts(db)(_.uid == uid).toList
-            log.warn("RET: " + ret)
-            self reply ret
+            val account = SvdAccounts(db)(_.uid == uid).headOption
+            log.trace("GetAccount(%d): %s", uid, account)
+            self reply account
         
         case GetAccountManager(username) =>
             self reply accountManagers.flatMap(_.get(username))
