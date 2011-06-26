@@ -24,13 +24,23 @@ class SvdAccountManager(val uid: Int) extends Actor with SvdExceptionHandler {
     
     log.info("Starting AccountManager for uid: %s".format(uid))
     
-    val server = new DBServer(9009, SvdConfig.userHomeDir / "%s".format(uid) / "%s.userdb".format(uid)) // 2011-06-26 00:20:59 - dmilith - XXX: hardcoded port name
+    val server = new DBServer(9009, SvdConfig.userHomeDir / "%s".format(uid) / "%s.db".format(uid)) // 2011-06-26 00:20:59 - dmilith - XXX: hardcoded port name
     val db = server.openClient
-    val account = Accounts(db)(_.uid == uid).headOption.getOrElse {
-        val newAccount = new SvdAccount(uid = uid, gid = uid)
-        db << newAccount
-        newAccount
+    val accountsManager = remote.actorOf[SvdAccountsManager](SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
+    log.warn(accountsManager.toString)
+    val account: SvdAccount = (accountsManager !! GetAccount(uid)).headOption match {
+        case Some(acct: SvdAccount) =>
+            acct
+        case None =>
+            null
     }
+    
+    // 2011-06-26 21:47:49 - dmilith - HACK: FIXME: PENDING: do it via remote actors with GetAccount(uid)
+    if (account == null) {
+        log.error("Unregistered UID: %s".format(uid))
+        sys.exit(1)
+    }
+    
     log.debug("Got user account: %s".format(account))
     
     val sh = new SvdShell(account)
@@ -41,13 +51,11 @@ class SvdAccountManager(val uid: Int) extends Actor with SvdExceptionHandler {
     def receive = {
         case Init =>
             log.info("SvdAccountManager received Init.")
-            // SvdSystemManager ! GetAllProcesses
-            // SvdSystemManager ! GetNetstat
             
-            sh.exec("rm -rf /Users/501/THE_DB_by_initdb && initdb -D /Users/501/THE_DB_by_initdb && pg_ctl -D /Users/501/THE_DB_by_initdb start && sleep 45 && pg_ctl -D /Users/501/THE_DB_by_initdb stop")
-            log.debug("OUTPUT: " + sh.output(0).head)
-            sh.close(0)
-            sh.exec("ls -lam /usr")
+            // sh.exec("rm -rf /Users/501/THE_DB_by_initdb && initdb -D /Users/501/THE_DB_by_initdb && pg_ctl -D /Users/501/THE_DB_by_initdb start && sleep 45 && pg_ctl -D /Users/501/THE_DB_by_initdb stop")
+            //             log.debug("OUTPUT: " + sh.output(0).head)
+            //             sh.close(0)
+            //             sh.exec("ls -lam /usr")
             
             val psAll = SvdLowLevelSystemAccess.processList(true)
             log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
