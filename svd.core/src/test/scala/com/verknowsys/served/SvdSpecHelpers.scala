@@ -6,7 +6,7 @@ import com.verknowsys.served._
 import org.apache.commons.io.FileUtils
 import java.io.File
 import akka.actor.ActorRef
-import com.verknowsys.served.systemmanager.native.SvdAccount
+import com.verknowsys.served.api.SvdAccount
 import scala.io.Source
 
 
@@ -50,7 +50,7 @@ object SvdSpecHelpers {
     
     val usedPorts = scala.collection.mutable.ListBuffer[Int]()
     def randomPort: Int = {
-        val port = util.Random.nextInt(40000) + 2000
+        val port = util.Random.nextInt(60000) + 2000
         if(usedPorts.contains(port)) {
             randomPort
         } else {
@@ -77,12 +77,13 @@ object SvdSpecHelpers {
     def waitFor(time: Int) = Thread.sleep(time)
     
     def currentAccount = {
-        val rawData = Source.fromFile(SvdConfig.systemPasswdFile, SvdConfig.defaultEncoding).getLines.toList
-        val accounts: List[SvdAccount] = rawData collect {
-            case SvdAccount(account) => account
-        }
+        val accounts: List[SvdAccount] =
+            SvdAccount(uid = randomPort, gid = randomPort, dbPort = randomPort, servicePort = randomPort, userName = "żółć") ::
+            SvdAccount(uid = randomPort, gid = randomPort, dbPort = randomPort, servicePort = randomPort, userName = System.getProperty("user.name")) ::
+            SvdAccount(uid = randomPort, gid = randomPort, dbPort = randomPort, servicePort = randomPort, userName = "gęś") :: Nil
         val account = accounts.find(_.userName == System.getProperty("user.name")).get
-        account.copy(homeDir = randomPath)
+        // account.copy(homeDir = randomPath)
+        account
     }
 
 }
