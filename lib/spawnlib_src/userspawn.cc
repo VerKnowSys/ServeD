@@ -48,7 +48,11 @@ int main(int argc, char const *argv[]) {
     if (!fileExists(homeDir)) {
         lm << homeDir << " does not exists. Creating it.";
         log_message(lm.str());
+#ifdef DEVEL
+        mkdir(homeDir.c_str(), 0755); /* XXX: hardcoded permissions but it's safe */
+#else
         mkdir(homeDir.c_str(), 0711); /* XXX: hardcoded permissions but it's safe */
+#endif
         chown(homeDir.c_str(), atoi(arg.c_str()), 20); /* XXX: hardcoded "staff" group */
     }
     
@@ -94,11 +98,11 @@ int main(int argc, char const *argv[]) {
     }
     ifs.close();
     
-    setuid(uid);
     chdir(homeDir.c_str());
     lm << "Starting UserSpawn for uid: " << uid << " in homeDir: " << homeDir;
     log_message(lm.str());
 
+    setuid(uid);
     spawnBackgroundTask("/usr/bin/java", "user", string(argv[1]), false, lockName);
     
     return 0;
