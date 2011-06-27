@@ -3,7 +3,7 @@ package com.verknowsys.served.systemmanager.managers
 
 import com.verknowsys.served.systemmanager._
 import com.verknowsys.served.SvdSpecHelpers._
-import com.verknowsys.served.systemmanager.native.SvdAccount
+import com.verknowsys.served.api._
 import org.specs._
 
 import akka.actor._
@@ -19,7 +19,7 @@ class SvdAccountManagerTest extends Specification with TestKit {
         "respond to GetAccount" in {
             val account = currentAccount
             am = actorOf(new SvdAccountManager(account)).start
-            am ! GetAccount
+            am ! GetAccount(account.uid)
             expectMsg(account)
             am.stop
         }
