@@ -60,6 +60,11 @@ extern "C" {
         // string javalp = "-Djava.library.path=" + currentDir() + "/lib";
         string jnalp = "-Djna.library.path=" + currentDir() + "/lib";
 
+#ifdef DEVEL
+    #define COUNT 13
+#else
+    #define COUNT 14
+#endif
         char *args[] = {
             (char*)"java",
             (char*)"-d64",
@@ -88,7 +93,7 @@ extern "C" {
 
         stringstream    ret;
         ret << "loading svd, with opts: [";
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < COUNT; i++) {
             ret << args[i] << " ";
         }
         ret << "]";
