@@ -45,6 +45,8 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
     // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
     
     override def postStop {
+        super.postStop
+        log.trace("Invoking postStop in SvdAccountsManager")
         db.close
         server.close
     }
