@@ -38,6 +38,13 @@ int main(int argc, char const *argv[]) {
     /* check and create home dir if necessary */
     string arg = string(argv[1]);
     string homeDir = string(USERS_HOME_DIR) + arg; /* NOTE: /Users/$UID homedir format */
+#ifdef DEVEL
+    /* also remove contents of home directory before each running in devel mode */
+    if (homeDir != string(USERS_HOME_DIR)) {
+        cout << "Cleaning files in homeDir: " << homeDir << endl;
+        spawn("/bin/rm -rf " + homeDir);
+    }
+#endif
     if (!fileExists(homeDir)) {
         lm << homeDir << " does not exists. Creating it.";
         log_message(lm.str());
