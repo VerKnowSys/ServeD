@@ -1,0 +1,13 @@
+:markdown
+  # ServeD API Test console
+
+  ## Startup
+:code
+  $ sbt "project api" console
+  > :load console.scala
+:markdown
+  Now you are logged in to ServeD and you can make API requests using:
+:code
+  > svd !! git.ListRepositories
+:markdown
+  Note the *!!*, using *!* will not work
