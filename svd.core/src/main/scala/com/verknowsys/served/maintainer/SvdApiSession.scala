@@ -40,14 +40,14 @@ class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
             }
     }
     
-    lazy val loggingManagers = remote.actorFor("service:logging-manager", "localhost", 8000) :: Nil
+    // lazy val loggingManagers = remote.actorFor("service:logging-manager", "localhost", 8000) :: Nil  // XXX: HACK: should use account.servicePort instead of 8000
 
     protected def routes = {
         case msg: Logger.Base =>
             log.debug("Remote client sent %s. Forwarding to LoggingManager", msg)
             
             // temporary!
-            loggingManagers.foreach(_ ! msg)
+            // loggingManagers.foreach(_ ! msg) // disabled due to 8000 port issue 
             
             registry.actorFor[LoggingManager].get
             
