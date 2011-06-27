@@ -17,7 +17,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
     val shells: ArrayBuffer[Spawn] = ArrayBuffer[Spawn](startShell)
 
 
-    def startShell = expectinator.spawn(SvdConfig.defaultShell) // 2011-06-19 02:27:55 - dmilith - XXX: hardcoded shell
+    def startShell = expectinator.spawn(SvdConfig.defaultShell)
     
     
     def loadSettings =
