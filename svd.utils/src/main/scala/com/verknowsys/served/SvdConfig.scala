@@ -25,11 +25,11 @@ object SvdConfig {
     def userHomeDir                 = "/Users/"
     def defaultShell                = "/bin/sh"
     def defaultEncoding             = "UTF-8"
-    def remoteApiServerHost         = "localhost" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
+    def defaultHost                 = "127.0.0.1"
+    def remoteApiServerHost         = "127.0.0.1" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
     def remoteApiServerPort     = 10
     def remoteAccountServerPort = 12
     def defaultUserGroup        = 20 // 2011-06-09 01:06:59 - dmilith - NOTE: default GID for "staff" group both on Darwin and FreeBSD
-    
     def kqueueWaitInterval          = 500
     def sleepDefaultPause           = 1000
     def gatherTimeout               = 1000

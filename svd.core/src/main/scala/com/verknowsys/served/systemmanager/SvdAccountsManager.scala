@@ -113,8 +113,8 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
         }
         
         val map = Map( // 2011-06-22 16:49:20 - dmilith - XXX: FIXME: TODO: merge it into SvdAccount (gather automatically)
-            "teamon" -> ("localhost", randomUserPort),
-            "dmilith" -> ("localhost", randomUserPort)
+            "teamon" -> (SvdConfig.defaultHost, randomUserPort),
+            "dmilith" -> (SvdConfig.defaultHost, randomUserPort)
         )
         
         accountManagers = Some(map.mapValues { case(host, port) =>
