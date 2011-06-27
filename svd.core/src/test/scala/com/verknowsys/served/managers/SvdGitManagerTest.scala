@@ -1,6 +1,7 @@
 package com.verknowsys.served.managers
 
 import com.verknowsys.served.testing._
+import com.verknowsys.served._
 import Actor._
 import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.systemmanager.managers._
@@ -13,9 +14,9 @@ import akka.util.duration._
 
 
 class SvdGitManagerTest extends DefaultTest {
+
     val account = currentAccount
-    val homeDir = account.homeDir
-    
+    val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val dbServer = new DBServer(randomPort, randomPath)
     val db = dbServer.openClient
     val manager = actorOf(new SvdGitManager(account, db)).start
