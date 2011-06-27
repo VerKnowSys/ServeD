@@ -26,108 +26,7 @@ case object SvdUserUIDs extends DB[SvdUserUID]
 case object SvdUserGIDs extends DB[SvdUserGID]
 
 
-class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExceptionHandler with Logging {
-
-    import events._
-
-    val server = new DBServer(SvdConfig.remoteAccountServerPort, SvdConfig.systemHomeDir / SvdConfig.coreSvdAccountsDatabaseName)
-    val db = server.openClient
-    
-    log.info("SvdAccountsManager is loading")
-    
-    log.debug("User accounts registered in Account database: %s".format(SvdAccounts(db).mkString(", ")))
-    log.debug("User ports registered in Account database: %s".format(SvdUserPorts(db).mkString(", ")))
-    log.debug("System ports registered in Account database: %s".format(SvdSystemPorts(db).mkString(", ")))
-    log.debug("User uids registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
-    log.debug("User gids registered in Account database: %s".format(SvdUserGIDs(db).mkString(", ")))
-
-    
-    // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
-    
-    override def postStop {
-        super.postStop
-        log.trace("Invoking postStop in SvdAccountsManager")
-        db.close
-        server.close
-    }
-
-    
-    // Safe map for fast access to AccountManagers
-    protected var accountManagers: Option[Map[String, ActorRef]] = None
-
-
-    def receive = {
-        case Init =>
-            log.debug("SvdAccountsManager received Init. Running default task..")
-            // registerFileEventFor(SvdConfig.systemHomeDir, Modified)
-            
-            // 2011-06-26 18:17:00 - dmilith - HACK: XXX: HARDCODE: default user definition hack moved here now ;]
-            // 2011-06-27 02:46:10 - dmilith - FIXME: PENDING: TODO: find out WTF in neodatis bug when more than two elements are inserted at once:
-            // (1 until 10).foreach{
-                // _ =>
-                    if (!userUIDRegistered(501)) {
-                        registerUserAccount(501, "mac-user")
-                    }
-
-                    val ruid = randomUserUid
-                    if (!userUIDRegistered(ruid)) {
-                        registerUserAccount(ruid, "żółć")
-                    }
-                    
-            // }
-            
-            respawnUsersActors
-            self reply_? Success
-        
-        case GetAccount(uid) =>
-            val account = SvdAccounts(db)(_.uid == uid).headOption
-            log.trace("GetAccount(%d): %s", uid, account)
-            self reply account
-        
-        case GetAccountManager(username) =>
-            self reply accountManagers.flatMap(_.get(username))
-        
-        case x: Any =>
-            log.warn("%s has received unknown signal: %s".format(this.getClass, x))
-            
-    }
-
-    private def respawnUsersActors {
-        // 2011-06-26 18:38:42 - dmilith - PENDING: XXX: FIXME: fix respawning issues with AM
-        // // kill all Account Managers
-        // log.trace("Actor.registry size before: %d", registry.actors.size)
-        // registry.actorsFor[SvdAccountManager] foreach { _.stop }
-        // 
-        // // spawn Account Manager for each account entry in passwd file
-        // accountManagers = Some(userAccounts.map { account =>
-        //     val manager = actorOf(new SvdAccountManager(account))
-        //     self.link(manager)
-        //     manager.start
-        //     (account.userName, manager)
-        // }.toMap)
-        // log.trace("Actor.registry size after: %d", registry.actors.size)
-        
-        val wrapper = SvdWrapLibrary.instance
-        userAccounts.foreach{
-            account =>
-                log.warn("Sending spawn message for account: %s".format(account))
-                wrapper.sendSpawnMessage(account.uid.toString)
-        }
-        
-        val map = Map( // 2011-06-22 16:49:20 - dmilith - XXX: FIXME: TODO: merge it into SvdAccount (gather automatically)
-            "teamon" -> (SvdConfig.defaultHost, randomUserPort),
-            "dmilith" -> (SvdConfig.defaultHost, randomUserPort)
-        )
-        
-        accountManagers = Some(map.mapValues { case(host, port) =>
-            val am = remote.actorFor("service:account-manager", host, port)
-            log.trace("account-manager: %s :%s".format(host, port))
-            // self link am
-            am
-        })
-    }
-
-
+class SvdAccountUtils(db: DBClient) { // This prefix sucks
     /**
      *  @author dmilith
      *
@@ -206,7 +105,7 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             gid = uid,
             servicePort = port,
             dbPort = dbP
-            )
+        )
     }
 
 
@@ -270,7 +169,7 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             true
 
 
-    /**
+    /**s
      *  @author dmilith
      *
      *   returns true if system uid is registered in svd database
@@ -292,6 +191,116 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             false
         else
             true
+    
+}
+
+class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExceptionHandler with Logging {
+
+    import events._
+
+    val server = new DBServer(SvdConfig.remoteAccountServerPort, SvdConfig.systemHomeDir / SvdConfig.coreSvdAccountsDatabaseName)
+    val db = server.openClient
+    
+    val svdAccountUtils = new SvdAccountUtils(db)
+    import svdAccountUtils._
+    
+    log.info("SvdAccountsManager is loading")
+    
+    log.debug("User accounts registered in Account database: %s".format(SvdAccounts(db).mkString(", ")))
+    log.debug("User ports registered in Account database: %s".format(SvdUserPorts(db).mkString(", ")))
+    log.debug("System ports registered in Account database: %s".format(SvdSystemPorts(db).mkString(", ")))
+    log.debug("User uids registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
+    log.debug("User gids registered in Account database: %s".format(SvdUserGIDs(db).mkString(", ")))
+
+    
+    // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
+    
+    override def postStop {
+        super.postStop
+        log.trace("Invoking postStop in SvdAccountsManager")
+        db.close
+        server.close
+    }
+
+    
+    // Safe map for fast access to AccountManagers
+    protected var accountManagers: Option[Map[String, ActorRef]] = None
+
+
+    def receive = {
+        case Init =>
+            log.debug("SvdAccountsManager received Init. Running default task..")
+            // registerFileEventFor(SvdConfig.systemHomeDir, Modified)
+            
+            // 2011-06-26 18:17:00 - dmilith - HACK: XXX: HARDCODE: default user definition hack moved here now ;]
+            // 2011-06-27 02:46:10 - dmilith - FIXME: PENDING: TODO: find out WTF in neodatis bug when more than two elements are inserted at once:
+            (1 to 10) foreach {
+                _ =>
+                    if (!userUIDRegistered(501)) {
+                        registerUserAccount(501, "mac-user")
+                    }
+
+                    val ruid = randomUserUid
+                    log.trace("Adding user for %d", ruid)
+                    if (!userUIDRegistered(ruid)) {
+                        log.trace("Added")
+                        registerUserAccount(ruid, "żółć")
+                    }
+                    
+            }
+            
+            respawnUsersActors
+            self reply_? Success
+        
+        case GetAccount(uid) =>
+            val account = SvdAccounts(db)(_.uid == uid).headOption
+            log.trace("GetAccount(%d): %s", uid, account)
+            self reply account
+        
+        case GetAccountManager(username) =>
+            self reply accountManagers.flatMap(_.get(username))
+        
+        case x: Any =>
+            log.warn("%s has received unknown signal: %s".format(this.getClass, x))
+            
+    }
+
+    private def respawnUsersActors {
+        // 2011-06-26 18:38:42 - dmilith - PENDING: XXX: FIXME: fix respawning issues with AM
+        // // kill all Account Managers
+        // log.trace("Actor.registry size before: %d", registry.actors.size)
+        // registry.actorsFor[SvdAccountManager] foreach { _.stop }
+        // 
+        // // spawn Account Manager for each account entry in passwd file
+        // accountManagers = Some(userAccounts.map { account =>
+        //     val manager = actorOf(new SvdAccountManager(account))
+        //     self.link(manager)
+        //     manager.start
+        //     (account.userName, manager)
+        // }.toMap)
+        // log.trace("Actor.registry size after: %d", registry.actors.size)
+        
+        val wrapper = SvdWrapLibrary.instance
+        userAccounts.foreach{
+            account =>
+                log.warn("Sending spawn message for account: %s".format(account))
+                wrapper.sendSpawnMessage(account.uid.toString)
+        }
+        
+        val map = Map( // 2011-06-22 16:49:20 - dmilith - XXX: FIXME: TODO: merge it into SvdAccount (gather automatically)
+            "teamon" -> (SvdConfig.defaultHost, randomUserPort),
+            "dmilith" -> (SvdConfig.defaultHost, randomUserPort)
+        )
+        
+        accountManagers = Some(map.mapValues { case(host, port) =>
+            val am = remote.actorFor("service:account-manager", host, port)
+            log.trace("account-manager: %s :%s".format(host, port))
+            // self link am
+            am
+        })
+    }
+
+
 
     
     /**
