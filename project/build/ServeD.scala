@@ -105,7 +105,10 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "0.11.1-SNAPSHOT" // Move it out
         val akkaRemote = akkaModule("remote")
         val akkaTestKit = akkaModule("testkit")
-        val neodatis = "org.neodatis.odb" % "neodatis-odb" % "1.9.30.689"
+        
+        val mediavks = "media vks" at "http://media.verknowsys.com/.m2/repository"
+        val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
+        
         val h2 = "com.h2database" % "h2" % "1.3.154"
         
         lazy val assembly = onejar
