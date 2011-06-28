@@ -36,8 +36,6 @@
     Success
     RepositoryDoesNotExistError
     
-    
-    
 %h3 Listing repositories
 
 %p Returns list of Repository objects.
@@ -49,3 +47,14 @@
   :response
     Repositories(list: List[Repository])
 
+%h3 Retrieving repository
+
+%p Returns repository object if exists, othervise None
+
+.api
+  :request
+    case class GetRepositoryByName(name: String)
+    // or
+    case class GetRepositoryByUUID(uuid: UUID)
+  :response
+    Option[Repository]

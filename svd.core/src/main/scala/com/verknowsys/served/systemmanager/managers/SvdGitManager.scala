@@ -27,7 +27,13 @@ class SvdGitManager(val account: SvdAccount, val db: DBClient) extends SvdManage
         case ListRepositories =>
             log.trace("Listing git repositories in %s", gitHomeDir)
             self reply Repositories(RepositoryDB(db).toList)
-
+            
+        case GetRepositoryByName(name) =>
+            self reply RepositoryDB(db)(_.name == name).headOption
+        
+        case GetRepositoryByUUID(uuid) =>
+            self reply RepositoryDB(db)(uuid)
+        
         case CreateRepository(name) =>
             RepositoryDB(db)(_.name == name).headOption match {
                 case Some(repo) =>

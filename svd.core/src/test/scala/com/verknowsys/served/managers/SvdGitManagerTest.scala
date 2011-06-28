@@ -88,6 +88,40 @@ class SvdGitManagerTest extends DefaultTest {
              expectMsg(Repositories(Nil))
         }
     }
+    
+    ignore should "retrieve repository by name" in {
+        manager ! CreateRepository("foo")
+        val foo = within(3 second){
+             expectMsgClass(classOf[Repository])
+        }
+
+        manager ! GetRepositoryByName("foo")
+        within(3 second){
+             expectMsg(Some(foo))
+        }
+        
+        manager ! GetRepositoryByName("blaaah")
+        within(3 second){
+             expectMsg(None)
+        }
+    }
+    
+    ignore should "retrieve repository by uuid" in {
+        manager ! CreateRepository("foo")
+        val foo = within(3 second){
+             expectMsgClass(classOf[Repository])
+        }
+
+        manager ! GetRepositoryByUUID(foo.uuid)
+        within(3 second){
+             expectMsg(Some(foo))
+        }
+        
+        manager ! GetRepositoryByName(java.util.UUID.randomUUID)
+        within(3 second){
+             expectMsg(None)
+        }
+    }
 
     it should "raise error when removing non existing repository" in {
         manager ! RemoveRepository(java.util.UUID.randomUUID)

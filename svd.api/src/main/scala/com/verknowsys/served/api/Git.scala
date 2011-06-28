@@ -22,6 +22,10 @@ case class Repository(
 
 // messages
 
+case class GetRepositoryByName(name: String) extends Base
+case class GetRepositoryByUUID(uuid: UUID) extends Base
+    
+
 case class CreateRepository(name: String) extends Base
     // Repository
     case object RepositoryExistsError
