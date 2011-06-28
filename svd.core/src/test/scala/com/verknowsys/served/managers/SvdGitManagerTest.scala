@@ -117,7 +117,7 @@ class SvdGitManagerTest extends DefaultTest {
              expectMsg(Some(foo))
         }
         
-        manager ! GetRepositoryByName(java.util.UUID.randomUUID)
+        manager ! GetRepositoryByUUID(java.util.UUID.randomUUID)
         within(3 second){
              expectMsg(None)
         }
