@@ -1,6 +1,7 @@
 package com.verknowsys.served
 
 import com.verknowsys.served.utils.LoggerUtils
+import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.api.Logger
 
 import org.scalatest._
@@ -48,6 +49,7 @@ package object testing {
                          with OneInstancePerTest
                          with BeforeAndAfterEach
                          with CustomMatchers
+                         with Logging
 
 
     // Common types and objects mapping
