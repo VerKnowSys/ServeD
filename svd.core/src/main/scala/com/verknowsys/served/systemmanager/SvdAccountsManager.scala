@@ -234,8 +234,8 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             
             // 2011-06-26 18:17:00 - dmilith - HACK: XXX: HARDCODE: default user definition hack moved here now ;]
             // 2011-06-27 02:46:10 - dmilith - FIXME: PENDING: TODO: find out WTF in neodatis bug when more than two elements are inserted at once:
-            (1 to 10) foreach {
-                _ =>
+            // (1 to 10) foreach {
+                // _ =>
                     if (!userUIDRegistered(501)) {
                         registerUserAccount(501, "mac-user")
                     }
@@ -247,7 +247,7 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
                         registerUserAccount(ruid, "żółć")
                     }
                     
-            }
+            // }
             
             respawnUsersActors
             self reply_? Success

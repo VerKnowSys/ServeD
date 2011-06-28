@@ -27,7 +27,9 @@ int main(int argc, char const *argv[]) {
         exit(1);
     }
 #else
-    cout << "Devel mode enabled" << endl;
+    cout << "Devel mode enabled. Auto cleaning svd logs.." << endl;
+    /* also remove contents of log files when running in devel mode */
+    spawn("/bin/rm " + string(INTERNAL_LOG_FILE));
 #endif
 
     /* stop & start action */
