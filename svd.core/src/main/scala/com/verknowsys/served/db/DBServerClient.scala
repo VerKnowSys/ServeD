@@ -4,28 +4,44 @@ import org.neodatis.odb._
 import org.neodatis.odb.core.NeoDatisError
 import com.verknowsys.served.utils.Logging
 
-class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
-    /**
-     * This two lines are required to make java.util.UUID work correctly with NeoDatis.
-     * Because of implementation of `equals` method in java.util.UUID class which compares
-     * `mostSigBits` and `leastSigBits` as well as `variant`. The `variant` field is declared
-     * as `private transient int variant = -1`, so NeoDatis will not save it into database.
-     * This field should have default assigned value `-1` but that happens only when object
-     * is created using constructor, and NeoDatis uses reflection when retrieving objects
-     * from database which leads to `variant` field with value of 0. Next, the `variant()`
-     * method calculates UUID variant using `mostSigBits`, but ONLY if `variant` is -1.
-     * Otherwise variant value will not be calculated. Since all UUIDs generated with java.util.UUID
-     * class have variant 2, and UUID retrieved from NeoDatis database has variant 0 the same
-     * object savend and then retrieved from NeoDatis is different in terms of `equals` method.
-     * To solve this issue we need to force storing of transient `variant` field into database 
-     * and that is exactly what those two lines do.
-     *
-     * @author teamon
-     *
-     * Reference: http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/java/util/UUID.java
-     */
-    currentODB.getClassRepresentation(classOf[UUID].getName(), false).persistAttribute("variant")
-    historyODB.getClassRepresentation(classOf[UUID].getName(), false).persistAttribute("variant")
+class DBClient(val server: DBServer) extends Logging {
+    // XXX: HACK: VAR: This sucks a lot
+    var currentODB: ODB = null
+    var historyODB: ODB = null
+    
+    reconnect
+    
+    def reconnect {
+        if(currentODB != null) currentODB.close
+        if(historyODB != null) historyODB.close
+        
+        currentODB = server.currentClient
+        historyODB = server.historyClient
+        
+        /**
+         * This two lines are required to make java.util.UUID work correctly with NeoDatis.
+         * Because of implementation of `equals` method in java.util.UUID class which compares
+         * `mostSigBits` and `leastSigBits` as well as `variant`. The `variant` field is declared
+         * as `private transient int variant = -1`, so NeoDatis will not save it into database.
+         * This field should have default assigned value `-1` but that happens only when object
+         * is created using constructor, and NeoDatis uses reflection when retrieving objects
+         * from database which leads to `variant` field with value of 0. Next, the `variant()`
+         * method calculates UUID variant using `mostSigBits`, but ONLY if `variant` is -1.
+         * Otherwise variant value will not be calculated. Since all UUIDs generated with java.util.UUID
+         * class have variant 2, and UUID retrieved from NeoDatis database has variant 0 the same
+         * object savend and then retrieved from NeoDatis is different in terms of `equals` method.
+         * To solve this issue we need to force storing of transient `variant` field into database 
+         * and that is exactly what those two lines do.
+         *
+         * @author teamon
+         *
+         * Reference: http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/java/util/UUID.java
+         */
+        currentODB.getClassRepresentation(classOf[UUID].getName(), false).persistAttribute("variant")
+        historyODB.getClassRepresentation(classOf[UUID].getName(), false).persistAttribute("variant")
+    }
+    
+
     
     /**
      * Save object in database
@@ -52,6 +68,8 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
                 currentODB.store(newObj)
                 currentODB.commit
         }
+        
+        reconnect
     }
     
     /**
@@ -117,7 +135,7 @@ class DBServer(port: Int, path: String){
      *
      * @author teamon
      */
-    def openClient = new DBClient(currentClient, historyClient)
+    def openClient = new DBClient(this)
     
     /**
      * Shutdown server
@@ -127,9 +145,9 @@ class DBServer(port: Int, path: String){
     
     def close = server.close
     
-    protected def currentClient = server.openClient(dbpath("current"))
+    def currentClient = server.openClient(dbpath("current"))
     
-    protected def historyClient = server.openClient(dbpath("history"))
+    def historyClient = server.openClient(dbpath("history"))
     
     protected def dbpath(suffix: String) = path + "_" + suffix
 }
