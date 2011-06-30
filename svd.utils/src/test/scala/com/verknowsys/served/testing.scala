@@ -8,6 +8,8 @@ import org.scalatest._
 import org.scalatest.matchers._
 import akka.testkit.TestKit
 import java.io.File
+import scala.io.Source
+
 
 package object testing {
     trait TestLogger {
@@ -56,4 +58,7 @@ package object testing {
     type Actor = akka.actor.Actor
     val Actor = akka.actor.Actor
     type ActorRef = akka.actor.ActorRef
+    
+    // Utility methods
+    def testPublicKey = Source.fromURL(getClass.getResource("/test_key_rsa.pub")).getLines.mkString("\n")
 }
