@@ -58,5 +58,17 @@ package object utils {
         } }
     }
     
+    /**
+     * Executes given call-by-name and returns Some(val)
+     * In case of any exception returns None
+     * 
+     * @author teamon
+     */
+    def catchException[T](f: => T): Option[T] = try {
+        Some(f)
+    } catch {
+        case _ => None
+    }
+    
     
 }
