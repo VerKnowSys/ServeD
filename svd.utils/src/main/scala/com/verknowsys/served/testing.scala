@@ -56,7 +56,4 @@ package object testing {
     type Actor = akka.actor.Actor
     val Actor = akka.actor.Actor
     type ActorRef = akka.actor.ActorRef
-    
-    import SvdSpecHelpers._
 }
-

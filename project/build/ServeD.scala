@@ -53,11 +53,12 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
     }
     
     
-    class SvdUtils(info: ProjectInfo) extends SvdProject(info) {
+    class SvdUtils(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
         val javaNet = "java.net" at "http://download.java.net/maven/2"
         val commonsio = "commons-io" % "commons-io" % "1.4"
         val messadmin = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
         val jna = "net.java.dev.jna" % "jna" % "3.2.5"
+        val akkaTestKit = akkaModule("testkit")
     }
 
 
@@ -104,7 +105,6 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val smack = "jivesoftware" % "smack" % "3.0.4"
         val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "0.11.1-SNAPSHOT" // Move it out
         val akkaRemote = akkaModule("remote")
-        val akkaTestKit = akkaModule("testkit")
         
         val mediavks = "media vks" at "http://media.verknowsys.com/.m2/repository"
         val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
