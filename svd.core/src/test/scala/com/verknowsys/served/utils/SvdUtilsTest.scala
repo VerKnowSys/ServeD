@@ -29,41 +29,43 @@ class SvdUtilsTest extends Specification with Logging {
         
     }
 
-    // XXX: PENDING: FIXME: fix uid issue from Java
-    // "chown should change owner" in {
-    //     val account = currentAccount // XXX: this generates random User UID, and it's not possible to chown to it without root
-    //     val path = randomPath
-    //     FileUtils.touch(path / "dupa007")
-    //     SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = account.gid) must beTrue
-    //     SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = account.gid, recursive = true) must beTrue
-    //     SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = account.gid, recursive = false) must beTrue
-    //     
-    //     try { 
-    //       new File(path / "dupa0078").delete
-    //     } catch {
-    //       case e: Exception =>
-    //         fail("Shouldn't throw exception on deleting non existing file.")
-    //     }
-    //     
-    //     try { 
-    //       SvdSystemManagerUtils.chown(path / "dupa0078", user = account.uid, group = account.gid) must beTrue
-    //       fail("Chown on non existing folder/ file should throw an exception!")
-    //     } catch {
-    //       case e: Exception =>
-    //     }
-    //     
-    //     val f = new File(path / "dupa_32745923").mkdirs
-    //     val g = new File(path / "dupa_32745923/abc").mkdirs
-    //     val h = new File(path / "dupa_32745923/xyz").mkdirs
-    //     FileUtils.touch(path / "dupa_32745923/abc/dupa00")
-    //     FileUtils.touch(path / "dupa_32745923/abc/dupa01")
-    //     FileUtils.touch(path / "dupa_32745923/dupa011")
-    //     FileUtils.touch(path / "dupa_32745923/dupa004")
-    //     FileUtils.touch(path / "dupa_32745923/dupa003")
-    //     new File(path / "dupa_32745923/dupa003").exists must beTrue
-    //     new File(path / "dupa_32745923/xyz").exists must beTrue
-    //     new File(path / "dupa_32745923/xyz").isDirectory must beTrue
-    // }
+    "chown should change owner" in {
+        val path = randomPath
+        import CLibrary._
+        val clib = CLibrary.instance
+        val account = currentAccount.copy(uid = clib.getuid, gid = SvdConfig.defaultUserGroup)
+        
+        FileUtils.touch(path / "dupa007")
+        SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = account.gid) must beTrue
+        SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = account.gid, recursive = true) must beTrue
+        SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = account.gid, recursive = false) must beTrue
+        
+        try { 
+          new File(path / "dupa0078").delete
+        } catch {
+          case e: Exception =>
+            fail("Shouldn't throw exception on deleting non existing file.")
+        }
+        
+        try { 
+          SvdSystemManagerUtils.chown(path / "dupa0078", user = account.uid, group = account.gid) must beTrue
+          fail("Chown on non existing folder/ file should throw an exception!")
+        } catch {
+          case e: Exception =>
+        }
+        
+        val f = new File(path / "dupa_32745923").mkdirs
+        val g = new File(path / "dupa_32745923/abc").mkdirs
+        val h = new File(path / "dupa_32745923/xyz").mkdirs
+        FileUtils.touch(path / "dupa_32745923/abc/dupa00")
+        FileUtils.touch(path / "dupa_32745923/abc/dupa01")
+        FileUtils.touch(path / "dupa_32745923/dupa011")
+        FileUtils.touch(path / "dupa_32745923/dupa004")
+        FileUtils.touch(path / "dupa_32745923/dupa003")
+        new File(path / "dupa_32745923/dupa003").exists must beTrue
+        new File(path / "dupa_32745923/xyz").exists must beTrue
+        new File(path / "dupa_32745923/xyz").isDirectory must beTrue
+    }
     
     "chmod should change permissions and count files in given folder properly" in {
         val path = randomPath
