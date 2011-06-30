@@ -24,8 +24,9 @@ class SvdAccountManager(val account: SvdAccount) extends Actor with SvdException
     val server = new DBServer(account.dbPort, SvdConfig.userHomeDir / "%s".format(account.uid) / "%s.db".format(account.uid))
     val db = server.openClient
     
+    val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val sh = new SvdShell(account)
-    val gitManager = Actor.actorOf(new SvdGitManager(account, db))
+    val gitManager = Actor.actorOf(new SvdGitManager(account, db, homeDir / "git"))
     self startLink gitManager
     
 

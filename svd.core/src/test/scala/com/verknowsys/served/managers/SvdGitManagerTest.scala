@@ -16,10 +16,10 @@ import akka.util.duration._
 class SvdGitManagerTest extends DefaultTest {
 
     val account = currentAccount
-    val homeDir = SvdConfig.userHomeDir / account.uid.toString
+    val homeDir = "/var/tmp" / account.uid.toString
     val dbServer = new DBServer(randomPort, randomPath)
     val db = dbServer.openClient
-    val manager = actorOf(new SvdGitManager(account, db)).start
+    val manager = actorOf(new SvdGitManager(account, db, homeDir / "git")).start
     mkdir(homeDir / "git")
 
     override def afterEach {

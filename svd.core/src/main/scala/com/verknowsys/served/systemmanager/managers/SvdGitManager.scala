@@ -14,18 +14,24 @@ import akka.actor._
 import akka.config.Supervision._
 import akka.actor.Actor.{remote, actorOf, registry}
 
+
 /**
  * Git Manager
  * 
  * @author teamon
  */
-class SvdGitManager(val account: SvdAccount, val db: DBClient) extends SvdManager(account) with DatabaseAccess {
-    log.info("Starting GitManager for account: " + account)
+class SvdGitManager(
+        val account: SvdAccount,
+        val db: DBClient,
+        val accountHomeDir: String
+    ) extends SvdManager(account) with DatabaseAccess {
+        
+    log.info("Starting GitManager for account: %s in home dir: %s".format(account, accountHomeDir))
 
 
     def receive = {
         case ListRepositories =>
-            log.trace("Listing git repositories in %s", gitHomeDir)
+            log.trace("Listing git repositories in %s", accountHomeDir)
             self reply Repositories(RepositoryDB(db).toList)
             
         case GetRepositoryByName(name) =>
@@ -38,10 +44,11 @@ class SvdGitManager(val account: SvdAccount, val db: DBClient) extends SvdManage
             RepositoryDB(db)(_.name == name).headOption match {
                 case Some(repo) =>
                     self reply RepositoryExistsError
+                    
                 case None =>
                     log.trace("Creating new git repository: %s for account: %s".format(name, account.userName))
                     val repo = Repository(name)
-                    Git.init(gitHomeDir / repo.name, bare = true)
+                    Git.init(accountHomeDir / repo.name, bare = true)
                     db << repo
                     self reply repo
             }
@@ -51,13 +58,12 @@ class SvdGitManager(val account: SvdAccount, val db: DBClient) extends SvdManage
                 case Some(repo) =>
                     log.trace("Removing git repository: %s for account: %s".format(repo.name, account.userName))
                     db ~ repo
-                    SvdUtils.rmdir(gitHomeDir / repo.name + ".git")
+                    SvdUtils.rmdir(accountHomeDir / repo.name + ".git")
                     self reply Success
+                    
                 case None =>
                     self reply RepositoryDoesNotExistError
             }
     }
 
-    
-    protected lazy val gitHomeDir = SvdUtils.checkOrCreateDir(SvdConfig.userHomeDir / account.uid.toString / "git")
 }
