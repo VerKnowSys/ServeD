@@ -76,14 +76,6 @@ object SvdSpecHelpers {
 
     def waitFor(time: Int) = Thread.sleep(time)
     
-    def currentAccount = {
-        val accounts: List[SvdAccount] =
-            SvdAccount(uid = randomPort, gid = randomPort, dbPort = randomPort, servicePort = randomPort, userName = "żółć") ::
-            SvdAccount(uid = randomPort, gid = randomPort, dbPort = randomPort, servicePort = randomPort, userName = System.getProperty("user.name")) ::
-            SvdAccount(uid = randomPort, gid = randomPort, dbPort = randomPort, servicePort = randomPort, userName = "gęś") :: Nil
-        val account = accounts.find(_.userName == System.getProperty("user.name")).get
-        // account.copy(homeDir = randomPath)
-        account
-    }
+    def currentAccount = SvdAccount(uid = randomPort, gid = randomPort, dbPort = randomPort, servicePort = randomPort, userName = System.getProperty("user.name"))
 
 }
