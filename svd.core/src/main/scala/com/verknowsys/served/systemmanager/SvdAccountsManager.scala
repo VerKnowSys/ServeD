@@ -26,7 +26,7 @@ case object SvdUserUIDs extends DB[SvdUserUID]
 case object SvdUserGIDs extends DB[SvdUserGID]
 
 
-class SvdAccountUtils(db: DBClient) { // This prefix sucks
+class SvdAccountUtils(db: DBClient) {
     /**
      *  @author dmilith
      *
