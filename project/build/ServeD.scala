@@ -59,6 +59,8 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val messadmin = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
         val jna = "net.java.dev.jna" % "jna" % "3.2.5"
         val akkaTestKit = akkaModule("testkit")
+        
+        override def parallelExecution = false // Due to global LoggingUtils object
     }
 
 
