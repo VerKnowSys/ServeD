@@ -16,7 +16,7 @@ import akka.util.duration._
 class SvdGitManagerTest extends DefaultTest {
 
     val account = currentAccount
-    val homeDir = "/var/tmp" / account.uid.toString
+    val homeDir = tmpDir / account.uid.toString
     val dbServer = new DBServer(randomPort, randomPath)
     val db = dbServer.openClient
     val manager = actorOf(new SvdGitManager(account, db, homeDir / "git")).start

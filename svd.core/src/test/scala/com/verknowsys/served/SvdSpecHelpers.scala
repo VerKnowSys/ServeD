@@ -14,32 +14,34 @@ object SvdSpecHelpers {
 	implicit def StringToFile(s: String) = new File(s)
     implicit def ItemToSeq[T](a: T) = a :: Nil
     
+    def tmpDir = "/var/tmp"
+    
     def touch(file: File) = {
-        if (file.startsWith(SvdConfig.systemTmpDir))
+        if (file.startsWith(tmpDir))
             FileUtils.touch(file)
     }
     
     def readFile(path: String) = {
-        if (path.startsWith(SvdConfig.systemTmpDir))
+        if (path.startsWith(tmpDir))
             FileUtils.readFileToString(path)
     }
 
     def writeFile(path: String, data: String) = {
-        if (path.startsWith(SvdConfig.systemTmpDir))
+        if (path.startsWith(tmpDir))
             FileUtils.writeStringToFile(path, data)
     }
     
     def mkdir(path: String) = {
-        if (path.startsWith(SvdConfig.systemTmpDir))
+        if (path.startsWith(tmpDir))
             FileUtils.forceMkdir(path)
     }
     
     def rmdir(path: String) = try {
-        if (path.startsWith(SvdConfig.systemTmpDir))
+        if (path.startsWith(tmpDir))
             FileUtils.forceDelete(path)
     } catch { case _ => }
     
-    final val TEST_DIR = SvdConfig.systemTmpDir / "served"
+    final val TEST_DIR = tmpDir / "served"
     var count = 0
     def randomPath = {
         count += 1

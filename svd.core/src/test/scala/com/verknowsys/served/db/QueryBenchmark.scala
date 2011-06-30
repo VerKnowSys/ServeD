@@ -16,8 +16,8 @@ case class Foo(val uuid: UUID = randomUUID)
 
 object QueryBenchmark {
     def main(args: Array[String]): Unit = {
-        val dbname = SvdConfig.systemTmpDir / "svd_bench/svd_db_query_benchmark.neodatis"
-        rmdir(SvdConfig.systemTmpDir / "svd_bench")
+        val dbname = tmpDir / "svd_bench/svd_db_query_benchmark.neodatis"
+        rmdir(tmpDir / "svd_bench")
         
         val server = ODBFactory.openServer(randomPort)
 

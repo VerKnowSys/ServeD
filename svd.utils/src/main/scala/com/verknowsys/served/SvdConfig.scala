@@ -19,8 +19,6 @@ object SvdConfig {
     def coreSvdAccountsDatabaseName = "accounts.db"
     def served                      = "ServeD v" + version
     def systemConfDir               = "/etc"
-    @deprecated def systemLogDir    = "/var/log" // DEPRECATED
-    @deprecated def systemTmpDir    = "/var/tmp" // DEPRECATED
     def systemHomeDir               = "/SystemUsers/"
     def userHomeDir                 = "/Users/"
     def defaultShell                = "/bin/sh"
