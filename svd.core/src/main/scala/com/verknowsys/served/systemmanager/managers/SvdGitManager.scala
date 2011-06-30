@@ -54,16 +54,29 @@ class SvdGitManager(
             }
 
         case RemoveRepository(uuid) =>
-            RepositoryDB(db)(uuid) match {
-                case Some(repo) =>
-                    log.trace("Removing git repository: %s for account: %s".format(repo.name, account.userName))
-                    db ~ repo
-                    SvdUtils.rmdir(gitRepositoriesLocation / repo.name + ".git")
-                    self reply Success
-                    
-                case None =>
-                    self reply RepositoryDoesNotExistError
+            withRepo(uuid) { repo =>
+                log.trace("Removing git repository: %s for account: %s".format(repo.name, account.userName))
+                db ~ repo
+                SvdUtils.rmdir(gitRepositoriesLocation / repo.name + ".git")
+            }
+            
+        case AddAuthorizedKey(uuid, key) =>
+            withRepo(uuid) { repo =>
+                db << repo.copy(authorizedKeys = repo.authorizedKeys + key)
+            }
+            
+        case RemoveAuthorizedKey(uuid, key) =>
+            withRepo(uuid) { repo =>
+                db << repo.copy(authorizedKeys = repo.authorizedKeys - key)
             }
     }
+    
+    def withRepo(uuid: UUID)(f: (Repository) => Unit) = self reply (RepositoryDB(db)(uuid) match {
+        case Some(repo) => 
+            f(repo)
+            Success
+        case None => 
+            RepositoryDoesNotExistError
+    })
 
 }

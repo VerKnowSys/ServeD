@@ -15,7 +15,7 @@ sealed abstract class Base extends ApiMessage
 
 case class Repository(
     name: String,                       // the name of repository
-    authorizedKeys: List[Int] = Nil,    // list of keys with access to this repository
+    authorizedKeys: Set[PublicKey] = Set(),    // list of keys with access to this repository
     uuid: UUID = randomUUID
 ) extends Persistent
 
@@ -42,4 +42,7 @@ case class RemoveRepository(uuid: UUID) extends Base
 
 case object ListRepositories extends Base
     case class Repositories(repositories: List[Repository])
+    
+case class AddAuthorizedKey(uuid: UUID, key: PublicKey) extends Base
+case class RemoveAuthorizedKey(uuid: UUID, key: PublicKey) extends Base
 

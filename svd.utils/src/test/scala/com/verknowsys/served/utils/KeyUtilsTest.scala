@@ -16,4 +16,8 @@ class KeyUtilsTest extends DefaultTest {
         val key = KeyUtils.load("some weird key")
         key should equal (None)
     }
+    
+    it should "compare keys" in {
+        KeyUtils.load(testPublicKey) should equal (KeyUtils.load(testPublicKey))
+    }
 }
