@@ -48,7 +48,7 @@ class SvdAccountManager(val account: SvdAccount) extends Actor with SvdException
     
     
     override def postStop {
-        sh.closeAll
+        sh.close
         db.close
         server.close
     }

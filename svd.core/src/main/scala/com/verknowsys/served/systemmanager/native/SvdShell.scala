@@ -14,10 +14,9 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
         new ExpectJ(timeout)
             else
                 new ExpectJ
-    val shells: ArrayBuffer[Spawn] = ArrayBuffer[Spawn](startShell)
 
-
-    def startShell = expectinator.spawn(SvdConfig.defaultShell)
+    loadSettings
+    val shell = expectinator.spawn(SvdConfig.defaultShell)
     
     
     def loadSettings =
@@ -29,43 +28,37 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
         "ulimit -u 120\n" :: Nil
     
     
-    def dead(shellNumber: Int = 0) = shells(shellNumber).isClosed
+    def dead = shell.isClosed
     
     
-    def exec(command: String, expected: String = "", shellNumber: Int = 0) = {
+    def exec(command: String, expected: String = "") = {
         try {
-            if (dead(shellNumber)) {
+            if (dead) {
                 throw new Exception("Failed to exec (dead)")
             } else {
-                loadSettings.foreach{s => shells(shellNumber).send(s)} // load settings
-                shells(shellNumber).send(command + "\n")
+                shell.send(command + "\n")
                 if (expected != "")
-                    shells(shellNumber).expect(expected)
+                    shell.expect(expected)
             }
         } catch {
             case e: Exception =>
-                log.error(e.getMessage + " shell: " + shellNumber + " with command: '" + command + "'. Expected: '" + expected + "'")
+                log.error(e.getMessage + " shell with command: '" + command + "'. Expected: '" + expected + "'")
         }
     }
     
     
-    def output(shellNumber: Int = 0) = shells(shellNumber).getCurrentStandardOutContents :: shells(shellNumber).getCurrentStandardErrContents :: Nil
+    def output = (shell.getCurrentStandardOutContents, shell.getCurrentStandardErrContents)
     
     
-    def close(shellNumber: Int = 0) {
+    def close {
         try {
-            shells(shellNumber).send("exit\n")
-            shells.remove(shellNumber)
-            if (shells.isEmpty) {
-                log.debug("Empty shell list detected.")
-            }
+            shell.send("exit\n")
+            shell.stop
         } catch {
             case e: Exception =>
                 log.error(e.getMessage + " on exit")
         }
     }
-    
-    
-    def closeAll = shells.foreach{s => s.stop}
+
     
 }
