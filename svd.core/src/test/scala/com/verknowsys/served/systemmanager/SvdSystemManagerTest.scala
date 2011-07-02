@@ -28,19 +28,43 @@ class SvdSystemManagerTest extends DefaultTest with Logging {
         SIGQUIT.id should be(3)
         SIGKILL.id should be(9)
     }
-        
-        
+
+
+    it should "check that all SvdLowLevelSystemAccess helpers are initialized properly" in {
+        SvdLowLevelSystemAccess.netstat should not be (null)
+        SvdLowLevelSystemAccess.net should not be (null)
+        SvdLowLevelSystemAccess.mem should not be (null)
+        SvdLowLevelSystemAccess.net should not be (null)
+        SvdLowLevelSystemAccess.swp should not be (null)
+        SvdLowLevelSystemAccess.tcp should not be (null)
+        SvdLowLevelSystemAccess.swapUsed should not be ==(null)
+        SvdLowLevelSystemAccess.swapFree should not be ==(null)
+        SvdLowLevelSystemAccess.swapTotal should not be ==(null)
+        SvdLowLevelSystemAccess.tcpConnections should not be ==(null)
+        SvdLowLevelSystemAccess.tcpFailedAttempts should not be ==(null)
+        SvdLowLevelSystemAccess.tcpInError should not be ==(null)
+        SvdLowLevelSystemAccess.memFree should not be ==(null)
+        SvdLowLevelSystemAccess.memUsed should not be ==(null)
+        SvdLowLevelSystemAccess.memTotal should not be ==(null)
+        SvdLowLevelSystemAccess.memUsagePercentage should not be ==(null)
+    }
+    
+
     it should "be able to get a bunch of system info/ data from sigar" in {
+        
+        SvdLowLevelSystemAccess.processList(true).size should be >(0)
+        SvdLowLevelSystemAccess.processList(false) should not equal(SvdLowLevelSystemAccess.processList(true))
+        SvdLowLevelSystemAccess.processCount(false) should equal(SvdLowLevelSystemAccess.processCount(true))
+        SvdLowLevelSystemAccess.processCount(false) should be >(1)
         
         val psAll = SvdLowLevelSystemAccess.getProcList
         psAll should not be (null)
         
-        val netstat = SvdLowLevelSystemAccess.netstat
-        netstat should not be (null)
-        
         val pid = SvdLowLevelSystemAccess.getCurrentProcessPid
         pid should not be ==(null)
         pid should be > (1L)
+        SvdLowLevelSystemAccess.getProcessInfo(pid) should include("TIME_KERNEL")
+        SvdLowLevelSystemAccess.getProcessInfo(pid) should include("PNAME")
         
         val procStat = SvdLowLevelSystemAccess.getProcState(pid)
         procStat should not be (null)
