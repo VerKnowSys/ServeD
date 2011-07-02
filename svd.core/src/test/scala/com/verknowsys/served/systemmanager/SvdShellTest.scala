@@ -68,6 +68,30 @@ class SvdShellTest extends DefaultTest {
         
         sh.close
     }
+    
+    
+    it should "be able to get return code from ran processes" in {
+        val sh = new SvdShell(
+            new SvdAccount(
+                userName = System.getProperty("user.name"),
+                uid = randomPort,
+                gid = randomPort,
+                servicePort = randomPort,
+                dbPort = randomPort
+            )
+        )
+        sh.exec("lsdjf")
+        sh.exec("echo $?", expectedStdout = Array("127")) // NOTE: 127 - command not found code from shell
+        sh.exec("ls /nonexistantSomethingBlaBla")
+        sh.exec("echo $?", expectedStdout = Array("1")) // NOTE: 1 - error thrown from ls command
+        sh.exec("ls")
+        sh.exec("echo $?", expectedStdout = Array("0"))
+        sh.output._2 should include("command not found")
+        sh.output._1 should include("0")
+        sh.output._1 should include("1")
+        sh.output._1 should include("127") // NOTE: beware! output contains output from EVERYTHING ran in particular shell!
+        sh.close
+    }
 
 
 }
