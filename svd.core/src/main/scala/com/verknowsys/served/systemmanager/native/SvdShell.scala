@@ -8,6 +8,9 @@ import scala.collection.mutable._
 import expectj._
 
 
+class SvdShellException(reason: String) extends Exception(reason)
+
+
 class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
 
     val expectinator = if (timeout > 0)
@@ -32,17 +35,12 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
     
     
     def exec(command: String, expected: String = "") = {
-        try {
-            if (dead) {
-                throw new Exception("Failed to exec (dead)")
-            } else {
-                shell.send(command + "\n")
-                if (expected != "")
-                    shell.expect(expected)
-            }
-        } catch {
-            case e: Exception =>
-                log.error(e.getMessage + " shell with command: '" + command + "'. Expected: '" + expected + "'")
+        if (dead) {
+            throw new SvdShellException("Failed to exec command: %s".format(command))
+        } else {
+            shell.send(command + "\n")
+            if (expected != "")
+                shell.expect(expected)
         }
     }
     

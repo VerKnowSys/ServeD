@@ -24,7 +24,7 @@ class SvdShellTest extends DefaultTest {
     }
     
     
-    it should "spawn command properly and know when it's dead" in {
+    it should "spawn command properly and know when it's dead and throw proper exception when shell is dead" in {
         val sh = new SvdShell(
             new SvdAccount(
                 userName = System.getProperty("user.name"),
@@ -39,6 +39,7 @@ class SvdShellTest extends DefaultTest {
         sh.dead should be(false)
         sh.close
         sh.dead should be(true)
+        evaluating { sh.exec("") } should produce [SvdShellException]
     }
     
     
