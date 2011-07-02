@@ -44,6 +44,8 @@ class SvdShellTest extends DefaultTest {
     
     
     it should "get proper output from shell" in {
+        import expectj.TimeoutException
+        
         val sh = new SvdShell(
             new SvdAccount(
                 userName = System.getProperty("user.name"),
@@ -54,10 +56,16 @@ class SvdShellTest extends DefaultTest {
             )
         )
         
-        sh.exec("ls /dev")
-        sh.output._2 should be("")
-        sh.output._1 should include("null")
-        sh.output._1 should include("zero")
+        sh.exec(command = "ls -m /dev", expectedStdout = Array("null", "zero"), waitForOutputFor = 2)
+        
+        evaluating {
+            sh.exec(command = "ls -m /dev", expectedStdout = Array("somethingNonExistant"), waitForOutputFor = 1)
+        } should produce [TimeoutException]
+        
+        evaluating {
+            sh.exec(command = "ls -m /dev", expectedStderr = Array("somethingNonExistant"), waitForOutputFor = 1)
+        } should produce [TimeoutException]
+        
         sh.close
     }
 
