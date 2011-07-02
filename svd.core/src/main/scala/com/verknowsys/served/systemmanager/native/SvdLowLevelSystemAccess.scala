@@ -16,20 +16,12 @@ import com.sun.jna.{Native, Library}
 
 object SvdLowLevelSystemAccess extends Logging {
     
-    val core: Option[Sigar] = core match {
-        case Some(x: Sigar) =>
-            log.debug("Sigar already defined. Passing current value.")
-            Some(x)
-        case _ =>
-            log.debug("No Sigar defined. Defining new one.")
-            Some(new Sigar)
-    }
-        
-    val netstat = core.get.getNetStat
-    val net = core.get.getNetInfo
-    val mem = core.get.getMem
-    val swp = core.get.getSwap
-    val tcp = core.get.getTcp
+    val core = new Sigar
+    val netstat = core.getNetStat
+    val net = core.getNetInfo
+    val mem = core.getMem
+    val swp = core.getSwap
+    val tcp = core.getTcp
     
     val swapUsed = swp.getUsed
     val swapFree = swp.getFree
@@ -79,7 +71,7 @@ object SvdLowLevelSystemAccess extends Logging {
      */
     def getProcessInfo(apid: Long) = {
         try {
-         val an = SvdLowLevelSystemAccess.core.get.getProcState(apid)
+         val an = SvdLowLevelSystemAccess.core.getProcState(apid)
              (
                 "PNAME:[%s] " +
                 "USER:[%s] " +
@@ -96,7 +88,7 @@ object SvdLowLevelSystemAccess extends Logging {
                 "TIME_TOTAL:[%s] " +
                 "TIME_USER:[%s] " +
                 "\n")
-                    .format(an.getName, SvdLowLevelSystemAccess.core.get.getProcCredName(apid).getUser, SvdLowLevelSystemAccess.core.get.getProcMem(apid).getResident, SvdLowLevelSystemAccess.core.get.getProcMem(apid).getShare, apid, an.getPpid, an.getThreads, an.getPriority, an.getNice, SvdLowLevelSystemAccess.core.get.getProcArgs(apid).mkString(" "), SvdLowLevelSystemAccess.core.get.getProcCpu(apid).getStartTime, SvdLowLevelSystemAccess.core.get.getProcCpu(apid).getSys, SvdLowLevelSystemAccess.core.get.getProcCpu(apid).getTotal, SvdLowLevelSystemAccess.core.get.getProcCpu(apid).getUser)
+                    .format(an.getName, SvdLowLevelSystemAccess.core.getProcCredName(apid).getUser, SvdLowLevelSystemAccess.core.getProcMem(apid).getResident, SvdLowLevelSystemAccess.core.getProcMem(apid).getShare, apid, an.getPpid, an.getThreads, an.getPriority, an.getNice, SvdLowLevelSystemAccess.core.getProcArgs(apid).mkString(" "), SvdLowLevelSystemAccess.core.getProcCpu(apid).getStartTime, SvdLowLevelSystemAccess.core.getProcCpu(apid).getSys, SvdLowLevelSystemAccess.core.getProcCpu(apid).getTotal, SvdLowLevelSystemAccess.core.getProcCpu(apid).getUser)
 
         } catch { 
             case _ =>
@@ -110,7 +102,7 @@ object SvdLowLevelSystemAccess extends Logging {
      *
      *  Returns current process pid
      */
-    def getCurrentProcessPid = core.get.getPid
+    def getCurrentProcessPid = core.getPid
 
     
     /**
@@ -118,7 +110,7 @@ object SvdLowLevelSystemAccess extends Logging {
      *
      *   Returns list of processes in system
      */
-    def getProcList = core.get.getProcList
+    def getProcList = core.getProcList
     
     
     /**
@@ -126,8 +118,8 @@ object SvdLowLevelSystemAccess extends Logging {
      *
      *   Returns process credentials with given process pid
      */
-    def getProcCredName(pid: Long) = core.get.getProcCredName(pid)
-    def getProcCred(pid: Long) = core.get.getProcCred(pid)
+    def getProcCredName(pid: Long) = core.getProcCredName(pid)
+    def getProcCred(pid: Long) = core.getProcCred(pid)
     
 
     /**
@@ -135,7 +127,7 @@ object SvdLowLevelSystemAccess extends Logging {
      *
      *   Returns system load
      */
-    def getSystemLoad = core.get.getLoadAverage
+    def getSystemLoad = core.getLoadAverage
     
     
     /**
@@ -143,7 +135,7 @@ object SvdLowLevelSystemAccess extends Logging {
      *
      *   Returns disk usage of given location
      */
-    def getDiskUsage(location: String) = core.get.getDiskUsage(location)
+    def getDiskUsage(location: String) = core.getDiskUsage(location)
     
     
     /**
@@ -151,7 +143,7 @@ object SvdLowLevelSystemAccess extends Logging {
      *
      *   Returns current system uptime
      */
-    def getSystemUptime = core.get.getUptime.getUptime
+    def getSystemUptime = core.getUptime.getUptime
     
     
     /**
@@ -159,7 +151,7 @@ object SvdLowLevelSystemAccess extends Logging {
      *
      *   Returns state of given process pid
      */
-    def getProcState(pid: Long) = core.get.getProcState(pid)
+    def getProcState(pid: Long) = core.getProcState(pid)
 
 
     /**
@@ -173,7 +165,7 @@ object SvdLowLevelSystemAccess extends Logging {
     *
     */
     def processList(sort: Boolean = false) = {
-        val preList = SvdLowLevelSystemAccess.core.get.getProcList.toList // 2010-10-24 01:09:51 - dmilith - Java "Array" here.
+        val preList = SvdLowLevelSystemAccess.core.getProcList.toList // 2010-10-24 01:09:51 - dmilith - Java "Array" here.
         val sourceList = if (sort) preList.sortWith(_.toInt < _.toInt) else preList
         log.trace("unsorted    : " + preList)
         log.debug("processList : " + sourceList)

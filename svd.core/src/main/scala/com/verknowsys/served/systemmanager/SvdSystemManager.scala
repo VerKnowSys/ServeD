@@ -51,7 +51,7 @@ class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
             // self reply ProcessesList(psAll)
         
         case GetNetstat =>
-            SvdLowLevelSystemAccess.netstat.stat(SvdLowLevelSystemAccess.core.get)
+            SvdLowLevelSystemAccess.netstat.stat(SvdLowLevelSystemAccess.core)
             log.warn("Network usage (bytes): IN: %s, OUT: %s".format(SvdLowLevelSystemAccess.netstat.getTcpInboundTotal, SvdLowLevelSystemAccess.netstat.getTcpOutboundTotal))
             // self reply Success
             

@@ -139,13 +139,13 @@ class SvdSystemManagerTest extends DefaultTest with Logging {
         val disk = SvdLowLevelSystemAccess.getDiskUsage("/")
         disk should not be (null)
         
-        val sysStat = SvdLowLevelSystemAccess.core.get.getProcStat
+        val sysStat = SvdLowLevelSystemAccess.core.getProcStat
         sysStat should not be (null)
         sysStat.getTotal should be >=(10L)
         log.debug("Total processes in system: %s".format(sysStat.getTotal))
         
-        for (i <- psAll.toList.sortWith{ SvdLowLevelSystemAccess.core.get.getProcState(_).getName < SvdLowLevelSystemAccess.core.get.getProcState(_).getName}) {
-            val procstat3 = SvdLowLevelSystemAccess.core.get.getProcState(i)
+        for (i <- psAll.toList.sortWith{ SvdLowLevelSystemAccess.core.getProcState(_).getName < SvdLowLevelSystemAccess.core.getProcState(_).getName}) {
+            val procstat3 = SvdLowLevelSystemAccess.core.getProcState(i)
             procstat3 should not be (null)
             ("Name" :: "State" :: "Ppid" :: "Priority" :: "Nice" :: Nil).foreach{
                 elem =>
