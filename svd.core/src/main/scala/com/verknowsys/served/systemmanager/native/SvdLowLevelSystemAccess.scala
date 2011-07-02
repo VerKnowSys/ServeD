@@ -112,6 +112,55 @@ object SvdLowLevelSystemAccess extends Logging {
      */
     def getCurrentProcessPid = core.get.getPid
 
+    
+    /**
+     *  @author dmilith
+     *
+     *   Returns list of processes in system
+     */
+    def getProcList = core.get.getProcList
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   Returns process credentials with given process pid
+     */
+    def getProcCredName(pid: Long) = core.get.getProcCredName(pid)
+    def getProcCred(pid: Long) = core.get.getProcCred(pid)
+    
+
+    /**
+     *  @author dmilith
+     *
+     *   Returns system load
+     */
+    def getSystemLoad = core.get.getLoadAverage
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   Returns disk usage of given location
+     */
+    def getDiskUsage(location: String) = core.get.getDiskUsage(location)
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   Returns current system uptime
+     */
+    def getSystemUptime = core.get.getUptime.getUptime
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   Returns state of given process pid
+     */
+    def getProcState(pid: Long) = core.get.getProcState(pid)
+
 
     /**
     *   @author dmilith
