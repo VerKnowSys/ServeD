@@ -10,6 +10,7 @@ import com.verknowsys.served.api.SvdAccount
 import scala.io.Source
 
 
+@deprecated("SvdSpecHelpers should be moved to testing", "2011-07-02")
 object SvdSpecHelpers {
 	implicit def StringToFile(s: String) = new File(s)
     implicit def ItemToSeq[T](a: T) = a :: Nil
