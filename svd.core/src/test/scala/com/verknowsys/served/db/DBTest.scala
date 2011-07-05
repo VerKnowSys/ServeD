@@ -50,7 +50,17 @@ class DBTest extends DatabaseTest {
             
             users1.historyFor(teamon.uuid) must haveSize(1)
             users1.historyFor(teamon.uuid) must contain(teamon)
-            users1.historyFor(dmilith.uuid) must beEmpty
+            users1.historyFor(dmilith.uuid) must contain(dmilith)
+            
+            
+            db << teamon
+            db ~ teamon
+            
+            users1.historyFor(teamon.uuid) must haveSize(2)
+            users1.historyFor(teamon.uuid) must contain(teamon)
+            
+            db << teamon.copy(name = "teamon 1")
+            db ~ teamon
         }
         
         "store Users and Drugs" in {
@@ -143,8 +153,10 @@ class DBTest extends DatabaseTest {
             reconnect
             
             Users(db) must haveSize(2)
-            Users(db).historyFor(uuid1) must beEmpty
-            Users(db).historyFor(uuid2) must beEmpty
+            Users(db).historyFor(uuid1) must haveSize(1)
+            Users(db).historyFor(uuid1) must contain(teamon)
+            Users(db).historyFor(uuid2) must haveSize(1)
+            Users(db).historyFor(uuid2) must contain(dmilith)
             Users(db).historyFor(uuid3) must beEmpty
             
             val teamon2 = teamon.copy(name = "teamon2")
@@ -161,7 +173,8 @@ class DBTest extends DatabaseTest {
             Users(db)(uuid3) must beNone
             Users(db).historyFor(uuid1) must haveSize(1)
             Users(db).historyFor(uuid1) must contain(teamon)
-            Users(db).historyFor(uuid2) must beEmpty
+            Users(db).historyFor(uuid2) must haveSize(1)
+            Users(db).historyFor(uuid2) must contain(dmilith)
             Users(db).historyFor(uuid3) must beEmpty
             
             
@@ -176,7 +189,8 @@ class DBTest extends DatabaseTest {
             Users(db).historyFor(uuid1) must haveSize(2)
             Users(db).historyFor(uuid1) must contain(teamon)
             Users(db).historyFor(uuid1) must contain(teamon2)
-            Users(db).historyFor(uuid2) must beEmpty
+            Users(db).historyFor(uuid2) must haveSize(1)
+            Users(db).historyFor(uuid2) must contain(dmilith)
             Users(db).historyFor(uuid3) must beEmpty
             
             db << dmilith2
@@ -205,7 +219,8 @@ class DBTest extends DatabaseTest {
             reconnect
             
             Users(db) must haveSize(1)
-            Users(db).historyFor(teamon) must beEmpty
+            Users(db).historyFor(teamon) must haveSize(1)
+            Users(db).historyFor(teamon) must contain(teamon)
             
             val teamon2 = teamon.copy()
             db << teamon2
@@ -213,7 +228,8 @@ class DBTest extends DatabaseTest {
             reconnect
             
             Users(db) must haveSize(1)
-            Users(db).historyFor(teamon) must beEmpty
+            Users(db).historyFor(teamon) must haveSize(1)
+            Users(db).historyFor(teamon) must contain(teamon)
         }
         
         "sort history by descending createdAt" in {

@@ -51,6 +51,8 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
             case None =>
                 currentODB.store(newObj)
                 currentODB.commit
+                historyODB.store(newObj)
+                historyODB.commit
         }
     }
     
@@ -59,12 +61,23 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
      *
      * @author teamon
      */
-    def ~[T <: Persistent : ClassManifest](obj: T) = find(obj.uuid) map { obj =>
-        historyODB.store(obj)
-        historyODB.commit
+    def ~[T <: Persistent : ClassManifest](obj: T) { this ~ obj.uuid }
+    
+    /**
+     * Remove object with given uuid from database
+     *
+     * @author teamon
+     */
+    def ~[T <: Persistent : ClassManifest](uuid: UUID) = find(uuid) foreach { obj =>
+        (new FindByUUIDOrderedCollection[T](historyODB, obj.uuid)).headOption match {
+            case Some(o) if o == obj =>
+            case _ =>
+                historyODB.store(obj)
+                historyODB.commit
+        }
+
         currentODB.delete(obj)
         currentODB.commit
-        obj
     }
     
     protected[db] def find[T <: Persistent : ClassManifest](uuid: UUID) = {
