@@ -17,26 +17,26 @@ class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
     private var manager: Option[ActorRef] = None // XXX: Var
 
     override def receive = {
-        case General.Connect(username) =>
-            log.trace("Remote client trying to connect with username %s", username)
+        case General.Connect(userUid) =>
+            log.trace("Remote client trying to connect with UID: %s", userUid)
 
-            (registry.actorFor[SvdAccountsManager] flatMap (_ !! GetAccountManager(username))) match {
+            (registry.actorFor[SvdAccountsManager] flatMap (_ !! GetAccountManager(userUid))) match {
                 case Some(res) => res match {
                     case Some(m: ActorRef) =>
                         manager = Some(m)
                         become(dispatch)
                         self reply Success
-                        log.trace("Remote client successfully connected with username %s", username)
+                        log.trace("Remote client successfully connected with UID: %s", userUid)
 
                     case Some(e: Error) => 
                         self reply e
                     
                     case _ =>
-                        self reply Error("User with name '%s' not found".format(username))
+                        self reply Error("User with UID: '%s' not found".format(userUid))
                 }
 
                 case _ =>
-                    self reply Error("User with name '%s' not found".format(username))
+                    self reply Error("User with UID: '%s' not found".format(userUid))
             }
     }
     

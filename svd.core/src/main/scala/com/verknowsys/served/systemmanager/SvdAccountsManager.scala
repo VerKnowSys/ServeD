@@ -17,7 +17,7 @@ import java.io.File
 import scala.util._
 
 
-case class GetAccountManager(username: String)
+case class GetAccountManager(userUid: Int)
 
 case object SvdAccounts extends DB[SvdAccount]
 case object SvdUserPorts extends DB[SvdUserPort]
@@ -223,10 +223,6 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
     }
 
     
-    // Safe map for fast access to AccountManagers
-    protected var accountManagers: Option[Map[String, ActorRef]] = None
-
-
     def receive = {
         case Init =>
             log.debug("SvdAccountsManager received Init. Running default task..")
@@ -257,50 +253,26 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             log.trace("GetAccount(%d): %s", uid, account)
             self reply account
         
-        case GetAccountManager(username) =>
-            self reply accountManagers.flatMap(_.get(username))
+        case GetAccountManager(givenUid) =>
+            self reply SvdAccounts(db)(_.uid == givenUid).headOption.map(
+                account =>
+                    remote.actorFor("service:account-manager", SvdConfig.defaultHost, account.servicePort)
+            ).getOrElse(AccountNotFound)
         
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
             
     }
 
-    private def respawnUsersActors {
-        // 2011-06-26 18:38:42 - dmilith - PENDING: XXX: FIXME: fix respawning issues with AM
-        // // kill all Account Managers
-        // log.trace("Actor.registry size before: %d", registry.actors.size)
-        // registry.actorsFor[SvdAccountManager] foreach { _.stop }
-        // 
-        // // spawn Account Manager for each account entry in passwd file
-        // accountManagers = Some(userAccounts.map { account =>
-        //     val manager = actorOf(new SvdAccountManager(account))
-        //     self.link(manager)
-        //     manager.start
-        //     (account.userName, manager)
-        // }.toMap)
-        // log.trace("Actor.registry size after: %d", registry.actors.size)
-        
+
+    private def respawnUsersActors {        
         val wrapper = SvdWrapLibrary.instance
         userAccounts.foreach{
             account =>
                 log.warn("Sending spawn message for account: %s".format(account))
                 wrapper.sendSpawnMessage(account.uid.toString)
         }
-        
-        val map = Map( // 2011-06-22 16:49:20 - dmilith - XXX: FIXME: TODO: merge it into SvdAccount (gather automatically)
-            "teamon" -> (SvdConfig.defaultHost, randomUserPort),
-            "dmilith" -> (SvdConfig.defaultHost, randomUserPort)
-        )
-        
-        accountManagers = Some(map.mapValues { case(host, port) =>
-            val am = remote.actorFor("service:account-manager", host, port)
-            log.trace("account-manager: %s :%s".format(host, port))
-            // self link am
-            am
-        })
     }
-
-
 
     
     /**

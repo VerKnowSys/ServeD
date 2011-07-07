@@ -16,7 +16,7 @@ class Auth {
             "username" -%> SHtml.text(username.get, username.set),
             "password" -%> SHtml.password("", password = _),
             "send" -%> SHtml.submit("Log in", () => {
-                if(Session.login(username.get, password)){
+                if(Session.login(username.get.toInt, password)){ // XXX: toInt sucks
                     S.redirectTo("/")
                 } else {
                     S.error("Wrong username")

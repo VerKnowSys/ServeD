@@ -20,9 +20,9 @@ class ApiClient(svd: Svd) {
     ).map(_.commands).reduce(_ orElse _)
 
     // Connect to ServeD
-    request(General.Connect(username)) {
+    request(General.Connect(userUid)) {
         case Success => 
-            info("ServeD interactive shell. Welcome %s", username)
+            info("ServeD interactive shell. Welcome %s", userUid)
             prompt(new Prompt)
         case Error(message) =>
             error(message)
@@ -47,7 +47,7 @@ class ApiClient(svd: Svd) {
      *
      * @author teamon
      */ 
-    private lazy val username = System.getProperty("user.name")
+    private lazy val userUid = 501 // 2011-07-07 23:20:40 - dmilith - XXX: yet another place requiring code which is available in utils (getuid)
 }
 
 object Runner {

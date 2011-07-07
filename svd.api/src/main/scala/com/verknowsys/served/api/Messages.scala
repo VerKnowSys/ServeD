@@ -17,7 +17,7 @@ object General {
     
     // Request
     case object CreateSession extends Base
-    case class Connect(username: String) extends Base
+    case class Connect(userUid: Int) extends Base
     case object Disconnect extends Base
 }
 

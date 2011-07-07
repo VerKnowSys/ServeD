@@ -27,10 +27,10 @@ object Session {
         protected def service = RemoteSession(host, port).get // HACK: Handle error!!
     }
 
-    def login(username: String, password: String) = {
-        api.request(General.Connect(username)) {
+    def login(userUid: Int, password: String) = {
+        api.request(General.Connect(userUid)) {
             case Success =>
-                Username.set(username)
+                Username.set(userUid.toString) // XXX: hacky but all here is one big hack right now
             case Error =>
                 //logger.error("Failed to log in")
         }.isDefined
@@ -41,10 +41,11 @@ object Session {
     def authorized = {
         // TODO: Add some real validation. Temporary code so there is no need to log in on every code reload 
         // (jetty restarts app and session vars are gone)
-        if(Username.get == ""){
-            login(System.getProperty("user.name"), "")
-        }
-        Username.get != "" // change me!
+        // if(Username.get == ""){
+        //             login(System.getProperty("user.name"), "")
+        //         }
+        //         Username.get != "" // change me!
+        true
     }
 }
 
