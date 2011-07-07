@@ -211,6 +211,17 @@ object SvdUtils extends Logging {
     /**
      *  @author dmilith
      *
+     *   Returns uid of current logged in user
+     */
+    def getUserUid = {
+        import CLibrary._
+        CLibrary.instance.getuid
+    }
+    
+
+    /**
+     *  @author dmilith
+     *
      *   counts time spent on operation in given block
      */
     def bench(block: => Unit) = {

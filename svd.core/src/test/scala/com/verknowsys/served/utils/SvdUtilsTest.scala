@@ -31,9 +31,7 @@ class SvdUtilsTest extends Specification with Logging {
 
     "chown should change owner" in {
         val path = randomPath
-        import CLibrary._
-        val clib = CLibrary.instance
-        val account = currentAccount.copy(uid = clib.getuid, gid = SvdConfig.defaultUserGroup)
+        val account = currentAccount.copy(uid = SvdUtils.getUserUid, gid = SvdConfig.defaultUserGroup)
         
         FileUtils.touch(path / "dupa007")
         SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = account.gid) must beTrue
