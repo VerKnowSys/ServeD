@@ -102,7 +102,11 @@ int main(int argc, char const *argv[]) {
     lm << "Starting UserSpawn for uid: " << uid << " in homeDir: " << homeDir;
     log_message(lm.str());
 
-    setuid(uid);
+    if (setuid(uid) != 0) {
+        lm << "SetUID(" << uid << ") failed. Aborting.";
+        log_message(lm.str());
+        exit(1);
+    }
     spawnBackgroundTask("/usr/bin/java", "user", string(argv[1]), false, lockName);
     
     return 0;
