@@ -21,21 +21,14 @@ class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
             log.trace("Remote client trying to connect with UID: %s", userUid)
 
             (registry.actorFor[SvdAccountsManager] flatMap (_ !! GetAccountManager(userUid))) match {
-                case Some(res) => res match {
-                    case Some(m: ActorRef) =>
-                        manager = Some(m)
-                        become(dispatch)
-                        self reply Success
-                        log.trace("Remote client successfully connected with UID: %s", userUid)
-
-                    case Some(e: Error) => 
-                        self reply e
-                    
-                    case _ =>
-                        self reply Error("User with UID: '%s' not found".format(userUid))
-                }
+                case Some(m: ActorRef) =>
+                    manager = Some(m)
+                    become(dispatch)
+                    self reply Success
+                    log.info("Remote client successfully connected with UID: %s", userUid)
 
                 case _ =>
+                    log.error("User with UID: '%d' not found", userUid)
                     self reply Error("User with UID: '%s' not found".format(userUid))
             }
     }

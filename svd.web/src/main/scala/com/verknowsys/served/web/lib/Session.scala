@@ -7,8 +7,8 @@ import akka.actor.{Actor, ActorRef}
 import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.api._
 
-object Session {
-    object Username extends SessionVar[String]("")
+object Session extends Logging {
+    object UserID extends SessionVar[Int](-1)
     
     object api {
         final val host = "localhost" // TODO: Use some configuration
@@ -17,7 +17,12 @@ object Session {
         object svd extends SessionVar[ActorRef](service)
 
         def request[T](msg: ApiMessage)(f: PartialFunction[Any, T]): Option[T] = {
-            (svd.get !! msg) match {
+            log.debug("API REQUEST: %s", msg)
+            
+            val response = svd.get !! msg
+            log.debug("API RESPONSE: %s", response)
+            
+            response match {
                 case Some(response) if f.isDefinedAt(response) => Some(f(response))
                 case Some(response) => None //logger.error("[akka] Unhandled reponse %s", response)
                 case None => None//logger.error("[akka] Connection timeout")
@@ -30,22 +35,22 @@ object Session {
     def login(userUid: Int, password: String) = {
         api.request(General.Connect(userUid)) {
             case Success =>
-                Username.set(userUid.toString) // XXX: hacky but all here is one big hack right now
+                UserID.set(userUid) // XXX: hacky but all here is one big hack right now
             case Error =>
                 //logger.error("Failed to log in")
         }.isDefined
     }
     
-    def logout = Username.set("")
+    def logout = UserID.set(-1)
     
     def authorized = {
         // TODO: Add some real validation. Temporary code so there is no need to log in on every code reload 
         // (jetty restarts app and session vars are gone)
-        // if(Username.get == ""){
-        //             login(System.getProperty("user.name"), "")
-        //         }
-        //         Username.get != "" // change me!
-        true
+        if(UserID.get == -1){
+            login(501, "")
+        }
+        
+        UserID.get != -1 // change me!
     }
 }
 

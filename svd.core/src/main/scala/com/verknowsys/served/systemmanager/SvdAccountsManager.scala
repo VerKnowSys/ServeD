@@ -236,12 +236,12 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
                         registerUserAccount(501, "mac-user")
                     }
 
-                    val ruid = randomUserUid
-                    log.trace("Adding user for %d", ruid)
-                    if (!userUIDRegistered(ruid)) {
-                        log.trace("Added")
-                        registerUserAccount(ruid, "żółć")
-                    }
+                    // val ruid = randomUserUid
+                    // log.trace("Adding user for %d", ruid)
+                    // if (!userUIDRegistered(ruid)) {
+                    //     log.trace("Added")
+                    //     registerUserAccount(ruid, "żółć")
+                    // }
                     
             // }
             
@@ -254,10 +254,10 @@ class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExcepti
             self reply account
         
         case GetAccountManager(givenUid) =>
-            self reply SvdAccounts(db)(_.uid == givenUid).headOption.map(
-                account =>
+            log.trace("GetAccountManager(%d)", givenUid)
+            self reply SvdAccounts(db)(_.uid == givenUid).headOption.map { account =>
                     remote.actorFor("service:account-manager", SvdConfig.defaultHost, account.servicePort)
-            ).getOrElse(AccountNotFound)
+            }.getOrElse(AccountNotFound)
         
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
