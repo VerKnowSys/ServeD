@@ -1,0 +1,10 @@
+#!/bin/sh
+
+while true; 
+do
+    sudo ./spawn stop; 
+    sudo ./userspawn 501 stop;
+    ps -ef | grep java | grep boot | awk '{print $2}' | xargs sudo kill -TERM
+    sudo ./spawn start &
+    read; 
+done;
