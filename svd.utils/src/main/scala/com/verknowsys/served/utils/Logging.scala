@@ -86,7 +86,7 @@ abstract class AbstractLogger(klazz: String) {
     def trace(msg: => String) = log(Trace, msg)
     def trace(msg: String, arg: Any, args: Any*): Unit = trace(msg.format((arg :: args.toList):_*))
     
-    protected[utils] def log(lvl: Logger.Levels.Value, message: => String, className: String = klazz) = {
+    /*protected[utils] */ def log(lvl: Logger.Levels.Value, message: => String, className: String = klazz) = {
         if(LoggerUtils.levelFor(className) >= lvl) display(lvl, message, className)
     }
 
