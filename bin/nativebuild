@@ -35,8 +35,6 @@ check $? "Spawn"
 $CXX -O2 -pipe -fPIC lib/spawnlib_src/userspawn.cc -o userspawn lib/core.o lib/utils.o
 check $? "UserSpawn"
 
-# $CXX -O2 -pipe -fPIC lib/spawnlib_src/controlcli.cc -o ctrlcli lib/core.o lib/utils.o
-
 case $system in
 
     Darwin)
