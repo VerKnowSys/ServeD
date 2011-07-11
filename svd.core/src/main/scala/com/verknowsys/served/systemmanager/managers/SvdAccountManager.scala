@@ -17,7 +17,7 @@ import com.verknowsys.served.systemmanager.SvdAccountsManager
  * 
  * @author teamon
  */
-class SvdAccountManager(val account: SvdAccount) extends Actor with SvdExceptionHandler {
+class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     
     log.info("Starting AccountManager for uid: %s".format(account.uid))
     

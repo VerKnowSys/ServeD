@@ -194,7 +194,8 @@ class SvdAccountUtils(db: DBClient) {
     
 }
 
-class SvdAccountsManager extends Actor with SvdFileEventsReactor with SvdExceptionHandler with Logging {
+
+class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
     import events._
 

@@ -30,7 +30,7 @@ object SvdSystemManager extends GlobalActorRef(Actor.registry.actorFor[SvdSystem
 *   
 *   SvdSystemManager - responsible for System managment and monitoring
 */
-class SvdSystemManager extends Actor with Logging with SvdExceptionHandler {
+class SvdSystemManager extends SvdExceptionHandler {
 
     log.info("SvdSystemManager is loading")
     

@@ -15,7 +15,7 @@ import akka.actor.{Actor, ActorRef, SupervisorActor}
  *
  *  @author teamon
  */
-class SvdSystemInfo extends Actor with Logging {
+class SvdSystemInfo extends SvdExceptionHandler {
     log.info("Starting SvdSystemInfo")
     
     def receive = {
