@@ -59,10 +59,12 @@ Throwable details: (%s).
     
     
     override def postStop = {
+        super.postStop
         log.trace("postStop executed in %s".format(this.getClass))
     }
    
     override def unhandled(msg: Any){
+        super.unhandled(msg)
         log.warn("Message sent to %s was not recognized: %s", this.getClass, msg)
     }
     
