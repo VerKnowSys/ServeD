@@ -9,12 +9,14 @@ import net.liftweb.sitemap._
 import net.liftweb.sitemap.Loc._
 
 import com.verknowsys.served.web.lib.Session
+import com.verknowsys.served.web.snippet.GitController
+import com.verknowsys.served.utils.Logging
 
 /**
  * A class that's instantiated early and run.  It allows the application
  * to modify lift's environment
  */
-class Boot {
+class Boot extends Logging {
     val Authorized = If(
         () => Session.authorized,
         () => RedirectWithState(
@@ -29,30 +31,38 @@ class Boot {
     )
 
     def siteMap = SiteMap(
-        Menu(S ? "Home") / "index" >> Authorized,
-        Menu(S ? "Git") / "git" >> Authorized,
-        Menu(S ? "Monitoring") / "monitoring" >> Authorized submenus (
-            Menu(S ? "Akka actors") / "monitoring" / "akka_actors",
-            Menu(S ? "CPU usage")   / "monitoring" / "cpu"
+        Menu("Home") / "index" >> Authorized,
+        // Menu(Loc("git", ("git" :: Nil) -> true, "Git", Authorized)),
+
+        Menu("Monitoring") / "monitoring" >> Authorized submenus (
+            Menu("Akka actors") / "monitoring" / "akka_actors",
+            Menu("CPU usage")   / "monitoring" / "cpu"
         ),
-        Menu(S ? "Configuration") / "configuration" >> Authorized submenus (
-            Menu(S ? "Logging") / "configuration" / "logging"
+        Menu("Configuration") / "configuration" >> Authorized submenus (
+            Menu("Logging") / "configuration" / "logging"
         ),
 
-        Menu(S ? "Log in") / "login" >> Unauthorized,
+        Menu("Log in") / "login" >> Unauthorized,
         Menu(Loc("logout", "logout" :: Nil, "Log out", EarlyResponse(() => {
             Session.logout
             Full(RedirectWithState("/",
                 RedirectState(() => S.notice("Logged out"))
             ))
-        }), Authorized, Hidden))
+        }), Authorized, Hidden)),
+
+        (Menu("Git") / "git"),
+        (Menu("Git show") / "git" / "show" >> Hidden)
     )
-    
+
     def boot {
         // where to search snippet
         LiftRules.addToPackages("com.verknowsys.served.web")
 
         LiftRules.setSiteMap(siteMap)
+
+        LiftRules.dispatch.append(GitController)
+
+
 
         // Ajax loader
         LiftRules.ajaxStart = Full(() => LiftRules.jsArtifacts.show("ajax-loader").cmd)
@@ -60,7 +70,7 @@ class Boot {
 
         // Force the request to be UTF-8
         LiftRules.early.append(_.setCharacterEncoding("UTF-8"))
-        
+
         // Use scoped snippets
         LiftRules.snippetNamesToSearch.default.set((s: String) => LiftRules.searchSnippetsWithRequestPath(s))
     }

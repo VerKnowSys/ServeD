@@ -26,14 +26,21 @@ object AddRepository extends LiftScreen {
     }
 }
 
-class GitSnippet extends Logging {
-    def listRepositories = {
-        log.trace("Listing repositories")
+object GitController extends Crud.All with Logging {
+    type Entity = Repository
+    val Prefix = "git"
+
+    def find(name: String) = $(GetRepositoryByName(name)){ case Some(repo: Repository) => repo }
+    def show(repo: Repository) = {
+        ".name" #> repo.name
+    }
+
+    def index = {
         val repositories = $(ListRepositories){ case Repositories(repositories) => repositories }.getOrElse(Nil)
         ".row *" #> repositories.map { repo =>
             val id = nextFuncName
             ".name [id]" #> id &
-            ".name *"  #> repo.name &
+            ".name *"  #> linkTo(repo.name, repo.name) &
             ".remove *"     #> SHtml.a(() => {
                 $(RemoveRepository(repo.uuid)){
                     case Success => JE.JsRaw("$('#"+id+"').parent().remove()").cmd
@@ -42,3 +49,29 @@ class GitSnippet extends Logging {
         }
     }
 }
+
+// class GitSnippet extends Logging {
+//     def listRepositories = {
+//         log.trace("Listing repositories")
+//         val repositories = $(ListRepositories){ case Repositories(repositories) => repositories }.getOrElse(Nil)
+//         ".row *" #> repositories.map { repo =>
+//             val id = nextFuncName
+//             ".name [id]" #> id &
+//             ".name *"  #> repo.name &
+//             ".remove *"     #> SHtml.a(() => {
+//                 $(RemoveRepository(repo.uuid)){
+//                     case Success => JE.JsRaw("$('#"+id+"').parent().remove()").cmd
+//                 }.getOrElse(JsCmds.Noop)
+//             }, Text("Remove"))
+//         }
+//     }
+//
+//     def show(html: NodeSeq) = {
+//         S.param("name").flatMap { name =>
+//             $(GetRepositoryByName(name)){
+//                 case Some(repo: Repository) =>
+//                     ".name" #> repo.name
+//             }
+//         } openOr Text("Repository does not exist")
+//     }
+// }
