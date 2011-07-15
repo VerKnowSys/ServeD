@@ -19,9 +19,9 @@ object AddRepository extends LiftScreen {
     override def finishButton: Elem = <button>{"Add repository"}</button>
 
     def finish() {
-        $(CreateRepository(name.is)){
+        CreateRepository(name.is) <> {
             case repo: Repository =>
-                S.notice("Repository " + repo.name + " created")
+                S.redirectTo("/git", () => S.notice("Repository " + repo.name + " created"))
         }
     }
 }
@@ -30,21 +30,21 @@ object GitController extends Crud.All with Logging {
     type Entity = Repository
     val Prefix = "git"
 
-    def find(name: String) = $(GetRepositoryByName(name)){ case Some(repo: Repository) => repo }
+    def find(name: String) = GetRepositoryByName(name) <> { case Some(repo: Repository) => repo }
     def show(repo: Repository) = {
         ".name" #> repo.name
     }
 
     def index = {
-        val repositories = $(ListRepositories){ case Repositories(repositories) => repositories }.getOrElse(Nil)
+        val repositories = ListRepositories <> { case Repositories(repositories) => repositories } getOrElse Nil
         ".row *" #> repositories.map { repo =>
             val id = nextFuncName
-            ".name [id]" #> id &
-            ".name *"  #> linkTo(repo.name, repo.name) &
+            ".name [id]"    #> id &
+            ".name *"       #> linkTo(repo.name, repo.name) &
             ".remove *"     #> SHtml.a(() => {
-                $(RemoveRepository(repo.uuid)){
+                RemoveRepository(repo.uuid) <> {
                     case Success => JE.JsRaw("$('#"+id+"').parent().remove()").cmd
-                }.getOrElse(JsCmds.Noop)
+                } getOrElse JsCmds.Noop
             }, Text("Remove"))
         }
     }
