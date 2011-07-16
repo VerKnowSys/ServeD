@@ -11,6 +11,9 @@ import net.liftweb.sitemap.Loc._
 import com.verknowsys.served.web.lib.Session
 import com.verknowsys.served.web.snippet.GitController
 import com.verknowsys.served.utils.Logging
+import java.security.PublicKey
+import com.verknowsys.served.utils.KeyUtils
+
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -66,6 +69,16 @@ class Boot extends Logging {
         LiftRules.setSiteMap(SiteMap(siteMapEntries:_*))
 
         LiftRules.dispatch.append(GitController)
+
+        LiftRules.appendGlobalFormBuilder(
+            FormBuilderLocator[Option[PublicKey]](
+                (value, setter) =>
+                    SHtml.textarea(
+                        value.map(_.toString) getOrElse "",
+                        s => setter(KeyUtils.load(s))
+                    )
+            )
+        )
 
 
 

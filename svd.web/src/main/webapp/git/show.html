@@ -1,3 +1,15 @@
 <div class="lift:surround?with=default;at=content">
-  <h2>Repository: <span class="name">name</span></h2>
+  <div class="repo">
+    <h2>Repository: <span id="name">name</span></h2>
+  </div>
+
+  <div class="keys">
+    <h3>Authorized keys</h3>
+
+    <ul class="standard lift:GitRepositoryKeys">
+      <li><span class="key_name">Name of key</span></li>
+    </ul>
+
+    <lift:AddKey/>
+  </div>
 </div>
