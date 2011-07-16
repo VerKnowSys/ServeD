@@ -4,6 +4,7 @@ import net.liftweb.util._
 import net.liftweb.util.Helpers._
 import net.liftweb.http._
 import net.liftweb.http.js._
+import net.liftweb.sitemap._
 
 import scala.xml._
 
@@ -29,6 +30,12 @@ object AddRepository extends LiftScreen {
 object GitController extends Crud.All with Logging {
     type Entity = Repository
     val Prefix = "git"
+
+    def menus =
+        (Menu("Git") / "git") ::
+        (Menu("Git show") / "git" / * >> Loc.Hidden) ::
+        Nil
+
 
     def find(name: String) = GetRepositoryByName(name) <> { case Some(repo: Repository) => repo }
     def show(repo: Repository) = {

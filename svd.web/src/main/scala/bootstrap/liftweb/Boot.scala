@@ -30,35 +30,40 @@ class Boot extends Logging {
         () => RedirectResponse("/")
     )
 
-    def siteMap = SiteMap(
-        Menu("Home") / "index" >> Authorized,
-        // Menu(Loc("git", ("git" :: Nil) -> true, "Git", Authorized)),
+    def authorized(list: List[Menu.Menuable]) = list map { _ >> Authorized }
 
-        Menu("Monitoring") / "monitoring" >> Authorized submenus (
-            Menu("Akka actors") / "monitoring" / "akka_actors",
-            Menu("CPU usage")   / "monitoring" / "cpu"
-        ),
-        Menu("Configuration") / "configuration" >> Authorized submenus (
-            Menu("Logging") / "configuration" / "logging"
-        ),
-
-        Menu("Log in") / "login" >> Unauthorized,
+    def authEntries =
+        (Menu("Log in") / "login" >> Unauthorized) ::
         Menu(Loc("logout", "logout" :: Nil, "Log out", EarlyResponse(() => {
             Session.logout
             Full(RedirectWithState("/",
                 RedirectState(() => S.notice("Logged out"))
             ))
-        }), Authorized, Hidden)),
+        }), Authorized, Hidden)) ::
+        Nil
 
-        (Menu("Git") / "git") >> Authorized,
-        (Menu("Git show") / "git" / * >> Hidden >> Authorized)
-    )
+    def basicEntries =
+        (Menu("Home") / "index" >> Authorized) ::
+        (Menu("Monitoring") / "monitoring" >> Authorized submenus (
+            Menu("Akka actors") / "monitoring" / "akka_actors",
+            Menu("CPU usage")   / "monitoring" / "cpu"
+        )) ::
+        (Menu("Configuration") / "configuration" >> Authorized submenus (
+            Menu("Logging") / "configuration" / "logging"
+        )) ::
+        Nil
+
+    def siteMapEntries =
+        basicEntries :::
+        authorized(GitController.menus) :::
+        authEntries
+
 
     def boot {
         // where to search snippet
         LiftRules.addToPackages("com.verknowsys.served.web")
 
-        LiftRules.setSiteMap(siteMap)
+        LiftRules.setSiteMap(SiteMap(siteMapEntries:_*))
 
         LiftRules.dispatch.append(GitController)
 
