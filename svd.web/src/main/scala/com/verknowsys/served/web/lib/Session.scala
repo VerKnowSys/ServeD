@@ -7,10 +7,6 @@ import akka.actor.{Actor, ActorRef}
 import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.api._
 
-object $ {
-    def apply[T](msg: ApiMessage)(f: PartialFunction[Any, T]) = Session.api.request(msg)(f)
-}
-
 object Session extends Logging {
     object UserID extends SessionVar[Int](-1)
 
@@ -37,12 +33,12 @@ object Session extends Logging {
     }
 
     def login(userUid: Int, password: String) = {
-        $(General.Connect(userUid)) {
+        (General.Connect(userUid) <> {
             case Success =>
                 UserID.set(userUid) // XXX: hacky but all here is one big hack right now
             case Error =>
                 //logger.error("Failed to log in")
-        }.isDefined
+        }).isDefined
     }
 
     def logout = UserID.set(-1)

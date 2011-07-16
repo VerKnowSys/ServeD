@@ -50,8 +50,8 @@ class Boot extends Logging {
             ))
         }), Authorized, Hidden)),
 
-        (Menu("Git") / "git"),
-        (Menu("Git show") / "git" / "show" >> Hidden)
+        (Menu("Git") / "git") >> Authorized,
+        (Menu("Git show") / "git" / * >> Hidden >> Authorized)
     )
 
     def boot {
