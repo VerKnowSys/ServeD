@@ -31,7 +31,7 @@ object SvdConfig {
     def kqueueWaitInterval          = 500
     def sleepDefaultPause           = 1000
     def gatherTimeout               = 1000
-
+    def standardShellEnvironment    = ". /etc/profile\nulimit -u 120\n"
     def notificationXmppRecipients  = "dmilith@verknowsys.com,i@teamon.eu"
     def notificationXmppHost        = "verknowsys.com"
     def notificationXmppPort        = 5222
