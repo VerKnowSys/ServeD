@@ -41,9 +41,15 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             
             val psAll = SvdLowLevelSystemAccess.processList(true)
             log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
+            self reply Success
+            
+            // TODO:
+            // new SvdService(account, "rails app x", SvdShellOperation("rails dupa" :: "cd dupa" :: "script/rails" :: Nil)).start
+            self reply Success
             
         case msg: git.Base => 
             gitManager forward msg
+            
     }
     
     
