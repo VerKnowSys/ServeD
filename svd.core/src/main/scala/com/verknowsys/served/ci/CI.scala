@@ -1,8 +1,11 @@
 package com.verknowsys.served.ci
 
 import com.verknowsys.served.utils.Logging
+import com.verknowsys.served.utils._
+
 import akka.actor.Actor
 import akka.actor.Actor.actorOf
+
 
 class CI extends SvdExceptionHandler {
     def receive = {
