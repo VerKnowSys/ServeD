@@ -20,8 +20,7 @@ import java.io._
 class SvdShellTest extends DefaultTest {
 
 
-    override def beforeEach {
-    }
+    def shr(op: String, env: String = "") = SvdShellOperation(op, env)
     
     
     it should "spawn command properly and know when it's dead and throw proper exception when shell is dead" in {
@@ -35,11 +34,11 @@ class SvdShellTest extends DefaultTest {
             )
         )
         
-        sh.exec("")
+        sh.exec(shr(""))
         sh.dead should be(false)
         sh.close
         sh.dead should be(true)
-        evaluating { sh.exec("") } should produce [SvdShellException]
+        evaluating { sh.exec(shr("")) } should produce [SvdShellException]
     }
     
     
@@ -56,14 +55,14 @@ class SvdShellTest extends DefaultTest {
             )
         )
         
-        sh.exec(command = "ls -m /dev", expectedStdout = Array("null", "zero"), waitForOutputFor = 2)
+        sh.exec(shr("ls -m /dev"), expectedStdout = Array("null", "zero"), waitForOutputFor = 2)
         
         evaluating {
-            sh.exec(command = "ls -m /dev", expectedStdout = Array("somethingNonExistant"), waitForOutputFor = 1)
+            sh.exec(shr("ls -m /dev"), expectedStdout = Array("somethingNonExistant"), waitForOutputFor = 1)
         } should produce [TimeoutException]
         
         evaluating {
-            sh.exec(command = "ls -m /dev", expectedStderr = Array("somethingNonExistant"), waitForOutputFor = 1)
+            sh.exec(shr("ls -m /dev"), expectedStderr = Array("somethingNonExistant"), waitForOutputFor = 1)
         } should produce [TimeoutException]
         
         sh.close
@@ -80,12 +79,12 @@ class SvdShellTest extends DefaultTest {
                 dbPort = randomPort
             )
         )
-        sh.exec("lsdjf")
-        sh.exec("echo $?", expectedStdout = Array("127")) // NOTE: 127 - command not found code from shell
-        sh.exec("ls /nonexistantSomethingBlaBla")
-        sh.exec("echo $?", expectedStdout = Array("1")) // NOTE: 1 - error thrown from ls command
-        sh.exec("ls")
-        sh.exec("echo $?", expectedStdout = Array("0"))
+        sh.exec(shr("lsdjf"))
+        sh.exec(shr("echo $?"), expectedStdout = Array("127")) // NOTE: 127 - command not found code from shell
+        sh.exec(shr("ls /nonexistantSomethingBlaBla"))
+        sh.exec(shr("echo $?"), expectedStdout = Array("1")) // NOTE: 1 - error thrown from ls command
+        sh.exec(shr("ls"))
+        sh.exec(shr("echo $?"), expectedStdout = Array("0"))
         sh.output._2 should include("command not found")
         sh.output._1 should include("0")
         sh.output._1 should include("1")
