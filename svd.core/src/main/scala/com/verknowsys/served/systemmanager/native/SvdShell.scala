@@ -23,27 +23,27 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
     
     
     def loadSettings =
-        ". /etc/profile\n" ::
         "export USER=%s\n".format(account.userName) ::
         "export USERNAME=%s\n".format(account.userName) ::
         "export EDITOR=true\n" ::
+        "%s\n".format("") :: 
         "cd %s%s\n".format(SvdConfig.userHomeDir, account.uid) ::
-        "ulimit -u 120\n" :: Nil
+        SvdConfig.standardShellEnvironment :: Nil
     
     
     def dead = shell.isClosed
     
     
     def exec(
-        command: String,
-        expectedStdout: Array[String] = Array(),
-        expectedStderr: Array[String] = Array(),
-        waitForOutputFor: Int = 2
+            operation: SvdShellOperation,
+            expectedStdout: Array[String] = Array(),
+            expectedStderr: Array[String] = Array(),
+            waitForOutputFor: Int = 2
         ) {
             if (dead) {
-                throw new SvdShellException("Failed to exec command: '%s' on dead shell.".format(command))
+                throw new SvdShellException("Failed to exec operation: '%s' on dead shell.".format(operation.commands.replace("\n", ", ")))
             } else {
-                shell.send(command + "\n")
+                shell.send(operation.commands + "\n")
                 if (expectedStdout.size != 0) expectedStdout.foreach {
                     expect =>
                         shell.expect(expect, waitForOutputFor)
