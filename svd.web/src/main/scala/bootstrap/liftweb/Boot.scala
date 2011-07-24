@@ -58,7 +58,8 @@ class Boot extends Logging {
 
     def siteMapEntries =
         basicEntries :::
-        authorized(GitController.menus) :::
+        (Menu("Git") / "git" >> Authorized) ::
+        // authorized(GitController.menus) :::
         authEntries
 
 
@@ -68,7 +69,7 @@ class Boot extends Logging {
 
         LiftRules.setSiteMap(SiteMap(siteMapEntries:_*))
 
-        LiftRules.dispatch.append(GitController)
+        // LiftRules.dispatch.append(GitController)
 
         LiftRules.appendGlobalFormBuilder(
             FormBuilderLocator[Option[PublicKey]](
