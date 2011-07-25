@@ -1,4 +1,5 @@
 -@ val entries: Map[String, com.verknowsys.served.api.Logger.Levels.Value]
+-@ val form: com.verknowsys.forms.BaseForm
 
 %h2 Logger
 %table
@@ -10,3 +11,6 @@
         %tr
           %td= className
           %td= level
+
+%h3 New entry
+= form.toHtml

@@ -6,6 +6,4 @@ import com.verknowsys.served.utils.LoggerUtils
 class Main extends LoggerFilter {
     LoggerUtils.addEntry("org.fusesource", Logger.Levels.Info)
     LoggerUtils.addEntry("org.scalatra", Logger.Levels.Info)
-
-    println(LoggerUtils.levels)
 }

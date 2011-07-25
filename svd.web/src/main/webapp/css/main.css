@@ -78,3 +78,7 @@ a {
   font-size: 12px;
   list-style: disc;
 }
+
+.form-field-with-errors input {
+  border: 1px solid red;
+}

@@ -26,6 +26,13 @@ object API extends Logging {
         }
     }
 
+    def !(msg: ApiMessage){
+        request(msg){
+            case Success => // TODO: Do something with that
+            case _ => // TODO: Do something with that
+        }
+    }
+
     // XXX: Very temporary stuff
     def login {
         (svd !! General.GetStatus) match {
