@@ -81,10 +81,22 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
 
 
     class SvdWeb(info: ProjectInfo) extends JettyEmbedWebProject(info) {
-        val sonatypeNexusSnapshots = "Sonatype Nexus Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
-
         val scalatraVersion = "2.0.0.M4"
         val scalatra = "org.scalatra" %% "scalatra" % scalatraVersion
+        val scalate = "org.scalatra" %% "scalatra-scalate" % scalatraVersion
+        // val scalatraSocketIO = "org.scalatra" %% "scalatra-socketio" % scalatraVersion
+        val servletApi = "org.mortbay.jetty" % "servlet-api" % "2.5-20081211" % "provided"
+
+        // http://groups.google.com/group/simple-build-tool/msg/1f17b43807d06cda
+        override def testClasspath = super.testClasspath +++ buildCompilerJar
+
+        val sonatypeNexusSnapshots = "Sonatype Nexus Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+        // For Scalate
+        val fuseSourceSnapshots = "FuseSource Snapshot Repository" at "http://repo.fusesource.com/nexus/content/repositories/snapshots"
+
+        override def webappClasspath =
+            super.webappClasspath +++
+            buildCompilerJar
     }
 
 
