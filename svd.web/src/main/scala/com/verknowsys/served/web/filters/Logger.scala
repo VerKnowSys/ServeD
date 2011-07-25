@@ -5,18 +5,14 @@ import com.verknowsys.served.api.Logger._
 
 import com.verknowsys.forms._
 
-case class Entry(className: String, level: Levels.Value)
-
-
-
 class LoggerFilter extends REST {
     def prefix = "logger"
 
-    class LoggerEntryForm(entry: Option[Entry] = None, params: Params = Params.Empty) extends Form[Entry](entry, params, createPath){
+    class LoggerEntryForm(entry: Option[AddEntry] = None, params: Params = Params.Empty) extends Form[AddEntry](entry, params, createPath){
         def bind = for {
             cn <- className
             l <- level
-        } yield Entry(cn, l)
+        } yield AddEntry(cn, l)
 
         val className = new StringField("className", _.className, NotEmpty)
         val level = new SelectField("level", _.level, Levels.values.toSeq)
@@ -33,12 +29,9 @@ class LoggerFilter extends REST {
         val form = new LoggerEntryForm(params = formParams)
 
         if(form.isValid) {
-            val entry = form.value.get
-            log.info("Form valid")
-            API ! AddEntry(entry.className, Levels.Trace)
+            API ! form.value.get
             redirect(indexPath)
         } else {
-            log.error("Form invalid")
             render("index", Map("entries" -> listEntries, "form" -> form))
         }
     }
