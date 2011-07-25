@@ -11,12 +11,15 @@ import com.verknowsys.served.systemmanager._
 import com.verknowsys.served.systemmanager.managers._
 
 
-class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
+class SvdApiSession extends Actor with SvdExceptionHandler {
     log.info("Starting new API session")
 
     private var manager: Option[ActorRef] = None // XXX: Var
 
     override def receive = {
+        case General.GetStatus =>
+            self reply General.Status.Disconnected
+
         case General.Connect(userUid) =>
             log.trace("Remote client trying to connect with UID: %s", userUid)
 
@@ -32,25 +35,28 @@ class SvdApiSession extends Actor with Dispatcher with SvdExceptionHandler {
                     self reply Error("User with UID: '%s' not found".format(userUid))
             }
     }
-    
+
     // lazy val loggingManagers = remote.actorFor("service:logging-manager", "localhost", 8000) :: Nil  // XXX: HACK: should use account.servicePort instead of 8000
 
-    protected def routes = {
+    protected def dispatch: Receive = {
+        case General.GetStatus =>
+            self reply General.Status.Connected
+
         case msg: Logger.Base =>
             log.debug("Remote client sent %s. Forwarding to LoggingManager", msg)
-            
+
             // temporary!
-            // loggingManagers.foreach(_ ! msg) // disabled due to 8000 port issue 
-            
-            registry.actorFor[LoggingManager].get
-            
+            // loggingManagers.foreach(_ ! msg) // disabled due to 8000 port issue
+
+            registry.actorFor[LoggingManager].foreach { _ forward msg }
+
         case msg: Admin.Base =>
             log.debug("Remote client sent %s. Forwarding to SvdSystemInfo", msg)
-            registry.actorFor[SvdSystemInfo].get
+            registry.actorFor[SvdSystemInfo].foreach { _ forward msg }
 
-        case msg if manager.isDefined => 
+        case msg if manager.isDefined =>
             log.debug("Remote client sent %s. Forwarding to AccountManager", msg)
-            manager.get
+            manager.foreach { _ forward msg }
     }
 }
 

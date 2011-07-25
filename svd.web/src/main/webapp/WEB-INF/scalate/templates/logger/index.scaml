@@ -1,0 +1,12 @@
+-@ val entries: Map[String, com.verknowsys.served.api.Logger.Levels.Value]
+
+%h2 Logger
+%table
+  %tr
+    %th Class name
+    %th Level
+    - entries foreach
+      - case (className, level) =>
+        %tr
+          %td= className
+          %td= level

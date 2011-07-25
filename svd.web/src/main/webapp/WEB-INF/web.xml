@@ -7,7 +7,7 @@
 
   <filter>
     <filter-name>svd.web</filter-name>
-    <filter-class>com.verknowsys.served.web.Main</filter-class>
+    <filter-class>com.verknowsys.served.web.filters.Main</filter-class>
   </filter>
 
   <filter-mapping>
