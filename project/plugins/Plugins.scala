@@ -13,9 +13,9 @@ class Plugins(info: ProjectInfo) extends PluginDefinition(info) {
     val onejarSBT = "com.github.retronym" % "sbt-onejar" % "0.2"
     val extract     = "org.scala-tools.sbt" % "installer-plugin" % "0.3.0" // sbt installer action
     val growl       = "me.lessis" % "sbt-growl-plugin" % "0.0.5"
-    val akkaPlugin  = "se.scalablesolutions.akka" % "akka-sbt-plugin" % "1.1"
+    val akkaPlugin  = "se.scalablesolutions.akka" % "akka-sbt-plugin" % "1.1.3"
     val coffeeScript = "org.coffeescript" % "coffee-script-sbt-plugin" % "1.0"
-    
+
     val jettyEmbeddedWarRepo = "Embeded Jetty Repo" at "https://github.com/glenford/repo/raw/master"
     val jettyEmbeddedWar = "net.usersource" % "sbt-jetty-embed-plugin" % "0.6.1"
 }
