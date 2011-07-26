@@ -5,7 +5,7 @@ jar="${pwd}/svd.core/target/scala_2.9.0/core_2.9.0-1.0-onejar.jar"
 
 if [ -e "${jar}" ]; then
     echo "Executing: ${jar}"
-    java -XX:+UseCompressedOops -XX:MaxPermSize=512M -XX:+UseParallelGC -Xms64m -Xmx768m -Dfile.encoding=UTF-8 -noverify -server -Djna.library.path=$(pwd)/wrap -jar "${jar}" user "$@"
+    java -XX:+UseCompressedOops -XX:MaxPermSize=512M -XX:+UseParallelGC -Xms64m -Xmx768m -Dfile.encoding=UTF-8 -noverify -server -Djna.library.path=$(pwd)/lib -jar "${jar}" user "$@"
 else
     echo "Assembly not found. Use build script!"
 fi
