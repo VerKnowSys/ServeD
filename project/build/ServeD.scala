@@ -9,24 +9,23 @@ import net.usersource.jettyembed._
 
 
 class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProject {
-    
+
     // Projects
     lazy val api   = project("svd.api", "api", new SvdApi(_))
     lazy val cli   = project("svd.cli", "cli", new SvdCli(_), api)
     lazy val utils = project("svd.utils", "utils", new SvdUtils(_), api)
     lazy val core  = project("svd.core", "core", new SvdCore(_), api, utils)
-    lazy val web   = project("svd.web", "web", new SvdWeb(_), api, utils)
-    
-    
+
+
     class SvdProject(info: ProjectInfo) extends DefaultProject(info) with GrowlingTests with BasicSelfExtractingProject with ScctProject {
-        
+
         val mavenVKS = "maven.verknowsys.com" at "http://maven.verknowsys.com/repository/"
         val snapshots = "snapshots" at "http://scala-tools.org/repo-snapshots"
         val releases  = "releases" at "http://scala-tools.org/repo-releases"
-         
+
         val specsTest = "org.scala-tools.testing" % "specs_2.9.0.RC5" % "1.6.8-SNAPSHOT" % "test"
         val scalatest = "org.scalatest" %% "scalatest" % "1.6.1.RC1"
-        
+
         override def parallelExecution = true
         override def compileOrder = CompileOrder.JavaThenScala
         override def javaCompileOptions = super.javaCompileOptions ++
@@ -43,7 +42,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             compileOptions("-Xresident") ++
             compileOptions("-g:source") ++
             (MaxCompileErrors(1) :: ExplainTypes :: Unchecked :: Deprecation :: Nil).toSeq
-        
+
         override def installActions = "update" :: "run" :: Nil
         override val growlTestImages = GrowlTestImages(
             Some("project/growl_images/pass.png"),
@@ -51,15 +50,15 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             Some("project/growl_images/fail.png")
         )
     }
-    
-    
+
+
     class SvdUtils(info: ProjectInfo) extends SvdProject(info) with AkkaProject {
         val javaNet = "java.net" at "http://download.java.net/maven/2"
         val commonsio = "commons-io" % "commons-io" % "1.4"
         val messadmin = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
         val jna = "net.java.dev.jna" % "jna" % "3.2.5"
         val akkaTestKit = akkaModule("testkit")
-        
+
         override def parallelExecution = false // Due to global LoggingUtils object
     }
 
@@ -75,28 +74,10 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
 
         lazy val cli = task { None; } dependsOn(run(Array("127.0.0.1", "5555")))
         lazy val assembly = onejar
-        
+
         override def mainClass = Some("com.verknowsys.served.cli.Runner")
     }
-    
-    
-    class SvdWeb(info: ProjectInfo) extends JettyEmbedWebProject(info) with CoffeeScriptCompile {
-        val scalaToolsSnapshots = "scala-tools snapshots" at "http://scala-tools.org/repo-snapshots/"
-        val liftVersion = "2.4-SNAPSHOT"
-        
-        override def jettyWebappPath  = webappPath
-        override def compileAction = super.compileAction dependsOn(compileCoffeeScript)
-        override def libraryDependencies = Set(
-          "net.liftweb" %% "lift-webkit" % liftVersion % "compile->default",
-          // "net.liftweb" % "lift-mapper_2.9.0-1" % liftVersion % "compile->default",
-          // "org.mortbay.jetty" % "jetty" % "6.1.26" % "test->default"
-          // "org.scala-tools.testing" % "specs" % "1.6.2.1" % "test->default"
-          // "junit" % "junit" % "4.5" % "test->default",
-          // "com.h2database" % "h2" % "1.2.138"
-        ) ++ super.libraryDependencies
-    }
 
-    
     class SvdCore(info: ProjectInfo) extends SvdProject(info) with AkkaProject with OneJarProject {
         val akkaRepo = "Akka Repo" at "http://akka.io/repository"
         val javaNet = "java.net" at "http://download.java.net/maven/2"
@@ -107,16 +88,16 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
         val smack = "jivesoftware" % "smack" % "3.0.4"
         val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "0.11.1-SNAPSHOT" // Move it out
         val akkaRemote = akkaModule("remote")
-        
+
         val mediavks = "media vks" at "http://media.verknowsys.com/.m2/repository"
         val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
-        
+
         val h2 = "com.h2database" % "h2" % "1.3.154"
-        
+
         lazy val assembly = onejar
         override def mainClass = Some("com.verknowsys.served.boot")
-        
-        
+
+
         lazy val served = task { None } dependsOn(run(Array()))
         lazy val svd = served
         lazy val stress = task {
@@ -142,7 +123,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             }
             None
         }
-        lazy val notes = task { 
+        lazy val notes = task {
             def filetree(file: File, pattern: String): List[File] = {
                 if(file.isDirectory) file.listFiles.toList.flatMap(filetree(_, pattern))
                 else if(file.getPath.matches(pattern)) List(file)
@@ -164,7 +145,7 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
             )
 
             filetree(new File("."), ".*src(?!.*OLD).*\\.scala") flatMap { file =>
-                FileUtilities.readString(file, log).right.get.split("\n").zipWithIndex.map { 
+                FileUtilities.readString(file, log).right.get.split("\n").zipWithIndex.map {
                     case (line, i) => line match {
                         case XXX(msg)   => ("xxx ",  file, i+1, msg)
                         case NOTE(msg)  => ("note",  file, i+1, msg)
@@ -174,17 +155,17 @@ class ServeD(info: ProjectInfo) extends ParentProject(info) with SimpleScalaProj
                         case _ => ("", null, 0, "")
                     }
                 } filter { _._3 != 0 }
-            } sort { 
+            } sort {
                 case ((n1, f1, _, _), (n2, f2, _, _)) => if(n1.compareTo(n2) == 0) f1.compareTo(f2) < 0 else n1.compareTo(n2) < 0
-            } foreach { 
-                case (name, file, line, msg) => 
+            } foreach {
+                case (name, file, line, msg) =>
                     println("[%s%s%s] %s:%d  %s%s%s".format(Colors(name), name, Console.RESET, file.getPath.replaceAll("src/(main|test)/scala/com/verknowsys/served", "...$1..."), line, Colors(name), msg, Console.RESET))
             }
             None
         }
         lazy val todo = notes
     }
-        
-    
+
+
 }
 
