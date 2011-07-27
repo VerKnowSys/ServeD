@@ -7,7 +7,22 @@ object BuildSettings {
         version         := "0.2.0",
         scalaVersion    := "2.9.0-1",
         resolvers       := Resolvers.all,
-        logLevel        := Level.Info
+        logLevel        := Level.Info,
+        compileOrder    := CompileOrder.JavaThenScala,
+
+        scalacOptions   += "-Ywarn-dead-code",
+        scalacOptions   += "-Xresident",
+        scalacOptions   += "-g:source",
+        scalacOptions   += "-explaintypes",
+        scalacOptions   += "-unchecked",
+        scalacOptions   += "-deprecation",
+
+        javacOptions     += "-g:none",
+        // javacOptions     += "-encoding UTF-8",
+        // javacOptions     += "-source 1.6",
+        // javacOptions     += "-target 1.6",
+        // javacOptions     += "-Xlint:unchecked",
+        javacOptions     += "-Xlint:deprecation"
     )
 }
 
@@ -19,7 +34,6 @@ object Resolvers {
     val scalaTools  = "releases" at "http://scala-tools.org/repo-releases"
     // val mediavks = "media vks" at "http://media.verknowsys.com/.m2/repository"
     val jgitRepo = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
-
 
     val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo)
 }
