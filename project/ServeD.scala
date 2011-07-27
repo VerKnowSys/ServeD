@@ -1,6 +1,8 @@
 import sbt._
 import sbt.Keys._
 
+import com.github.siasia.WebPlugin
+
 object BuildSettings {
     val buildSettings = Defaults.defaultSettings ++ Seq(
         organization    := "VerKnowSys",
@@ -30,12 +32,12 @@ object Resolvers {
     val akkaRepo = "Akka Repository" at "http://akka.io/repository"
     val jlineRepo = "JLine Project Repository" at "http://jline.sourceforge.net/m2rep"
     val javaNet = "java.net" at "http://download.java.net/maven/2"
-    // val scalaToolsSnapshots = "snapshots" at "http://scala-tools.org/repo-snapshots"
     val scalaTools  = "releases" at "http://scala-tools.org/repo-releases"
-    // val mediavks = "media vks" at "http://media.verknowsys.com/.m2/repository"
     val jgitRepo = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
+    val sonatype = "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
 
-    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo)
+
+    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype)
 }
 
 object Dependencies {
@@ -54,13 +56,21 @@ object Dependencies {
     val smack = "jivesoftware" % "smack" % "3.0.4"
     val specs = "org.scala-tools.testing" %% "specs" % "1.6.8"
     val h2 = "com.h2database" % "h2" % "1.3.154"
+
+    val scalatra = "org.scalatra" %% "scalatra" % "2.0.0-SNAPSHOT"
+    val scalate = "org.scalatra" %% "scalatra-scalate" % "2.0.0-SNAPSHOT"
+    val jetty = "org.mortbay.jetty" % "jetty" % "6.1.22" % "jetty"
+    val servlet = "javax.servlet" % "servlet-api" % "2.5"
 }
 
 object ServeD extends Build {
     import BuildSettings._
     import Dependencies._
 
-    lazy val root = Project("ServeD", file("."), settings = buildSettings) aggregate(api, cli, utils, core, testing)
+    lazy val root = Project("ServeD", file("."), settings = buildSettings) aggregate(
+        api, cli, utils, core, web, testing
+    )
+
     lazy val api = Project("api", file("svd.api"),
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(akkaRemote)
@@ -84,14 +94,19 @@ object ServeD extends Build {
         settings = buildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(
-                h2,
-                neodatis,
-                jgit,
-                expect4j,
-                smack
+                h2, neodatis, jgit, expect4j, smack
             )
         )
     ) dependsOn(utils, testing % "test")
+
+    lazy val web = Project("web", file("svd.web"),
+        settings = buildSettings ++ WebPlugin.webSettings ++ Seq(
+            compileOrder    := CompileOrder.Mixed,
+            libraryDependencies ++= Seq(
+                scalatra, scalate, jetty, servlet % "provided"
+            )
+        )
+    ) dependsOn(utils)
 
     lazy val testing = Project("testkit", file("svd.testing"),
         settings = buildSettings ++ Seq(
