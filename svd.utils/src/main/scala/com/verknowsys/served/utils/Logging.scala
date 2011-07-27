@@ -12,7 +12,9 @@ trait Logging {
     @transient lazy val log = new ConsoleLogger(this.getClass.getName)
 }
 
-object LoggerUtils {
+object GlobalLogger extends LoggingMachine
+
+trait LoggingMachine {
     // read defaults from properteis file
     def readDefaults: Map[String, Logger.Levels.Value] = {
         val res = getClass.getResource("/svd.logger.properties")
@@ -40,10 +42,6 @@ object LoggerUtils {
         "warn"  -> Logger.Levels.Warn,
         "error" -> Logger.Levels.Error
     )
-
-
-    // def set(conf: Map[String, Logger.Levels.Value]){ config = conf } // XXX: Remove this!
-    // There should be trait LoggerUtils and GlobalLogger and LoggerManager should get GlobalLogger as parameter!!!
 
     protected var config = readDefaults
 
@@ -119,7 +117,7 @@ abstract class AbstractLogger(klazz: String) {
     def trace(msg: String, arg: Any, args: Any*): Unit = trace(msg.format((arg :: args.toList):_*))
 
     /*protected[utils] */ def log(lvl: Logger.Levels.Value, message: => String, className: String = klazz) = {
-        if(LoggerUtils.levelFor(className) >= lvl) display(lvl, message, className)
+        if(GlobalLogger.levelFor(className) >= lvl) display(lvl, message, className)
     }
 
     protected[utils] def display(level: Logger.Levels.Value, message: String, className: String)

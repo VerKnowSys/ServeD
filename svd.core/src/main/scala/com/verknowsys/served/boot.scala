@@ -32,10 +32,11 @@ object boot extends Logging {
         
         val accountsManager = actorOf[SvdAccountsManager]
         val systemManager = actorOf[SvdSystemManager]
+        val loggingManager = actorOf(new LoggingManager(GlobalLogger))
 
         val list = (
             actorOf[SvdFileEventsManager] ::
-            actorOf[LoggingManager] ::
+            loggingManager ::
             systemManager ::
             accountsManager :: 
             actorOf[SvdSystemInfo] ::
