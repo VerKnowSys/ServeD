@@ -25,7 +25,7 @@ object BuildSettings {
         // javacOptions     += "-target 1.6",
         // javacOptions     += "-Xlint:unchecked",
         javacOptions     += "-Xlint:deprecation"
-    )
+    ) ++ Tasks.all
 }
 
 object Resolvers {
