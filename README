@@ -45,6 +45,10 @@
 2. Testing
     2.1 - Use sbt test
 
+3. Custom sbt commands:
+    cp        - show full classpath
+    write-cp  - write classpaths to .classpath files
+
 That's all folks
 
 

@@ -55,5 +55,17 @@ object Tasks {
             }
     }
 
-    def all = Seq(notesTask)
+    val cp = TaskKey[Unit]("cp", "Show full classpath")
+
+    val cpTask = cp <<= (fullClasspath in Compile) map { (cp) =>
+        println(cp map { _.data } mkString ":")
+    }
+
+    val writeCp = TaskKey[Unit]("write-cp", "Write full classpath to ${module}.classhpath file")
+
+    val writeCpTasl = writeCp <<= (moduleName, fullClasspath in Compile) map { (module, cp) =>
+        IO.write(file(module + ".classpath"), cp map { _.data } mkString ":")
+    }
+
+    def all = Seq(notesTask, cpTask, writeCpTasl)
 }

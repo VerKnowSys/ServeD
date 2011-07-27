@@ -86,7 +86,6 @@ object ServeD extends Build {
 
     lazy val utils = Project("utils", file("svd.utils"),
         settings = buildSettings ++ Seq(
-            parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(messadmin, jna)
         )
     ) dependsOn(api, testing % "test")
