@@ -35,9 +35,10 @@ object Resolvers {
     val scalaTools  = "releases" at "http://scala-tools.org/repo-releases"
     val jgitRepo = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
     val sonatype = "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
+    val guiceyfruit = "guiceyfruit repo" at "http://guiceyfruit.googlecode.com/svn/repo/releases"
+    val mediavks = "Media VKS" at "http://media.verknowsys.com/maven2-repository/"
 
-
-    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype)
+    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, mediavks)
 }
 
 object Dependencies {
