@@ -32,6 +32,7 @@ tmtags
 *.dylib
 *.so
 *.jar
+!vendor/*
 *.patch
 *.orig
 *.rej
