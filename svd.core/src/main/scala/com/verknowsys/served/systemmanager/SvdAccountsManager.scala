@@ -267,11 +267,10 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
 
     private def respawnUsersActors {        
-        val wrapper = SvdWrapLibrary.instance
         userAccounts.foreach{
             account =>
                 log.warn("Sending spawn message for account: %s".format(account))
-                wrapper.sendSpawnMessage(account.uid.toString)
+                new SvdShell(account).exec(new SvdShellOperation("./kick " + account.uid)) // HACK
         }
     }
 

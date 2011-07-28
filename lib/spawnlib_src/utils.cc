@@ -25,39 +25,39 @@
 #endif
 
 
-void cleanupLockAndSockFIles() {
-    if (fileExists(LOCK_FILE)) {
-        log_message("Removing lock file (process is dead but file is still there).");
-        spawn("/bin/rm " + string(LOCK_FILE));
-    }
-    if (fileExists(SOCK_FILE)) {
-        log_message("Removing socket file (process is dead but file is still there).");
-        spawn("/bin/rm " + string(SOCK_FILE));
-    }
-    if (fileExists(SOCKET_LOCK_FILE)) {
-        log_message("Removing socket server lock file (process is dead but file is still there).");
-        spawn("/bin/rm " + string(SOCKET_LOCK_FILE));
-    }
-}
+// void cleanupLockAndSockFIles() {
+//     if (fileExists(LOCK_FILE)) {
+//         log_message("Removing lock file (process is dead but file is still there).");
+//         spawn("/bin/rm " + string(LOCK_FILE));
+//     }
+//     if (fileExists(SOCK_FILE)) {
+//         log_message("Removing socket file (process is dead but file is still there).");
+//         spawn("/bin/rm " + string(SOCK_FILE));
+//     }
+//     if (fileExists(SOCKET_LOCK_FILE)) {
+//         log_message("Removing socket server lock file (process is dead but file is still there).");
+//         spawn("/bin/rm " + string(SOCKET_LOCK_FILE));
+//     }
+// }
 
 
 void log_message(string message) {
     FILE *logfile;
-	logfile = fopen(INTERNAL_LOG_FILE, "a+");
-	if (!logfile) {
-	    return;
-	}
-	fprintf(logfile, (char*)"%s\n", message.c_str());
-	fclose(logfile);
-}
-
-
-bool processAlive(pid_t pid) {
-    if (kill(pid, 0) != -1) { /* pid as first param, signal 0 determines no real action, but error checking is still performed */
-        return true;
+    logfile = fopen(INTERNAL_LOG_FILE, "a+");
+    if (!logfile) {
+        return;
     }
-    return false;
+    fprintf(logfile, (char*)"%s\n", message.c_str());
+    fclose(logfile);
 }
+
+
+// bool processAlive(pid_t pid) {
+//     if (kill(pid, 0) != -1) { /* pid as first param, signal 0 determines no real action, but error checking is still performed */
+//         return true;
+//     }
+//     return false;
+// }
 
 
 string currentDir() {
