@@ -20,38 +20,16 @@ extern "C" {
     
     
     string getClassPath() {
-        vector<string> modules;
-        vector<string> libPaths;
-        string postfixManaged = string(POSTFIX_MANAGED_JARS);
-        string postfixTarget = string(POSTFIX_TARGET_CLASSES);
-        modules.push_back(API_MODULE);
-        modules.push_back(CORE_MODULE);
-        modules.push_back(UTILS_MODULE);
-
-        vector<string>::iterator it;
-        /* list and create jar file list to pass to java */
-        for (unsigned int ind = 0; ind < modules.size(); ind++) {
-            string prefix = modules[ind] + postfixManaged;
-            vector<string> files = vector<string>();
-            getdir(prefix, files);
-            for (unsigned int i = 0; i < files.size(); i++) {
-                libPaths.push_back(prefix + files[i]);
-            }
-            libPaths.push_back(modules[ind] + postfixTarget);
+        ifstream f("tmp/core.classpath");
+        if(f.is_open()){
+            string cp;
+            f >> cp;
+            f.close();
+            return cp;
+        } else {
+            cerr << "tmp/core.classpath not found!";
+            exit(-1);
         }
-        
-        /* also include scala */
-        libPaths.push_back(currentDir() + string(SCALA_LIBRARY));
-        
-        /* include akka.conf to classpath */
-        libPaths.push_back(currentDir() + string(AKKA_CONF));
-        
-        stringstream ret;
-        for (it = libPaths.begin(); it < libPaths.end(); it++) {
-            ret << *it << ":";
-        }
-        ret << ".";
-        return ret.str();
     }
 #endif
 
