@@ -1,0 +1,9 @@
+-@ val repos: List[com.verknowsys.served.api.git.Repository]
+
+%h2 Git repositories
+%table
+  %tr
+    %th Name
+    - for(repo <- repos)
+      %tr
+        %td= repo.name

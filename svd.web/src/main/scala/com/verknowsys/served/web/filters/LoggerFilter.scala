@@ -5,9 +5,7 @@ import com.verknowsys.served.api.Logger._
 
 import com.verknowsys.forms._
 
-class LoggerFilter extends REST {
-    def prefix = "logger"
-
+class LoggerFilter extends REST("logger") {
     class LoggerEntryForm(entry: Option[AddEntry] = None, params: Params = Params.Empty) extends Form[AddEntry](entry, params, createPath){
         def bind = for {
             cn <- className

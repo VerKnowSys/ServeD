@@ -6,32 +6,19 @@ import scalate.ScalateSupport
 import com.verknowsys.forms._
 import com.verknowsys.served.utils.Logging
 
-abstract trait REST extends ScalatraFilter with ScalateSupport with Logging {
+abstract trait Action extends ScalatraFilter with ScalateSupport with Logging {
     def prefix: String
-
-
-    def index: Map[String, Any]
-    // def show
-    // def new
-    def create
-    // def edit
-    // def update
-    // def destroy
-
-    // Path helpers
-    def indexPath = pathPrefix
-    def createPath = pathPrefix
 
     beforeAll {
         contentType = "text/html"
     }
 
-    get(pathPrefix){
-        render("index", index)
-    }
-
-    post(pathPrefix){
-        create
+    protected override def effectiveMethod: HttpMethod = {
+        HttpMethod(request.getMethod) match {
+            case Post => params.get("_method").map(m => HttpMethod(m.toUpperCase)) getOrElse Post
+            case Head => Get
+            case x => x
+        }
     }
 
 
@@ -49,4 +36,29 @@ abstract trait REST extends ScalatraFilter with ScalateSupport with Logging {
 
     protected def render(path: String, attributes: Map[String, Any] = Map()) =
         templateEngine.layout("/WEB-INF/scalate/templates/" + pathPrefix + "/" + path + ".scaml", attributes)
+
 }
+
+abstract trait IndexAction extends Action {
+    def index: Map[String, Any]
+
+    def indexPath = pathPrefix
+
+    get(pathPrefix){
+        render("index", index)
+    }
+}
+
+abstract trait CreateAction extends Action {
+    def create
+
+    def createPath = pathPrefix
+
+    post(pathPrefix){
+        create
+    }
+}
+
+abstract class REST(val prefix: String = "") extends IndexAction
+                                            with CreateAction
+
