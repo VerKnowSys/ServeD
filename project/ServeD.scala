@@ -2,6 +2,7 @@ import sbt._
 import sbt.Keys._
 
 import com.github.siasia.WebPlugin
+import coffeescript.CoffeeScript
 
 object BuildSettings {
     val buildSettings = Defaults.defaultSettings ++ Seq(
@@ -105,7 +106,7 @@ object ServeD extends Build {
             libraryDependencies ++= Seq(
                 scalatra, scalate, jetty, servlet % "provided"
             )
-        )
+        ) ++ CoffeeScript.coffeeSettings
     ) dependsOn(utils)
 
     lazy val testing = Project("testkit", file("svd.testing"),

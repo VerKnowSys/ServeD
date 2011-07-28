@@ -1,9 +1,13 @@
 import sbt._
 import sbt.Keys._
-
+import sbt.inc.Analysis
 
 object Tasks {
     import scala.Console._
+
+    val notes = TaskKey[Unit]("notes", "Shows code notes")
+    val cp = TaskKey[Analysis]("cp", "Write full classpath to ${module}.classhpath file")
+
 
     val XXX  = ".*//.*(?i:xxx)(.*):?".r
     val NOTE = ".*//.*(?i:note)(.*):?".r
@@ -23,9 +27,7 @@ object Tasks {
         "fixme" -> YELLOW
     )
 
-    val notes = TaskKey[Unit]("notes", "Shows code notes")
-
-    val notesTask = notes <<= (moduleName, baseDirectory, unmanagedSources in Compile, unmanagedSources in Test) map {
+    def notesTask = (moduleName, baseDirectory, unmanagedSources in Compile, unmanagedSources in Test) map {
         (module, baseDir, mainFiles, testFiles) =>
             List(mainFiles, testFiles) foreach { files =>
                 files filterNot { file =>
@@ -55,17 +57,14 @@ object Tasks {
             }
     }
 
-    val cp = TaskKey[Unit]("cp", "Show full classpath")
-
-    val cpTask = cp <<= (fullClasspath in Compile) map { (cp) =>
-        println(cp map { _.data } mkString ":")
-    }
-
-    val writeCp = TaskKey[Unit]("write-cp", "Write full classpath to ${module}.classhpath file")
-
-    val writeCpTasl = writeCp <<= (moduleName, fullClasspath in Compile) map { (module, cp) =>
+    def cpTask = (moduleName, fullClasspath in Compile) map { (module, cp) =>
         IO.write(file("tmp/" + module + ".classpath"), cp map { _.data } mkString ":")
+        Analysis.Empty
     }
 
-    def all = Seq(notesTask, cpTask, writeCpTasl)
+    def all: Seq[Setting[_]] = Seq(
+        notes <<= notesTask,
+        cp <<= cpTask,
+        compile <<= cpTask
+    )
 }
