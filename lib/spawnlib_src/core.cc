@@ -6,7 +6,7 @@
 #include "core.h"
 
 
-static string coreDir = currentDir();
+const static string coreDir = currentDir();
 
 
 using namespace std;
@@ -18,19 +18,20 @@ extern "C" {
 
 #ifdef DEVEL
     
-    
     string getClassPath() {
-        ifstream f("tmp/core.classpath");
-        if(f.is_open()){
-            string cp;
+        string strink = coreDir + "/tmp/core.classpath";
+        string cp = "";
+        ifstream f(strink.c_str());
+        if (f.is_open()){
             f >> cp;
             f.close();
-            return cp;
         } else {
-            cerr << "tmp/core.classpath not found!";
+            cerr << strink << " not found!" << endl;
             exit(-1);
         }
+        return cp;
     }
+    
 #endif
 
 
@@ -39,9 +40,9 @@ extern "C" {
         string jnalp = "-Djna.library.path=" + currentDir() + "/lib";
 
 #ifdef DEVEL
-    #define COUNT 13
-#else
     #define COUNT 14
+#else
+    #define COUNT 13
 #endif
         char *args[] = {
             (char*)"java",
@@ -69,212 +70,118 @@ extern "C" {
             (char*)0
         };
 
-        stringstream    ret;
-        ret << "loading svd, with opts: [";
+        cerr << "Loading svd, with opts: [";
         for (int i = 0; i < COUNT; i++) {
-            ret << args[i] << " ";
+            cerr << args[i] << " ";
         }
-        ret << "]";
-        log_message(ret.str());
-        
+        cerr << "]" << endl;
         execv((char*)java_path.c_str(), args);
     }
 
 
-    void spawnBackgroundTask(string abs_java_bin_path, string main_starting_class_param, string cmdline_param, bool bindSocket, string lockFileName) {
+    void spawnBackgroundTask(string abs_java_bin_path, string main_starting_class_param, string cmdline_param, string lockFileName) {
         int i, lfp;
         char str[32];
 
-        if (getppid() == 1)
-            return; /* already a daemon */
+        // if (getppid() == 1)
+        //     return; /* already a daemon */
         
-    	i = fork();
-    	if (i < 0) {
-            log_message("Fork error!");
-            exit(1); /* fork error */
-    	}
-
-        if (i > 0) {
-            /* blocking function for parent */
-            if (bindSocket) {
-                log_message("Spawning socket listener");
-                createSocketServer();
-            } else {
-                return;
-            }
-        } 
+        // i = fork();
+        // if (i < 0) {
+        //             log_message("Fork error!");
+        //             exit(1); /* fork error */
+        // }
 
     	/* child (daemon) continues */
     	setsid(); /* obtain a new process group */
-        for (i = getdtablesize(); i >= 0; --i)
-            close(i); /* close all descriptors */
+        cerr << "Sid set" << endl;
+        // for (i = getdtablesize(); i >= 0; --i)
+        //             close(i); /* close all descriptors */
 
-        string logFileName = cmdline_param + "-" + string(LOG_FILE);
-        freopen (logFileName.c_str(), "a+", stdout);
-        freopen (logFileName.c_str(), "a+", stderr);
+        // string logFileName = cmdline_param + "-" + string(LOG_FILE);
+        //         freopen (logFileName.c_str(), "a+", stdout);
+        //         freopen (logFileName.c_str(), "a+", stderr);
     	umask(027); /* set newly created file permissions */
     	
     	if (cmdline_param == string(CORE_SVD_ID)) {
-    	    log_message("Spawning boot svd in dir: " + currentDir());
+            cerr << "Spawning boot svd in dir: " << currentDir() << endl;
     	} else {
     	    string homeDir = string(USERS_HOME_DIR) + cmdline_param;
-            log_message("Spawning user svd in home dir: " + homeDir);
+            cerr << "Spawning user svd in home dir: " << homeDir << endl;
             chdir(homeDir.c_str());
     	}
 
     	lfp = open(lockFileName.c_str(), O_RDWR | O_CREAT, 0640);
     	if (lfp < 0) {
-            log_message("Cannot open!");
+            cerr << "Cannot open!" << endl;
     	    exit(1); /* can not open */
     	}
 
-    	if (lockf(lfp, F_TLOCK, 0) < 0) {
-            log_message("Cannot lock! Already spawned?");
-    	    exit(1); /* can not lock */
-    	}
+        // if (lockf(lfp, F_TLOCK, 0) < 0) {
+        //             cerr << "Cannot lock! Already spawned?" << endl;
+        //     exit(1); /* can not lock */
+        // }
 
     	/* first instance continues */
     	sprintf(str, "%d\n", getpid());
     	write(lfp, str, strlen(str)); /* record pid to lockfile */
-    	signal(SIGCHLD, SIG_IGN); /* ignore child */
-    	signal(SIGTSTP, SIG_IGN); /* ignore tty signals */
-    	signal(SIGTTOU, SIG_IGN);
-    	signal(SIGTTIN, SIG_IGN);
-    	signal(SIGHUP, defaultSignalHandler); /* catch hangup signal */
-    	signal(SIGTERM, defaultSignalHandler); /* catch kill signal */
+    	
+    	// signal(SIGCHLD, SIG_IGN); /* ignore child */
+        signal(SIGTSTP, SIG_IGN); /* ignore tty signals */
+        signal(SIGTTOU, SIG_IGN);
+        signal(SIGTTIN, SIG_IGN);
+        signal(SIGHUP, defaultSignalHandler); /* catch hangup signal */
+        signal(SIGTERM, defaultSignalHandler); /* catch kill signal */
         signal(SIGINT, defaultSignalHandler);
 
     	/* spawn svd */
     	chdir(coreDir.c_str()); /* change running directory before spawning svd */
-    	load_svd(abs_java_bin_path, (currentDir() + JAR_FILE), main_starting_class_param, cmdline_param);
+    	load_svd(abs_java_bin_path, (coreDir + JAR_FILE), main_starting_class_param, cmdline_param);
     }
 
 
-    char* spawn(string _command) {
+    void spawn(string uid) {
         ofstream        ofs;
         FILE            *fpipe = NULL;
-        stringstream    ret, logFile;
+        char            line[SOCK_DATA_PACKET_SIZE];
         int             childExitStatus = 0;
-        pid_t           pid = 0;
+        pid_t           pid = getpid();
         pid_t           ppid = getppid();
-        char            line[1024];
-        uid_t           userUid;
+        uid_t           userUid = getuid();
 
-        log_message("Spawning command: " + _command);
-        if (!(fpipe = (FILE*)popen(_command.c_str(), "r"))) {
-            ret << POPEN_EXCEPTION;
-            return (char*)(ret.str()).c_str();
+        cerr << "Spawning command: " << uid << endl;
+        if (!(fpipe = (FILE*)popen(uid.c_str(), "r"))) {
+            cerr << POPEN_EXCEPTION << endl;
+            return;
         }
-        pid = getpid();
-        userUid = getuid();
+
+        #ifdef DEVEL
+            cerr << "Spawn pid: " << pid << endl;
+            cerr << "Spawn ppid: " << ppid << endl;
+            cerr << "Spawn uid: " << userUid << endl;
+        #endif
         
         switch (userUid) {
             case 0:
-                logFile << "/dev/null"; /* we're already handling log files for root */
                 break;
             
             default:
-                string cmdPrintable = escape(_command);
-                logFile << string(USERS_HOME_DIR) << userUid << "/" << pid << "--" << cmdPrintable << ".log";
+                string cmdPrintable = escape(uid);
+                stringstream s;
+                s << string(USERS_HOME_DIR) << userUid << "/" << pid << "--" << cmdPrintable << ".log";
+                ofs.open(s.str().c_str());
+                while (fgets(line, sizeof(line) + sizeof((char*)0), fpipe)) {
+                    #ifdef DEVEL
+                        cerr << "Output: " << line << endl;
+                    #endif
+                    ofs << line;
+                }
+                ofs.close();
+                pclose(fpipe);
                 break;
         }
-        log_message("Logfile of spawn: " + logFile.str());
-        
-        ofs.open(logFile.str().c_str());
-        while (fgets(line, sizeof(line), fpipe)) {
-            ofs << line;
-        }
-        ofs.close();
-        pclose(fpipe);
-
-        ret << ppid << ";" << pid;
-        return (char*)(ret.str()).c_str();
     }
     
-    
-    void createSocketServer() {
-        int sockfd, newsockfd, servlen, n;
-        socklen_t clilen;
-        struct sockaddr_un  cli_addr, serv_addr;
-        char buf[SOCK_DATA_PACKET_SIZE];
-
-        if ((sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
-            log_message("exception while creating socket");
-
-        bzero((char *) &serv_addr, sizeof(serv_addr));
-        serv_addr.sun_family = AF_UNIX;
-        strcpy(serv_addr.sun_path, SOCK_FILE);
-        servlen = strlen(serv_addr.sun_path) + sizeof(serv_addr.sun_path) + sizeof(serv_addr.sun_family);
-
-        if (bind(sockfd, (struct sockaddr *)&serv_addr, servlen) < 0) {
-            log_message("exception while binding socket"); 
-        }
-        
-        /* we also need to take care of socket server which spawns with own pid */
-        pid_t sockPid = getpid();
-        stringstream s;
-        s << "Socket process pid: " << sockPid;
-        log_message(s.str());
-        umask(027); /* set newly created file permissions */
-    	chdir(currentDir().c_str()); /* change running directory */
-        char str[32];
-    	int lfp = open(SOCKET_LOCK_FILE, O_RDWR | O_CREAT, 0640);
-    	if (lfp < 0) {
-            log_message("Cannot open!");
-    	    exit(1); /* can not open */
-    	}
-    	if (lockf(lfp, F_TLOCK, 0) < 0) {
-            log_message("Cannot lock! Already spawned?");
-    	    exit(1); /* can not lock */
-    	}
-    	sprintf(str, "%d\n", sockPid);
-        write(lfp, str, strlen(str)); /* record pid to lockfile */
-        
-        /* prepare listen on socket addr */
-        listen(sockfd, 5);
-        clilen = sizeof(cli_addr);
-        
-        /* main listening group */
-        while (1) {
-            newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
-            if (newsockfd < 0)
-                 log_message("exception on accepting socket");
-
-            n = read(newsockfd, buf, SOCK_DATA_PACKET_SIZE);
-            log_message("BUF: " + string(buf));
-            close(newsockfd);
-            
-            /* spawn userland served */
-            string cmd = currentDir() + "/userspawn " + string(buf);
-            string result = spawn((char*)cmd.c_str());
-            log_message("Result from spawn: " + result);
-        }
-        close(sockfd);
-    }
-    
-    
-    void sendSpawnMessage(char* content) {
-        int sockfd, servlen,n;
-        struct sockaddr_un  serv_addr;
-        char buffer[SOCK_DATA_PACKET_SIZE];
-        
-        bzero((char *)&serv_addr, sizeof(serv_addr));
-        serv_addr.sun_family = AF_UNIX;
-        strncpy(serv_addr.sun_path, SOCK_FILE, strlen(SOCK_FILE) + 1);
-        servlen = strlen(serv_addr.sun_path) + sizeof(serv_addr.sun_path) + sizeof(serv_addr.sun_family);
-        
-        if ((sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
-            log_message("Exception while creating socket");
-
-        if (connect(sockfd, (struct sockaddr *)&serv_addr, servlen) < 0)
-            log_message("Exception while connecting to socket server");
-
-        bzero(buffer, SOCK_DATA_PACKET_SIZE);
-        strncpy(buffer, content, strlen(content));
-        write(sockfd, buffer, sizeof(buffer));
-        close(sockfd);
-    }
-
     
 }
 

@@ -45,9 +45,9 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             
             // TODO:
             // new SvdService(account, "rails app x", SvdShellOperation("rails dupa" :: "cd dupa" :: "script/rails" :: Nil)).start
-            self reply Success
-            
-        case msg: git.Base => 
+            // self reply Success
+
+        case msg: git.Base =>
             gitManager forward msg
             
     }
