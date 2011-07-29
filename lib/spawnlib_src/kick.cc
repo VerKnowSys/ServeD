@@ -62,7 +62,7 @@ int main(int argc, char const *argv[]) {
 
     pid_t pid;
     uid_t uid = atoi(arg.c_str());
-    string lockName = homeDir + "/" + arg;
+    string lockName = homeDir + "/" + arg + ".pid";
     ifstream ifs(lockName.c_str(), ios::in);
     ifs >> pid;
     ifs.close();
