@@ -217,12 +217,24 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
     
     override def postStop {
+        log.info("Stopping spawned user workers")
+        SvdAccounts(db).foreach{
+            account =>
+                log.info("Shutdown hook of SvdAccountsManager")
+                val src = Source.fromFile(
+                        SvdConfig.userHomeDir / "%d".format(account.uid) / "%d.pid".format(account.uid)
+                    ).mkString.split("\n").head // PID FILE
+                log.trace("Src: " + src)
+                val i: Int = src.toInt
+                val cmd = CLibrary.instance
+                log.debug("Kill: " + cmd.kill(i, 3)) // HACK: SIGINT
+        }
         super.postStop
         log.trace("Invoking postStop in SvdAccountsManager")
         db.close
         server.close
     }
-
+    
     
     def receive = {
         case Init =>
@@ -269,7 +281,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     private def respawnUsersActors {        
         userAccounts.foreach{
             account =>
-                log.warn("Sending spawn message for account: %s".format(account))
+                log.warn("Spawning account: %s".format(account))
                 new SvdShell(account).exec(new SvdShellOperation("./kick " + account.uid)) // HACK
         }
     }
