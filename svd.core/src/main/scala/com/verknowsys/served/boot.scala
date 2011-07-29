@@ -81,9 +81,9 @@ object boot extends Logging {
             case Some(account) =>
                 log.debug("Got account, starting AccountManager for %s", account)
                 val am = actorOf(new SvdAccountManager(account)).start
-                val loggingManager = actorOf[LoggingManager]
-                am ! Init
                 
+                val loggingManager = actorOf(new LoggingManager(GlobalLogger)).start
+                am !! Init
                 remote.start(SvdConfig.defaultHost, account.servicePort)
                 remote.register("service:account-manager", am)
                 remote.register("service:logging-manager", loggingManager)
