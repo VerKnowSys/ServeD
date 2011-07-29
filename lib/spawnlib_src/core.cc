@@ -27,7 +27,7 @@ extern "C" {
             f.close();
         } else {
             cerr << "Directory " << strink << " not found!" << endl;
-            exit(-1);
+            exit(CLASSPATH_DIR_MISSING_ERROR);
         }
         return cp;
     }
@@ -87,7 +87,7 @@ extern "C" {
 
     	setsid(); /* obtain a new process group */
     	#ifdef DEVEL
-            cerr << "Sid set. Continuing spawnBackgroundTask.." << endl;
+            cerr << "Session active. Continuing in background task" << endl;
         #endif
 
         string logFileName = cmdline_param + "-" + string(INTERNAL_LOG_FILE);
@@ -106,12 +106,12 @@ extern "C" {
     	lfp = open(lockFileName.c_str(), O_RDWR | O_CREAT, 0640);
     	if (lfp < 0) {
             cerr << "Lock file occupied. Cannot open." << endl;
-    	    exit(1); /* can not open */
+    	    exit(LOCK_FILE_OCCUPIED_ERROR); /* can not open */
     	}
 
         if (lockf(lfp, F_TLOCK, 0) < 0) {
             cerr << "Cannot lock! Already spawned?" << endl;
-            exit(1); /* can not lock */
+            exit(CANNOT_LOCK_ERROR); /* can not lock */
         }
 
     	/* first instance continues */
@@ -143,8 +143,8 @@ extern "C" {
 
         cerr << "Spawning command: " << uid << endl;
         if (!(fpipe = (FILE*)popen(uid.c_str(), "r"))) {
-            cerr << POPEN_EXCEPTION << endl;
-            return;
+            cerr << POPEN_ERROR << endl;
+            exit(POPEN_ERROR);
         }
 
         #ifdef DEVEL

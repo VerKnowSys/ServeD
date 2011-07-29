@@ -11,16 +11,16 @@ using namespace std;
 
 
 int main(int argc, char const *argv[]) {
-
+    
     if (getuid() != 0) {
         cerr << "Kick requires root privileges to run." << endl;
-        exit(1);
+        exit(NOROOT_PRIVLEGES_ERROR);
     }
     
 #ifndef DEVEL
     if (!fileExists(currentDir() + JAR_FILE)) {
         cerr << "No ServeD Core available! Rebuild svd.core first!" << endl;
-        exit(1);
+        exit(CLASSPATH_DIR_MISSING_ERROR);
     }
 #endif
 
@@ -35,18 +35,26 @@ int main(int argc, char const *argv[]) {
     if (argc == 1) {
         cerr << "Spawning core" << endl;
         arg = "0";
-        homeDir = CORE_HOMEDIR; 
+        homeDir = CORE_HOMEDIR;
+        #ifdef DEVEL
+            cerr << "HomeDir: " << homeDir << " and argument: " << arg << endl;
+            string log = homeDir + "/boot-" + INTERNAL_LOG_FILE; // XXX: hardcoded "boot"
+            cerr << "Development mode: cleaning log: " << log << endl;
+            remove(log.c_str());
+        #endif
     } else {
         arg = string(argv[1]);
         homeDir = string(USERS_HOME_DIR) + arg; /* NOTE: /Users/$UID homedir format */
+        #ifdef DEVEL
+            cerr << "HomeDir: " << homeDir << " and argument: " << arg << endl;
+            string log = homeDir + "/" + arg + "-" + INTERNAL_LOG_FILE;
+            cerr << "Development mode: cleaning log: " << log << endl;
+            remove(log.c_str());
+        #endif
     }
-    
-    
-#ifdef DEVEL
-    cerr << "HomeDir: " << homeDir << " and argument: " << arg << endl;
-#endif
+        
     if (!fileExists(homeDir)) {
-        cerr << homeDir << " does not exists. Creating it." << endl;
+        cerr << "Directory: " << homeDir << " does not exists. Creating it." << endl;
 #ifdef DEVEL
         mkdir(homeDir.c_str(), 0755); /* XXX: hardcoded permissions but it's safe */
 #else
@@ -62,10 +70,6 @@ int main(int argc, char const *argv[]) {
     ifs >> pid;
     ifs.close();
     
-    // // handling CTRL-C & TERM
-    // signal(SIGINT, &handler);
-    // signal(SIGTERM, &handler);
-
     chdir(homeDir.c_str());
     #ifdef DEVEL
         cerr << "Starting UserSpawn for uid: " << uid << " in homeDir: " << homeDir << endl;
@@ -77,7 +81,7 @@ int main(int argc, char const *argv[]) {
     } else
     if (setuid(uid) != 0) {
         cerr << "SetUID(" << uid << ") failed. Aborting." << endl;
-        exit(1);
+        exit(SETUID_ERROR);
     }
     spawnBackgroundTask("/usr/bin/java", "user", arg, lockName);
     return 0;

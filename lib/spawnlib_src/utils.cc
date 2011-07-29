@@ -13,7 +13,7 @@
         struct dirent *dirp;
         if((dp = opendir(dir.c_str())) == NULL) {
             cout << "Error(" << errno << ") opening " << dir << endl;
-            return errno;
+            return DIRECTORY_OPEN_ERROR;
         }
 
         while ((dirp = readdir(dp)) != NULL) {
