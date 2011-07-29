@@ -44,13 +44,17 @@ object boot extends Logging {
             Nil).map(Supervise(_, Permanent))
 
         // supervise and autostart
-        Supervisor(
+        val supervisor = Supervisor(
             SupervisorConfig(
                 OneForOneStrategy(List(classOf[Exception], classOf[RuntimeException], classOf[NullPointerException]), 50, 1000),
                 list
-          )
+            )
         )
-
+        
+        SvdUtils.addShutdownHook {
+            log.info("Shutdown requested")
+            supervisor.shutdown
+        }
 
         systemManager ! Init
         accountsManager ! Init
