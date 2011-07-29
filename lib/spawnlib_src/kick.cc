@@ -44,11 +44,6 @@ int main(int argc, char const *argv[]) {
     
 #ifdef DEVEL
     cerr << "HomeDir: " << homeDir << " and argument: " << arg << endl;
-    /* also remove contents of home directory before each running in devel mode */
-    // if (homeDir != string(USERS_HOME_DIR)) {
-        // cerr << "Cleaning files in homeDir: " << homeDir << endl;
-        // spawn("/bin/rm -rf " + homeDir);
-    // }
 #endif
     if (!fileExists(homeDir)) {
         cerr << homeDir << " does not exists. Creating it." << endl;
@@ -66,19 +61,24 @@ int main(int argc, char const *argv[]) {
     ifstream ifs(lockName.c_str(), ios::in);
     ifs >> pid;
     ifs.close();
+    
+    // // handling CTRL-C & TERM
+    // signal(SIGINT, &handler);
+    // signal(SIGTERM, &handler);
 
     chdir(homeDir.c_str());
-    cerr << "Starting UserSpawn for uid: " << uid << " in homeDir: " << homeDir << endl;
+    #ifdef DEVEL
+        cerr << "Starting UserSpawn for uid: " << uid << " in homeDir: " << homeDir << endl;
+    #endif
     
     if (uid == 0) {
         // spawn core
-        spawnBackgroundTask("/usr/bin/java", "svd", string(CORE_SVD_ID), LOCK_FILE);
+        spawnBackgroundTask("/usr/bin/java", "svd", string(CORE_SVD_ID), lockName);
     } else
     if (setuid(uid) != 0) {
         cerr << "SetUID(" << uid << ") failed. Aborting." << endl;
         exit(1);
     }
     spawnBackgroundTask("/usr/bin/java", "user", arg, lockName);
-
     return 0;
 }

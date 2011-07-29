@@ -26,7 +26,7 @@ extern "C" {
             f >> cp;
             f.close();
         } else {
-            cerr << strink << " not found!" << endl;
+            cerr << "Directory " << strink << " not found!" << endl;
             exit(-1);
         }
         return cp;
@@ -70,11 +70,13 @@ extern "C" {
             (char*)0
         };
 
+    #ifdef DEVEL
         cerr << "Loading svd, with opts: [";
         for (int i = 0; i < COUNT; i++) {
             cerr << args[i] << " ";
         }
         cerr << "]" << endl;
+    #endif
         execv((char*)java_path.c_str(), args);
     }
 
@@ -83,24 +85,14 @@ extern "C" {
         int i, lfp;
         char str[32];
 
-        // if (getppid() == 1)
-        //     return; /* already a daemon */
-        
-        // i = fork();
-        // if (i < 0) {
-        //             log_message("Fork error!");
-        //             exit(1); /* fork error */
-        // }
-
-    	/* child (daemon) continues */
     	setsid(); /* obtain a new process group */
-        cerr << "Sid set" << endl;
-        // for (i = getdtablesize(); i >= 0; --i)
-        //             close(i); /* close all descriptors */
+    	#ifdef DEVEL
+            cerr << "Sid set. Continuing spawnBackgroundTask.." << endl;
+        #endif
 
-        // string logFileName = cmdline_param + "-" + string(LOG_FILE);
-        //         freopen (logFileName.c_str(), "a+", stdout);
-        //         freopen (logFileName.c_str(), "a+", stderr);
+        string logFileName = cmdline_param + "-" + string(INTERNAL_LOG_FILE);
+        freopen (logFileName.c_str(), "a+", stdout);
+        freopen (logFileName.c_str(), "a+", stderr);
     	umask(027); /* set newly created file permissions */
     	
     	if (cmdline_param == string(CORE_SVD_ID)) {
@@ -113,14 +105,14 @@ extern "C" {
 
     	lfp = open(lockFileName.c_str(), O_RDWR | O_CREAT, 0640);
     	if (lfp < 0) {
-            cerr << "Cannot open!" << endl;
+            cerr << "Lock file occupied. Cannot open." << endl;
     	    exit(1); /* can not open */
     	}
 
-        // if (lockf(lfp, F_TLOCK, 0) < 0) {
-        //             cerr << "Cannot lock! Already spawned?" << endl;
-        //     exit(1); /* can not lock */
-        // }
+        if (lockf(lfp, F_TLOCK, 0) < 0) {
+            cerr << "Cannot lock! Already spawned?" << endl;
+            exit(1); /* can not lock */
+        }
 
     	/* first instance continues */
     	sprintf(str, "%d\n", getpid());
