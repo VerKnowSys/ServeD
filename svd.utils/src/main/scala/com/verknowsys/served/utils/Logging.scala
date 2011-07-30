@@ -16,9 +16,8 @@ object GlobalLogger extends LoggingMachine
 
 trait LoggingMachine {
     // read defaults from properteis file
-    def readDefaults: Map[String, Logger.Levels.Value] = {
-        val res = getClass.getResource("/svd.logger.properties")
-        val opt = if(res != null){
+    def readDefaults = {
+        Option(getClass.getResource("/svd.logger.properties")) flatMap { res =>
             val props = new SvdProperties(res.getPath)
             props.data.map { pairs =>
                 (Map[String, Logger.Levels.Value]() /: pairs) {
@@ -28,11 +27,7 @@ trait LoggingMachine {
                     }
                 }
             }
-        } else {
-            None
-        }
-
-        opt getOrElse Map[String, Logger.Levels.Value]()
+        } getOrElse Map[String, Logger.Levels.Value]()
     }
 
     val levelsMapping = Map(

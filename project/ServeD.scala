@@ -3,9 +3,11 @@ import sbt.Keys._
 
 import com.github.siasia.WebPlugin
 import coffeescript.CoffeeScript
+import growl._
+import growl.GrowlingTests._
 
 object BuildSettings {
-    val buildSettings = Defaults.defaultSettings ++ Seq(
+    val buildSettings = Defaults.defaultSettings ++ GrowlingTests.growlSettings ++ Seq(
         organization    := "VerKnowSys",
         version         := "0.2.0",
         scalaVersion    := "2.9.0-1",
@@ -20,12 +22,41 @@ object BuildSettings {
         scalacOptions   += "-unchecked",
         scalacOptions   += "-deprecation",
 
-        javacOptions     += "-g:none",
+        javacOptions    += "-g:none",
         // javacOptions     += "-encoding UTF-8",
         // javacOptions     += "-source 1.6",
         // javacOptions     += "-target 1.6",
         // javacOptions     += "-Xlint:unchecked",
-        javacOptions     += "-Xlint:deprecation"
+        javacOptions    += "-Xlint:deprecation",
+
+        // Customized GrowlingTests configuration
+        images in Growl := GrowlTestImages(
+            Some("project/growl_images/pass.png"),
+            Some("project/growl_images/fail.png"),
+            Some("project/growl_images/fail.png")
+        ),
+        groupFormatter in Growl <<= (images in Growl) {
+            (imgs) =>
+                (res: GroupResult) =>
+                    GrowlResultFormat(
+                        Some(res.name),
+                        res.name.replace("com.verknowsys.served", "svd"), // shorten class name
+                        res.status match {
+                            case TestResult.Error  => "Had Errors"
+                            case TestResult.Passed => "Passed"
+                            case TestResult.Failed => "Failed"
+                        },
+                        res.status match {
+                            case TestResult.Error | TestResult.Failed => true
+                            case _ => false
+                        },
+                        res.status match {
+                            case TestResult.Error  => imgs.error
+                            case TestResult.Passed => imgs.pass
+                            case TestResult.Failed => imgs.fail
+                        }
+                    )
+        }
     ) ++ Tasks.all
 }
 

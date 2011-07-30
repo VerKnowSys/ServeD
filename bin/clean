@@ -10,7 +10,10 @@ for i in *; do
 done
 
 sbt clean
-echo "Cleaned."
+echo "Project source cleaned.."
+
+rm -rf lib/*.o
+echo "Native library cleaned."
 
 sbt update
-echo "Updated."
+echo "Project updated."

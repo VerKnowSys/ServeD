@@ -29,7 +29,7 @@
 
 /* global constants */
 
-#define DEVEL true
+#define DEVEL
 #define CORE_HOMEDIR "/SystemUsers/Core"
 #define USERS_HOME_DIR "/Users/"
 #define LOCK_FILE	"svd-core.lock"
@@ -44,6 +44,13 @@
 #define SETUID_EXCEPTION 251
 #define POPEN_EXCEPTION 252
 
+#define LOCK_FILE_OCCUPIED_ERROR -100
+#define CANNOT_LOCK_ERROR -101
+#define POPEN_ERROR -102
+#define CLASSPATH_DIR_MISSING_ERROR -103
+#define NOROOT_PRIVLEGES_ERROR -104
+#define SETUID_ERROR -105
+#define DIRECTORY_OPEN_ERROR -106
 
 #ifdef DEVEL
 
@@ -63,7 +70,6 @@ extern void log_message(string message);
 extern void defaultSignalHandler(int sig);
 extern string escape(string input);
 extern int getdir (string dir, vector<string> &files);
-extern void cleanupLockAndSockFIles();
 extern void spawnBackgroundTask(string abs_java_bin_path, string main_starting_class_param, string cmdline_param, string lockFileName);
 
 

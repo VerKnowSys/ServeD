@@ -26,8 +26,8 @@ extern "C" {
             f >> cp;
             f.close();
         } else {
-            cerr << strink << " not found!" << endl;
-            exit(-1);
+            cerr << "Directory " << strink << " not found!" << endl;
+            exit(CLASSPATH_DIR_MISSING_ERROR);
         }
         return cp;
     }
@@ -70,11 +70,13 @@ extern "C" {
             (char*)0
         };
 
+    #ifdef DEVEL
         cerr << "Loading svd, with opts: [";
         for (int i = 0; i < COUNT; i++) {
             cerr << args[i] << " ";
         }
         cerr << "]" << endl;
+    #endif
         execv((char*)java_path.c_str(), args);
     }
 
@@ -83,24 +85,14 @@ extern "C" {
         int i, lfp;
         char str[32];
 
-        // if (getppid() == 1)
-        //     return; /* already a daemon */
-        
-        // i = fork();
-        // if (i < 0) {
-        //             log_message("Fork error!");
-        //             exit(1); /* fork error */
-        // }
-
-    	/* child (daemon) continues */
     	setsid(); /* obtain a new process group */
-        cerr << "Sid set" << endl;
-        // for (i = getdtablesize(); i >= 0; --i)
-        //             close(i); /* close all descriptors */
+    	#ifdef DEVEL
+            cerr << "Session active. Continuing in background task" << endl;
+        #endif
 
-        // string logFileName = cmdline_param + "-" + string(LOG_FILE);
-        //         freopen (logFileName.c_str(), "a+", stdout);
-        //         freopen (logFileName.c_str(), "a+", stderr);
+        string logFileName = cmdline_param + "-" + string(INTERNAL_LOG_FILE);
+        freopen (logFileName.c_str(), "a+", stdout);
+        freopen (logFileName.c_str(), "a+", stderr);
     	umask(027); /* set newly created file permissions */
     	
     	if (cmdline_param == string(CORE_SVD_ID)) {
@@ -113,14 +105,14 @@ extern "C" {
 
     	lfp = open(lockFileName.c_str(), O_RDWR | O_CREAT, 0640);
     	if (lfp < 0) {
-            cerr << "Cannot open!" << endl;
-    	    exit(1); /* can not open */
+            cerr << "Lock file occupied. Cannot open." << endl;
+    	    exit(LOCK_FILE_OCCUPIED_ERROR); /* can not open */
     	}
 
-        // if (lockf(lfp, F_TLOCK, 0) < 0) {
-        //             cerr << "Cannot lock! Already spawned?" << endl;
-        //     exit(1); /* can not lock */
-        // }
+        if (lockf(lfp, F_TLOCK, 0) < 0) {
+            cerr << "Cannot lock! Already spawned?" << endl;
+            exit(CANNOT_LOCK_ERROR); /* can not lock */
+        }
 
     	/* first instance continues */
     	sprintf(str, "%d\n", getpid());
@@ -151,8 +143,8 @@ extern "C" {
 
         cerr << "Spawning command: " << uid << endl;
         if (!(fpipe = (FILE*)popen(uid.c_str(), "r"))) {
-            cerr << POPEN_EXCEPTION << endl;
-            return;
+            cerr << POPEN_ERROR << endl;
+            exit(POPEN_ERROR);
         }
 
         #ifdef DEVEL

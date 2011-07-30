@@ -202,6 +202,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     val server = new DBServer(SvdConfig.remoteAccountServerPort, SvdConfig.systemHomeDir / SvdConfig.coreSvdAccountsDatabaseName)
     val db = server.openClient
     
+    val rootAccount = SvdAccount("root", uid = 0, gid = 0, dbPort = 0, servicePort = 0) // XXX
     val svdAccountUtils = new SvdAccountUtils(db)
     import svdAccountUtils._
     
@@ -218,11 +219,24 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     
     override def postStop {
         super.postStop
+        log.info("Stopping spawned user workers")
+        SvdAccounts(db).foreach{
+            account =>
+                val pidFile = SvdConfig.userHomeDir / "%d".format(account.uid) / "%d.pid".format(account.uid)
+                val src = Source.fromFile(pidFile).mkString.split("\n").head // PID
+                log.trace("Client VM PID to be killed: " + src)
+                new SvdShell(account).exec(new SvdShellOperation("kill " + src + "; /bin/rm " + pidFile))
+        }
+        // removing also pid file of root core of svd:
+        val corePid = SvdConfig.systemHomeDir / "Core" / "0.pid" // XXX: hardcoded
+        log.trace("Cleaning core pid file: %s".format(corePid))
+        new SvdShell(rootAccount).exec(new SvdShellOperation("/bin/rm %s".format(corePid))) // XXX: hardcoded
+        
         log.trace("Invoking postStop in SvdAccountsManager")
         db.close
         server.close
     }
-
+    
     
     def receive = {
         case Init =>
@@ -269,7 +283,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     private def respawnUsersActors {        
         userAccounts.foreach{
             account =>
-                log.warn("Sending spawn message for account: %s".format(account))
+                log.warn("Spawning account: %s".format(account))
                 new SvdShell(account).exec(new SvdShellOperation("./kick " + account.uid)) // HACK
         }
     }
