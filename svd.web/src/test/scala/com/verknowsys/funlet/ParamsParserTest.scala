@@ -40,11 +40,11 @@ class ParamsParserTest extends DefaultTest {
     )
 
     it should "encode params" in {
-        Params.encode(parsedParams) encoded should equal (rawParams)
+        Params.encode(parsedParams) should equal (rawParams)
     }
 
-    // it should "decode params" in {
-    //     Params.decode(rawParams) should equal (parsedParams)
-    // }
+    it should "decode params" in {
+        Params.decode(rawParams) should equal (parsedParams)
+    }
 
 }

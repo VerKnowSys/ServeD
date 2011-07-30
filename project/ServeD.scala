@@ -138,7 +138,7 @@ object ServeD extends Build {
                 scalatra, scalate, jetty, servlet % "provided"
             )
         ) ++ CoffeeScript.coffeeSettings
-    ) dependsOn(utils)
+    ) dependsOn(utils, testing % "test")
 
     lazy val testing = Project("testkit", file("svd.testing"),
         settings = buildSettings ++ Seq(
