@@ -6,46 +6,31 @@
 #include "core.h"
 
 
-#ifdef DEVEL
+// #ifdef DEVEL
     
-    int getdir (string dir, vector<string> &files) {
-        DIR *dp;
-        struct dirent *dirp;
-        if((dp = opendir(dir.c_str())) == NULL) {
-            cout << "Error(" << errno << ") opening " << dir << endl;
-            return DIRECTORY_OPEN_ERROR;
-        }
+    // int getdir (string dir, vector<string> &files) {
+    //     DIR *dp;
+    //     struct dirent *dirp;
+    //     if((dp = opendir(dir.c_str())) == NULL) {
+    //         cerr << "Error opening directory: " << dir << endl;
+    //         return DIRECTORY_OPEN_ERROR;
+    //     }
+    // 
+    //     while ((dirp = readdir(dp)) != NULL) {
+    //         files.push_back(string(dirp->d_name));
+    //     }
+    //     closedir(dp);
+    //     return 0;
+    // }
 
-        while ((dirp = readdir(dp)) != NULL) {
-            files.push_back(string(dirp->d_name));
-        }
-        closedir(dp);
-        return 0;
-    }
-#endif
-
-
-// void cleanupLockAndSockFIles() {
-//     if (fileExists(LOCK_FILE)) {
-//         log_message("Removing lock file (process is dead but file is still there).");
-//         spawn("/bin/rm " + string(LOCK_FILE));
-//     }
-//     if (fileExists(SOCK_FILE)) {
-//         log_message("Removing socket file (process is dead but file is still there).");
-//         spawn("/bin/rm " + string(SOCK_FILE));
-//     }
-//     if (fileExists(SOCKET_LOCK_FILE)) {
-//         log_message("Removing socket server lock file (process is dead but file is still there).");
-//         spawn("/bin/rm " + string(SOCKET_LOCK_FILE));
-//     }
-// }
+// #endif
 
 
 void log_message(string message) {
     FILE *logfile;
     logfile = fopen(INTERNAL_LOG_FILE, "a+");
     if (!logfile) {
-        return;
+        exit(DIAGNOSTIC_LOG_ERROR);
     }
     fprintf(logfile, (char*)"%s\n", message.c_str());
     fclose(logfile);
@@ -105,16 +90,14 @@ bool fileExists(string strFilename) {
 
 void defaultSignalHandler(int sig) {
 	switch(sig) {
-	case SIGHUP:
-		log_message("SIGHUP (hangup) signal catched. Not removing lock");
-		break;
-		
-	case SIGTERM:
-		log_message("SIGTERM/INT (terminate) signal catched. Removing lock");
-		string rmCmd = "/bin/rm " + string(LOCK_FILE);
-		system(rmCmd.c_str());
-		exit(0);
-		break;
-		
+    	case SIGQUIT:
+    	case SIGINT:
+    	case SIGTERM:
+    		cerr << "SIGTERM/INT (terminate) signal catched. Quitting" << endl;
+    		string rmCmd = "/bin/rm " + string(LOCK_FILE);
+    		system(rmCmd.c_str());
+    		exit(0);
+    		break;
+    		
 	}
 }
