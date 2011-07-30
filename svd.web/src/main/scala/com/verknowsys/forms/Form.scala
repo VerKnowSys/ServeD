@@ -1,6 +1,8 @@
 package com.verknowsys.forms
 
 import scala.xml.NodeSeq
+import java.security.PublicKey
+import com.verknowsys.served.utils.KeyUtils
 
 trait Validators {
     val NotEmpty: Validator[String] = s => if(s.isEmpty) Some("Must not be empty") else None
@@ -20,6 +22,12 @@ trait CommonFields {
 
     class IntField(name: String, getter: Entity => Int, validators: Validator[Int]*)(implicit form: Form[Entity]) extends Field(name, getter, validators:_*){
         def decode(param: String) = try { Some(param.toInt) } catch { case ex: java.lang.NumberFormatException => None }
+    }
+
+    class PublicKeyField(name: String, getter: Entity => PublicKey)(implicit form: Form[Entity]) extends Field[Entity, PublicKey](name, getter){
+        def decode(param: String) = KeyUtils.load(param)
+
+        override def inputHtml = <textarea name={fieldName} id={fieldId}>{fieldValue}</textarea>
     }
 
     class SelectField[T](name: String, getter: Entity => T, values: Seq[T])(implicit form: Form[Entity]) extends Field[Entity, T](name, getter){

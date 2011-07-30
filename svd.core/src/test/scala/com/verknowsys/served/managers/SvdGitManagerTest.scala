@@ -21,14 +21,14 @@ class SvdGitManagerTest extends DefaultTest {
     val db = dbServer.openClient
     val manager = actorOf(new SvdGitManager(account, db, homeDir / "git")).start
     mkdir(homeDir / "git")
-    
+
     def newRepo = {
         manager ! CreateRepository("foo")
         within(timeout){
              expectMsgClass(classOf[Repository])
         }
     }
-    
+
     def timeout = 3.seconds
 
     override def afterEach {
@@ -97,7 +97,7 @@ class SvdGitManagerTest extends DefaultTest {
              expectMsg(Repositories(Nil))
         }
     }
-    
+
     it should "retrieve repository by name" in {
         manager ! CreateRepository("foo")
         val foo = within(timeout){
@@ -108,13 +108,13 @@ class SvdGitManagerTest extends DefaultTest {
         within(timeout){
              expectMsg(Some(foo))
         }
-        
+
         manager ! GetRepositoryByName("blaaah")
         within(timeout){
              expectMsg(None)
         }
     }
-    
+
     it should "retrieve repository by uuid" in {
         manager ! CreateRepository("foo")
         val foo = within(timeout){
@@ -125,7 +125,7 @@ class SvdGitManagerTest extends DefaultTest {
         within(timeout){
              expectMsg(Some(foo))
         }
-        
+
         manager ! GetRepositoryByUUID(java.util.UUID.randomUUID)
         within(timeout){
              expectMsg(None)
@@ -138,59 +138,59 @@ class SvdGitManagerTest extends DefaultTest {
             expectMsg(RepositoryDoesNotExistError)
         }
     }
-    
+
     it should "add new key to config" in {
         val repo = newRepo
-        val key = KeyUtils.load(testPublicKey).get // we are sure this is valid key
-        
+        val key = AccessKey("default", KeyUtils.load(testPublicKey).get) // we are sure this is valid key
+
         manager ! AddAuthorizedKey(repo.uuid, key)
         within(timeout){
             expectMsg(Success)
         }
-        
+
         manager ! GetRepositoryByUUID(repo.uuid)
         val res = within(timeout){
             expectMsgClass(classOf[Some[Repository]])
         }.get
-        
+
         res.authorizedKeys should have size(1)
         res.authorizedKeys should contain (key)
         res should equal (repo.copy(authorizedKeys = Set() + key))
-        
+
         manager ! AddAuthorizedKey(repo.uuid, key)
         within(timeout){
             expectMsg(Success)
         }
-        
+
         manager ! GetRepositoryByUUID(repo.uuid)
         val res2 = within(timeout){
             expectMsgClass(classOf[Some[Repository]])
         }.get
-        
+
         res2.authorizedKeys should have size(1)
         res2.authorizedKeys should contain (key)
         res2 should equal (res)
     }
-    
+
     it should "remove key from config" in {
         val repo = newRepo
-        val key = KeyUtils.load(testPublicKey).get // we are sure this is valid key
-        
+        val key = AccessKey("default", KeyUtils.load(testPublicKey).get) // we are sure this is valid key
+
         manager ! AddAuthorizedKey(repo.uuid, key)
         within(timeout){
             expectMsg(Success)
         }
-        
+
         manager ! RemoveAuthorizedKey(repo.uuid, key)
         within(timeout){
             expectMsg(Success)
         }
-        
+
         manager ! GetRepositoryByUUID(repo.uuid)
         val res = within(timeout){
             expectMsgClass(classOf[Some[Repository]])
         }.get
-        
+
         res.authorizedKeys should have size(0)
         res.authorizedKeys should not contain (key)
         res should equal (repo.copy(authorizedKeys = Set()))

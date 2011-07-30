@@ -6,7 +6,7 @@ import scalate.ScalateSupport
 import com.verknowsys.forms._
 import com.verknowsys.served.utils.Logging
 
-abstract trait Endpoint extends ScalatraFilter with ScalateSupport with Logging {
+abstract trait Endpoint extends ScalatraFilter with ScalateSupport with FlashMapSupport with MethodOverride with Logging {
     def publicAfterFilters = afterFilters.toList
 
     beforeAll {
@@ -33,5 +33,5 @@ abstract trait Endpoint extends ScalatraFilter with ScalateSupport with Logging 
 
     def render(path: String, attributes: (String, Any)*): Unit = render(path, attributes.toMap)
     def render(path: String, attributes: Map[String, Any] = Map()) =
-        templateEngine.layout("/WEB-INF/scalate/templates/" + path + ".scaml", attributes)
+        templateEngine.layout("/WEB-INF/scalate/templates/" + path + ".scaml", attributes + ("flash" -> flash))
 }
