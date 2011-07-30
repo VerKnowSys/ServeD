@@ -1,12 +1,14 @@
-package com.verknowsys.served.web.filters
+package com.verknowsys.served.web.endpoints
 
 import com.verknowsys.served.web.lib._
 import com.verknowsys.served.api.Logger._
 
 import com.verknowsys.forms._
 
-class LoggerFilter extends REST("logger") {
-    class LoggerEntryForm(entry: Option[AddEntry] = None, params: Params = Params.Empty) extends Form[AddEntry](entry, params, createPath){
+trait LoggerEndpoint {
+    self: Endpoint =>
+
+    class LoggerEntryForm(entry: Option[AddEntry] = None, params: Params = Params.Empty) extends Form[AddEntry](entry, params){
         def bind = for {
             cn <- className
             l <- level
@@ -18,19 +20,17 @@ class LoggerFilter extends REST("logger") {
         def fields = className :: level :: Nil
     }
 
-    def index = {
-        val form = new LoggerEntryForm()
-        Map("entries" -> listEntries, "form" -> form)
+    get("/logger"){
+        render("logger/index", "entries" -> listEntries, "form" -> new LoggerEntryForm())
     }
 
-    def create = {
+    post("/logger"){
         val form = new LoggerEntryForm(params = formParams)
-
-        if(form.isValid) {
-            API ! form.value.get
-            redirect(indexPath)
+        if(form.isValid){
+            API ! form.get
+            redirect("/logger")
         } else {
-            render("index", Map("entries" -> listEntries, "form" -> form))
+            render("logger/index", "entries" -> listEntries, "form" -> form)
         }
     }
 

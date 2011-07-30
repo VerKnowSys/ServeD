@@ -1,0 +1,15 @@
+-@ val repo: git.Repository
+-@ val form: BaseForm
+
+%h2 Git repository: #{repo.name}
+
+%h3 Keys
+%table
+  %tr
+    %th
+  - for(key <- repo.authorizedKeys)
+    %tr
+      %td= key
+
+%h3 Add key
+= form.toHtml

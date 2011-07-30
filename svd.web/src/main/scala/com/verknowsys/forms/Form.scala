@@ -66,6 +66,8 @@ abstract class Form[E](val entity: Option[E], val params: Params, val action: St
 
     def value = bind orElse entity
 
+    def get = value.get
+
     implicit val self = this
 
     def submitButton =

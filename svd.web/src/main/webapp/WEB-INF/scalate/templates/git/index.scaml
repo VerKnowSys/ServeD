@@ -1,4 +1,5 @@
--@ val repos: List[com.verknowsys.served.api.git.Repository]
+-@ val repos: List[git.Repository]
+-@ val form: BaseForm
 
 %h2 Git repositories
 %table
@@ -6,4 +7,7 @@
     %th Name
     - for(repo <- repos)
       %tr
-        %td= repo.name
+        %td= linkTo(repo.name, "/git/" + repo.name)
+
+%h3 New entry
+= form.toHtml

@@ -4,35 +4,15 @@
   xmlns:web="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
   xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
   version="2.4">
-<!--
-  <filter>
-    <filter-name>LoggerFilter</filter-name>
-    <filter-class>com.verknowsys.served.web.filters.LoggerFilter</filter-class>
-  </filter>
-
-  <filter-mapping>
-    <filter-name>LoggerFilter</filter-name>
-    <url-pattern>/logger/*</url-pattern>
-  </filter-mapping>
 
   <filter>
-    <filter-name>GitFilter</filter-name>
-    <filter-class>com.verknowsys.served.web.filters.GitFilter</filter-class>
+    <filter-name>Main</filter-name>
+    <filter-class>com.verknowsys.served.web.endpoints.Main</filter-class>
   </filter>
-
   <filter-mapping>
-    <filter-name>GitFilter</filter-name>
-    <url-pattern>/git/*</url-pattern>
+    <filter-name>Main</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
--->
-<servlet>
-  <servlet-name>Main</servlet-name>
-  <servlet-class>com.verknowsys.funlet.Main</servlet-class>
-</servlet>
-<servlet-mapping>
-  <servlet-name>Main</servlet-name>
-  <url-pattern>/*</url-pattern>
-</servlet-mapping>
 
 
   <servlet-mapping>
