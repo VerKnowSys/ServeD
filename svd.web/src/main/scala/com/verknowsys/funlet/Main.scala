@@ -13,6 +13,11 @@ class ItemsEndpoint(request: Request) extends RestEndpoint(request){
 
 
 class Main extends MainDispatcher {
+    override def apply(request: Request) = request match {
+        case Request(Get, Nil) => StringResponse(200, "Hello world")
+        case req => performDispatch(req)
+    }
+
     val dispatchers =
         ItemsDispatcher ::
         Nil

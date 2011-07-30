@@ -4,12 +4,11 @@ trait Dispatcher extends PartialEndpoint {
     type Dispatch = PartialFunction[Request, Endpoint]
     def dispatch: Dispatch
 
-    def apply(request: Request) = _dispatch(request)(request)
-    def isDefinedAt(request: Request) = {
-        val dfn = _dispatch.isDefinedAt(request)
-        println("Dispathcer: " + this.getClass + "isDefinedAt: " + dfn)
-        dfn
-    }
+    def apply(request: Request) = performDispatch(request)
+
+    def isDefinedAt(request: Request) = _dispatch.isDefinedAt(request)
+
+    def performDispatch(request: Request) = _dispatch(request)(request)
 
     lazy val _dispatch = dispatch
 }
@@ -17,7 +16,9 @@ trait Dispatcher extends PartialEndpoint {
 abstract trait MainDispatcher extends MainEndpoint {
     val dispatchers: List[PartialEndpoint]
 
-    def apply(request: Request) = (dispatchers reduce (_ orElse _) orElse default)(request)
+    def apply(request: Request) = performDispatch(request)
+
+    def performDispatch(request: Request) = (dispatchers :+ default reduce (_ orElse _))(request)
 
     val default: PartialEndpoint = {
         case _ => StringResponse(404, "NotFound")
