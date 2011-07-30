@@ -6,44 +6,40 @@
 #include "core.h"
 
 
+extern string currentDir();
+extern string escape(string input);
+extern void defaultSignalHandler(int sig);
+extern void log_message(string message);
+
 const static string coreDir = currentDir();
 
 
-using namespace std;
-
-
-/* spawner core library functions */
-extern "C" {
+    #ifdef DEVEL
     
-
-#ifdef DEVEL
-    
-    string getClassPath() {
-        string strink = coreDir + "/tmp/core.classpath";
-        string cp = "";
-        ifstream f(strink.c_str());
-        if (f.is_open()){
-            f >> cp;
-            f.close();
-        } else {
-            cerr << "Directory " << strink << " not found!" << endl;
-            exit(CLASSPATH_DIR_MISSING_ERROR);
+        string getClassPath() {
+            string core = coreDir + CORE_CLASSPATH_FILE;
+            string cp = "";
+            ifstream f(core.c_str());
+            if (f.is_open()){
+                f >> cp;
+                f.close();
+            } else {
+                cerr << "Directory " << core << " not found!" << endl;
+                exit(CLASSPATH_DIR_MISSING_ERROR);
+            }
+            return cp;
         }
-        return cp;
-    }
     
-#endif
+    #endif
 
 
     void load_svd(string java_path, string jar, string mainClassParam, string svd_arg) {
-        // string javalp = "-Djava.library.path=" + currentDir() + "/lib";
         string jnalp = "-Djna.library.path=" + currentDir() + "/lib";
-
-#ifdef DEVEL
-    #define COUNT 14
-#else
-    #define COUNT 13
-#endif
+        #ifdef DEVEL
+            #define COUNT 14
+        #else
+            #define COUNT 13
+        #endif
         char *args[] = {
             (char*)"java",
             (char*)"-d64",
@@ -53,35 +49,39 @@ extern "C" {
             (char*)"-Xms64m",
             (char*)"-Xmx512m",
             (char*)"-Dfile.encoding=UTF-8",
-            // (char*)javalp.c_str(),
             (char*)jnalp.c_str(),
-#ifndef DEVEL
-            /* when not devel, use classes from assembly jar */
-            (char*)"-jar",
-            (char*)jar.c_str(),
-#else
-            /* when devel, use classes from compile folders */
-            (char*)"-cp",
-            (char*)getClassPath().c_str(),
-            (char*)MAIN_CLASS,
-#endif
+            #ifndef DEVEL
+                /* when not devel, use classes from assembly jar */
+                (char*)"-jar",
+                (char*)jar.c_str(),
+            #else
+                /* when devel, use classes from compile folders */
+                (char*)"-cp",
+                (char*)getClassPath().c_str(),
+                (char*)MAIN_CLASS,
+            #endif
             (char*)mainClassParam.c_str(),
             (char*)svd_arg.c_str(),
             (char*)0
         };
 
-    #ifdef DEVEL
-        cerr << "Loading svd, with opts: [";
-        for (int i = 0; i < COUNT; i++) {
-            cerr << args[i] << " ";
-        }
-        cerr << "]" << endl;
-    #endif
+        #ifdef DEVEL
+            cerr << "Loading svd, with opts: [";
+            for (int i = 0; i < COUNT; i++) {
+                cerr << args[i] << " ";
+            }
+            cerr << "]" << endl;
+        #endif
         execv((char*)java_path.c_str(), args);
     }
 
 
-    void spawnBackgroundTask(string abs_java_bin_path, string main_starting_class_param, string cmdline_param, string lockFileName) {
+    void spawnBackgroundTask(
+        string abs_java_bin_path,
+        string main_starting_class_param,
+        string cmdline_param,
+        string lockFileName) {
+
         int i, lfp;
         char str[32];
 
@@ -118,7 +118,6 @@ extern "C" {
     	sprintf(str, "%d\n", getpid());
     	write(lfp, str, strlen(str)); /* record pid to lockfile */
     	
-    	// signal(SIGCHLD, SIG_IGN); /* ignore child */
         signal(SIGTSTP, SIG_IGN); /* ignore tty signals */
         signal(SIGTTOU, SIG_IGN);
         signal(SIGTTIN, SIG_IGN);
@@ -130,50 +129,3 @@ extern "C" {
     	chdir(coreDir.c_str()); /* change running directory before spawning svd */
     	load_svd(abs_java_bin_path, (coreDir + JAR_FILE), main_starting_class_param, cmdline_param);
     }
-
-
-    void spawn(string uid) {
-        ofstream        ofs;
-        FILE            *fpipe = NULL;
-        char            line[SOCK_DATA_PACKET_SIZE];
-        int             childExitStatus = 0;
-        pid_t           pid = getpid();
-        pid_t           ppid = getppid();
-        uid_t           userUid = getuid();
-
-        cerr << "Spawning command: " << uid << endl;
-        if (!(fpipe = (FILE*)popen(uid.c_str(), "r"))) {
-            cerr << POPEN_ERROR << endl;
-            exit(POPEN_ERROR);
-        }
-
-        #ifdef DEVEL
-            cerr << "Spawn pid: " << pid << endl;
-            cerr << "Spawn ppid: " << ppid << endl;
-            cerr << "Spawn uid: " << userUid << endl;
-        #endif
-        
-        switch (userUid) {
-            case 0:
-                break;
-            
-            default:
-                string cmdPrintable = escape(uid);
-                stringstream s;
-                s << string(USERS_HOME_DIR) << userUid << "/" << pid << "--" << cmdPrintable << ".log";
-                ofs.open(s.str().c_str());
-                while (fgets(line, sizeof(line) + sizeof((char*)0), fpipe)) {
-                    #ifdef DEVEL
-                        cerr << "Output: " << line << endl;
-                    #endif
-                    ofs << line;
-                }
-                ofs.close();
-                pclose(fpipe);
-                break;
-        }
-    }
-    
-    
-}
-
