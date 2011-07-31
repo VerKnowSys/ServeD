@@ -1,7 +1,12 @@
 package com.verknowsys.served.web.endpoints
 
-import org.scalatra.ScalatraFilter
-import scala.collection.mutable.ListBuffer
+import com.verknowsys.funlet._
 
-class Main extends Endpoint with LoggerEndpoint
-                            with GitEndpoint
+class Main extends MainEndpoint {
+    override val endpoints = GitEndpoint :: LoggerEndpoint :: Nil
+
+    override def routes(implicit req: Request) = {
+        case Request(Get, path) => "Hello"
+    }
+
+}

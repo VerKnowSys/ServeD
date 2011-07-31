@@ -16,7 +16,7 @@
 
   <servlet>
     <servlet-name>Main</servlet-name>
-    <servlet-class>com.verknowsys.served.web.Main</servlet-class>
+    <servlet-class>com.verknowsys.served.web.endpoints.Main</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>Main</servlet-name>

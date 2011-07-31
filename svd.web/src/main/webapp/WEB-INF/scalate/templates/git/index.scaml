@@ -5,9 +5,11 @@
 %table
   %tr
     %th Name
+    %th # of access keys
     - for(repo <- repos)
       %tr
         %td= linkTo(repo.name, "/git/" + repo.name)
+        %td= repo.authorizedKeys.size
 
-%h3 New entry
+%h3 New repository
 = form.toHtml

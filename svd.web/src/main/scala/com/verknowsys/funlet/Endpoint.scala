@@ -22,6 +22,10 @@ trait Endpoint extends PartialFunction[Request, Response] with Logging {
 
     // utils
     def render(name: String, attributes:(String, Any)*) = RenderTemplateResponse(name, attributes.toMap)
+
+    def redirect(path: String) = RedirectResponse(path)
+
+    def formParam(implicit req: Request) = req.params("form")
 }
 
 trait MainEndpoint extends HttpServlet with Endpoint {

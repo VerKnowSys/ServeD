@@ -38,3 +38,10 @@ case class RenderTemplateResponse(
 
     override def toString = "Render tempate: " + name
 }
+
+case object NotFoundResponse extends Response {
+    def apply(servletResponse: HttpServletResponse, main: MainEndpoint){
+        servletResponse.setStatus(404)
+        servletResponse.getWriter.print("NotFound")
+    }
+}

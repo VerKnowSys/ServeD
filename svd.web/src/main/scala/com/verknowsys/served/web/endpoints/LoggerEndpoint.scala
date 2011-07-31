@@ -1,14 +1,27 @@
 package com.verknowsys.served.web.endpoints
 
+import com.verknowsys.funlet._
 import com.verknowsys.served.web.lib._
 import com.verknowsys.served.api.Logger._
 
-import com.verknowsys.forms._
+object LoggerEndpoint extends Endpoint {
+    def routes(implicit req: Request) = {
+        case Request(Get,   "logger" :: Nil) =>
+            render("logger/index", "entries" -> listEntries, "form" -> new LoggerEntryForm())
 
-trait LoggerEndpoint {
-    self: Endpoint =>
+        case Request(Post,  "logger" :: Nil) =>
+                val form = new LoggerEntryForm(param = formParam)
+                if(form.isValid){
+                    API ! form.get
+                    redirect("/logger")
+                } else {
+                    render("logger/index", "entries" -> listEntries, "form" -> form)
+                }
+    }
 
-    class LoggerEntryForm(entry: Option[AddEntry] = None, params: Params = Params.Empty) extends Form[AddEntry](entry, params){
+    protected def listEntries = ListEntries <> { case Entries(entries) => entries } getOrElse Map()
+
+    class LoggerEntryForm(entry: Option[AddEntry] = None, param: Param = Empty) extends Form[AddEntry](entry, param){
         def bind = for {
             cn <- className
             l <- level
@@ -19,20 +32,4 @@ trait LoggerEndpoint {
 
         def fields = className :: level :: Nil
     }
-
-    get("/logger"){
-        render("logger/index", "entries" -> listEntries, "form" -> new LoggerEntryForm())
-    }
-
-    post("/logger"){
-        val form = new LoggerEntryForm(params = formParams)
-        if(form.isValid){
-            API ! form.get
-            redirect("/logger")
-        } else {
-            render("logger/index", "entries" -> listEntries, "form" -> form)
-        }
-    }
-
-    protected def listEntries = ListEntries <> { case Entries(entries) => entries } getOrElse Map()
 }

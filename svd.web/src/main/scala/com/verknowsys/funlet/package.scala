@@ -16,6 +16,7 @@ package object funlet {
     val Trace = org.scalatra.Trace
     val Connect = org.scalatra.Connect
 
+    // params
     implicit def String2StringParam(s: String): StringParam = StringParam(s)
     implicit def StringParam2String(sp: StringParam) = sp.value
     implicit def List2ListParam(list: List[StringParam]): ListParam = ListParam(list)
@@ -23,6 +24,16 @@ package object funlet {
     implicit def Map2MapParam(map: Map[String, Param]): MapParam = MapParam(map)
     implicit def MapParam2Map(mp: MapParam) = mp.value
 
+    implicit def StringParam2MapParam(sp: StringParam) = Empty
+    implicit def ListParam2MapParam(lp: ListParam) = Empty
+    val Empty = MapParam(Map())
+
+    // response
     implicit def NodeSeq2StringResponse(node: NodeSeq) = StringResponse(200, node.toString)
     implicit def String2StringResponse(str: String) = StringResponse(200, str)
+    implicit def OptionResponse2Response(opt: Option[Response]) = opt getOrElse NotFoundResponse
+
+    // forms
+    implicit def fieldToOption[E,T](field: Field[E, T]) = field.value
+    type Validator[T] = Function1[T, Option[String]]
 }
