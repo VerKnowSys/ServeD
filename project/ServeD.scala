@@ -90,9 +90,8 @@ object Dependencies {
     val specs = "org.scala-tools.testing" %% "specs" % "1.6.8"
     val h2 = "com.h2database" % "h2" % "1.3.154"
 
-    val scalatra = "org.scalatra" %% "scalatra" % "2.0.0-SNAPSHOT"
-    val scalate = "org.scalatra" %% "scalatra-scalate" % "2.0.0-SNAPSHOT"
-    val jetty = "org.mortbay.jetty" % "jetty" % "6.1.22" % "jetty"
+    val scalate = "org.fusesource.scalate" % "scalate-core" % "1.5.0"
+    val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.4.1.v20110513"
     val servlet = "javax.servlet" % "servlet-api" % "2.5"
 }
 
@@ -135,7 +134,7 @@ object ServeD extends Build {
         settings = buildSettings ++ WebPlugin.webSettings ++ Seq(
             compileOrder    := CompileOrder.Mixed,
             libraryDependencies ++= Seq(
-                scalatra, scalate, jetty, servlet % "provided"
+                scalate, jetty % "jetty", servlet % "provided"
             )
         ) ++ CoffeeScript.coffeeSettings
     ) dependsOn(utils, testing % "test")
