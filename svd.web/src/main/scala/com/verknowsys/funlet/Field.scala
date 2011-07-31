@@ -11,7 +11,12 @@ abstract class Field[Entity, T](val name: String, getter: Entity => T, validator
 
     def calculateValue: (Option[T], Seq[String]) = {
         val value = form.params.get(name).map(decode) getOrElse form.entity.map(getter)
-        val errors = value map { v => validators.view map {_(v)} collect { case Some(e) => e } } getOrElse Nil
+        val errors = value match {
+            case Some(v) => validators.view map { _(v) } collect { case Some(e) => e }
+            case None if form.isSubmitted => List("Is invalid")
+            case _ => Nil
+        }
+
         (value, errors)
     }
 

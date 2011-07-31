@@ -3,6 +3,10 @@ package com.verknowsys
 import scala.xml.NodeSeq
 
 package object funlet {
+    type Session = Map[String, Any]
+    type Headers = Map[String, String]
+    type Cookies = Map[String, String]
+
     // params
     implicit def String2StringParam(s: String): StringParam = StringParam(s)
     implicit def StringParam2String(sp: StringParam) = sp.value
@@ -16,11 +20,14 @@ package object funlet {
     val Empty = MapParam(Map())
 
     // response
-    implicit def NodeSeq2StringResponse(node: NodeSeq) = StringResponse(200, node.toString)
-    implicit def String2StringResponse(str: String) = StringResponse(200, str)
+    implicit def NodeSeq2StringResponse(node: NodeSeq) = new StringResponse(200, node.toString)
+    implicit def String2StringResponse(str: String) = new StringResponse(200, str)
     implicit def OptionResponse2Response(opt: Option[Response]) = opt getOrElse NotFoundResponse
 
     // forms
     implicit def fieldToOption[E,T](field: Field[E, T]) = field.value
     type Validator[T] = Function1[T, Option[String]]
+
+    // misc
+    implicit def Pair2Map(pair: (String, Any)) = Map(pair)
 }

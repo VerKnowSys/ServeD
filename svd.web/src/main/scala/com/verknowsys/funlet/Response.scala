@@ -2,46 +2,67 @@ package com.verknowsys.funlet
 
 import javax.servlet.http._
 
-trait Response extends Function2[HttpServletResponse, MainEndpoint, Unit]
+abstract class Response(
+    val headers: Headers = Map(),
+    val cookies: Cookies = Map(),
+    val session: Session = Map()
+){
+    def apply(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse, main: MainEndpoint){
+        headersWithContentType foreach { case(name, value) => servletResponse.setHeader(name, value) }
+        cookies foreach { case(name, value) => servletResponse.addCookie(new Cookie(name, value)) }
 
-case class RedirectResponse(path: String) extends Response {
-    def apply(servletResponse: HttpServletResponse, main: MainEndpoint){
+        lazy val servletSession = servletRequest.getSession(true)
+        session foreach { case(name, value) => servletSession.setAttribute(name, value) }
+    }
+
+    protected def headersWithContentType =
+        if(headers.contains("Content-Type")) headers
+        else headers + ("Content-Type" -> "text/html")
+}
+
+class RedirectResponse(
+    path: String,
+    headers: Headers = Map(),
+    cookies: Cookies = Map(),
+    session: Session = Map()
+) extends Response(headers, cookies, session) {
+    override def apply(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse, main: MainEndpoint){
+        super.apply(servletRequest, servletResponse, main)
         servletResponse.sendRedirect(path)
     }
 
     override def toString = "Redirect: " + path
 }
 
-case class StringResponse(
+class StringResponse(
     status: Int,
     body: String,
-    headers: Map[String, String] = Map("Content-Type" -> "text/html"),
-    cookies: Map[String, String] = Map()
-) extends Response {
-    def apply(servletResponse: HttpServletResponse, main: MainEndpoint){
+    headers: Headers = Map(),
+    cookies: Cookies = Map(),
+    session: Session = Map()
+) extends Response(headers, cookies, session) {
+    override def apply(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse, main: MainEndpoint){
+        super.apply(servletRequest, servletResponse, main)
         servletResponse.setStatus(status)
         servletResponse.getWriter.print(body)
-        headers foreach { case(name, value) => servletResponse.setHeader(name, value) }
-        cookies foreach { case(name, value) => servletResponse.addCookie(new Cookie(name, value)) }
     }
 
     override def toString = (status, body, headers, cookies).toString
 }
 
-case class RenderTemplateResponse(
+class RenderTemplateResponse(
     name: String,
-    attributes: Map[String, Any]
-) extends Response {
-    def apply(servletResponse: HttpServletResponse, main: MainEndpoint){
+    attributes: Map[String, Any],
+    headers: Headers = Map(),
+    cookies: Cookies = Map(),
+    session: Session = Map()
+) extends Response(headers, cookies, session) {
+    override def apply(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse, main: MainEndpoint){
+        super.apply(servletRequest, servletResponse, main)
         main.templateEngine.layout("/WEB-INF/scalate/templates/" + name + ".scaml", attributes)
     }
 
     override def toString = "Render tempate: " + name
 }
 
-case object NotFoundResponse extends Response {
-    def apply(servletResponse: HttpServletResponse, main: MainEndpoint){
-        servletResponse.setStatus(404)
-        servletResponse.getWriter.print("NotFound")
-    }
-}
+object NotFoundResponse extends StringResponse(404, "NotFound")

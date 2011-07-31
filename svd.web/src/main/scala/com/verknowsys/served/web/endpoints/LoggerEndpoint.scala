@@ -6,17 +6,17 @@ import com.verknowsys.served.api.Logger._
 
 object LoggerEndpoint extends Endpoint {
     def routes(implicit req: Request) = {
-        case Request(Get,   "logger" :: Nil) =>
+        case Get("logger" :: Nil) =>
             render("logger/index", "entries" -> listEntries, "form" -> new LoggerEntryForm())
 
-        case Request(Post,  "logger" :: Nil) =>
-                val form = new LoggerEntryForm(param = formParam)
-                if(form.isValid){
-                    API ! form.get
-                    redirect("/logger")
-                } else {
-                    render("logger/index", "entries" -> listEntries, "form" -> form)
-                }
+        case Post("logger" :: Nil) =>
+            val form = new LoggerEntryForm(param = formParam)
+            if(form.isValid){
+                API ! form.get
+                redirect("/logger")
+            } else {
+                render("logger/index", "entries" -> listEntries, "form" -> form)
+            }
     }
 
     protected def listEntries = ListEntries <> { case Entries(entries) => entries } getOrElse Map()

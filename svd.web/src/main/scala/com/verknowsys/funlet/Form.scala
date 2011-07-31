@@ -1,6 +1,6 @@
 package com.verknowsys.funlet
 
-import scala.xml.NodeSeq
+import scala.xml.{NodeSeq, Null}
 
 trait Validators {
     val NotEmpty: Validator[String] = s => if(s.isEmpty) Some("Must not be empty") else None
@@ -15,7 +15,7 @@ abstract trait BaseForm {
     def toHtml: NodeSeq
 }
 
-abstract class Form[E](val entity: Option[E], param: Param, val action: String = "", val method: String = "post") extends BaseForm with Validators with CommonFields {
+abstract class Form[E](val entity: Option[E], param: Param, val action: String = "", val method: HttpMethod = Post) extends BaseForm with Validators with CommonFields {
     type Entity = E
 
     def bind: Option[Entity]
@@ -37,13 +37,19 @@ abstract class Form[E](val entity: Option[E], param: Param, val action: String =
         case _ => Map()
     }
 
+    val (realMethod, fakeMethod) = method match {
+        case m @ (Get | Post) => (m.name, Null)
+        case m => (Post.name, <input type="hidden" value={"_" + m.name}/>)
+    }
+
     def submitButton =
         <div class="form-row form-submit">
             <input type="submit" value="Submit" />
         </div>
 
     def toHtml =
-        <form action={action} method={method}>
+        <form action={action} method={realMethod}>
+            {fakeMethod}
             {fields map (_.toHtml)}
             {submitButton}
         </form>

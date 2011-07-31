@@ -18,10 +18,13 @@ class Request(servletRequest: HttpServletRequest){
 
     def isAjax = headers("X-Requested-With").isDefined
 
-
     lazy val cookies = _cookies
 
-    def session = servletRequest.getSession
+    def session(name: String) = Option(_session.getAttribute(name))
+
+    def session = _session
+
+    lazy val _session = servletRequest.getSession(true)
 
     protected def _path =
         if(servletRequest.getPathInfo != null) servletRequest.getPathInfo
@@ -40,7 +43,7 @@ class Request(servletRequest: HttpServletRequest){
     protected def _cookies = Option(servletRequest.getCookies).getOrElse(Array()).toSeq.
                                 groupBy(_.getName).mapValues(v => v map (_.getValue))
 
-    override def toString = (method, path, _servletParams).toString
+    override def toString = method.name + " " + path + " " + _servletParams
 }
 
 object Request {

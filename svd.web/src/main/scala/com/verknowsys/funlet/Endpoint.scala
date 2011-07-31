@@ -21,11 +21,13 @@ trait Endpoint extends PartialFunction[Request, Response] with Logging {
     protected def _routes(implicit req: Request) = routes(req)
 
     // utils
-    def render(name: String, attributes:(String, Any)*) = RenderTemplateResponse(name, attributes.toMap)
+    def render(name: String, attributes:(String, Any)*) = new RenderTemplateResponse(name, attributes.toMap)
 
-    def redirect(path: String) = RedirectResponse(path)
+    def redirect(path: String, flash: Map[String, Any] = Map(), session: Map[String, Any] = Map()) = new RedirectResponse(path, session = session)
 
     def formParam(implicit req: Request) = req.params("form")
+
+    def session(name: String)(implicit req: Request) = req.session(name)
 }
 
 trait MainEndpoint extends HttpServlet with Endpoint {
@@ -63,12 +65,11 @@ trait MainEndpoint extends HttpServlet with Endpoint {
                     log.debug("Request: %s", request)
                     val response = apply(request)
                     log.debug("Response: %s", response)
-                    response(servletResponse, this)
+                    response(rawRequest, rawResponse, this)
                 } catch {
                     case e =>
                         log.error("Exception: %s", e)
                         renderErrorPage(e)
-                        // StringResponse(500, renderErrorPage(e))(servletResponse, this)
                 }
             }
         }

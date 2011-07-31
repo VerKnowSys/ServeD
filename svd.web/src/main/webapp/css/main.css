@@ -79,6 +79,7 @@ a {
   list-style: disc;
 }
 
-.form-field-with-errors input {
+.form-field-with-errors input,
+.form-field-with-errors textarea {
   border: 1px solid red;
 }

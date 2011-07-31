@@ -6,10 +6,10 @@ import com.verknowsys.served.api.git._
 
 object GitEndpoint extends Endpoint {
     def routes(implicit req: Request) = {
-        case Request(Get, "git" :: Nil) =>
+        case Get("git" :: Nil) =>
             render("git/index", "repos" -> listRepos, "form" -> new RepositoryForm())
 
-        case Request(Post, "git" :: Nil) =>
+        case Post("git" :: Nil) =>
             val form = new RepositoryForm(param = formParam)
             if(form.isValid){
                 API ! CreateRepository(form.get.name)
@@ -19,20 +19,20 @@ object GitEndpoint extends Endpoint {
                 render("git/index", "repos" -> listRepos, "form" -> form)
             }
 
-        case Request(Get, "git" :: name :: Nil) =>
+        case Get("git" :: name :: Nil) =>
             find(name) map { repo =>
                 render("git/show", "repo" -> repo, "form" -> new PublicKeyForm(action = "/git/" + repo.name + "/keys"))
             }
 
 
 
-        case Request(Post, "git" :: name :: "keys" :: Nil) =>
+        case Post("git" :: name :: "keys" :: Nil) =>
             find(name) map { repo =>
                 val form = new PublicKeyForm(param = formParam, action = "/git/" + repo.name + "/keys")
                 if(form.isValid){
                     API ! AddAuthorizedKey(repo.uuid, form.get)
                     // flash("notice") = "Key added"
-                    redirect("/git/" + repo.name)
+                    redirect("/git/" + repo.name, session = "success" -> "KeyAdded")
                 } else {
                     // flash("alert") = "Invalid stuff"
                     render("git/show", "repo" -> repo, "form" -> form)

@@ -3,13 +3,16 @@
 
 %h2 Git repository: #{repo.name}
 
-%h3 Keys
-%table
-  %tr
-    %th
-  - for(key <- repo.authorizedKeys)
+- if(!repo.authorizedKeys.isEmpty)
+  %h3 Keys
+  %table
     %tr
-      %td= key
+      %th
+    - for(key <- repo.authorizedKeys)
+      %tr
+        %td= key
+- else
+  %span No access keys. Add one below
 
 %h3 Add key
 = form.toHtml

@@ -1,7 +1,9 @@
 package com.verknowsys.funlet
 
 // Scalatra mapping
-abstract class HttpMethod(name: String)
+abstract class HttpMethod(val name: String){
+    def unapply(req: Request) = if(req.method == this) Some(req.path) else None
+}
 object HttpMethod {
     def apply(name: String) = name.toUpperCase match {
         case "OPTIONS"   => Options

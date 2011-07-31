@@ -6,7 +6,7 @@ class Main extends MainEndpoint {
     override val endpoints = GitEndpoint :: LoggerEndpoint :: Nil
 
     override def routes(implicit req: Request) = {
-        case Request(Get, path) => "Hello"
+        case Get(path) => render("index")
     }
 
 }
