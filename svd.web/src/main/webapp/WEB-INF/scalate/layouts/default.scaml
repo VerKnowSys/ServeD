@@ -1,5 +1,5 @@
 -@ val body: String
--@ val flash: org.scalatra.FlashMap
+// -@ val flash: org.scalatra.FlashMap
 
 !!!
 %html
@@ -9,8 +9,8 @@
   %body
     #container
       #flash
-        = flash.get("notice")
-        = flash.get("alert")
+        // = flash.get("notice")
+        // = flash.get("alert")
       #nav
         %a(href="/logger") Logger
         |
