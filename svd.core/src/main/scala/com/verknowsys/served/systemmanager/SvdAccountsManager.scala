@@ -223,7 +223,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
         SvdAccounts(db).foreach{
             account =>
                 val pidFile = SvdConfig.userHomeDir / "%d".format(account.uid) / "%d.pid".format(account.uid)
-                val src = Source.fromFile(pidFile).mkString.split("\n").head // PID
+                val src = Source.fromFile(pidFile).take(1).mkString // PID
                 log.trace("Client VM PID to be killed: " + src)
                 new SvdShell(account).exec(new SvdShellOperation("kill " + src + "; /bin/rm " + pidFile))
         }
