@@ -54,6 +54,16 @@ public class Storage {
         buffer = new LinkedList<ProcessInfo>();
         // Check if database file exist, if not, setup processinfo table
         boolean doSetup = !(new File(databaseFilePath + ".h2.db")).exists();
+
+
+        // Load driver
+        try {
+             Class.forName("org.h2.Driver").newInstance();
+        } catch(Exception e) {
+            System.err.println("Error loading H2 jdbc driver" + e.getMessage());
+        }
+
+
         conn = DriverManager.getConnection("jdbc:h2:" + databaseFilePath);
         if(doSetup) setupTable();
                 

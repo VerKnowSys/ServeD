@@ -32,10 +32,11 @@ object boot extends Logging {
         
         val accountsManager = actorOf[SvdAccountsManager]
         val systemManager = actorOf[SvdSystemManager]
+        val loggingManager = actorOf(new LoggingManager(GlobalLogger))
 
         val list = (
             actorOf[SvdFileEventsManager] ::
-            actorOf[LoggingManager] ::
+            loggingManager ::
             systemManager ::
             accountsManager :: 
             actorOf[SvdSystemInfo] ::
@@ -43,13 +44,17 @@ object boot extends Logging {
             Nil).map(Supervise(_, Permanent))
 
         // supervise and autostart
-        Supervisor(
+        val supervisor = Supervisor(
             SupervisorConfig(
                 OneForOneStrategy(List(classOf[Exception], classOf[RuntimeException], classOf[NullPointerException]), 50, 1000),
                 list
-          )
+            )
         )
-
+        
+        SvdUtils.addShutdownHook {
+            log.info("Shutdown requested")
+            supervisor.shutdown
+        }
 
         systemManager ! Init
         accountsManager ! Init
@@ -80,9 +85,9 @@ object boot extends Logging {
             case Some(account) =>
                 log.debug("Got account, starting AccountManager for %s", account)
                 val am = actorOf(new SvdAccountManager(account)).start
-                val loggingManager = actorOf[LoggingManager]
-                am ! Init
                 
+                val loggingManager = actorOf(new LoggingManager(GlobalLogger)).start
+                am !! Init
                 remote.start(SvdConfig.defaultHost, account.servicePort)
                 remote.register("service:account-manager", am)
                 remote.register("service:logging-manager", loggingManager)

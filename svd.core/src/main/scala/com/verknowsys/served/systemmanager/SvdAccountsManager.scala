@@ -202,6 +202,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     val server = new DBServer(SvdConfig.remoteAccountServerPort, SvdConfig.systemHomeDir / SvdConfig.coreSvdAccountsDatabaseName)
     val db = server.openClient
     
+    val rootAccount = SvdAccount("root", uid = 0, gid = 0, dbPort = 0, servicePort = 0) // XXX
     val svdAccountUtils = new SvdAccountUtils(db)
     import svdAccountUtils._
     
@@ -218,11 +219,30 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     
     override def postStop {
         super.postStop
+        log.info("Stopping spawned user workers")
+        SvdAccounts(db).foreach{
+            account =>
+                val pidFile = SvdConfig.userHomeDir / "%d".format(account.uid) / "%d.pid".format(account.uid)
+                log.trace("PIDFile: %s".format(pidFile))
+                val pid = Source.fromFile(pidFile).mkString
+                log.trace("Client VM PID to be killed: %s".format(pid))
+                new SvdShell(account).exec(new SvdShellOperation(
+                    """
+                    /bin/kill -INT %s
+                    /bin/rm %s
+                    """.format(pid, pidFile)
+                ))
+        }
+        // removing also pid file of root core of svd:
+        val corePid = SvdConfig.systemHomeDir / "Core" / "0.pid" // XXX: hardcoded
+        log.trace("Cleaning core pid file: %s with content: %s".format(corePid, Source.fromFile(corePid).mkString))
+        new SvdShell(rootAccount).exec(new SvdShellOperation("/bin/rm %s".format(corePid))) // XXX: hardcoded
+        
         log.trace("Invoking postStop in SvdAccountsManager")
         db.close
         server.close
     }
-
+    
     
     def receive = {
         case Init =>
@@ -267,11 +287,10 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
 
     private def respawnUsersActors {        
-        val wrapper = SvdWrapLibrary.instance
         userAccounts.foreach{
             account =>
-                log.warn("Sending spawn message for account: %s".format(account))
-                wrapper.sendSpawnMessage(account.uid.toString)
+                log.warn("Spawning account: %s".format(account))
+                new SvdShell(account).exec(new SvdShellOperation("./kick " + account.uid)) // HACK
         }
     }
 

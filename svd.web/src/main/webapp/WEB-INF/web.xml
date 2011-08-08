@@ -5,15 +5,24 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
   version="2.4">
 
-  <filter>
-    <filter-name>svd.web</filter-name>
-    <filter-class>com.verknowsys.served.web.filters.Main</filter-class>
+  <!--<filter>
+    <filter-name>Main1</filter-name>
+    <filter-class>com.verknowsys.served.web.endpoints.Main</filter-class>
   </filter>
-
   <filter-mapping>
-    <filter-name>svd.web</filter-name>
+    <filter-name>Main1</filter-name>
     <url-pattern>/*</url-pattern>
-  </filter-mapping>
+  </filter-mapping>-->
+
+  <servlet>
+    <servlet-name>Main</servlet-name>
+    <servlet-class>com.verknowsys.served.web.endpoints.Main</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Main</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+
 
   <servlet-mapping>
     <servlet-name>default</servlet-name>

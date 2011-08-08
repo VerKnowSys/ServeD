@@ -19,7 +19,7 @@ a:hover { text-decoration:underline; }
 .site {
 	margin: 0px auto;
 	padding: 0px 15px;
-	width: 720px;
+	width: 820px;
 }
 
 #header {
@@ -115,7 +115,7 @@ a:hover { text-decoration:underline; }
 
 .api .side {
     float: left;
-    width: 350px;
+    width: 400px;
 }
 .api .side:first-child { margin-right: 10px;}
 .api .side h4 {

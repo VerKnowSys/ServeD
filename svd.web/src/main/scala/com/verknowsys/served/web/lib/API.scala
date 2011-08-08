@@ -9,7 +9,11 @@ object API extends Logging {
     final val host = "localhost" // TODO: Use some configuration
     final val port = 10 // 2011-06-09 02:01:28 - dmilith - TODO: XXX: should use config value for standard value of API port
 
-    lazy val svd = RemoteSession(host, port).get // HACK: Handle error!!
+    lazy val svd = {
+        val session = RemoteSession(host, port)
+        if(!session.isDefined) log.error("ServeD not found at %s:%d", host, port)
+        session.get // HACK: Handle error!!
+    }
 
     def request[T](msg: ApiMessage)(f: PartialFunction[Any, T]): Option[T] = {
         login // XXX: Temporary code!
