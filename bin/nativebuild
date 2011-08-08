@@ -2,17 +2,7 @@
 
 
 system="$(uname)"
-# ccache="$(which ccache)"
-
-# if [ "$ccache" != "" ]; then
-#     echo "ccache found"
-#     export CXX="ccache clang++"
-# else
-# echo "no ccache found"
-export CXX="clang++"
-# fi
-
-rm -rf lib/*.dylib *.dSYM spawn userspawn
+export CXX="g++"
 
 check() {
     if [ "$1" = "0" ]; then
@@ -23,38 +13,13 @@ check() {
     fi
 }
 
-$CXX -Os -c -fPIC lib/spawnlib_src/utils.cc -o lib/utils.o
+$CXX -Os -c -fPIC lib/kickstart/utils.cc -o lib/utils.o
 check $? "Utils"
 
-$CXX -Os -c -fPIC lib/spawnlib_src/core.cc -o lib/core.o
+$CXX -Os -c -fPIC lib/kickstart/core.cc -o lib/core.o
 check $? "Core"
 
-$CXX -Os -fPIC lib/spawnlib_src/kick.cc -o kick lib/core.o lib/utils.o
+$CXX -Os -fPIC lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
 check $? "KickStart"
 
-# $CXX -Os -fPIC lib/spawnlib_src/spawn.cc -o spawn lib/core.o lib/utils.o
-# check $? "Spawn"
-
-# $CXX -Os -fPIC lib/spawnlib_src/userspawn.cc -o userspawn lib/core.o lib/utils.o
-# check $? "UserSpawn"
-
-# case $system in
-# 
-#     Darwin)
-#         $CXX -dynamic -shared -flat_namespace -undefined suppress -o lib/libsvdwrap.dylib lib/core.o lib/utils.o
-#         check $? "Library"
-#         ;;
-# 
-#     FreeBSD)
-#         $CXX -dynamic -shared -flat_namespace -o lib/libsvdwrap.so lib/core.o lib/utils.o
-#         result=$?
-#         if [ "$result" = "0" ]; then
-#             echo "Native library compiled sucessfully"
-#         else
-#             echo "Failure"
-#         fi
-#         ;;
-#         
-# esac
-
-# rm -rf lib/*.o
+rm -rf lib/*.o
