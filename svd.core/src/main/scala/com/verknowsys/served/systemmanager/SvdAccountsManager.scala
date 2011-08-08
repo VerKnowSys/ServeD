@@ -223,13 +223,19 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
         SvdAccounts(db).foreach{
             account =>
                 val pidFile = SvdConfig.userHomeDir / "%d".format(account.uid) / "%d.pid".format(account.uid)
-                val src = Source.fromFile(pidFile).mkString.split("\n").head // PID
-                log.trace("Client VM PID to be killed: " + src)
-                new SvdShell(account).exec(new SvdShellOperation("kill " + src + "; /bin/rm " + pidFile))
+                log.trace("PIDFile: %s".format(pidFile))
+                val pid = Source.fromFile(pidFile).mkString
+                log.trace("Client VM PID to be killed: %s".format(pid))
+                new SvdShell(account).exec(new SvdShellOperation(
+                    """
+                    /bin/kill -INT %s
+                    /bin/rm %s
+                    """.format(pid, pidFile)
+                ))
         }
         // removing also pid file of root core of svd:
         val corePid = SvdConfig.systemHomeDir / "Core" / "0.pid" // XXX: hardcoded
-        log.trace("Cleaning core pid file: %s".format(corePid))
+        log.trace("Cleaning core pid file: %s with content: %s".format(corePid, Source.fromFile(corePid).mkString))
         new SvdShell(rootAccount).exec(new SvdShellOperation("/bin/rm %s".format(corePid))) // XXX: hardcoded
         
         log.trace("Invoking postStop in SvdAccountsManager")
