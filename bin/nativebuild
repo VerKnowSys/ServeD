@@ -2,9 +2,7 @@
 
 
 system="$(uname)"
-export CXX="clang++"
-
-rm -rf lib/*.dylib *.dSYM spawn userspawn
+export CXX="g++"
 
 check() {
     if [ "$1" = "0" ]; then
@@ -15,11 +13,13 @@ check() {
     fi
 }
 
-$CXX -Os -c -fPIC lib/spawnlib_src/utils.cc -o lib/utils.o
+$CXX -Os -c -fPIC lib/kickstart/utils.cc -o lib/utils.o
 check $? "Utils"
 
-$CXX -Os -c -fPIC lib/spawnlib_src/core.cc -o lib/core.o
+$CXX -Os -c -fPIC lib/kickstart/core.cc -o lib/core.o
 check $? "Core"
 
-$CXX -Os -fPIC lib/spawnlib_src/kick.cc -o kick lib/core.o lib/utils.o
+$CXX -Os -fPIC lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
 check $? "KickStart"
+
+rm -rf lib/*.o
