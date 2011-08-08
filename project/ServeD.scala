@@ -69,8 +69,9 @@ object Resolvers {
     val sonatype = "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
     val guiceyfruit = "guiceyfruit repo" at "http://guiceyfruit.googlecode.com/svn/repo/releases"
     val mediavks = "Media VKS" at "http://media.verknowsys.com/maven2-repository/"
+    val repoVks = "VerKnowSys Public Repository" at "http://repo.verknowsys.com"
 
-    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, mediavks)
+    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, mediavks, repoVks)
 }
 
 object Dependencies {
@@ -90,9 +91,8 @@ object Dependencies {
     val specs = "org.scala-tools.testing" %% "specs" % "1.6.8"
     val h2 = "com.h2database" % "h2" % "1.3.154"
 
-    val scalate = "org.fusesource.scalate" % "scalate-core" % "1.5.0"
     val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.4.1.v20110513"
-    val servlet = "javax.servlet" % "servlet-api" % "2.5"
+    val funlet = "com.verknowsys" %% "funlet" % "0.1.0-SNAPSHOT"
 }
 
 object ServeD extends Build {
@@ -134,7 +134,7 @@ object ServeD extends Build {
         settings = buildSettings ++ WebPlugin.webSettings ++ Seq(
             compileOrder    := CompileOrder.Mixed,
             libraryDependencies ++= Seq(
-                scalate, jetty % "jetty", servlet % "provided"
+                funlet, jetty % "jetty"
             )
         ) ++ CoffeeScript.coffeeSettings
     ) dependsOn(utils, testing % "test")

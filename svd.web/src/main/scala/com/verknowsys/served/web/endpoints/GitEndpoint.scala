@@ -52,7 +52,7 @@ object GitEndpoint extends Endpoint {
         def fields = name :: Nil
     }
 
-    class PublicKeyForm(accessKey: Option[AccessKey] = None, param: Param = Empty, action: String = "") extends Form[AccessKey](accessKey, param, action) {
+    class PublicKeyForm(accessKey: Option[AccessKey] = None, param: Param = Empty, action: String = "") extends Form[AccessKey](accessKey, param, action) with CustomFields {
         def bind = for {
             n <- name
             k <- publicKey
