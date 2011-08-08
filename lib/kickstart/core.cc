@@ -34,7 +34,7 @@ const static string coreDir = currentDir();
 
 
     void load_svd(string java_path, string jar, string mainClassParam, string svd_arg) {
-        string jnalp = "-Djna.library.path=" + currentDir() + "/lib";
+        string jnalp = "-Djava.library.path=" + currentDir() + "/lib";
         #ifdef DEVEL
             #define COUNT 14
         #else
@@ -42,12 +42,12 @@ const static string coreDir = currentDir();
         #endif
         char *args[] = {
             (char*)"java",
-            (char*)"-d64",
-            (char*)"-XX:+UseCompressedOops",
-            (char*)"-XX:MaxPermSize=256M",
-            (char*)"-XX:+UseParallelGC",
-            (char*)"-Xms64m",
-            (char*)"-Xmx512m",
+            (char*)"-d32",
+            (char*)"-client",
+            (char*)"-Xmn512k",
+            (char*)"-XX:NewRatio=1",
+            (char*)"-Xms1m",
+            (char*)"-Xmx16m",
             (char*)"-Dfile.encoding=UTF-8",
             (char*)jnalp.c_str(),
             #ifndef DEVEL
