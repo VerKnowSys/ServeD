@@ -59,7 +59,7 @@ class RenderTemplateResponse(
 ) extends Response(headers, cookies, session) {
     override def apply(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse, main: MainEndpoint){
         super.apply(servletRequest, servletResponse, main)
-        main.templateEngine.layout("/WEB-INF/scalate/templates/" + name + ".scaml", attributes)
+        main.templateEngine.layout("/WEB-INF/scalate/templates/" + name + ".jade", attributes)
     }
 
     override def toString = "Render tempate: " + name
