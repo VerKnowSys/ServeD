@@ -93,6 +93,7 @@ object Dependencies {
 
     val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.4.1.v20110513"
     val funlet = "com.verknowsys" %% "funlet" % "0.1.0-SNAPSHOT"
+    val slf4japi = "org.slf4j" % "slf4j-api" % "1.5.8"
 }
 
 object ServeD extends Build {
@@ -117,7 +118,8 @@ object ServeD extends Build {
 
     lazy val utils = Project("utils", file("svd.utils"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(messadmin, jna)
+            compileOrder        := CompileOrder.Mixed,
+            libraryDependencies ++= Seq(messadmin, jna, slf4japi)
         )
     ) dependsOn(api, testing % "test")
 
