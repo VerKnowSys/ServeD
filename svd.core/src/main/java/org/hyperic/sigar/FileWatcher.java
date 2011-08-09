@@ -66,7 +66,10 @@ public abstract class FileWatcher {
     public void add(File[] files)
         throws SigarException {
         for (int i=0; i<files.length; i++) {
-            add(files[i]);
+            try {
+                add(files[i]);
+            } catch (SigarFileNotFoundException e) {
+            }
         }
     }
 

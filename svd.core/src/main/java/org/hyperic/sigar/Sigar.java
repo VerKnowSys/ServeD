@@ -354,7 +354,7 @@ public class Sigar implements SigarProxy {
         CpuPerc[] perc =
             new CpuPerc[curLen < oldLen ? curLen : oldLen];
         
-        for (int i=0; i<curLen; i++) {
+        for (int i=0; i<perc.length; i++) {
             perc[i] =
                 CpuPerc.fetch(this, oldCpuList[i],
                               this.lastCpuList[i]);
@@ -565,7 +565,7 @@ public class Sigar implements SigarProxy {
      * @return Environment variable value.
      * @exception SigarException on failure.
      */
-    public String getProcEnv( long pid, String key) throws SigarException {
+    public String getProcEnv(long pid, String key) throws SigarException {
         return ProcEnv.getValue(this, pid, key);
     }
 
