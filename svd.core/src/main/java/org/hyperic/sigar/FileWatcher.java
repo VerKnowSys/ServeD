@@ -69,6 +69,7 @@ public abstract class FileWatcher {
             try {
                 add(files[i]);
             } catch (SigarFileNotFoundException e) {
+                System.out.println("SigarFileNotFoundException: " + e);
             }
         }
     }
