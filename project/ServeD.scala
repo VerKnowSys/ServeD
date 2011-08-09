@@ -90,9 +90,9 @@ object Dependencies {
     val smack = "jivesoftware" % "smack" % "3.0.4"
     val specs = "org.scala-tools.testing" %% "specs" % "1.6.8"
     val h2 = "com.h2database" % "h2" % "1.3.154"
-
     val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.4.1.v20110513"
     val funlet = "com.verknowsys" %% "funlet" % "0.1.0-SNAPSHOT"
+    val sshd = "org.apache.sshd" % "sshd-core" % "0.5.0"
     val slf4japi = "org.slf4j" % "slf4j-api" % "1.5.8"
 }
 
@@ -127,14 +127,13 @@ object ServeD extends Build {
         settings = buildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(
-                h2, neodatis, jgit, expect4j, smack
+                h2, neodatis, jgit, expect4j, smack, sshd
             )
         )
     ) dependsOn(utils, testing % "test")
 
     lazy val web = Project("web", file("svd.web"),
         settings = buildSettings ++ WebPlugin.webSettings ++ Seq(
-            compileOrder    := CompileOrder.Mixed,
             libraryDependencies ++= Seq(
                 funlet, jetty % "jetty"
             )

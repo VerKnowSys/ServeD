@@ -194,6 +194,7 @@ class SvdAccountUtils(db: DBClient) {
     
 }
 
+object SvdAccountsManager extends GlobalActorRef(Actor.registry.actorFor[SvdAccountsManager])
 
 class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 

@@ -1,6 +1,5 @@
 package org.slf4j.impl
 
-import org.slf4j.helpers.FormattingTuple
 import org.slf4j.Logger
 import org.slf4j.Marker
 import org.slf4j.helpers.MessageFormatter
@@ -24,35 +23,29 @@ class SvdSLF4JLogger(val name: String) extends Logger with Logging {
     def isWarnEnabled(marker: Marker) = true
     def isErrorEnabled(marker: Marker) = true
 
-    // (x$1: java.lang.String, x$2: java.lang.Throwable)Unit is not defined
-    // (x$1: java.lang.String, x$2: Array[java.lang.Object])Unit is not defined
-    // (x$1: java.lang.String, x$2: Any, x$3: Any)Unit is not defined
-    // (x$1: java.lang.String, x$2: Any)Unit is not defined
-    // (x$1: java.lang.String)Unit is not defined
-
     def trace(marker: Marker, msg: String, t: Throwable) = log.log(Trace, msg + t.toString, name)
     def debug(marker: Marker, msg: String, t: Throwable) = log.log(Debug, msg + t.toString, name)
     def info(marker: Marker,  msg: String, t: Throwable) = log.log(Info,  msg + t.toString, name)
     def warn(marker: Marker,  msg: String, t: Throwable) = log.log(Warn,  msg + t.toString, name)
     def error(marker: Marker, msg: String, t: Throwable) = log.log(Error, msg + t.toString, name)
 
-    def trace(marker: Marker, msg: String, a: Array[Object]) = log.log(Trace, MessageFormatter.arrayFormat(msg, a).getMessage, name)
-    def debug(marker: Marker, msg: String, a: Array[Object]) = log.log(Debug, MessageFormatter.arrayFormat(msg, a).getMessage, name)
-    def info(marker: Marker, msg:  String, a: Array[Object]) = log.log(Info,  MessageFormatter.arrayFormat(msg, a).getMessage, name)
-    def warn(marker: Marker, msg:  String, a: Array[Object]) = log.log(Warn,  MessageFormatter.arrayFormat(msg, a).getMessage, name)
-    def error(marker: Marker, msg: String, a: Array[Object]) = log.log(Error, MessageFormatter.arrayFormat(msg, a).getMessage, name)
+    def trace(marker: Marker, msg: String, a: Array[Object]) = log.log(Trace, MessageFormatter.arrayFormat(msg, a), name)
+    def debug(marker: Marker, msg: String, a: Array[Object]) = log.log(Debug, MessageFormatter.arrayFormat(msg, a), name)
+    def info(marker: Marker, msg:  String, a: Array[Object]) = log.log(Info,  MessageFormatter.arrayFormat(msg, a), name)
+    def warn(marker: Marker, msg:  String, a: Array[Object]) = log.log(Warn,  MessageFormatter.arrayFormat(msg, a), name)
+    def error(marker: Marker, msg: String, a: Array[Object]) = log.log(Error, MessageFormatter.arrayFormat(msg, a), name)
 
-    def trace(marker: Marker, msg: String, x1: Any, x2: Any) = log.log(Trace, MessageFormatter.format(msg, x1, x2).getMessage, name)
-    def debug(marker: Marker, msg: String, x1: Any, x2: Any) = log.log(Debug, MessageFormatter.format(msg, x1, x2).getMessage, name)
-    def info(marker: Marker, msg:  String, x1: Any, x2: Any) = log.log(Info,  MessageFormatter.format(msg, x1, x2).getMessage, name)
-    def warn(marker: Marker, msg:  String, x1: Any, x2: Any) = log.log(Warn,  MessageFormatter.format(msg, x1, x2).getMessage, name)
-    def error(marker: Marker, msg: String, x1: Any, x2: Any) = log.log(Error, MessageFormatter.format(msg, x1, x2).getMessage, name)
+    def trace(marker: Marker, msg: String, x1: Any, x2: Any) = log.log(Trace, MessageFormatter.format(msg, x1, x2), name)
+    def debug(marker: Marker, msg: String, x1: Any, x2: Any) = log.log(Debug, MessageFormatter.format(msg, x1, x2), name)
+    def info(marker: Marker, msg:  String, x1: Any, x2: Any) = log.log(Info,  MessageFormatter.format(msg, x1, x2), name)
+    def warn(marker: Marker, msg:  String, x1: Any, x2: Any) = log.log(Warn,  MessageFormatter.format(msg, x1, x2), name)
+    def error(marker: Marker, msg: String, x1: Any, x2: Any) = log.log(Error, MessageFormatter.format(msg, x1, x2), name)
 
-    def trace(marker: Marker, msg: String, x1: Any) = log.log(Trace, MessageFormatter.format(msg, x1).getMessage, name)
-    def debug(marker: Marker, msg: String, x1: Any) = log.log(Debug, MessageFormatter.format(msg, x1).getMessage, name)
-    def info(marker: Marker, msg:  String, x1: Any) = log.log(Info,  MessageFormatter.format(msg, x1).getMessage, name)
-    def warn(marker: Marker, msg:  String, x1: Any) = log.log(Warn,  MessageFormatter.format(msg, x1).getMessage, name)
-    def error(marker: Marker, msg: String, x1: Any) = log.log(Error, MessageFormatter.format(msg, x1).getMessage, name)
+    def trace(marker: Marker, msg: String, x1: Any) = log.log(Trace, MessageFormatter.format(msg, x1), name)
+    def debug(marker: Marker, msg: String, x1: Any) = log.log(Debug, MessageFormatter.format(msg, x1), name)
+    def info(marker: Marker, msg:  String, x1: Any) = log.log(Info,  MessageFormatter.format(msg, x1), name)
+    def warn(marker: Marker, msg:  String, x1: Any) = log.log(Warn,  MessageFormatter.format(msg, x1), name)
+    def error(marker: Marker, msg: String, x1: Any) = log.log(Error, MessageFormatter.format(msg, x1), name)
 
     def trace(marker: Marker, msg: String) = log.log(Trace, msg, name)
     def debug(marker: Marker, msg: String) = log.log(Debug, msg, name)
@@ -67,28 +60,27 @@ class SvdSLF4JLogger(val name: String) extends Logger with Logging {
     def warn(msg:  String, t: Throwable) = log.log(Warn,  msg + t.toString, name)
     def error(msg: String, t: Throwable) = log.log(Error, msg + t.toString, name)
 
-    def trace(msg: String, a: Array[Object]) = log.log(Trace, MessageFormatter.arrayFormat(msg, a).getMessage, name)
-    def debug(msg: String, a: Array[Object]) = log.log(Debug, MessageFormatter.arrayFormat(msg, a).getMessage, name)
-    def info(msg:  String, a: Array[Object]) = log.log(Info,  MessageFormatter.arrayFormat(msg, a).getMessage, name)
-    def warn(msg:  String, a: Array[Object]) = log.log(Warn,  MessageFormatter.arrayFormat(msg, a).getMessage, name)
-    def error(msg: String, a: Array[Object]) = log.log(Error, MessageFormatter.arrayFormat(msg, a).getMessage, name)
+    def trace(msg: String, a: Array[Object]) = log.log(Trace, MessageFormatter.arrayFormat(msg, a), name)
+    def debug(msg: String, a: Array[Object]) = log.log(Debug, MessageFormatter.arrayFormat(msg, a), name)
+    def info(msg:  String, a: Array[Object]) = log.log(Info,  MessageFormatter.arrayFormat(msg, a), name)
+    def warn(msg:  String, a: Array[Object]) = log.log(Warn,  MessageFormatter.arrayFormat(msg, a), name)
+    def error(msg: String, a: Array[Object]) = log.log(Error, MessageFormatter.arrayFormat(msg, a), name)
 
-    def trace(msg: String, x1: Any, x2: Any) = log.log(Trace, MessageFormatter.format(msg, x1, x2).getMessage, name)
-    def debug(msg: String, x1: Any, x2: Any) = log.log(Debug, MessageFormatter.format(msg, x1, x2).getMessage, name)
-    def info(msg:  String, x1: Any, x2: Any) = log.log(Info,  MessageFormatter.format(msg, x1, x2).getMessage, name)
-    def warn(msg:  String, x1: Any, x2: Any) = log.log(Warn,  MessageFormatter.format(msg, x1, x2).getMessage, name)
-    def error(msg: String, x1: Any, x2: Any) = log.log(Error, MessageFormatter.format(msg, x1, x2).getMessage, name)
+    def trace(msg: String, x1: Any, x2: Any) = log.log(Trace, MessageFormatter.format(msg, x1, x2), name)
+    def debug(msg: String, x1: Any, x2: Any) = log.log(Debug, MessageFormatter.format(msg, x1, x2), name)
+    def info(msg:  String, x1: Any, x2: Any) = log.log(Info,  MessageFormatter.format(msg, x1, x2), name)
+    def warn(msg:  String, x1: Any, x2: Any) = log.log(Warn,  MessageFormatter.format(msg, x1, x2), name)
+    def error(msg: String, x1: Any, x2: Any) = log.log(Error, MessageFormatter.format(msg, x1, x2), name)
 
-    def trace(msg: String, x1: Any) = log.log(Trace, MessageFormatter.format(msg, x1).getMessage, name)
-    def debug(msg: String, x1: Any) = log.log(Debug, MessageFormatter.format(msg, x1).getMessage, name)
-    def info(msg:  String, x1: Any) = log.log(Info,  MessageFormatter.format(msg, x1).getMessage, name)
-    def warn(msg:  String, x1: Any) = log.log(Warn,  MessageFormatter.format(msg, x1).getMessage, name)
-    def error(msg: String, x1: Any) = log.log(Error, MessageFormatter.format(msg, x1).getMessage, name)
+    def trace(msg: String, x1: Any) = log.log(Trace, MessageFormatter.format(msg, x1), name)
+    def debug(msg: String, x1: Any) = log.log(Debug, MessageFormatter.format(msg, x1), name)
+    def info(msg:  String, x1: Any) = log.log(Info,  MessageFormatter.format(msg, x1), name)
+    def warn(msg:  String, x1: Any) = log.log(Warn,  MessageFormatter.format(msg, x1), name)
+    def error(msg: String, x1: Any) = log.log(Error, MessageFormatter.format(msg, x1), name)
 
     def trace(msg: String) = log.log(Trace, msg, name)
     def debug(msg: String) = log.log(Debug, msg, name)
     def info(msg:  String) = log.log(Info,  msg, name)
     def warn(msg:  String) = log.log(Warn,  msg, name)
     def error(msg: String) = log.log(Error, msg, name)
-
 }
