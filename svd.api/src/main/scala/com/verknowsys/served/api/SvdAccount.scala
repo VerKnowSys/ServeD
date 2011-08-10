@@ -1,6 +1,6 @@
 package com.verknowsys.served.api
 
-
+import com.verknowsys.served.api._
 import com.verknowsys.served.api.pools._
 
 
@@ -20,6 +20,7 @@ case class SvdAccount (
         dbPort: Int,
         information: String = "",
         shell: String = "",
+        keys: Set[AccessKey] = Set.empty,
         uuid: UUID = randomUUID
     ) extends Persistent {
     
