@@ -56,7 +56,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             self reply account
 
         case AuthorizeWithKey(key) =>
-            log.trace("Trying to find key in account: %s which have keys: %s", account, account.keys)
+            log.trace("Trying to find key in account: %s", account)
             self reply accountKeys.keys.find(_.key == key).isDefined
 
         case ListKeys =>
