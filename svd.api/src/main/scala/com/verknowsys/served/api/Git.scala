@@ -1,7 +1,8 @@
 package com.verknowsys.served.api.git
 
+
 import com.verknowsys.served.api._
-import java.security.PublicKey
+
 
 /**
  * This module is related to operations on git repositories
@@ -12,15 +13,6 @@ sealed abstract class Base extends ApiMessage
 
 
 // data
-
-case class AccessKey(name: String, key: PublicKey){
-    override def equals(that: Any) = that match {
-        case AccessKey(n, k) => k == k
-        case _ => false
-    }
-
-    override def hashCode = key.hashCode
-}
 
 case class Repository(
     name: String,                       // the name of repository

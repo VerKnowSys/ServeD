@@ -11,6 +11,6 @@ import akka.actor.ActorRef
  * @author teamon
  */
 abstract class GlobalActorRef(actor: => Option[ActorRef]) {
-    def !(message: Any)(implicit sender: Option[ActorRef] = None) = actor.map(_ ! message)
-    def !!(message: Any)(implicit sender: Option[ActorRef] = None) = actor.map(_ !! message)
+    def !(message: Any)(implicit sender: Option[ActorRef] = None) = actor.foreach(_ ! message)
+    def !!(message: Any)(implicit sender: Option[ActorRef] = None) = actor.flatMap(_ !! message)
 }

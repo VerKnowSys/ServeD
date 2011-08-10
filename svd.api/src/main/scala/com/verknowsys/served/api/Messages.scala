@@ -11,7 +11,6 @@ case class Error(val message: String) extends ApiResponse
 // General errors
 case object NotImplementedError
 
-
 object General {
     sealed abstract class Base extends ApiMessage
 

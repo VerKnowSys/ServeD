@@ -16,6 +16,7 @@ class SvdSystemManagerTest extends DefaultTest with Logging {
 
 
     override def beforeEach {
+        System.setProperty("java.library.path", System.getProperty("user.dir") + "/lib")
         SvdLowLevelSystemAccess
     }
     

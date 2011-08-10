@@ -24,7 +24,7 @@ object SvdPools {
      *
      *   userUidPool describes a range of system uids for users
      */
-    def userUidPool = 10000 until 60000
+    def userUidPool = 10000 until 2147483646
     
 
     /**
@@ -32,6 +32,6 @@ object SvdPools {
      *
      *   userGidPool describes a range of system gids for users
      */
-    def userGidPool = 10000 until 60000
+    def userGidPool = 10000 until 2147483646
 
 }

@@ -1,6 +1,6 @@
 package com.verknowsys.served.api
 
-
+import com.verknowsys.served.api._
 import com.verknowsys.served.api.pools._
 
 
@@ -16,8 +16,6 @@ case class SvdAccount (
         pass: String = "",
         uid: Int,
         gid: Int,
-        servicePort: Int,
-        dbPort: Int,
         information: String = "",
         shell: String = "",
         uuid: UUID = randomUUID

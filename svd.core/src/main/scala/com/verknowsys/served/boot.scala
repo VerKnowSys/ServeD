@@ -9,6 +9,7 @@ import com.verknowsys.served.systemmanager.SvdAccountsManager
 import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.systemmanager.managers.SvdAccountManager
+import com.verknowsys.served.sshd.SSHD
 import com.verknowsys.served.api._
 
 import akka.actor._
@@ -29,18 +30,20 @@ object boot extends Logging {
         println("=========================")
         println()
         println()
-        
+
         val accountsManager = actorOf[SvdAccountsManager]
         val systemManager = actorOf[SvdSystemManager]
         val loggingManager = actorOf(new LoggingManager(GlobalLogger))
+        val sshd = actorOf(new SSHD(1234))
 
         val list = (
             actorOf[SvdFileEventsManager] ::
             loggingManager ::
             systemManager ::
-            accountsManager :: 
+            accountsManager ::
             actorOf[SvdSystemInfo] ::
-            // actorOf[SvdNotificationCenter] :: 
+            // actorOf[SvdNotificationCenter] ::
+            sshd ::
             Nil).map(Supervise(_, Permanent))
 
         // supervise and autostart
@@ -50,7 +53,7 @@ object boot extends Logging {
                 list
             )
         )
-        
+
         SvdUtils.addShutdownHook {
             log.info("Shutdown requested")
             supervisor.shutdown
@@ -59,13 +62,14 @@ object boot extends Logging {
         systemManager ! Init
         accountsManager ! Init
 
+
         // Remote services
         remote.start(SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
         remote.registerPerSession("service:api", actorOf[SvdApiConnection])
         remote.register("service:accounts-manager", accountsManager)
     }
-    
-    
+
+
     def user(userUID: Int){
         println()
         println()
@@ -74,9 +78,9 @@ object boot extends Logging {
         println("=========================")
         println()
         println()
-        
+
         // Get account form remote service
-        
+
         log.debug("Getting account for uid %d", userUID)
         val remoteAccountsManager = remote.actorFor("service:accounts-manager", SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
         (remoteAccountsManager !! GetAccount(userUID)) collect {
@@ -85,10 +89,10 @@ object boot extends Logging {
             case Some(account) =>
                 log.debug("Got account, starting AccountManager for %s", account)
                 val am = actorOf(new SvdAccountManager(account)).start
-                
+
                 val loggingManager = actorOf(new LoggingManager(GlobalLogger)).start
                 am !! Init
-                remote.start(SvdConfig.defaultHost, account.servicePort)
+                remote.start(SvdConfig.defaultHost, 12345) // XXX: hack: both defaultHost and port
                 remote.register("service:account-manager", am)
                 remote.register("service:logging-manager", loggingManager)
 
@@ -98,14 +102,14 @@ object boot extends Logging {
                 }
 
                 log.info("Spawned UserBoot for UID: %d", userUID)
-                
+
             case None =>
                 log.error("Account for uid %d does not exist", userUID)
                 sys.exit(1)
         }
     }
-    
-    
+
+
     def handleSignal(name: String)(block: => Unit) {
         Signal.handle(new Signal(name), new SignalHandler {
             def handle(sig: Signal) {
@@ -114,8 +118,8 @@ object boot extends Logging {
             }
         })
     }
-    
-    
+
+
     def main(args: Array[String]) {
         if (SvdUtils.isLinux) {
             log.error("Linux systems aren't supported yet!")
@@ -125,9 +129,9 @@ object boot extends Logging {
         // handle signals
         handleSignal("ABRT") { SvdUtils.getAllLiveThreads }
         handleSignal("USR2") { log.warn("TODO: implement USR2 handling (show svd config values)") }
-        
+
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
-        
+
         args.toList match {
             case "user" :: userid :: xs =>
                 log.info("Spawning user (%d)", userid.toInt)
