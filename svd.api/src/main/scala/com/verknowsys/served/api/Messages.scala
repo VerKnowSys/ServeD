@@ -11,7 +11,7 @@ case class Error(val message: String) extends ApiResponse
 // General errors
 case object NotImplementedError
 
-case class AuthorizeWithKey(key: java.security.PublicKey)
+case class AuthorizeWithKey(key: AccessKey)
 
 object General {
     sealed abstract class Base extends ApiMessage
