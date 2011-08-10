@@ -9,11 +9,8 @@ for i in *; do
     fi
 done
 
-sbt clean
+bin/sbt clean
 echo "Project source cleaned.."
 
 rm -rf lib/*.o
 echo "Native library cleaned."
-
-sbt update
-echo "Project updated."
