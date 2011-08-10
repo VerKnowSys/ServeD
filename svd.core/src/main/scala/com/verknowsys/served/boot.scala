@@ -96,6 +96,11 @@ object boot extends Logging {
                 remote.register("service:account-manager", am)
                 remote.register("service:logging-manager", loggingManager)
 
+                SvdUtils.addShutdownHook {
+                    log.info("Shutdown of user svd requested")
+                    am.stop
+                }
+
                 log.info("Spawned UserBoot for UID: %d", userUID)
 
             case None =>
