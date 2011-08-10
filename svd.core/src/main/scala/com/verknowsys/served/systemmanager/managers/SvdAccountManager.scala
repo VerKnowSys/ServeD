@@ -1,6 +1,7 @@
 package com.verknowsys.served.systemmanager.managers
 
 import com.verknowsys.served.SvdConfig
+import com.verknowsys.served.api.git._
 import com.verknowsys.served.api._
 import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
@@ -47,6 +48,9 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             // new SvdService(account, "rails app x", SvdShellOperation("rails dupa" :: "cd dupa" :: "script/rails" :: Nil)).start
             // self reply Success
 
+        case AuthorizeWithKey(key) =>
+            self reply account.keys.contains(key)
+        
         case msg: git.Base =>
             gitManager forward msg
             

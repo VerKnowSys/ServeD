@@ -2,6 +2,7 @@ package com.verknowsys.served.web.endpoints
 
 import com.verknowsys.funlet._
 import com.verknowsys.served.web.lib._
+import com.verknowsys.served.api._
 import com.verknowsys.served.api.git._
 
 object GitEndpoint extends Endpoint {
