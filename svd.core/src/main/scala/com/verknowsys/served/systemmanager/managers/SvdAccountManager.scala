@@ -58,6 +58,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     
     
     override def postStop {
+        log.debug("Executing postStop for user svd UID: %s".format(account.uid))
+        super.postStop
         sh.close
         db.close
         server.close
