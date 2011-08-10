@@ -7,6 +7,7 @@ import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.git._
+import com.verknowsys.served.api._
 import com.verknowsys.served.api.git._
 import com.verknowsys.served.api.Success
 import com.verknowsys.served.db._

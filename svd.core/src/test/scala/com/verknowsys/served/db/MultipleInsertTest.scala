@@ -15,7 +15,7 @@ class MultipleInsertTest extends DatabaseTest {
             (1 to 10) foreach { i =>
                 val ruid = randomUserUid
                 if (!userUIDRegistered(ruid)) {
-                    registerUserAccount(ruid, "żółć")
+                    registerUserAccount(ruid)
                 }
             }
         }

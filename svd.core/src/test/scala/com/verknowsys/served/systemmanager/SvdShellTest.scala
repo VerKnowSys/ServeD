@@ -28,9 +28,7 @@ class SvdShellTest extends DefaultTest {
             new SvdAccount(
                 userName = System.getProperty("user.name"),
                 uid = randomPort,
-                gid = randomPort,
-                servicePort = randomPort,
-                dbPort = randomPort
+                gid = randomPort
             )
         )
         
@@ -49,9 +47,7 @@ class SvdShellTest extends DefaultTest {
             new SvdAccount(
                 userName = System.getProperty("user.name"),
                 uid = randomPort,
-                gid = randomPort,
-                servicePort = randomPort,
-                dbPort = randomPort
+                gid = randomPort
             )
         )
         
@@ -74,9 +70,7 @@ class SvdShellTest extends DefaultTest {
             new SvdAccount(
                 userName = System.getProperty("user.name"),
                 uid = randomPort,
-                gid = randomPort,
-                servicePort = randomPort,
-                dbPort = randomPort
+                gid = randomPort
             )
         )
         sh.exec(shr("lsdjf"))
