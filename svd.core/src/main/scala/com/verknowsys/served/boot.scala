@@ -92,7 +92,7 @@ object boot extends Logging {
 
                 val loggingManager = actorOf(new LoggingManager(GlobalLogger)).start
                 am !! Init
-                remote.start(SvdConfig.defaultHost, account.servicePort)
+                remote.start(SvdConfig.defaultHost, 12345) // XXX: hack: both defaultHost and port
                 remote.register("service:account-manager", am)
                 remote.register("service:logging-manager", loggingManager)
 

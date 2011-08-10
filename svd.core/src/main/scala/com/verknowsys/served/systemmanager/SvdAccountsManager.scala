@@ -90,21 +90,14 @@ class SvdAccountUtils(db: DBClient) {
     /**
      *  @author dmilith
      *
-     *   registers user UID with given number and name in svd database
+     *   registers user UID with given number in svd database
      */
-    def registerUserAccount(uid: Int, nam: String) = {
-        val port = randomUserPort
-        val dbP = randomUserPort
-        registerUserPort(port)
-        registerUserPort(dbP)
-        registerUserUID(uid, nam)
-        registerUserGID(uid, nam)
+    def registerUserAccount(uid: Int) = {
+        registerUserUID(uid)
+        registerUserGID(uid)
         db << SvdAccount(
-            userName = nam,
             uid = uid,
-            gid = uid,
-            servicePort = port,
-            dbPort = dbP
+            gid = uid
         )
     }
 
@@ -114,8 +107,8 @@ class SvdAccountUtils(db: DBClient) {
      *
      *   registers user UID with given number and name in svd database
      */
-    def registerUserUID(num: Int, nam: String) =
-        db << SvdUserUID(number = num, name = nam)
+    def registerUserUID(num: Int) =
+        db << SvdUserUID(number = num)
             
     
     /**
@@ -123,8 +116,8 @@ class SvdAccountUtils(db: DBClient) {
      *
      *   registers user GID with given number and name in svd database
      */
-    def registerUserGID(num: Int, nam: String) =
-        db << SvdUserGID(number = num, name = nam)
+    def registerUserGID(num: Int) =
+        db << SvdUserGID(number = num)
 
 
     /**
@@ -203,7 +196,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     val server = new DBServer(SvdConfig.remoteAccountServerPort, SvdConfig.systemHomeDir / SvdConfig.coreSvdAccountsDatabaseName)
     val db = server.openClient
     
-    val rootAccount = SvdAccount("root", uid = 0, gid = 0, dbPort = 0, servicePort = 0) // XXX
+    val rootAccount = SvdAccount("root", uid = 0, gid = 0) // XXX
     val svdAccountUtils = new SvdAccountUtils(db)
     import svdAccountUtils._
     
@@ -255,7 +248,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
             // (1 to 10) foreach {
                 // _ =>
                     if (!userUIDRegistered(501)) {
-                        registerUserAccount(501, "mac-user")
+                        registerUserAccount(501)
                     }
 
                     // val ruid = randomUserUid
@@ -278,7 +271,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
         case GetAccountManager(givenUid) =>
             log.trace("GetAccountManager(%d)", givenUid)
             self reply SvdAccounts(db)(_.uid == givenUid).headOption.map { account =>
-                    remote.actorFor("service:account-manager", SvdConfig.defaultHost, account.servicePort)
+                    remote.actorFor("service:account-manager", SvdConfig.defaultHost, 12345) // XXX: hack with both port and defaultHost
             }.getOrElse(AccountNotFound)
         
         case x: Any =>

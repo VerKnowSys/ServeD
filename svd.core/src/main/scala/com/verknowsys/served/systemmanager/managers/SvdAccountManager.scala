@@ -22,7 +22,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     
     log.info("Starting AccountManager for uid: %s".format(account.uid))
     
-    val server = new DBServer(account.dbPort, SvdConfig.userHomeDir / "%s".format(account.uid) / "%s.db".format(account.uid))
+    val server = new DBServer(12345, SvdConfig.userHomeDir / "%s".format(account.uid) / "%s.db".format(account.uid))
     val db = server.openClient
     
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
