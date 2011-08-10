@@ -2,6 +2,7 @@ package com.verknowsys.served.web.endpoints
 
 import com.verknowsys.funlet._
 import com.verknowsys.served.web.lib._
+import com.verknowsys.served.web.forms._
 import com.verknowsys.served.api._
 import com.verknowsys.served.api.git._
 
@@ -22,14 +23,14 @@ object GitEndpoint extends Endpoint {
 
         case Get("git" :: name :: Nil) =>
             find(name) map { repo =>
-                render("git/show", "repo" -> repo, "form" -> new PublicKeyForm(action = "/git/" + repo.name + "/keys"))
+                render("git/show", "repo" -> repo, "form" -> new AccessKeyForm(action = "/git/" + repo.name + "/keys"))
             }
 
 
 
         case Post("git" :: name :: "keys" :: Nil) =>
             find(name) map { repo =>
-                val form = new PublicKeyForm(param = formParam, action = "/git/" + repo.name + "/keys")
+                val form = new AccessKeyForm(param = formParam, action = "/git/" + repo.name + "/keys")
                 if(form.isValid){
                     API ! AddAuthorizedKey(repo.uuid, form.get)
                     // flash("notice") = "Key added"
@@ -51,17 +52,5 @@ object GitEndpoint extends Endpoint {
         val name = new StringField("name", _.name, NotEmpty)
 
         def fields = name :: Nil
-    }
-
-    class PublicKeyForm(accessKey: Option[AccessKey] = None, param: Param = Empty, action: String = "") extends Form[AccessKey](accessKey, param, action) with CustomFields {
-        def bind = for {
-            n <- name
-            k <- publicKey
-        } yield AccessKey(n, k)
-
-        val name = new StringField("name", _.name, NotEmpty)
-        val publicKey = new PublicKeyField("publicKey", _.key)
-
-        def fields = name :: publicKey :: Nil
     }
 }
