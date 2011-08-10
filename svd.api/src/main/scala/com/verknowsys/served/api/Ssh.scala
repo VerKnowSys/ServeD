@@ -4,7 +4,7 @@ package com.verknowsys.served.api
 import java.security.PublicKey
 
 /**
- *  @author dmilith
+ *  @author teamon
  *
  *   SSH related API
  */
