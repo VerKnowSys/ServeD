@@ -16,11 +16,8 @@ case class SvdAccount (
         pass: String = "",
         uid: Int,
         gid: Int,
-        servicePort: Int,
-        dbPort: Int,
         information: String = "",
         shell: String = "",
-        keys: Set[AccessKey] = Set.empty,
         uuid: UUID = randomUUID
     ) extends Persistent {
     
