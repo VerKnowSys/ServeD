@@ -45,7 +45,6 @@ class PublicKeyAuth extends PublickeyAuthenticator with Logging {
         log.debug("User: %s trying to connect with key: %s", username, key)
 
         catchException { username.toInt } map { userUid =>
-
             log.trace("UserId %d", userUid)
 
             val res = (SvdAccountsManager !! GetAccountManager(userUid))

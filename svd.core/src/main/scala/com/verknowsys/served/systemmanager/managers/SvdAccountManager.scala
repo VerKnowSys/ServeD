@@ -1,9 +1,10 @@
 package com.verknowsys.served.systemmanager.managers
 
 import com.verknowsys.served.SvdConfig
+import com.verknowsys.served.api.accountkeys._
 import com.verknowsys.served.api.git._
 import com.verknowsys.served.api._
-import com.verknowsys.served.db._
+import com.verknowsys.served.db.{DBServer, DBClient, DB}
 import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
 
@@ -12,6 +13,9 @@ import akka.actor.Actor
 import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.systemmanager.SvdAccountsManager
 
+
+case class AccountKeys(keys: Set[AccessKey] = Set.empty, uuid: UUID = randomUUID) extends Persistent
+object AccountKeysDB extends DB[AccountKeys]
 
 /**
  * Account Manager - owner of all managers
@@ -48,15 +52,35 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             // new SvdService(account, "rails app x", SvdShellOperation("rails dupa" :: "cd dupa" :: "script/rails" :: Nil)).start
             // self reply Success
 
+        case GetAccount =>
+            self reply account
+
         case AuthorizeWithKey(key) =>
             log.trace("Trying to find key in account: %s which have keys: %s", account, account.keys)
-            self reply account.keys.find(_.key == key).isDefined
+            self reply accountKeys.keys.find(_.key == key).isDefined
+
+        case ListKeys =>
+            self reply accountKeys.keys
+
+        case AddKey(key) =>
+            val ak = accountKeys
+            db << ak.copy(keys = ak.keys + key)
+
+        case RemoveKey(key) =>
+            val ak = accountKeys
+            db << ak.copy(keys = ak.keys - key)
+
 
         case msg: git.Base =>
             gitManager forward msg
 
     }
 
+    protected def accountKeys = {
+        val ak = AccountKeysDB(db).headOption
+        log.debug("accountKeys: %s", ak)
+        ak getOrElse AccountKeys()
+    }
 
     override def postStop {
         log.debug("Executing postStop for user svd UID: %s".format(account.uid))
