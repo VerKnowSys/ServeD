@@ -22,7 +22,7 @@ class SSHD(port: Int) extends Actor with SvdExceptionHandler {
     sshd.setPort(port)
     sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("hostkey.ser"))
     sshd.setPublickeyAuthenticator(new PublicKeyAuth())
-    // sshd.setShellFactory(new ProcessShellFactory(Array("/usr/local/bin/zsh", "-i", "-l")))
+    sshd.setShellFactory(new SvdShellFactory(Array("./shell"))) // XXX: hardcoded name
 
     override def preStart {
         log.info("Starting SSHD on port %d", port)
@@ -35,12 +35,14 @@ class SSHD(port: Int) extends Actor with SvdExceptionHandler {
     }
 
     override def postStop {
+        log.debug("Stopping SSHD")
         super.postStop
         sshd.stop
     }
 }
 
 class PublicKeyAuth extends PublickeyAuthenticator with Logging {
+
     def authenticate(username: String, key: PublicKey, session: ServerSession) = {
         log.debug("User: %s trying to connect with key: %s", username, key)
 
