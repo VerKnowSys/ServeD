@@ -44,10 +44,10 @@ const static string coreDir = currentDir();
             (char*)"java",
             (char*)"-d32",
             (char*)"-client",
-            (char*)"-Xmn512k",
+            (char*)"-Xmn1m",
             (char*)"-XX:NewRatio=1",
-            (char*)"-Xms1m",
-            (char*)"-Xmx16m",
+            (char*)"-Xms2m",
+            (char*)"-Xmx32m",
             (char*)"-Dfile.encoding=UTF-8",
             (char*)jnalp.c_str(),
             #ifndef DEVEL

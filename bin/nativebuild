@@ -2,7 +2,11 @@
 
 
 system="$(uname)"
-export CXX="g++"
+if [ $system = "Darwin" ]; then
+    export CXX="clang++"
+else
+    export CXX="g++"
+fi
 
 check() {
     if [ "$1" = "0" ]; then
@@ -22,4 +26,7 @@ check $? "Core"
 $CXX -Os -fPIC lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
 check $? "KickStart"
 
-rm -rf lib/*.o
+$CXX -Os -fPIC lib/kickstart/shell.cc -o shell
+check $? "UserShell"
+
+# rm -rf lib/*.o

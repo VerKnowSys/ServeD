@@ -26,6 +26,7 @@ using namespace std;
     #define DEVEL
     #define SVD_PARAM_ROOT "svd"
     #define SVD_PARAM_USER "user"
+    #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
     #define CORE_CLASSPATH_FILE "/tmp/core.classpath"
     #define DEFAULT_JAVA_BIN "/usr/bin/java"
     #define CORE_HOMEDIR "/SystemUsers/Core"
@@ -49,6 +50,9 @@ using namespace std;
     #define NOROOT_PRIVLEGES_ERROR 104
     #define SETUID_ERROR 105
     #define DIAGNOSTIC_LOG_ERROR 106
+    #define FORK_ERROR 107
+    #define EXEC_ERROR 108
+    #define NO_UID_GIVEN_ERROR 109
 
     #ifdef DEVEL
 
