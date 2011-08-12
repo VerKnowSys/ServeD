@@ -15,7 +15,6 @@ case class SvdAccount (
         userName: String = "guest",
         pass: String = "",
         uid: Int,
-        gid: Int,
         information: String = "",
         shell: String = "",
         uuid: UUID = randomUUID
@@ -67,20 +66,6 @@ case class SvdUserUID(
         uuid: UUID = randomUUID
     ) extends Persistent {
         override def toString = "SvdUSerUID(" + number + ")"
-    }
-
-
-/**
- *  @author dmilith
- *
- *   SvdGID stores system gid and human readable name related to it
- */
-case class SvdUserGID(
-        number: Int,
-        name: String = "",
-        uuid: UUID = randomUUID
-    ) extends Persistent {
-        override def toString = "SvdUSerGID(" + number + ")"
     }
 
 
