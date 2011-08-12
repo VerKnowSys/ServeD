@@ -80,6 +80,10 @@ public class SvdShellFactory implements Factory<Command> {
             builder.environment().put("LOGNAME", env.get("USER"));
             builder.environment().put("USER", env.get("USER"));
             builder.environment().put("TERM", "xterm-256color");
+            builder.environment().put("HISTCONTROL", "erasedups");
+            builder.environment().put("HISTFILE", "~/.shell_history");
+            builder.environment().put("HISTSIZE", "8192");
+            builder.environment().put("SAVEHIST", "10000");
             builder.environment().put("LC_CTYPE", "UTF-8");
             builder.environment().put("LSCOLORS", "cxfxcxdxbxegedabagacad");
             builder.environment().put("EDITOR", "/usr/bin/vi");

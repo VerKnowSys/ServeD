@@ -75,8 +75,10 @@ int main(int argc, char const *argv[]) {
                 homeDir << " and chowning it for uid:" <<
                     uid << " and gid: " <<
                         gid << endl;
+            mkdir(homeDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        #else
+            mkdir(homeDir.c_str(), S_IRWXU); /* No rights for others than user - most safe */
         #endif
-        mkdir(homeDir.c_str(), S_IRWXU); /* No rights for others than user - most safe */
         chown(homeDir.c_str(), uid, gid);
     }
 

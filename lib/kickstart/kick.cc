@@ -6,7 +6,7 @@
 
 #include "core.h"
 
-
+extern string currentDir();
 extern void defaultSignalHandler(int sig);
 extern bool fileExists(string strFilename);
 extern void spawnBackgroundTask(string abs_java_bin_path, string main_starting_class_param, string cmdline_param, string lockFileName);
@@ -33,7 +33,7 @@ int main(int argc, char const *argv[]) {
     /* check for home prefix dir */
     if (!fileExists(USERS_HOME_DIR)) {
         cerr << USERS_HOME_DIR << " does not exists. Creating default dir." << endl;
-        mkdir(USERS_HOME_DIR, 0750); /* XXX: hardcoded permissions but it's safe */
+        mkdir(USERS_HOME_DIR, S_IRWXU);
     }
 
     /* check and create home dir if necessary */
@@ -63,11 +63,11 @@ int main(int argc, char const *argv[]) {
     if (!fileExists(homeDir)) {
         cerr << "Directory: " << homeDir << " does not exists. Creating it." << endl;
         #ifdef DEVEL
-                mkdir(homeDir.c_str(), 0755); /* XXX: hardcoded permissions but it's safe */
+                mkdir(homeDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         #else
-                mkdir(homeDir.c_str(), 0711); /* XXX: hardcoded permissions but it's safe */
+                mkdir(homeDir.c_str(), S_IRWXU);
         #endif
-        chown(homeDir.c_str(), atoi(arg.c_str()), 20); /* XXX: hardcoded "staff" group */
+        chown(homeDir.c_str(), atoi(arg.c_str()), DEFAULT_USER_GROUP);
     }
 
     pid_t pid;

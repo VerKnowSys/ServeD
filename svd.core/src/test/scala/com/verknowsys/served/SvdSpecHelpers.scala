@@ -79,6 +79,6 @@ object SvdSpecHelpers {
 
     def waitFor(time: Int) = Thread.sleep(time)
     
-    def currentAccount = SvdAccount(uid = randomPort, gid = randomPort, userName = System.getProperty("user.name"))
+    def currentAccount = SvdAccount(uid = randomPort, userName = System.getProperty("user.name"))
 
 }

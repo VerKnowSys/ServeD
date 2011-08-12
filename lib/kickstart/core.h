@@ -27,9 +27,8 @@ using namespace std;
     #define SVD_PARAM_ROOT "svd"
     #define SVD_PARAM_USER "user"
     #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
-    #define CORE_CLASSPATH_FILE "/tmp/core.classpath"
     #define DEFAULT_JAVA_BIN "/usr/bin/java"
-    #define CORE_HOMEDIR "/SystemUsers/Core"
+    #define CORE_HOMEDIR "/SystemUsers"
     #define USERS_HOME_DIR "/Users/"
     #define LOCK_FILE	"svd-core.lock"
     #define SOCKET_LOCK_FILE "svd-ss.lock"
@@ -57,6 +56,7 @@ using namespace std;
     #ifdef DEVEL
 
         #define MAIN_CLASS "com.verknowsys.served.boot"
+        #define CORE_CLASSPATH_FILE "/tmp/core.classpath"
 
         string getClassPath();
     

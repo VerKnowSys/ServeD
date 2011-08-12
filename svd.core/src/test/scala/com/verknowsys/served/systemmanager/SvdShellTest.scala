@@ -27,8 +27,7 @@ class SvdShellTest extends DefaultTest {
         val sh = new SvdShell(
             new SvdAccount(
                 userName = System.getProperty("user.name"),
-                uid = randomPort,
-                gid = randomPort
+                uid = randomPort
             )
         )
         
@@ -46,8 +45,7 @@ class SvdShellTest extends DefaultTest {
         val sh = new SvdShell(
             new SvdAccount(
                 userName = System.getProperty("user.name"),
-                uid = randomPort,
-                gid = randomPort
+                uid = randomPort
             )
         )
         
@@ -69,8 +67,7 @@ class SvdShellTest extends DefaultTest {
         val sh = new SvdShell(
             new SvdAccount(
                 userName = System.getProperty("user.name"),
-                uid = randomPort,
-                gid = randomPort
+                uid = randomPort
             )
         )
         sh.exec(shr("lsdjf"))
