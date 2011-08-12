@@ -43,41 +43,66 @@ void execute(char **argv) {
 
 int main(int argc, char const *argv[]) {
         
-    char  *arguments[64];
-    string arg, homeDir;
     if (argc == 1) {
         cerr << "No UID argument given!" << endl;
         exit(NO_UID_GIVEN_ERROR);
     }
-    arg = string(argv[1]);
+    
+    string arg = string(argv[1]);
     if (arg == "0") {
         cerr << "Cannot spawn as root!" << endl;
         exit(1);
     }
     
-    homeDir = string(USERS_HOME_DIR) + arg; /* NOTE: /Users/$UID homedir format */
-    #ifdef DEVEL
-        cerr << "Spawning user shell for UID: " << arg << endl;
-    #endif
-
     /* Checking uid validity */
     uid_t uid = atoi(arg.c_str());
-    chdir(homeDir.c_str());
     if (uid == NULL) {
         cerr << "Ambigous uid given!" << endl;
         exit(AMBIGOUS_ENTRY_ERROR);
     }
+    gid_t gid = DEFAULT_USER_GROUP;
+
+    /* Checking home directory existnace */
+    struct stat st;
+    string homeDir = string(USERS_HOME_DIR) + arg; /* NOTE: /Users/$UID homedir format used here */
+    if(stat(homeDir.c_str(), &st) == 0) {
+        #ifdef DEVEL
+            cerr << "Home directory " << homeDir << " is present" << endl;
+        #endif
+    } else {
+        #ifdef DEVEL
+            cerr << "Creating home directory " << 
+                homeDir << " and chowning it for uid:" <<
+                    uid << " and gid: " <<
+                        gid << endl;
+        #endif
+        mkdir(homeDir.c_str(), S_IRWXU); /* No rights for others than user - most safe */
+        chown(homeDir.c_str(), uid, gid);
+    }
+
+    /* setting user uid and gid privileges for shell */
     if (setuid(uid) != 0) {
         cerr << "Error setuid to uid: " << uid << endl;
         exit(SETUID_ERROR);
     }
-
+    if (setgid(gid) != 0) {
+        cerr << "Error setgid to gid: " << gid << endl;
+        exit(SETGID_ERROR);
+    }
+    chdir(homeDir.c_str());
+    
     string command = string(DEFAULT_SHELL_COMMAND) + " -i -s";
     #ifdef DEVEL
-        cerr << "Spawning shell: " << command << endl;
+        cerr << "Spawning command: " << command << ", for uid: " << uid << " and gid: " << gid << endl;
     #endif
     
-    char* cmd = (char*)(command.c_str());
-    parse(cmd, arguments);
+    char *arguments[2];
+    parse((char*)(command.c_str()), arguments);
+    #ifdef DEVEL
+        cout << "Arguments: ";
+        for (int i = 0; arguments[i] != NULL; ++i) 
+            cout << arguments[i] << " ";
+        cout << endl;
+    #endif
     execute(arguments);
 }
