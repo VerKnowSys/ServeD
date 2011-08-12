@@ -23,8 +23,8 @@ class SvdGathererTest extends Specification with TestKit {
     val homeDir1 = randomPath //testPath("home/teamon")
     val homeDir2 = randomPath //testPath("home/dmilith")
     
-    val account1 = new SvdAccount(userName = "teamon", uid = randomPort, gid = randomPort)
-    val account2 = new SvdAccount(userName = "dmilith", uid = randomPort, gid = randomPort)
+    val account1 = new SvdAccount(userName = "teamon", uid = randomPort)
+    val account2 = new SvdAccount(userName = "dmilith", uid = randomPort)
     
     var gather1: ActorRef = null
     var gather2: ActorRef = null

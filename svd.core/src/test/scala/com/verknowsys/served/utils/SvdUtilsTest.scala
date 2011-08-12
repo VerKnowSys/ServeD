@@ -31,12 +31,12 @@ class SvdUtilsTest extends Specification with Logging {
 
     "chown should change owner" in {
         val path = randomPath
-        val account = currentAccount.copy(uid = SvdUtils.getUserUid, gid = SvdConfig.defaultUserGroup)
+        val account = currentAccount.copy(uid = SvdUtils.getUserUid)
         
         FileUtils.touch(path / "dupa007")
-        SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = account.gid) must beTrue
-        SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = account.gid, recursive = true) must beTrue
-        SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = account.gid, recursive = false) must beTrue
+        SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = SvdConfig.defaultUserGroup) must beTrue
+        SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = SvdConfig.defaultUserGroup, recursive = true) must beTrue
+        SvdSystemManagerUtils.chown(path / "dupa007", user = account.uid, group = SvdConfig.defaultUserGroup, recursive = false) must beTrue
         
         try { 
           new File(path / "dupa0078").delete
@@ -46,7 +46,7 @@ class SvdUtilsTest extends Specification with Logging {
         }
         
         try { 
-          SvdSystemManagerUtils.chown(path / "dupa0078", user = account.uid, group = account.gid) must beTrue
+          SvdSystemManagerUtils.chown(path / "dupa0078", user = account.uid, group = SvdConfig.defaultUserGroup) must beTrue
           fail("Chown on non existing folder/ file should throw an exception!")
         } catch {
           case e: Exception =>
