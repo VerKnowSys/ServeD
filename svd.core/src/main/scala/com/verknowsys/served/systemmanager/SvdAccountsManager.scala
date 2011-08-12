@@ -23,7 +23,6 @@ case object SvdAccounts extends DB[SvdAccount]
 case object SvdUserPorts extends DB[SvdUserPort]
 case object SvdSystemPorts extends DB[SvdSystemPort]
 case object SvdUserUIDs extends DB[SvdUserUID]
-case object SvdUserGIDs extends DB[SvdUserGID]
 
 
 class SvdAccountUtils(db: DBClient) {
@@ -75,30 +74,11 @@ class SvdAccountUtils(db: DBClient) {
     /**
      *  @author dmilith
      *
-     *   randomUserGid is a helper function to be used with SvdUserGID in API
-     */
-    def randomUserGid: Int = {
-        val rnd = new Random(System.currentTimeMillis)
-        val gid = SvdPools.userGidPool.start + rnd.nextInt(SvdPools.userGidPool.end - SvdPools.userGidPool.start) 
-        if (!userGIDRegistered(gid)) {
-            gid
-        } else
-            randomUserGid
-    }
-
-
-    /**
-     *  @author dmilith
-     *
      *   registers user UID with given number in svd database
      */
     def registerUserAccount(uid: Int) = {
         registerUserUID(uid)
-        registerUserGID(uid)
-        db << SvdAccount(
-            uid = uid,
-            gid = uid
-        )
+        db << SvdAccount(uid = uid)
     }
 
 
@@ -111,15 +91,6 @@ class SvdAccountUtils(db: DBClient) {
         db << SvdUserUID(number = num)
             
     
-    /**
-     *  @author dmilith
-     *
-     *   registers user GID with given number and name in svd database
-     */
-    def registerUserGID(num: Int) =
-        db << SvdUserGID(number = num)
-
-
     /**
      *  @author dmilith
      *
@@ -173,17 +144,6 @@ class SvdAccountUtils(db: DBClient) {
         else
             true
 
-
-    /**
-     *  @author dmilith
-     *
-     *   returns true if system gid is registered in svd database
-     */
-    def userGIDRegistered(num: Int) =
-        if (SvdUserGIDs(db)(_.number == num).isEmpty)
-            false
-        else
-            true
     
 }
 
@@ -196,7 +156,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     val server = new DBServer(SvdConfig.remoteAccountServerPort, SvdConfig.systemHomeDir / SvdConfig.coreSvdAccountsDatabaseName)
     val db = server.openClient
     
-    val rootAccount = SvdAccount("root", uid = 0, gid = 0) // XXX
+    val rootAccount = SvdAccount("root", uid = 0)
     val svdAccountUtils = new SvdAccountUtils(db)
     import svdAccountUtils._
     
@@ -206,7 +166,6 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     log.debug("User ports registered in Account database: %s".format(SvdUserPorts(db).mkString(", ")))
     log.debug("System ports registered in Account database: %s".format(SvdSystemPorts(db).mkString(", ")))
     log.debug("User uids registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
-    log.debug("User gids registered in Account database: %s".format(SvdUserGIDs(db).mkString(", ")))
 
     
     // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
@@ -228,7 +187,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
                 ))
         }
         // removing also pid file of root core of svd:
-        val corePid = SvdConfig.systemHomeDir / "Core" / "0.pid" // XXX: hardcoded
+        val corePid = SvdConfig.systemHomeDir / "0.pid" // XXX: hardcoded
         log.trace("Cleaning core pid file: %s with content: %s".format(corePid, Source.fromFile(corePid).mkString))
         new SvdShell(rootAccount).exec(new SvdShellOperation("/bin/rm %s".format(corePid))) // XXX: hardcoded
         
