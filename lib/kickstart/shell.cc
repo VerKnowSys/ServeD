@@ -60,8 +60,13 @@ int main(int argc, char const *argv[]) {
         cerr << "Spawning user shell for UID: " << arg << endl;
     #endif
 
+    /* Checking uid validity */
     uid_t uid = atoi(arg.c_str());
     chdir(homeDir.c_str());
+    if (uid == NULL) {
+        cerr << "Ambigous uid given!" << endl;
+        exit(AMBIGOUS_ENTRY_ERROR);
+    }
     if (setuid(uid) != 0) {
         cerr << "Error setuid to uid: " << uid << endl;
         exit(SETUID_ERROR);

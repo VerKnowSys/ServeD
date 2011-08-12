@@ -37,11 +37,9 @@ using namespace std;
     #define INTERNAL_LOG_FILE "svd-diagnostics.log"
     #define SOCK_FILE   "svd.sock"
     #define CORE_SVD_ID "boot"
+    #define DEFAULT_USER_GROUP 0
     #define SOCK_DATA_PACKET_SIZE 32
-
     #define MAXPATHLEN  512
-    #define SETUID_EXCEPTION 251
-    #define POPEN_EXCEPTION 252
 
     #define LOCK_FILE_OCCUPIED_ERROR 100
     #define CANNOT_LOCK_ERROR 101
@@ -49,10 +47,12 @@ using namespace std;
     #define CLASSPATH_DIR_MISSING_ERROR 103
     #define NOROOT_PRIVLEGES_ERROR 104
     #define SETUID_ERROR 105
-    #define DIAGNOSTIC_LOG_ERROR 106
+    #define SETGID_ERROR 106
     #define FORK_ERROR 107
     #define EXEC_ERROR 108
     #define NO_UID_GIVEN_ERROR 109
+    #define DIAGNOSTIC_LOG_ERROR 110
+    #define AMBIGOUS_ENTRY_ERROR 111
 
     #ifdef DEVEL
 
