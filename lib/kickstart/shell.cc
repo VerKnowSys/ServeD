@@ -9,6 +9,10 @@
 
 #include "core.h"
 
+#ifdef __FreeBSD__
+#include <sys/wait.h>
+#endif
+
 
 void parse(char *line, char **argv) {
     while (*line != '\0') {
