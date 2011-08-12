@@ -31,4 +31,4 @@ case object GetNetstat
 case class SpawnProcess(cmd: String)
 case class Kill(what: Int, signal: Any)
 case class Chmod(what: String, mode: Int, recursive: Boolean)
-case class Chown(what: String, userId: Int, groupId: Int, recursive: Boolean)
+case class Chown(what: String, userId: Int, recursive: Boolean)
