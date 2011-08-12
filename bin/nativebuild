@@ -17,6 +17,13 @@ check() {
     fi
 }
 
+$CXX -Os -fPIC lib/kickstart/shell.cc -o shell
+check $? "UserShell"
+
+if [ "$1" = "sh" ]; then
+    exit
+fi
+
 $CXX -Os -c -fPIC lib/kickstart/utils.cc -o lib/utils.o
 check $? "Utils"
 
@@ -25,8 +32,5 @@ check $? "Core"
 
 $CXX -Os -fPIC lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
 check $? "KickStart"
-
-$CXX -Os -fPIC lib/kickstart/shell.cc -o shell
-check $? "UserShell"
 
 # rm -rf lib/*.o
