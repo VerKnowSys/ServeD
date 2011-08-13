@@ -51,8 +51,10 @@ class SvdSystemManager extends SvdExceptionHandler {
             // self reply ProcessesList(psAll)
         
         case GetNetstat =>
-            SvdLowLevelSystemAccess.netstat.stat(SvdLowLevelSystemAccess.core)
-            log.warn("Network usage (bytes): IN: %s, OUT: %s".format(SvdLowLevelSystemAccess.netstat.getTcpInboundTotal, SvdLowLevelSystemAccess.netstat.getTcpOutboundTotal))
+            // XXX: NOTE: TODO: this function causes SIGSEGV on FreeBSD. This requires some investigation!
+            
+            // SvdLowLevelSystemAccess.netstat.stat(SvdLowLevelSystemAccess.core)
+            // log.warn("Network usage (bytes): IN: %s, OUT: %s".format(SvdLowLevelSystemAccess.netstat.getTcpInboundTotal, SvdLowLevelSystemAccess.netstat.getTcpOutboundTotal)) 
             // self reply Success
             
         case Quit =>
