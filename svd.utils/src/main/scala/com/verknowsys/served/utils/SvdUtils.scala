@@ -68,6 +68,17 @@ object SvdUtils extends Logging {
      */
     def newUuid = UUID.randomUUID
     
+
+    /**
+     *  @author dmilith
+     *
+     *   Returns uid owner of given file/dir
+     */
+     def getOwner(path: String) = {
+        import CStat._
+        CStat.instance.getOwner(path)
+     }
+     
     
     /**
      *  @author dmilith

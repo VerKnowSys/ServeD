@@ -125,17 +125,6 @@ object SvdLowLevelSystemAccess extends Logging {
     /**
      *  @author dmilith
      *
-     *   Returns uid owner of given file/dir
-     */
-     def getOwner(path: String): Int = {
-        import CStat._
-        CStat.instance.getOwner(path)
-     }
-     
-
-    /**
-     *  @author dmilith
-     *
      *   Returns system load
      */
     def getSystemLoad = core.getLoadAverage
