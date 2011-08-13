@@ -32,7 +32,7 @@ if [ "$system" = "Darwin" ]; then
     $CXX -Os -arch i386 -arch x86_64 -fPIC -shared lib/kickstart/stat.cc -o lib/libstat.dylib
 else
     echo "Skipping build for $system"
-    # $CXX -Os -m32 -fPIC -shared lib/kickstart/stat.cc -o lib/libstat.so
+    # $CXX -Os -fPIC -shared lib/kickstart/stat.cc -o lib/libstat.so
 fi
 check $? "StatLib"
 

@@ -29,7 +29,11 @@ using namespace std;
     #define SVD_PARAM_ROOT "svd"
     #define SVD_PARAM_USER "user"
     #define MOTD_FILE "/etc/motd"
-    #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
+    #ifdef __FreeBSD__
+        #define DEFAULT_SHELL_COMMAND "/Software/Zsh-4.3.10/bin/zsh"
+    #else
+        #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
+    #endif
     #define DEFAULT_JAVA_BIN "/usr/bin/java"
     #define CORE_HOMEDIR "/SystemUsers"
     #define USERS_HOME_DIR "/Users/"
