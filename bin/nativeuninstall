@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ "$(id -u)" != "0" ]; then
+    echo "Native Uninstaller requires root privileges to run!"
+    exit 1
+fi
+
+system="$(uname)"
+
+if [ -e "/sbin/kick" ]; then
+    echo "* Uninstalling svdkick"
+    rm -f /sbin/svdkick
+fi
+
+if [ -e "/bin/svdshell" ]; then
+    echo "* Uninstalling svdshell"
+    rm -f /bin/svdshell
+fi
+
+echo "Done"

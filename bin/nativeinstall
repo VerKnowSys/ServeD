@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ "$(id -u)" != "0" ]; then
+    echo "Native Installer requires root privileges to run!"
+    exit 1
+fi
+
+system="$(uname)"
+
+if [ -e "kick" ]; then
+    echo "* Installing svdkick to /sbin"
+    cp -f ./kick /sbin/svdkick
+fi
+
+if [ -e "shell" ]; then
+    echo "* Installing svdshell to /bin"
+    cp -f ./shell /bin/svdshell
+fi
+
+echo "Done"
