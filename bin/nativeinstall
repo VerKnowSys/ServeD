@@ -16,5 +16,3 @@ if [ -e "shell" ]; then
     echo "* Installing svdshell to /bin"
     cp -f ./shell /bin/svdshell
 fi
-
-echo "Done"

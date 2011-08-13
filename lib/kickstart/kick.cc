@@ -14,6 +14,8 @@ extern void spawnBackgroundTask(string abs_java_bin_path, string main_starting_c
 
 int main(int argc, char const *argv[]) {
     
+    cout << endl << "ServeD KickStart v" << APP_VERSION << " - " << COPYRIGHT << endl;
+        
     signal(SIGINT, defaultSignalHandler);
     signal(SIGQUIT, defaultSignalHandler);
     signal(SIGTERM, defaultSignalHandler);
@@ -78,9 +80,6 @@ int main(int argc, char const *argv[]) {
     ifs.close();
     
     chdir(homeDir.c_str());
-    #ifdef DEVEL
-        cerr << "Starting UserSpawn for uid: " << uid << " in homeDir: " << homeDir << endl;
-    #endif
     
     if (uid == 0) {
         spawnBackgroundTask(DEFAULT_JAVA_BIN, SVD_PARAM_ROOT, string(CORE_SVD_ID), lockName);

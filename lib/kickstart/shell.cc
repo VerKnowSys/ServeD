@@ -42,7 +42,9 @@ void execute(char **argv) {
 
 
 int main(int argc, char const *argv[]) {
-        
+    
+    cout << endl << "ServeD Shell v" << APP_VERSION << " - " << COPYRIGHT << endl;
+    
     if (argc == 1) {
         cerr << "No UID argument given!" << endl;
         exit(NO_UID_GIVEN_ERROR);
@@ -51,7 +53,7 @@ int main(int argc, char const *argv[]) {
     string arg = string(argv[1]);
     if (arg == "0") {
         cerr << "Cannot spawn as root!" << endl;
-        exit(1);
+        exit(ROOT_UID_ERROR);
     }
     
     /* Checking uid validity */

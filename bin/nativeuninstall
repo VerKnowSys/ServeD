@@ -16,5 +16,3 @@ if [ -e "/bin/svdshell" ]; then
     echo "* Uninstalling svdshell"
     rm -f /bin/svdshell
 fi
-
-echo "Done"

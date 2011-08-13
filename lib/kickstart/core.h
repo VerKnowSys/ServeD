@@ -24,6 +24,8 @@ using namespace std;
 #define __CORE__
 
     #define DEVEL
+    #define APP_VERSION "1.0"
+    #define COPYRIGHT "Copyright © 2oo9-2o11 VerKnowSys.com - All Rights Reserved."
     #define SVD_PARAM_ROOT "svd"
     #define SVD_PARAM_USER "user"
     #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
@@ -52,6 +54,7 @@ using namespace std;
     #define NO_UID_GIVEN_ERROR 109
     #define DIAGNOSTIC_LOG_ERROR 110
     #define AMBIGOUS_ENTRY_ERROR 111
+    #define ROOT_UID_ERROR 112
 
     #ifdef DEVEL
 

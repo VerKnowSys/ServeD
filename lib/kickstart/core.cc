@@ -87,7 +87,7 @@ const static string coreDir = currentDir();
 
     	setsid(); /* obtain a new process group */
     	#ifdef DEVEL
-            cerr << "Session active. Continuing in background task" << endl;
+            cerr << "Booting ServeD" << endl;
         #endif
 
         string logFileName = cmdline_param + "-" + string(INTERNAL_LOG_FILE);
@@ -103,7 +103,7 @@ const static string coreDir = currentDir();
             chdir(homeDir.c_str());
     	}
 
-    	lfp = open(lockFileName.c_str(), O_RDWR | O_CREAT, 0640);
+    	lfp = open(lockFileName.c_str(), O_RDWR | O_CREAT, 0600);
     	if (lfp < 0) {
             cerr << "Lock file occupied. Cannot open." << endl;
     	    exit(LOCK_FILE_OCCUPIED_ERROR); /* can not open */
