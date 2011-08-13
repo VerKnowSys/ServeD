@@ -294,6 +294,24 @@ object SvdUtils extends Logging {
         else
             Array()
     }
+    
+    
+    /**
+     *  @author dmilith
+     *
+     *   List of directories from given location
+     */
+    def listDirectories(location: String) =
+        (new File(location)).listFiles.filter(_.isDirectory)
+
+
+    /**
+     *  @author dmilith
+     *
+     *   List of files from given location
+     */
+    def listFiles(location: String) =
+        (new File(location)).listFiles.filterNot(_.isDirectory)
 
     
     /**
