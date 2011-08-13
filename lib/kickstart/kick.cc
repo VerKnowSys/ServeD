@@ -14,7 +14,7 @@ extern void spawnBackgroundTask(string abs_java_bin_path, string main_starting_c
 
 int main(int argc, char const *argv[]) {
     
-    cout << endl << "ServeD KickStart v" << APP_VERSION << " - " << COPYRIGHT << endl;
+    cout << "ServeD KickStart v" << APP_VERSION << " - " << COPYRIGHT << endl;
         
     signal(SIGINT, defaultSignalHandler);
     signal(SIGQUIT, defaultSignalHandler);

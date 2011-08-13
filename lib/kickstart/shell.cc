@@ -43,8 +43,16 @@ void execute(char **argv) {
 
 int main(int argc, char const *argv[]) {
     
-    cout << endl << "ServeD Shell v" << APP_VERSION << " - " << COPYRIGHT << endl;
+    cout << "ServeD Shell v" << APP_VERSION << " - " << COPYRIGHT << endl;
     
+    /* Print motd */
+    ifstream t(MOTD_FILE);
+    stringstream buffer;
+    buffer << t.rdbuf();
+    if (buffer.str() != "") {
+        cout << endl << buffer.str() << endl;
+    }
+
     if (argc == 1) {
         cerr << "No UID argument given!" << endl;
         exit(NO_UID_GIVEN_ERROR);

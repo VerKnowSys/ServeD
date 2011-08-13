@@ -28,6 +28,7 @@ using namespace std;
     #define COPYRIGHT "Copyright © 2oo9-2o11 VerKnowSys.com - All Rights Reserved."
     #define SVD_PARAM_ROOT "svd"
     #define SVD_PARAM_USER "user"
+    #define MOTD_FILE "/etc/motd"
     #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
     #define DEFAULT_JAVA_BIN "/usr/bin/java"
     #define CORE_HOMEDIR "/SystemUsers"
