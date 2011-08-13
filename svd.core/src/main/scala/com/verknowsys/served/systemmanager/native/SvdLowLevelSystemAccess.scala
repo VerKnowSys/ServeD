@@ -121,6 +121,17 @@ object SvdLowLevelSystemAccess extends Logging {
     def getProcCredName(pid: Long) = core.getProcCredName(pid)
     def getProcCred(pid: Long) = core.getProcCred(pid)
     
+    
+    /**
+     *  @author dmilith
+     *
+     *   Returns uid owner of given file/dir
+     */
+     def getOwner(path: String): Int = {
+        import CStat._
+        CStat.instance.getOwner(path)
+     }
+     
 
     /**
      *  @author dmilith
