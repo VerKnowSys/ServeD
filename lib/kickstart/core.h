@@ -66,4 +66,10 @@ using namespace std;
     
     #endif
 
+    extern "C" {
+
+        int getOwner(char* path);
+        
+    }
+        
 #endif

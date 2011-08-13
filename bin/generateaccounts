@@ -1,0 +1,7 @@
+#!/bin/sh
+
+pwd=$(pwd)
+jar="${pwd}/svd.core/target/scala_2.9.0/core_2.9.0-1.0-onejar.jar"
+
+echo "Executing: ${jar}"
+java -d32 -XX:MaxPermSize=512M -XX:+UseParallelGC -Xms64m -Xmx768m -Dfile.encoding=UTF-8 -noverify -client -Djna.library.path=$(pwd)/lib -Djava.library.path=$(pwd)/lib -cp "$(cat tmp/core.classpath)" com.verknowsys.served.SvdAccountCollector
