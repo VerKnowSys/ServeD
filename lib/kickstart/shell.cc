@@ -87,7 +87,7 @@ int main(int argc, char const *argv[]) {
                         gid << endl;
             mkdir(homeDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         #else
-            mkdir(homeDir.c_str(), S_IRWXU); /* No rights for others than user - most safe */
+            mkdir(homeDir.c_str(), S_IRWXU | S_IXOTH); /* No rights for others than user - most safe */
         #endif
         chown(homeDir.c_str(), uid, gid);
     }

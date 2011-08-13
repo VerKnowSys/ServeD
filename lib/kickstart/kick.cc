@@ -35,7 +35,7 @@ int main(int argc, char const *argv[]) {
     /* check for home prefix dir */
     if (!fileExists(USERS_HOME_DIR)) {
         cerr << USERS_HOME_DIR << " does not exists. Creating default dir." << endl;
-        mkdir(USERS_HOME_DIR, S_IRWXU);
+        mkdir(USERS_HOME_DIR, S_IRWXU | S_IXOTH); /* NOTE: everyone must have access to execute home dir! */
     }
 
     /* check and create home dir if necessary */
