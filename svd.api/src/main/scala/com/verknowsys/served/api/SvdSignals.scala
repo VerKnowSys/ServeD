@@ -10,6 +10,7 @@ package com.verknowsys.served.api
  */
 
 case object Init
+case object Install
 case object Run
 case object Quit
 case object Ready
