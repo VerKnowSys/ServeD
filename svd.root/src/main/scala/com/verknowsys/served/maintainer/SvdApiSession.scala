@@ -4,14 +4,13 @@ import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.{remote, actorOf, registry}
 import akka.routing.Dispatcher
 
-import com.verknowsys.served.utils.Logging
-import com.verknowsys.served.utils.SvdExceptionHandler
 import com.verknowsys.served.api._
-import com.verknowsys.served.systemmanager._
-import com.verknowsys.served.systemmanager.managers._
+import com.verknowsys.served.utils._
+import com.verknowsys.served.managers._
 
 
-class SvdApiSession extends Actor with SvdExceptionHandler {
+
+class SvdApiSession extends SvdManager {
     log.info("Starting new API session")
 
     private var manager: Option[ActorRef] = None // XXX: Var
@@ -23,7 +22,7 @@ class SvdApiSession extends Actor with SvdExceptionHandler {
         case General.Connect(userUid) =>
             log.trace("Remote client trying to connect with UID: %s", userUid)
 
-            (registry.actorFor[SvdAccountsManager] flatMap (_ !! GetAccountManager(userUid))) match {
+            (SvdAccountsManager !! GetAccountManager(userUid)) match {
                 case Some(m: ActorRef) =>
                     manager = Some(m)
                     become(dispatch)

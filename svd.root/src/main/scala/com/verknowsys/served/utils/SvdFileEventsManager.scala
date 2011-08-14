@@ -3,10 +3,10 @@ package com.verknowsys.served.utils
 
 import com.verknowsys.served.api._
 
-import com.sun.jna.NativeLong
 import scala.collection.mutable.{HashMap => MutableMap, ListBuffer}
 import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.actorOf
+import com.sun.jna.NativeLong
 import com.sun.jna.{Native, Library}
 import events._
 
@@ -20,7 +20,7 @@ object events {
     class SvdKqueueException extends Exception
     class SvdKeventException extends Exception
     class SvdFileOpenException extends Exception
-    
+
     final val Modified          = CLibrary.NOTE_WRITE | CLibrary.NOTE_EXTEND
     final val Deleted           = CLibrary.NOTE_DELETE
     final val Renamed           = CLibrary.NOTE_RENAME
@@ -28,15 +28,15 @@ object events {
 }
 
 
-/** 
+/**
  * Include this trait in your actor to use file events
- * 
+ *
  * {{{
- * class MyActor extends Actor with FileEventsReactor {    
+ * class MyActor extends Actor with FileEventsReactor {
  *     def receive = {
  *         case FileEvent(path, flags) => // handle event ...
  *     }
- * 
+ *
  *     override def preStart {
  *         registerFileEventFor("/path/to/file", Modified)
  *     }
@@ -48,10 +48,10 @@ object events {
  *     override def postStop {
  *         super.postStop // Must put this line to unregistr events on stop
  *     }
- * 
- * } 
- * }}} 
- * 
+ *
+ * }
+ * }}}
+ *
  * @author teamon
  */
 trait SvdFileEventsReactor extends SvdExceptionHandler {
@@ -63,7 +63,7 @@ trait SvdFileEventsReactor extends SvdExceptionHandler {
             case None => log.warn("Could not register file event. FileEventsManager worker not found.")
         }
     }
-    
+
     def unregisterFileEvents {
         Actor.registry.actorFor[SvdFileEventsManager] match {
             case Some(fem) => fem ! SvdUnregisterFileEvent(this.self)
@@ -71,25 +71,25 @@ trait SvdFileEventsReactor extends SvdExceptionHandler {
         }
         super.postStop // 2011-01-30 01:06:54 - dmilith - NOTE: execute SvdExceptionHandler's code
     }
-    
+
     override def preRestart(reason: Throwable) = unregisterFileEvents
     override def postStop = unregisterFileEvents
 }
 
 
 
-/** 
+/**
  * Main file events manager actor
- * 
+ *
  * For internal use only. Start it using {{{ actorOf[SvdFileEventsManager] }}}
- * 
+ *
  * @author teamon
  */
 class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
     import CLibrary._
-    
+
     log.info("SvdFileEventsManager is loading")
-    
+
     protected val clib = CLibrary.instance
     protected lazy val kq = {
         val k = clib.kqueue() // NOTE: C call
@@ -100,16 +100,16 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
     type ActorRefList = ListBuffer[(Int, ActorRef)]
     type IdentsMap = MutableMap[Int, (String, ActorRefList)]
 
-    /** 
-     * Mutable map holding [file descriptor => (path, list of (flags, actor ref))] 
-     * 
+    /**
+     * Mutable map holding [file descriptor => (path, list of (flags, actor ref))]
+     *
      * @author teamon
      */
     protected val idents = new IdentsMap
-        
-    /** 
-     * BSD kqueue events reader thread 
-     * 
+
+    /**
+     * BSD kqueue events reader thread
+     *
      * @author teamon
      */
     protected lazy val readerThread = SvdUtils.loopThread {
@@ -124,20 +124,20 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
             }
         }
     }
-    
+
     override def preStart {
         readerThread.start
     }
-    
+
     override def preRestart(reason: Throwable) {
         readerThread.kill
     }
-    
+
     override def postStop {
         readerThread.kill
     }
 
-    
+
     def receive = {
         // register new file event, sent from any actor
         case SvdRegisterFileEvent(path, flags, ref) =>
@@ -145,11 +145,11 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
                 case Some((_, (p, list))) => list += ((flags, ref))
                 case None => registerNewFileEvent(path, flags, ref)
             }
-            
+
             log.trace("Registered new file event: %s / %s for %s", path, flags, ref)
             log.trace("Registered file events: %s", idents)
             self reply Success
-            
+
         case SvdUnregisterFileEvent(ref) =>
             idents.foreach { case ((ident, (path, list))) =>
                 list filter { case ((flags, actor)) => actor == ref } foreach { list -= _ }
@@ -157,40 +157,40 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
                     idents -= ident
                 }
             }
-            
+
             log.trace("Unregistered file events for %s", ref)
             log.trace("Registered file events: %s", idents)
             // self reply Success
 
         // Forward event sent by kqueue to file watchers
-        case SvdKqueueFileEvent(ident, flags) => 
+        case SvdKqueueFileEvent(ident, flags) =>
             log.trace("New kqueue file event. flags: %x", flags)
-        
-            idents.get(ident.intValue).foreach { 
+
+            idents.get(ident.intValue).foreach {
                 case (path, list) => list collect {
                     case ((fl, ref)) if (fl & flags) > 0 => ref ! SvdFileEvent(path, flags)
                 }
             }
-        
+
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
 
     }
-    
-    
+
+
     protected def registerNewFileEvent(path: String, flags: Int, ref: ActorRef): Unit = synchronized {
         val ident = clib.open(path, O_RDONLY)
         if(ident == -1){
             throw new SvdFileOpenException
         }
-        
+
         val event = new kevent(new NativeLong(ident),
                     (EVFILT_VNODE).toShort,
                     (EV_ADD | EV_ENABLE | EV_CLEAR).toShort,
                     flags,
                     new NativeLong(),
                     null)
-        
+
         val nev = clib.kevent(kq, event, 1, null, 0, null)
         if(nev == -1){
             registerNewFileEvent(path, flags, ref) // XXX: try again, not really safe

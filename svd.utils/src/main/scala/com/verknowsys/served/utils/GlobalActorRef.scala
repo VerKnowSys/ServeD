@@ -11,9 +11,22 @@ import akka.actor.ActorRef
  *
  * @author teamon
  */
-abstract class GlobalActorRef(actorFun: => Option[ActorRef]) {
+abstract class GlobalActorRef(actorFun: => ActorRef) {
     lazy val actor = actorFun
 
-    def !(message: Any)(implicit sender: Option[ActorRef] = None) = actor.foreach(_ ! message)
-    def !!(message: Any)(implicit sender: Option[ActorRef] = None) = actor.flatMap(_ !! message)
+    def apply() = actor
+
+    // HACK: This should be donw with implicit conversion
+    def !(message: Any)(implicit sender: Option[ActorRef] = None) = actor ! message
+    def !!(message: Any)(implicit sender: Option[ActorRef] = None) = actor !! message
 }
+
+abstract class OptionalGlobalActorRef(actorFun: => Option[ActorRef]) {
+    lazy val actor = actorFun
+
+    def apply() = actor
+
+    def !(message: Any)(implicit sender: Option[ActorRef] = None) = actor.foreach { _ ! message }
+    def !!(message: Any)(implicit sender: Option[ActorRef] = None) = actor.foreach { _ !! message }
+}
+

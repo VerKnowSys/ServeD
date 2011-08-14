@@ -101,14 +101,18 @@ object ServeD extends Build {
     import Dependencies._
 
     lazy val served = Project("ServeD", file("."), settings = buildSettings) aggregate(
-        api, cli, utils, web, testing
+        api, cli, utils, web, testing, root, user
     )
 
-    lazy val root = Project("root", file("svd.root"), settings = buildSettings) dependsOn(common)
+    lazy val root = Project("root", file("svd.root"),
+        settings = buildSettings ++ Seq(
+            libraryDependencies ++= Seq(h2, expect4j, sshd)
+        )
+    ) dependsOn(common)
 
     lazy val user = Project("user", file("svd.user"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(jgit)
+            libraryDependencies ++= Seq(jgit, smack)
         )
     ) dependsOn(common)
 

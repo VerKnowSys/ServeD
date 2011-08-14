@@ -2,7 +2,10 @@ package com.verknowsys.served.managers
 
 import com.verknowsys.served.api.{Success, Logger}
 import com.verknowsys.served.utils.LoggingMachine
+import com.verknowsys.served.utils.GlobalActorRef
+import akka.actor.Actor.actorOf
 
+object LoggingManager extends GlobalActorRef(actorOf[LoggingManager])
 
 class LoggingManager(val loggingMachine: LoggingMachine) extends SvdManager {
     log.info("Starting LoggingManager")

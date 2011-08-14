@@ -22,7 +22,6 @@ case object SvdUserPorts extends DB[SvdUserPort]
 case object SvdSystemPorts extends DB[SvdSystemPort]
 case object SvdUserUIDs extends DB[SvdUserUID]
 
-
 class SvdAccountUtils(db: DBClient) {
     /**
      *  @author dmilith
@@ -145,7 +144,7 @@ class SvdAccountUtils(db: DBClient) {
 
 }
 
-object SvdAccountsManager extends GlobalActorRef(Actor.registry.actorFor[SvdAccountsManager])
+object SvdAccountsManager extends GlobalActorRef(actorOf[SvdAccountsManager])
 
 class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 

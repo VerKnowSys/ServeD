@@ -14,7 +14,7 @@ package object utils {
      * @author teamon
      */
     implicit def StringToFile(s: String) = new File(s)
-    
+
     /**
      * Join two paths into one
      *
@@ -40,10 +40,10 @@ package object utils {
             }
         }
     }
-    
+
     /**
      * Replace string usign key-value
-     * 
+     *
      * {{{
      *    scala> "foo %{bar} and %{baz}" % ("bar" -> "xxx", "baz" -> "blah")
      *    res0: String = foo xxx and blah
@@ -53,15 +53,15 @@ package object utils {
      */
     implicit def repl4str(s: String) = new {
         def %(args: Any*) = args.foldLeft(s){ case (s, a) => a match {
-            case (key, value) => s.replace("%{" + key + "}", value.toString) 
+            case (key, value) => s.replace("%{" + key + "}", value.toString)
             case value => s.replaceFirst("%", value.toString)
         } }
     }
-    
+
     /**
      * Executes given call-by-name and returns Some(val)
      * In case of any exception returns None
-     * 
+     *
      * @author teamon
      */
     def catchException[T](f: => T): Option[T] = try {
@@ -69,6 +69,7 @@ package object utils {
     } catch {
         case _ => None
     }
-    
-    
+
+    implicit def GlobalActorRef2ActorRef(global: GlobalActorRef) = global.actor
+
 }
