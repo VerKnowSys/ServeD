@@ -1,9 +1,14 @@
 package com.verknowsys.served
 
 
+import java.io.File
 import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.api.SvdAccount
+import com.verknowsys.served.api.{SvdAccount, SvdShellOperation}
+import com.verknowsys.served.systemmanager.native.SvdShell
+import com.verknowsys.served.systemmanager.SvdSystemManagerUtils
+
+import org.apache.commons.io.FileUtils
 
 
 /**
@@ -43,9 +48,24 @@ object SvdAccountCollector extends Logging {
                 
                 log.info("Processing account folder: %s. Owned by uid: %s".format(element, owner))
                 val account = new SvdAccount(uid = owner, userName = userName)
-                if (SvdAccounts(db)(_.uid == owner).isEmpty)
+                if (SvdAccounts(db)(_.uid == owner).isEmpty) {
                     db << account
-                else
+                    
+                    val homeDir = SvdConfig.userHomeDir / "%s".format(account.uid)
+                    val hdFile = new File(homeDir)
+                    if (!hdFile.exists) {
+                        log.trace("Creating %s".format(homeDir))
+                        hdFile.mkdir
+                    }
+                    log.debug("Performing copy of user files from: %s to %s".format(element, homeDir))
+                    try {
+                        FileUtils.copyDirectory(element, homeDir)
+                    } catch {
+                        case x: java.io.FileNotFoundException =>
+                            log.warn("Problem: %s".format(x))
+                    }
+                    SvdSystemManagerUtils.chown(homeDir, owner, SvdConfig.defaultUserGroup, true)
+                } else
                     log.warn("Account already imported: %s. Skipping.".format(account))
         }
         
