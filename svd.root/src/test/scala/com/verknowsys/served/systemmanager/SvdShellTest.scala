@@ -1,4 +1,4 @@
-package com.verknowsys.served.systemmanager.native
+package com.verknowsys.served.systemmanager
 
 
 import com.verknowsys.served.testing._
@@ -21,8 +21,8 @@ class SvdShellTest extends DefaultTest {
 
 
     def shr(op: String, env: String = "", expectStdOut: List[String] = Nil, expectStdErr: List[String] = Nil, waitForOutputFor: Int = 5) = SvdShellOperation(op, env, expectStdOut, expectStdErr, waitForOutputFor)
-    
-    
+
+
     it should "spawn command properly and know when it's dead and throw proper exception when shell is dead" in {
         val sh = new SvdShell(
             new SvdAccount(
@@ -30,39 +30,39 @@ class SvdShellTest extends DefaultTest {
                 uid = randomPort
             )
         )
-        
+
         sh.exec(shr(""))
         sh.dead should be(false)
         sh.close
         sh.dead should be(true)
         evaluating { sh.exec(shr("")) } should produce [SvdShellException]
     }
-    
-    
+
+
     it should "get proper output from shell" in {
         import expectj.TimeoutException
-        
+
         val sh = new SvdShell(
             new SvdAccount(
                 userName = System.getProperty("user.name"),
                 uid = randomPort
             )
         )
-        
+
         sh.exec(shr("ls -m /dev", expectStdOut = List("null", "zero"), waitForOutputFor = 2))
-        
+
         evaluating {
             sh.exec(shr("ls -m /dev", expectStdOut = List("somethingNonExistant"), waitForOutputFor = 1))
         } should produce [TimeoutException]
-        
+
         evaluating {
             sh.exec(shr("ls -m /dev", expectStdErr = List("somethingNonExistant"), waitForOutputFor = 1))
         } should produce [TimeoutException]
-        
+
         sh.close
     }
-    
-    
+
+
     it should "be able to get return code from ran processes" in {
         val sh = new SvdShell(
             new SvdAccount(

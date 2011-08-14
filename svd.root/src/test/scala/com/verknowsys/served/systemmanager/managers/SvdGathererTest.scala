@@ -2,7 +2,6 @@ package com.verknowsys.served.systemmanager.managers
 
 
 import com.verknowsys.served.systemmanager.native._
-import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.utils._
@@ -22,14 +21,14 @@ class SvdGathererTest extends Specification with TestKit {
 
     val homeDir1 = randomPath //testPath("home/teamon")
     val homeDir2 = randomPath //testPath("home/dmilith")
-    
+
     val account1 = new SvdAccount(userName = "teamon", uid = randomPort)
     val account2 = new SvdAccount(userName = "dmilith", uid = randomPort)
-    
+
     var gather1: ActorRef = null
     var gather2: ActorRef = null
-    
-    
+
+
     "SvdGatherer" should {
         doBefore {
             gather1 = actorOf(new SvdGatherer(account1)).start
@@ -37,57 +36,57 @@ class SvdGathererTest extends Specification with TestKit {
             mkdir(homeDir1)
             mkdir(homeDir2)
         }
-        
+
         doAfter {
             registry.shutdownAll
             rmdir(homeDir1)
             rmdir(homeDir2)
         }
-        
+
         "create more than one instance of SvdGatherer" in {
             gather1 ! "Test signal 1"
             expectMsg(Nil)
-            
+
             gather2 ! "Test signal 2"
             expectMsg(Nil)
         }
- 
+
         "Calendar should give correct values" in {
             val calendar0 = new GregorianCalendar(0,0,0,0,0,0)
             calendar0.get(Calendar.HOUR) must beEqual(0)
             calendar0.get(Calendar.MINUTE) must beEqual(0)
             calendar0.get(Calendar.SECOND) must beEqual(0)
-            
+
             val calendar1 = new GregorianCalendar(0,0,0,0,0,0)
             calendar1.set(Calendar.SECOND, 3666)
             calendar1.get(Calendar.HOUR) must beEqual(1)
             calendar1.get(Calendar.MINUTE) must beEqual(1)
             calendar1.get(Calendar.SECOND) must beEqual(6)
-            
+
             val calendar2 = new GregorianCalendar(0,0,0,0,0,0)
             calendar2.set(Calendar.SECOND, 3667)
             calendar2.get(Calendar.HOUR) must beEqual(1)
             calendar2.get(Calendar.MINUTE) must beEqual(1)
             calendar2.get(Calendar.SECOND) must beEqual(7)
         }
-        
+
         "SvdUtils.secondsToHMS() should give correct values" in {
             val matcher = SvdUtils.secondsToHMS(3666)
             matcher must beMatching("01h:01m:06s")
             val matcher2 = SvdUtils.secondsToHMS(3667L.toInt)
             matcher2 must beMatching("01h:01m:07s")
         }
-        
+
         // "we should be able to check when it's worth to compress String" in {
         //     val in = new BufferedReader(new FileReader("/dev/urandom"))
-        //     
+        //
         //     val str = new StringBuilder("")
         //     println(SvdUtils.bench {
         //         for (i <- 1.to(150)) {
         //             str.append(in.read)
-        //         }    
+        //         }
         //     })
-        //     
+        //
         //     val chpoint = str.toString
         //     // println("str: %s".format(chpoint))
         //     val chplen = chpoint.length
