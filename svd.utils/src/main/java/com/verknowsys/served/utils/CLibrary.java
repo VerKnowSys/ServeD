@@ -2,11 +2,13 @@ package com.verknowsys.served.utils;
 
 import com.sun.jna.*;
 
+
 /**
- * clib wrapper for kqueue
+ *  @author teamon, dmilith
  *
- * @author teamon 
- */
+ *   Interfaces and libraries to low level access to posix system functions
+ */ 
+
 public interface CLibrary extends Library {
     public static final CLibrary instance = (CLibrary) Native.loadLibrary("c", CLibrary.class);
 
