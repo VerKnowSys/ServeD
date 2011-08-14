@@ -108,19 +108,19 @@ object ServeD extends Build {
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(h2, expect4j, sshd)
         )
-    ) dependsOn(common)
+    ) dependsOn(common, testing % "test")
 
     lazy val user = Project("user", file("svd.user"),
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(jgit, smack)
         )
-    ) dependsOn(common)
+    ) dependsOn(common, testing % "test")
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(neodatis, expect4j)
         )
-    ) dependsOn(utils)
+    ) dependsOn(utils, testing % "test")
 
     lazy val api = Project("api", file("svd.api"),
         settings = buildSettings ++ Seq(
