@@ -105,17 +105,22 @@ object ServeD extends Build {
         api, cli, utils, web, testing, root, user
     )
 
+
     lazy val root = Project("root", file("svd.root"),
         settings = buildSettings ++ Seq(
+            parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(h2, expect4j, sshd)
         )
     ) dependsOn(common, testing % "test")
 
+
     lazy val user = Project("user", file("svd.user"),
         settings = buildSettings ++ Seq(
+            parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(jgit, smack)
         )
     ) dependsOn(common, testing % "test")
+
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
@@ -123,17 +128,20 @@ object ServeD extends Build {
         )
     ) dependsOn(utils, testing % "test")
 
+
     lazy val api = Project("api", file("svd.api"),
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(akkaRemote)
         )
     )
 
+
     lazy val cli = Project("cli", file("svd.cli"),
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(jline)
         )
     ) dependsOn(api)
+
 
     lazy val utils = Project("utils", file("svd.utils"),
         settings = buildSettings ++ Seq(
@@ -142,14 +150,6 @@ object ServeD extends Build {
         )
     ) dependsOn(api, testing % "test")
 
-    // lazy val core = Project("core", file("svd.core"),
-    //     settings = buildSettings ++ Seq(
-    //         parallelExecution in Test := false, // NOTE: This should be removed
-    //         libraryDependencies ++= Seq(
-    //             h2, jgit, expect4j, smack, sshd
-    //         )
-    //     )
-    // ) dependsOn(utils, common, testing % "test")
 
     lazy val web = Project("web", file("svd.web"),
         settings = buildSettings ++ WebPlugin.webSettings ++ Seq(
@@ -158,6 +158,7 @@ object ServeD extends Build {
             )
         ) ++ CoffeeScript.coffeeSettings
     ) dependsOn(utils, testing % "test")
+
 
     lazy val testing = Project("testkit", file("svd.testing"),
         settings = buildSettings ++ Seq(

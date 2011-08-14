@@ -88,4 +88,23 @@ package object testing {
         dir
     }
 
+    def testPath(path: String) = TEST_DIR + "/" + path
+
+    def removeTestDir = rmdir(TEST_DIR)
+
+    def createTestDir = mkdir(TEST_DIR)
+
+    def reloadTestDir = {
+        removeTestDir
+        createTestDir
+    }
+
+    def restoreFile(path: String)(f: => Unit){
+        val content = readFile(path)
+        f
+        writeFile(path, content.toString)
+    }
+
+    def waitFor(time: Int) = Thread.sleep(time)
+
 }
