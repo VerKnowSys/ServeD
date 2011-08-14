@@ -70,9 +70,14 @@ case class SvdUserUID(
 
 
 // 2011-06-25 23:13:38 - dmilith - PENDING: user domain issues
-// /**
-//  *  @author dmilith
-//  *
-//  *   SvdUserDomain describes user domain registered by user
-//  */
-// case class SvdUserDomain(name: String, uuid: UUID = randomUUID) extends Persistent
+/**
+ *  @author dmilith
+ *
+ *   SvdUserDomain describes user domain registered by user
+ */
+case class SvdUserDomain(
+        name: String,
+        uuid: UUID = randomUUID
+    ) extends Persistent {
+        override def toString = "SvdUserDomain(" + name + ")"
+    }
