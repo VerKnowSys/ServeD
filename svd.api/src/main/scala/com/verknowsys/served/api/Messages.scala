@@ -43,3 +43,7 @@ object Admin {
         linkedActors: List[ActorInfo]
     )
 }
+
+// XXX: Temporary place for those messages
+case class GetAccountManager(userUid: Int)
+case object GetPort

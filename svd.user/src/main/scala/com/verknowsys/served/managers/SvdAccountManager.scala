@@ -1,6 +1,5 @@
-package com.verknowsys.served.systemmanager.managers
+package com.verknowsys.served.managers
 
-import com.verknowsys.served.systemmanager.GetPort
 import com.verknowsys.served.LocalAccountsManager
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.api.accountkeys._
@@ -12,8 +11,6 @@ import com.verknowsys.served.systemmanager.native._
 
 import akka.actor.Actor.{remote, actorOf, registry}
 import akka.actor.{Actor, ActorRef}
-import com.verknowsys.served.systemmanager.SvdSystemManager
-import com.verknowsys.served.systemmanager.SvdAccountsManager
 
 
 case class AccountKeys(keys: Set[AccessKey] = Set.empty, uuid: UUID = randomUUID) extends Persistent

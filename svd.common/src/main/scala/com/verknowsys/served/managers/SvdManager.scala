@@ -1,18 +1,13 @@
-package com.verknowsys.served.systemmanager.managers
+package com.verknowsys.served.managers
 
-
-import com.verknowsys.served.utils.SvdExceptionHandler
-import com.verknowsys.served.systemmanager.native._
+import com.verknowsys.served.utils._
 import com.verknowsys.served.api._
-
 import akka.actor.Actor
 
 
 /**
- * Base class for all managers
- * 
+ * Base trait for all managers
+ *
  * @author teamon
  */
-abstract class SvdManager(account: SvdAccount) extends Actor with SvdExceptionHandler {
-
-}
+abstract trait SvdManager extends Actor with SvdExceptionHandler with Logging

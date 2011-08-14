@@ -18,23 +18,25 @@ import java.util.zip.Deflater
 import java.util.zip.Inflater
 import java.util.ArrayList
 import java.util.regex.Pattern
+import sun.misc.SignalHandler
+import sun.misc.Signal
 
 
 /**
  * SvdUtils object containing common functions
- * 
+ *
  * @author dmilith
- *   
+ *
  */
 object SvdUtils extends Logging {
-    
-    
+
+
     /**
     *   @author dmilith
-    *   
+    *
     *   check and inform when current user isn't superuser (root)
-    *   
-    */   
+    *
+    */
     def rootCheck {
         System.getProperty("user.name") match {
             case "root" =>
@@ -43,7 +45,7 @@ object SvdUtils extends Logging {
                 sys.error(err)
         }
     }
-    
+
 
     /**
      *  @author dmilith
@@ -51,23 +53,23 @@ object SvdUtils extends Logging {
      *   returns true if running system matches BSD
      */
     def isBSD = System.getProperty("os.name").contains("BSD")
-    
-    
+
+
     /**
      *  @author dmilith
      *
      *   returns true if running system matches Linux
      */
     def isLinux = System.getProperty("os.name").contains("Linux")
-    
-    
+
+
     /**
      *  @author dmilith
      *
      *   Generate unique identifier
      */
     def newUuid = UUID.randomUUID
-    
+
 
     /**
      *  @author dmilith
@@ -78,14 +80,14 @@ object SvdUtils extends Logging {
         import CStat._
         CStat.instance.getOwner(path)
      }
-     
-    
+
+
     /**
      *  @author dmilith
      *
      *  Checks and creates (if missing) given directory name
      *
-     */    
+     */
     def checkOrCreateDir(dir: String) = {
         if (new File(dir).exists) {
             log.debug("Directory: '%s' exists".format(dir))
@@ -95,8 +97,8 @@ object SvdUtils extends Logging {
         }
         dir
     }
-    
-    
+
+
     /**
      *  @author dmilith
      *
@@ -127,8 +129,8 @@ object SvdUtils extends Logging {
         log.debug("Original string length: %d, Compressed one: %d".format(input.length, compressedString.length))
         compressedString
     }
-    
-    
+
+
     /**
      *  @author dmilith
      *
@@ -141,7 +143,7 @@ object SvdUtils extends Logging {
         val compressedByte = input.getBytes
         decompressor.setInput(compressedByte)
         val bos = new ByteArrayOutputStream(compressedByte.length)
-        
+
         while (!decompressor.finished) {
             try {
                 val count = decompressor.inflate(buf)
@@ -161,7 +163,7 @@ object SvdUtils extends Logging {
         log.debug("Compressed string length: %d, Decompressed one: %d".format(input.length, decompressedString.length))
         decompressedString
     }
-    
+
 
     /**
      *  @author dmilith
@@ -176,8 +178,8 @@ object SvdUtils extends Logging {
             calendar.get(Calendar.MINUTE),
             calendar.get(Calendar.SECOND))
     }
-    
-    
+
+
     /**
      *  @author dmilith
      *
@@ -185,7 +187,7 @@ object SvdUtils extends Logging {
      *
      */
     def getAllLiveThreads = log.trace("Live threads list:\n%s".format(Thread.getAllStackTraces.toList.map{ th => "%s - %s\n".format(th._1, th._2.toList.map{ elem => "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(elem.getFileName, elem.getClassName, elem.getMethodName, elem.getLineNumber, elem.isNativeMethod)})}))
-        
+
 
     /**
      *  @author dmilith
@@ -197,8 +199,8 @@ object SvdUtils extends Logging {
      *
      */
     def sizeof(any: Any) = ObjectProfiler.sizeof(any)
-    
-    
+
+
     /**
      *  @author dmilith
      *
@@ -218,6 +220,16 @@ object SvdUtils extends Logging {
             }
         )
 
+    def handleSignal(name: String)(block: => Unit) =
+        Signal.handle(new Signal(name), new SignalHandler {
+            def handle(sig: Signal) {
+                log.warn("Signal called: " + name)
+                block
+            }
+        })
+
+
+
 
     /**
      *  @author dmilith
@@ -228,7 +240,7 @@ object SvdUtils extends Logging {
         import CLibrary._
         CLibrary.instance.getuid
     }
-    
+
 
     /**
      *  @author dmilith
@@ -240,27 +252,27 @@ object SvdUtils extends Logging {
         block
         System.currentTimeMillis - start
     }
-        
-        
-    /** 
-     * Create new SvdLoopThread with provided function 
-     * 
+
+
+    /**
+     * Create new SvdLoopThread with provided function
+     *
      * @author teamon
      */
     def loopThread(f: => Unit) = new SvdLoopThread(f)
-    
-    
-    /** 
+
+
+    /**
      * Checks if file exists
-     * 
+     *
      * @author teamon
      */
     def fileExists(path: String) = (new java.io.File(path)).exists
-    
-    
-    /** 
+
+
+    /**
      * Removes directory
-     * 
+     *
      * @author teamon
      */
     def rmdir(path: String) = try { FileUtils.forceDelete(path) } catch { case x: Throwable => log.warn(x.getMessage) }
@@ -277,7 +289,7 @@ object SvdUtils extends Logging {
         extensions: Array[String] = Array("scala", "java"),
         recursive: Boolean = true): String = {
             val files = FileUtils.listFiles(root, extensions, recursive)
-            val filter = new FilenameFilter { 
+            val filter = new FilenameFilter {
                 def accept(dir: File, aName: String) =
                     aName.lastIndexOf(name) != -1
             }
@@ -305,8 +317,8 @@ object SvdUtils extends Logging {
         else
             Array()
     }
-    
-    
+
+
     /**
      *  @author dmilith
      *
@@ -324,7 +336,7 @@ object SvdUtils extends Logging {
     def listFiles(location: String) =
         (new File(location)).listFiles.filterNot(_.isDirectory)
 
-    
+
     /**
      *  @author dmilith
      *
@@ -338,8 +350,8 @@ object SvdUtils extends Logging {
         else
             Array()
     }
-    
-    
+
+
     /**
     * @author dmilith
     *
@@ -362,7 +374,7 @@ object SvdUtils extends Logging {
         }
         false
     }
-    
+
 
 }
 

@@ -101,16 +101,20 @@ object ServeD extends Build {
     import Dependencies._
 
     lazy val served = Project("ServeD", file("."), settings = buildSettings) aggregate(
-        api, cli, utils, core, web, testing
+        api, cli, utils, web, testing
     )
 
     lazy val root = Project("root", file("svd.root"), settings = buildSettings) dependsOn(common)
 
-    lazy val user = Project("user", file("svd.user"), settings = buildSettings) dependsOn(common)
+    lazy val user = Project("user", file("svd.user"),
+        settings = buildSettings ++ Seq(
+            libraryDependencies ++= Seq(jgit)
+        )
+    ) dependsOn(common)
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis)
+            libraryDependencies ++= Seq(neodatis, expect4j)
         )
     ) dependsOn(utils)
 
@@ -133,14 +137,14 @@ object ServeD extends Build {
         )
     ) dependsOn(api, testing % "test")
 
-    lazy val core = Project("core", file("svd.core"),
-        settings = buildSettings ++ Seq(
-            parallelExecution in Test := false, // NOTE: This should be removed
-            libraryDependencies ++= Seq(
-                h2, jgit, expect4j, smack, sshd
-            )
-        )
-    ) dependsOn(utils, common, testing % "test")
+    // lazy val core = Project("core", file("svd.core"),
+    //     settings = buildSettings ++ Seq(
+    //         parallelExecution in Test := false, // NOTE: This should be removed
+    //         libraryDependencies ++= Seq(
+    //             h2, jgit, expect4j, smack, sshd
+    //         )
+    //     )
+    // ) dependsOn(utils, common, testing % "test")
 
     lazy val web = Project("web", file("svd.web"),
         settings = buildSettings ++ WebPlugin.webSettings ++ Seq(

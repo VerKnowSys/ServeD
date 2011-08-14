@@ -1,4 +1,4 @@
-package com.verknowsys.served.systemmanager
+package com.verknowsys.served.managers
 
 
 import com.verknowsys.served.db._
@@ -16,9 +16,6 @@ import scala.io.Source
 import java.io.File
 import scala.util._
 
-
-case class GetAccountManager(userUid: Int)
-case object GetPort
 
 case object SvdAccounts extends DB[SvdAccount]
 case object SvdUserPorts extends DB[SvdUserPort]

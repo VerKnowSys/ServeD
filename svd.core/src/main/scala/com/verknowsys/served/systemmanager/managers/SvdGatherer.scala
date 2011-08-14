@@ -1,5 +1,7 @@
 package com.verknowsys.served.systemmanager.managers
 
+import com.verknowsys.served.managers.SvdManager
+
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
@@ -22,10 +24,10 @@ import akka.actor.Actor.registry
  *   The main goal for SvdGatherer is to gather user usage stats and write them to file.
  *
  */
-class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
+class SvdGatherer(account: SvdAccount) extends SvdManager {
     log.info("Starting Gatherer for account: " + account)
-    
-    
+
+
     private def gather = SvdUtils.loopThread {
         log.trace("Time elapsed on gather(): %d".format(
             SvdUtils.bench {
@@ -37,11 +39,11 @@ class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
                         pid => ( // 2011-03-13 02:30:02 - dmilith - NOTE: tuple with whole major user data:
                             pid,
                             core.getProcState(pid).getName, // NOTE: process name
-                            core.getProcCpu(pid).getTotal / 1000, // NOTE: time in seconds 
+                            core.getProcCpu(pid).getTotal / 1000, // NOTE: time in seconds
                             core.getProcMem(pid).getResident / 1024 / 1024 // NOTE: unit is MegaByte.
                         )
                     }
-                    
+
                     // 2011-03-13 15:24:53 - dmilith - NOTE: appending data to user process database
                     // val db = new DB
                     //                     userPsWithAllData.foreach{
@@ -50,13 +52,13 @@ class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
                     //                             db << value
                     //                             log.trace("DB single object size: %d".format(SvdUtils.sizeof(value)))
                     //                     }
-                    
-                    
+
+
                     // log.trace("DB objects in db: %d".format(db.all[PSData].toList.length))
                     // log.trace("DB stats: %s".format(db.current.stats))
-                    
+
                     // db.close
-                    
+
                     log.debug("userData of (%s):\n%s".format(
                         account,
                         userPsWithAllData.map{
@@ -65,28 +67,28 @@ class SvdGatherer(account: SvdAccount) extends SvdManager(account) {
                                     elem._1, elem._2, SvdUtils.secondsToHMS(elem._3.toInt), elem._4) // 2011-03-13 03:28:20 - dmilith - NOTE: in very unusual cases it may lead to truncation of Long value, but I've never ever seen pid bigger than Integer value.
                         }.mkString("\n")
                     ))
-                    
+
                 } catch {
                     case x: SigarException =>
                         log.warn("Gather(), Sigar Exception occured: %s".format(x.getMessage))
                 }
             }
         ))
-        
+
         Thread.sleep(SvdConfig.gatherTimeout)
-        
+
     }.start
-    
+
     override def preStart {
         // gather
     }
-    
-    
+
+
     def receive = {
         case x =>
             log.warn("SvdGatherer received unhandled signal: %s".format(x))
             self reply Nil
-            
+
     }
- 
+
 }

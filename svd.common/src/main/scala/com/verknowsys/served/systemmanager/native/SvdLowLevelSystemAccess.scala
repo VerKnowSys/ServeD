@@ -4,7 +4,6 @@ package com.verknowsys.served.systemmanager.native
 import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.utils.monitor._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.api.acl._
 import com.verknowsys.served.utils.Logging
@@ -15,28 +14,28 @@ import com.sun.jna.{Native, Library}
 
 
 object SvdLowLevelSystemAccess extends Logging {
-    
+
     val core = new Sigar
     val netstat = core.getNetStat
     val net = core.getNetInfo
     val mem = core.getMem
     val swp = core.getSwap
     val tcp = core.getTcp
-    
+
     val swapUsed = swp.getUsed
     val swapFree = swp.getFree
     val swapTotal = swp.getTotal
-    
+
     val tcpConnections = tcp.getActiveOpens
     val tcpFailedAttempts = tcp.getAttemptFails
     val tcpInError = tcp.getInErrs
-    
+
     val memFree = mem.getActualFree
     val memUsed = mem.getActualUsed
     val memTotal = mem.getTotal
     val memUsagePercentage = mem.getUsedPercent
-    
-    
+
+
     override def toString =
         (
         "MEM_USED:[%d], " +
@@ -51,10 +50,10 @@ object SvdLowLevelSystemAccess extends Logging {
         "TCP_IN_ERROR:[%d] ")
             .format(memUsed, memFree, memTotal, memUsagePercentage, swapUsed, swapFree, swapTotal, tcpConnections, tcpFailedAttempts, tcpInError)
 
-    
+
     /**
     *   @author dmilith
-    *   
+    *
     *   Returns System Process count.
     *
     *   Arguments:
@@ -90,7 +89,7 @@ object SvdLowLevelSystemAccess extends Logging {
                 "\n")
                     .format(an.getName, SvdLowLevelSystemAccess.core.getProcCredName(apid).getUser, SvdLowLevelSystemAccess.core.getProcMem(apid).getResident, SvdLowLevelSystemAccess.core.getProcMem(apid).getShare, apid, an.getPpid, an.getThreads, an.getPriority, an.getNice, SvdLowLevelSystemAccess.core.getProcArgs(apid).mkString(" "), SvdLowLevelSystemAccess.core.getProcCpu(apid).getStartTime, SvdLowLevelSystemAccess.core.getProcCpu(apid).getSys, SvdLowLevelSystemAccess.core.getProcCpu(apid).getTotal, SvdLowLevelSystemAccess.core.getProcCpu(apid).getUser)
 
-        } catch { 
+        } catch {
             case _ =>
                 "NONE"
         }
@@ -104,15 +103,15 @@ object SvdLowLevelSystemAccess extends Logging {
      */
     def getCurrentProcessPid = core.getPid
 
-    
+
     /**
      *  @author dmilith
      *
      *   Returns list of processes in system
      */
     def getProcList = core.getProcList
-    
-    
+
+
     /**
      *  @author dmilith
      *
@@ -120,32 +119,32 @@ object SvdLowLevelSystemAccess extends Logging {
      */
     def getProcCredName(pid: Long) = core.getProcCredName(pid)
     def getProcCred(pid: Long) = core.getProcCred(pid)
-    
-    
+
+
     /**
      *  @author dmilith
      *
      *   Returns system load
      */
     def getSystemLoad = core.getLoadAverage
-    
-    
+
+
     /**
      *  @author dmilith
      *
      *   Returns disk usage of given location
      */
     def getDiskUsage(location: String) = core.getDiskUsage(location)
-    
-    
+
+
     /**
      *  @author dmilith
      *
      *   Returns current system uptime
      */
     def getSystemUptime = core.getUptime.getUptime
-    
-    
+
+
     /**
      *  @author dmilith
      *
@@ -156,10 +155,10 @@ object SvdLowLevelSystemAccess extends Logging {
 
     /**
     *   @author dmilith
-    *   
+    *
     *   Gets List of pids of whole system processes.
-    *   
-    *   Arguments: 
+    *
+    *   Arguments:
     *       sort: Boolean. Default: false.
     *           If true then it will return sorted alphabetically list of processes.
     *
@@ -171,8 +170,8 @@ object SvdLowLevelSystemAccess extends Logging {
         log.debug("processList : " + sourceList)
         sourceList
     }
-    
-    
+
+
     log.debug("%s has been initialized".format(this.getClass))
-    
+
 }
