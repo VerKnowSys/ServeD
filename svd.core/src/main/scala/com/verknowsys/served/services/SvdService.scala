@@ -52,6 +52,15 @@ class SvdService(account: SvdAccount, name: String) extends SvdExceptionHandler 
     def afterStopHook: List[SvdShellOperation] = Nil
     
 
+    /**
+     *  @author dmilith
+     *
+     *   installHook - Software prepare / install hook.
+     *   Will be executed only on demand, by sending Install signal to SvdService
+     */
+    def installHook: List[SvdShellOperation] = Nil
+
+
     lazy val shell = new SvdShell(account)
     configureHook.foreach {
         hook =>
@@ -61,6 +70,19 @@ class SvdService(account: SvdAccount, name: String) extends SvdExceptionHandler 
     
     
     def receive = {
+
+        /**
+         *  @author dmilith
+         *
+         *   Install should be sent to install required software for service. 
+         */        
+        case Install =>
+            log.debug("SvdService install started for: %s".format(name))
+            installHook.foreach {
+                hook =>
+                    log.trace("installHook: %s".format(hook))
+                    shell.exec(hook)
+            }
         
         /**
          *  @author dmilith
