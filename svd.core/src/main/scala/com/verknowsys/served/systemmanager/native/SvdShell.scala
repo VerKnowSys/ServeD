@@ -34,25 +34,20 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
     def dead = shell.isClosed
     
     
-    def exec(
-            operation: SvdShellOperation,
-            expectedStdout: Array[String] = Array(),
-            expectedStderr: Array[String] = Array(),
-            waitForOutputFor: Int = 2
-        ) {
-            if (dead) {
-                throw new SvdShellException("Failed to exec operation: '%s' on dead shell.".format(operation.commands.replace("\n", ", ")))
-            } else {
-                shell.send(operation.commands + "\n")
-                if (expectedStdout.size != 0) expectedStdout.foreach {
-                    expect =>
-                        shell.expect(expect, waitForOutputFor)
-                }
-                if (expectedStderr.size != 0) expectedStderr.foreach {
-                    expect =>
-                        shell.expectErr(expect, waitForOutputFor)
-                }
+    def exec(operation: SvdShellOperation) {
+        if (dead) {
+            throw new SvdShellException("Failed to exec operation: '%s' on dead shell.".format(operation.commands.replace("\n", ", ")))
+        } else {
+            shell.send(operation.commands + "\n")
+            if (operation.expectStdOut.size != 0) operation.expectStdOut.foreach {
+                expect =>
+                    shell.expect(expect, operation.waitForOutputFor)
             }
+            if (operation.expectStdErr.size != 0) operation.expectStdErr.foreach {
+                expect =>
+                    shell.expectErr(expect, operation.waitForOutputFor)
+            }
+        }
     }
     
     
