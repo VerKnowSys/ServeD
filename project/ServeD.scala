@@ -100,9 +100,19 @@ object ServeD extends Build {
     import BuildSettings._
     import Dependencies._
 
-    lazy val root = Project("ServeD", file("."), settings = buildSettings) aggregate(
+    lazy val served = Project("ServeD", file("."), settings = buildSettings) aggregate(
         api, cli, utils, core, web, testing
     )
+
+    lazy val root = Project("root", file("svd.root"), settings = buildSettings) dependsOn(common)
+
+    lazy val user = Project("user", file("svd.user"), settings = buildSettings) dependsOn(common)
+
+    lazy val common = Project("common", file("svd.common"),
+        settings = buildSettings ++ Seq(
+            libraryDependencies ++= Seq(neodatis)
+        )
+    ) dependsOn(utils)
 
     lazy val api = Project("api", file("svd.api"),
         settings = buildSettings ++ Seq(
@@ -127,10 +137,10 @@ object ServeD extends Build {
         settings = buildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(
-                h2, neodatis, jgit, expect4j, smack, sshd
+                h2, jgit, expect4j, smack, sshd
             )
         )
-    ) dependsOn(utils, testing % "test")
+    ) dependsOn(utils, common, testing % "test")
 
     lazy val web = Project("web", file("svd.web"),
         settings = buildSettings ++ WebPlugin.webSettings ++ Seq(

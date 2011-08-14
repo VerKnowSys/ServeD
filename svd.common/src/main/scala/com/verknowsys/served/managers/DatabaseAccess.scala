@@ -5,9 +5,9 @@ import akka.actor.Actor
 
 trait DatabaseAccess {
     self: Actor =>
-    
+
     val db: DBClient
-    
+
     override def postStop {
         db.close
     }
