@@ -52,8 +52,7 @@ class SvdService(account: SvdAccount, name: String) extends SvdExceptionHandler 
     def afterStopHook: List[SvdShellOperation] = Nil
     
 
-    
-    val shell = new SvdShell(account)
+    lazy val shell = new SvdShell(account)
     configureHook.foreach {
         hook =>
             log.trace("configureHook: %s".format(hook))
@@ -66,9 +65,9 @@ class SvdService(account: SvdAccount, name: String) extends SvdExceptionHandler 
         /**
          *  @author dmilith
          *
-         *   Init should be sent when we want to start this service
+         *   Run should be sent when we want to start this service
          */
-        case Init =>
+        case Run =>
             log.debug("SvdService with name %s has been started".format(name))
             startHook.foreach {
                 hook =>
