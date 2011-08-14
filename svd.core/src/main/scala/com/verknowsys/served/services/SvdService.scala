@@ -10,14 +10,14 @@ import com.verknowsys.served.api._
 import akka.actor.Actor
 
 
-class SvdService(account: SvdAccount, name: String) extends SvdExceptionHandler {    
+class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExceptionHandler {
     
     /**
      *  @author dmilith
      *
      *   configureHook - will be executed before starting service actor
      */
-    def configureHook: List[SvdShellOperation] = Nil
+    def configureHook = config.configure
 
 
     /**
@@ -25,7 +25,7 @@ class SvdService(account: SvdAccount, name: String) extends SvdExceptionHandler 
      *
      *   afterStartHook - will be executed after starting of service
      */
-    def afterStartHook: List[SvdShellOperation] = Nil
+    def afterStartHook = config.afterStart
 
 
     /**
@@ -33,7 +33,7 @@ class SvdService(account: SvdAccount, name: String) extends SvdExceptionHandler 
      *
      *   startHook - hook executed on service start
      */
-    def startHook: List[SvdShellOperation] = Nil
+    def startHook = config.start
 
 
     /**
@@ -41,7 +41,7 @@ class SvdService(account: SvdAccount, name: String) extends SvdExceptionHandler 
      *
      *   stopHook - stop hook executed on stop
      */
-    def stopHook: List[SvdShellOperation] = Nil
+    def stopHook = config.stop
 
 
     /**
@@ -49,7 +49,7 @@ class SvdService(account: SvdAccount, name: String) extends SvdExceptionHandler 
      *
      *   afterStopHook - will be executed after service stop
      */
-    def afterStopHook: List[SvdShellOperation] = Nil
+    def afterStopHook = config.afterStop
     
 
     /**
@@ -58,7 +58,7 @@ class SvdService(account: SvdAccount, name: String) extends SvdExceptionHandler 
      *   installHook - Software prepare / install hook.
      *   Will be executed only on demand, by sending Install signal to SvdService
      */
-    def installHook: List[SvdShellOperation] = Nil
+    def installHook = config.install
 
 
     lazy val shell = new SvdShell(account)
@@ -77,7 +77,7 @@ class SvdService(account: SvdAccount, name: String) extends SvdExceptionHandler 
          *   Install should be sent to install required software for service. 
          */        
         case Install =>
-            log.debug("SvdService install started for: %s".format(name))
+            log.debug("SvdService install started for: %s".format(config.name))
             installHook.foreach {
                 hook =>
                     log.trace("installHook: %s".format(hook))
@@ -90,7 +90,7 @@ class SvdService(account: SvdAccount, name: String) extends SvdExceptionHandler 
          *   Run should be sent when we want to start this service
          */
         case Run =>
-            log.debug("SvdService with name %s has been started".format(name))
+            log.debug("SvdService with name %s has been started".format(config.name))
             startHook.foreach {
                 hook =>
                     log.trace("startHook: %s".format(hook))
