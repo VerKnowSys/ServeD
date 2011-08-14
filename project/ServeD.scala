@@ -94,6 +94,7 @@ object Dependencies {
     val funlet = "com.verknowsys" %% "funlet" % "0.1.0-SNAPSHOT"
     val sshd = "org.apache.sshd" % "sshd-core" % "0.5.0"
     val slf4japi = "org.slf4j" % "slf4j-api" % "1.5.8"
+    val commonsio = "commons-io" % "commons-io" % "1.3.2"
 }
 
 object ServeD extends Build {
@@ -160,7 +161,7 @@ object ServeD extends Build {
 
     lazy val testing = Project("testkit", file("svd.testing"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(specs, scalatest, akkaTestkit)
+            libraryDependencies ++= Seq(specs, scalatest, akkaTestkit, commonsio)
         )
     )
 }

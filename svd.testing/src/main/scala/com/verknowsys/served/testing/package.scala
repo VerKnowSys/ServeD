@@ -9,6 +9,7 @@ import org.scalatest.matchers._
 import akka.testkit.TestKit
 import java.io.File
 import scala.io.Source
+import org.apache.commons.io.FileUtils
 
 
 package object testing {
@@ -61,4 +62,30 @@ package object testing {
 
     // Utility methods
     def testPublicKey = Source.fromURL(getClass.getResource("/test_key_rsa.pub")).getLines.mkString("\n")
+
+    implicit def StringToFile(s: String) = new File(s)
+
+    def tmpDir = "/var/tmp"
+
+    def fssecure(path: String)(f: String => Unit) { if(path.startsWith(tmpDir)) f(path) }
+
+    def touch(path: String) = fssecure(path) { p => FileUtils touch p }
+
+    def readFile(path: String) = fssecure(path) { p => FileUtils readFileToString p }
+
+    def writeFile(path: String, data: String) = fssecure(path) { p => FileUtils.writeStringToFile(p, data) }
+
+    def mkdir(path: String) = fssecure(path) { p => FileUtils forceMkdir p }
+
+    def rmdir(path: String) = fssecure(path) { p => try { FileUtils forceDelete p } catch { case _ => } }
+
+    final val TEST_DIR = tmpDir + "/served"
+    private var count = 0
+    def randomPath = {
+        count += 1
+        val dir = TEST_DIR + "/dir_" + count + "_" + java.util.UUID.randomUUID.toString
+        mkdir(dir)
+        dir
+    }
+
 }
