@@ -11,7 +11,9 @@ import akka.actor.Actor.{remote, actorOf, registry}
 
 
 
-object LocalAccountsManager extends GlobalActorRef(Some(remote.actorFor("service:accounts-manager", SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)))
+object LocalAccountsManager extends GlobalActorRef(
+    remote.actorFor("service:accounts-manager", SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
+)
 
 object userboot extends Logging {
     def run(userUID: Int){
