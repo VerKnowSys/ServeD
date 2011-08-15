@@ -40,7 +40,7 @@ object SvdSystemManagerUtils extends Logging {
         } else {
             import CLibrary._
             val clib = CLibrary.instance
-            val files = if (recursive) SvdUtils.recursiveListFilesFromPath(new File(path)).toList else (new File(path) :: Nil)
+            val files = if (recursive) SvdUtils.recursiveListFilesFromPath(new File(path)).toList ::: List(new File(path)) else (new File(path) :: Nil)
             log.trace("chown(path: %s, user: %d, group: %d, recursion: %s): File list: %s. Amount of files: %s".format(path, user, group, recursive, files.mkString(", "), files.length))
 
             for (file <- files) {
@@ -64,7 +64,7 @@ object SvdSystemManagerUtils extends Logging {
         } else {
             import CLibrary._
             val clib = CLibrary.instance
-            val files = if (recursive) SvdUtils.recursiveListFilesFromPath(new File(path)).toList else (new File(path) :: Nil)
+            val files = if (recursive) SvdUtils.recursiveListFilesFromPath(new File(path)).toList ::: List(new File(path)) else (new File(path) :: Nil)
             log.trace("chmod(path: %s, mode: %d, recursion: %s)".format(path, mode, recursive))
 
             for (file <- files) {
