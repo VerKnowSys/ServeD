@@ -165,6 +165,8 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     log.debug("User uids registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
 
 
+    private val accountManagers = scala.collection.mutable.Map[Int, ActorRef]() // UID => AccountManager ref
+
     // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
 
     override def postStop {
@@ -229,11 +231,13 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
             log.trace("GetAccount(%d): %s", uid, account)
             self reply account
 
-        case GetAccountManager(givenUid) =>
-            log.trace("GetAccountManager(%d)", givenUid)
-            self reply SvdAccounts(db)(_.uid == givenUid).headOption.map { account =>
-                    remote.actorFor("service:account-manager", SvdConfig.defaultHost, 12345) // XXX: hack with both port and defaultHost
-            }.getOrElse(AccountNotFound)
+        case GetAccountManager(uid) =>
+            log.trace("GetAccountManager(%d)", uid)
+            self reply (accountManagers get uid getOrElse AccountNotFound)
+
+        case Alive(uid) =>
+            log.trace("Got Alive(%d) from %s", uid, self.sender)
+            accountManagers(uid) = self.sender.get
 
         case GetPort =>
             self reply randomUserPort

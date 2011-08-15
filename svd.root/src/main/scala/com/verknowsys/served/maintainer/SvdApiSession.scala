@@ -15,7 +15,7 @@ class SvdApiSession extends SvdManager {
 
     private var manager: Option[ActorRef] = None // XXX: Var
 
-    override def receive = traceReceive {
+    override def receive = {
         case General.GetStatus =>
             self reply General.Status.Disconnected
 

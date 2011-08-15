@@ -67,6 +67,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
                     self reply Success
 
                     // Start the real work
+                    log.trace("Becaming started")
+                    LocalAccountsManager ! Alive(account.uid)
                     become(started(db, gitManager))
 
                 case _ =>
