@@ -1,4 +1,4 @@
-/* 
+/*
     Author: Daniel (dmilith) Dettlaff
     © 2011 - VerKnowSys
 */
@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
-#include <sys/stat.h> 
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
 
@@ -26,8 +26,6 @@ using namespace std;
     #define DEVEL
     #define APP_VERSION "1.0"
     #define COPYRIGHT "Copyright © 2oo9-2o11 VerKnowSys.com - All Rights Reserved."
-    #define SVD_PARAM_ROOT "svd"
-    #define SVD_PARAM_USER "user"
     #define MOTD_FILE "/etc/motd"
     #ifdef __FreeBSD__
         #define DEFAULT_SHELL_COMMAND "/Software/Zsh-4.3.10/bin/zsh"
@@ -61,19 +59,32 @@ using namespace std;
     #define AMBIGOUS_ENTRY_ERROR 111
     #define ROOT_UID_ERROR 112
 
+    struct execParams {
+        string javaPath;
+        #ifdef DEVEL
+        string classPathFile;
+        string mainClass;
+        #else
+        string jar;
+        #endif
+        string svdArg;
+    };
+
     #ifdef DEVEL
 
-        #define MAIN_CLASS "com.verknowsys.served.boot"
-        #define CORE_CLASSPATH_FILE "/tmp/core.classpath"
+        #define ROOT_MAIN_CLASS "com.verknowsys.served.rootboot"
+        #define USER_MAIN_CLASS "com.verknowsys.served.userboot"
+        #define ROOT_CLASSPATH_FILE "/tmp/root.classpath"
+        #define USER_CLASSPATH_FILE "/tmp/user.classpath"
 
-        string getClassPath();
-    
+        string getClassPath(string classPathFile);
+
     #endif
 
     extern "C" {
 
         int getOwner(char* path);
-        
+
     }
-        
+
 #endif
