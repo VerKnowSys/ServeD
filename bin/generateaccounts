@@ -9,4 +9,4 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 echo "Executing: ${jar}"
-java -d32 -XX:MaxPermSize=512M -XX:+UseParallelGC -Xms64m -Xmx768m -Dfile.encoding=UTF-8 -noverify -client -Djna.library.path=$(pwd)/lib -Djava.library.path=$(pwd)/lib -cp "$(cat tmp/core.classpath)" com.verknowsys.served.SvdAccountCollector "$@"
+java -d32 -XX:MaxPermSize=512M -XX:+UseParallelGC -Xms64m -Xmx768m -Dfile.encoding=UTF-8 -noverify -client -Djna.library.path=$(pwd)/lib -Djava.library.path=$(pwd)/lib -cp "$(cat tmp/root.classpath)" com.verknowsys.served.SvdAccountCollector "$@"
