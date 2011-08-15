@@ -306,16 +306,18 @@ object SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
+     *  @author dmilith, teamon
      *
      *   Recursive list files in given path
      */
-    def recursiveListFilesFromPath(filePath: File): Array[File] = {
-        val out = filePath.listFiles
-        if (out != null)
-            out ++ out.filter(_.isDirectory).flatMap(recursiveListFilesFromPath(_))
-        else
-            Array()
+    def recursiveListFilesFromPath(file: File): List[File] = {
+        file :: (
+            if (file.isDirectory)
+                Option(file.listFiles).map(
+                    e =>
+                        e.toList.flatMap(recursiveListFilesFromPath)
+                ) getOrElse Nil
+            else Nil)
     }
 
 
@@ -335,21 +337,6 @@ object SvdUtils extends Logging {
      */
     def listFiles(location: String) =
         (new File(location)).listFiles.filterNot(_.isDirectory)
-
-
-    /**
-     *  @author dmilith
-     *
-     *   Recursive list files in given path + match by Regex
-     */
-    def recursiveListFilesByRegex(filePath: File, regex: Regex): Array[File] = {
-        val list = filePath.listFiles
-        val out = list.filter(filePath => regex.findFirstIn(filePath.getName).isDefined)
-        if (out != null)
-            out ++ list.filter(_.isDirectory).flatMap(recursiveListFilesByRegex(_, regex))
-        else
-            Array()
-    }
 
 
     /**

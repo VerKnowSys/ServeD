@@ -90,7 +90,7 @@ class SvdUtilsTest extends Specification with Logging {
         SvdSystemManagerUtils.chmod(path / "dupa_327/xyz", 0777, false) must beTrue
         FileUtils.touch(path / "dupa_32745923/dupa011")
         SvdSystemManagerUtils.chmod(path / "dupa_32745923/dupa011", 0111, false) must beTrue
-        SvdUtils.recursiveListFilesFromPath(path / "dupa_327").size must beEqual(3)
+        SvdUtils.recursiveListFilesFromPath(path / "dupa_327").size must beEqual(4) // also count parent dir
     }
 
     "recursive file listings should work properly without regex" in {
