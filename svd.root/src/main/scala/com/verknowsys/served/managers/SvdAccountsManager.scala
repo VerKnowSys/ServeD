@@ -236,8 +236,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
             self reply (accountManagers get uid getOrElse AccountNotFound)
 
         case Alive(uid) =>
-            log.trace("Got Alive(%d) from %s", uid, self.sender)
-            accountManagers(uid) = self.sender.get
+            self.sender foreach (accountManagers(uid) = _)
 
         case GetPort =>
             self reply randomUserPort
