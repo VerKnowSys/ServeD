@@ -34,7 +34,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     private var _dbClient: Option[DBClient] = None // XXX: Refactor
 
 
-    def receive = {
+    def receive = traceReceive {
         case Init =>
             log.info("SvdAccountManager received Init.")
 
@@ -79,7 +79,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             // self reply Success
     }
 
-    def started(db: DBClient, gitManager: ActorRef): Receive = {
+    def started(db: DBClient, gitManager: ActorRef): Receive = traceReceive {
         case GetAccount =>
             self reply account
 
