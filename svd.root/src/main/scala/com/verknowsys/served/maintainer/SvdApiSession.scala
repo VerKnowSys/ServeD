@@ -15,7 +15,7 @@ class SvdApiSession extends SvdManager {
 
     private var manager: Option[ActorRef] = None // XXX: Var
 
-    override def receive = {
+    override def receive = traceReceive {
         case General.GetStatus =>
             self reply General.Status.Disconnected
 
@@ -37,7 +37,7 @@ class SvdApiSession extends SvdManager {
 
     // lazy val loggingManagers = remote.actorFor("service:logging-manager", "localhost", 8000) :: Nil  // XXX: HACK: should use account.servicePort instead of 8000
 
-    protected def dispatch: Receive = {
+    protected def dispatch: Receive = traceReceive {
         case General.GetStatus =>
             self reply General.Status.Connected
 
@@ -54,7 +54,7 @@ class SvdApiSession extends SvdManager {
             registry.actorFor[SvdSystemInfo].foreach { _ forward msg }
 
         case msg if manager.isDefined =>
-            log.debug("Remote client sent %s. Forwarding to AccountManager", msg)
+            log.debug("Remote client sent %s. Forwarding to AccountManager (%s)", msg, manager)
             manager.foreach { _ forward msg }
     }
 }

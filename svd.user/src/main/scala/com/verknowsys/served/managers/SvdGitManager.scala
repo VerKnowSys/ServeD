@@ -25,7 +25,7 @@ class SvdGitManager(
     log.info("Starting GitManager for account: %s in home dir: %s".format(account, gitRepositoriesLocation))
 
 
-    def receive = {
+    def receive = traceReceive {
         case ListRepositories =>
             log.trace("Listing git repositories in %s", gitRepositoriesLocation)
             self reply Repositories(RepositoryDB(db).toList)

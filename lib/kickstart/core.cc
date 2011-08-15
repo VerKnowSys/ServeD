@@ -1,4 +1,4 @@
-/* 
+/*
     Author: Daniel (dmilith) Dettlaff
     © 2011 - VerKnowSys
 */
@@ -15,9 +15,9 @@ const static string coreDir = currentDir();
 
 
     #ifdef DEVEL
-    
-        string getClassPath() {
-            string core = coreDir + CORE_CLASSPATH_FILE;
+
+        string getClassPath(string classPathFile) {
+            string core = coreDir + classPathFile;
             string cp = "";
             ifstream f(core.c_str());
             if (f.is_open()){
@@ -29,16 +29,15 @@ const static string coreDir = currentDir();
             }
             return cp;
         }
-    
+
     #endif
 
-
-    void load_svd(string java_path, string jar, string mainClassParam, string svd_arg) {
+    void load_svd(execParams params) {
         string jnalp = "-Djava.library.path=" + currentDir() + "/lib";
         #ifdef DEVEL
-            #define COUNT 14
-        #else
             #define COUNT 13
+        #else
+            #define COUNT 12
         #endif
         char *args[] = {
             (char*)"java",
@@ -53,15 +52,14 @@ const static string coreDir = currentDir();
             #ifndef DEVEL
                 /* when not devel, use classes from assembly jar */
                 (char*)"-jar",
-                (char*)jar.c_str(),
+                (char*)params.jar.c_str(),
             #else
                 /* when devel, use classes from compile folders */
                 (char*)"-cp",
-                (char*)getClassPath().c_str(),
-                (char*)MAIN_CLASS,
+                (char*)getClassPath(params.classPathFile).c_str(),
+                (char*)params.mainClass.c_str(),
             #endif
-            (char*)mainClassParam.c_str(),
-            (char*)svd_arg.c_str(),
+            (char*)params.svdArg.c_str(),
             (char*)0
         };
 
@@ -72,16 +70,10 @@ const static string coreDir = currentDir();
             }
             cerr << "]" << endl;
         #endif
-        execv((char*)java_path.c_str(), args);
+        execv((char*)params.javaPath.c_str(), args);
     }
 
-
-    void spawnBackgroundTask(
-        string abs_java_bin_path,
-        string main_starting_class_param,
-        string cmdline_param,
-        string lockFileName) {
-
+    void spawnBackgroundTask(execParams params, string lockFileName) {
         int i, lfp;
         char str[32];
 
@@ -90,15 +82,15 @@ const static string coreDir = currentDir();
             cerr << "Booting ServeD" << endl;
         #endif
 
-        string logFileName = cmdline_param + "-" + string(INTERNAL_LOG_FILE);
+        string logFileName = params.svdArg + "-" + string(INTERNAL_LOG_FILE);
         freopen (logFileName.c_str(), "a+", stdout);
         freopen (logFileName.c_str(), "a+", stderr);
     	umask(027); /* set newly created file permissions */
-    	
-    	if (cmdline_param == string(CORE_SVD_ID)) {
+
+    	if (params.svdArg == string(CORE_SVD_ID)) {
             cerr << "Spawning boot svd in dir: " << currentDir() << endl;
     	} else {
-    	    string homeDir = string(USERS_HOME_DIR) + cmdline_param;
+    	    string homeDir = string(USERS_HOME_DIR) + params.svdArg;
             cerr << "Spawning user svd in home dir: " << homeDir << endl;
             chdir(homeDir.c_str());
     	}
@@ -117,7 +109,7 @@ const static string coreDir = currentDir();
     	/* first instance continues */
     	sprintf(str, "%d\n", getpid());
     	write(lfp, str, strlen(str)); /* record pid to lockfile */
-    	
+
         signal(SIGTSTP, SIG_IGN); /* ignore tty signals */
         signal(SIGTTOU, SIG_IGN);
         signal(SIGTTIN, SIG_IGN);
@@ -127,5 +119,9 @@ const static string coreDir = currentDir();
 
     	/* spawn svd */
     	chdir(coreDir.c_str()); /* change running directory before spawning svd */
-    	load_svd(abs_java_bin_path, (coreDir + JAR_FILE), main_starting_class_param, cmdline_param);
+
+        #ifndef DEVEL
+        params.jar = coreDir + JAR_FILE;
+        #endif
+    	load_svd(params);
     }
