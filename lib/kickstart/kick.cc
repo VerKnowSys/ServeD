@@ -87,8 +87,8 @@ int main(int argc, char const *argv[]) {
     if (uid == 0) {
         params.svdArg = string(CORE_SVD_ID);
         #ifdef DEVEL
-        params.mainClass = ROOT_MAIN_CLASS;
-        params.classPathFile = ROOT_CLASSPATH_FILE;
+            params.mainClass = ROOT_MAIN_CLASS;
+            params.classPathFile = ROOT_CLASSPATH_FILE;
         #endif
         spawnBackgroundTask(params, lockName);
     } else if (setuid(uid) != 0) {
@@ -97,8 +97,8 @@ int main(int argc, char const *argv[]) {
     }
 
     #ifdef DEVEL
-    params.mainClass = USER_MAIN_CLASS;
-    params.classPathFile = USER_CLASSPATH_FILE;
+        params.mainClass = USER_MAIN_CLASS;
+        params.classPathFile = USER_CLASSPATH_FILE;
     #endif
 
     spawnBackgroundTask(params, lockName);
