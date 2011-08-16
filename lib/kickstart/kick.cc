@@ -47,17 +47,17 @@ int main(int argc, char const *argv[]) {
         #ifdef DEVEL
             cerr << "Spawning ServeD Core" << endl;
             cerr << "HomeDir: " << homeDir << " and argument: " << params.svdArg << endl;
-            string log = homeDir + "/boot-" + INTERNAL_LOG_FILE; // XXX: hardcoded "boot"
+            string log = homeDir + CORE_SVD_ID + "-" + INTERNAL_LOG_FILE;
             cerr << "Development mode. Cleaning log: " << log << endl;
             remove(log.c_str());
         #endif
     } else {
         params.svdArg = string(argv[1]);
-        homeDir = string(USERS_HOME_DIR) + params.svdArg; /* NOTE: /Users/$UID homedir format */
+        homeDir = string(USERS_HOME_DIR) + params.svdArg + "/"; /* NOTE: /Users/$UID homedir format */
         #ifdef DEVEL
             cerr << "Spawning ServeD Controller for UID: " << params.svdArg << endl;
             cerr << "HomeDir: " << homeDir << " and argument: " << params.svdArg << endl;
-            string log = homeDir + "/" + params.svdArg + "-" + INTERNAL_LOG_FILE;
+            string log = homeDir + params.svdArg + "-" + INTERNAL_LOG_FILE;
             cerr << "Development mode. Cleaning log: " << log << endl;
             remove(log.c_str());
         #endif

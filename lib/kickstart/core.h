@@ -36,7 +36,7 @@ using namespace std;
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
     #endif
 
-    #define CORE_HOMEDIR "/SystemUsers"
+    #define CORE_HOMEDIR "/SystemUsers/"
     #define USERS_HOME_DIR "/Users/"
 
     #define LOCK_FILE   "svd-core.lock"
