@@ -5,6 +5,7 @@ import com.github.siasia.WebPlugin
 import coffeescript.CoffeeScript
 import growl._
 import growl.GrowlingTests._
+import sbtassembly.Plugin.assemblySettings
 
 object BuildSettings {
     val buildSettings = Defaults.defaultSettings ++ GrowlingTests.growlSettings ++ Seq(
@@ -110,7 +111,7 @@ object ServeD extends Build {
         settings = buildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(h2, expect4j, sshd)
-        )
+        ) ++ assemblySettings
     ) dependsOn(common, testing % "test")
 
 
@@ -118,7 +119,7 @@ object ServeD extends Build {
         settings = buildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(jgit, smack)
-        )
+        ) ++ assemblySettings
     ) dependsOn(common, testing % "test")
 
 
