@@ -10,9 +10,31 @@ system="$(uname)"
 if [ -e "kick" ]; then
     echo "* Installing svdkick to /sbin"
     cp -f ./kick /sbin/svdkick
+else
+    echo "! Recompile to install svdkick"
 fi
 
 if [ -e "shell" ]; then
     echo "* Installing svdshell to /bin"
     cp -f ./shell /bin/svdshell
+else
+    echo "! Recompile to install svdshell"
 fi
+
+echo "* Installing native libraries"
+if [ ! -d "/lib" ]; then
+    mkdir /lib
+    if [ "$system" = "Darwin" ]; then
+        echo "Making /lib hidden"
+        chflags hidden /lib
+    fi
+fi
+# NOTE: TODO: maybe use case in case of support for more systems:
+if [ "$system" = "FreeBSD" ]; then
+    cp -fv lib/*.so /lib
+fi
+if [ "$system" = "Darwin" ]; then
+    cp -fv lib/*.dylib /lib
+fi
+chmod 0755 /lib
+chmod 0644 /lib/*
