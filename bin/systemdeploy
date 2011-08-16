@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ "$(id -u)" != "0" ]; then
+    echo "System Deployer requires root privileges to run!"
+    exit 1
+fi
+
+bin/sbt assembly
+bin/install
+bin/nativebuild
+bin/nativeinstall
