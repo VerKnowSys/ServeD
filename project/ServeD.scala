@@ -64,7 +64,7 @@ object BuildSettings {
     val coreBuildSettings = buildSettings ++ assemblySettings ++ Seq(
         test in Assembly := false,
         excludedFiles in Assembly := { (bases: Seq[File]) =>
-            val ext = Set(".class", ".jnilib", ".so", ".properties", ".conf")
+            val ext = Set(".class", ".dylib", ".jnilib", ".so", ".properties", ".conf")
 
             bases flatMap { base =>
                 (base ** "*").get filterNot { f => ext exists (f.getName endsWith _ ) }
