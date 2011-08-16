@@ -23,23 +23,30 @@ using namespace std;
 #ifndef __CORE__
 #define __CORE__
 
-    #define DEVEL
-    #define APP_VERSION "1.0"
+    // #define DEVEL
+    #define APP_VERSION "1.1"
     #define COPYRIGHT "Copyright © 2oo9-2o11 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
+
     #ifdef __FreeBSD__
         #define DEFAULT_SHELL_COMMAND "/Software/Zsh-4.3.10/bin/zsh"
+        #define DEFAULT_JAVA_BIN "/Software/Openjdk7/bin/java"
     #else
         #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
+        #define DEFAULT_JAVA_BIN "/usr/bin/java"
     #endif
-    #define DEFAULT_JAVA_BIN "/usr/bin/java"
+
     #define CORE_HOMEDIR "/SystemUsers"
     #define USERS_HOME_DIR "/Users/"
-    #define LOCK_FILE	"svd-core.lock"
+
+    #define LOCK_FILE   "svd-core.lock"
     #define SOCKET_LOCK_FILE "svd-ss.lock"
-    #define JAR_FILE    "/svd.core/target/scala_2.9.0/core_2.9.0-1.0-onejar.jar"
     #define INTERNAL_LOG_FILE "svd-diagnostics.log"
     #define SOCK_FILE   "svd.sock"
+
+    #define ROOT_JAR_FILE    "/sbin/root.core"
+    #define USER_JAR_FILE    "/bin/user.core"
+
     #define CORE_SVD_ID "boot"
     #define DEFAULT_USER_GROUP 0
     #define SOCK_DATA_PACKET_SIZE 32
@@ -58,14 +65,15 @@ using namespace std;
     #define DIAGNOSTIC_LOG_ERROR 110
     #define AMBIGOUS_ENTRY_ERROR 111
     #define ROOT_UID_ERROR 112
+    #define INSTALLATION_MISSING_ERROR 113
 
     struct execParams {
         string javaPath;
         #ifdef DEVEL
-        string classPathFile;
-        string mainClass;
+            string classPathFile;
+            string mainClass;
         #else
-        string jar;
+            string jar;
         #endif
         string svdArg;
     };
