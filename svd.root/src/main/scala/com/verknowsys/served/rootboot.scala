@@ -26,7 +26,7 @@ object rootboot extends Logging {
         println()
         println()
 
-        val sshd = actorOf(new SSHD(1234))
+        val sshd = actorOf(new SSHD(SvdConfig.sshPort))
 
         val list = (
             actorOf[SvdFileEventsManager] ::

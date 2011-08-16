@@ -13,7 +13,7 @@ object SvdConfig {
      * These configuration settings can be overriden by configuration stored in ServeD database
      *
      */
-     
+
     def version                     = "0.2.0"
     def coreSvdDatabaseName         = "svd.db"
     def coreSvdAccountsDatabaseName = "accounts.db"
@@ -25,9 +25,10 @@ object SvdConfig {
     def defaultEncoding             = "UTF-8"
     def defaultHost                 = "127.0.0.1"
     def remoteApiServerHost         = "127.0.0.1" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
-    def remoteApiServerPort     = 10
-    def remoteAccountServerPort = 12
-    def defaultUserGroup        = 0 // from now, every file created for user in filesystem will have 0 uid
+    def sshPort                     = 22
+    def remoteApiServerPort         = 10
+    def remoteAccountServerPort     = 12
+    def defaultUserGroup            = 0 // from now, every file created for user in filesystem will have 0 uid
     def kqueueWaitInterval          = 500
     def sleepDefaultPause           = 1000
     def gatherTimeout               = 1000
@@ -42,5 +43,5 @@ object SvdConfig {
     def notificationXmppCompression = true
     def notificationXmppUseSasl     = true
 
-    
+
 }
