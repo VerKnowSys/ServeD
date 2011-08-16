@@ -3,11 +3,12 @@ import sbt.Keys._
 
 import com.github.siasia.WebPlugin
 import coffeescript.CoffeeScript
-import growl._
-import growl.GrowlingTests._
-import sbtassembly.Plugin.assemblySettings
+import sbtassembly.Plugin._
 
 object BuildSettings {
+    import growl._
+    import growl.GrowlingTests._
+
     val buildSettings = Defaults.defaultSettings ++ GrowlingTests.growlSettings ++ Seq(
         organization    := "VerKnowSys",
         version         := "0.2.0",
@@ -59,6 +60,20 @@ object BuildSettings {
                     )
         }
     ) ++ Tasks.all
+
+    val coreBuildSettings = buildSettings ++ assemblySettings ++ Seq(
+        test in Assembly := false,
+        excludedFiles in Assembly := { (bases: Seq[File]) =>
+            bases flatMap { base =>
+                (base ** "*").get filterNot { f =>
+                    (f.getName endsWith ".class") ||
+                    (f.getName endsWith ".jnilib") ||
+                    f.getName == "akka.conf" ||
+                    f.getName == "logger.properties"
+                }
+            }
+        }
+    )
 }
 
 object Resolvers {
@@ -108,18 +123,19 @@ object ServeD extends Build {
 
 
     lazy val root = Project("root", file("svd.root"),
-        settings = buildSettings ++ Seq(
+        settings = coreBuildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
-            libraryDependencies ++= Seq(h2, expect4j, sshd)
-        ) ++ assemblySettings
+            libraryDependencies ++= Seq(h2, expect4j, sshd),
+            mainClass in Assembly := Some("com.verknowsys.served.rootboot")
+        )
     ) dependsOn(common, testing % "test")
 
 
     lazy val user = Project("user", file("svd.user"),
-        settings = buildSettings ++ Seq(
+        settings = coreBuildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(jgit, smack)
-        ) ++ assemblySettings
+        )
     ) dependsOn(common, testing % "test")
 
 
