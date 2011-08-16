@@ -1,0 +1,26 @@
+#!/bin/sh
+
+if [ "$(id -u)" != "0" ]; then
+    echo "ServeD Installer requires root privileges to run!"
+    exit 1
+fi
+
+system="$(uname)"
+
+# XXX: hardcoded version:
+src_root="./svd.root/target/root-assembly-0.2.0.jar"
+dst_root="/sbin/root.core"
+if [ -e "$src_root" ]; then
+    echo "* Installing root core to /sbin"
+    cp -fv "$src_root" "$dst_root"
+    chmod 0400 "$dst_root"
+fi
+
+# XXX: hardcoded version:
+src_user="./svd.user/target/user-assembly-0.2.0.jar"
+dst_user="/bin/user.core"
+if [ -e "$src_user" ]; then
+    echo "* Installing user core to /bin"
+    cp -fv "$src_user" "$dst_user"
+    chmod 0444 "$dst_user"
+fi
