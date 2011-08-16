@@ -8,7 +8,7 @@ import SvdPOSIX._
 
 
 object SvdSystemManagerUtils extends Logging {
-    
+
 
     /**
       * Kills system process with given pid and signal
@@ -26,11 +26,11 @@ object SvdSystemManagerUtils extends Logging {
         else
             false
     }
-    
 
-    /** 
+
+    /**
      * Changes owner of file at given path
-     * 
+     *
      * @author dmilith
      */
     def chown(path: String, user: Int, group: Int = SvdConfig.defaultUserGroup, recursive: Boolean = true) =
@@ -52,9 +52,9 @@ object SvdSystemManagerUtils extends Logging {
         }
 
 
-    /** 
+    /**
      * Changes permissions of file at given path
-     * 
+     *
      * @author dmilith
      */
     def chmod(path: String, mode: Int, recursive: Boolean = true) =
