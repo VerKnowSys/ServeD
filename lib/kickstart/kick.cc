@@ -26,9 +26,9 @@ int main(int argc, char const *argv[]) {
     }
 
     #ifndef DEVEL
-        if (!fileExists(currentDir() + JAR_FILE)) {
-            cerr << "No ServeD Core available! Rebuild svd.core first!" << endl;
-            exit(CLASSPATH_DIR_MISSING_ERROR);
+        if (!fileExists(USER_JAR_FILE) or !fileExists(ROOT_JAR_FILE)) {
+            cerr << "No ServeD Core available in system! Install ServeD Core first!" << endl;
+            exit(INSTALLATION_MISSING_ERROR);
         }
     #endif
 
