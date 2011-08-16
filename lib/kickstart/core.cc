@@ -77,38 +77,40 @@ const static string coreDir = currentDir();
         int i, lfp;
         char str[32];
 
-    	setsid(); /* obtain a new process group */
-    	#ifdef DEVEL
+        setsid(); /* obtain a new process group */
+        #ifdef DEVEL
             cerr << "Booting ServeD" << endl;
         #endif
 
         string logFileName = params.svdArg + "-" + string(INTERNAL_LOG_FILE);
         freopen (logFileName.c_str(), "a+", stdout);
         freopen (logFileName.c_str(), "a+", stderr);
-    	umask(027); /* set newly created file permissions */
+        umask(027); /* set newly created file permissions */
 
-    	if (params.svdArg == string(CORE_SVD_ID)) {
+        bool userSpawn = false;
+        if (params.svdArg == string(CORE_SVD_ID)) {
             cerr << "Spawning boot svd in dir: " << currentDir() << endl;
-    	} else {
-    	    string homeDir = string(USERS_HOME_DIR) + params.svdArg;
+        } else {
+            userSpawn = true;
+            string homeDir = string(USERS_HOME_DIR) + params.svdArg;
             cerr << "Spawning user svd in home dir: " << homeDir << endl;
             chdir(homeDir.c_str());
-    	}
+        }
 
-    	lfp = open(lockFileName.c_str(), O_RDWR | O_CREAT, 0600);
-    	if (lfp < 0) {
+        lfp = open(lockFileName.c_str(), O_RDWR | O_CREAT, 0600);
+        if (lfp < 0) {
             cerr << "Lock file occupied: " << lockFileName << ". Cannot open." << endl;
-    	    exit(LOCK_FILE_OCCUPIED_ERROR); /* can not open */
-    	}
+            exit(LOCK_FILE_OCCUPIED_ERROR); /* can not open */
+        }
 
         if (lockf(lfp, F_TLOCK, 0) < 0) {
             cerr << "Cannot lock! Already spawned?" << endl;
             exit(CANNOT_LOCK_ERROR); /* can not lock */
         }
 
-    	/* first instance continues */
-    	sprintf(str, "%d\n", getpid());
-    	write(lfp, str, strlen(str)); /* record pid to lockfile */
+        /* first instance continues */
+        sprintf(str, "%d\n", getpid());
+        write(lfp, str, strlen(str)); /* record pid to lockfile */
 
         signal(SIGTSTP, SIG_IGN); /* ignore tty signals */
         signal(SIGTTOU, SIG_IGN);
@@ -117,11 +119,14 @@ const static string coreDir = currentDir();
         signal(SIGTERM, defaultSignalHandler); /* catch kill signal */
         signal(SIGINT, defaultSignalHandler);
 
-    	/* spawn svd */
-    	chdir(coreDir.c_str()); /* change running directory before spawning svd */
-
+        /* spawn svd */
         #ifndef DEVEL
-        params.jar = coreDir + JAR_FILE;
+            if (userSpawn)
+                params.jar = USER_JAR_FILE;
+            else
+                params.jar = ROOT_JAR_FILE;
+        #else
+            chdir(coreDir.c_str()); /* change running directory before spawning svd in devel mode */
         #endif
-    	load_svd(params);
+        load_svd(params);
     }
