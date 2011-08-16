@@ -33,7 +33,7 @@ const static string coreDir = currentDir();
     #endif
 
     void load_svd(execParams params) {
-        string jnalp = "-Djava.library.path=" + currentDir() + "/lib";
+        string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
         #ifdef DEVEL
             #define COUNT 13
         #else

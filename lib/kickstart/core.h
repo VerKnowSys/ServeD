@@ -38,20 +38,19 @@ using namespace std;
 
     #define CORE_HOMEDIR "/SystemUsers/"
     #define USERS_HOME_DIR "/Users/"
+    #define LIBRARIES_DIR "/lib/"
 
+    #define CORE_SVD_ID "boot"
+    #define SOCK_FILE "svd.sock"
     #define LOCK_FILE   "svd-core.lock"
     #define SOCKET_LOCK_FILE "svd-ss.lock"
     #define INTERNAL_LOG_FILE "svd-diagnostics.log"
-    #define SOCK_FILE   "svd.sock"
+    #define ROOT_JAR_FILE "/sbin/root.core"
+    #define USER_JAR_FILE "/bin/user.core"
 
-    #define ROOT_JAR_FILE    "/sbin/root.core"
-    #define USER_JAR_FILE    "/bin/user.core"
-
-    #define CORE_SVD_ID "boot"
     #define DEFAULT_USER_GROUP 0
     #define SOCK_DATA_PACKET_SIZE 32
     #define MAXPATHLEN  512
-
     #define LOCK_FILE_OCCUPIED_ERROR 100
     #define CANNOT_LOCK_ERROR 101
     #define POPEN_ERROR 102
