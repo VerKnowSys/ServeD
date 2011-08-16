@@ -251,7 +251,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
         userAccounts.foreach{
             account =>
                 log.warn("Spawning account: %s".format(account))
-                new SvdShell(account).exec(new SvdShellOperation("./kick " + account.uid)) // HACK
+                new SvdShell(account).exec(new SvdShellOperation("svdkick " + account.uid)) // HACK
         }
     }
 
