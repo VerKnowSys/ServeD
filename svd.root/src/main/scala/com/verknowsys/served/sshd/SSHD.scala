@@ -1,5 +1,6 @@
 package com.verknowsys.served.sshd
 
+import com.verknowsys.served.SvdConfig
 import java.security.PublicKey
 import org.apache.sshd.{SshServer => ApacheSSHServer}
 // import org.apache.sshd.server.PasswordAuthenticator
@@ -21,7 +22,7 @@ class SSHD(port: Int) extends Actor with SvdExceptionHandler {
     sshd.setPort(port)
     sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("hostkey.ser"))
     sshd.setPublickeyAuthenticator(new PublicKeyAuth())
-    sshd.setShellFactory(new SvdShellFactory(Array("./shell"))) // XXX: hardcoded name
+    sshd.setShellFactory(new SvdShellFactory(Array(SvdConfig.servedShell)))
 
     override def preStart {
         log.info("Starting SSHD on port %d", port)
