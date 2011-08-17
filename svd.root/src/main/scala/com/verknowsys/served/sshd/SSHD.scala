@@ -1,22 +1,27 @@
 package com.verknowsys.served.sshd
 
-import com.verknowsys.served.SvdConfig
-import java.security.PublicKey
-import org.apache.sshd.{SshServer => ApacheSSHServer}
-// import org.apache.sshd.server.PasswordAuthenticator
-import org.apache.sshd.server.PublickeyAuthenticator
-import org.apache.sshd.server.session.ServerSession
-// import org.apache.sshd.server.CommandFactory
-// import org.apache.sshd.server.CommandFactory._
-// import org.apache.sshd.server.command.UnknownCommand
-import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider
-import org.apache.sshd.server.shell.ProcessShellFactory
+
 import com.verknowsys.served.managers.SvdAccountsManager
 import com.verknowsys.served.utils._
+import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.api._
 import akka.actor.{Actor, ActorRef}
 
+
+import java.security.PublicKey
+import org.apache.sshd.{SshServer => ApacheSSHServer}
+import org.apache.sshd.server.PublickeyAuthenticator
+import org.apache.sshd.server.session.ServerSession
+import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider
+import org.apache.sshd.server.shell.ProcessShellFactory
+// import org.apache.sshd.server.PasswordAuthenticator
+// import org.apache.sshd.server.CommandFactory
+// import org.apache.sshd.server.CommandFactory._
+// import org.apache.sshd.server.command.UnknownCommand
+
+
 class SSHD(port: Int) extends Actor with SvdExceptionHandler {
+
     val sshd = ApacheSSHServer.setUpDefaultServer()
 
     sshd.setPort(port)
