@@ -16,7 +16,7 @@ import com.sun.jna.{Native, Library}
 object SvdLowLevelSystemAccess extends Logging {
 
     val core = new Sigar
-    val netstat = core.getNetStat
+    // val netstat = core.getNetStat // XXX: NOTE: TODO: FIXME: this causes SIGSEGV on FreeBSD host
     val net = core.getNetInfo
     val mem = core.getMem
     val swp = core.getSwap
