@@ -1,0 +1,55 @@
+#!/bin/sh
+
+. /etc/rc.subr
+
+name="served"
+pid_file="/SystemUsers/0.pid"
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
+status_cmd="${name}_status"
+extra_commands="status"
+
+
+served_status() {
+    echo "ServeD status"
+    if [ -e "$pid_file" ]; then
+        echo "* RootCore worker:"
+        ps -Af |grep root\.core | echo "$(wc -l) - 1" | bc
+        echo "* UserCore workers:"
+        ps -Af |grep user\.core | echo "$(wc -l) - 1" | bc
+    else
+        echo "No workers around."
+    fi
+}
+
+
+served_start() {
+    echo "Starting ServeD KickStart"
+    if [ -e "$pid_file" ]; then
+        ps -A |grep $(cat $pid_file) > /dev/null 2>&1
+        if [ "$?" = "0" ]; then
+            echo "Already started!"
+            return
+        else
+            svdkick & 2>&1
+        fi
+    else
+        svdkick & 2>&1
+    fi
+
+}
+
+
+served_stop() {
+    echo "Stopping ServeD KickStart"
+    if [ ! -e "$pid_file" ]; then
+        echo "Already stopped!"
+        return
+    else
+        kill -INT "$(cat $pid_file)"
+    fi
+}
+
+
+load_rc_config $name
+run_rc_command "$1"
