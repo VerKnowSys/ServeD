@@ -5,7 +5,8 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
-bin/sbt assembly
-bin/install
-bin/nativebuild
-bin/nativeinstall
+bin/sbt assembly && \
+bin/install && \
+bin/nativebuild && \
+bin/nativeinstall && \
+echo "Done. Success!"
