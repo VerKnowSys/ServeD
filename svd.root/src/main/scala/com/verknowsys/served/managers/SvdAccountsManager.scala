@@ -186,7 +186,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
                 ))
         }
         // removing also pid file of root core of svd:
-        val corePid = SvdConfig.systemHomeDir / "0.pid" // XXX: hardcoded
+        val corePid = SvdConfig.systemHomeDir / SvdConfig.rootPidFile
         log.trace("Cleaning core pid file: %s with content: %s".format(corePid, Source.fromFile(corePid).mkString))
         new SvdShell(rootAccount).exec(new SvdShellOperation("/bin/rm %s".format(corePid))) // XXX: hardcoded
 

@@ -17,6 +17,7 @@ object SvdConfig {
     def version                     = "0.2.0"
     def kickApp                     = "svdkick"
     def servedShell                 = "svdshell"
+    def rootPidFile                 = "0.pid"
     def coreSvdDatabaseName         = "svd.db"
     def coreSvdAccountsDatabaseName = "accounts.db"
     def served                      = "ServeD v" + version
