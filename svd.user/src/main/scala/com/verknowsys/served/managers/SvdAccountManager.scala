@@ -9,6 +9,7 @@ import com.verknowsys.served.db.{DBServer, DBClient, DB}
 import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
 
+import org.hyperic.sigar._
 import akka.actor.Actor.{remote, actorOf, registry}
 import akka.actor.{Actor, ActorRef}
 
@@ -28,6 +29,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val sh = new SvdShell(account)
+    val sigar = new Sigar
 
     // Only for closing in postStop
     private var _dbServer: Option[DBServer] = None // XXX: Refactor
@@ -43,7 +45,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             //             sh.close(0)
             //             sh.exec("ls -lam /usr")
 
-            val psAll = SvdLowLevelSystemAccess.processList(true)
+            val psAll = sigar.getProcList
             log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
 
 
