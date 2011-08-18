@@ -27,6 +27,7 @@ served_status() {
 
 served_start() {
     echo "Starting ServeD KickStart"
+    sleep 3
     core=$(ps -Af |grep root\.core | wc -l)
     if [ $core = 2 ]; then
         echo "Already started!"
@@ -40,6 +41,7 @@ served_start() {
 
 served_stop() {
     echo "Stopping ServeD KickStart"
+    sleep 3
     if [ ! -e "$pid_file" ]; then
         echo "Already stopped!"
         return
