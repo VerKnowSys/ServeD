@@ -79,6 +79,7 @@ public class SvdShellFactory implements Factory<Command> {
             builder.environment().put("SHELL", "/usr/local/bin/zsh");
             builder.environment().put("LOGNAME", env.get("USER"));
             builder.environment().put("USER", env.get("USER"));
+            builder.environment().put("HOME", "/Users/" + env.get("USER"));
             builder.environment().put("TERM", "xterm-256color");
             builder.environment().put("HISTCONTROL", "erasedups");
             builder.environment().put("HISTFILE", "~/.shell_history");
