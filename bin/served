@@ -3,7 +3,12 @@
 . /etc/rc.subr
 
 export PATH="$PATH:/Software/Openjdk7/bin"
-export JAVA_HOME="/Software/Openjdk7/bin"
+export JAVA_HOME="/Software/Openjdk7"
+
+if [ ! -e $JAVA_HOME/bin/java ]; then
+    echo "Cannot find OpenJDK"
+    exit 1
+fi
 
 name="served"
 pid_file="/SystemUsers/0.pid"
@@ -11,17 +16,16 @@ start_cmd="${name}_start"
 stop_cmd="${name}_stop"
 status_cmd="${name}_status"
 extra_commands="status"
+root=$(jps | grep -v Jps |grep root\.core | wc -l)
+users=$(ps -Af |grep user\.core | grep -v grep | wc -l)
 
 
 served_status() {
     if [ -e "$pid_file" ]; then
-        root=$(jps | grep -v Jps |grep root\.core | wc -l)
         echo "* RootCore worker:"
         echo "== $(echo ${root})"
-
-        user=$(ps -Af |grep user\.core | grep -v grep | wc -l)
         echo "* UserCore workers:"
-        echo "== $(echo $user - 1 | bc)"
+        echo "== $(echo ${users})"
     else
         echo "No workers around."
     fi
@@ -30,13 +34,13 @@ served_status() {
 
 served_start() {
     echo "Starting ServeD KickStart"
-    sleep 3
-    core=$(ps -Af |grep root\.core | wc -l)
-    if [ $core = 2 ]; then
+    core=$(jps | grep -v Jps |grep root\.core | wc -l)
+    if [ $core = 1 ]; then
         echo "Already started!"
         return
     else
-        svdkick & 2>&1
+        svdkick > /dev/null 2>&1 &
+        echo "ServeD started."
         return
     fi
 }
