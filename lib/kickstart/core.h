@@ -24,7 +24,7 @@ using namespace std;
 #define __CORE__
 
     // #define DEVEL
-    #define APP_VERSION "1.1"
+    #define APP_VERSION "0.1.1"
     #define COPYRIGHT "Copyright © 2oo9-2o11 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
