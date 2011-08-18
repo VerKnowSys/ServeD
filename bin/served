@@ -15,6 +15,7 @@ pid_file="/SystemUsers/0.pid"
 start_cmd="${name}_start"
 stop_cmd="${name}_stop"
 status_cmd="${name}_status"
+restart_cmd="${name}_restart"
 extra_commands="status"
 root=$(jps | grep -v Jps |grep root\.core | wc -l)
 users=$(ps -Af |grep user\.core | grep -v grep | wc -l)
@@ -35,7 +36,7 @@ served_status() {
 served_start() {
     echo "Starting ServeD KickStart"
     core=$(jps | grep -v Jps |grep root\.core | wc -l)
-    if [ $core = 1 ]; then
+    if [ "${core}" -eq "1" ]; then
         echo "Already started!"
         return
     else
@@ -46,14 +47,31 @@ served_start() {
 }
 
 
+served_restart() {
+    served_stop
+    sleep 2
+    amount=$(ps -Au |grep java | grep -v grep | wc -l)
+    if [ "$amount" -gt "0" ]; then
+        echo "Some arrogant process found. Sending napalm."
+        killall java
+    fi
+    sleep 2
+    served_start
+}
+
+
 served_stop() {
     echo "Stopping ServeD KickStart"
-    sleep 3
-    if [ ! -e "$pid_file" ]; then
-        echo "Already stopped!"
+    if [ "$(jps | grep -v Jps |grep root\.core | wc -l)" -eq "1" ]; then
+        kill -INT "$(cat $pid_file)"
+        if [ "$?" -eq "1" ]; then
+            echo "Invalid pid detected! Trying TERM on root core"
+            pid=$(jps | grep -v Jps |grep user\.core | awk '{print $1}')
+            kill -TERM $pid > /dev/null 2>&1
+        fi
         return
     else
-        kill -INT "$(cat $pid_file)"
+        echo "Already stopped!"
         return
     fi
 }
