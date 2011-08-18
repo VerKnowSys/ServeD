@@ -1,5 +1,7 @@
 package com.verknowsys.served
 
+import scala.io.Source
+
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.SvdProperties
 
@@ -14,7 +16,8 @@ object SvdConfig {
      *
      */
 
-    def version                     = "0.2.0"
+    def version                     = "0.2.0" + "-" + Source.fromURL(getClass.getResource("/VERSION")).getLines.mkString
+    def copyright                   = "Copyright © 2oo9-2o11 VerKnowSys.com - All Rights Reserved."
     def kickApp                     = "svdkick"
     def servedShell                 = "svdshell"
     def rootPidFile                 = "0.pid"

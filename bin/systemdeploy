@@ -5,6 +5,11 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
+branch="$(git name-rev --name-only HEAD)"
+sha="$(cat .git/refs/heads/${branch})"
+destination="${branch}-${sha}"
+echo $destination > svd.common/src/main/resources/VERSION
+echo "Getting current sha: $destination"
 bin/sbt assembly && \
 bin/install && \
 bin/nativebuild && \
