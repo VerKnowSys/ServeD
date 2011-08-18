@@ -2,6 +2,9 @@
 
 . /etc/rc.subr
 
+export PATH="$PATH:/Software/Openjdk7/bin"
+export JAVA_HOME="/Software/Openjdk7/bin"
+
 name="served"
 pid_file="/SystemUsers/0.pid"
 start_cmd="${name}_start"
@@ -12,11 +15,11 @@ extra_commands="status"
 
 served_status() {
     if [ -e "$pid_file" ]; then
-        root=$(ps -Af |grep root\.core | wc -l)
+        root=$(jps | grep -v Jps |grep root\.core | wc -l)
         echo "* RootCore worker:"
-        echo "== $(echo $root - 1 | bc)"
+        echo "== $(echo ${root})"
 
-        user=$(ps -Af |grep user\.core | wc -l)
+        user=$(ps -Af |grep user\.core | grep -v grep | wc -l)
         echo "* UserCore workers:"
         echo "== $(echo $user - 1 | bc)"
     else
