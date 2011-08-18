@@ -66,6 +66,8 @@ object rootboot extends Logging {
             log.error("Linux systems aren't supported yet!")
             sys.exit(1)
         }
+        log.info("ServeD v" + SvdConfig.version)
+        log.info(SvdConfig.copyright)
 
         // handle signals
         SvdUtils.handleSignal("ABRT") { SvdUtils.getAllLiveThreads }

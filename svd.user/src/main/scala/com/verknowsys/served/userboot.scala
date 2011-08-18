@@ -17,6 +17,9 @@ object LocalAccountsManager extends GlobalActorRef(
 
 object userboot extends Logging {
     def run(userUID: Int){
+        log.info("ServeD v" + SvdConfig.version)
+        log.info(SvdConfig.copyright)
+
         println()
         println()
         println("=========================")
