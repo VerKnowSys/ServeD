@@ -11,12 +11,14 @@ extra_commands="status"
 
 
 served_status() {
-    echo "ServeD status"
     if [ -e "$pid_file" ]; then
+        root=$(ps -Af |grep root\.core | wc -l)
         echo "* RootCore worker:"
-        ps -Af |grep root\.core | echo "$(wc -l) - 1" | bc
+        echo "== $(echo $root - 1 | bc)"
+
+        user=$(ps -Af |grep user\.core | wc -l)
         echo "* UserCore workers:"
-        ps -Af |grep user\.core | echo "$(wc -l) - 1" | bc
+        echo "== $(echo $user - 1 | bc)"
     else
         echo "No workers around."
     fi
@@ -25,18 +27,14 @@ served_status() {
 
 served_start() {
     echo "Starting ServeD KickStart"
-    if [ -e "$pid_file" ]; then
-        ps -A |grep $(cat $pid_file) > /dev/null 2>&1
-        if [ "$?" = "0" ]; then
-            echo "Already started!"
-            return
-        else
-            svdkick & 2>&1
-        fi
+    core=$(ps -Af |grep root\.core | wc -l)
+    if [ $core = 2 ]; then
+        echo "Already started!"
+        return
     else
         svdkick & 2>&1
+        return
     fi
-
 }
 
 
@@ -47,6 +45,7 @@ served_stop() {
         return
     else
         kill -INT "$(cat $pid_file)"
+        return
     fi
 }
 
