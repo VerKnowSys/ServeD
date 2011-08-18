@@ -49,14 +49,21 @@ served_start() {
 
 served_restart() {
     served_stop
-    sleep 2
+    sleep 5
     amount=$(ps -Au |grep java | grep -v grep | wc -l)
     if [ "$amount" -gt "0" ]; then
         echo "Some arrogant process found. Sending napalm."
         killall java
     fi
-    sleep 2
+    sleep 5
+    amount=$(ps -Au |grep java | grep -v grep | wc -l)
+    if [ "$amount" -gt "0" ]; then
+        echo "Some bastard is still alive! Sending anihilation."
+        killall -KILL java
+    fi
     served_start
+    sleep 5
+    served_status
 }
 
 
