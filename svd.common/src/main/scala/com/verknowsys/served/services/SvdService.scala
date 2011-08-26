@@ -11,7 +11,8 @@ import akka.actor.Actor
 
 
 class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExceptionHandler {
-    
+
+
     /**
      *  @author dmilith
      *
@@ -50,7 +51,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
      *   afterStopHook - will be executed after service stop
      */
     def afterStopHook = config.afterStop
-    
+
 
     /**
      *  @author dmilith
@@ -67,15 +68,15 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
             log.trace("configureHook: %s".format(hook))
             shell.exec(hook)
     }
-    
-    
+
+
     def receive = {
 
         /**
          *  @author dmilith
          *
-         *   Install should be sent to install required software for service. 
-         */        
+         *   Install should be sent to install required software for service.
+         */
         case Install =>
             log.debug("SvdService install started for: %s".format(config.name))
             installHook.foreach {
@@ -83,7 +84,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                     log.trace("installHook: %s".format(hook))
                     shell.exec(hook)
             }
-        
+
         /**
          *  @author dmilith
          *
@@ -121,9 +122,27 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
             }
             shell.close
             self reply Success
-            
+
     }
-    
+
+
+    override def postStop {
+        super.postStop
+        stopHook.foreach {
+            hook =>
+                log.trace("stopHook: %s".format(hook))
+                shell.exec(hook)
+        }
+        afterStopHook.foreach {
+            hook =>
+                log.trace("afterStopHook: %s".format(hook))
+                shell.exec(hook)
+        }
+        shell.close
+        log.info("Stopping SvdService: %s".format(config))
+    }
+
+
 }
 
 // class SvdSystemService extends SvdExceptionHandler

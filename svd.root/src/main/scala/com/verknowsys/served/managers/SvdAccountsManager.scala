@@ -9,6 +9,7 @@ import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.api._
 import com.verknowsys.served.api.pools._
+import com.verknowsys.served.services._
 
 import akka.actor.{Actor, ActorRef}
 import akka.actor.Actor.{remote, actorOf, registry}
@@ -159,6 +160,9 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
     log.info("SvdAccountsManager is loading")
 
+    log.info("Registering Coreginx")
+    val coreginx = actorOf(new SvdService(SvdRootServices.CoreginxConfig, rootAccount))
+
     log.debug("User accounts registered in Account database: %s".format(SvdAccounts(db).mkString(", ")))
     log.debug("User ports registered in Account database: %s".format(SvdUserPorts(db).mkString(", ")))
     log.debug("System ports registered in Account database: %s".format(SvdSystemPorts(db).mkString(", ")))
@@ -185,6 +189,9 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
                     """.format(pid, pidFile)
                 ))
         }
+        log.debug("Coreginx STOP")
+        coreginx.stop
+
         // removing also pid file of root core of svd:
         val corePid = SvdConfig.systemHomeDir / SvdConfig.rootPidFile
         log.trace("Cleaning core pid file: %s with content: %s".format(corePid, Source.fromFile(corePid).mkString))
@@ -199,6 +206,11 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     def receive = {
         case Init =>
             log.debug("SvdAccountsManager received Init. Running default task..")
+
+            log.info("Spawning Coreginx")
+            coreginx.start
+            coreginx ! Run
+
             // registerFileEventFor(SvdConfig.systemHomeDir, Modified)
 
             // 2011-06-26 18:17:00 - dmilith - HACK: XXX: HARDCODE: default user definition hack moved here now ;]
