@@ -49,21 +49,29 @@ served_start() {
 
 served_restart() {
     served_stop
-    sleep 5
-    amount=$(ps -Au |grep java | grep -v grep | wc -l)
-    if [ "$amount" -gt "0" ]; then
-        echo "Some arrogant process found. Sending napalm."
-        killall java
-    fi
-    sleep 5
-    amount=$(ps -Au |grep java | grep -v grep | wc -l)
-    if [ "$amount" -gt "0" ]; then
-        echo "Some bastard is still alive! Sending anihilation."
-        killall -KILL java
-    fi
+    for i in $(jot 10); do
+        amount=$(ps -Au |grep java | grep -v grep | wc -l)
+        if [ "$amount" -gt "0" ]; then
+            echo "Some arrogant process found. Sending napalm."
+            killall -TERM java
+        fi
+        if [ "$amount" -eq "0" ]; then
+            break
+        fi
+        sleep 1
+    done
+    for i in $(jot 10); do
+        amount=$(ps -Au |grep java | grep -v grep | wc -l)
+        if [ "$amount" -gt "0" ]; then
+            echo "Some bastard is still alive! Sending anihilation."
+            killall -KILL java
+        fi
+        if [ "$amount" -eq "0" ]; then
+            break
+        fi
+        sleep 1
+    done
     served_start
-    sleep 5
-    served_status
 }
 
 
@@ -71,11 +79,6 @@ served_stop() {
     echo "Stopping ServeD KickStart"
     if [ "$(jps | grep -v Jps |grep root\.core | wc -l)" -eq "1" ]; then
         kill -INT "$(cat $pid_file)"
-        if [ "$?" -eq "1" ]; then
-            echo "Invalid pid detected! Trying TERM on root core"
-            pid=$(jps | grep -v Jps |grep user\.core | awk '{print $1}')
-            kill -TERM $pid > /dev/null 2>&1
-        fi
         return
     else
         echo "Already stopped!"
