@@ -72,6 +72,13 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
 
 
     lazy val shell = new SvdShell(account)
+    log.debug("SvdService install started for: %s".format(config.name))
+
+    installHook.foreach { // XXX: HACK: totally idiotic, but currently required to install app non-interactively
+        hook =>
+            log.trace("installHook: %s".format(hook))
+            shell.exec(hook)
+    }
     configureHook.foreach {
         hook =>
             log.trace("configureHook: %s".format(hook))
