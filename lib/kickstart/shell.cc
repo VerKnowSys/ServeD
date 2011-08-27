@@ -23,7 +23,7 @@ void parse(char *line, char **argv) {
     *argv = '\0';
 }
 
-     
+
 void execute(char **argv) {
     int    status;
     pid_t  pid;
@@ -42,9 +42,9 @@ void execute(char **argv) {
 
 
 int main(int argc, char const *argv[]) {
-    
+
     cout << "ServeD Shell v" << APP_VERSION << " - " << COPYRIGHT << endl;
-    
+
     /* Print motd */
     ifstream t(MOTD_FILE);
     stringstream buffer;
@@ -57,13 +57,13 @@ int main(int argc, char const *argv[]) {
         cerr << "No UID argument given!" << endl;
         exit(NO_UID_GIVEN_ERROR);
     }
-    
+
     string arg = string(argv[1]);
     if (arg == "0") {
         cerr << "Cannot spawn as root!" << endl;
         exit(ROOT_UID_ERROR);
     }
-    
+
     /* Checking uid validity */
     uid_t uid = atoi(arg.c_str());
     if (uid == NULL) {
@@ -81,7 +81,7 @@ int main(int argc, char const *argv[]) {
         #endif
     } else {
         #ifdef DEVEL
-            cerr << "Creating home directory " << 
+            cerr << "Creating home directory " <<
                 homeDir << " and chowning it for uid:" <<
                     uid << " and gid: " <<
                         gid << endl;
@@ -102,17 +102,17 @@ int main(int argc, char const *argv[]) {
         exit(SETGID_ERROR);
     }
     chdir(homeDir.c_str());
-    
+
     string command = string(DEFAULT_SHELL_COMMAND) + " -i -s";
     #ifdef DEVEL
         cerr << "Spawning command: " << command << ", for uid: " << uid << " and gid: " << gid << endl;
     #endif
-    
+
     char *arguments[2];
     parse((char*)(command.c_str()), arguments);
     #ifdef DEVEL
         cout << "Arguments: ";
-        for (int i = 0; arguments[i] != NULL; ++i) 
+        for (int i = 0; arguments[i] != NULL; ++i)
             cout << arguments[i] << " ";
         cout << endl;
     #endif
