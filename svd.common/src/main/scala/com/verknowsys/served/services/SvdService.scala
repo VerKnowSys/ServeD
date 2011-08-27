@@ -157,6 +157,8 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
     }
 
 
+    override def toString = "SvdService name: %s with config: %s".format(config.name, config)
+
 }
 
 // class SvdSystemService extends SvdExceptionHandler
