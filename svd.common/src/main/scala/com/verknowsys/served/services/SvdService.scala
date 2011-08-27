@@ -98,6 +98,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                     log.trace("installHook: %s".format(hook))
                     shell.exec(hook)
             }
+            self reply Success
 
         /**
          *  @author dmilith
