@@ -1,17 +1,31 @@
 #!/bin/sh
 
-if [ "$(id -u)" != "0" ]; then
-    echo "System Deployer requires root privileges to run!"
-    exit 1
-fi
+rootcheck() {
+    if [ "$(id -u)" != "0" ]; then
+        echo "System Deployer requires root privileges to run!"
+        exit 1
+    fi
+}
 
+system="$(uname)"
 branch="$(git name-rev --name-only HEAD)"
 sha="$(cat .git/refs/heads/${branch})"
 destination="${branch}-${sha}"
 echo $destination > svd.common/src/main/resources/VERSION
 echo "Getting current sha: $destination"
 bin/sbt assembly && \
-bin/install && \
+if [ $system = "Darwin" ]; then
+    sudo bin/install
+else
+    rootcheck && \
+    bin/install
+fi
 bin/nativebuild && \
-bin/nativeinstall && \
+if [ $system = "Darwin" ]; then
+    sudo bin/nativeinstall
+else
+    rootcheck && \
+    bin/nativeinstall
+fi
+
 echo "Done. Success!"
