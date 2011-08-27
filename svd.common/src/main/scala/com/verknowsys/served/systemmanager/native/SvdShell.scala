@@ -3,7 +3,7 @@ package com.verknowsys.served.systemmanager.native
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
-import com.verknowsys.served.utils.Logging
+import com.verknowsys.served.utils._
 import scala.collection.mutable._
 import expectj._
 
@@ -20,20 +20,21 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
 
     loadSettings
     val shell = expectinator.spawn(SvdConfig.defaultShell)
-    
-    
+
+
     def loadSettings =
+        "export HOME=%s\n".format(SvdConfig.userHomeDir / "%s".format(account.uid)) ::
         "export USER=%s\n".format(account.userName) ::
         "export USERNAME=%s\n".format(account.userName) ::
         "export EDITOR=true\n" ::
-        "%s\n".format("") :: 
+        "%s\n".format("") ::
         "cd %s%s\n".format(SvdConfig.userHomeDir, account.uid) ::
         SvdConfig.standardShellEnvironment :: Nil
-    
-    
+
+
     def dead = shell.isClosed
-    
-    
+
+
     def exec(operation: SvdShellOperation) {
         if (dead) {
             throw new SvdShellException("Failed to exec operation: '%s' on dead shell.".format(operation.commands.replace("\n", ", ")))
@@ -49,11 +50,11 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
             }
         }
     }
-    
-    
+
+
     def output = (shell.getCurrentStandardOutContents, shell.getCurrentStandardErrContents)
-    
-    
+
+
     def close {
         try {
             shell.send("exit\n")
@@ -64,5 +65,5 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
         }
     }
 
-    
+
 }
