@@ -62,10 +62,24 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
     def installHook = config.install
 
 
+    /**
+     *  @author dmilith
+     *
+     *   validateHook - Performed right after configure on each application run
+     *   Will throw exception when validation process wont pass
+     */
+    def validateHook = config.validate
+
+
     lazy val shell = new SvdShell(account)
     configureHook.foreach {
         hook =>
             log.trace("configureHook: %s".format(hook))
+            shell.exec(hook)
+    }
+    validateHook.foreach {
+        hook =>
+            log.trace("validateHook: %s".format(hook))
             shell.exec(hook)
     }
 
