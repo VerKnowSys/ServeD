@@ -26,13 +26,12 @@ case class SvdServiceConfig(
 case class SvdShellOperation(
         commands: String,
         env: String = "",
-        expectStdOut: List[String] = Nil, 
+        expectStdOut: List[String] = Nil,
         expectStdErr: List[String] = Nil,
         waitForOutputFor: Int = 5, /* waiting 5 seconds until operation is done */
         uuid: UUID = randomUUID
     ) {
-        override def toString = "SvdShellOperation(uuid: '%s'; cmd: '%s'; env: '%s')".format(
-            uuid,
+        override def toString = "SvdShellOperation(cmd: '%s'; env: '%s')".format(
             commands.split("\n").mkString(", "),
             env.mkString(", ")
             )
