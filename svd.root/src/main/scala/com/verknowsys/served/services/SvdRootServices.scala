@@ -8,9 +8,14 @@ import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.api._
 
 
+/**
+ *  @author dmilith
+ *
+ *   Predefined root services
+ */
 object SvdRootServices {
 
-    val CoreginxConfig = SvdServiceConfig(
+    lazy val coreginxConfig = SvdServiceConfig(
         name = "Coreginx",
         install = SvdShellOperation("echo INSTALL task: Not implemented") :: Nil,
         start = SvdShellOperation("/Software/Coreginx/sbin/nginx") :: Nil,
