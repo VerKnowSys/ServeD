@@ -1,5 +1,6 @@
 package com.verknowsys.served.managers
 
+import com.verknowsys.served.services._
 import com.verknowsys.served.LocalAccountsManager
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.api.accountkeys._
@@ -22,6 +23,7 @@ object AccountKeysDB extends DB[AccountKeys]
  * @author teamon
  */
 class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
+
     class DBServerInitializationException extends Exception
 
     log.info("Starting AccountManager for uid: %s".format(account.uid))
@@ -29,17 +31,36 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val sh = new SvdShell(account)
 
+    /**
+     *  @author dmilith
+     *
+     *   Definitions of "built in" SvdService configurations, parametrized by SvdAccountManager's account
+     */
+     lazy val passengerConfig = SvdServiceConfig(
+         name = "Passenger",
+         install = SvdShellOperation("mkdir -p %s/Apps ; cp -R /Software/Passenger-** %s/Apps/Passenger".format(homeDir, homeDir)) :: Nil,
+         // configure = SvdShellOperation() :: Nil,
+         validate = SvdShellOperation("test -d %s/Apps/Passenger && echo Ok".format(homeDir), waitForOutputFor = 60, expectStdOut = List("Ok")) :: Nil,
+         start = SvdShellOperation("%s/Apps/Passenger/sbin/nginx".format(homeDir)) :: Nil,
+         stop = SvdShellOperation("%s/Apps/Passenger/sbin/nginx -s stop".format(homeDir)) :: Nil
+     )
+
+
     // Only for closing in postStop
     private var _dbServer: Option[DBServer] = None // XXX: Refactor
     private var _dbClient: Option[DBClient] = None // XXX: Refactor
 
+    val _apps = actorOf(new SvdService(passengerConfig, account))
+
+
+    log.info("Spawning applications of uid: %s".format(account.uid))
+    // TODO: gather list of configurations from user config
 
     def receive = traceReceive {
         case Init =>
             log.info("SvdAccountManager received Init.")
             val psAll = SvdLowLevelSystemAccess.processList(false)
             log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
-
 
             // Connect to database
             // Get port from pool
@@ -53,6 +74,12 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
                     _dbServer = Some(server)
                     _dbClient = Some(db)
+
+                    log.trace("Spawning user app: %s".format(_apps))
+                    _apps.start
+                    _apps !! Install
+                    _apps !! Run
+                    self startLink _apps
 
                     // Start GitManager for this account
                     val gitManager = Actor.actorOf(new SvdGitManager(account, db, homeDir / "git"))
@@ -94,7 +121,6 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             val ak = accountKeys(db)
             db << ak.copy(keys = ak.keys - key)
 
-
         case msg: git.Base =>
             gitManager forward msg
     }
@@ -105,12 +131,14 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
         ak getOrElse AccountKeys()
     }
 
+
     override def postStop {
         log.debug("Executing postStop for user svd UID: %s".format(account.uid))
-        super.postStop
+        _apps.stop
         sh.close
         _dbClient.foreach(_.close)
         _dbServer.foreach(_.close)
+        super.postStop
     }
 
 }
