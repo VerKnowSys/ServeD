@@ -38,7 +38,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
      */
      lazy val passengerConfig = SvdServiceConfig(
          name = "Passenger",
-         install = SvdShellOperation("mkdir -p %s/Apps ; cp -R /Software/Passenger-** %s/Apps/Passenger".format(homeDir, homeDir)) :: Nil,
+         install = SvdShellOperation("mkdir -p %s/Apps ; cp -R %sPassenger-** %s/Apps/Passenger".format(homeDir, SvdConfig.softwareRoot, homeDir)) :: Nil,
          // configure = SvdShellOperation() :: Nil,
          validate = SvdShellOperation("test -d %s/Apps/Passenger && echo Ok".format(homeDir), waitForOutputFor = 60, expectStdOut = List("Ok")) :: Nil,
          start = SvdShellOperation("%s/Apps/Passenger/sbin/nginx".format(homeDir)) :: Nil,
