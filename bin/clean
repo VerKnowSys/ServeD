@@ -1,6 +1,9 @@
 #!/bin/sh
 
-sudo rm -rf ~/.ivy2
+if [ "$1" = "deep" ]; then
+    echo "Deep clean"
+    rm -rf ~/.ivy2
+fi
 
 for i in *; do
     if [ -d "$i" ]; then
@@ -12,5 +15,6 @@ done
 bin/sbt clean
 echo "Project source cleaned.."
 
-rm -rf lib/*.o
-echo "Native library cleaned."
+rm -f lib/*.o
+rm -f ./kick ./shell
+echo "Native code cleaned."
