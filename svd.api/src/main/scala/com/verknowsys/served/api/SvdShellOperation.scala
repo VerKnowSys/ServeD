@@ -13,6 +13,7 @@ case class SvdServiceConfig(
         afterStart: List[SvdShellOperation] = Nil,
         stop: List[SvdShellOperation] = Nil,
         afterStop: List[SvdShellOperation] = Nil,
+        reload: List[SvdShellOperation] = Nil,
         validate: List[SvdShellOperation] = Nil,
         uuid: UUID = randomUUID
     ) extends Persistent

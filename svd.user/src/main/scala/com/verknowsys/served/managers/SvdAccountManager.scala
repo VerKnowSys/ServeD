@@ -62,7 +62,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
                     log.trace("Spawning user app: %s".format(_apps))
                     _apps.start
-                    _apps !! Run
+                    _apps !! Run /* temporary call due to lack of web interface */
+                    _apps !! Reload /* temporary call due to lack of web interface */
                     self startLink _apps
 
                     // Start GitManager for this account

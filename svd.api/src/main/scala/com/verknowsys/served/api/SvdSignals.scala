@@ -11,6 +11,7 @@ package com.verknowsys.served.api
 
 case object Init
 case object Run
+case object Reload
 case object Quit
 case object Ready
 case object MainLoop

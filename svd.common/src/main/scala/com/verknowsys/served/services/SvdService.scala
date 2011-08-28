@@ -75,6 +75,15 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
     /**
      *  @author dmilith
      *
+     *   reloadHook - Service reloading command
+     *   Will be executed only on demand, by sending Reload signal to SvdService
+     */
+    def reloadHook = config.reload
+
+
+    /**
+     *  @author dmilith
+     *
      *   validateHook - Performed right after configure on each application run
      *   Will throw exception when validation process wont pass
      */
@@ -109,6 +118,24 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
 
 
     def receive = {
+
+        /**
+         *  @author dmilith
+         *
+         *   Reload by default should be SIGHUP signal sent to process pid
+         */
+        case Reload =>
+            validateHook.foreach {
+                hook =>
+                    log.trace("validateHook: %s".format(hook))
+                    shell.exec(hook)
+            }
+            reloadHook.foreach {
+                hook =>
+                    log.trace("reloadHook: %s".format(hook))
+                    shell.exec(hook)
+            }
+            self reply Success
 
         /**
          *  @author dmilith
