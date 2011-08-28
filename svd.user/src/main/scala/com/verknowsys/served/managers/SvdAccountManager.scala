@@ -77,7 +77,6 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
                     log.trace("Spawning user app: %s".format(_apps))
                     _apps.start
-                    _apps !! Install
                     _apps !! Run
                     self startLink _apps
 
