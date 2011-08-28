@@ -58,6 +58,14 @@ object SvdUtils extends Logging {
     /**
      *  @author dmilith
      *
+     *   returns true if running system matches Darwin
+     */
+    def isOSX = System.getProperty("os.name").contains("Darwin")
+
+
+    /**
+     *  @author dmilith
+     *
      *   returns true if running system matches Linux
      */
     def isLinux = System.getProperty("os.name").contains("Linux")
@@ -294,13 +302,21 @@ object SvdUtils extends Logging {
                     aName.lastIndexOf(name) != -1
             }
             val iterator = files.iterator
-            log.trace("Looking for: %s in %s. Extensions: %s, Recursive: %s".format(name, root, extensions.mkString(" "), recursive))
+            log.trace("Looking for: %s in %s. Extensions: %s, Recursive: %s".format(
+                name,
+                root,
+                extensions.mkString(" "),
+                recursive))
+
             while (iterator.hasNext) {
-                val file = iterator.next.asInstanceOf[File] // 2011-02-01 06:44:08 - dmilith - XXX: try matcher here
-                if (filter.accept(root, file.toString)) {
-        			return file.getAbsolutePath
-        		}
+                val file = iterator.next
+                file match {
+                    case f: File =>
+                        if (filter.accept(root, file.toString))
+                            return file.getAbsolutePath
+                }
             }
+
         ""
     }
 
