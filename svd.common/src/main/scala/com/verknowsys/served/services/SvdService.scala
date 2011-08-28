@@ -7,10 +7,15 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.api._
 
+import java.io.File
 import akka.actor.Actor
 
 
 class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExceptionHandler {
+
+
+    lazy val shell = new SvdShell(account)
+    lazy val installIndicator = new File(SvdConfig.userHomeDir / "%s".format(account.uid) / "Apps" / config.name / SvdConfig.installed)
 
 
     /**
@@ -59,7 +64,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
      *   installHook - Software prepare / install hook.
      *   Will be executed only on demand, by sending Install signal to SvdService
      */
-    def installHook = config.install
+    def installHook = config.install ::: SvdShellOperation("touch %s".format(installIndicator)) :: Nil
 
 
     /**
@@ -71,14 +76,21 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
     def validateHook = config.validate
 
 
-    lazy val shell = new SvdShell(account)
     log.debug("SvdService install started for: %s".format(config.name))
 
-    installHook.foreach { // XXX: HACK: totally idiotic, but currently required to install app non-interactively
-        hook =>
-            log.trace("installHook: %s".format(hook))
-            shell.exec(hook)
+    /* check for previous installation */
+    log.trace("Looking for %s file to check software installation status".format(installIndicator))
+    if (!installIndicator.exists) {
+        log.info("Performing installation of software: %s".format(config.name))
+        installHook.foreach {
+            hook =>
+                log.trace("installHook: %s".format(hook))
+                shell.exec(hook)
+        }
+    } else {
+        log.info("Software already installed: %s".format(config.name))
     }
+
     configureHook.foreach {
         hook =>
             log.trace("configureHook: %s".format(hook))
@@ -96,21 +108,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
         /**
          *  @author dmilith
          *
-         *   Install should be sent to install required software for service.
-         */
-        case Install =>
-            log.debug("SvdService install started for: %s".format(config.name))
-            installHook.foreach {
-                hook =>
-                    log.trace("installHook: %s".format(hook))
-                    shell.exec(hook)
-            }
-            self reply Success
-
-        /**
-         *  @author dmilith
-         *
-         *   Run should be sent when we want to start this service
+         *   Run should be sent when we want to start this service.
          */
         case Run =>
             log.debug("SvdService with name %s has been started".format(config.name))
