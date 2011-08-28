@@ -34,15 +34,46 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     /**
      *  @author dmilith
      *
-     *   Definitions of "built in" SvdService configurations, parametrized by SvdAccountManager's account
+     *   Definitions of "built in" SvdService configurations, parametrized by SvdAccountManager's account.
+     *   NOTE: "name" is additionally name of service root folder.
      */
-     lazy val passengerConfig = SvdServiceConfig(
-         name = "Passenger",
-         install = SvdShellOperation("mkdir -p %s/Apps ; cp -R %sPassenger-** %s/Apps/Passenger".format(homeDir, SvdConfig.softwareRoot, homeDir)) :: Nil,
+     def passengerConfig(name: String = "Passenger") = SvdServiceConfig(
+
+         name = name,
+
+         install = SvdShellOperation(
+            "mkdir -p %s/Apps ; cp -R %s%s-** %s/Apps/%s && echo install".format(
+                    homeDir,
+                    SvdConfig.softwareRoot,
+                    name,
+                    homeDir,
+                    name),
+                waitForOutputFor = 90,
+                expectStdOut = List("install")) :: Nil,
+
          // configure = SvdShellOperation() :: Nil,
-         validate = SvdShellOperation("test -d %s/Apps/Passenger && echo Ok".format(homeDir), waitForOutputFor = 60, expectStdOut = List("Ok")) :: Nil,
-         start = SvdShellOperation("%s/Apps/Passenger/sbin/nginx".format(homeDir)) :: Nil,
-         stop = SvdShellOperation("%s/Apps/Passenger/sbin/nginx -s stop".format(homeDir)) :: Nil
+
+         validate = SvdShellOperation(
+            "test -e %s/Apps/%s/sbin/nginx && echo validate".format(
+                    homeDir,
+                    name),
+                waitForOutputFor = 60,
+                expectStdOut = List("validate")) :: Nil,
+
+         start = SvdShellOperation(
+            "%s/Apps/%s/sbin/nginx && echo start".format(
+                    homeDir,
+                    name),
+                waitForOutputFor = 30,
+                expectStdOut = List("start")) :: Nil,
+
+         stop = SvdShellOperation(
+            "%s/Apps/%s/sbin/nginx -s stop && echo stop".format(
+                homeDir,
+                name),
+            waitForOutputFor = 15,
+            expectStdOut = List("stop")) :: Nil
+
      )
 
 
@@ -50,7 +81,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     private var _dbServer: Option[DBServer] = None // XXX: Refactor
     private var _dbClient: Option[DBClient] = None // XXX: Refactor
 
-    val _apps = actorOf(new SvdService(passengerConfig, account))
+    val _apps = actorOf(new SvdService(passengerConfig(), account))
 
 
     log.info("Spawning applications of uid: %s".format(account.uid))
