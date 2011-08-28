@@ -31,57 +31,11 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val sh = new SvdShell(account)
 
-    /**
-     *  @author dmilith
-     *
-     *   Definitions of "built in" SvdService configurations, parametrized by SvdAccountManager's account.
-     *   NOTE: "name" is additionally name of service root folder.
-     */
-     def passengerConfig(name: String = "Passenger") = SvdServiceConfig(
-
-         name = name,
-
-         install = SvdShellOperation(
-            "mkdir -p %s/Apps ; cp -R %s%s-** %s/Apps/%s && echo install".format(
-                    homeDir,
-                    SvdConfig.softwareRoot,
-                    name,
-                    homeDir,
-                    name),
-                waitForOutputFor = 90,
-                expectStdOut = List("install")) :: Nil,
-
-         // configure = SvdShellOperation() :: Nil,
-
-         validate = SvdShellOperation(
-            "test -e %s/Apps/%s/sbin/nginx && echo validate".format(
-                    homeDir,
-                    name),
-                waitForOutputFor = 60,
-                expectStdOut = List("validate")) :: Nil,
-
-         start = SvdShellOperation(
-            "%s/Apps/%s/sbin/nginx && echo start".format(
-                    homeDir,
-                    name),
-                waitForOutputFor = 30,
-                expectStdOut = List("start")) :: Nil,
-
-         stop = SvdShellOperation(
-            "%s/Apps/%s/sbin/nginx -s stop && echo stop".format(
-                homeDir,
-                name),
-            waitForOutputFor = 15,
-            expectStdOut = List("stop")) :: Nil
-
-     )
-
-
     // Only for closing in postStop
     private var _dbServer: Option[DBServer] = None // XXX: Refactor
     private var _dbClient: Option[DBClient] = None // XXX: Refactor
 
-    val _apps = actorOf(new SvdService(passengerConfig(), account))
+    val _apps = actorOf(new SvdService(SvdUserServices.passengerConfig(account), account))
 
 
     log.info("Spawning applications of uid: %s".format(account.uid))
