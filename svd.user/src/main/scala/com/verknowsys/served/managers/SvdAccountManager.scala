@@ -82,9 +82,6 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
                     throw new DBServerInitializationException
             }
 
-            // TODO:
-            // new SvdService(account, "rails app x", SvdShellOperation("rails dupa" :: "cd dupa" :: "script/rails" :: Nil)).start
-            // self reply Success
     }
 
     def started(db: DBClient, gitManager: ActorRef): Receive = traceReceive {

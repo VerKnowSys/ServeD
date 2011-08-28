@@ -143,7 +143,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
          *   Run should be sent when we want to start this service.
          */
         case Run =>
-            log.debug("SvdService with name %s has been started".format(config.name))
+            log.info("SvdService with name %s has been started".format(config.name))
             startHook.foreach {
                 hook =>
                     log.trace("startHook: %s".format(hook))
@@ -191,7 +191,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                 shell.exec(hook)
         }
         shell.close
-        log.info("Stopping SvdService: %s".format(config))
+        log.info("Stopping SvdService: %s".format(config.name))
     }
 
 
