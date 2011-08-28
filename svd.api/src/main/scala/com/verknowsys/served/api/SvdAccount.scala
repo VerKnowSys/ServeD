@@ -6,10 +6,10 @@ import com.verknowsys.served.api.pools._
 
 /**
  * SvdAccount describes one virtual svd User
- * 
+ *
  * @author dmilith
  * @author teamon
- * 
+ *
  */
 case class SvdAccount (
         userName: String = "guest",
@@ -19,8 +19,8 @@ case class SvdAccount (
         shell: String = "",
         uuid: UUID = randomUUID
     ) extends Persistent {
-    
-    override def toString = "SvdAccount(" + userName + ")"
+
+    override def toString = "SvdAccount(%s)[%s]".format(userName, uid)
 
 }
 
