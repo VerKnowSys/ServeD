@@ -62,9 +62,9 @@ http {
         name = name,
 
         install = SvdShellOperation(
-            "mkdir -p %s0/Apps ; cp -R %s%s** %s0/Apps/%s && echo install".format(
-                    SvdConfig.systemHomeDir, /* mkdir */
-                    SvdConfig.softwareRoot, name, SvdConfig.systemHomeDir, name), /* cp */
+            "mkdir -p %s ; cp -R %s** %s && echo install".format(
+                    SvdConfig.systemHomeDir / "0" / "Apps", /* mkdir */
+                    SvdConfig.softwareRoot / name, SvdConfig.systemHomeDir / "0" / name), /* cp */
                 waitForOutputFor = 90,
                 expectStdOut = List("install")) :: Nil,
 
@@ -77,25 +77,26 @@ http {
            )) :: Nil,
 
         validate = SvdShellOperation(
-            "test -d %s0/Apps/%s && echo validation".format(
-                    SvdConfig.systemHomeDir,
-                    name),
-                waitForOutputFor = 60,
-                expectStdOut = List("validation")) :: Nil,
-
-        start = SvdShellOperation(
-            "%s0/Apps/%s/sbin/nginx -p %s && echo start".format(
+            "%s0/Apps/%s/sbin/nginx -p %s/ -t".format(
                     SvdConfig.systemHomeDir,
                     name,
-                    SvdConfig.systemHomeDir / "0" / "Apps" / name + "/"),
+                    SvdConfig.systemHomeDir / "0" / "Apps" / name),
+                waitForOutputFor = 10,
+                expectStdErr = List("test is successful")) :: Nil,
+
+        start = SvdShellOperation(
+            "%s0/Apps/%s/sbin/nginx -p %s/ && echo start".format(
+                    SvdConfig.systemHomeDir,
+                    name,
+                    SvdConfig.systemHomeDir / "0" / "Apps" / name),
                 waitForOutputFor = 5,
                 expectStdOut = List("start")) :: Nil,
 
         stop = SvdShellOperation(
-            "%s0/Apps/%s/sbin/nginx -p %s -s stop && echo stop".format(
+            "%s0/Apps/%s/sbin/nginx -p %s/ -s stop && echo stop".format(
                     SvdConfig.systemHomeDir,
                     name,
-                    SvdConfig.systemHomeDir / "0" / "Apps" / name + "/"),
+                    SvdConfig.systemHomeDir / "0" / "Apps" / name),
                 waitForOutputFor = 15,
                 expectStdOut = List("stop")) :: Nil
 
