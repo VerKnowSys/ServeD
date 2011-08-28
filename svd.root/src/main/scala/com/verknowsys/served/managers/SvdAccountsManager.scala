@@ -213,27 +213,9 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
             // registerFileEventFor(SvdConfig.systemHomeDir, Modified)
 
-            // 2011-06-26 18:17:00 - dmilith - HACK: XXX: HARDCODE: default user definition hack moved here now ;]
-            // 2011-06-27 02:46:10 - dmilith - FIXME: PENDING: TODO: find out WTF in neodatis bug when more than two elements are inserted at once:
-            // (1 to 10) foreach {
-                // _ =>
-                    if (!userUIDRegistered(501)) {
-                        registerUserAccount(501)
-                    }
-
-                    if (!userUIDRegistered(10001)) {
-                        registerUserAccount(10001)
-                    }
-
-
-                    // val ruid = randomUserUid
-                    // log.trace("Adding user for %d", ruid)
-                    // if (!userUIDRegistered(ruid)) {
-                    //     log.trace("Added")
-                    //     registerUserAccount(ruid, "żółć")
-                    // }
-
-            // }
+            if (SvdUtils.isOSX) /* 2011-06-26 18:17:00 - dmilith - NOTE: XXX: default user definition only for OSX hosts: */
+                if (!userUIDRegistered(501))
+                    registerUserAccount(501)
 
             respawnUsersActors
             self reply_? Success
@@ -263,7 +245,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
         userAccounts.foreach{
             account =>
                 log.warn("Spawning account: %s".format(account))
-                new SvdShell(account).exec(new SvdShellOperation(SvdConfig.kickApp + " " + account.uid)) // HACK
+                new SvdShell(account).exec(new SvdShellOperation(SvdConfig.kickApp + " " + account.uid))
         }
     }
 
