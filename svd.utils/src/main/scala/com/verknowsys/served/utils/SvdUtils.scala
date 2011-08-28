@@ -194,7 +194,22 @@ object SvdUtils extends Logging {
      *  Get all live threads of ServeD. Useful only when debugging.
      *
      */
-    def getAllLiveThreads = log.trace("Live threads list:\n%s".format(Thread.getAllStackTraces.toList.map{ th => "%s - %s\n".format(th._1, th._2.toList.map{ elem => "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(elem.getFileName, elem.getClassName, elem.getMethodName, elem.getLineNumber, elem.isNativeMethod)})}))
+    def getAllLiveThreads = log.trace("Live threads list:\n%s".format(
+        Thread.getAllStackTraces.toList.map{
+            th =>
+                "%s - %s\n".format(
+                    th._1,
+                    th._2.toList.map{
+                        elem =>
+                            "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(
+                                elem.getFileName,
+                                elem.getClassName,
+                                elem.getMethodName,
+                                elem.getLineNumber,
+                                elem.isNativeMethod)
+                    }
+                )
+        }))
 
 
     /**
