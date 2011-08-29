@@ -8,95 +8,49 @@ import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.api._
 
 
+/**
+ *  @author dmilith
+ *
+ *   Definitions of "built in" SvdService configurations, parametrized by SvdAccountManager's account.
+ *   NOTE: "name" is additionally name of service root folder.
+ */
+
 object SvdUserServices {
 
 
-    def passengerDefinitionTemplate(
-        account: SvdAccount, defaultDomainName: String = SvdConfig.defaultDomain) =
-"""
-worker_processes    %s;
-
-events {
-    worker_connections  %s;
-}
-
-http {
-    include     mime.types;
-    default_type    application/octet-stream;
-    keepalive_timeout   %s;
-    gzip    on;
-
-    server {
-        listen  %s;
-        server_name %s;
-        access_log  logs/%s.access.log;
-        location    /   {
-            root    %s;
-            index   index.html  index.htm;
-        }
-        error_page  500    502    503    504    /50x.html;
-        location    =  /50x.html {
-            root    %shtml;
-        }
-    }
-}
-
-""".format(
-    SvdConfig.defaultHttpAmountOfWorkers, /* worker_processes */
-    SvdConfig.defaultHttpWorkerConnections, /* worker_connections */
-    SvdConfig.defaultHttpKeepAliveTimeout, /* keepalive_timeout */
-    8181, /* listen */ // XXX:, HACK:
-    "localhost", /* server name */
-    defaultDomainName, /* access log */
-    SvdConfig.userHomeDir / "%s".format(account.uid) / "Public", /* root */
-    SvdConfig.publicHttpDir /* root */
-)
-
-    /**
-     *  @author dmilith
-     *
-     *   Definitions of "built in" SvdService configurations, parametrized by SvdAccountManager's account.
-     *   NOTE: "name" is additionally name of service root folder.
-     */
-     def passengerConfig(account: SvdAccount, name: String = "Passenger") = SvdServiceConfig(
-
+     def rackWebAppConfig(account: SvdAccount, domain: SvdUserDomain, name: String = "Passenger") = SvdServiceConfig(
+        /*      appRoot     =>  SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name    */
         name = name,
 
         install = SvdShellOperation(
             "mkdir -p %s ; cp -R %s-** %s && echo install".format(
-                    SvdConfig.userHomeDir / account.uid.toString / "Apps", /* mkdir */
-                    SvdConfig.softwareRoot / name,
-                    SvdConfig.userHomeDir / account.uid.toString / "Apps" / name),
-                waitForOutputFor = 90,
-                expectStdOut = List("install")) :: Nil,
-
-        configure = SvdShellOperation(
-           "mkdir %s ; echo \"%s\" > %s".format(
-                SvdConfig.userHomeDir / "%s".format(account.uid) / "Public",
-                passengerDefinitionTemplate(account),
-                SvdConfig.userHomeDir / "%s".format(account.uid) / "Apps" / name / "conf" / "nginx.conf")) :: Nil,
+                SvdConfig.userHomeDir / account.uid.toString / "Apps", /* mkdir */
+                SvdConfig.softwareRoot / name,
+                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name),
+            waitForOutputFor = 90,
+            expectStdOut = List("install")) :: Nil,
 
         validate = SvdShellOperation(
-            "%s/sbin/nginx -p %s/ -t".format(
-                    SvdConfig.userHomeDir / account.uid.toString / "Apps" / name,
-                    SvdConfig.userHomeDir / "%s".format(account.uid) / "Apps" / name,
-                    name),
-                waitForOutputFor = 10,
-                expectStdErr = List("test is successful")) :: Nil,
+            "test -d %s && test -e %s && test -e %s && echo validation".format(
+                SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name,
+                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "ruby",
+                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "gem"),
+            waitForOutputFor = 5,
+            expectStdOut = List("validation")) :: Nil,
 
         start = SvdShellOperation(
-            "%s/sbin/nginx -p %s/ && echo start".format(
-                    SvdConfig.userHomeDir / account.uid.toString / "Apps" / name,
-                    SvdConfig.userHomeDir / "%s".format(account.uid) / "Apps" / name,
-                    name),
-                waitForOutputFor = 30,
-                expectStdOut = List("start")) :: Nil,
+            "cd %s && %s start -e production -S %s -d && echo start".format( /* XXX: FIXME: HARDCODE: port should be generated, pool size should be automatically set */
+                SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name,
+                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "passenger",
+                SvdConfig.temporaryDir / "%s-%s.socket".format(domain.name, account.uuid)),
+            waitForOutputFor = 90,
+            expectStdOut = List("start")) :: Nil,
 
         stop = SvdShellOperation(
-            "%s/sbin/nginx -p %s/ -s stop && echo stop".format(
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name,
-                SvdConfig.userHomeDir / "%s".format(account.uid) / "Apps" / name,
-                name),
+            "cd %s && %s stop --pid-file %s && echo stop".format(
+                SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name,
+                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "passenger",
+                SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name / "tmp" / "pids" / "passenger.pid"),
             waitForOutputFor = 15,
             expectStdOut = List("stop")) :: Nil
 
