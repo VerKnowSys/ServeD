@@ -25,6 +25,7 @@ object SvdConfig {
     def coreSvdAccountsDatabaseName     = "accounts.db"
     def served                          = "ServeD v" + version
     def systemConfDir                   = "/etc"
+    def temporaryDir                    = "/tmp"
     def systemHomeDir                   = "/SystemUsers/"
     def userHomeDir                     = "/Users/"
     def softwareRoot                    = "/Software/"
