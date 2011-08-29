@@ -44,7 +44,6 @@ http {
             root    %shtml;
         }
     }
-}
 
 """.format(
     SvdConfig.defaultHttpAmountOfWorkers, /* worker_processes */
@@ -58,6 +57,65 @@ http {
 )
 
 
+    /**
+     *  @author dmilith
+     *
+     *   Add entry about proxy on user's web app on given port
+     */
+    def newWebAppEntry(domain: SvdUserDomain, port: SvdUserPort) = """
+# ENTRY %s
+server {
+    listen %s;
+    server_name %s %s;
+    location / {
+        proxy_pass http://localhost:%s;
+    }
+}
+# ENTRY END
+""".format(
+    domain.name,
+    SvdConfig.defaultHttpPort, /* listen */
+    domain.name, /* main server_name */
+    if (domain.wildcard) /* wildcard */
+        "*.%s".format(domain.name)
+    else
+        "",
+    port.number
+)
+
+
+    /**
+     *  @author dmilith
+     *
+     *   Add entry about proxy on user's web app through unix socket (default)
+     */
+    def newWebAppEntry(domain: SvdUserDomain, account: SvdAccount) = """
+# ENTRY %s
+server {
+    listen %s;
+    server_name %s %s;
+    location / {
+        proxy_pass http://%s;
+    }
+}
+# ENTRY END
+""".format(
+    domain.name,
+    SvdConfig.defaultHttpPort, /* listen */
+    domain.name, /* main server_name */
+    if (domain.wildcard) /* wildcard */
+        "*.%s".format(domain.name)
+    else
+        "",
+    "unix:/tmp/%s-%s.socket".format(domain.name, account.uuid)
+)
+
+
+    /**
+     *  @author dmilith
+     *
+     *   Creates Coreginx configuration required to spawn service properly.
+     */
     def coreginxConfig(name: String = "Coreginx") = SvdServiceConfig(
         name = name,
 
@@ -73,7 +131,20 @@ http {
                 SvdConfig.publicHttpDir, /* mkdir */
                 SvdConfig.publicHttpDir, /* chown */
                 SvdConfig.systemHomeDir / "0" / "Apps" / name / "html", SvdConfig.publicHttpDir, /* cp */
-                coreginxDefinitionTemplate(), SvdConfig.systemHomeDir / "0" / "Apps" / name / "conf" / "nginx.conf" /* echo */
+                coreginxDefinitionTemplate() +
+
+// NOTE: devel only
+                newWebAppEntry(
+                    SvdUserDomain(
+                        "delda",
+                        false
+                    ),
+                    SvdAccount(uid = 501).copy(uuid = java.util.UUID.fromString("7811db03-52f0-4ef8-bcf0-dbc93982315e"))
+                ) +
+                "\n}",
+// NOTE: devel only
+
+                SvdConfig.systemHomeDir / "0" / "Apps" / name / "conf" / "nginx.conf" /* echo */
            )) :: Nil,
 
         validate = SvdShellOperation(
