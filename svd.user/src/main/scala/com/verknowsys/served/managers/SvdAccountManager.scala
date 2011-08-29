@@ -35,7 +35,15 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     private var _dbServer: Option[DBServer] = None // XXX: Refactor
     private var _dbClient: Option[DBClient] = None // XXX: Refactor
 
-    val _apps = actorOf(new SvdService(SvdUserServices.passengerConfig(account), account))
+    val _apps = actorOf(
+        new SvdService(
+            SvdUserServices.rackWebAppConfig(
+                account,
+                domain = SvdUserDomain("delda") // NOTE: it's also tells about app root dir set to /Users/501/WebApps/delda
+            ),
+            account
+        )
+    )
 
 
     log.info("Spawning applications of uid: %s".format(account.uid))
@@ -63,7 +71,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
                     log.trace("Spawning user app: %s".format(_apps))
                     _apps.start
                     _apps !! Run /* temporary call due to lack of web interface */
-                    _apps !! Reload /* temporary call due to lack of web interface */
+                    // _apps !! Reload /* temporary call due to lack of web interface */
                     self startLink _apps
 
                     // Start GitManager for this account
