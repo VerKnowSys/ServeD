@@ -77,7 +77,8 @@ case class SvdUserUID(
  */
 case class SvdUserDomain(
         name: String,
+        wildcard: Boolean = true,
         uuid: UUID = randomUUID
     ) extends Persistent {
-        override def toString = "SvdUserDomain(" + name + ")"
+        override def toString = "SvdUserDomain(%s)[wldcrd: %s]".format(name, wildcard)
     }
