@@ -26,7 +26,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
     class DBServerInitializationException extends Exception
 
-    log.info("Starting AccountManager for uid: %s".format(account.uid))
+    log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
 
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val sh = new SvdShell(account)
@@ -35,15 +35,39 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     private var _dbServer: Option[DBServer] = None // XXX: Refactor
     private var _dbClient: Option[DBClient] = None // XXX: Refactor
 
-    val _apps = actorOf(
-        new SvdService(
-            SvdUserServices.rackWebAppConfig(
-                account,
-                domain = SvdUserDomain("delda") // NOTE: it's also tells about app root dir set to /Users/501/WebApps/delda
-            ),
-            account
-        )
+    lazy val _passenger = new SvdService(
+        SvdUserServices.rackWebAppConfig(
+            account,
+            domain = SvdUserDomain("delda") // NOTE: it's also tells about app root dir set to /Users/501/WebApps/delda
+        ),
+        account
     )
+
+    lazy val _postgres = new SvdService(
+        SvdUserServices.postgresDatabaseConfig(
+            account
+        ),
+        account
+    )
+
+    val _apps =
+        try {
+            actorOf(_passenger)
+        } catch {
+            case e: Throwable =>
+                log.error("EXCPT in %s".format(e))
+                Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
+        }
+
+    val _dbs =
+        try {
+            actorOf(_postgres)
+        } catch {
+            case e: Throwable =>
+                log.error("EXCPT in %s".format(e))
+                Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
+        }
+
 
 
     log.info("Spawning applications of uid: %s".format(account.uid))
@@ -54,6 +78,11 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             log.info("SvdAccountManager received Init.")
             val psAll = SvdLowLevelSystemAccess.processList(false)
             log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
+
+            log.info("Spawning user databases: %s".format(_dbs))
+            _dbs.start
+            _dbs !! Run /* temporary call due to lack of web interface */
+            self startLink _dbs
 
             // Connect to database
             // Get port from pool
@@ -68,11 +97,13 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
                     _dbServer = Some(server)
                     _dbClient = Some(db)
 
-                    log.trace("Spawning user app: %s".format(_apps))
+                    log.info("Spawning user app: %s".format(_apps))
                     _apps.start
                     _apps !! Run /* temporary call due to lack of web interface */
                     // _apps !! Reload /* temporary call due to lack of web interface */
                     self startLink _apps
+
+
 
                     // Start GitManager for this account
                     val gitManager = Actor.actorOf(new SvdGitManager(account, db, homeDir / "git"))
@@ -125,6 +156,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     override def postStop {
         log.debug("Executing postStop for user svd UID: %s".format(account.uid))
         _apps.stop
+        _dbs.stop
         sh.close
         _dbClient.foreach(_.close)
         _dbServer.foreach(_.close)
