@@ -18,7 +18,7 @@ import com.verknowsys.served.api._
 object SvdUserServices {
 
 
-    def postgresDatabaseConfig(account: SvdAccount, name: String = "PostgreSQL") = SvdServiceConfig(
+    def postgresDatabaseConfig(account: SvdAccount, name: String = "Postgresql") = SvdServiceConfig(
         name = name,
 
         install = SvdShellOperation(
@@ -42,14 +42,15 @@ object SvdUserServices {
             expectStdOut = List("validation")) :: Nil,
 
         configure = SvdShellOperation(
-            "echo %s > %s && echo %s > %s && echo configuration".format(
+            "mkdir -p %s ; echo \"%s\" > \"%s\" && echo \"%s\" > \"%s\" && echo configuration".format(
+                SvdConfig.temporaryDir / "%s-%s".format(name, account.uuid),
                 """
                 local all all trust
                 host replication all 0.0.0.0/0 trust
                 """,
                 SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / name / "pg_hba.conf", /* pg_hba.conf */
                 """
-                unix_socket_directory %s
+                unix_socket_directory '%s'
                 max_connections = 10
                 checkpoint_segments = 24
                 password_encryption = on
@@ -60,7 +61,7 @@ object SvdUserServices {
                 max_stack_depth = 16MB
 
                 logging_collector = true
-                log_directory = %s
+                log_directory = '%s'
                 client_encoding = 'UTF-8'
                 lc_messages = 'pl_PL.UTF-8'
                 lc_monetary = 'pl_PL.UTF-8'
@@ -73,14 +74,13 @@ object SvdUserServices {
                 max_wal_senders = 5
                 wal_keep_segments = 32
                 archive_mode = on
-                # archive_command = '#{CP_BIN} %p __POSTGRES_WAL_DIR__/%f'
                 """.format(
-                    SvdConfig.temporaryDir / "%s-%s.socket".format(name, account.uuid),
-                    SvdConfig.temporaryDir / "%s-%s.log".format(name, account.uuid) // NOTE: consider log in app dir
+                    SvdConfig.temporaryDir / "%s-%s".format(name, account.uuid),
+                    SvdConfig.temporaryDir / "%s-%s".format(name, account.uuid) // NOTE: consider log in app dir
                 ),
                 SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / name / "postgresql.conf" /* postgresql.conf */
             ),
-            waitForOutputFor = 5,
+            waitForOutputFor = 15,
             expectStdOut = List("configuration")) :: Nil,
 
         start = SvdShellOperation(
@@ -92,7 +92,7 @@ object SvdUserServices {
             expectStdOut = List("start")) :: Nil,
 
         stop = SvdShellOperation(
-            "%s -m fast -D %s stop && echo stop".format(
+            "%s -m fast -D '%s' stop && echo stop".format(
                 SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "pg_ctl",
                 SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / name /* data folder */
             ),
@@ -107,7 +107,8 @@ object SvdUserServices {
         name = name,
 
         install = SvdShellOperation(
-            "mkdir -p %s ; cp -R %s-** %s && echo install".format(
+            "mkdir -p %s ; mkdir -p %s ; cp -R %s-** %s && echo install".format(
+                SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name, /* mkdir */
                 SvdConfig.userHomeDir / account.uid.toString / "Apps", /* mkdir */
                 SvdConfig.softwareRoot / name,
                 SvdConfig.userHomeDir / account.uid.toString / "Apps" / name),
@@ -115,7 +116,7 @@ object SvdUserServices {
             expectStdOut = List("install")) :: Nil,
 
         validate = SvdShellOperation(
-            "test -d %s && test -e %s && test -e %s && echo validation".format(
+            "test -d %s && test -x %s && test -x %s && echo validation".format(
                 SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name,
                 SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "ruby",
                 SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "gem"),
