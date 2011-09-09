@@ -56,6 +56,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
         } catch {
             case e: Throwable =>
                 log.error("EXCPT in %s".format(e))
+                // 2011-09-09 21:12:09 - dmilith - TODO: FIXME: PENDING: make notifications about eceptions to user
                 Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
         }
 
@@ -65,6 +66,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
         } catch {
             case e: Throwable =>
                 log.error("EXCPT in %s".format(e))
+                // 2011-09-09 21:12:09 - dmilith - TODO: FIXME: PENDING: make notifications about eceptions to user
                 Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
         }
 
