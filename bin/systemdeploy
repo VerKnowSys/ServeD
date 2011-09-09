@@ -7,12 +7,7 @@ rootcheck() {
     fi
 }
 
-system="$(uname)"
-branch="$(git name-rev --name-only HEAD)"
-sha="$(cat .git/refs/heads/${branch})"
-destination="${branch}-${sha}"
-echo $destination > svd.common/src/main/resources/VERSION
-echo "Getting current sha: $destination"
+bin/current
 bin/sbt assembly && \
 if [ $system = "Darwin" ]; then
     sudo bin/install

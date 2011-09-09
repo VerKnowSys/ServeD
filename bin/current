@@ -1,0 +1,8 @@
+#!/bin/sh
+
+system="$(uname)"
+branch="$(git name-rev --name-only HEAD)"
+sha="$(cat .git/refs/heads/${branch})"
+destination="${branch}-${sha}"
+echo $destination > svd.common/src/main/resources/VERSION
+echo "Storing version of current sha into $destination"
