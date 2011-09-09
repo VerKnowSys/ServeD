@@ -5,13 +5,6 @@ if [ "$1" = "deep" ]; then
     rm -rf ~/.ivy2
 fi
 
-for i in *; do
-    if [ -d "$i" ]; then
-        sudo rm -rf "$i/lib_managed"
-        rm -rf "$i/target"
-    fi
-done
-
 bin/sbt clean
 echo "Project source cleaned.."
 
