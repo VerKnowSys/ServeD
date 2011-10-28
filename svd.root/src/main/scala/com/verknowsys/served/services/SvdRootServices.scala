@@ -68,7 +68,7 @@ server {
     listen %s;
     server_name %s %s;
     location / {
-        proxy_pass http://localhost:%s;
+        proxy_pass http://127.0.0.1:%s;
     }
 }
 # ENTRY END
@@ -121,7 +121,7 @@ server {
 
         install = SvdShellOperation(
             "mkdir -p %s ; cp -R %s** %s && echo install".format(
-                    SvdConfig.systemHomeDir / "0" / "Apps", /* mkdir */
+                    SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir, /* mkdir */
                     SvdConfig.softwareRoot / name, SvdConfig.systemHomeDir / "0" / name), /* cp */
                 waitForOutputFor = 90,
                 expectStdOut = List("install")) :: Nil,
@@ -130,28 +130,24 @@ server {
            "mkdir -p %s ; chown -R nobody %s && cp -r %s %s && echo \"%s\" > %s".format(
                 SvdConfig.publicHttpDir, /* mkdir */
                 SvdConfig.publicHttpDir, /* chown */
-                SvdConfig.systemHomeDir / "0" / "Apps" / name / "html", SvdConfig.publicHttpDir, /* cp */
+                SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "html", SvdConfig.publicHttpDir, /* cp */
                 coreginxDefinitionTemplate() +
 
 // NOTE: devel only
                 newWebAppEntry(
-                    SvdUserDomain(
-                        "delda",
-                        false
-                    ),
+                    SvdUserDomain("localhost"),
                     SvdAccount(uid = 501).copy(uuid = java.util.UUID.fromString("7811db03-52f0-4ef8-bcf0-dbc93982315e"))
                 ) +
-                "\n}",
-// NOTE: devel only
+                "\n}", // XXX: HACK: NOTE: closing base "server" clause. STILL HACK
 
-                SvdConfig.systemHomeDir / "0" / "Apps" / name / "conf" / "nginx.conf" /* echo */
+                SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "conf" / "nginx.conf" /* echo */
            )) :: Nil,
 
         validate = SvdShellOperation(
             "%s0/Apps/%s/sbin/nginx -p %s/ -t".format(
                     SvdConfig.systemHomeDir,
                     name,
-                    SvdConfig.systemHomeDir / "0" / "Apps" / name),
+                    SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name),
                 waitForOutputFor = 10,
                 expectStdErr = List("test is successful")) :: Nil,
 
@@ -159,7 +155,7 @@ server {
             "%s0/Apps/%s/sbin/nginx -p %s/ && echo start".format(
                     SvdConfig.systemHomeDir,
                     name,
-                    SvdConfig.systemHomeDir / "0" / "Apps" / name),
+                    SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name),
                 waitForOutputFor = 5,
                 expectStdOut = List("start")) :: Nil,
 
@@ -167,7 +163,7 @@ server {
             "%s0/Apps/%s/sbin/nginx -p %s/ -s stop && echo stop".format(
                     SvdConfig.systemHomeDir,
                     name,
-                    SvdConfig.systemHomeDir / "0" / "Apps" / name),
+                    SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name),
                 waitForOutputFor = 15,
                 expectStdOut = List("stop")) :: Nil
 

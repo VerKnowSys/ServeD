@@ -158,7 +158,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     val svdAccountUtils = new SvdAccountUtils(db)
     import svdAccountUtils._
 
-    log.info("SvdAccountsManager is loading")
+    log.info("SvdAccountsManager (v%s) is loading".format(SvdConfig.version))
 
     log.info("Registering Coreginx")
     val coreginx = actorOf(new SvdService(SvdRootServices.coreginxConfig(), rootAccount))

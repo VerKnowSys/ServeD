@@ -17,9 +17,9 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
     lazy val shell = new SvdShell(account)
     lazy val installIndicator = new File(
         if (account.uid == 0)
-            SvdConfig.systemHomeDir / "%s".format(account.uid) / "Apps" / config.name / SvdConfig.installed
+            SvdConfig.systemHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / SvdConfig.installed
         else
-            SvdConfig.userHomeDir / "%s".format(account.uid) / "Apps" / config.name / SvdConfig.installed
+            SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / SvdConfig.installed
     )
 
 

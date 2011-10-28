@@ -23,20 +23,20 @@ object SvdUserServices {
 
         install = SvdShellOperation(
             "mkdir -p %s ; cp -R %s-** %s && %s -D %s && echo install".format(
-                SvdConfig.userHomeDir / account.uid.toString / "Apps", /* mkdir */
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir, /* mkdir */
                 SvdConfig.softwareRoot / name,
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name, /* cp */
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "initdb",
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / name /* data folder */
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name, /* cp */
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "initdb",
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / name /* data folder */
             ),
             waitForOutputFor = 90,
             expectStdOut = List("install")) :: Nil,
 
         validate = SvdShellOperation(
             "test -x %s && test -x %s && test -x %s && echo validation".format(
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "initdb",
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "pg_ctl",
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "postgres"
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "initdb",
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "pg_ctl",
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "postgres"
             ),
             waitForOutputFor = 5,
             expectStdOut = List("validation")) :: Nil,
@@ -48,7 +48,7 @@ object SvdUserServices {
                 local all all trust
                 host replication all 0.0.0.0/0 trust
                 """,
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / name / "pg_hba.conf", /* pg_hba.conf */
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / name / "pg_hba.conf", /* pg_hba.conf */
                 """
                 unix_socket_directory '%s'
                 max_connections = 10
@@ -78,23 +78,23 @@ object SvdUserServices {
                     SvdConfig.temporaryDir / "%s-%s".format(name, account.uuid),
                     SvdConfig.temporaryDir / "%s-%s".format(name, account.uuid) // NOTE: consider log in app dir
                 ),
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / name / "postgresql.conf" /* postgresql.conf */
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / name / "postgresql.conf" /* postgresql.conf */
             ),
             waitForOutputFor = 15,
             expectStdOut = List("configuration")) :: Nil,
 
         start = SvdShellOperation(
             "%s -m fast -D %s start && echo start".format(
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "pg_ctl",
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / name /* data folder */
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "pg_ctl",
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / name /* data folder */
             ),
             waitForOutputFor = 90,
             expectStdOut = List("start")) :: Nil,
 
         stop = SvdShellOperation(
             "%s -m fast -D '%s' stop && echo stop".format(
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "pg_ctl",
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / name /* data folder */
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "pg_ctl",
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / name /* data folder */
             ),
             waitForOutputFor = 15,
             expectStdOut = List("stop")) :: Nil
@@ -103,39 +103,39 @@ object SvdUserServices {
 
 
     def rackWebAppConfig(account: SvdAccount, domain: SvdUserDomain, name: String = "Passenger") = SvdServiceConfig(
-        /*      appRoot     =>  SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name    */
+        /*      appRoot     =>  SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name    */
         name = name,
 
         install = SvdShellOperation(
             "mkdir -p %s ; mkdir -p %s ; cp -R %s-** %s && echo install".format(
-                SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name, /* mkdir */
-                SvdConfig.userHomeDir / account.uid.toString / "Apps", /* mkdir */
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name, /* mkdir */
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir, /* mkdir */
                 SvdConfig.softwareRoot / name,
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name),
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name),
             waitForOutputFor = 90,
             expectStdOut = List("install")) :: Nil,
 
         validate = SvdShellOperation(
             "test -d %s && test -x %s && test -x %s && echo validation".format(
-                SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name,
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "ruby",
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "gem"),
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name,
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "ruby",
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "gem"),
             waitForOutputFor = 5,
             expectStdOut = List("validation")) :: Nil,
 
         start = SvdShellOperation(
             "cd %s && %s start -e production -S %s -d && echo start".format( /* XXX: FIXME: HARDCODE: port should be generated, pool size should be automatically set */
-                SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name,
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "passenger",
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name,
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "passenger",
                 SvdConfig.temporaryDir / "%s-%s.socket".format(domain.name, account.uuid)),
             waitForOutputFor = 90,
             expectStdOut = List("start")) :: Nil,
 
         stop = SvdShellOperation(
             "cd %s && %s stop --pid-file %s && echo stop".format(
-                SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name,
-                SvdConfig.userHomeDir / account.uid.toString / "Apps" / name / "bin" / "passenger",
-                SvdConfig.userHomeDir / account.uid.toString / "WebApps" / domain.name / "tmp" / "pids" / "passenger.pid"),
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name,
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "passenger",
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name / "tmp" / "pids" / "passenger.pid"),
             waitForOutputFor = 15,
             expectStdOut = List("stop")) :: Nil
 
