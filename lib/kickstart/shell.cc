@@ -66,7 +66,7 @@ int main(int argc, char const *argv[]) {
 
     /* Checking uid validity */
     uid_t uid = atoi(arg.c_str());
-    if (uid == NULL) {
+    if (!uid && arg != "0") {
         cerr << "Ambigous uid given!" << endl;
         exit(AMBIGOUS_ENTRY_ERROR);
     }
