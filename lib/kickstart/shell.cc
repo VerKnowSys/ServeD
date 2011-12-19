@@ -25,7 +25,7 @@ void parse(char *line, char **argv) {
 
 
 void execute(char **argv) {
-    int    status;
+    int status;
     pid_t  pid;
     if ((pid = fork()) < 0) {
         cerr << "Error forking child process failed!" << endl;
@@ -36,7 +36,12 @@ void execute(char **argv) {
             exit(EXEC_ERROR);
         }
     } else {
-        while (wait(&status) != pid); /* wait for process */
+        #ifdef __linux__
+            #include <sys/wait.h>
+            waitpid(pid, &status, 0); /* wait for process */
+        #else
+            while (wait(&status) != pid); /* wait for process */
+        #endif
     }
 }
 
