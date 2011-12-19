@@ -2,7 +2,7 @@
 
 
 system="$(uname)"
-if [ $system = "Darwin" ]; then
+if [ -e "/usr/bin/clang++" ]; then
     export CXX="clang++"
 else
     export CXX="g++"
@@ -28,6 +28,13 @@ if [ "$1" = "sh" ]; then
     exit
 fi
 
+
+$CXX -Os -c -fPIC lib/kickstart/core.cc -o lib/core.o
+check $? "Core"
+
+$CXX -Os -c -fPIC lib/kickstart/utils.cc -o lib/utils.o
+check $? "Utils"
+
 if [ "$system" = "Darwin" ]; then
     $CXX -Os -arch i386 -arch x86_64 -fPIC -shared lib/kickstart/stat.cc -o lib/libstat.dylib
 else
@@ -35,12 +42,6 @@ else
     # $CXX -Os -fPIC -shared lib/kickstart/stat.cc -o lib/libstat.so
 fi
 check $? "StatLib"
-
-$CXX -Os -c -fPIC lib/kickstart/utils.cc -o lib/utils.o
-check $? "Utils"
-
-$CXX -Os -c -fPIC lib/kickstart/core.cc -o lib/core.o
-check $? "Core"
 
 $CXX -Os -fPIC lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
 check $? "KickStart"
