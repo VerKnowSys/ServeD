@@ -213,9 +213,9 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
             // registerFileEventFor(SvdConfig.systemHomeDir, Modified)
 
-            if (SvdUtils.isOSX) /* 2011-06-26 18:17:00 - dmilith - NOTE: XXX: default user definition only for OSX hosts: */
-                if (!userUIDRegistered(501))
-                    registerUserAccount(501)
+            //if (SvdUtils.isOSX) /* 2011-06-26 18:17:00 - dmilith - NOTE: XXX: default user definition only for OSX hosts: */
+            if (!userUIDRegistered(501))
+                registerUserAccount(501)
 
             respawnUsersActors
             self reply_? Success
