@@ -122,7 +122,7 @@ server {
         install = SvdShellOperation(
             "mkdir -p %s ; cp -R %s** %s && echo install".format(
                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir, /* mkdir */
-                    SvdConfig.softwareRoot / name, SvdConfig.systemHomeDir / "0" / name), /* cp */
+                    SvdConfig.softwareRoot / name, SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name), /* cp */
                 waitForOutputFor = 90,
                 expectStdOut = List("install")) :: Nil,
 
