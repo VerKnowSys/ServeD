@@ -62,10 +62,6 @@ object rootboot extends Logging {
     }
 
     def main(args: Array[String]) {
-        if (SvdUtils.isLinux) {
-            log.error("Linux systems aren't supported yet!")
-            sys.exit(1)
-        }
         log.info("ServeD v" + SvdConfig.version)
         log.info(SvdConfig.copyright)
 

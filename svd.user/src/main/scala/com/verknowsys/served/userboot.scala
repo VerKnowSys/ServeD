@@ -65,11 +65,6 @@ object userboot extends Logging {
 
 
     def main(args: Array[String]) {
-        if (SvdUtils.isLinux) {
-            log.error("Linux systems aren't supported yet!")
-            sys.exit(1)
-        }
-
         // handle signals
         SvdUtils.handleSignal("ABRT") { SvdUtils.getAllLiveThreads }
         SvdUtils.handleSignal("USR2") { log.warn("TODO: implement USR2 handling (show svd config values)") }
