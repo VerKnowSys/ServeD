@@ -14,7 +14,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
-
+#ifdef __linux__
+    #include <string.h>
+#endif
 
 using namespace std;
 
