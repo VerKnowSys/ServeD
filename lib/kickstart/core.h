@@ -23,17 +23,22 @@ using namespace std;
 #ifndef __CORE__
 #define __CORE__
 
-    // #define DEVEL
-    #define APP_VERSION "0.1.1"
+    #define DEVEL true
+    #define APP_VERSION "0.1.2"
     #define COPYRIGHT "Copyright © 2oo9-2o11 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     #ifdef __FreeBSD__
         #define DEFAULT_SHELL_COMMAND "/Software/Zsh-4.3.10/bin/zsh"
         #define DEFAULT_JAVA_BIN "/Software/Openjdk7/bin/java"
-    #else
+    #elif __linux__ 
+        #define DEFAULT_SHELL_COMMAND "/Software/Zsh-4.3.10/bin/zsh"
+        #define DEFAULT_JAVA_BIN "/usr/bin/java"
+    #elif __APPLE__
         #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
+    #else
+        #error No supported OS found!
     #endif
 
     #define CORE_HOMEDIR "/SystemUsers/"
