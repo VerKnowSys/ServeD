@@ -22,14 +22,14 @@ object SvdUserServices {
         name = name,
 
         install = SvdShellOperation(
-            "mkdir -p %s ; cp -R %s-** %s && %s -D %s && echo install".format(
+            "mkdir -p %s ; cp -r %s %s && %s -D %s && echo install".format(
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir, /* mkdir */
                 SvdConfig.softwareRoot / name,
-                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name, /* cp */
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir, /* cp */
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "initdb",
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / name /* data folder */
             ),
-            waitForOutputFor = 90,
+            waitForOutputFor = 120,
             expectStdOut = List("install")) :: Nil,
 
         validate = SvdShellOperation(
@@ -107,12 +107,12 @@ object SvdUserServices {
         name = name,
 
         install = SvdShellOperation(
-            "mkdir -p %s ; mkdir -p %s ; cp -R %s-** %s && echo install".format(
+            "mkdir -p %s ; mkdir -p %s ; cp -r %s %s && echo install".format(
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name, /* mkdir */
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir, /* mkdir */
                 SvdConfig.softwareRoot / name,
-                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name),
-            waitForOutputFor = 90,
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir),
+            waitForOutputFor = 120,
             expectStdOut = List("install")) :: Nil,
 
         validate = SvdShellOperation(
