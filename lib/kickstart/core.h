@@ -29,13 +29,13 @@ using namespace std;
 
     #define DEVEL true
     #define APP_VERSION "0.1.2"
-    #define COPYRIGHT "Copyright © 2oo9-2o11 VerKnowSys.com - All Rights Reserved."
+    #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     #ifdef __FreeBSD__
         #define DEFAULT_SHELL_COMMAND "/Software/Zsh-4.3.10/bin/zsh"
         #define DEFAULT_JAVA_BIN "/Software/Openjdk7/bin/java"
-    #elif __linux__ 
+    #elif __linux__
         #define DEFAULT_SHELL_COMMAND "/Software/Zsh-4.3.10/bin/zsh"
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
     #elif __APPLE__
