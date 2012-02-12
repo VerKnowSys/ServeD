@@ -23,7 +23,7 @@ check() {
 
 
 if [ "$system" = "FreeBSD" ]; then
-    $CXX -Os -fPIC -shared lib/kickstart/usage_sys.cc -o lib/libusagesys.dylib -lkvm
+    $CXX -Os -fPIC -shared lib/kickstart/usage_sys.cc -o lib/libusagesys.so -lkvm
     check $? "UsageSysLib"
 fi
 
