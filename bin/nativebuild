@@ -21,13 +21,18 @@ check() {
     fi
 }
 
+if [ "$1" = "cpu" ]; then
+    $CXX -Os -fPIC lib/kickstart/usage_cpu.cc -o usage-cpu -lkvm
+    check $? "Usage-CPU"
+    exit
+fi
+
 $CXX -Os -fPIC lib/kickstart/shell.cc -o shell
 check $? "UserShell"
 
 if [ "$1" = "sh" ]; then
     exit
 fi
-
 
 $CXX -Os -c -fPIC lib/kickstart/core.cc -o lib/core.o
 check $? "Core"
