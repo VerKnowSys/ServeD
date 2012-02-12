@@ -21,10 +21,10 @@ check() {
     fi
 }
 
-if [ "$1" = "sys" ]; then
-    $CXX -Os -fPIC lib/kickstart/usage_sys.cc -o usage-sys -lkvm
-    check $? "Usage-SYS"
-    exit
+
+if [ "$system" = "FreeBSD" ]; then
+    $CXX -Os -fPIC -shared lib/kickstart/usage_sys.cc -o lib/libusagesys.dylib -lkvm
+    check $? "UsageSysLib"
 fi
 
 $CXX -Os -fPIC lib/kickstart/shell.cc -o shell
