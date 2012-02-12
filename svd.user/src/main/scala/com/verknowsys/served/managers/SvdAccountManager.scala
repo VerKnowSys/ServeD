@@ -78,8 +78,6 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     def receive = traceReceive {
         case Init =>
             log.info("SvdAccountManager received Init.")
-            val psAll = SvdLowLevelSystemAccess.processList(false)
-            log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
 
             log.info("Spawning user databases: %s".format(_dbs))
             _dbs.start
@@ -126,6 +124,10 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     }
 
     def started(db: DBClient, gitManager: ActorRef): Receive = traceReceive {
+        // case GetUserProcessList =>
+        //     val psAll = SvdLowLevelSystemAccess.processList(false)
+        //     log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
+
         case GetAccount =>
             self reply account
 
