@@ -35,7 +35,22 @@ int getProcessUsage(int uid, bool consoleOutput) {
         procs = kvm_getprocs(kd, KERN_PROC_UID, uid, &count); // get process directly from kernel
 
     if (consoleOutput)
-        cout << "Process count: " << count << " for UID: " << uid << endl;
+        cout << "Process count: " << count << ". Owner UID: " << uid << endl;
+
+    cout << setiosflags(ios::left)
+        << setw(6) << "| NO:"
+        << setw(27) << "| NAME:"
+        << setw(52) << "| CMD:"
+        << setw(10) << "| PID:"
+        << setw(10) << "| PPID:"
+        << setw(10) << "| RSS:"
+        << setw(10) << "| MRSS:"
+        << setw(16) << "| RUN-TIME(ms):"
+        << setw(12) << "| BLK-IN:"
+        << setw(12) << "| BLK-OUT:"
+        << setw(6) << "| THR:"
+        << setw(6) << "| PRI-NRML:"
+        << endl;
 
     for (int i = 0; i < count; ++i) {
         command = "";
@@ -48,19 +63,20 @@ int getProcessUsage(int uid, bool consoleOutput) {
                 command += " " + string(args[y]);
 
         if (consoleOutput) {
-            cout << setiosflags(ios::left) << setw(4) << (i + 1)
-                << "NAME: " << setw(25) << (procs->ki_comm)
-                << "CMD: " << setw(50) << (command)
-                << "PID: " << setw(6) << (procs->ki_pid)
-                << "PPID: " << setw(6) << (procs->ki_ppid)
-                << "RSS: " << setw(6) << (procs->ki_rssize * 4)
-                << "MRSS: " << setw(6) << (procs->ki_rusage.ru_maxrss * 4)
-                << "RUN-TIME(ms): " << setw(10) << (procs->ki_runtime / 1000) // 1000000)
-                << "BLOCK-IN: " << setw(8) << (procs->ki_rusage.ru_inblock)
-                << "BLOCK-OUT: " << setw(8) << (procs->ki_rusage.ru_oublock)
+            cout << setiosflags(ios::left)
+                << "| " << setw(4) << (i + 1)
+                << "| " << setw(25) << (procs->ki_comm)
+                << "| " << setw(50) << (command)
+                << "| " << setw(8) << (procs->ki_pid)
+                << "| " << setw(8) << (procs->ki_ppid)
+                << "| " << setw(8) << (procs->ki_rssize * 4)
+                << "| " << setw(8) << (procs->ki_rusage.ru_maxrss * 4)
+                << "| " << setw(14) << (procs->ki_runtime / 1000) // 1000000)
+                << "| " << setw(10) << (procs->ki_rusage.ru_inblock)
+                << "| " << setw(10) << (procs->ki_rusage.ru_oublock)
                 // << "SWPS: " << (procs->ki_rusage.ru_nswap)
-                << "THRDS: " << setw(4) << (procs->ki_numthreads)
-                << "PRI-NRML: " << setw(4) << ord(procs->ki_pri.pri_level)
+                << "| " << setw(4) << (procs->ki_numthreads)
+                << "| " << setw(6) << ord(procs->ki_pri.pri_level)
                 // << "PRI-NTVE: " << ord(procs->ki_pri.pri_native)
                 // << "PRI-USER: " << ord(procs->ki_pri.pri_user)
                 << endl;

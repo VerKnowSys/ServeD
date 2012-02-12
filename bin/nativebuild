@@ -21,9 +21,9 @@ check() {
     fi
 }
 
-if [ "$1" = "cpu" ]; then
-    $CXX -Os -fPIC lib/kickstart/usage_cpu.cc -o usage-cpu -lkvm
-    check $? "Usage-CPU"
+if [ "$1" = "sys" ]; then
+    $CXX -Os -fPIC lib/kickstart/usage_sys.cc -o usage-sys -lkvm
+    check $? "Usage-SYS"
     exit
 fi
 
