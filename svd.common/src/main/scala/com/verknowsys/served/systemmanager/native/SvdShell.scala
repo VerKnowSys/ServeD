@@ -18,7 +18,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
             else
                 new ExpectJ
 
-    loadSettings
+    // loadSettings // XXX: UNUSED still
     var shell = expectinator.spawn(SvdConfig.defaultShell)
 
 
@@ -36,18 +36,20 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
 
 
     def exec(operation: SvdShellOperation) {
-        if (dead) // if shell is dead, respawn it! It MUST live no matter what
+        if (dead) { // if shell is dead, respawn it! It MUST live no matter what
+            log.trace("Found dead shell: %s".format(shell))
             shell = expectinator.spawn(SvdConfig.defaultShell)
-        else {
-            shell.send(operation.commands + "\n")
-            if (operation.expectStdOut.size != 0) operation.expectStdOut.foreach {
-                expect =>
-                    shell.expect(expect, operation.waitForOutputFor)
-            }
-            if (operation.expectStdErr.size != 0) operation.expectStdErr.foreach {
-                expect =>
-                    shell.expectErr(expect, operation.waitForOutputFor)
-            }
+            if (dead)
+                throw new SvdShellException("Found dead shell where it should be alive!")
+        }
+        shell.send(operation.commands + "\n")
+        if (operation.expectStdOut.size != 0) operation.expectStdOut.foreach {
+            expect =>
+                shell.expect(expect, operation.waitForOutputFor)
+        }
+        if (operation.expectStdErr.size != 0) operation.expectStdErr.foreach {
+            expect =>
+                shell.expectErr(expect, operation.waitForOutputFor)
         }
     }
 
