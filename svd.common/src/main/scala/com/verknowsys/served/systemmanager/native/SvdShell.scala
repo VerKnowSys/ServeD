@@ -19,7 +19,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
                 new ExpectJ
 
     loadSettings
-    val shell = expectinator.spawn(SvdConfig.defaultShell)
+    var shell = expectinator.spawn(SvdConfig.defaultShell)
 
 
     def loadSettings =
@@ -32,13 +32,10 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
         SvdConfig.standardShellEnvironment :: Nil
 
 
-    def dead = shell.isClosed
-
-
     def exec(operation: SvdShellOperation) {
-        if (dead) {
-            throw new SvdShellException("Failed to exec operation: '%s' on dead shell.".format(operation.commands.replace("\n", ", ")))
-        } else {
+        if (shell.isClosed) // if shell is dead, respawn it! It MUST live no matter what
+            shell = expectinator.spawn(SvdConfig.defaultShell)
+        else {
             shell.send(operation.commands + "\n")
             if (operation.expectStdOut.size != 0) operation.expectStdOut.foreach {
                 expect =>
@@ -57,6 +54,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
 
     def close {
         try {
+            log.trace("Stopping shell %s. Shell is closed?: %s".format(shell, shell.isClosed))
             shell.send("exit\n")
             shell.stop
         } catch {
