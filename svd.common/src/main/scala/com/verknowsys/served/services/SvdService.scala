@@ -172,7 +172,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                     log.trace("afterStopHook: %s".format(hook))
                     shell.exec(hook)
             }
-            shell.close
+            // shell.close
             self reply Success
 
     }
@@ -191,7 +191,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                 shell.exec(hook)
         }
         shell.close
-        log.info("Stopping SvdService: %s".format(config.name))
+        log.info("Stopped SvdService: %s".format(config.name))
     }
 
 
