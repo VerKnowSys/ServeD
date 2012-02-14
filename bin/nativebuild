@@ -23,8 +23,17 @@ check() {
 
 
 if [ "$system" = "FreeBSD" ]; then
-    $CXX -Os -fPIC -shared lib/kickstart/usage_sys.cc -o lib/libusagesys.so -lkvm
+
+    pref=""
+    if [ $(uname -p) = "amd64" ]; then
+        pref="-amd64"
+    fi
+
+    $CXX -Os -fPIC -shared lib/kickstart/usage_sys.cc -o lib/libusagesys${pref}.so -lkvm
     check $? "UsageSysLib"
+
+    $CXX -Os -fPIC lib/kickstart/usage_check.cc -o usage_check lib/libusagesys${pref}.so
+    check $? "UsageSysCheck"
 fi
 
 $CXX -Os -fPIC lib/kickstart/shell.cc -o shell
