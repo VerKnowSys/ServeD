@@ -175,22 +175,29 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
     override def postStop {
         super.postStop
+
+        log.debug("Stopping Coreginx")
+        coreginx.stop
+
         log.info("Stopping spawned user workers")
         SvdAccounts(db).foreach{
             account =>
                 val pidFile = SvdConfig.userHomeDir / "%d".format(account.uid) / "%d.pid".format(account.uid)
                 log.trace("PIDFile: %s".format(pidFile))
-                val pid = Source.fromFile(pidFile).mkString
-                log.trace("Client VM PID to be killed: %s".format(pid))
-                new SvdShell(account).exec(new SvdShellOperation(
-                    """
-                    /bin/kill -INT %s
-                    /bin/rm %s
-                    """.format(pid, pidFile)
-                ))
+                try {
+                    val pid = Source.fromFile(pidFile).mkString
+                    log.trace("Client VM PID to be killed: %s".format(pid))
+                    new SvdShell(account).exec(new SvdShellOperation(
+                        """
+                        /bin/kill -INT %s
+                        /bin/rm %s
+                        """.format(pid, pidFile)
+                    ))
+                } catch {
+                    case e: java.io.FileNotFoundException =>
+                        log.warn("User pid file not found in %s!".format(pidFile))
+                }
         }
-        log.debug("Coreginx STOP")
-        coreginx.stop
 
         // removing also pid file of root core of svd:
         val corePid = SvdConfig.systemHomeDir / SvdConfig.rootPidFile
