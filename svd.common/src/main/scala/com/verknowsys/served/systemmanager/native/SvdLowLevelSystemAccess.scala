@@ -22,7 +22,5 @@ object SvdLowLevelSystemAccess extends Logging {
 
 
     log.debug("%s has been initialized".format(this.getClass))
-    if (SvdUtils.isBSD)
-        log.warn("SYSUSAGE: " + usagesys(0))
 
 }
