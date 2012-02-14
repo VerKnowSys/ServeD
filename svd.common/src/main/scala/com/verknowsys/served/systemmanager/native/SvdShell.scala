@@ -32,8 +32,11 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
         SvdConfig.standardShellEnvironment :: Nil
 
 
+    def dead = shell.isClosed
+
+
     def exec(operation: SvdShellOperation) {
-        if (shell.isClosed) // if shell is dead, respawn it! It MUST live no matter what
+        if (dead) // if shell is dead, respawn it! It MUST live no matter what
             shell = expectinator.spawn(SvdConfig.defaultShell)
         else {
             shell.send(operation.commands + "\n")
