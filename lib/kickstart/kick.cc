@@ -35,7 +35,11 @@ int main(int argc, char const *argv[]) {
     /* check for home prefix dir */
     if (!fileExists(USERS_HOME_DIR)) {
         cerr << USERS_HOME_DIR << " does not exists. Creating default dir." << endl;
-        mkdir(USERS_HOME_DIR, S_IRWXU | S_IXOTH); /* NOTE: everyone must have access to execute home dir! */
+        #ifdef DEVEL
+            mkdir(USERS_HOME_DIR, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        #else
+            mkdir(USERS_HOME_DIR, S_IRWXU | S_IXGRP | S_IXOTH);
+        #endif
     }
 
     /* check and create home dir if necessary */
@@ -75,7 +79,7 @@ int main(int argc, char const *argv[]) {
 
     pid_t pid;
     uid_t uid = atoi(params.svdArg.c_str());
-    string lockName = homeDir + "/" + params.svdArg + ".pid";
+    string lockName = homeDir + params.svdArg + ".pid";
     ifstream ifs(lockName.c_str(), ios::in);
     ifs >> pid;
     ifs.close();
