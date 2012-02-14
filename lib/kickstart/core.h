@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <iomanip>
+#include <errno.h>
 
 #ifdef __linux__
     #include <string.h>
@@ -27,16 +28,16 @@ using namespace std;
 #ifndef __CORE__
 #define __CORE__
 
-    #define DEVEL true
-    #define APP_VERSION "0.1.2"
+    // #define DEVEL true
+    #define APP_VERSION "0.1.3"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     #ifdef __FreeBSD__
-        #define DEFAULT_SHELL_COMMAND "/Software/Zsh-4.3.10/bin/zsh"
+        #define DEFAULT_SHELL_COMMAND "/Software/Zsh/bin/zsh"
         #define DEFAULT_JAVA_BIN "/Software/Openjdk7/bin/java"
     #elif __linux__
-        #define DEFAULT_SHELL_COMMAND "/Software/Zsh-4.3.10/bin/zsh"
+        #define DEFAULT_SHELL_COMMAND "/Software/Zsh/bin/zsh"
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
     #elif __APPLE__
         #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
@@ -100,6 +101,7 @@ using namespace std;
     extern "C" {
 
         int getOwner(char* path);
+        const char* getProcessUsage(int uid, bool consoleOutput);
 
     }
 
