@@ -99,7 +99,7 @@ const static string coreDir = currentDir();
 
         lfp = open(lockFileName.c_str(), O_RDWR | O_CREAT, 0600);
         if (lfp < 0) {
-            cerr << "Lock file occupied: " << lockFileName << ". Cannot open." << endl;
+            cerr << "Lock file occupied: " << lockFileName << ". Error: " << strerror(errno) << endl;
             exit(LOCK_FILE_OCCUPIED_ERROR); /* can not open */
         }
 
