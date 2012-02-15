@@ -18,13 +18,13 @@
 extern "C" {
 
 
-    const char* getProcessUsage(int uid, bool consoleOutput = false) {
+    const char* getProcessUsage(int uid, bool consoleOutput) {
 
         int count = 0;
         char** args = NULL;
         string command, output;
 
-        kvm_t* kd = kvm_open(NULL, "/dev/mem", NULL, O_RDONLY, "kvm_open");
+        kvm_t* kd = kvm_open(NULL, "/dev/null", NULL, O_RDONLY, NULL);
         if (kd == 0) {
             if (consoleOutput)
                 cerr << "Error initializing kernel descriptor!" << endl;
@@ -70,24 +70,37 @@ extern "C" {
                 else
                     command += " " + string(args[y]);
 
-            out << setiosflags(ios::left)
-                << "| " << setw(4) << (i + 1)
-                << "| " << setw(25) << (procs->ki_comm)
-                << "| " << setw(50) << (command)
-                << "| " << setw(8) << (procs->ki_pid)
-                << "| " << setw(8) << (procs->ki_ppid)
-                << "| " << setw(8) << (procs->ki_rssize * 4)
-                << "| " << setw(8) << (procs->ki_rusage.ru_maxrss * 4)
-                << "| " << setw(14) << (procs->ki_runtime / 1000)
-                << "| " << setw(10) << (procs->ki_rusage.ru_inblock)
-                << "| " << setw(10) << (procs->ki_rusage.ru_oublock)
-                << "| " << setw(4) << (procs->ki_numthreads)
-                << "| " << setw(6) << ord(procs->ki_pri.pri_level)
-                << endl;
+            if (consoleOutput) {
+                out << setiosflags(ios::left)
+                    << "| " << setw(4) << (i + 1)
+                    << "| " << setw(25) << (procs->ki_comm)
+                    << "| " << setw(50) << (command)
+                    << "| " << setw(8) << (procs->ki_pid)
+                    << "| " << setw(8) << (procs->ki_ppid)
+                    << "| " << setw(8) << (procs->ki_rssize * 4)
+                    << "| " << setw(8) << (procs->ki_rusage.ru_maxrss * 4)
+                    << "| " << setw(14) << (procs->ki_runtime / 1000)
+                    << "| " << setw(10) << (procs->ki_rusage.ru_inblock)
+                    << "| " << setw(10) << (procs->ki_rusage.ru_oublock)
+                    << "| " << setw(4) << (procs->ki_numthreads)
+                    << "| " << setw(6) << ord(procs->ki_pri.pri_level)
+                    << endl;
+            } else {
+                out << (procs->ki_pid)
+                    << "|" << (procs->ki_ppid)
+                    << "|" << (procs->ki_comm)
+                    << "|" << (command)
+                    << "|" << (procs->ki_rssize * 4)
+                    << "|" << (procs->ki_rusage.ru_maxrss * 4)
+                    << "|" << (procs->ki_runtime / 1000)
+                    << "|" << (procs->ki_rusage.ru_inblock)
+                    << "|" << (procs->ki_rusage.ru_oublock)
+                    << "|" << (procs->ki_numthreads)
+                    << "|" << ord(procs->ki_pri.pri_level)
+                    << endl;
+            }
 
-            if (consoleOutput)
-                cout << out.str();
-
+            args = NULL;
             output += out.str();
             procs++;
         }
