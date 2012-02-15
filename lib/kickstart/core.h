@@ -11,11 +11,18 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
+#include <sys/time.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <iomanip>
+#include <unistd.h>
+#include <ctype.h>
+#include <err.h>
 #include <errno.h>
+#include <netdb.h>
+#include <pwd.h>
+#include <stdarg.h>
 
 #ifdef __linux__
     #include <string.h>
@@ -29,7 +36,7 @@ using namespace std;
 #define __CORE__
 
     // #define DEVEL true
-    #define APP_VERSION "0.1.3"
+    #define APP_VERSION "0.1.4"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -101,7 +108,8 @@ using namespace std;
     extern "C" {
 
         int getOwner(char* path);
-        const char* getProcessUsage(int uid, bool consoleOutput);
+        const char* getProcessUsage(int uid, bool consoleOutput = false);
+        const char* getSocketUsage();
 
     }
 

@@ -21,11 +21,11 @@
 #include <arpa/inet.h>
 
 
-int	 opt_4;		/* Show IPv4 sockets */
-int	 opt_6;		/* Show IPv6 sockets */
-int	 opt_c;		/* Show connected sockets */
-int	 opt_L;		/* Don't show IPv4 or IPv6 loopback sockets */
-int	 opt_l;		/* Show listening sockets */
+int	 opt_4 = 1;		/* Show IPv4 sockets */
+int	 opt_6 = 0;		/* Show IPv6 sockets */
+int	 opt_c = 1;		/* Show connected sockets */
+int	 opt_L = 1;		/* Don't show IPv4 or IPv6 loopback sockets */
+int	 opt_l = 1;		/* Show listening sockets */
 // int     opt_u;        /* Show Unix domain sockets */
 // int     opt_v;        /* Verbose mode */
 
@@ -38,12 +38,12 @@ int	 opt_l;		/* Show listening sockets */
 
 // int    *protos = NULL;    /* protocols to use */
 // size_t     numprotos;    /* allocated size of protos[] */
-int    *ports = NULL;
+// int    *ports = NULL;
 
 
-//#define INT_BIT (sizeof(int)*CHAR_BIT)
+// #define INT_BIT (sizeof(int)*CHAR_BIT)
 // #define SET_PORT(p) do { ports[p / INT_BIT] |= 1 << (p % INT_BIT); } while (0)
-//#define CHK_PORT(p) (ports[p / INT_BIT] & (1 << (p % INT_BIT)))
+// #define CHK_PORT(p) (ports[p / INT_BIT] & (1 << (p % INT_BIT)))
 
 struct sock {
 	void *socket;
@@ -89,23 +89,22 @@ void sockaddr(struct sockaddr_storage *sa, int af, void *addr, int port) {
 }
 
 
-void gather_inet(int proto) {
+static void gather_inet(int proto) {
 	struct xinpgen *xig = NULL, *exig = NULL;
 	struct xinpcb *xip = NULL;
 	struct xtcpcb *xtp = NULL;
 	struct inpcb *inp = NULL;
 	struct xsocket *so = NULL;
 	struct sock *sock = NULL;
-	const char *varname, *protoname;
-	size_t len, bufsize;
+	const char *varname = NULL, *protoname = NULL;
+	size_t len = 0, bufsize = 0;
 	void *buf = NULL;
-	int hash, retry, vflag;
+	int hash = 0, retry = 0, vflag = 0;
 
-	vflag = 0;
 	if (opt_4)
 		vflag |= INP_IPV4;
-	if (opt_6)
-		vflag |= INP_IPV6;
+    // if (opt_6)
+    //     vflag |= INP_IPV6;
 
 	switch (proto) {
 	case IPPROTO_TCP:
@@ -121,15 +120,15 @@ void gather_inet(int proto) {
 		protoname = "div";
 		break;
 	default:
-		errx(1, "protocol %d not supported", proto);
+		cerr << "protocol " << proto << " not supported" << endl;
 	}
 
-	bufsize = 2048;
+	bufsize = 8192;
 	retry = 5;
 	do {
 		for (;;) {
 			if ((buf = realloc(buf, bufsize)) == NULL)
-				err(1, "realloc()");
+				cerr << "realloc()" << endl;
 			len = bufsize;
 			if (sysctlbyname(varname, buf, &len, NULL, 0) == 0) {
                 varname = NULL;
@@ -138,15 +137,14 @@ void gather_inet(int proto) {
 			if (errno == ENOENT)
 				goto out;
 			if (errno != ENOMEM)
-				err(1, "sysctlbyname()");
+				cerr << "sysctlbyname()" << endl;
 			bufsize *= 2;
 		}
 		xig = (struct xinpgen *)buf;
 		exig = (struct xinpgen *)(void *)
 		    ((char *)buf + len - sizeof *exig);
-		if (xig->xig_len != sizeof *xig ||
-		    exig->xig_len != sizeof *exig)
-			errx(1, "struct xinpgen size mismatch");
+		if (xig->xig_len != sizeof *xig || exig->xig_len != sizeof *exig)
+			cerr << "struct xinpgen size mismatch" << endl;
 	} while (xig->xig_gen != exig->xig_gen && retry--);
 
     // if (xig->xig_gen != exig->xig_gen && opt_v)
@@ -177,7 +175,7 @@ void gather_inet(int proto) {
 			so = &xip->xi_socket;
 			break;
 		default:
-			errx(1, "protocol %d not supported", proto);
+			cerr << "protocol " <<  proto << " not supported" << endl;
 		}
 		if ((inp->inp_vflag & vflag) == 0)
 			continue;
@@ -207,21 +205,17 @@ void gather_inet(int proto) {
 		}
         // if ((sock = (struct sock*)calloc(1, sizeof *sock)) == NULL)
         if ((sock = (struct sock*)malloc(sizeof *sock)) == NULL)
-			err(1, "malloc()");
+			cerr << "malloc()" << endl;
 		sock->socket = so->xso_so;
 		sock->proto = proto;
 		if (inp->inp_vflag & INP_IPV4) {
 			sock->family = AF_INET;
-			sockaddr(&sock->laddr, sock->family,
-			    &inp->inp_laddr, inp->inp_lport);
-			sockaddr(&sock->faddr, sock->family,
-			    &inp->inp_faddr, inp->inp_fport);
+			sockaddr(&sock->laddr, sock->family, &inp->inp_laddr, inp->inp_lport);
+			sockaddr(&sock->faddr, sock->family, &inp->inp_faddr, inp->inp_fport);
 		} else if (inp->inp_vflag & INP_IPV6) {
 			sock->family = AF_INET6;
-			sockaddr(&sock->laddr, sock->family,
-			    &inp->in6p_laddr, inp->inp_lport);
-			sockaddr(&sock->faddr, sock->family,
-			    &inp->in6p_faddr, inp->inp_fport);
+			sockaddr(&sock->laddr, sock->family, &inp->in6p_laddr, inp->inp_lport);
+			sockaddr(&sock->faddr, sock->family, &inp->in6p_faddr, inp->inp_fport);
 		}
 		sock->vflag = inp->inp_vflag;
 		sock->protoname = protoname;
@@ -241,13 +235,13 @@ void getfiles() {
 		err(1, "malloc()");
 	while (sysctlbyname("kern.file", xfiles, &len, 0, 0) == -1) {
 		if (errno != ENOMEM)
-			err(1, "sysctlbyname()");
+			cerr << "sysctlbyname()" << endl;
 		len *= 2;
 		if ((xfiles = (struct xfile*)realloc(xfiles, len)) == NULL)
-			err(1, "realloc()");
+			cerr << "realloc()" << endl;
 	}
 	if (len > 0 && xfiles->xf_size != sizeof *xfiles)
-		errx(1, "struct xfile size mismatch");
+		cerr << "struct xfile size mismatch" << endl;
 	nxfiles = len / sizeof *xfiles;
     free(xfiles);
 }
@@ -281,18 +275,23 @@ const string printaddr(int af, struct sockaddr_storage *ss) {
 	}
 	if (addrstr[0] == '\0')
 		inet_ntop(af, addr, addrstr, sizeof addrstr);
+
 	if (port == 0) {
         ou << addrstr << ":*";
+        sun = NULL;
+        addr = NULL;
         return ou.str();
     } else {
         ou << addrstr << ":" << port;
+        sun = NULL;
+        addr = NULL;
         return ou.str();
     }
 }
 
 
 const char* getprocname(pid_t pid) {
-	static struct kinfo_proc proc;
+	struct kinfo_proc proc;
 	size_t len;
 	int mib[4];
 
@@ -333,13 +332,12 @@ const char* getprocname(pid_t pid) {
 // }
 
 
-string display() {
-	struct passwd *pwd = NULL;
+const char* display() {
 	struct xfile *xf = NULL;
 	struct sock *s = NULL;
 	void *p = NULL;
-	int hash, n;
-	setpassent(1);
+	int hash = 0, n = 0;
+    // setpassent(1);
     string result = "";
 	for (xf = xfiles, n = 0; n < nxfiles; ++n, ++xf) {
         stringstream out;
@@ -356,64 +354,51 @@ string display() {
 
         out << (u_long)xf->xf_pid << "|";
         out << getprocname(xf->xf_pid) << "|";
-		if ((pwd = getpwuid(xf->xf_uid)) == NULL)
-            out << (u_long)xf->xf_uid << "|";
-		else
-            out << pwd->pw_name << "|";
+        out << (u_long)xf->xf_uid << "|";
+        out << s->protoname << "|";
 
-        out << s->protoname;
-		if (s->vflag & INP_IPV4)
-            out << "4|";
-		if (s->vflag & INP_IPV6)
-            out << "6|";
 		switch (s->family) {
     		case AF_INET:
     		case AF_INET6:
-                out << printaddr(s->family, &s->faddr);
+                out << printaddr(s->family, &s->laddr) << "|" << printaddr(s->family, &s->faddr);
     			break;
-    		case AF_UNIX:
-                if (s->laddr.ss_len > 0) { /* server */
-                    out << "|" << printaddr(s->family, &s->laddr);
-    				break;
-    			}
-    			p = *(void **)&s->faddr; /* client */
-    			if (p == NULL)
-    				break;
-    			for (hash = 0; hash < HASHSIZE; ++hash) {
-    				for (s = sockhash[hash]; s != NULL; s = s->next)
-    					if (s->pcb == p)
-    						break;
-    				if (s != NULL)
-    					break;
-    			}
-    			if (s == NULL || s->laddr.ss_len == 0) {
-                    out << "|??";
-                } else {
-                    out << "|" << printaddr(s->family, &s->laddr);
-                }
-			    break;
+            // case AF_UNIX:
+            //                 if (s->laddr.ss_len > 0) { /* server */
+            //                     out << "|" << printaddr(s->family, &s->laddr);
+            //         break;
+            //     }
+            //     p = *(void **)&s->faddr; /* client */
+            //     if (p == NULL)
+            //         break;
+            //     for (hash = 0; hash < HASHSIZE; ++hash) {
+            //         for (s = sockhash[hash]; s != NULL; s = s->next)
+            //             if (s->pcb == p)
+            //                 break;
+            //         if (s != NULL)
+            //             break;
+            //     }
+            //     if (s == NULL || s->laddr.ss_len == 0) {
+            //                     out << "|??";
+            //                 } else {
+            //                     out << "|" << printaddr(s->family, &s->laddr);
+            //                 }
+            //                 break;
     		default:
     			abort();
 		}
-        out << "\n";
+        out << endl;
         result += out.str();
 	}
-    return result;
+    return result.c_str();
 }
 
 
 const char* getSocketUsage() {
 
-    opt_c = 1; // connected
-    opt_l = 1; // listened
-    opt_L = 1; // don't show loopback
-    opt_4 = 1;
-    opt_6 = 1;
-
     gather_inet(IPPROTO_TCP);
     gather_inet(IPPROTO_UDP);
     getfiles();
 
-	return display().c_str();
+	return display();
 }
 
