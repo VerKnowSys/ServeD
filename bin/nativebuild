@@ -2,14 +2,18 @@
 
 
 system="$(uname)"
+export FLAGS="-Os -fPIC"
 if [ -e "/usr/bin/clang++" ]; then
     export CXX="clang++"
+    export CC="clang"
 else
     export CXX="g++"
+    export CC="gcc"
 fi
 
 echo "System: $system"
-echo "Compiler: $CXX"
+echo "Compilers: $CC, $CXX"
+echo "FLAGS: $FLAGS"
 echo
 
 check() {
@@ -29,39 +33,34 @@ if [ "$system" = "FreeBSD" ]; then
         pref="-amd64"
     fi
 
-    $CXX -Os -fPIC -shared lib/kickstart/usage_sys.cc -o lib/libusagesys${pref}.so -lkvm
+    $CXX $FLAGS -shared lib/kickstart/usage_sys.cc -o lib/libusagesys${pref}.so -lutil -lprocstat -lkvm
     check $? "UsageSysLib"
 
-    $CXX -Os -fPIC -shared lib/kickstart/usage_socket.cc -o lib/libusagesocket${pref}.so
-    check $? "UsageSocket"
-
-    $CXX -Os -fPIC lib/kickstart/usage_check.cc -o usage_check lib/libusagesys${pref}.so lib/libusagesocket${pref}.so
+    $CXX $FLAGS lib/kickstart/usage_check.cc -o usage_check lib/libusagesys${pref}.so -lutil -lprocstat -lkvm
     check $? "UsageSysCheck"
 
 fi
 
-$CXX -Os -fPIC lib/kickstart/shell.cc -o shell
+$CXX $FLAGS lib/kickstart/shell.cc -o shell
 check $? "UserShell"
 
 if [ "$1" = "sh" ]; then
     exit
 fi
 
-$CXX -Os -c -fPIC lib/kickstart/core.cc -o lib/core.o
+$CXX $FLAGS -c lib/kickstart/core.cc -o lib/core.o
 check $? "Core"
 
-$CXX -Os -c -fPIC lib/kickstart/utils.cc -o lib/utils.o
+$CXX $FLAGS -c lib/kickstart/utils.cc -o lib/utils.o
 check $? "Utils"
 
 if [ "$system" = "Darwin" ]; then
-    $CXX -Os -arch i386 -arch x86_64 -fPIC -shared lib/kickstart/stat.cc -o lib/libstat.dylib
-else
-    echo "Skipping build for $system"
+    $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/stat.cc -o lib/libstat.dylib
     # $CXX -Os -fPIC -shared lib/kickstart/stat.cc -o lib/libstat.so
 fi
 check $? "StatLib"
 
-$CXX -Os -fPIC lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
+$CXX $FLAGS lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
 check $? "KickStart"
 
 # rm -rf lib/*.o
