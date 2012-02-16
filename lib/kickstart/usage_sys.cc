@@ -27,282 +27,109 @@
 #include <libprocstat.h>
 
 
-#define ord(c) ((int)(unsigned char)(c))
+extern "C" {
 
 
-int	hflag = 1, nflag = 0, Cflag = 0;
-
-static struct cap_desc {
-	cap_rights_t	 cd_right;
-	const char	*cd_desc;
-} cap_desc[] = {
-	/* General file I/O. */
-	{ CAP_READ,		"rd" },
-	{ CAP_WRITE,		"wr" },
-	{ CAP_MMAP,		"mm" },
-	{ CAP_MAPEXEC,		"me" },
-	{ CAP_FEXECVE,		"fe" },
-	{ CAP_FSYNC,		"fy" },
-	{ CAP_FTRUNCATE,	"ft" },
-	{ CAP_SEEK,		"se" },
-
-	/* VFS methods. */
-	{ CAP_FCHFLAGS,		"cf" },
-	{ CAP_FCHDIR,		"cd" },
-	{ CAP_FCHMOD,		"cm" },
-	{ CAP_FCHOWN,		"cn" },
-	{ CAP_FCNTL,		"fc" },
-	{ CAP_FPATHCONF,	"fp" },
-	{ CAP_FLOCK,		"fl" },
-	{ CAP_FSCK,		"fk" },
-	{ CAP_FSTAT,		"fs" },
-	{ CAP_FSTATFS,		"sf" },
-	{ CAP_FUTIMES,		"fu" },
-	{ CAP_CREATE,		"cr" },
-	{ CAP_DELETE,		"de" },
-	{ CAP_MKDIR,		"md" },
-	{ CAP_RMDIR,		"rm" },
-	{ CAP_MKFIFO,		"mf" },
-
-	/* Lookups - used to constraint *at() calls. */
-	{ CAP_LOOKUP,		"lo" },
-
-	/* Extended attributes. */
-	{ CAP_EXTATTR_GET,	"eg" },
-	{ CAP_EXTATTR_SET,	"es" },
-	{ CAP_EXTATTR_DELETE,	"ed" },
-	{ CAP_EXTATTR_LIST,	"el" },
-
-	/* Access Control Lists. */
-	{ CAP_ACL_GET,		"ag" },
-	{ CAP_ACL_SET,		"as" },
-	{ CAP_ACL_DELETE,	"ad" },
-	{ CAP_ACL_CHECK,	"ac" },
-
-	/* Socket operations. */
-	{ CAP_ACCEPT,		"at" },
-	{ CAP_BIND,		"bd" },
-	{ CAP_CONNECT,		"co" },
-	{ CAP_GETPEERNAME,	"pn" },
-	{ CAP_GETSOCKNAME,	"sn" },
-	{ CAP_GETSOCKOPT,	"gs" },
-	{ CAP_LISTEN,		"ln" },
-	{ CAP_PEELOFF,		"pf" },
-	{ CAP_SETSOCKOPT,	"ss" },
-	{ CAP_SHUTDOWN,		"sh" },
-
-	/* Mandatory Access Control. */
-	{ CAP_MAC_GET,		"mg" },
-	{ CAP_MAC_SET,		"ms" },
-
-	/* Methods on semaphores. */
-	{ CAP_SEM_GETVALUE,	"sg" },
-	{ CAP_SEM_POST,		"sp" },
-	{ CAP_SEM_WAIT,		"sw" },
-
-	/* Event monitoring and posting. */
-	{ CAP_POLL_EVENT,	"po" },
-	{ CAP_POST_EVENT,	"ev" },
-
-	/* Strange and powerful rights that should not be given lightly. */
-	{ CAP_IOCTL,		"io" },
-	{ CAP_TTYHOOK,		"ty" },
-
-#ifdef NOTYET
-	{ CAP_PDGETPID,		"pg" },
-	{ CAP_PDWAIT4,		"pw" },
-	{ CAP_PDKILL,		"pk" },
-#endif
-};
+    #define ord(c) ((int)(unsigned char)(c))
 
 
-    static const u_int	cap_desc_count = sizeof(cap_desc) /
-			    sizeof(cap_desc[0]);
-
-
-    void addr_to_string(struct sockaddr_storage *ss, char *buffer, int buflen) {
+    const char* addr_to_string(struct sockaddr_storage *ss) {
     	char buffer2[INET6_ADDRSTRLEN];
     	struct sockaddr_in6 *sin6;
     	struct sockaddr_in *sin;
     	struct sockaddr_un *sun;
-
+        stringstream out;
     	switch (ss->ss_family) {
-    	case AF_LOCAL:
-    		sun = (struct sockaddr_un *)ss;
-    		if (strlen(sun->sun_path) == 0)
-    			strlcpy(buffer, "-", buflen);
-    		else
-    			strlcpy(buffer, sun->sun_path, buflen);
-    		break;
-
-    	case AF_INET:
-    		sin = (struct sockaddr_in *)ss;
-    		snprintf(buffer, buflen, "%s:%d", inet_ntoa(sin->sin_addr),
-    		    ntohs(sin->sin_port));
-    		break;
-
-    	case AF_INET6:
-    		sin6 = (struct sockaddr_in6 *)ss;
-    		if (inet_ntop(AF_INET6, &sin6->sin6_addr, buffer2,
-    		    sizeof(buffer2)) != NULL)
-    			snprintf(buffer, buflen, "%s.%d", buffer2,
-    			    ntohs(sin6->sin6_port));
-    		else
-    			strlcpy(buffer, "-", sizeof(buffer));
-    		break;
-
-    	default:
-    		strlcpy(buffer, "", buflen);
-    		break;
+        	case AF_LOCAL:
+        		sun = (struct sockaddr_un *)ss;
+                out << sun->sun_path;
+        		break;
+        	case AF_INET:
+        		sin = (struct sockaddr_in *)ss;
+                out << inet_ntoa(sin->sin_addr) << ":" << ntohs(sin->sin_port);
+        		break;
+            case AF_INET6:
+                sin6 = (struct sockaddr_in6 *)ss;
+        		if (inet_ntop(AF_INET6, &sin6->sin6_addr, buffer2, sizeof(buffer2)) != NULL)
+                    out << buffer2 << "." << ntohs(sin6->sin6_port);
+                break;
+        	default:
+                out << "*:*";
+        		break;
     	}
-    }
-
-
-    const char* stringify_address(struct sockaddr_storage *ss) {
-    	char addr[PATH_MAX];
-    	addr_to_string(ss, addr, sizeof(addr));
-    	return addr;
+        return out.str().c_str();
     }
 
 
     static const char* protocol_to_string(int domain, int type, int protocol) {
     	switch (domain) {
-    	case AF_INET:
-    	case AF_INET6:
-    		switch (protocol) {
-    		case IPPROTO_TCP:
-    			return ("TCP");
-    		case IPPROTO_UDP:
-    			return ("UDP");
-    		case IPPROTO_ICMP:
-    			return ("ICM");
-    		case IPPROTO_RAW:
-    			return ("RAW");
-    		case IPPROTO_SCTP:
-    			return ("SCT");
-    		case IPPROTO_DIVERT:
-    			return ("IPD");
-    		default:
-    			return ("IP?");
-    		}
-    	case AF_LOCAL:
-    		switch (type) {
-    		case SOCK_STREAM:
-    			return ("UDS");
-    		case SOCK_DGRAM:
-    			return ("UDD");
-    		default:
-    			return ("UD?");
-    		}
-    	default:
-    		return ("?");
+        	case AF_INET:
+        	case AF_INET6:
+        		switch (protocol) {
+        		case IPPROTO_TCP:
+        			return ("TCP");
+        		case IPPROTO_UDP:
+        			return ("UDP");
+        		case IPPROTO_ICMP:
+        			return ("ICM");
+        		case IPPROTO_RAW:
+        			return ("RAW");
+        		case IPPROTO_SCTP:
+        			return ("SCT");
+        		case IPPROTO_DIVERT:
+        			return ("IPD");
+        		default:
+        			return ("IP?");
+        		}
+        	case AF_LOCAL:
+        		switch (type) {
+        		case SOCK_STREAM:
+        			return ("UDS");
+        		case SOCK_DGRAM:
+        			return ("UDD");
+        		default:
+        			return ("UD?");
+        		}
+        	default:
+        		return ("?");
     	}
     }
-
-
-    // static u_int width_capability(cap_rights_t rights) {
-    //     u_int count, i, width;
-    //     count = 0;
-    //     width = 0;
-    //     for (i = 0; i < cap_desc_count; i++) {
-    //         if (rights & cap_desc[i].cd_right) {
-    //             width += strlen(cap_desc[i].cd_desc);
-    //             if (count)
-    //                 width++;
-    //             count++;
-    //         }
-    //     }
-    //     return (width);
-    // }
-
-
-    // static void
-    // print_capability(cap_rights_t rights, u_int capwidth)
-    // {
-    //     u_int count, i, width;
-    //
-    //     count = 0;
-    //     width = 0;
-    //     for (i = width_capability(rights); i < capwidth; i++) {
-    //         if (rights || i != 0)
-    //             printf(" ");
-    //         else
-    //             printf("-");
-    //     }
-    //     for (i = 0; i < cap_desc_count; i++) {
-    //         if (rights & cap_desc[i].cd_right) {
-    //             printf("%s%s", count ? "," : "", cap_desc[i].cd_desc);
-    //             width += strlen(cap_desc[i].cd_desc);
-    //             if (count)
-    //                 width++;
-    //             count++;
-    //         }
-    //     }
-    // }
 
 
     const char* procstat_files(struct procstat *procstat, struct kinfo_proc *kipp) {
     	struct sockstat sock;
     	struct filestat_list *head;
     	struct filestat *fst;
-    	int error;
         stringstream out;
 
     	head = procstat_getfiles(procstat, kipp, 0);
     	if (head == NULL)
-    		return (const char*)"ERROR: HEAD NULL";
+    		return "ERROR: HEAD NULL";
 
     	STAILQ_FOREACH(fst, head, next) {
-            if (fst->fs_type == PS_FST_TYPE_SOCKET) {
-
-    			error = procstat_get_socket_info(procstat, fst, &sock, NULL);
-                // cout << "SOCK:: " << sock.dom_family << " TYPE: " << sock.type << " PROTO: " << sock.proto << " ";
-    			if (error != 0) {
+            if (fst->fs_type == PS_FST_TYPE_SOCKET) { // only sockets
+    			if (procstat_get_socket_info(procstat, fst, &sock, NULL) != 0) {
                     return "ERROR PROCSTAT GET SOCKET";
     				break;
     			}
-                out << protocol_to_string(sock.dom_family, sock.type, sock.proto) << "|";
-    			// printf("%-3s ",
-    			//                     );
-                if (sock.dom_family == AF_LOCAL) {
-                    struct sockaddr_un *sun =
-                        (struct sockaddr_un *)&sock.sa_local;
-
-                    if (sun->sun_path[0] != 0)
-                        out << stringify_address(&sock.sa_local);
-                    else
-                        out << stringify_address(&sock.sa_peer);
-                } else {
-    				out << stringify_address(&sock.sa_local) << "|" << stringify_address(&sock.sa_peer);
+                if ((sock.dom_family == AF_INET) || (sock.dom_family == AF_INET6)) { // only INET domain
+                    out << protocol_to_string(sock.dom_family, sock.type, sock.proto) << " ";
+                    if (sock.dom_family == AF_LOCAL) {
+                        struct sockaddr_un *sun = (struct sockaddr_un *)&sock.sa_local;
+                        if (sun->sun_path[0] != 0)
+                            out << addr_to_string(&sock.sa_local);
+                        else
+                            out << addr_to_string(&sock.sa_peer);
+                    } else {
+        				out << addr_to_string(&sock.sa_local) << "-" << addr_to_string(&sock.sa_peer);
+                    }
+                    out << "#";
                 }
             }
     	}
         procstat_freefiles(procstat, head);
-        return (const char*)out.str().c_str();
+        return out.str().c_str();
     }
-
-
-    static int
-    kinfo_proc_compare(const void *a, const void *b)
-    {
-    	int i;
-
-    	i = ((const struct kinfo_proc *)a)->ki_pid -
-    	    ((const struct kinfo_proc *)b)->ki_pid;
-    	if (i != 0)
-    		return (i);
-    	i = ((const struct kinfo_proc *)a)->ki_tid -
-    	    ((const struct kinfo_proc *)b)->ki_tid;
-    	return (i);
-    }
-
-
-    void kinfo_proc_sort(struct kinfo_proc *kipp, int count) {
-    	qsort(kipp, count, sizeof(*kipp), kinfo_proc_compare);
-    }
-
-
-extern "C" {
 
 
     const char* getProcessUsage(int uid, bool consoleOutput) {
