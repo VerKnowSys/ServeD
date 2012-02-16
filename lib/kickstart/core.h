@@ -23,6 +23,7 @@
 #include <netdb.h>
 #include <pwd.h>
 #include <stdarg.h>
+#include <libutil.h>
 
 #ifdef __linux__
     #include <string.h>
@@ -36,7 +37,7 @@ using namespace std;
 #define __CORE__
 
     // #define DEVEL true
-    #define APP_VERSION "0.1.4"
+    #define APP_VERSION "0.1.5"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -109,7 +110,6 @@ using namespace std;
 
         int getOwner(char* path);
         const char* getProcessUsage(int uid, bool consoleOutput = false);
-        const char* getSocketUsage();
 
     }
 
