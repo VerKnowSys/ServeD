@@ -1,26 +1,9 @@
+/*
+    Author: Daniel (dmilith) Dettlaff
+    © 2012 - VerKnowSys
+*/
 
 #include "core.h"
-
-#include <sys/cdefs.h>
-#include <kvm.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <paths.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <unistd.h>
-#include <ctype.h>
-#include <err.h>
-#include <netdb.h>
-#include <pwd.h>
-#include <stdarg.h>
-#include <sys/sysctl.h>
-#include <sys/user.h>
-#include <sys/proc.h>
-#include <sys/un.h>
-#include <time.h>
-#include <sys/stat.h>
-#include <libutil.h>
 
 
 int main(int argc, char const *argv[]) {

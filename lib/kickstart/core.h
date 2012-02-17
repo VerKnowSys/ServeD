@@ -4,49 +4,43 @@
 */
 
 
+#ifndef __CORE__
+#define __CORE__
+
+
 #include <iostream>
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <algorithm>
-#include <iterator>
 #include <vector>
-#include <sys/time.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <signal.h>
 #include <iomanip>
-#include <unistd.h>
-#include <ctype.h>
-#include <err.h>
+
+#include <kvm.h>
+#include <time.h>
 #include <errno.h>
-#include <netdb.h>
-#include <pwd.h>
-#include <stdarg.h>
-#include <libutil.h>
+#include <sys/stat.h>
+#include <sys/user.h>
+#include <sys/capability.h>
+#include <sys/socket.h>
+#include <sys/sysctl.h>
+#include <sys/un.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <libprocstat.h>
 
-#ifdef __linux__
-    #include <string.h>
-#endif
 
-using namespace std;
+    using namespace std;
 
-
-/* global constants */
-#ifndef __CORE__
-#define __CORE__
+    /* global constants */
 
     // #define DEVEL true
-    #define APP_VERSION "0.1.5"
+    #define APP_VERSION "0.1.6"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     #ifdef __FreeBSD__
         #define DEFAULT_SHELL_COMMAND "/Software/Zsh/bin/zsh"
         #define DEFAULT_JAVA_BIN "/Software/Openjdk7/bin/java"
-    #elif __linux__
-        #define DEFAULT_SHELL_COMMAND "/Software/Zsh/bin/zsh"
-        #define DEFAULT_JAVA_BIN "/usr/bin/java"
     #elif __APPLE__
         #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
@@ -60,7 +54,7 @@ using namespace std;
 
     #define CORE_SVD_ID "boot"
     #define SOCK_FILE "svd.sock"
-    #define LOCK_FILE   "svd-core.lock"
+    #define LOCK_FILE "svd-core.lock"
     #define SOCKET_LOCK_FILE "svd-ss.lock"
     #define INTERNAL_LOG_FILE "svd-diagnostics.log"
     #define ROOT_JAR_FILE "/sbin/root.core"
@@ -68,7 +62,6 @@ using namespace std;
 
     #define DEFAULT_USER_GROUP 0
     #define SOCK_DATA_PACKET_SIZE 32
-    #define MAXPATHLEN  512
     #define LOCK_FILE_OCCUPIED_ERROR 100
     #define CANNOT_LOCK_ERROR 101
     #define POPEN_ERROR 102

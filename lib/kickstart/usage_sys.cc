@@ -6,27 +6,6 @@
 #include "core.h"
 
 
-#include <kvm.h>
-#include <sys/sysctl.h>
-#include <sys/user.h>
-#include <sys/proc.h>
-#include <paths.h>
-#include <sys/param.h>
-#include <sys/capability.h>
-#include <sys/socket.h>
-#include <sys/sysctl.h>
-#include <sys/un.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <err.h>
-#include <libprocstat.h>
-#include <inttypes.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <libprocstat.h>
-
-
 extern "C" {
 
 

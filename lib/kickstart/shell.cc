@@ -35,14 +35,8 @@ void execute(char **argv) {
             cerr << "Exec failed!" << endl;
             exit(EXEC_ERROR);
         }
-    } else {
-        #ifdef __linux__
-            #include <sys/wait.h>
-            waitpid(pid, &status, 0); /* wait for process */
-        #else
-            while (wait(&status) != pid); /* wait for process */
-        #endif
-    }
+    } else
+        while (wait(&status) != pid); /* wait for process */
 }
 
 
