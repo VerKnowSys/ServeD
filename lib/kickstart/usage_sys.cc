@@ -117,7 +117,7 @@ extern "C" {
         char** args = NULL;
         string command, output;
 
-        kvm_t* kd = kvm_open(NULL, "/dev/null", NULL, O_RDONLY, NULL);
+        kvm_t* kd = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL);
         if (kd == 0) {
             if (consoleOutput)
                 cerr << "Error initializing kernel descriptor!" << endl;
