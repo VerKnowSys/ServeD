@@ -116,6 +116,7 @@ extern "C" {
         int count = 0;
         char** args = NULL;
         string command, output;
+        int pagesize = getpagesize();
 
         kvm_t* kd = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL);
         if (kd == 0) {
@@ -177,8 +178,8 @@ extern "C" {
                     << "| " << setw(50) << (command)
                     << "| " << setw(8) << (procs->ki_pid)
                     << "| " << setw(8) << (procs->ki_ppid)
-                    << "| " << setw(8) << (procs->ki_rssize * 4)
-                    << "| " << setw(8) << (procs->ki_rusage.ru_maxrss * 4)
+                    << "| " << setw(8) << (procs->ki_rssize * pagesize)
+                    << "| " << setw(8) << (procs->ki_rusage.ru_maxrss * pagesize)
                     << "| " << setw(14) << (procs->ki_runtime / 1000)
                     << "| " << setw(10) << (procs->ki_rusage.ru_inblock)
                     << "| " << setw(10) << (procs->ki_rusage.ru_oublock)
@@ -191,8 +192,8 @@ extern "C" {
                     << "|" << (procs->ki_ppid)
                     << "|" << (procs->ki_comm)
                     << "|" << (command)
-                    << "|" << (procs->ki_rssize * 4)
-                    << "|" << (procs->ki_rusage.ru_maxrss * 4)
+                    << "|" << (procs->ki_rssize * pagesize)
+                    << "|" << (procs->ki_rusage.ru_maxrss * pagesize)
                     << "|" << (procs->ki_runtime / 1000)
                     << "|" << (procs->ki_rusage.ru_inblock)
                     << "|" << (procs->ki_rusage.ru_oublock)
