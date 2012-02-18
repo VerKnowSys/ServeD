@@ -2,23 +2,31 @@
 
 
 system="$(uname)"
-export FLAGS="-Os -fPIC"
+DEVEL="false"
+FLAGS="-Os -fPIC"
+CXX="g++"
+STRIP="strip"
+
+
 if [ -e "/usr/bin/clang++" ]; then
-    export CXX="clang++"
-    export CC="clang"
-else
-    export CXX="g++"
-    export CC="gcc"
+    CXX="clang++"
 fi
 
 echo "System: $system"
-echo "Compilers: $CC, $CXX"
-echo "FLAGS: $FLAGS"
+echo "Compiler: $CXX"
+echo "Flags: $FLAGS"
+echo "Devel: $DEVEL"
 echo
 
 check() {
     if [ "$1" = "0" ]; then
         echo "* $2 => Compiled Sucessfully"
+        if [ "$DEVEL" != "true" ]; then
+            if [ "$3" != "" ]; then
+                echo "  Stripping $3"
+                $STRIP $3
+            fi
+        fi
     else
         echo "* $2 => Failure"
         exit 1
@@ -26,41 +34,30 @@ check() {
 }
 
 
-if [ "$system" = "FreeBSD" ]; then
-
-    pref=""
-    if [ $(uname -p) = "amd64" ]; then
-        pref="-amd64"
-    fi
-
-    $CXX $FLAGS -shared lib/kickstart/usage_sys.cc -o lib/libusagesys${pref}.so -lutil -lprocstat -lkvm
-    check $? "UsageSysLib"
-
-    $CXX $FLAGS lib/kickstart/usage_check.cc -o usage_check lib/libusagesys${pref}.so -lutil -lprocstat -lkvm
-    check $? "UsageSysCheck"
-
-fi
-
-$CXX $FLAGS lib/kickstart/shell.cc -o shell
-check $? "UserShell"
-
-if [ "$1" = "sh" ]; then
-    exit
-fi
-
 $CXX $FLAGS -c lib/kickstart/core.cc -o lib/core.o
 check $? "Core"
 
 $CXX $FLAGS -c lib/kickstart/utils.cc -o lib/utils.o
 check $? "Utils"
 
-if [ "$system" = "Darwin" ]; then
-    $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/stat.cc -o lib/libstat.dylib
-    # $CXX -Os -fPIC -shared lib/kickstart/stat.cc -o lib/libstat.so
-fi
-check $? "StatLib"
+$CXX $FLAGS lib/kickstart/shell.cc -o shell
+check $? "UserShell" "shell"
 
 $CXX $FLAGS lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
-check $? "KickStart"
+check $? "KickStart" "kick"
 
-# rm -rf lib/*.o
+if [ "$system" = "FreeBSD" ]; then
+    $CXX $FLAGS -shared lib/kickstart/usage_sys.cc -o lib/libusagesys.so -lutil -lprocstat -lkvm
+    check $? "UsageSysLib" "lib/libusagesys.so"
+
+    $CXX $FLAGS lib/kickstart/usage_check.cc -o usage_check lib/libusagesys.so -lutil -lprocstat -lkvm
+    check $? "UsageSysCheck" "usage_check"
+
+    $CXX $FLAGS -shared lib/kickstart/stat.cc -o lib/libstat.so
+    check $? "StatLib" "lib/libstat.so"
+fi
+
+if [ "$system" = "Darwin" ]; then
+    $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/stat.cc -o lib/libstat.dylib
+    check $? "StatLib" "lib/libstat.dylib"
+fi
