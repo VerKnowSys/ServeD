@@ -70,9 +70,9 @@ int main(int argc, char const *argv[]) {
     if (!fileExists(homeDir)) {
         cerr << "Directory: " << homeDir << " does not exists. Creating it." << endl;
         #ifdef DEVEL
-                mkdir(homeDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+            mkdir(homeDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         #else
-                mkdir(homeDir.c_str(), S_IRWXU);
+            mkdir(homeDir.c_str(), S_IRWXU);
         #endif
         chown(homeDir.c_str(), atoi(params.svdArg.c_str()), DEFAULT_USER_GROUP);
     }

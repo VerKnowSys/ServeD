@@ -180,7 +180,7 @@ extern "C" {
                     << "| " << setw(8) << (procs->ki_ppid)
                     << "| " << setw(8) << (procs->ki_rssize * pagesize)
                     << "| " << setw(8) << (procs->ki_rusage.ru_maxrss * pagesize)
-                    << "| " << setw(14) << (procs->ki_runtime / 1000)
+                    << "| " << setw(14) << (procs->ki_runtime / 1000) // miliseconds
                     << "| " << setw(10) << (procs->ki_rusage.ru_inblock)
                     << "| " << setw(10) << (procs->ki_rusage.ru_oublock)
                     << "| " << setw(4) << (procs->ki_numthreads)
