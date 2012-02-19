@@ -9,6 +9,12 @@ rootcheck() {
 
 system="$(uname)"
 
+$(java -d32 -version)
+if [ "$?" != "0" ]; then
+    echo "System Deployer requires 32bit JDK available in PATH (Your PATH: $PATH)!"
+    exit 1
+fi
+
 bin/current
 bin/sbt assembly && \
 if [ $system = "Darwin" ]; then
