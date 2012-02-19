@@ -20,7 +20,8 @@ object SvdConfig {
     def copyright                       = "Copyright © 2oo9-2o11 VerKnowSys.com - All Rights Reserved."
     def operatingSystem                 = System.getProperty("os.name")
     def binaryArchitecture              = "64"
-    def binarySoftwareRepository        = "http://software.verknowsys.com/binary/" + operatingSystem + "/" + binaryArchitecture
+    def systemVersion                   = System.getProperty("os.version")
+    def binarySoftwareRepository        = "http://software.verknowsys.com/binary/" + operatingSystem + "/" + binaryArchitecture + "/" + systemVersion
     def kickApp                         = "svdkick"
     def servedShell                     = "svdshell"
     def rootPidFile                     = "0.pid"
