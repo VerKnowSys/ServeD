@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 rootcheck() {
     if [ "$(id -u)" != "0" ]; then
         echo "System Deployer requires root privileges to run!"
@@ -7,13 +8,26 @@ rootcheck() {
     fi
 }
 
-system="$(uname)"
 
-$(java -d32 -version)
-if [ "$?" != "0" ]; then
-    echo "System Deployer requires 32bit JDK available in PATH (Your PATH: $PATH)!"
-    exit 1
-fi
+requirementscheck() {
+    
+    $(java -d32 -version)
+    if [ "$?" != "0" ]; then
+        echo "System Deployer requires 32bit JDK available in PATH!"
+        exit 1
+    fi
+
+    $(git --version)
+    if [ "$?" != "0" ]; then
+        echo "System Deployer requires GIT available in PATH!"
+        exit 1
+    fi
+    
+}
+
+
+system="$(uname)"
+requirementscheck
 
 bin/clean
 bin/current
