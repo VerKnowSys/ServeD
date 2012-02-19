@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ "$(id -u)" != "0" ]; then
+	echo "Consider running this script as root to be sure of cleaning non current user / root old files."
+fi
+
 if [ "$1" = "deep" ]; then
     echo "Deep clean"
     rm -rf ~/.ivy2
@@ -8,6 +12,8 @@ fi
 bin/sbt clean
 echo "Project source cleaned.."
 
-rm -f lib/*.o
 rm -f ./kick ./shell
-echo "Native code cleaned."
+rm -f lib/*.o*
+rm -f lib/*.so
+rm -f lib/*.dylib
+echo "Native code and libraries wiped out."
