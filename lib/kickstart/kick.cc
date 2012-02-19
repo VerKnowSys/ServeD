@@ -85,8 +85,11 @@ int main(int argc, char const *argv[]) {
     ifs.close();
 
     chdir(homeDir.c_str());
-
-    params.javaPath = DEFAULT_JAVA_BIN;
+    
+    if (uid == 0)
+        params.javaPath = DEFAULT_JAVA64_BIN;
+    else
+        params.javaPath = DEFAULT_JAVA_BIN;
 
     if (uid == 0) {
         params.svdArg = string(CORE_SVD_ID);

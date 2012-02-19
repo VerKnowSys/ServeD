@@ -32,21 +32,22 @@ const static string coreDir = currentDir();
 
     #endif
 
-    void load_svd(execParams params) {
+
+    void load_svd64(execParams params) {
         string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
+        int count = 13;
         #ifdef DEVEL
-            #define COUNT 13
-        #else
-            #define COUNT 12
+            count = 14;
         #endif
         char *args[] = {
             (char*)"java",
-            (char*)"-d32",
+            (char*)"-d64",
             (char*)"-client",
-            (char*)"-Xmn1m",
+            (char*)"-Xmn2m",
             (char*)"-XX:NewRatio=1",
-            (char*)"-Xms2m",
-            (char*)"-Xmx32m",
+            (char*)"-Xms8m",
+            (char*)"-Xmx128m",
+            (char*)"-XX:+UseCompressedOops",
             (char*)"-Dfile.encoding=UTF-8",
             (char*)jnalp.c_str(),
             #ifndef DEVEL
@@ -64,14 +65,56 @@ const static string coreDir = currentDir();
         };
 
         #ifdef DEVEL
-            cerr << "Loading svd, with opts: [";
-            for (int i = 0; i < COUNT; i++) {
+            cerr << "Loading svd-64, with opts: [";
+            for (int i = 0; i < count; i++) {
                 cerr << args[i] << " ";
             }
             cerr << "]" << endl;
         #endif
         execv((char*)params.javaPath.c_str(), args);
     }
+
+
+    void load_svd(execParams params) {
+        // string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
+        int count = 11;
+        #ifdef DEVEL
+            count = 12;
+        #endif
+        char *args[] = {
+            (char*)"java",
+            (char*)"-d32",
+            (char*)"-client",
+            (char*)"-Xmn1m",
+            (char*)"-XX:NewRatio=1",
+            (char*)"-Xms2m",
+            (char*)"-Xmx32m",
+            (char*)"-Dfile.encoding=UTF-8",
+            // (char*)jnalp.c_str(),
+            #ifndef DEVEL
+                /* when not devel, use classes from assembly jar */
+                (char*)"-jar",
+                (char*)params.jar.c_str(),
+            #else
+                /* when devel, use classes from compile folders */
+                (char*)"-cp",
+                (char*)getClassPath(params.classPathFile).c_str(),
+                (char*)params.mainClass.c_str(),
+            #endif
+            (char*)params.svdArg.c_str(),
+            (char*)0
+        };
+
+        #ifdef DEVEL
+            cerr << "Loading svd, with opts: [";
+            for (int i = 0; i < count; i++) {
+                cerr << args[i] << " ";
+            }
+            cerr << "]" << endl;
+        #endif
+        execv((char*)params.javaPath.c_str(), args);
+    }
+    
 
     void spawnBackgroundTask(execParams params, string lockFileName) {
         int i, lfp;
@@ -120,13 +163,15 @@ const static string coreDir = currentDir();
         signal(SIGINT, defaultSignalHandler);
 
         /* spawn svd */
-        #ifndef DEVEL
-            if (userSpawn)
-                params.jar = USER_JAR_FILE;
-            else
-                params.jar = ROOT_JAR_FILE;
-        #else
+        #ifdef DEVEL
             chdir(coreDir.c_str()); /* change running directory before spawning svd in devel mode */
         #endif
-        load_svd(params);
+            
+        if (userSpawn) {
+            params.jar = USER_JAR_FILE;
+            load_svd(params);
+        } else {
+            params.jar = ROOT_JAR_FILE;
+            load_svd64(params);
+        }
     }

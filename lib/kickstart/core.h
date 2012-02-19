@@ -34,16 +34,18 @@
     /* global constants */
 
     // #define DEVEL true
-    #define APP_VERSION "0.1.6"
+    #define APP_VERSION "0.1.7"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     #ifdef __FreeBSD__
         #define DEFAULT_SHELL_COMMAND "/Software/Zsh/bin/zsh"
-        #define DEFAULT_JAVA_BIN "/Software/Openjdk7/bin/java"
+        #define DEFAULT_JAVA_BIN "/Software/Openjdk/bin/java"
+        #define DEFAULT_JAVA64_BIN "/Software/Openjdk64/bin/java"
     #elif __APPLE__
         #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
+        #define DEFAULT_JAVA64_BIN "/usr/bin/java"
     #else
         #error No supported OS found!
     #endif
