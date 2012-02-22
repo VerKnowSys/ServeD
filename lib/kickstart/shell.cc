@@ -24,13 +24,31 @@ void parse(char *line, char **argv) {
 }
 
 
-void execute(char **argv) {
+void execute(char **argv, int uid) {
     int status;
     pid_t  pid;
     if ((pid = fork()) < 0) {
         cerr << "Error forking child process failed!" << endl;
         exit(FORK_ERROR);
     } else if (pid == 0) {
+        stringstream hd, usr;
+        hd << USERS_HOME_DIR << uid;
+        usr << uid;
+        const char* homeDir = hd.str().c_str();
+        const char* userName = usr.str().c_str();
+        chdir(homeDir);
+        setenv("HOME", homeDir, 1);
+        setenv("LOGNAME", userName, 1);
+        setenv("PWD", homeDir, 1);
+        setenv("OLDPWD", homeDir, 1);
+        setenv("USER", userName, 1);
+        setenv("USERNAME", userName, 1);
+        unsetenv("SUDO_USERNAME");
+        unsetenv("SUDO_USER");
+        unsetenv("SUDO_UID");
+        unsetenv("SUDO_GID");
+        unsetenv("SUDO_COMMAND");
+        unsetenv("MAIL");
         if (execvp(*argv, argv) < 0) {
             cerr << "Exec failed!" << endl;
             exit(EXEC_ERROR);
@@ -100,7 +118,7 @@ int main(int argc, char const *argv[]) {
         cerr << "Error setgid to gid: " << gid << endl;
         exit(SETGID_ERROR);
     }
-    chdir(homeDir.c_str());
+    // chdir(homeDir.c_str());
 
     string command = string(DEFAULT_SHELL_COMMAND) + " -i -s";
     #ifdef DEVEL
@@ -115,5 +133,5 @@ int main(int argc, char const *argv[]) {
             cout << arguments[i] << " ";
         cout << endl;
     #endif
-    execute(arguments);
+    execute(arguments, uid);
 }
