@@ -25,7 +25,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#ifndef __APPLE__
+#ifdef __FreeBSD__
     #include <kvm.h>
     #include <sys/capability.h>
     #include <libprocstat.h>
