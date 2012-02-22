@@ -58,7 +58,7 @@ served_restart() {
         if [ "$amount" -eq "0" ]; then
             break
         fi
-        sleep 1
+        sleep 10
     done
     for i in $(jot 10); do
         amount=$(ps -Au |grep java | grep -v grep | wc -l)
