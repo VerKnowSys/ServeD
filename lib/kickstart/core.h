@@ -15,18 +15,23 @@
 #include <vector>
 #include <iomanip>
 
-#include <kvm.h>
 #include <time.h>
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/user.h>
-#include <sys/capability.h>
 #include <sys/socket.h>
 #include <sys/sysctl.h>
 #include <sys/un.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <libprocstat.h>
+
+#ifndef __APPLE__
+    #include <kvm.h>
+    #include <sys/capability.h>
+    #include <libprocstat.h>
+#else
+    #include <sys/fcntl.h>
+#endif
 
 
     using namespace std;
