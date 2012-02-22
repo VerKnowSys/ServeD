@@ -45,35 +45,35 @@ object SvdUserServices {
             "mkdir -p %s ; echo \"%s\" > \"%s\" && echo \"%s\" > \"%s\" && echo configuration".format(
                 SvdConfig.temporaryDir / "%s-%s".format(name, account.uuid),
                 """
-                local all all trust
-                host replication all 0.0.0.0/0 trust
+local all all trust
+host replication all 0.0.0.0/0 trust
                 """,
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / name / "pg_hba.conf", /* pg_hba.conf */
                 """
-                unix_socket_directory '%s'
-                max_connections = 10
-                checkpoint_segments = 24
-                password_encryption = on
-                datestyle = 'iso, mdy'
-                shared_buffers = 64MB
-                temp_buffers = 32MB
-                work_mem = 16MB
-                max_stack_depth = 16MB
+unix_socket_directory '%s'
+max_connections = 10
+checkpoint_segments = 24
+password_encryption = on
+datestyle = 'iso, mdy'
+shared_buffers = 64MB
+temp_buffers = 32MB
+work_mem = 16MB
+max_stack_depth = 16MB
 
-                logging_collector = true
-                log_directory = '%s'
-                client_encoding = 'UTF-8'
-                lc_messages = 'pl_PL.UTF-8'
-                lc_monetary = 'pl_PL.UTF-8'
-                lc_numeric = 'pl_PL.UTF-8'
-                lc_time = 'pl_PL.UTF-8'
-                default_text_search_config = 'pg_catalog.polish'
+logging_collector = true
+log_directory = '%s'
+client_encoding = 'UTF-8'
+lc_messages = 'pl_PL.UTF-8'
+lc_monetary = 'pl_PL.UTF-8'
+lc_numeric = 'pl_PL.UTF-8'
+lc_time = 'pl_PL.UTF-8'
+default_text_search_config = 'pg_catalog.polish'
 
-                # master for host standby, streaming replication:
-                wal_level = hot_standby
-                max_wal_senders = 5
-                wal_keep_segments = 32
-                archive_mode = on
+# master for host standby, streaming replication:
+wal_level = hot_standby
+max_wal_senders = 5
+wal_keep_segments = 32
+archive_mode = on
                 """.format(
                     SvdConfig.temporaryDir / "%s-%s".format(name, account.uuid),
                     SvdConfig.temporaryDir / "%s-%s".format(name, account.uuid) // NOTE: consider log in app dir
