@@ -145,7 +145,7 @@ archive_mode = on
                  """.format(
                     SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "var/run",
                     SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "var/log",
-                    SvdConfig.publicHttpDir / account.uid.toString + "-" + name + "-" + domain.name +  "-" + "php-fpm.sock" // socket file
+                    SvdConfig.publicHttpDir / account.uuid.toString + "-" + name + "-" + domain.name +  "-" + "php-fpm.sock" // socket file
                     ),
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "etc" / "php-fpm.conf", /* php-fpm.conf */
                 """
