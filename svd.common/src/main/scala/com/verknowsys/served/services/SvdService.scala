@@ -101,15 +101,15 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                 log.trace("installHook: %s".format(hook))
                 shell.exec(hook)
         }
+        configureHook.foreach {
+            hook =>
+                log.trace("configureHook: %s".format(hook))
+                shell.exec(hook)
+        }
     } else {
         log.info("Software already installed: %s".format(config.name))
     }
 
-    configureHook.foreach {
-        hook =>
-            log.trace("configureHook: %s".format(hook))
-            shell.exec(hook)
-    }
     validateHook.foreach {
         hook =>
             log.trace("validateHook: %s".format(hook))
