@@ -15,45 +15,52 @@ import com.verknowsys.served.api._
  */
 object SvdRootServices {
 
-
-    def coreginxDefinitionTemplate(
-        defaultDomainName: String = SvdConfig.defaultDomain) =
+    /**
+     *  @author dmilith
+     *
+     *   Generating default empty template including accounts web configuration
+     */
+    def coreginxEmptyDefinitionTemplate(accountList: List[SvdAccount]) =
 """
-worker_processes    %s;
+worker_processes            %s;
 
 events {
-    worker_connections  %s;
+    worker_connections      %s;
 }
 
 http {
-    include     mime.types;
-    default_type    application/octet-stream;
-    keepalive_timeout   %s;
-    gzip    on;
-
-    server {
-        listen  %s;
-        server_name %s;
-        access_log  logs/%s.access.log;
-        location    /   {
-            root    %shtml;
-            index   index.html  index.htm;
-        }
-        error_page  500    502    503    504    /50x.html;
-        location    =  /50x.html {
-            root    %shtml;
-        }
-    }
-
+    include                 mime.types;
+    default_type            application/octet-stream;
+    keepalive_timeout       %s;
+    gzip                    on;
+    charset                 utf-8;
+    gzip_http_version       1.1;
+    gzip_vary               on;
+    gzip_comp_level         3;
+    gzip_proxied            any;
+    gzip_types              text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+    gzip_disable            "MSIE [1-6].(?!.*SV1)";
+    sendfile                on;
+    tcp_nopush              on;
+    keepalive_timeout       120;
+    keepalive_requests      100;
+    tcp_nodelay             on;
+    ignore_invalid_headers  on;
+    recursive_error_pages   on;
+    
+    # user includes:
+    %s
+}
 """.format(
     SvdConfig.defaultHttpAmountOfWorkers, /* worker_processes */
     SvdConfig.defaultHttpWorkerConnections, /* worker_connections */
     SvdConfig.defaultHttpKeepAliveTimeout, /* keepalive_timeout */
-    SvdConfig.defaultHttpPort, /* listen */
-    defaultDomainName, /* server name */
-    defaultDomainName, /* access log */
-    SvdConfig.publicHttpDir, /* root */
-    SvdConfig.publicHttpDir /* root */
+    accountList.map {
+        account =>
+            "include %s;\n".format(
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / SvdConfig.webConfigDir / "*.conf"
+            )
+    }
 )
 
 
@@ -127,19 +134,16 @@ server {
                 expectStdOut = List("install")) :: Nil,
 
         configure = SvdShellOperation(
-           "mkdir -p %s ; chown -R nobody %s && cp -r %s %s && echo \"%s\" > %s".format(
+            "mkdir -p %s ; chown -R nobody %s && cp -r %s %s && echo \"%s\" > %s".format(
                 SvdConfig.publicHttpDir, /* mkdir */
                 SvdConfig.publicHttpDir, /* chown */
                 SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "html", SvdConfig.publicHttpDir, /* cp */
-                coreginxDefinitionTemplate() +
-
-// NOTE: devel only
-                newWebAppEntry(
-                    SvdUserDomain("localhost"),
-                    SvdAccount(uid = 501).copy(uuid = java.util.UUID.fromString("7811db03-52f0-4ef8-bcf0-dbc93982315e"))
-                ) +
-                "\n}", // XXX: HACK: NOTE: closing base "server" clause. STILL HACK
-
+                coreginxEmptyDefinitionTemplate(SvdAccount(uid = 501) :: Nil),
+                // NOTE: devel only
+                    // newWebAppEntry(
+                    //     SvdUserDomain("localhost"),
+                    //     SvdAccount(uid = 501).copy(uuid = java.util.UUID.fromString("7811db03-52f0-4ef8-bcf0-dbc93982315e"))
+                    // ) +
                 SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "conf" / "nginx.conf" /* echo */
            )) :: Nil,
 
