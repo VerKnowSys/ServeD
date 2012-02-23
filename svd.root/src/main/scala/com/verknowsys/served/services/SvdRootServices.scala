@@ -32,18 +32,16 @@ http {
     include                 mime.types;
     default_type            application/octet-stream;
     keepalive_timeout       %s;
-    gzip                    on;
+    keepalive_requests      100;
     charset                 utf-8;
+    gzip                    on;
     gzip_http_version       1.1;
     gzip_vary               on;
     gzip_comp_level         3;
     gzip_proxied            any;
     gzip_types              text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
-    gzip_disable            "MSIE [1-6].(?!.*SV1)";
     sendfile                on;
     tcp_nopush              on;
-    keepalive_timeout       120;
-    keepalive_requests      100;
     tcp_nodelay             on;
     ignore_invalid_headers  on;
     recursive_error_pages   on;
@@ -58,9 +56,9 @@ http {
     accountList.map {
         account =>
             "include %s;\n".format(
-                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / SvdConfig.webConfigDir / "*.conf"
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webConfigDir / "*.conf"
             )
-    }
+    }.mkString("\n")
 )
 
 
