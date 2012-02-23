@@ -18,6 +18,94 @@ import com.verknowsys.served.api._
 object SvdUserServices {
 
 
+    /**
+     *  @author dmilith
+     *
+     *   Add entry for PHP WebAPp
+     */
+    def newPhpWebAppEntry(appName: String = "Php", domain: SvdUserDomain, account: SvdAccount) = """
+# ENTRY %s
+upstream %s {
+    server %s
+}
+server {
+    listen %s;
+    server_name %s %s;
+    access_log off;
+    error_log %s;
+    location ~* ^.+.(css|jpg|jpeg|gif|png|js|ico|xml|mp3|eps|cdr|rar|zip|p7|pdf|swf)$ {
+        root %s;
+        add_header Cache-Control max-age=315360000;
+        expires 30d;
+        error_page 500 502 503 504 /50x.html;
+        error_page 400 402 403 404 /40x.html;
+        break;
+    }
+    location / {
+        root %s;
+        index index.html index.htm;
+        error_page 500 502 503 504 /50x.html;
+        error_page 400 402 403 404 /40x.html;
+    }
+    location ~ \.php$ {
+        root %s;
+        index index.html index.php;
+        error_page 500 502 503 504 /50x.html;
+        error_page 400 402 403 404 /40x.html;
+        if (-f $request_filename) {
+            break;
+        }
+        proxy_read_timeout 120;
+        proxy_connect_timeout 120;
+        fastcgi_param  QUERY_STRING       $query_string;
+        fastcgi_param  REQUEST_METHOD     $request_method;
+        fastcgi_param  CONTENT_TYPE       $content_type;
+        fastcgi_param  CONTENT_LENGTH     $content_length;
+        fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+        fastcgi_param  REQUEST_URI        $request_uri;
+        fastcgi_param  DOCUMENT_URI       $document_uri;
+        fastcgi_param  DOCUMENT_ROOT      $document_root;
+        fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+        fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+        fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+        fastcgi_param  REMOTE_ADDR        $remote_addr;
+        fastcgi_param  REMOTE_PORT        $remote_port;
+        fastcgi_param  SERVER_ADDR        $server_addr;
+        fastcgi_param  SERVER_PORT        $server_port;
+        fastcgi_param  SERVER_NAME        $server_name;
+        fastcgi_param SCRIPT_FILENAME %s$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_script_name;
+        fastcgi_pass %s;
+    }
+    location = /50x.html {
+        root %s;
+    }
+    location = /40x.html {
+        root %s;
+    }
+}
+# ENTRY END
+""".format(
+        domain.name, /* ENTRY */
+        "backend_" + appName + "_" + account.uuid.toString, /* backend postfix */
+        "unix:%s".format(SvdConfig.publicHttpDir / account.uuid.toString + "-" + domain.name + "-" + appName + ".sock"), /* server */ 
+        SvdConfig.defaultHttpPort, /* listen */
+        domain.name, /* main server_name */
+        if (domain.wildcard) /* wildcard */
+            "*.%s".format(domain.name)
+        else
+            "www.%s".format(domain.name),
+        SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / appName / "http-error.log", /* error log */
+        SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name, /* root for location static */
+        SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name, /* root for location / */
+        SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name, /* root for location ~ php */
+        SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name, /* SCRIPT_FILENAME */
+        "backend_" + appName + "_" + account.uuid.toString, /* fastcgi_pass */
+        SvdConfig.publicHttpDir / "http", /* error root */
+        SvdConfig.publicHttpDir / "http" /* error root */
+    )
+
+
     def postgresDatabaseConfig(account: SvdAccount, name: String = "Postgresql") = SvdServiceConfig(
         name = name,
 
@@ -145,7 +233,7 @@ archive_mode = on
                  """.format(
                     SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "var/run",
                     SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "var/log",
-                    SvdConfig.publicHttpDir / account.uuid.toString + "-" + name + "-" + domain.name +  "-" + "php-fpm.sock" // socket file
+                    SvdConfig.publicHttpDir / account.uuid.toString + "-" + domain.name +  "-" + name + ".sock" // socket file
                     ),
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "etc" / "php-fpm.conf", /* php-fpm.conf */
                 """
