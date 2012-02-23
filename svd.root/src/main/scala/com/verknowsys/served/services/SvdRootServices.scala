@@ -136,7 +136,7 @@ server {
                 SvdConfig.publicHttpDir, /* mkdir */
                 SvdConfig.publicHttpDir, /* chown */
                 SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "html", SvdConfig.publicHttpDir, /* cp */
-                coreginxEmptyDefinitionTemplate(SvdAccount(uid = 501) :: Nil),
+                coreginxEmptyDefinitionTemplate(SvdAccount(uid = 501) :: Nil), // XXX: hardcode
                 // NOTE: devel only
                     // newWebAppEntry(
                     //     SvdUserDomain("localhost"),
@@ -144,27 +144,30 @@ server {
                     // ) +
                 SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "conf" / "nginx.conf" /* echo */
            )) :: Nil,
+         
+        reload = SvdShellOperation(
+            "%s -p %s/ -s reload".format(
+                SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "sbin" / "nginx",
+                SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name
+            )) :: Nil,
 
         validate = SvdShellOperation(
-            "%s0/Apps/%s/sbin/nginx -p %s/ -t".format(
-                    SvdConfig.systemHomeDir,
-                    name,
+            "%s -p %s/ -t".format(
+                    SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "sbin" / "nginx",
                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name),
                 waitForOutputFor = 10,
                 expectStdErr = List("test is successful")) :: Nil,
 
         start = SvdShellOperation(
-            "%s0/Apps/%s/sbin/nginx -p %s/ && echo start".format(
-                    SvdConfig.systemHomeDir,
-                    name,
+            "%s -p %s/ && echo start".format(
+                    SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "sbin" / "nginx",
                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name),
                 waitForOutputFor = 5,
                 expectStdOut = List("start")) :: Nil,
 
         stop = SvdShellOperation(
-            "%s0/Apps/%s/sbin/nginx -p %s/ -s stop && echo stop".format(
-                    SvdConfig.systemHomeDir,
-                    name,
+            "%s -p %s/ -s stop && echo stop".format(
+                    SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "sbin" / "nginx",
                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name),
                 waitForOutputFor = 15,
                 expectStdOut = List("stop")) :: Nil
