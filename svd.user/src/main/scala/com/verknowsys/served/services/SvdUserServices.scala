@@ -105,9 +105,10 @@ archive_mode = on
     def phpWebAppConfig(account: SvdAccount, domain: SvdUserDomain, name: String = "Php") = SvdServiceConfig(
         name = name,
         install = SvdShellOperation(
-            "mkdir -p %s ; mkdir -p %s ; cp -r %s %s && echo install".format(
+            "mkdir -p %s ; mkdir -p %s ; mkdir -p %s ; cp -r %s %s && echo install".format(
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name, /* mkdir */
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir, /* mkdir */
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webConfigDir, /* mkdir */
                 SvdConfig.softwareRoot / name,
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir),
                 waitForOutputFor = 120,
@@ -353,9 +354,10 @@ archive_mode = on
         name = name,
 
         install = SvdShellOperation(
-            "mkdir -p %s ; mkdir -p %s ; cp -r %s %s && echo install".format(
+            "mkdir -p %s ; mkdir -p %s ; mkdir -p %s ; cp -r %s %s && echo install".format(
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name, /* mkdir */
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir, /* mkdir */
+                SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webConfigDir, /* mkdir */
                 SvdConfig.softwareRoot / name,
                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir),
             waitForOutputFor = 120,
