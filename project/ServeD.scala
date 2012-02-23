@@ -1,9 +1,11 @@
 import sbt._
 import sbt.Keys._
 
+import scala.io.Source
 import com.github.siasia.WebPlugin
 import coffeescript.CoffeeScript
 import sbtassembly.Plugin._
+
 
 object BuildSettings {
     import growl._
@@ -11,7 +13,7 @@ object BuildSettings {
 
     val buildSettings = Defaults.defaultSettings ++ GrowlingTests.growlSettings ++ Seq(
         organization    := "VerKnowSys",
-        version         := "0.2.0",
+        version         := Source.fromFile("VERSION").mkString,
         scalaVersion    := "2.9.0-1",
         resolvers       := Resolvers.all,
         logLevel        := Level.Info,
