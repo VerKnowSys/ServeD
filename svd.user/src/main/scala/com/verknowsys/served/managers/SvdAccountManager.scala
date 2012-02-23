@@ -94,6 +94,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
                     val server = new DBServer(dbPort, SvdConfig.userHomeDir / "%s".format(account.uid) / "%s.db".format(account.uid))
                     val db = server.openClient
 
+                    log.info(SvdUserServices.newPhpWebAppEntry("Php", SvdUserDomain("deldaphp", false), account))
+                    
                     _dbServer = Some(server)
                     _dbClient = Some(db)
 
