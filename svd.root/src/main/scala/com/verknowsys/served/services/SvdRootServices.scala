@@ -26,6 +26,7 @@ worker_processes            %s;
 
 events {
     worker_connections      %s;
+    use                     kqueue;
 }
 
 http {
@@ -37,7 +38,7 @@ http {
     gzip                    on;
     gzip_http_version       1.1;
     gzip_vary               on;
-    gzip_comp_level         3;
+    gzip_comp_level         4;
     gzip_proxied            any;
     gzip_types              text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
     sendfile                on;
