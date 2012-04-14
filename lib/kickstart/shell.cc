@@ -37,7 +37,7 @@ void execute(char **argv, int uid) {
         const char* homeDir = hd.str().c_str();
         const char* userName = usr.str().c_str();
         chdir(homeDir);
-        setenv("HOME", homeDir, 1);
+        setenv("HOME", hd.str().c_str(), 1);
         setenv("LOGNAME", userName, 1);
         setenv("PWD", homeDir, 1);
         setenv("OLDPWD", homeDir, 1);
