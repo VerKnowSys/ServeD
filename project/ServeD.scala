@@ -110,6 +110,7 @@ object Dependencies {
     val sshd = "org.apache.sshd" % "sshd-core" % "0.5.0"
     val slf4japi = "org.slf4j" % "slf4j-api" % "1.5.8"
     val commonsio = "commons-io" % "commons-io" % "1.3.2"
+    val webbit = "org.webbitserver" % "webbit" % "0.3.8"
 }
 
 object ServeD extends Build {
@@ -124,7 +125,7 @@ object ServeD extends Build {
     lazy val root = Project("root", file("svd.root"),
         settings = coreBuildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
-            libraryDependencies ++= Seq(h2, expect4j, sshd),
+            libraryDependencies ++= Seq(h2, expect4j, sshd, webbit),
             mainClass in Assembly := Some("com.verknowsys.served.rootboot")
         )
     ) dependsOn(common, testing % "test")
