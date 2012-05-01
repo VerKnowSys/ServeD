@@ -25,10 +25,10 @@ case object RevertBackup
 // case object Failure extends InternalResponse
 
 // SvdSystemManager
-case object GetAllProcesses
 case object GetRunningProcesses
 case object GetNetstat
 
+case class GetUserProcesses(uid: Int)
 case class SpawnProcess(cmd: String)
 case class Kill(what: Int, signal: Any)
 case class Chmod(what: String, mode: Int, recursive: Boolean)

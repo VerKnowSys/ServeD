@@ -19,6 +19,8 @@ import akka.actor.Actor.actorOf
 import com.sun.jna.{Native, Library}
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
+import org.webbitserver._
+import org.webbitserver.handler._
 
 
 object SvdSystemManager extends GlobalActorRef(actorOf[SvdSystemManager])
@@ -37,6 +39,19 @@ class SvdSystemManager extends SvdExceptionHandler {
     def receive = {
         case Init =>
             log.debug("SvdSystemManager ready")
+
+            if (SvdUtils.isBSD)
+                log.warn("SYSUSAGE: " + SvdLowLevelSystemAccess.usagesys(0))
+
+
+            log.info("Spawning Webbit WebSockets Server")
+            val webServer = WebServers.createWebServer(60006)
+              .add("/livemonitor", new SvdWebSocketsHandler)
+              .add(new StaticFileHandler("/web"))
+              .start
+            log.info("WebSockets Server running at " + webServer.getUri)
+
+            
             // log.info("Sigar version loaded: %s".format(core.getVersion))
             // log.debug("System Resources Availability: [%s]".format(SvdLowLevelSystemAccess))
             // log.debug("Current PID: %d. System Information:\n%s".format(SvdLowLevelSystemAccess.getCurrentProcessPid, SvdLowLevelSystemAccess.getProcessInfo(SvdLowLevelSystemAccess.getCurrentProcessPid)))
@@ -44,10 +59,13 @@ class SvdSystemManager extends SvdExceptionHandler {
             //     SvdLowLevelSystemAccess.net.getDefaultGateway, SvdLowLevelSystemAccess.net.getDomainName, SvdLowLevelSystemAccess.net.getHostName, SvdLowLevelSystemAccess.net.getPrimaryDns, SvdLowLevelSystemAccess.net.getSecondaryDns
             // )
 
-        case GetAllProcesses =>
-            // val psAll = SvdLowLevelSystemAccess.processList(true)
-            // log.debug("All process IDs: %s".format(psAll.mkString(", ")))
-            // self reply ProcessesList(psAll)
+        case GetUserProcesses(uid: Int) =>
+            log.debug("Gathering user processes of %s".format(uid))
+            if (SvdUtils.isBSD)
+                self reply SvdLowLevelSystemAccess.usagesys(uid)
+            else
+                self reply "NOT-IMPLEMENTED"
+
 
         case GetNetstat =>
             // XXX: NOTE: TODO: this function causes SIGSEGV on FreeBSD. This requires some investigation!
