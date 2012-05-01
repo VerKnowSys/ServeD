@@ -14,7 +14,7 @@ object BuildSettings {
     val buildSettings = Defaults.defaultSettings ++ GrowlingTests.growlSettings ++ Seq(
         organization    := "VerKnowSys",
         version         := Source.fromFile("VERSION").mkString,
-        scalaVersion    := "2.9.0-1",
+        scalaVersion    := "2.9.1",
         resolvers       := Resolvers.all,
         logLevel        := Level.Info,
         compileOrder    := CompileOrder.JavaThenScala,
@@ -76,7 +76,7 @@ object BuildSettings {
 }
 
 object Resolvers {
-    val akkaRepo = "Akka Repository" at "http://akka.io/repository"
+    val akkaRepo = "Akka Maven Repository" at "http://repo.akka.io/releases"
     val jlineRepo = "JLine Project Repository" at "http://jline.sourceforge.net/m2rep"
     val javaNet = "java.net" at "http://download.java.net/maven/2"
     val scalaTools  = "releases" at "http://scala-tools.org/repo-releases"
@@ -84,13 +84,13 @@ object Resolvers {
     val sonatype = "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
     val guiceyfruit = "guiceyfruit repo" at "http://guiceyfruit.googlecode.com/svn/repo/releases"
     val mediavks = "Media VKS" at "http://media.verknowsys.com/maven2-repository/"
-    val repoVks = "VerKnowSys Public Repository" at "http://repo.verknowsys.com"
+    val repoVks = "VerKnowSys Public Repository" at "http://maven.verknowsys.com/repository"
 
     val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, mediavks, repoVks)
 }
 
 object Dependencies {
-    val akkaVersion = "1.1.3"
+    val akkaVersion = "1.3.1"
 
     val akkaActor = "se.scalablesolutions.akka" % "akka-actor" % akkaVersion
     val akkaRemote = "se.scalablesolutions.akka" % "akka-remote" % akkaVersion
@@ -103,10 +103,10 @@ object Dependencies {
     val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "1.0.0.201106090707-r"
     val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
     val smack = "jivesoftware" % "smack" % "3.0.4"
-    val specs = "org.scala-tools.testing" %% "specs" % "1.6.8"
+    val specs = "org.scala-tools.testing" %% "specs" % "1.6.9"
     val h2 = "com.h2database" % "h2" % "1.3.154"
-    val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.4.1.v20110513"
-    val funlet = "com.verknowsys" %% "funlet" % "0.1.0-SNAPSHOT"
+    // val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.4.1.v20110513"
+    // val funlet = "com.verknowsys" %% "funlet" % "0.1.0-SNAPSHOT"
     val sshd = "org.apache.sshd" % "sshd-core" % "0.5.0"
     val slf4japi = "org.slf4j" % "slf4j-api" % "1.5.8"
     val commonsio = "commons-io" % "commons-io" % "1.3.2"
@@ -118,7 +118,7 @@ object ServeD extends Build {
     import Dependencies._
 
     lazy val served = Project("ServeD", file("."), settings = buildSettings) aggregate(
-        api, cli, utils, web, testing, root, user
+        api, cli, utils, testing, root, user // web,
     )
 
 
@@ -168,14 +168,14 @@ object ServeD extends Build {
     ) dependsOn(api, testing % "test")
 
 
-    lazy val web = Project("web", file("svd.web"),
-        settings = buildSettings ++ WebPlugin.webSettings ++ Seq(
-            libraryDependencies ++= Seq(
-                funlet, jetty % "jetty"
-            )
-        ) ++ CoffeeScript.coffeeSettings
-    ) dependsOn(utils, testing % "test")
-
+    // lazy val web = Project("web", file("svd.web"),
+    //     settings = buildSettings ++ WebPlugin.webSettings ++ Seq(
+    //         libraryDependencies ++= Seq(
+    //             funlet, jetty % "jetty"
+    //         )
+    //     ) ++ CoffeeScript.coffeeSettings
+    // ) dependsOn(utils, testing % "test")
+    // 
 
     lazy val testing = Project("testkit", file("svd.testing"),
         settings = buildSettings ++ Seq(
