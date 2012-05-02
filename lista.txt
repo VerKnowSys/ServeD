@@ -1,6 +1,6 @@
 ~ -> /Users/UID/
 
-/Public/        -> owner: nobody, prawa: rwx-wx-wx
+/Public/        -> owner: nobody, prawa: rwx-wx-wx (733)
                     example socket: /Public/b71bb213-8b8f-4895-b39c-8fd8a9baf052-deldaphp-Php.sock;
                     socket name rules: /Public/ account.uuid - domain.name - AppName.sock
 
