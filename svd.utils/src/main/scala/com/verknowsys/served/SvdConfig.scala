@@ -36,7 +36,7 @@ object SvdConfig {
     def applicationsDir                 = "Apps"
     def webApplicationsDir              = "WebApps"
     def webConfigDir                    = "WebConfig"
-    def installed                       = "INSTALLED"
+    def installed                       = "installed"
     def defaultShell                    = "/bin/sh"
     def defaultEncoding                 = "UTF-8"
     def publicHttpDir                   = "/Public/"
