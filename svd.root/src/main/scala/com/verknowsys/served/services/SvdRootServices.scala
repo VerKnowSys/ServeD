@@ -79,9 +79,9 @@ http {
                 expectStdOut = List("install")) :: Nil,
 
         configure = SvdShellOperation(
-            "mkdir -p %s ; chown -R nobody %s && cp -r %s %s && echo \"%s\" > %s".format(
-                SvdConfig.publicHttpDir, /* mkdir */
-                SvdConfig.publicHttpDir, /* chown */
+                "mkdir -p %s ; chown -R nobody %s && ".format(SvdConfig.publicHttpDir, SvdConfig.publicHttpDir) // chowning /Public on Coreginx reload
+            ) :: SvdShellOperation(
+            "cp -r %s %s && echo \"%s\" > %s".format(
                 SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "html", SvdConfig.publicHttpDir, /* cp */
                 coreginxEmptyDefinitionTemplate(SvdAccount(uid = 501) :: Nil), // XXX: hardcode
                 // NOTE: devel only
@@ -93,10 +93,12 @@ http {
            )) :: Nil,
          
         reload = SvdShellOperation(
+                "mkdir -p %s ; chown -R nobody %s && ".format(SvdConfig.publicHttpDir, SvdConfig.publicHttpDir) // chowning /Public on Coreginx reload
+            ) :: SvdShellOperation(
             "%s -p %s/ -s reload".format(
                 SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "sbin" / "nginx",
-                SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name
-            )) :: Nil,
+                SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name)
+            ) :: Nil,
 
         validate = SvdShellOperation(
             "%s -p %s/ -t".format(
@@ -110,7 +112,10 @@ http {
                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "sbin" / "nginx",
                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name),
                 waitForOutputFor = 5,
-                expectStdOut = List("start")) :: Nil,
+                expectStdOut = List("start")) ::
+            SvdShellOperation(
+                "mkdir -p %s ; chown -R nobody %s && ".format(SvdConfig.publicHttpDir, SvdConfig.publicHttpDir) // chowning /Public on Coreginx reload
+            ) :: Nil,
 
         stop = SvdShellOperation(
             "%s -p %s/ -s stop && echo stop".format(
