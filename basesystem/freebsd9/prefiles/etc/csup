@@ -1,0 +1,9 @@
+*default host=ftp.at.FreeBSD.org
+*default base=/var/db
+*default prefix=/usr
+*default release=cvs tag=RELENG_9_0
+*default delete use-rel-suffix
+*default compress
+src-all
+llvm
+
