@@ -12,8 +12,6 @@ PW_BIN="/usr/sbin/pw"
 CHFLAGS_BIN="/bin/chflags"
 PWD_BIN="/bin/pwd"
 
-PREFILES="$(${PWD_BIN})/prefiles/"
-
 SSH_AUTH_KEYS="
 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAxWWFZVKHKUOgQiO7C/sClpYInJr7nkWAkld94s5QY03kxbOOx862IELwssnt0K+Yrm8LJqZr+adP5/s98hT3bJ2FTdSqm5FaJT+YHUNJlsG4ufRBxtjuYlHH++uYjfBnl66T31L6E3yQJuxYtC0dzIU12TEsFtAQotWgwwcI3ioPnjOQtgY0eWW9yhrnR6m5k5NMQKbrJK5wXC1PzwL3fa3G3XyD5f5ZrFUf6T30EUJs7J0Tvo1hGI1xUWNXK3E2RBlCwcOFYjom71XyE5q7iuY42AbCI25ttFOk1r/zjhXSxNEoTf+3bO0W/LlBUo9DRECE1AtTnYQmSU1tYU6TsQ== dmilith@macbook-pro-daniel-dettlaff.local
 "
@@ -680,9 +678,6 @@ PasswordAuthentication yes
 PermitRootLogin yes
 Subsystem	sftp	/usr/libexec/sftp-server
 " > /etc/ssh/sshd_config
-
-echo "Copying prefiles from ServeD…"
-${CP_BIN} -r "${PREFILES}" /
 
 echo "Updating login db…"
 ${MKDB_CAP_BIN} /etc/login.conf

@@ -8,7 +8,12 @@ BSDMAKE_BIN="/usr/bin/make"
 READ_BIN="/usr/bin/read"
 REBOOT_BIN="/sbin/reboot"
 PWD_BIN="/bin/pwd"
+CP_BIN="/bin/cp"
+DATE_BIN="/bin/date"
+MKDIR_BIN="/bin/mkdir"
 
+KERNEL_CONFIG_PATH="/usr/src/sys/amd64/conf/"
+PREFILES="$(${PWD_BIN})/prefiles/"
 LOG="$(${PWD_BIN})/STAGE-ONE.log"
 
 echo "
@@ -23,15 +28,28 @@ src-all
 
 
 echo "Fetching FreeBSD sources for development server"
-time $CSUP_BIN "${CSUP_FILE}" > "$LOG"
+# time $CSUP_BIN "${CSUP_FILE}" > "$LOG"
+
+echo "Copying VERKNOWSYS kernel config to ${KERNEL_CONFIG_PATH}"
+${CP_BIN} $(${PWD_BIN})/kernel/VerKnowSys ${KERNEL_CONFIG_PATH}VerKnowSys
+
+echo "Copying prefiles from ServeD…"
+${CP_BIN} -R "${PREFILES}" /
 
 echo "Building world"
 cd /usr/src
 time $BSDMAKE_BIN buildworld >> "$LOG"
 
-echo "Building kernel"
-time $BSDMAKE_BIN buildkernel >> "$LOG"
-time $BSDMAKE_BIN installkernel >> "$LOG"
+time $BSDMAKE_BIN buildkernel KERNCONF=VerKnowSys >> "$LOG"
+
+datenow="$(${DATE_BIN} +"%y_%m_%d-%H_%M_%S")"
+oldkernel_dir="/boot/kernel_old_${datenow}"
+echo "Making copy of actual kernel to: ${oldkernel_dir}"
+${MKDIR_BIN} -p ${oldkernel_dir}
+${CP_BIN} -r /boot/kernel ${oldkernel_dir}
+
+echo "Installing kernel"
+time $BSDMAKE_BIN installkernel KERNCONF=VerKnowSys >> "$LOG"
 
 echo "Reboot is required to run new kernel, after which You need to execute STAGE-TWO script"
 echo "... If you're believer, you may start to pray now."
