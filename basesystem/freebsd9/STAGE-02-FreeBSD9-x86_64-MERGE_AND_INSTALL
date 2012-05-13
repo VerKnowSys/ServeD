@@ -1,0 +1,10 @@
+# Stage two
+
+BSDMAKE_BIN="/usr/bin/make"
+MERGEMASTER_BIN="/usr/sbin/mergemaster"
+
+cd /usr/src
+${MERGEMASTER_BIN} -pF
+${BSDMAKE_BIN} installworld
+${MERGEMASTER_BIN} -F
+echo "Done. Base system installed. We're ready for last stage…"

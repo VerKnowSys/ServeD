@@ -1,0 +1,41 @@
+#!/bin/sh
+
+BSD_VERSION="RELENG_9_0"
+DEFAULT_SOURCE="ftp.at.FreeBSD.org"
+CSUP_FILE="/etc/csup"
+CSUP_BIN="/usr/bin/csup"
+BSDMAKE_BIN="/usr/bin/make"
+READ_BIN="/usr/bin/read"
+REBOOT_BIN="/sbin/reboot"
+PWD_BIN="/bin/pwd"
+
+LOG="$(${PWD_BIN})/STAGE-ONE.log"
+
+echo "
+*default host=${DEFAULT_SOURCE}
+*default base=/var/db
+*default prefix=/usr
+*default release=cvs tag=${BSD_VERSION}
+*default delete use-rel-suffix
+*default compress
+src-all
+" > "${CSUP_FILE}"
+
+
+echo "Fetching FreeBSD sources for development server"
+time $CSUP_BIN "${CSUP_FILE}" > "$LOG"
+
+echo "Building world"
+cd /usr/src
+time $BSDMAKE_BIN buildworld >> "$LOG"
+
+echo "Building kernel"
+time $BSDMAKE_BIN buildkernel >> "$LOG"
+time $BSDMAKE_BIN installkernel >> "$LOG"
+
+echo "Reboot is required to run new kernel, after which You need to execute STAGE-TWO script"
+echo "... If you're believer, you may start to pray now."
+echo
+echo "[Hit Enter to reboot machine]"
+${READ_BIN} reply
+${REBOOT_BIN}
