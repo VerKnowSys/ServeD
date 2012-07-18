@@ -2,16 +2,15 @@ import sbt._
 import sbt.Keys._
 
 import scala.io.Source
-import com.github.siasia.WebPlugin
-import coffeescript.CoffeeScript
+// import com.github.siasia.WebPlugin
+// import coffeescript.CoffeeScript
 import sbtassembly.Plugin._
+import AssemblyKeys._
 
 
 object BuildSettings {
-    import growl._
-    import growl.GrowlingTests._
 
-    val buildSettings = Defaults.defaultSettings ++ GrowlingTests.growlSettings ++ Seq(
+    val buildSettings = Defaults.defaultSettings ++ Seq( // ++ GrowlingTests.growlSettings
         organization    := "VerKnowSys",
         version         := Source.fromFile("VERSION").mkString,
         scalaVersion    := "2.9.1",
@@ -31,47 +30,12 @@ object BuildSettings {
         // javacOptions     += "-source 1.6",
         // javacOptions     += "-target 1.6",
         // javacOptions     += "-Xlint:unchecked",
-        javacOptions    += "-Xlint:deprecation",
+        javacOptions    += "-Xlint:deprecation"
 
-        // Customized GrowlingTests configuration
-        images in Growl := GrowlTestImages(
-            Some("project/growl_images/pass.png"),
-            Some("project/growl_images/fail.png"),
-            Some("project/growl_images/fail.png")
-        ),
-        groupFormatter in Growl <<= (images in Growl) {
-            (imgs) =>
-                (res: GroupResult) =>
-                    GrowlResultFormat(
-                        Some(res.name),
-                        res.name.replace("com.verknowsys.served", "svd"), // shorten class name
-                        res.status match {
-                            case TestResult.Error  => "Had Errors"
-                            case TestResult.Passed => "Passed"
-                            case TestResult.Failed => "Failed"
-                        },
-                        res.status match {
-                            case TestResult.Error | TestResult.Failed => true
-                            case _ => false
-                        },
-                        res.status match {
-                            case TestResult.Error  => imgs.error
-                            case TestResult.Passed => imgs.pass
-                            case TestResult.Failed => imgs.fail
-                        }
-                    )
-        }
     ) ++ Tasks.all
 
     val coreBuildSettings = buildSettings ++ assemblySettings ++ Seq(
-        test in Assembly := false,
-        excludedFiles in Assembly := { (bases: Seq[File]) =>
-            val ext = Set(".class", ".dylib", ".jnilib", ".so", ".properties", ".conf", "VERSION")
-
-            bases flatMap { base =>
-                (base ** "*").get filterNot { f => ext exists (f.getName endsWith _ ) }
-            }
-        }
+        test in assembly := false
     )
 }
 
@@ -114,10 +78,13 @@ object Dependencies {
 }
 
 object ServeD extends Build {
+
+
     import BuildSettings._
     import Dependencies._
 
-    lazy val served = Project("ServeD", file("."), settings = buildSettings) aggregate(
+
+    lazy val served = Project("served", file("."), settings = buildSettings) aggregate(
         api, cli, utils, testing, root, user // web,
     )
 
@@ -126,7 +93,7 @@ object ServeD extends Build {
         settings = coreBuildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(h2, expect4j, sshd, webbit),
-            mainClass in Assembly := Some("com.verknowsys.served.rootboot")
+            mainClass in assembly := Some("com.verknowsys.served.rootboot")
         )
     ) dependsOn(common, testing % "test")
 
@@ -175,7 +142,7 @@ object ServeD extends Build {
     //         )
     //     ) ++ CoffeeScript.coffeeSettings
     // ) dependsOn(utils, testing % "test")
-    // 
+    //
 
     lazy val testing = Project("testkit", file("svd.testing"),
         settings = buildSettings ++ Seq(
