@@ -10,7 +10,7 @@ rootcheck() {
 
 
 requirementscheck() {
-    
+
     $(java -d32 -version)
     if [ "$?" != "0" ]; then
         echo "System Deployer requires 32bit JDK available in PATH!"
@@ -22,7 +22,7 @@ requirementscheck() {
         echo "System Deployer requires GIT available in PATH!"
         exit 1
     fi
-    
+
 }
 
 
@@ -31,19 +31,24 @@ requirementscheck
 
 bin/clean
 bin/current
-bin/sbt assembly && \
-if [ $system = "Darwin" ]; then
-    sudo bin/install
+bin/sbt compile
+if [ "$?" = "0" ]; then
+    bin/sbt assembly && \
+    if [ $system = "Darwin" ]; then
+        sudo bin/install
+    else
+        rootcheck && \
+        bin/install
+    fi
+    bin/nativebuild && \
+    if [ $system = "Darwin" ]; then
+        sudo bin/nativeinstall
+    else
+        rootcheck && \
+        bin/nativeinstall
+    fi
+    echo "Done. Success!"
 else
-    rootcheck && \
-    bin/install
-fi
-bin/nativebuild && \
-if [ $system = "Darwin" ]; then
-    sudo bin/nativeinstall
-else
-    rootcheck && \
-    bin/nativeinstall
+    echo "Done. Failure!"
 fi
 
-echo "Done. Success!"
