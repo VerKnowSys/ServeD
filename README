@@ -1,35 +1,40 @@
 /**
 *   ServeD - README
 *
-*   © Copyright 2009-2012 Daniel Dettlaff and Tymon Tobolski. ® All Rights Reserved.
+*   © Copyright 2008-2012 Daniel Dettlaff. ® All Rights Reserved.
 *   This Software is a close code project. You may not redistribute this code without permission of author.
+*
+*
+*   Credits for:
+*       Tymon Tobolski - lead developer (active between: 2009-2012)
+*
+*       Marcin (lopex) Mielżyński - Scala and overall help.
+*       Iwo (db) ? - System technical info
+*
 */
 
 
 0. Requirements:
 
-    0.1 - Java - OpenJDK (recommended, but all Sun-Compatible JVMs should work).
-        >= Latest 1.6, 64-bit
+    0.1 - Java - OpenJDK (recommended, but all Sun/Oracle-Compatible JVMs should work).
+        >= Latest 1.6, 32-bit & 64-bit (yes, both are required)
 
     0.2 - Simple Build Tool (sbt: http://code.google.com/p/simple-build-tool/)
-        >= 0.11
+        >= 0.11.3
 
     0.3 - Scala (will be downloaded by sbt automatically)
-        >= 2.9
+        >= 2.9.1
 
     0.4 - ZSH Shell (for SvdSystemManager)
         >= 4.3.10
 
-    0.5 - Sudo (for SvdSystemManager)
-        >= 1.7.4p6
-
-    0.6 - Smack library (for XMPP Notifications)
+    0.5 - Smack library (for XMPP Notifications)
         >= 3.0.4
 
-    0.7 - pIRCbot library (for IRC Notifications)
+    0.6 - pIRCbot library (for IRC Notifications)
         >= 1.4.2
 
-    0.8 - List of currently supported platforms:
+    0.7 - List of currently supported platforms:
         Mac OSX (100% features, development),
         Free BSD (100% features, production),
 
@@ -59,12 +64,6 @@ Questions?
     - dmilith on Skype
 
 
-    And I'm as "teamon" on:
-    - #scala.pl, #scala at irc.freenode.net
-    - i@teamon.eu on jabber/mail
-
-
-
 Rules for colab-team:
     - Every var should contain "XXX" mark in code comments
     - FP is the main rule here for coding
@@ -75,6 +74,6 @@ More detailed rules are in POLICIES file in same directory.
 
 
 /**
-*   This is closed code project. You may not redistribute it without permission of author.
+*   This is closed code project. You may not redistribute it without permission of authors.
 *   Copyright © 2010-2012 verknowsys.com. ® All rights reserved
 */
