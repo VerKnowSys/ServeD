@@ -13,7 +13,7 @@ object BuildSettings {
     val buildSettings = Defaults.defaultSettings ++ Seq( // ++ GrowlingTests.growlSettings
         organization    := "VerKnowSys",
         version         := Source.fromFile("VERSION").mkString,
-        scalaVersion    := "2.9.1",
+        scalaVersion    := Source.fromFile("VERSION-SCALA").mkString,
         resolvers       := Resolvers.all,
         logLevel        := Level.Info,
         compileOrder    := CompileOrder.JavaThenScala,
