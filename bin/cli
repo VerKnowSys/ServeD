@@ -2,14 +2,15 @@
 
 
 pwd=$(pwd)
-jar="${pwd}/svd.cli/target/scala_2.9.0/cli_2.9.0-1.0-onejar.jar"
+scala=$(cat VERSION-SCALA)
+version=$(cat VERSION)
+jar="${pwd}/svd.cli/target/scala-${scala}/cli_${scala}-${version}.jar"
 
-rm $jar
-bin/sbt "project cli" compile package assembly
+bin/sbt "project cli" compile package
 
 if [ -e "${jar}" ]; then
     echo "Executing: ${jar}"
-    java -XX:+UseCompressedOops -XX:MaxPermSize=128M -XX:+UseParallelGC -Xms64m -Xmx256m -Dfile.encoding=UTF-8 -noverify -jar "${jar}" "$@"
+    java -d32 -XX:MaxPermSize=128M -XX:+UseParallelGC -Xms64m -Xmx256m -Dfile.encoding=UTF-8 -noverify -jar "${jar}" "$@"
 else
-    echo "Assembly not found. Use build script!"
+    echo "Assembly not found: ${jar}. Use build script!"
 fi
