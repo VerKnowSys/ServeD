@@ -4,8 +4,6 @@ resolvers ++= Seq(
   Resolver.url("Typesafe repository", new java.net.URL("http://typesafe.artifactoryonline.com/typesafe/ivy-releases/"))(Resolver.defaultIvyPatterns)
 )
 
-libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % ("0.1.3-"+v))
-
 libraryDependencies += "org.jcoffeescript" % "jcoffeescript" % "1.1" from "http://cloud.github.com/downloads/yeungda/jcoffeescript/jcoffeescript-1.1.jar"
 
 
@@ -24,6 +22,6 @@ addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.8.3")
 
 addSbtPlugin("org.ensime" % "ensime-sbt-cmd" % "0.0.10")
 
-addSbtPlugin("me.lessis" % "sbt-growl-plugin" % "0.1.3")
+// addSbtPlugin("me.lessis" % "sbt-growl-plugin" % "0.1.3")
 
-// resolvers += Classpaths.sbtPluginReleases
+// libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % (v+"-0.2.11"))

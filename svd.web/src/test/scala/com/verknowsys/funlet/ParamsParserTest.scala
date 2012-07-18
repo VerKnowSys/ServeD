@@ -1,8 +1,9 @@
 package com.verknowsys.funlet
 
-import com.verknowsys.served.testing._
+import org.scalatest._
+import org.scalatest.matchers._
 
-class ParamsParserTest extends DefaultTest {
+class ParamsParserTest extends FlatSpec with ShouldMatchers {
     val parsedParams = MapParam(Map(
         "user" -> MapParam(Map(
             "name" -> StringParam("teamon"),
