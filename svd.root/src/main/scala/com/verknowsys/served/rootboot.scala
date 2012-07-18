@@ -18,8 +18,6 @@ import akka.actor.Actor.{remote, actorOf, registry}
 
 object rootboot extends Logging {
     def run {
-        log.info("ServeD v" + SvdConfig.version)
-        log.info(SvdConfig.copyright)
         println()
         println()
         println("=========================")
