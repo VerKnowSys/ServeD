@@ -4,13 +4,21 @@
 pwd=$(pwd)
 scala=$(cat VERSION-SCALA)
 version=$(cat VERSION)
-jar="${pwd}/svd.cli/target/scala-${scala}/cli_${scala}-${version}.jar"
 
-bin/sbt "project cli" compile package
+jar="${pwd}/svd.cli/target/scala-${scala}/cli_${scala}-${version}.jar"
+user="${pwd}/svd.user/target/user-assembly-${version}.jar"
+main="com.verknowsys.served.cli.Runner"
+host="127.0.0.1"
+port="10"
+
+
+if [ ! -f "${jar}" ]; then
+  bin/sbt "project cli" package
+fi
 
 if [ -e "${jar}" ]; then
     echo "Executing: ${jar}"
-    java -d32 -XX:MaxPermSize=128M -XX:+UseParallelGC -Xms64m -Xmx256m -Dfile.encoding=UTF-8 -noverify -jar "${jar}" "$@"
+    java -d32 -XX:MaxPermSize=128M -XX:+UseParallelGC -Xms64m -Xmx256m -Dfile.encoding=UTF-8 -noverify -cp "${jar}:${user}" ${main} ${host} ${port}
 else
     echo "Assembly not found: ${jar}. Use build script!"
 fi
