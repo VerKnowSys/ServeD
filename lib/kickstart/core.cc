@@ -114,7 +114,7 @@ const static string coreDir = currentDir();
         #endif
         execv((char*)params.javaPath.c_str(), args);
     }
-    
+
 
     void spawnBackgroundTask(execParams params, string lockFileName) {
         int i, lfp;
@@ -166,12 +166,16 @@ const static string coreDir = currentDir();
         #ifdef DEVEL
             chdir(coreDir.c_str()); /* change running directory before spawning svd in devel mode */
         #endif
-            
+
         if (userSpawn) {
-            params.jar = USER_JAR_FILE;
+            #ifndef DEVEL
+                params.jar = USER_JAR_FILE;
+            #endif
             load_svd(params);
         } else {
-            params.jar = ROOT_JAR_FILE;
+            #ifndef DEVEL
+                params.jar = ROOT_JAR_FILE;
+            #endif
             load_svd64(params);
         }
     }
