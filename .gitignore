@@ -90,3 +90,6 @@ ctrlcli
 /kick
 /shell
 /svd.common/src/main/resources/FULLVERSION
+.project
+.history
+.ensime_port

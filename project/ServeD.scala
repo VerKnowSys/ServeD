@@ -62,21 +62,23 @@ object Dependencies {
     val messadmin = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
     val jna = "net.java.dev.jna" % "jna" % "3.2.5"
     val jline = "jline" % "jline" % "0.9.9"
-    val scalatest = "org.scalatest" % "scalatest_2.9.0" % "1.6.1"
+    val scalatest = "org.scalatest" % "scalatest_2.9.2" % "1.6.1"
     val expect4j = "net.sourceforge.expectj" % "expectj" % "2.0.1"
     val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "1.0.0.201106090707-r"
     val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
     val smack = "jivesoftware" % "smack" % "3.0.4"
-    val specs = "org.scala-tools.testing" %% "specs" % "1.6.9"
+    val specs = "org.scala-tools.testing" % "specs_2.8.1" % "1.6.8"
+    // val specs = "org.scala-tools.testing" %% "specs" % "1.6.9"
     val h2 = "com.h2database" % "h2" % "1.3.154"
-    val jetty = "org.mortbay.jetty" % "jetty" % "6.1.22" % "container"
+    // val jetty = "org.mortbay.jetty" % "jetty" % "6.1.22" % "container"
     // val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.4.1.v20110513"
     val sshd = "org.apache.sshd" % "sshd-core" % "0.5.0"
     val slf4japi = "org.slf4j" % "slf4j-api" % "1.5.8"
     val commonsio = "commons-io" % "commons-io" % "1.3.2"
     val webbit = "org.webbitserver" % "webbit" % "0.3.8"
-    val servlet = "javax.servlet" % "servlet-api" % "2.5"
-    val scalate = "org.fusesource.scalate" % "scalate-core" % "1.5.0"
+    val scalaz = "org.scalaz" %% "scalaz-core" % "6.0.3"
+    // val servlet = "javax.servlet" % "servlet-api" % "2.5"
+    // val scalate = "org.fusesource.scalate" % "scalate-core" % "1.5.0"
 }
 
 object ServeD extends Build {
@@ -87,14 +89,14 @@ object ServeD extends Build {
 
 
     lazy val served = Project("served", file("."), settings = buildSettings) aggregate(
-        api, cli, utils, testing, root, user // web,
+        api, cli, utils, testing, root, user, common // web,
     )
 
 
     lazy val root = Project("root", file("svd.root"),
         settings = coreBuildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
-            libraryDependencies ++= Seq(h2, expect4j, sshd, webbit),
+            libraryDependencies ++= Seq(jline, h2, expect4j, sshd, webbit),
             mainClass in assembly := Some("com.verknowsys.served.rootboot")
         )
     ) dependsOn(common, testing % "test")
@@ -103,14 +105,14 @@ object ServeD extends Build {
     lazy val user = Project("user", file("svd.user"),
         settings = coreBuildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
-            libraryDependencies ++= Seq(jgit, smack)
+            libraryDependencies ++= Seq(jline, jgit, smack)
         )
     ) dependsOn(common, testing % "test")
 
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis, expect4j)
+            libraryDependencies ++= Seq(neodatis, expect4j, scalaz)
         )
     ) dependsOn(utils, testing % "test")
 
@@ -137,13 +139,13 @@ object ServeD extends Build {
     ) dependsOn(api, testing % "test")
 
 
-    lazy val web = Project("web", file("svd.web"),
-        settings = buildSettings ++ webSettings ++ Seq(
-            libraryDependencies ++= Seq(
-                scalate, servlet, jetty
-            )
-        ) //++ CoffeeScript.coffeeSettings
-    ) dependsOn(utils, testing % "test")
+    // lazy val web = Project("web", file("svd.web"),
+    //     settings = buildSettings ++ webSettings ++ Seq(
+    //         libraryDependencies ++= Seq(
+    //             scalate, servlet, jetty
+    //         )
+    //     ) //++ CoffeeScript.coffeeSettings
+    // ) dependsOn(utils, testing % "test")
 
 
     lazy val testing = Project("testkit", file("svd.testing"),
