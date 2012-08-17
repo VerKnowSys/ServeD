@@ -117,7 +117,7 @@ const static string coreDir = currentDir();
 
 
     void spawnBackgroundTask(execParams params, string lockFileName) {
-        int i, lfp;
+        int lfp;
         char str[32];
 
         setsid(); /* obtain a new process group */
