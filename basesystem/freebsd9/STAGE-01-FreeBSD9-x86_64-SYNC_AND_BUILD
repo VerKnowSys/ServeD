@@ -3,6 +3,7 @@
 BSD_VERSION="RELENG_9_0"
 DEFAULT_SOURCE="ftp.at.FreeBSD.org"
 CSUP_FILE="/etc/csup"
+LOGIN_CONF_FILE="/etc/login.conf"
 CSUP_BIN="/usr/bin/csup"
 BSDMAKE_BIN="/usr/bin/make"
 READ_BIN="/usr/bin/read"
@@ -11,30 +12,18 @@ PWD_BIN="/bin/pwd"
 CP_BIN="/bin/cp"
 DATE_BIN="/bin/date"
 MKDIR_BIN="/bin/mkdir"
+CAP_MKDB="/usr/bin/cap_mkdb"
 
 KERNEL_CONFIG_PATH="/usr/src/sys/amd64/conf/"
 PREFILES="$(${PWD_BIN})/prefiles/"
 LOG="$(${PWD_BIN})/STAGE-ONE.log"
 
-echo "
-*default host=${DEFAULT_SOURCE}
-*default base=/var/db
-*default prefix=/usr
-*default release=cvs tag=${BSD_VERSION}
-*default delete use-rel-suffix
-*default compress
-src-all
-" > "${CSUP_FILE}"
-
 
 echo "Fetching FreeBSD sources for development server"
-# time $CSUP_BIN "${CSUP_FILE}" > "$LOG"
+time $CSUP_BIN "${CSUP_FILE}" #> "$LOG"
 
 echo "Copying VERKNOWSYS kernel config to ${KERNEL_CONFIG_PATH}"
 ${CP_BIN} $(${PWD_BIN})/kernel/VerKnowSys ${KERNEL_CONFIG_PATH}VerKnowSys
-
-echo "Copying prefiles from ServeD…"
-${CP_BIN} -R "${PREFILES}" /
 
 echo "Building world"
 cd /usr/src

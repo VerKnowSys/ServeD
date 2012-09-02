@@ -1,0 +1,82 @@
+#!/bin/sh
+
+BSD_VERSION="RELENG_9_0"
+DEFAULT_SOURCE="cvsup.cz.FreeBSD.org"
+CSUP_FILE="/etc/csup"
+LOGIN_CONF_FILE="/etc/login.conf"
+CSUP_BIN="/usr/bin/csup"
+BSDMAKE_BIN="/usr/bin/make"
+READ_BIN="/usr/bin/read"
+REBOOT_BIN="/sbin/reboot"
+PWD_BIN="/bin/pwd"
+CP_BIN="/bin/cp"
+DATE_BIN="/bin/date"
+MKDIR_BIN="/bin/mkdir"
+CAP_MKDB="/usr/bin/cap_mkdb"
+
+KERNEL_CONFIG_PATH="/usr/src/sys/amd64/conf/"
+PREFILES="$(${PWD_BIN})/prefiles/"
+LOG="$(${PWD_BIN})/STAGE-ONE.log"
+
+echo "
+default:\\
+  :charset=UTF-8:\\
+  :lang=pl_PL.UTF-8:\\
+  :passwd_format=md5:\\
+  :copyright=/etc/COPYRIGHT:\\
+  :welcome=/etc/motd:\\
+  :setenv=MAIL=/var/mail/$,BLOCKSIZE=K,FTP_PASSIVE_MODE=YES,LC_COLLATE=C:\\
+  :path=/sbin /bin /usr/sbin /usr/bin ~/Apps:\\
+  :nologin=/var/run/nologin:\\
+  :cputime=unlimited:\\
+  :datasize=unlimited:\\
+  :stacksize=unlimited:\\
+  :memorylocked=unlimited:\\
+  :memoryuse=unlimited:\\
+  :filesize=unlimited:\\
+  :coredumpsize=unlimited:\\
+  :openfiles=unlimited:\\
+  :maxproc=unlimited:\\
+  :sbsize=unlimited:\\
+  :vmemoryuse=unlimited:\\
+  :swapuse=unlimited:\\
+  :pseudoterminals=unlimited:\\
+  :priority=0:\\
+  :ignoretime@:\\
+  :umask=022:
+
+standard:\\
+  :tc=default:
+xuser:\\
+  :tc=default:
+staff:\\
+  :tc=default:
+daemon:\\
+  :tc=default:
+news:\\
+  :tc=default:
+dialer:\\
+  :tc=default:
+
+#
+root:\\
+  :ignorenologin:\\
+  :tc=default:
+" > "${LOGIN_CONF_FILE}"
+
+echo "Reloading login rules"
+${CAP_MKDB} ${LOGIN_CONF_FILE}
+
+echo "
+*default host=${DEFAULT_SOURCE}
+*default base=/var/db
+*default prefix=/usr
+*default release=cvs tag=${BSD_VERSION}
+*default delete use-rel-suffix
+*default compress
+src-all
+" > "${CSUP_FILE}"
+
+echo "Copying prefiles from ServeD…"
+${CP_BIN} -R "${PREFILES}" /
+
