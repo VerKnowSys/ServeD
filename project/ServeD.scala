@@ -2,7 +2,7 @@ import sbt._
 import sbt.Keys._
 
 import scala.io.Source
-import com.github.siasia.WebPlugin._
+// import com.github.siasia.WebPlugin._
 // import coffeescript.CoffeeScript
 import sbtassembly.Plugin._
 import AssemblyKeys._
