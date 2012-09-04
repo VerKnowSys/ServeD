@@ -1,4 +1,4 @@
-# Stage two
+#!/bin/sh
 
 BSDMAKE_BIN="/usr/bin/make"
 MERGEMASTER_BIN="/usr/sbin/mergemaster"
@@ -7,4 +7,5 @@ cd /usr/src
 ${MERGEMASTER_BIN} -pF
 ${BSDMAKE_BIN} installworld
 ${MERGEMASTER_BIN} -F
+${BSDMAKE_BIN} -DBATCH_DELETE_OLD_FILES delete-old delete-old-libs
 echo "Done. Base system installed. We're ready for last stage…"
