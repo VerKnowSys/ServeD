@@ -1,11 +1,12 @@
 #
 # @author: dmilith
-# @version:  0.5.0
+# @version:  0.5.1
 #
 
 cpu		HAMMER
 ident		VerKnowSys
 
+options   TEKEN_UTF8
 options 	SCHED_ULE		# ULE scheduler
 options 	PREEMPTION		# Enable kernel thread preemption
 options 	INET			# InterNETworking
@@ -319,7 +320,7 @@ device		dcons_crom	# Configuration ROM for dcons
 # device        snd_ich        # Intel, NVidia and other ICH AC'97 Audio
 # device        snd_uaudio    # USB Audio
 # device        snd_via8233    # VIA VT8233x Audio
-                                                                                                                                                                                                                                              
+
 device		uftdi		# For FTDI usb serial adapters
 device		uipaq		# Some WinCE based devices
 device		uplcom		# Prolific PL-2303 serial adapters
