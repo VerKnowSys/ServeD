@@ -4,20 +4,19 @@ BSD_VERSION="RELENG_9_0"
 DEFAULT_SOURCE="cvsup.cz.FreeBSD.org"
 CSUP_FILE="/etc/csup"
 LOGIN_CONF_FILE="/etc/login.conf"
-CSUP_BIN="/usr/bin/csup"
-BSDMAKE_BIN="/usr/bin/make"
+SRC_CONF_FILE="/etc/src.conf"
+MAKE_CONF_FILE="/etc/make.conf"
 READ_BIN="/usr/bin/read"
-REBOOT_BIN="/sbin/reboot"
 PWD_BIN="/bin/pwd"
 CP_BIN="/bin/cp"
-DATE_BIN="/bin/date"
-MKDIR_BIN="/bin/mkdir"
 CAP_MKDB="/usr/bin/cap_mkdb"
 
 KERNEL_CONFIG_PATH="/usr/src/sys/amd64/conf/"
 PREFILES="$(${PWD_BIN})/prefiles/"
 LOG="$(${PWD_BIN})/STAGE-ONE.log"
 
+
+echo "Creating ${LOGIN_CONF_FILE}"
 echo "
 default:\\
   :charset=UTF-8:\\
@@ -65,8 +64,9 @@ root:\\
 " > "${LOGIN_CONF_FILE}"
 
 echo "Reloading login rules"
-${CAP_MKDB} ${LOGIN_CONF_FILE}
+${CAP_MKDB} -v ${LOGIN_CONF_FILE}
 
+echo "Creating ${CSUP_FILE}"
 echo "
 *default host=${DEFAULT_SOURCE}
 *default base=/var/db
@@ -76,6 +76,75 @@ echo "
 *default compress
 src-all
 " > "${CSUP_FILE}"
+
+
+echo "Creating ${SRC_CONF_FILE}"
+echo "
+WITHOUT_CALENDAR='YES'
+WITHOUT_GAMES='YES'
+WITHOUT_IPX='YES'
+WITHOUT_IPX_SUPPORT='YES'
+WITHOUT_IPFW='YES'
+WITHOUT_INFO='YES'
+WITHOUT_HTML='YES'
+WITHOUT_FLOPPY='YES'
+WITHOUT_EXAMPLES='YES'
+WITHOUT_DICT='YES'
+WITHOUT_LPR='YES'
+WITHOUT_AT='YES'
+WITHOUT_ASSERT_DEBUG='YES'
+WITHOUT_SENDMAIL='YES'
+WITHOUT_RCMDS='YES'
+WITHOUT_WPA_SUPPLICANT_EAPOL='YES'
+WITHOUT_BLUETOOTH='YES'
+WITHOUT_MAIL='YES'
+WITHOUT_USB='YES'
+WITHOUT_WIRELESS='YES'
+WITHOUT_WIRELESS_SUPPORT='YES'
+WITHOUT_MAILWRAPPER='YES'
+WITHOUT_LOCATE='YES'
+WITHOUT_SOUND='YES'
+WITHOUT_NFS='YES'
+WITHOUT_EXAMPLES='YES'
+WITHOUT_CTM='YES'
+WITHOUT_LEGACY_CONSOLE='YES'
+WITHOUT_LOCALES='YES'
+WITHOUT_LOCATE='YES'
+WITHOUT_NLS='YES'
+WITHOUT_NLS_CATALOGS='YES'
+WITHOUT_PAM='YES'
+WITHOUT_PAM_SUPPORT='YES'
+WITHOUT_PROFILE='YES'
+WITHOUT_QUOTAS='YES'
+WITHOUT_RCS='YES'
+WITHOUT_SHAREDOCS='YES'
+WITHOUT_SYSINSTALL='YES'
+" > "${SRC_CONF_FILE}"
+
+
+echo "Creating ${MAKE_CONF_FILE}"
+echo "
+NO_PROFILE='YES'
+WITHOUT_MODULES = sound ntfs msdosfs usb nfs nfsclient nfs_common nfslock
+
+.if !defined(CC) || \${CC} == \"cc\"
+CC=clang
+.endif
+.if !defined(CXX) || \${CXX} == \"c++\"
+CXX=clang++
+.endif
+.if !defined(CPP) || \${CPP} == \"cpp\"
+CPP=clang-cpp
+.endif
+
+# Don't die on warnings
+NO_WERROR=
+WERROR=
+
+# Don't forget this when using Jails!
+NO_FSCHG=
+" > "${MAKE_CONF_FILE}"
+
 
 echo "Copying prefiles from ServeD…"
 ${CP_BIN} -R "${PREFILES}" /
