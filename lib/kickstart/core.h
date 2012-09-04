@@ -33,6 +33,14 @@
     #include <sys/fcntl.h>
 #endif
 
+#ifdef __linux__
+    #include <stdlib.h>
+    #include <signal.h>
+    #include <limits.h>
+    #include <sys/wait.h>
+    #define MAXPATHLEN PATH_MAX
+#endif
+
 
     using namespace std;
 
@@ -49,6 +57,10 @@
         #define DEFAULT_JAVA64_BIN "/Software/Openjdk64/bin/java"
     #elif __APPLE__
         #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
+        #define DEFAULT_JAVA_BIN "/usr/bin/java"
+        #define DEFAULT_JAVA64_BIN "/usr/bin/java"
+    #elif __linux__
+        #define DEFAULT_SHELL_COMMAND "/bin/zsh"
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
         #define DEFAULT_JAVA64_BIN "/usr/bin/java"
     #else
