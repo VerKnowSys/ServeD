@@ -120,18 +120,21 @@ int main(int argc, char const *argv[]) {
     }
     // chdir(homeDir.c_str());
 
+    // count and gather arguments
+    string appArguments = "";
+    for (int i = 2; i < argc; i++) {
+        appArguments += string(argv[i]) + " ";
+    }
     string command = string(DEFAULT_SHELL_COMMAND) + " -i -s";
+    if (argc > 2) { // additional arguments => spawn custom command with uid privileges
+        command = appArguments;
+    }
     #ifdef DEVEL
-        cerr << "Spawning command: " << command << ", for uid: " << uid << " and gid: " << gid << endl;
+        cerr << "Spawning command for uid: " << uid << ", gid: " << gid << endl;
+        cerr << "Command line: " << command << endl;
     #endif
 
-    char *arguments[2];
+    char *arguments[argc];
     parse((char*)(command.c_str()), arguments);
-    #ifdef DEVEL
-        cout << "Arguments: ";
-        for (int i = 0; arguments[i] != NULL; ++i)
-            cout << arguments[i] << " ";
-        cout << endl;
-    #endif
     execute(arguments, uid);
 }
