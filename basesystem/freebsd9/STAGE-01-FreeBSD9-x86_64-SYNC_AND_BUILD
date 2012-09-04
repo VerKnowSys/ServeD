@@ -19,17 +19,27 @@ PREFILES="$(${PWD_BIN})/prefiles/"
 LOG="$(${PWD_BIN})/STAGE-ONE.log"
 
 
-echo "Fetching FreeBSD sources for development server"
-time $CSUP_BIN "${CSUP_FILE}" #> "$LOG"
+check_result () {
+  if [ "$1" != "0" ]; then
+    echo "FAILURE"
+    exit 666
+  fi
+}
+
+
+# echo "Fetching FreeBSD sources for development server"
+# time $CSUP_BIN "${CSUP_FILE}" > "$LOG"
 
 echo "Copying VERKNOWSYS kernel config to ${KERNEL_CONFIG_PATH}"
 ${CP_BIN} $(${PWD_BIN})/kernel/VerKnowSys ${KERNEL_CONFIG_PATH}VerKnowSys
 
 echo "Building world"
 cd /usr/src
-time $BSDMAKE_BIN buildworld >> "$LOG"
+time $BSDMAKE_BIN -j4 buildworld >> "$LOG"
+check_result $?
 
 time $BSDMAKE_BIN buildkernel KERNCONF=VerKnowSys >> "$LOG"
+check_result $?
 
 datenow="$(${DATE_BIN} +"%y_%m_%d-%H_%M_%S")"
 oldkernel_dir="/boot/kernel_old_${datenow}"
@@ -39,6 +49,7 @@ ${CP_BIN} -r /boot/kernel ${oldkernel_dir}
 
 echo "Installing kernel"
 time $BSDMAKE_BIN installkernel KERNCONF=VerKnowSys >> "$LOG"
+check_result $?
 
 echo "Reboot is required to run new kernel, after which You need to execute STAGE-TWO script"
 echo "... If you're believer, you may start to pray now."
