@@ -1,6 +1,5 @@
 #!/bin/sh
 
-BSD_VERSION="RELENG_9_0"
 DEFAULT_SOURCE="ftp.at.FreeBSD.org"
 CSUP_FILE="/etc/csup"
 LOGIN_CONF_FILE="/etc/login.conf"
@@ -34,6 +33,13 @@ echo "Copying VERKNOWSYS kernel config to ${KERNEL_CONFIG_PATH}"
 ${CP_BIN} $(${PWD_BIN})/kernel/VerKnowSys ${KERNEL_CONFIG_PATH}VerKnowSys
 
 echo "Building world"
+
+unset LDFLAGS
+unset LD_LIBRARY_PATH
+unset CXXFLAGS
+unset CFLAGS
+unset PATH
+
 cd /usr/src
 time $BSDMAKE_BIN -j4 buildworld >> "$LOG"
 check_result $?
