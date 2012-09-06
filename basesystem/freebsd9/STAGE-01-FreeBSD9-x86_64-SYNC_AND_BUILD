@@ -12,6 +12,7 @@ CP_BIN="/bin/cp"
 DATE_BIN="/bin/date"
 MKDIR_BIN="/bin/mkdir"
 CAP_MKDB="/usr/bin/cap_mkdb"
+TIME_BIN="/usr/bin/time"
 
 KERNEL_CONFIG_PATH="/usr/src/sys/amd64/conf/"
 PREFILES="$(${PWD_BIN})/prefiles/"
@@ -27,7 +28,7 @@ check_result () {
 
 
 # echo "Fetching FreeBSD sources for development server"
-# time $CSUP_BIN "${CSUP_FILE}" > "$LOG"
+# ${TIME_BIN} $CSUP_BIN "${CSUP_FILE}" > "$LOG"
 
 echo "Copying VERKNOWSYS kernel config to ${KERNEL_CONFIG_PATH}"
 ${CP_BIN} $(${PWD_BIN})/kernel/VerKnowSys ${KERNEL_CONFIG_PATH}VerKnowSys
@@ -41,10 +42,10 @@ unset CFLAGS
 unset PATH
 
 cd /usr/src
-time $BSDMAKE_BIN -j4 buildworld >> "$LOG"
+${TIME_BIN} $BSDMAKE_BIN -j4 buildworld >> "$LOG"
 check_result $?
 
-time $BSDMAKE_BIN buildkernel KERNCONF=VerKnowSys >> "$LOG"
+${TIME_BIN} $BSDMAKE_BIN buildkernel KERNCONF=VerKnowSys >> "$LOG"
 check_result $?
 
 datenow="$(${DATE_BIN} +"%y_%m_%d-%H_%M_%S")"
@@ -54,7 +55,7 @@ ${MKDIR_BIN} -p ${oldkernel_dir}
 ${CP_BIN} -r /boot/kernel ${oldkernel_dir}
 
 echo "Installing kernel"
-time $BSDMAKE_BIN installkernel KERNCONF=VerKnowSys >> "$LOG"
+${TIME_BIN} $BSDMAKE_BIN installkernel KERNCONF=VerKnowSys >> "$LOG"
 check_result $?
 
 echo "Reboot is required to run new kernel, after which You need to execute STAGE-TWO script"
