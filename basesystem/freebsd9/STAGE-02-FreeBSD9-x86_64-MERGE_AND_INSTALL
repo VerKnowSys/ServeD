@@ -3,9 +3,25 @@
 BSDMAKE_BIN="/usr/bin/make"
 MERGEMASTER_BIN="/usr/sbin/mergemaster"
 
+check_result () {
+  if [ "$1" != "0" ]; then
+    echo "FAILURE"
+    exit 666
+  fi
+}
+
+
 cd /usr/src
 ${MERGEMASTER_BIN} -pF
+check_result $?
+
 ${BSDMAKE_BIN} installworld
+check_result $?
+
 ${MERGEMASTER_BIN} -F
+check_result $?
+
 ${BSDMAKE_BIN} -DBATCH_DELETE_OLD_FILES delete-old delete-old-libs
+check_result $?
+
 echo "Done. Base system installed. We're ready for last stage…"
