@@ -17,7 +17,9 @@ WHICH_BIN="/usr/bin/which"
 RM_BIN="/bin/rm"
 
 KERNEL_CONFIG_PATH="/usr/src/sys/amd64/conf/"
-PREFILES="$(${PWD_BIN})/prefiles/"
+CURRENT_DIR="$(${PWD_BIN})"
+PREFILES="${CURRENT_DIR}/prefiles/"
+KERNEL_CONFIG_FILE="${CURRENT_DIR}/kernel/VerKnowSys"
 
 
 check_result () {
@@ -27,6 +29,16 @@ check_result () {
   fi
 }
 
+echo "Checking current directory"
+if [ ! -d "${PREFILES}" ]; then
+  echo "This script must be running in ServeD/basesystem/freebsdX directory to run properly!"
+  exit 666
+fi
+
+if [ ! -e "${KERNEL_CONFIG_FILE}" ]; then
+  echo "No kernel config file found! WTF? Go fishing"
+  exit 666
+fi
 
 echo "Looking for GIT SCM"
 ${WHICH_BIN} git
@@ -51,7 +63,7 @@ else
 fi
 
 echo "Copying VERKNOWSYS kernel config to ${KERNEL_CONFIG_PATH}"
-${CP_BIN} $(${PWD_BIN})/kernel/VerKnowSys ${KERNEL_CONFIG_PATH}VerKnowSys
+${CP_BIN} ${KERNEL_CONFIG_FILE} ${KERNEL_CONFIG_PATH}VerKnowSys
 check_result $?
 
 echo "Building world"
