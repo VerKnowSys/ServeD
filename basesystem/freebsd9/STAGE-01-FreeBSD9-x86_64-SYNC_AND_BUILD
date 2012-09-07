@@ -1,7 +1,5 @@
 #!/bin/sh
 
-DEFAULT_SOURCE="ftp.at.FreeBSD.org"
-CSUP_FILE="/etc/csup"
 LOGIN_CONF_FILE="/etc/login.conf"
 CSUP_BIN="/usr/bin/csup"
 BSDMAKE_BIN="/usr/bin/make"
@@ -11,12 +9,12 @@ PWD_BIN="/bin/pwd"
 CP_BIN="/bin/cp"
 DATE_BIN="/bin/date"
 MKDIR_BIN="/bin/mkdir"
-CAP_MKDB="/usr/bin/cap_mkdb"
 TIME_BIN="/usr/bin/time"
+WHICH_BIN="/usr/bin/which"
+RM_BIN="/bin/rm"
 
 KERNEL_CONFIG_PATH="/usr/src/sys/amd64/conf/"
 PREFILES="$(${PWD_BIN})/prefiles/"
-LOG="$(${PWD_BIN})/STAGE-ONE.log"
 
 
 check_result () {
@@ -27,8 +25,23 @@ check_result () {
 }
 
 
-# echo "Fetching FreeBSD sources for development server"
-# ${TIME_BIN} $CSUP_BIN "${CSUP_FILE}" > "$LOG"
+echo "Looking for GIT SCM"
+${WHICH_BIN} git
+check_result $?
+
+if [ ! -d "/usr/src/sys" ]; then
+  echo "No system sources found"
+  ${RM_BIN} -rf /usr/src
+  cd /usr
+  echo "Cloning FreeBSD base system"
+  ${TIME_BIN} git clone git://github.com/VerKnowSys/freebsd.git src
+  cd src
+  git checkout releng/9.1
+else
+  echo "Updating kernel source"
+  cd /usr/src
+  ${TIME_BIN} git pull
+fi
 
 echo "Copying VERKNOWSYS kernel config to ${KERNEL_CONFIG_PATH}"
 ${CP_BIN} $(${PWD_BIN})/kernel/VerKnowSys ${KERNEL_CONFIG_PATH}VerKnowSys
@@ -42,10 +55,10 @@ unset CFLAGS
 unset PATH
 
 cd /usr/src
-${TIME_BIN} $BSDMAKE_BIN -j4 buildworld >> "$LOG"
+${TIME_BIN} $BSDMAKE_BIN -j8 buildworld
 check_result $?
 
-${TIME_BIN} $BSDMAKE_BIN buildkernel KERNCONF=VerKnowSys >> "$LOG"
+${TIME_BIN} $BSDMAKE_BIN buildkernel KERNCONF=VerKnowSys
 check_result $?
 
 datenow="$(${DATE_BIN} +"%y_%m_%d-%H_%M_%S")"
@@ -55,7 +68,7 @@ ${MKDIR_BIN} -p ${oldkernel_dir}
 ${CP_BIN} -r /boot/kernel ${oldkernel_dir}
 
 echo "Installing kernel"
-${TIME_BIN} $BSDMAKE_BIN installkernel KERNCONF=VerKnowSys >> "$LOG"
+${TIME_BIN} $BSDMAKE_BIN installkernel KERNCONF=VerKnowSys
 check_result $?
 
 echo "Reboot is required to run new kernel, after which You need to execute STAGE-TWO script"
