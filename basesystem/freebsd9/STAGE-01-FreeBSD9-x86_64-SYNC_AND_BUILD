@@ -1,6 +1,7 @@
 #!/bin/sh
 
 BSD_VERSION="9.1"
+BSD_GIT_REPOSITORY="git://github.com/VerKnowSys/freebsd.git"
 
 LOGIN_CONF_FILE="/etc/login.conf"
 CSUP_BIN="/usr/bin/csup"
@@ -36,7 +37,7 @@ if [ ! -d "/usr/src/sys" ]; then
   ${RM_BIN} -rf /usr/src
   cd /usr
   echo "Cloning FreeBSD base system"
-  ${TIME_BIN} git clone git://github.com/VerKnowSys/freebsd.git src
+  ${TIME_BIN} git clone ${BSD_GIT_REPOSITORY} src
   check_result $?
   cd src
   echo "Checking out ${BSD_VERSION}"
