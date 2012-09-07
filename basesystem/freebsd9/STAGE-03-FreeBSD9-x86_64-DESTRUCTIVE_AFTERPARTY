@@ -1,5 +1,9 @@
 #!/bin/sh
 
+ETC_SSH_CONFIG_FILE="/etc/ssh/ssh_config"
+ETC_SSHD_CONFIG_FILE="/etc/ssh/sshd_config"
+ETC_LOGIN_CONF_FILE="/etc/login.conf"
+
 LN_BIN="/bin/ln"
 RM_BIN="/bin/rm"
 MV_BIN="/bin/mv"
@@ -7,19 +11,10 @@ MKDIR_BIN="/bin/mkdir"
 SERVICE_BIN="/usr/sbin/service"
 MKDB_SERVICES_BIN="/usr/sbin/services_mkdb"
 MKDB_CAP_BIN="/usr/bin/cap_mkdb"
-PWD_MKDB="/usr/sbin/pwd_mkdb"
 PW_BIN="/usr/sbin/pw"
 CHFLAGS_BIN="/bin/chflags"
 PWD_BIN="/bin/pwd"
-
-ETC_SSH_CONFIG_FILE="/etc/ssh/ssh_config"
-ETC_SSHD_CONFIG_FILE="/etc/ssh/sshd_config"
-ETC_LOGIN_CONF_FILE="/etc/login.conf"
-
-
-SSH_AUTH_KEYS="
-ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAxWWFZVKHKUOgQiO7C/sClpYInJr7nkWAkld94s5QY03kxbOOx862IELwssnt0K+Yrm8LJqZr+adP5/s98hT3bJ2FTdSqm5FaJT+YHUNJlsG4ufRBxtjuYlHH++uYjfBnl66T31L6E3yQJuxYtC0dzIU12TEsFtAQotWgwwcI3ioPnjOQtgY0eWW9yhrnR6m5k5NMQKbrJK5wXC1PzwL3fa3G3XyD5f5ZrFUf6T30EUJs7J0Tvo1hGI1xUWNXK3E2RBlCwcOFYjom71XyE5q7iuY42AbCI25ttFOk1r/zjhXSxNEoTf+3bO0W/LlBUo9DRECE1AtTnYQmSU1tYU6TsQ== dmilith@macbook-pro-daniel-dettlaff.local
-"
+READ_BIN="/usr/bin/read"
 
 RMLIST="/usr/bin/newaliases
 /usr/bin/write
@@ -631,10 +626,14 @@ ${MV_BIN} /usr/bin/who /usr/rescue/who
 echo "Preparing passwd & group"
 ${MKDIR_BIN} -p /usr/root/.ssh
 ${PW_BIN} usermod root -d /usr/root
-echo "${SSH_AUTH_KEYS}" > /usr/root/.ssh/authorized_keys
+
+echo "Please paste your SSH public key now and press [enter] (or hit enter if you already have one):"
+${READ_BIN} PUBKEY
+echo "${PUBKEY}
+" >> /usr/root/.ssh/authorized_keys
+
 
 echo "Setting up sshd"
-
 echo "Host verknowsys.com *.verknowsys.com
 Port 60022
 " > ${ETC_SSH_CONFIG_FILE}
