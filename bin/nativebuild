@@ -43,6 +43,10 @@ check $? "Utils"
 $CXX $FLAGS lib/kickstart/shell.cc -o shell
 check $? "UserShell" "shell"
 
+$CXX $FLAGS lib/kickstart/daemon.cc -o daemon
+check $? "UserDaemon" "daemon"
+
+
 $CXX $FLAGS lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
 check $? "KickStart" "kick"
 
