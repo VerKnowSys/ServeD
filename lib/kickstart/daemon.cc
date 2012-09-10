@@ -148,7 +148,7 @@ int main(int argc, char const *argv[]) {
         cerr << "Command line: " << command << endl;
     #endif
 
-    char *arguments[argc+1];
+    char *arguments[argc];
     parse((char*)(command.c_str()), arguments);
     execute(arguments, uid);
 }
