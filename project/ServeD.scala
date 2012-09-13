@@ -77,6 +77,7 @@ object Dependencies {
     val commonsio = "commons-io" % "commons-io" % "1.3.2"
     val webbit = "org.webbitserver" % "webbit" % "0.3.8"
     val scalaz = "org.scalaz" %% "scalaz-core" % "6.0.3"
+    val tzip = "de.schlichtherle.truezip" % "truezip" % "7.6.4"
     // val servlet = "javax.servlet" % "servlet-api" % "2.5"
     // val scalate = "org.fusesource.scalate" % "scalate-core" % "1.5.0"
 }
@@ -112,7 +113,7 @@ object ServeD extends Build {
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis, expect4j, scalaz)
+            libraryDependencies ++= Seq(neodatis, expect4j, scalaz, tzip)
         )
     ) dependsOn(utils, testing % "test")
 
