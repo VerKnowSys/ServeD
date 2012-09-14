@@ -68,7 +68,7 @@ if [ "$system" = "Darwin" ]; then
     $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/stat.cc -o lib/libstat.dylib
     check $? "StatLib"
 
-    $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/system_time.cc -o lib/libsystemtime.dylib -lrt
+    $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/system_time.cc -o lib/libsystemtime.dylib
     check $? "SystemTimeLib"
 fi
 
