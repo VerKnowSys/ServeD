@@ -57,6 +57,7 @@ object SvdArchiver extends Logging {
     System.setProperty("de.schlichtherle.key.KeyManager", SvdConfig.defaultBackupKeyManager)
     TFile.setDefaultArchiveDetector(new DefaultArchiveDetector(SvdConfig.defaultBackupFileExtension))
 
+    // TODO: add checking of non existant source directory
 
     /**
         @author dmilith
@@ -79,7 +80,7 @@ object SvdArchiver extends Logging {
                         gathered
                     else {
                         val dir = rootDir.head
-                        val dirList = dir.listFiles.filter{_.isDirectory}.toList
+                        val dirList = dir.listFiles.par.filter{_.isDirectory}.toList
                         if (dirList.isEmpty) // TODO :pattern match instead of if
                             gatherAllDirsRecursively(rootDir.tail, gathered ++ List(dir))
                         else
@@ -97,7 +98,7 @@ object SvdArchiver extends Logging {
                 } else {
                     log.info("Found archive with name: %s. Checking for changes".format(trimmedFileName))
                     // perform check on existing archive, and try to do update:
-                    val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList).map{_.asInstanceOf[TFile]}
+                    val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList).par.map{_.asInstanceOf[TFile]}
 
 
                     // for {
@@ -121,7 +122,7 @@ object SvdArchiver extends Logging {
                     // checking for new directory name:
                     val rawArchiveList = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)).listFiles
                     if (rawArchiveList != null) {
-                        val rootArchiveDirs = rawArchiveList.toList.filter{_.isDirectory}
+                        val rootArchiveDirs = rawArchiveList.par.toList.filter{_.isDirectory}
                         val allArchiveDirs = gatherAllDirsRecursively(rootArchiveDirs).map{_.asInstanceOf[TFile]}
                         val allSrc = gatheredDirList.toList.flatMap{
                             a =>
@@ -140,10 +141,10 @@ object SvdArchiver extends Logging {
 
                         // detect changed files and update them when necessary
                         log.debug("Looking for time stamp diffs..")
-                        def helper(src: File, postfix: String = "") = src.getPath.split(trimmedFileName + postfix).tail.mkString("/")
+                        def helper(src: File, postfix: String = "") = src.getPath.split(trimmedFileName + postfix).par.tail.mkString("/")
                         for {
-                            src <- gatheredDirList.flatMap{_.listFiles.toList.filter{_.isFile}}
-                            dst <- allArchiveDirs.flatMap{_.listFiles.toList.filter{helper(_, ".%s".format(SvdConfig.defaultBackupFileExtension)).matches(helper(src))}}
+                            src <- gatheredDirList.par.flatMap{_.listFiles.par.toList.filter{_.isFile}}
+                            dst <- allArchiveDirs.par.flatMap{_.listFiles.par.toList.filter{helper(_, ".%s".format(SvdConfig.defaultBackupFileExtension)).matches(helper(src))}}
                         } yield {
                             if ( (src.lastModified/10000 != dst.lastModified/10000)) { // (src.getName == dst.getName) &&
                                 log.debug("Changed and will be updated: %s -> %s".format(src, dst))
@@ -157,7 +158,7 @@ object SvdArchiver extends Logging {
                         log.debug("DIFF %s".format(diff))
 
                     } else {
-                        val diffDir = gatheredDirList.flatMap{_.getPath.split(trimmedFileName).tail.mkString("/")}
+                        val diffDir = gatheredDirList.par.flatMap{_.getPath.split(trimmedFileName).tail.mkString("/")}
                         log.debug("Found missing directory: %s. Will be created and filled if not empty.".format(diffDir))
                         new TFile(fileOrDirectoryPath + diffDir).archiveCopyAllTo(new TFile("%s%s.%s%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension, diffDir)))
                     }
