@@ -40,6 +40,11 @@ object SvdConfig {
     def defaultShell                    = "/bin/sh"
     def defaultEncoding                 = "UTF-8"
     def publicHttpDir                   = "/Public/"
+    def defaultBackupDir                = "/Backup/"
+    def backupKey                       = "30E4A7AF-0624-4288-8CD6-31CC217725CF"
+    def defaultBackupKeyManager         = "com.verknowsys.served.utils.SvdArchiverKeyManager"
+    def defaultBackupFileExtension      = "zip.raes"
+    def defaultBackupFileMatcher        = """(.*)\.zip\.raes$"""
     def defaultHost                     = "127.0.0.1"
     def defaultDomain                   = "localhost"
     def remoteApiServerHost             = "127.0.0.1" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
