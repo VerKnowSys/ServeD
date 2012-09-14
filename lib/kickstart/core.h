@@ -30,10 +30,13 @@
     #include <sys/capability.h>
     #include <libprocstat.h>
 #else
+    #include <sys/fcntl.h>
+#endif
+
+#ifdef __APPLE__
     #include <mach/clock.h>
     #include <mach/clock_priv.h>
     #include <mach/clock_types.h>
-    #include <sys/fcntl.h>
 #endif
 
 #ifdef __linux__
