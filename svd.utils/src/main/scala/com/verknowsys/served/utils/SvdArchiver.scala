@@ -143,12 +143,14 @@ object SvdArchiver extends Logging {
                         log.debug("Looking for time stamp diffs..")
                         def helper(src: File, postfix: String = "") = src.getPath.split(trimmedFileName + postfix).par.tail.mkString("/")
                         for {
-                            src <- gatheredDirList.par.flatMap{_.listFiles.par.toList.filter{_.isFile}}
-                            dst <- allArchiveDirs.par.flatMap{_.listFiles.par.toList.filter{helper(_, ".%s".format(SvdConfig.defaultBackupFileExtension)).matches(helper(src))}}
+                            src <- gatheredDirList.par.flatMap{_.listFiles.toList.par.filter{_.isFile}}
+                            dst <- allArchiveDirs.par.flatMap{_.listFiles.toList.par.filter{helper(_, ".%s".format(SvdConfig.defaultBackupFileExtension)).matches(helper(src))}}
                         } yield {
                             if ( (src.lastModified/10000 != dst.lastModified/10000)) { // (src.getName == dst.getName) &&
                                 log.debug("Changed and will be updated: %s -> %s".format(src, dst))
                                 TFile.cp_p(src, dst)
+                            } else {
+                                log.debug("No change to %s".format(src))
                             }
                         }
 
