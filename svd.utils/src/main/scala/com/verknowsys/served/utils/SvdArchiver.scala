@@ -13,6 +13,13 @@ import de.schlichtherle.io.{File => TFile}
 
 /**
     @author dmilith
+    SvdArchive Exception class
+*/
+class SvdInvalidOrBrokenArchiveException(message: String) extends Exception(message)
+
+
+/**
+    @author dmilith
     AES Key provider
 */
 class SvdAESKeyProvider extends AesKeyProvider {
@@ -23,7 +30,7 @@ class SvdAESKeyProvider extends AesKeyProvider {
 
     def invalidOpenKey = {
         // This method is called whenever a key for an existing protected resource is invalid.
-        throw new UnsupportedOperationException("Cannot handle invalid keys!")
+        throw new SvdInvalidOrBrokenArchiveException("Security key is invalid or archive is broken!")
     }
 
     def getKeyStrength = AesKeyProvider.KEY_STRENGTH_128
@@ -45,7 +52,7 @@ class SvdArchiverKeyManager extends KeyManager {
     @author dmilith
     SvdArchiver object to compress and decompress AES encrypted ZIP files with ease.
 */
-object SvdArchiver {
+object SvdArchiver extends Logging {
 
     System.setProperty("de.schlichtherle.key.KeyManager", SvdConfig.defaultBackupKeyManager)
     TFile.setDefaultArchiveDetector(new DefaultArchiveDetector(SvdConfig.defaultBackupFileExtension))
@@ -82,12 +89,13 @@ object SvdArchiver {
 
                 // check for archive existance:
                 val virtualRootDestination = "%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)
+
                 if (new TFile(virtualRootDestination).listFiles == null) {
-                    println("No archive found. Creating new one")
+                    log.info("No archive found. Creating new one")
                     new TFile(fileOrDirectoryPath).archiveCopyAllTo(new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)))
 
                 } else {
-                    println("Found archive. Checking for changes")
+                    log.info("Found archive with name: %s. Checking for changes".format(trimmedFileName))
                     // perform check on existing archive, and try to do update:
                     val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList).map{_.asInstanceOf[TFile]}
 
@@ -104,7 +112,7 @@ object SvdArchiver {
                     //         dst <- new TFile(destinationFiles).listFiles.filter{_.getName.matches(src.getName)}
                     //     } yield {
                     //         if ((src.getName == dst.getName) && (src.lastModified/10000 != dst.lastModified/10000)) {
-                    //             println("Changed and will be updated: %s -> %s".format(src, dst))
+                    //             log.debug("Changed and will be updated: %s -> %s".format(src, dst))
                     //             TFile.cp_p(src, dst)
                     //         }
                     //     }
@@ -125,32 +133,32 @@ object SvdArchiver {
                         val allDst = allArchiveDirs.flatMap{
                             a =>
                                 a.listFiles.toList.map{
-                                    _.getPath.split(trimmedFileName + ".zip.raes").tail.mkString("/")
+                                    _.getPath.split(trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)).tail.mkString("/")
                                 }
                         }
 
 
                         // detect changed files and update them when necessary
-                        println("Looking for time stamp diffs..")
+                        log.debug("Looking for time stamp diffs..")
                         def helper(src: File, postfix: String = "") = src.getPath.split(trimmedFileName + postfix).tail.mkString("/")
                         for {
                             src <- gatheredDirList.flatMap{_.listFiles.toList.filter{_.isFile}}
-                            dst <- allArchiveDirs.flatMap{_.listFiles.toList.filter{helper(_, ".zip.raes").matches(helper(src))}}
+                            dst <- allArchiveDirs.flatMap{_.listFiles.toList.filter{helper(_, ".%s".format(SvdConfig.defaultBackupFileExtension)).matches(helper(src))}}
                         } yield {
                             if ( (src.lastModified/10000 != dst.lastModified/10000)) { // (src.getName == dst.getName) &&
-                                println("Changed and will be updated: %s -> %s".format(src, dst))
+                                log.debug("Changed and will be updated: %s -> %s".format(src, dst))
                                 TFile.cp_p(src, dst)
                             }
                         }
 
-                        println("SRC: " + allSrc.length)
-                        println("DST: " + allDst.length)
+                        log.debug("SRC: " + allSrc.length)
+                        log.debug("DST: " + allDst.length)
                         val diff = allSrc.filterNot{ a => allDst.contains(a)}
-                        println("DIFF %s".format(diff))
+                        log.debug("DIFF %s".format(diff))
 
                     } else {
                         val diffDir = gatheredDirList.flatMap{_.getPath.split(trimmedFileName).tail.mkString("/")}
-                        println("Found missing directory: %s. Will be created and filled if not empty.".format(diffDir))
+                        log.debug("Found missing directory: %s. Will be created and filled if not empty.".format(diffDir))
                         new TFile(fileOrDirectoryPath + diffDir).archiveCopyAllTo(new TFile("%s%s.%s%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension, diffDir)))
                     }
 
