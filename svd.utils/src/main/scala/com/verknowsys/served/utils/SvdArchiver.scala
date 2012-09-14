@@ -92,58 +92,68 @@ object SvdArchiver {
                     val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList).map{_.asInstanceOf[TFile]}
 
 
-                    for {
-                        source <- gatheredDirList
-                    } yield {
-                        val destinationFiles = "%s%s.%s%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension, source.getPath.split(trimmedFileName).tail.mkString("/"))
+                    // for {
+                    //     source <- gatheredDirList
+                    // } yield {
+                    //     val destinationFiles = "%s%s.%s%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension, source.getPath.split(trimmedFileName).tail.mkString("/"))
 
 
-                        // checking for new directory name:
-                        val rawArchiveList = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)).listFiles
-                        if (rawArchiveList != null) {
-                            val rootArchiveDirs = rawArchiveList.toList.filter{_.isDirectory}
-                            val allArchiveDirs = gatherAllDirsRecursively(rootArchiveDirs).map{_.asInstanceOf[TFile]}
-                            val allSrc = gatheredDirList.toList.flatMap{
-                                a =>
-                                    a.listFiles.toList.map{
-                                        _.getPath.split(trimmedFileName).tail.mkString("/")
-                                    }
-                            }
+                    //     // detect changed files and update them when necessary
+                    //     for {
+                    //         src <- gatheredDirList.flatMap{_.listFiles.filter{_.isFile}}
+                    //         dst <- new TFile(destinationFiles).listFiles.filter{_.getName.matches(src.getName)}
+                    //     } yield {
+                    //         if ((src.getName == dst.getName) && (src.lastModified/10000 != dst.lastModified/10000)) {
+                    //             println("Changed and will be updated: %s -> %s".format(src, dst))
+                    //             TFile.cp_p(src, dst)
+                    //         }
+                    //     }
+                    // }
 
-                            val allDst = allArchiveDirs.flatMap{
-                                a =>
-                                    a.listFiles.toList.map{
-                                        _.getPath.split(trimmedFileName + ".zip.raes").tail.mkString("/")
-                                    }
-                            }
+                    // checking for new directory name:
+                    val rawArchiveList = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)).listFiles
+                    if (rawArchiveList != null) {
+                        val rootArchiveDirs = rawArchiveList.toList.filter{_.isDirectory}
+                        val allArchiveDirs = gatherAllDirsRecursively(rootArchiveDirs).map{_.asInstanceOf[TFile]}
+                        val allSrc = gatheredDirList.toList.flatMap{
+                            a =>
+                                a.listFiles.toList.map{
+                                    _.getPath.split(trimmedFileName).tail.mkString("/")
+                                }
+                        }
 
-                            println("SRC: " + allSrc.length)
-                            println("DST: " + allDst.length)
-                            println("DIFF %s".format(allSrc.filterNot{ a => allDst.contains(a)} ))
-                            return
-
-                        } else {
-                            val diffDir = source.getPath.split(trimmedFileName).tail.mkString("/")
-                            println("Found missing directory: %s. Will be created and filled if not empty.".format(diffDir))
-                            new TFile(fileOrDirectoryPath + diffDir).archiveCopyAllTo(new TFile("%s%s.%s%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension, diffDir)))
-
-
-
-                            // new TFile(fileOrDirectoryPath + diffDir).archiveCopyAllTo(new File("%s%s".format(unpackDir,diffDir)), ArchiveDetector.DEFAULT, ArchiveDetector.NULL)
+                        val allDst = allArchiveDirs.flatMap{
+                            a =>
+                                a.listFiles.toList.map{
+                                    _.getPath.split(trimmedFileName + ".zip.raes").tail.mkString("/")
+                                }
                         }
 
 
                         // detect changed files and update them when necessary
+                        println("Looking for time stamp diffs..")
+                        def helper(src: File, postfix: String = "") = src.getPath.split(trimmedFileName + postfix).tail.mkString("/")
                         for {
-                            src <- source.listFiles.filter{_.isFile}
-                            dst <- new TFile(destinationFiles).listFiles.filter{_.getName.matches(src.getName)}
+                            src <- gatheredDirList.flatMap{_.listFiles.toList.filter{_.isFile}}
+                            dst <- allArchiveDirs.flatMap{_.listFiles.toList.filter{helper(_, ".zip.raes").matches(helper(src))}}
                         } yield {
-                            if ((src.getName == dst.getName) && (src.lastModified/10000 != dst.lastModified/10000)) {
+                            if ( (src.lastModified/10000 != dst.lastModified/10000)) { // (src.getName == dst.getName) &&
                                 println("Changed and will be updated: %s -> %s".format(src, dst))
                                 TFile.cp_p(src, dst)
                             }
                         }
+
+                        println("SRC: " + allSrc.length)
+                        println("DST: " + allDst.length)
+                        val diff = allSrc.filterNot{ a => allDst.contains(a)}
+                        println("DIFF %s".format(diff))
+
+                    } else {
+                        val diffDir = gatheredDirList.flatMap{_.getPath.split(trimmedFileName).tail.mkString("/")}
+                        println("Found missing directory: %s. Will be created and filled if not empty.".format(diffDir))
+                        new TFile(fileOrDirectoryPath + diffDir).archiveCopyAllTo(new TFile("%s%s.%s%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension, diffDir)))
                     }
+
                 }
 
         }
