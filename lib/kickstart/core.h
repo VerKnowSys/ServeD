@@ -30,6 +30,9 @@
     #include <sys/capability.h>
     #include <libprocstat.h>
 #else
+    #include <mach/clock.h>
+    #include <mach/clock_priv.h>
+    #include <mach/clock_types.h>
     #include <sys/fcntl.h>
 #endif
 
