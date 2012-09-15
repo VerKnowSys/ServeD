@@ -141,10 +141,13 @@ object SvdArchiver extends Logging {
 
                         // detect changed files and update them when necessary
                         log.debug("Looking for time stamp diffs..")
-                        def helper(src: File, postfix: String = "") = src.getPath.split(trimmedFileName + postfix).par.tail.mkString("/")
                         for {
                             src <- gatheredDirList.par.flatMap{_.listFiles.toList.par.filter{_.isFile}}
-                            dst <- allArchiveDirs.par.flatMap{_.listFiles.toList.par.filter{helper(_, ".%s".format(SvdConfig.defaultBackupFileExtension)).matches(helper(src))}}
+                            dst <- allArchiveDirs.par.flatMap{
+                                _.listFiles.toList.par.filter{
+                                    _.getPath.split(trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)).tail.mkString("/").matches(src.getPath.split(trimmedFileName).tail.mkString("/"))
+
+                                }}
                         } yield {
                             if ( (src.lastModified/10000 != dst.lastModified/10000)) { // (src.getName == dst.getName) &&
                                 log.debug("Changed and will be updated: %s -> %s".format(src, dst))
