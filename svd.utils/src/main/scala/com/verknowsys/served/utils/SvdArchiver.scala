@@ -142,10 +142,10 @@ object SvdArchiver extends Logging {
                         // detect changed files and update them when necessary
                         log.debug("Looking for time stamp diffs..")
                         for {
-                            src <- gatheredDirList.par.flatMap{_.listFiles.toList.par.filter{_.isFile}}
+                            src <- gatheredDirList.par.flatMap{_.listFiles.toList} //.par.filter{_.isFile}}
                             dst <- allArchiveDirs.par.flatMap{
                                 _.listFiles.toList.par.filter{
-                                    _.getPath.split(trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)).tail.mkString("/").matches(src.getPath.split(trimmedFileName).tail.mkString("/"))
+                                    _.getPath.split(trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)).par.tail.mkString("/") == (src.getPath.split(trimmedFileName).par.tail.mkString("/"))
 
                                 }}
                         } yield {
@@ -159,7 +159,7 @@ object SvdArchiver extends Logging {
 
                         log.debug("SRC: " + allSrc.length)
                         log.debug("DST: " + allDst.length)
-                        val diff = allSrc.filterNot{ a => allDst.contains(a)}
+                        val diff = allSrc.filterNot{ a => allDst.contains(a) }
                         log.debug("DIFF %s".format(diff))
 
                     } else {
