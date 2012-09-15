@@ -87,7 +87,7 @@ object SvdArchiver extends Logging {
             case true =>
                 // case 1: decompression cause matched extension found
                 val timeOfRun = SvdUtils.bench {
-                    new TFile(fileOrDirectoryPath).archiveCopyAllTo(new File("%s".format(unpackDir)), ArchiveDetector.DEFAULT, ArchiveDetector.NULL)
+                    new TFile(fileOrDirectoryPath).archiveCopyAllTo(new File("%s".format(unpackDir)), ArchiveDetector.NULL)
                 }
                 log.trace("Decompression of archive took: %dms. It's unpacked in: %s".format(timeOfRun, unpackDir))
 
