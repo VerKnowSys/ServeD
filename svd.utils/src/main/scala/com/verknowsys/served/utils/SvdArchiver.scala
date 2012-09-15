@@ -95,7 +95,9 @@ object SvdArchiver extends Logging {
                 // case 2: compression of whatever given as path
                 val sourceFiles = new TFile(fileOrDirectoryPath).listFiles
                 if (sourceFiles == null) {
-                    throw new SvdNonExistantSourceDirectoryException("Source directory does not exists: %s".format(fileOrDirectoryPath))
+                    val exception = new SvdNonExistantSourceDirectoryException("Source directory does not exists: %s".format(fileOrDirectoryPath))
+                    log.error("Error occured in %s. Exception: %s".format(this.getClass.getName, exception))
+                    return
                 }
                 val sourceDirs = sourceFiles.filter{_.isDirectory}
 
