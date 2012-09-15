@@ -138,15 +138,15 @@ object SvdArchiver extends Logging {
                                 }
                         }
 
-                        val proxy = allArchiveDirs.par.flatMap{
-                                _.listFiles.toList.par}
+                        val proxy = allArchiveDirs.par.flatMap{_.listFiles.toList.par}
+                        val nameProxy = trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)
 
                         // detect changed files and update them when necessary
                         log.debug("Looking for time stamp diffs..")
                         for {
                             src <- gatheredDirList.par.flatMap{_.listFiles.toList} //.par.filter{_.isFile}}
-                            dst <- proxy.filter{_.getPath.split(
-                                        trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)).tail.mkString("/") == (src.getPath.split(trimmedFileName).tail.mkString("/"))}
+                            dst <- proxy.filter{_.getPath.split(nameProxy
+                                ).tail.mkString("/") == (src.getPath.split(trimmedFileName).tail.mkString("/"))}
 
                         } yield {
                             if ( (src.lastModified/10000 != dst.lastModified/10000)) { // (src.getName == dst.getName) &&
