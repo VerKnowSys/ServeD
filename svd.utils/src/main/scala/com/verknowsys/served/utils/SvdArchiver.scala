@@ -136,22 +136,30 @@ object SvdArchiver extends Logging {
                         }
 
                         // detect changed files and update them when necessary
-                        val proxy = allArchiveDirs.par.flatMap{_.listFiles.toList.par}
-                        val nameProxy = trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)
-                        log.debug("Searching for changed files")
+                        // val proxy = allArchiveDirs.par.flatMap{_.listFiles.toList.par}
+                        // val nameProxy = trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)
+                        // log.debug("Searching for changed files")
+                        // val timeOfRun = SvdUtils.bench {
+                        //     for {
+                        //         src <- gatheredDirList.par.flatMap{_.listFiles.toList}.par.filter{_.isFile}
+                        //         dst <- proxy.filter{_.getPath.split(nameProxy
+                        //             ).tail.mkString("/") == (src.getPath.split(trimmedFileName).tail.mkString("/"))}
+                        //     } yield
+                        //         if ( (src.lastModified/10000 != dst.lastModified/10000)) { // (src.getName == dst.getName) &&
+                        //             log.debug("Changed file: %s".format(src))
+                        //             val copyTask = TFile.cp_p(src, dst)
+                        //             log.trace("File updated in archive? %s".format(copyTask))
+                        //         }
+                        // }
+                        // log.trace("Changed files check took: %dms".format(timeOfRun))
+                        log.debug("Updating archive contents")
                         val timeOfRun = SvdUtils.bench {
-                            for {
-                                src <- gatheredDirList.par.flatMap{_.listFiles.toList}.par.filter{_.isFile}
-                                dst <- proxy.filter{_.getPath.split(nameProxy
-                                    ).tail.mkString("/") == (src.getPath.split(trimmedFileName).tail.mkString("/"))}
-                            } yield
-                                if ( (src.lastModified/10000 != dst.lastModified/10000)) { // (src.getName == dst.getName) &&
-                                    log.debug("Changed file: %s".format(src))
-                                    val copyTask = TFile.cp_p(src, dst)
-                                    log.trace("File updated in archive? %s".format(copyTask))
-                                }
+                            val archive = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension))
+                            TFile.update()
+                            new TFile(fileOrDirectoryPath).archiveCopyAllTo(archive)
                         }
                         log.trace("Changed files check took: %dms".format(timeOfRun))
+
 
                         val diffTimeOfRun = SvdUtils.bench {
                             log.trace("Source files total: " + allSrc.length)
