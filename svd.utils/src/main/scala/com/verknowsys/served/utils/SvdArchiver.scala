@@ -112,27 +112,33 @@ object SvdArchiver extends Logging {
 
                 } else {
                     // updating archive
-                    log.info("Already found archive with name: %s. Will perform content update".format(trimmedFileName))
-                    // perform check on existing archive, and try to do update:
-                    val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList).par.map{_.asInstanceOf[TFile]}
+                    log.info("Already found archive with name: %s. Will try to perform content update".format(trimmedFileName))
 
-                    // checking for new directory name:
+                    // perform check on existing archive, and try to do update:
+                    log.debug("Updating archive contents")
+                    val timeOfRun = SvdUtils.bench {
+                        val archive = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension))
+                        TFile.umount()
+                        TFile.update()
+                        new TFile(fileOrDirectoryPath).archiveCopyAllTo(archive)
+                    }
+                    log.trace("Archive update took: %dms".format(timeOfRun))
+
+                    val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList).par.map{_.asInstanceOf[TFile]}
                     val rawArchiveList = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)).listFiles
                     if (rawArchiveList != null) {
                         val rootArchiveDirs = rawArchiveList.par.toList.filter{_.isDirectory}
                         val allArchiveDirs = gatherAllDirsRecursively(rootArchiveDirs).map{_.asInstanceOf[TFile]}
                         val allSrc = gatheredDirList.toList.flatMap{
-                            a =>
-                                a.listFiles.toList.map{
-                                    _.getPath.split(trimmedFileName).tail.mkString("/")
-                                }
+                            _.listFiles.toList.map{
+                                _.getPath.split(trimmedFileName).tail.mkString("/")
+                            }
                         }
 
                         val allDst = allArchiveDirs.flatMap{
-                            a =>
-                                a.listFiles.toList.map{
-                                    _.getPath.split(trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)).tail.mkString("/")
-                                }
+                            _.listFiles.toList.map{
+                                _.getPath.split(trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)).tail.mkString("/")
+                            }
                         }
 
                         // detect changed files and update them when necessary
@@ -152,13 +158,6 @@ object SvdArchiver extends Logging {
                         //         }
                         // }
                         // log.trace("Changed files check took: %dms".format(timeOfRun))
-                        log.debug("Updating archive contents")
-                        val timeOfRun = SvdUtils.bench {
-                            val archive = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension))
-                            TFile.update()
-                            new TFile(fileOrDirectoryPath).archiveCopyAllTo(archive)
-                        }
-                        log.trace("Archive update took: %dms".format(timeOfRun))
 
 
                         val diffTimeOfRun = SvdUtils.bench {
