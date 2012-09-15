@@ -114,16 +114,6 @@ object SvdArchiver extends Logging {
                     // updating archive
                     log.info("Already found archive with name: %s. Will try to perform content update".format(trimmedFileName))
 
-                    // perform check on existing archive, and try to do update:
-                    log.debug("Updating archive contents")
-                    val timeOfRun = SvdUtils.bench {
-                        val archive = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension))
-                        TFile.umount()
-                        TFile.update()
-                        new TFile(fileOrDirectoryPath).archiveCopyAllTo(archive)
-                    }
-                    log.trace("Archive update took: %dms".format(timeOfRun))
-
                     val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList).par.map{_.asInstanceOf[TFile]}
                     val rawArchiveList = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)).listFiles
                     if (rawArchiveList != null) {
@@ -180,6 +170,15 @@ object SvdArchiver extends Logging {
                         }
                         log.trace("Diff for added/ removed files + file update in archive took: %dms".format(diffTimeOfRun))
 
+                        // perform check on existing archive, and try to do update:
+                        log.debug("Updating archive contents")
+                        val timeOfRun = SvdUtils.bench {
+                            val archive = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension))
+                            TFile.umount()
+                            TFile.update()
+                            new TFile(fileOrDirectoryPath).archiveCopyAllTo(archive)
+                        }
+                        log.trace("Archive update took: %dms".format(timeOfRun))
 
                     // } else {
                     //     val diffDir = gatheredDirList.par.flatMap{_.getPath.split(trimmedFileName).tail.mkString("/")}
