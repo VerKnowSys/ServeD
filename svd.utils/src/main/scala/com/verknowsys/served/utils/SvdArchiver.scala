@@ -158,7 +158,7 @@ object SvdArchiver extends Logging {
                             TFile.update()
                             new TFile(fileOrDirectoryPath).archiveCopyAllTo(archive)
                         }
-                        log.trace("Changed files check took: %dms".format(timeOfRun))
+                        log.trace("Archive update took: %dms".format(timeOfRun))
 
 
                         val diffTimeOfRun = SvdUtils.bench {
@@ -171,11 +171,11 @@ object SvdArchiver extends Logging {
                             log.info(" - %d removed".format(diffRemoved.length))
 
                             diffAdded.foreach{ diffPath =>
-                                log.debug("Adding paths: %s".format(diffPath))
+                                log.debug("Adding file: %s".format(diffPath))
                                 new TFile(fileOrDirectoryPath + diffPath).archiveCopyAllTo(new TFile("%s%s.%s%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension, diffPath)))
                             }
                             diffRemoved.foreach{ diffPath =>
-                                log.debug("Removing paths: %s".format(diffPath))
+                                log.debug("Removing file: %s".format(diffPath))
                                 new TFile("%s%s.%s%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension, diffPath)).delete
                             }
                         }
