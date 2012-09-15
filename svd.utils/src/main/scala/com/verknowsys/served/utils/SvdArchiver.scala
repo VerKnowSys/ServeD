@@ -138,22 +138,22 @@ object SvdArchiver extends Logging {
                                 }
                         }
 
+                        val proxy = allArchiveDirs.par.flatMap{
+                                _.listFiles.toList.par}
 
                         // detect changed files and update them when necessary
                         log.debug("Looking for time stamp diffs..")
                         for {
                             src <- gatheredDirList.par.flatMap{_.listFiles.toList} //.par.filter{_.isFile}}
-                            dst <- allArchiveDirs.par.flatMap{
-                                _.listFiles.toList.par.filter{
-                                    _.getPath.split(trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)).par.tail.mkString("/") == (src.getPath.split(trimmedFileName).par.tail.mkString("/"))
+                            dst <- proxy.filter{_.getPath.split(
+                                        trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)).tail.mkString("/") == (src.getPath.split(trimmedFileName).tail.mkString("/"))}
 
-                                }}
                         } yield {
                             if ( (src.lastModified/10000 != dst.lastModified/10000)) { // (src.getName == dst.getName) &&
                                 log.debug("Changed and will be updated: %s -> %s".format(src, dst))
                                 TFile.cp_p(src, dst)
                             } else {
-                                log.debug("No change to %s".format(src))
+                                log.trace("No change to %s".format(src))
                             }
                         }
 
