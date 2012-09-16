@@ -90,6 +90,34 @@ object SvdArchiver extends Logging {
 
     /**
         @author dmilith
+        Unmount ZIP VFS to synchronize IO (for bigger files)
+    */
+    def unmountVFS =
+        try {
+            TFile.umount // unmount archive vfs
+        } catch {
+            case oops: ArchiveWarningException =>
+                log.warn("ArchiveWarningException!")
+                // Only instances of the class ArchiveWarningException exist in
+                // the sequential chain of exceptions. We decide to ignore this.
+            case ouch: ArchiveException =>
+                // At least one exception occured which is not just an
+                // ArchiveWarningException. This is a severe situation which
+                // needs to be handled.
+                // Print the sequential chain of exceptions in order of
+                // descending priority and ascending appearance.
+                //ouch.printStackTrace();
+                // Print the sequential chain of exceptions in order of
+                // appearance instead.
+                log.error(ouch.sortAppearance.getStackTrace.mkString("\n"))
+
+        } finally {
+            log.debug("VFS unmounted")
+        }
+
+
+    /**
+        @author dmilith
         Simple hook for compressing and decompressing AES ZIP archives.
     */
     def apply(fileOrDirectoryPath: String, prefix: String = "svd-archive-", unpackDir: String = SvdConfig.defaultBackupDir + "CURRENT") {
@@ -109,9 +137,18 @@ object SvdArchiver extends Logging {
                 val sourceFilesCore = new TFile(fileOrDirectoryPath)
                 if (sourceFilesCore.isFile) {
                     // packaging a single file
-                    log.trace("File given as source")
-                    log.error("[Not Yet Implemented]")
-                    return
+                    log.error("File given as source it's currently unsupported")
+                    // TODO: implement single file archiving
+                    // val timeOfRun = SvdUtils.bench {
+                    //     val destination = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension))
+                    //     log.debug("Creating %s of %s".format(destination, sourceFilesCore.getName))
+                    //     if (sourceFilesCore.archiveCopyTo(destination))
+                    //         log.trace("Successfully copied file: %s".format(sourceFilesCore))
+                    //     else
+                    //         log.trace("Failure while copying file: %s".format(sourceFilesCore))
+                    // }
+                    // log.trace("Archive creation took: %dms".format(timeOfRun))
+
                 } else {
                     // packaging a directory
                     log.trace("Directory given as source")
@@ -154,9 +191,8 @@ object SvdArchiver extends Logging {
                             log.debug("Updating archive contents")
                             val timeOfRun = SvdUtils.bench {
                                 val archive = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension))
-                                // TFile.update()
                                 val sourcePath = new TFile(fileOrDirectoryPath)
-                                sourcePath.archiveCopyAllTo(archive)
+                                TFile.update(sourcePath.archiveCopyAllTo(archive))
                             }
                             log.trace("Archive update took: %dms".format(timeOfRun))
 
@@ -171,8 +207,7 @@ object SvdArchiver extends Logging {
                                     }
                                 } ++ sourceFiles.filter{_.isFile}.map{
                                         _.getPath.replaceFirst("^.*?%s".format(fileOrDirectoryPath), "")
-                                    }
-                                    // don't forget to take files from root directory!
+                                    } // don't forget to take files from root directory!
 
                                 val allDst = allArchiveDirs.flatMap{
                                     _.listFiles.toList.par.map{
@@ -226,11 +261,6 @@ object SvdArchiver extends Logging {
                                 }
                                 log.trace("Diff for added/ removed files + file update in archive took: %dms".format(diffTimeOfRun))
 
-
-                            // } else {
-                            //     val diffDir = gatheredDirList.par.flatMap{_.getPath.split(trimmedFileName).tail.mkString("/")}
-                            //     log.debug("Found missing directory: %s. Will be created and filled if not empty.".format(diffDir))
-                            //     new TFile(fileOrDirectoryPath + diffDir).archiveCopyAllTo(new TFile("%s%s.%s%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension, diffDir)))
                             }
 
                         }
@@ -238,6 +268,7 @@ object SvdArchiver extends Logging {
                 }
 
         }
+        unmountVFS
     }
 
 
