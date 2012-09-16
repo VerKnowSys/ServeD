@@ -151,29 +151,30 @@ object SvdArchiver extends Logging {
                 val rootArchiveDirs = rawArchiveList.filter{_.isDirectory} //.toList
                 val allArchiveDirs = gatherAllDirsRecursively(rootArchiveDirs.toList) //.map{_.asInstanceOf[TFile]}
 
-                val allSrc = (gatheredDirList).par.flatMap{
+                val allSrc = (gatheredDirList).flatMap{
                     _.listFiles.map{
                         _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")
                     }
                 } ++ sourceFiles.filter{_.isFile}.map{ // append archive root directory files
                         _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")
-                    }
+                    }.par
 
-                val allDst = allArchiveDirs.par.flatMap{
+                val allDst = allArchiveDirs.flatMap{
                     _.listFiles.map{
                         _.getPath.replaceFirst("^.*?" + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension, "")
                     }
                 } ++ rawArchiveList.filter{_.isFile}.map{ // append archive root directory files
                         _.getPath.replaceFirst("^.*?" + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension, "")
-                    }
+                    }.par
 
                 // detect changed files and update them when necessary
-                val proxy = allArchiveDirs.par.flatMap{_.listFiles}
+                val proxy = allArchiveDirs.flatMap{_.listFiles}
                 val nameProxy = trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)
-                log.debug("Searching for changed files")
+                log.info("Total files in archive: %d".format(proxy.length))
+                log.debug("Searching for changed files.")
                 val timeOfRun = SvdUtils.bench {
                     for {
-                        src <- gatheredDirList.flatMap{_.listFiles}.filter{_.isFile}
+                        src <- gatheredDirList.flatMap{_.listFiles}.filter{_.isFile}.par
                         // src <- gatheredDirList.par.flatMap{_.listFiles.toList}.par.filter{_.isFile}
                         // dst <- proxy.filter{
                         // _.getPath.replaceFirst("^.*?%s".format(nameProxy), "/") == (src.getPath.replaceFirst("^.*?%s".format(trimmedFileName), "/"))
@@ -197,7 +198,9 @@ object SvdArchiver extends Logging {
                         }
                     }
                 }
-                log.trace("Changed files check took: %dms".format(timeOfRun))
+                val perSecond = proxy.length * 1000.0 / timeOfRun
+                val perMinute = proxy.length * 60000.0 / timeOfRun
+                log.trace("Changed files check took: %dms. So it's %2.2f per minute or %2.2f per second.".format(timeOfRun, perMinute, perSecond))
             }
         }
 
@@ -213,8 +216,8 @@ object SvdArchiver extends Logging {
     */
     def addOrRemoveInArchive(fileOrDirectoryPath: String, prefix: String = "svd-archive-") = {
         val trimmedFileName = prefix + fileOrDirectoryPath.split("/").last
-        log.info("Already found archive with name: %s.".format(trimmedFileName))
         log.debug("Source directory path: %s".format(fileOrDirectoryPath))
+        log.info("Found archive with name: %s.".format(trimmedFileName))
 
         val sourceFilesCore = new TFile(fileOrDirectoryPath)
         val sourceFiles = sourceFilesCore.listFiles
@@ -242,13 +245,11 @@ object SvdArchiver extends Logging {
                 val rootArchiveDirs = rawArchiveList.filter{_.isDirectory}
                 val allArchiveDirs = gatherAllDirsRecursively(rootArchiveDirs.toList) //.map{_.asInstanceOf[TFile]}
 
-                val allSrc = (gatheredDirList).flatMap{
+                val allSrc = gatheredDirList.flatMap{
                     _.listFiles.par.map{
-                        _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")
-                    }
-                } ++ sourceFiles.filter{_.isFile}.par.map{
-                        _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")
-                    } // don't forget to take files from root directory!
+                        _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")}
+                } ++ sourceFiles.filter{_.isFile}.par.map{ // append files from archive root directory
+                        _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")}
 
                 val allDst = allArchiveDirs.flatMap{
                     _.listFiles.map{
@@ -261,6 +262,7 @@ object SvdArchiver extends Logging {
                 // compute added files diff:
                 val diffAdded = allSrc.par.filterNot{ a => allDst.contains(a) }
                 val diffRemoved = allDst.par.filterNot{ a => allSrc.contains(a) }
+                log.info(" * %d files in archive".format(allDst.length))
                 log.info(" + %d added".format(diffAdded.length))
                 log.info(" - %d removed".format(diffRemoved.length))
 
