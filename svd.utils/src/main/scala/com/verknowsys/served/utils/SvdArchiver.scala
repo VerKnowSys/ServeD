@@ -7,7 +7,7 @@ import com.verknowsys.served._
 import de.schlichtherle.io._
 import de.schlichtherle.key._
 import de.schlichtherle.crypto.io.raes._
-import java.io.File
+import java.io.{File, FileNotFoundException}
 import de.schlichtherle.io.{File => TFile}
 
 
@@ -179,10 +179,15 @@ object SvdArchiver extends Logging {
                         val archFile = new TFile(archBase + src)
                         val difference = srcFile.lastModified - archFile.lastModified
                         if (difference > 1000) { //((src.getName == dst.getName) && (src.lastModified != dst.lastModified)) {
-                            TFile.cp_p(
-                                srcFile,
-                                archFile)
-                            log.debug("Changed file: %s. Difference: %d".format(src, difference))
+                            try {
+                                TFile.cp_p(
+                                    srcFile,
+                                    archFile)
+                                log.debug("Changed file: %s. Difference: %d".format(src, difference))
+                            } catch {
+                                case e: FileNotFoundException =>
+                                    log.error("File not found exception occured with element: %s. It will be ignored.".format(srcFile))
+                            }
                         } else {
                             // log.trace("File unchanged: %s -> %s. Difference: %d".format(src, dst, difference))
                         }
