@@ -159,47 +159,33 @@ object SvdArchiver extends Logging {
                         _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")
                     }.par
 
-                val allDst = allArchiveDirs.flatMap{
-                    _.listFiles.map{
-                        _.getPath.replaceFirst("^.*?" + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension, "")
-                    }
-                } ++ rawArchiveList.filter{_.isFile}.map{ // append archive root directory files
-                        _.getPath.replaceFirst("^.*?" + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension, "")
-                    }.par
-
                 // detect changed files and update them when necessary
                 val proxy = allArchiveDirs.flatMap{_.listFiles}
+                val amountOfFiles = proxy.length
                 val nameProxy = trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)
-                log.info("Total files in archive: %d".format(proxy.length))
+                log.info("Total files in archive: %d".format(amountOfFiles))
                 log.debug("Searching for changed files.")
                 val timeOfRun = SvdUtils.bench {
-                    for {
-                        src <- gatheredDirList.flatMap{_.listFiles}.filter{_.isFile}.par
-                        // src <- gatheredDirList.par.flatMap{_.listFiles.toList}.par.filter{_.isFile}
-                        // dst <- proxy.filter{
-                        // _.getPath.replaceFirst("^.*?%s".format(nameProxy), "/") == (src.getPath.replaceFirst("^.*?%s".format(trimmedFileName), "/"))
-                        //     }
-                        dst <- proxy.filter {
-                            _.getPath.replaceFirst("^.*?" + nameProxy, "") == src.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")
-                        }
-                    } yield {
-                        val difference = src.lastModified - dst.lastModified
-                        // log.trace("Src(%s) last modify: %d, Dst(%s) last modify: %d. Difference: %d".format(
-                        //     src.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, ""), src.lastModified,
-                        //     dst.getPath.replaceFirst("^.*?" + nameProxy, ""), dst.lastModified,
-                        //     difference))
+                val srcBase = fileOrDirectoryPath
+                val archBase = SvdConfig.defaultBackupDir + nameProxy
+
+                allSrc.map {
+                    src =>
+                        val srcFile = new TFile(srcBase + src)
+                        val archFile = new TFile(archBase + src)
+                        val difference = srcFile.lastModified - archFile.lastModified
                         if (difference > 1000) { //((src.getName == dst.getName) && (src.lastModified != dst.lastModified)) {
-                            TFile.cp_p(src, dst)
-                            log.trace("Changed file: %s".format(src))
-                            // val copyTask = dst.setLastModified(System.currentTimeMillis)
-                            // log.trace("File stamp updated in archive? %s".format(copyTask))
-                        // } else {
-                        //     log.trace("File unchanged: %s -> %s".format(src, dst))
+                            TFile.cp_p(
+                                srcFile,
+                                archFile)
+                            log.debug("Changed file: %s. Difference: %d".format(src, difference))
+                        } else {
+                            // log.trace("File unchanged: %s -> %s. Difference: %d".format(src, dst, difference))
                         }
-                    }
                 }
-                val perSecond = proxy.length * 1000.0 / timeOfRun
-                val perMinute = proxy.length * 60000.0 / timeOfRun
+                }
+                val perSecond = amountOfFiles * 1000.0 / timeOfRun
+                val perMinute = amountOfFiles * 60000.0 / timeOfRun
                 log.trace("Changed files check took: %dms. So it's %2.2f per minute or %2.2f per second.".format(timeOfRun, perMinute, perSecond))
             }
         }
