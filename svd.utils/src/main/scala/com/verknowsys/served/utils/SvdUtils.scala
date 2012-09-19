@@ -31,6 +31,18 @@ import sun.misc.Signal
 object SvdUtils extends Logging {
 
 
+
+    /**
+        @author dmilith
+        Unified & DRY method of throwing exceptions
+    */
+    def throwException[T <: Exception : Manifest](message: String) {
+        val exception = implicitly[Manifest[T]].erasure.getConstructor(classOf[String]).newInstance(message).asInstanceOf[T]
+        log.error("Error occured in %s.\nException: %s\n\n%s".format(this.getClass.getName, exception, exception.getStackTrace.mkString("\n")))
+        throw exception
+    }
+
+
     /**
     *   @author dmilith
     *
