@@ -292,6 +292,12 @@ object SvdArchiver extends Logging {
         trimmedFileName.matches(SvdConfig.defaultBackupFileMatcher) match {
             case true =>
                 // case 1: decompression cause matched extension found
+                if (!new TFile(fileOrDirectoryPath).exists) {
+                    val exception = new SvdFSACLSecurityException("Given source archive doesn't exists: %s. Operation is aborted.".format(fileOrDirectoryPath))
+                    log.error("Error occured in %s. Exception: %s".format(this.getClass.getName, exception))
+                    throw exception
+                }
+
                 val timeOfRun = SvdUtils.bench {
                     val from = new TFile(fileOrDirectoryPath)
                     val to = new TFile("%s".format(unpackDir))
