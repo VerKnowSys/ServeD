@@ -95,7 +95,11 @@ object SvdArchiver extends Logging {
     */
     def unmountVFS =
         try {
-            TFile.umount // unmount archive vfs
+            log.trace("Unmounting VFS")
+            val umountTime = SvdUtils.bench {
+                TFile.umount // unmount archive vfs
+            }
+            log.debug("Unmounting done in %dms".format(umountTime))
         } catch {
             case oops: ArchiveWarningException =>
                 log.warn("ArchiveWarningException!")
