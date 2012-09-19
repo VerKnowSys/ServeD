@@ -62,6 +62,7 @@ object SvdArchiver extends Logging {
     System.setProperty("de.schlichtherle.key.KeyManager", SvdConfig.defaultBackupKeyManager)
     TFile.setDefaultArchiveDetector(new DefaultArchiveDetector(SvdConfig.defaultBackupFileExtension))
 
+
     /**
         @author dmilith
         Recursive method of gathering all directories of path in both folders and archives.
@@ -155,12 +156,13 @@ object SvdArchiver extends Logging {
                 val rootArchiveDirs = rawArchiveList.filter{_.isDirectory} //.toList
                 val allArchiveDirs = gatherAllDirsRecursively(rootArchiveDirs.toList) //.map{_.asInstanceOf[TFile]}
 
-                val allSrc = (gatheredDirList).flatMap{
+                log.trace("Loading source files")
+                val prebuiltSrcPrefix = "^.*?" + fileOrDirectoryPath
+                val allSrc = (gatheredDirList).flatMap {
                     _.listFiles.map{
-                        _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")
-                    }
-                } ++ sourceFiles.filter{_.isFile}.map{ // append archive root directory files
-                        _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")
+                        _.getPath.replaceFirst(prebuiltSrcPrefix, "")
+                    }} ++ sourceFiles.filter{_.isFile}.map { // append archive root directory files
+                        _.getPath.replaceFirst(prebuiltSrcPrefix, "")
                     }.par
 
                 // detect changed files and update them when necessary
@@ -177,21 +179,24 @@ object SvdArchiver extends Logging {
                     src =>
                         val srcFile = new TFile(srcBase + src)
                         val archFile = new TFile(archBase + src)
-                        val difference = srcFile.lastModified - archFile.lastModified
-                        if (difference > 1000) { //((src.getName == dst.getName) && (src.lastModified != dst.lastModified)) {
+                        val difference = srcFile.lastModified - archFile.lastModified // NOTE: .lastModified() on non existant file will return 0, hence we can use it to add new files really fast
+                        if (difference > 1000) {
                             try {
                                 TFile.cp_p(
                                     srcFile,
                                     archFile)
-                                log.debug("Changed file: %s. Difference: %d".format(src, difference))
+                                log.debug("Added/Changed file: %s. Difference: %d".format(src, difference))
                             } catch {
                                 case e: FileNotFoundException =>
-                                    log.error("File not found exception occured with element: %s. It will be ignored.".format(srcFile))
+                                    if (srcFile.isDirectory) {
+                                        archFile.mkdirs()
+                                    }
                             }
                         } else {
                             // log.trace("File unchanged: %s -> %s. Difference: %d".format(src, dst, difference))
                         }
                 }
+
                 }
                 val perSecond = amountOfFiles * 1000.0 / timeOfRun
                 val perMinute = amountOfFiles * 60000.0 / timeOfRun
@@ -204,12 +209,10 @@ object SvdArchiver extends Logging {
 
     /**
         @author dmilith
-        Very fast way of dealing with adding new or removing old files from existing archive.
-        This will use disk IO _read_ only for reading archive file list.
-        This will use disk IO _write_ only if differences were found in file count on both sides.
-        WARNING: This function wont detect nor update changed files!
+        This will use disk IO _read_, only for reading archive file list.
+        This will use disk IO _write_, only for removing files from archive which were already deleted from file system.
     */
-    def addRemoveFilesFromArchive(fileOrDirectoryPath: String, prefix: String = "svd-archive-") = {
+    def compact(fileOrDirectoryPath: String, prefix: String = "svd-archive-") = {
         val trimmedFileName = prefix + fileOrDirectoryPath.split("/").last
         log.debug("Source directory path: %s".format(fileOrDirectoryPath))
         log.info("Found archive with name: %s.".format(trimmedFileName))
@@ -237,48 +240,37 @@ object SvdArchiver extends Logging {
             val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList) //.map{_.asInstanceOf[TFile]}
             val rawArchiveList = new TFile(SvdConfig.defaultBackupDir + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension).listFiles
             if (rawArchiveList != null) {
-                val rootArchiveDirs = rawArchiveList.filter{_.isDirectory}
-                val allArchiveDirs = gatherAllDirsRecursively(rootArchiveDirs.toList) //.map{_.asInstanceOf[TFile]}
-
-                val allSrc = gatheredDirList.flatMap{
-                    _.listFiles.par.map{
-                        _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")}
-                } ++ sourceFiles.filter{_.isFile}.par.map{ // append files from archive root directory
-                        _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")}
-
-                val allDst = allArchiveDirs.flatMap{
-                    _.listFiles.map{
-                        _.getPath.replaceFirst("^.*?" + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension, "")
-                    }
-                } ++ rawArchiveList.filter{_.isFile}.map{ // append archive root directory files
-                        _.getPath.replaceFirst("^.*?" + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension, "")
-                    }
-
-                // compute added files diff:
-                val diffAdded = allSrc.filterNot{ a => allDst.contains(a) }.par
-                val diffRemoved = allDst.filterNot{ a => allSrc.contains(a) }.par
-                log.info(" * %d files in archive".format(allDst.length))
-                log.info(" + %d added".format(diffAdded.length))
-                log.info(" - %d removed".format(diffRemoved.length))
-
                 val diffTimeOfRun = SvdUtils.bench {
+                    val rootArchiveDirs = rawArchiveList.filter{_.isDirectory}
+                    val allArchiveDirs = gatherAllDirsRecursively(rootArchiveDirs.toList) //.map{_.asInstanceOf[TFile]}
+
+                    log.trace("Loading source files")
+                    val allSrc = gatheredDirList.flatMap{
+                        _.listFiles.par.map{
+                            _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")
+                        }} ++ sourceFiles.filter{_.isFile}.par.map{ // append files from archive root directory
+                            _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")}
+
+                    log.trace("Loading archive files")
+                    val allDst = allArchiveDirs.flatMap{
+                        _.listFiles.map{
+                            _.getPath.replaceFirst("^.*?" + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension, "")
+                        }} ++ rawArchiveList.filter{_.isFile}.map{ // append archive root directory files
+                            _.getPath.replaceFirst("^.*?" + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension, "")
+                        }
+
+                    val diffRemoved = allDst.filterNot{ a => allSrc.contains(a) }.par
+                    log.info(" - %d removed".format(diffRemoved.length))
                     log.trace("Source files total: " + allSrc.length)
                     log.trace("Archived files total: " + allDst.length)
                     val baseName = SvdConfig.defaultBackupDir + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension
-                    diffAdded.foreach{ diffPath =>
-                        val source = new TFile(fileOrDirectoryPath + diffPath)
-                        val dest = new TFile(baseName + diffPath)
-                        val result = source.archiveCopyAllTo(dest)
-                        log.debug("Added file: " + diffPath + " (" + result + ")")
-                        // log.trace("Added list: %s".format(diffAdded.mkString(", ")))
-                    }
                     diffRemoved.foreach{ diffPath =>
                         val result = new TFile(baseName + diffPath).delete
                         log.debug("Removed file: " + diffPath + " (" + result + ")")
                         // log.trace("Removed list: %s".format(diffRemoved.mkString(", ")))
                     }
                 }
-                log.debug("Adding/Deleting files from archive taken: %dms".format(diffTimeOfRun))
+                log.debug("Compacting archive took: %dms".format(diffTimeOfRun))
 
             } else {
                 log.warn("This shouldn't happen. What's wrong with %s?".format(rawArchiveList))
@@ -357,31 +349,11 @@ object SvdArchiver extends Logging {
 
                         } else {
                             log.debug("Archive already found. Performing files update.")
-
-                            addRemoveFilesFromArchive(fileOrDirectoryPath, prefix)
                             updateByTimeStampDiff(fileOrDirectoryPath, prefix)
-
-                            // val timeOfRun = SvdUtils.bench {
-                            //     val source = new TFile(fileOrDirectoryPath)
-                            //     val destination = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension))
-                            //     log.debug("Removing old archive")
-                            //     destination.delete
-                            //     log.debug("Creating %s of %s".format(destination, source))
-                            //     if (source.archiveCopyAllTo(destination))
-                            //         log.trace("Successfully copied files")
-                            //     else {
-                            //         val exception = new SvdErrorWhileCopyingFiles("Some files couldn't be archived! No disk space?")
-                            //         log.error("Error occured in %s.\nException: %s\n\n%s".format(this.getClass.getName, exception, exception.getStackTrace.mkString("\n")))
-                            //         throw exception
-                            //     }
-                            // }
-                            // log.trace("Compression and encryption of archive took: %dms. It's packed in: %s".format(timeOfRun, "%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)))
                         }
                     }
                     log.debug("Whole operation taken: %dms".format(wholeOperationTime))
-
                 }
-
         }
         unmountVFS
     }
