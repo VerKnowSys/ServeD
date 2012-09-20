@@ -73,5 +73,6 @@ object SvdConfig {
     def notificationXmppCompression     = true
     def notificationXmppUseSasl         = true
 
+    def defaultNtpHost                  = "ntp.task.gda.pl"
 
 }

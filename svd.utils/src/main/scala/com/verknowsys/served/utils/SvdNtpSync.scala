@@ -1,5 +1,6 @@
 package com.verknowsys.served.utils
 
+import com.verknowsys.served._
 import com.google.code.sntpjc.Client
 
 
@@ -24,7 +25,7 @@ object SvdNtpSync extends Logging {
     }
 
 
-    def apply(host: String = "ntp.task.gda.pl") = {
+    def apply(host: String = SvdConfig.defaultNtpHost) = {
         setSystemTime(host) match {
             case true =>
                 log.info("Time synchronization succeed.")
