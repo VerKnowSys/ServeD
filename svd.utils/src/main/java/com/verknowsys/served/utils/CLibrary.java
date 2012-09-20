@@ -7,7 +7,7 @@ import com.sun.jna.*;
  *  @author teamon, dmilith
  *
  *   Interfaces and libraries to low level access to posix system functions
- */ 
+ */
 
 public interface CLibrary extends Library {
     public static final CLibrary instance = (CLibrary) Native.loadLibrary("c", CLibrary.class);
@@ -17,14 +17,17 @@ public interface CLibrary extends Library {
     public int chmod(String filename, int mode);
     public int chown(String filename, int user, int group);
     public int getuid();
-    
+
     // see sys/event.h header file
     public int kqueue();
     public int kevent(int kq, kevent change, int nchanges, kevent event, int nevents, Pointer timeout);
     public void perror(String label);
     public int open(String filename, int flags);
     public void close(int fd);
-    
+
+    public int symlink(String source, String destination);
+    public int readlink(String path, byte[] buf, int bufsiz);
+
     public static final int NOTE_DELETE = 0x00000001;       /* vnode was removed */
     public static final int NOTE_WRITE  = 0x00000002;       /* data contents changed */
     public static final int NOTE_EXTEND = 0x00000004;       /* size increased */
@@ -33,7 +36,7 @@ public interface CLibrary extends Library {
     public static final int NOTE_RENAME = 0x00000020;       /* vnode was renamed */
     public static final int NOTE_REVOKE = 0x00000040;       /* vnode access was revoked */
     public static final int NOTE_NONE   = 0x00000080;       /* No specific vnode event: to test for EVFILT_READ activation*/
-    
+
     public static final int O_RDONLY    = 0x0000;       /* open for reading only */
     public static final int O_WRONLY    = 0x0001;       /* open for writing only */
     public static final int O_RDWR      = 0x0002;       /* open for reading and writing */

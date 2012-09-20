@@ -62,6 +62,9 @@ if [ "$system" = "FreeBSD" ]; then
 
     $CXX $FLAGS -shared lib/kickstart/system_time.cc -o lib/libsystemtime.so -lrt
     check $? "SystemTimeLib" "lib/libsystemtime.so"
+
+    $CXX $FLAGS -shared lib/kickstart/symlink.cc -o lib/libsymlink.so
+    check $? "SymlinkLib" "lib/libsymlink.so"
 fi
 
 if [ "$system" = "Darwin" ]; then
@@ -70,9 +73,15 @@ if [ "$system" = "Darwin" ]; then
 
     $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/system_time.cc -o lib/libsystemtime.dylib
     check $? "SystemTimeLib"
+
+    $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/symlink.cc -o lib/libsymlink.dylib
+    check $? "SymlinkLib"
 fi
 
 if [ "$system" = "Linux" ]; then
     $CXX $FLAGS -shared lib/kickstart/system_time.cc -o lib/libsystemtime.so -lrt
     check $? "SystemTimeLib" "lib/libsystemtime.so"
+
+    $CXX $FLAGS -shared lib/kickstart/symlink.cc -o lib/libsymlink.so
+    check $? "SymlinkLib" "lib/libsymlink.so"
 fi
