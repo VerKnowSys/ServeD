@@ -6,7 +6,7 @@ import com.google.code.sntpjc.Client
 /**
     @author tallica
  */
-object SvdNtpSync {
+object SvdNtpSync extends Logging {
 
 
     def setSystemTime(host: String) = {
@@ -14,11 +14,11 @@ object SvdNtpSync {
             CSystemTime.instance.adjustSystemTime(new Client(host).getLocalOffset)
         }
         catch {
-            case e: java.lang.UnsatisfiedLinkError => println(e)
+            case e: java.lang.UnsatisfiedLinkError => log.error("%s\n".format(e))
                 false
-            case e: java.net.SocketTimeoutException => println(e)
+            case e: java.net.SocketTimeoutException => log.error("%s\n".format(e))
                 false
-            case _ => println("Failed to get current offset time from `%s`.".format(host))
+            case _ => log.error("Failed to get current offset time from `%s`.".format(host))
                 false
         }
     }
@@ -27,10 +27,10 @@ object SvdNtpSync {
     def apply(host: String = "ntp.task.gda.pl") = {
         setSystemTime(host) match {
             case true =>
-                println("Time synchronization succeed.")
+                log.info("Time synchronization succeed.")
 
             case false =>
-                println("Unable to synchronize time.")
+                log.warn("Unable to synchronize time.")
         }
     }
 
