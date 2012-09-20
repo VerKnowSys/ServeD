@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec java -Djna.library.path=$(pwd)/lib -Xmx512M -XX:MaxPermSize=256M ${SBT_OPTS} -jar $(dirname $0)/../vendor/sbt-launch.jar "$@"
