@@ -7,12 +7,12 @@
 
 extern "C" {
 
-    bool isSymlink(const char *path) {
+    int isSymlink(const char *path) {
         struct stat st;
 
         if (lstat(path, &st) < 0) {
             cerr << "Calling lstat() on ‘" << path << "’ failed." << endl;
-            return false;
+            return 0;
         }
 
         return S_ISLNK(st.st_mode) == 1;
