@@ -7,26 +7,9 @@ import com.verknowsys.served._
 import de.schlichtherle.io._
 import de.schlichtherle.key._
 import de.schlichtherle.crypto.io.raes._
-import java.io.{File, FileNotFoundException}
-import de.schlichtherle.io.{File => TFile}
-
-// TODO:
-// 1. zrobić mapowanie na posixowe 'ln -s' via JNA
-// 2. zrobić mapowaniew JNA na funkcję do sprawdzania czy plik/katalog jest symlinkiem.
-// 3. dla każdego pliku/katalogu jaki okaże się symlnkiem, trzeba mieć funkcję w JNA na odczytanie informacji o tym na co wskazuje symlink (bo nazwa symlinka to nazwa pliku)
-// 4. dla każ∂ego pliku/katalogu jaki jest symlnikiem, trzeba:
-// 4a. zapisać informację o miejscu wskazywania
-// 4b. zapisać ten plik jako pewien rodzaj.. "meta info file"
-// (można np zrobić nazwakataloguarchiwizowanego-uuidNazwy.symlinks
-// 5. Nie kopiować do archiwum pliku/katalogu symlnika (bo tworzy kopię, bo java 6 nie rozumie symlinków)
-// 6. Przy rozpakowaniu odczytujemy plik z symlinkami, jedziemy po każdej parze,
-// (+ewentualne ACL'e.. czyli chmod)
-// [ale chmod już mamy w JNA jako mapper i włąsny w scali w Utils)
-// ! ACL to nie chmod ;]
-// anyway.
-// ..parze, i używamy funkcji z JNA do stworzenia symlinków RELATYWNYCH dla każdego pliku/katalogu na liście
-
-
+import java.io.{File, FileNotFoundException, DataOutputStream}
+import de.schlichtherle.io.{File => TFile, FileOutputStream}
+import scala.io.Source
 
 /**
     @author dmilith
@@ -76,7 +59,6 @@ object SvdArchiver extends Logging {
 
     System.setProperty("de.schlichtherle.key.KeyManager", SvdConfig.defaultBackupKeyManager)
     TFile.setDefaultArchiveDetector(new DefaultArchiveDetector(SvdConfig.defaultBackupFileExtension))
-
 
     /**
         @author dmilith
@@ -133,11 +115,11 @@ object SvdArchiver extends Logging {
 
     /**
         @author dmilith
-        Perform update of changed files in archive.
-        It's slow but it uses lot less IO operations, cause it really updates only changed files.
+        Perform update of changed/new files in archive.
+        It updates only changed files.
         It will use disk IO _read_ only for reading archive file list and timestamp.
         This will use disk IO _write_ only if differences were found in existing files timestamps.
-        WARNING: This function wont add nor delete new/differed files!
+        WARNING: This function wont delete old files!
     */
     def updateByTimeStampDiff(fileOrDirectoryPath: String, prefix: String = "svd-archive-") = {
         val trimmedFileName = prefix + fileOrDirectoryPath.split("/").last
@@ -155,8 +137,13 @@ object SvdArchiver extends Logging {
         } else {
             val sourceDirs = sourceFiles.filter{_.isDirectory}
             val virtualRootDestination = "%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)
-            if (!new TFile(virtualRootDestination).exists)
-                SvdUtils.throwException[SvdArchiveNonExistantException]("Destination archive not found: %s. Nothing to add nor remove. Operation is aborted.".format(fileOrDirectoryPath))
+            val virtualRootFile = new TFile(virtualRootDestination)
+            if (!virtualRootFile.exists) {
+                log.debug("Virtual archive root doesn't exists and will be created")
+                virtualRootFile.mkdirs
+            }
+            // if (!new TFile(virtualRootDestination).exists)
+            //     SvdUtils.throwException[SvdArchiveNonExistantException]("Destination archive not found: %s. Nothing to add nor remove. Operation is aborted.".format(fileOrDirectoryPath))
 
             val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList) //.map{_.asInstanceOf[TFile]}
             val rawArchiveList = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)).listFiles
@@ -183,35 +170,67 @@ object SvdArchiver extends Logging {
                 val srcBase = fileOrDirectoryPath
                 val archBase = SvdConfig.defaultBackupDir + nameProxy
 
+                val symlinkMetadataFile = "/." + trimmedFileName + "-archive-metadata.symlinks"
+                val symlinkArchiveFileName = SvdConfig.temporaryDir + symlinkMetadataFile
+                val symlinkArchFile = new TFile(symlinkArchiveFileName)
+
+                val fos = new FileOutputStream(symlinkArchFile, true) // append mode true
+                val dos = new DataOutputStream(fos)
+
                 allSrc.map {
                     src =>
                         val srcFile = new TFile(srcBase + src)
+                        val srcFileTrimmed = (srcBase + src).replaceFirst("^.*?" + fileOrDirectoryPath, "")
                         val archFile = new TFile(archBase + src)
                         val difference = srcFile.lastModified - archFile.lastModified // NOTE: .lastModified() on non existant file will return 0, hence we can use it to add new files really fast
-                        if (difference > 1000) {
+
+                        if (SvdSymlink.isSymlink(srcFile)) {
+                            // log.trace("File " + srcFile + " is a symlink pointing to: " + SvdSymlink.getSymlinkDestination(srcFile))
                             try {
-                                TFile.cp_p(
-                                    srcFile,
-                                    archFile)
-                                log.debug("Added/Changed file: %s. Difference: %d".format(src, difference))
+                                dos.writeBytes(srcFileTrimmed + "**" + SvdSymlink.getSymlinkDestination(srcFile) + "\n")
                             } catch {
-                                case e: FileNotFoundException =>
-                                    if (srcFile.isDirectory) {
-                                        archFile.mkdirs()
-                                    }
+                                case e: Exception =>
+                                    log.error("Caught exception while writing to " + symlinkArchFile + ": " + e)
                             }
+
                         } else {
-                            // log.trace("File unchanged: %s -> %s. Difference: %d".format(src, dst, difference))
+                            if (difference > 1000) { // XXX : hardcode?
+                                try {
+                                    TFile.cp_p(
+                                        srcFile,
+                                        archFile)
+                                    // log.trace("Added/Changed file: %s. Difference: %d".format(src, difference))
+                                } catch {
+                                    case e: FileNotFoundException =>
+                                        if (srcFile.isDirectory) {
+                                            archFile.mkdirs()
+                                        }
+                                }
+                            } else {
+                                // log.trace("File unchanged: %s -> %s. Difference: %d".format(src, dst, difference))
+                            }
                         }
                 }
+                fos.close
+                dos.close
+
+                log.debug("Copying symlink metadata: %s to archive".format(symlinkArchFile))
+                TFile.cp_p(
+                    symlinkArchFile,
+                    new TFile(archBase + symlinkMetadataFile))
+
+                log.debug("Deleting symlink metadata temporary file: %s".format(symlinkArchFile))
+                symlinkArchiveFileName.delete
 
                 }
                 val perSecond = amountOfFiles * 1000.0 / timeOfRun
                 val perMinute = amountOfFiles * 60000.0 / timeOfRun
-                log.trace("Changed files check took: %dms. So it's %2.2f per minute or %2.2f per second.".format(timeOfRun, perMinute, perSecond))
+                if (perSecond == perMinute)
+                    log.trace("Changed files check took: %dms.".format(timeOfRun))
+                else
+                    log.trace("Changed files check took: %dms. So it's %2.2f per minute or %2.2f per second.".format(timeOfRun, perMinute, perSecond))
             }
         }
-
     }
 
 
@@ -236,30 +255,33 @@ object SvdArchiver extends Logging {
         } else {
             val sourceDirs = sourceFiles.filter{_.isDirectory}
             val virtualRootDestination = "%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)
-            if (!new TFile(virtualRootDestination).exists)
+            val virtualRootFile = new TFile(virtualRootDestination)
+            if (!virtualRootFile.exists) {
                 SvdUtils.throwException[SvdArchiveNonExistantException]("Destination archive not found: %s. Nothing to add nor remove. Operation is aborted.".format(fileOrDirectoryPath))
+            }
 
             val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList) //.map{_.asInstanceOf[TFile]}
             val rawArchiveList = new TFile(SvdConfig.defaultBackupDir + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension).listFiles
+            val symlinkMetadataFile = "/." + trimmedFileName + "-archive-metadata.symlinks"
             if (rawArchiveList != null) {
                 val diffTimeOfRun = SvdUtils.bench {
                     val rootArchiveDirs = rawArchiveList.filter{_.isDirectory}
                     val allArchiveDirs = gatherAllDirsRecursively(rootArchiveDirs.toList) //.map{_.asInstanceOf[TFile]}
 
                     log.trace("Loading source files")
-                    val allSrc = gatheredDirList.flatMap{
+                    val allSrc = (gatheredDirList.flatMap{
                         _.listFiles.par.map{
                             _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")
                         }} ++ sourceFiles.filter{_.isFile}.par.map{ // append files from archive root directory
-                            _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")}
+                            _.getPath.replaceFirst("^.*?" + fileOrDirectoryPath, "")}).filterNot{_.getPath == symlinkMetadataFile}
 
                     log.trace("Loading archive files")
-                    val allDst = allArchiveDirs.flatMap{
+                    val allDst = (allArchiveDirs.flatMap{
                         _.listFiles.map{
                             _.getPath.replaceFirst("^.*?" + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension, "")
                         }} ++ rawArchiveList.filter{_.isFile}.map{ // append archive root directory files
                             _.getPath.replaceFirst("^.*?" + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension, "")
-                        }
+                        }).filterNot{_.getPath == symlinkMetadataFile}
 
                     val diffRemoved = allDst.filterNot{ a => allSrc.contains(a) }.par
                     log.info(" - %d removed".format(diffRemoved.length))
@@ -298,6 +320,17 @@ object SvdArchiver extends Logging {
                     val from = new TFile(fileOrDirectoryPath)
                     val to = new TFile("%s".format(unpackDir))
                     from.archiveCopyAllTo(to, ArchiveDetector.NULL) // NOTE: don't unpack archives recursively
+
+                    log.debug("Files unpacked. Now reading symlinks metadata from archive")
+                    val symlinkMetadataFile = "/." + fileOrDirectoryPath.split("/").last.replaceFirst(".%s".format(SvdConfig.defaultBackupFileExtension), "") + "-archive-metadata.symlinks"
+                    val symlinksMetadata = Source.fromFile(unpackDir + symlinkMetadataFile).getLines.toList
+                    // log.trace("Symlink metadata: %s".format(symlinksMetadata.mkString(", ")))
+                    symlinksMetadata.map{ _.split("\\*\\*") }.foreach {
+                        entry =>
+                            val result = SvdSymlink.makeSymlink(unpackDir + entry.head, entry.tail.head)
+                            log.trace("Creating %s with destination %s. Result: %s".format(unpackDir + entry.head, entry.tail.head, result))
+                    }
+
                 }
                 log.trace("Decompression of archive: %s took: %dms. It's unpacked in: %s".format(fileOrDirectoryPath, timeOfRun, unpackDir))
 
@@ -316,27 +349,11 @@ object SvdArchiver extends Logging {
                         if (!sourceFilesCore.canRead)
                             SvdUtils.throwException[SvdArchiveACLException]("ACL access failure to file: %s. Operation is aborted.".format(fileOrDirectoryPath))
 
-                        // check for archive existance:
-                        if (new TFile(virtualRootDestination).listFiles == null) {
-                            // creating archive
-                            log.info("No archive found. Creating new one")
-                            val timeOfRun = SvdUtils.bench {
-                                val source = new TFile(fileOrDirectoryPath)
-                                val destination = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension))
-                                log.debug("Creating %s of %s".format(destination, source))
-                                if (source.archiveCopyAllTo(destination))
-                                    log.trace("Successfully copied files")
-                                else
-                                    log.trace("Failure while copying files")
-                            }
-                            log.trace("Compression and encryption of archive took: %dms. It's packed in: %s".format(timeOfRun, "%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)))
+                        log.debug("Composing archive from source files")
+                        updateByTimeStampDiff(fileOrDirectoryPath, prefix)
 
-                        } else {
-                            log.debug("Archive already found. Performing files update.")
-                            updateByTimeStampDiff(fileOrDirectoryPath, prefix)
-                        }
                     }
-                    log.debug("Whole operation taken: %dms".format(wholeOperationTime))
+                    log.debug("Whole operation took: %dms".format(wholeOperationTime))
                 }
         }
         unmountVFS
