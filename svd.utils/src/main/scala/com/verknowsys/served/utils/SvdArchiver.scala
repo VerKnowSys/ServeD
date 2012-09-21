@@ -167,59 +167,59 @@ object SvdArchiver extends Logging {
                 log.info("Total files in archive: %d".format(amountOfFiles))
                 log.debug("Searching for changed files.")
                 val timeOfRun = SvdUtils.bench {
-                val srcBase = fileOrDirectoryPath
-                val archBase = SvdConfig.defaultBackupDir + nameProxy
+                    val srcBase = fileOrDirectoryPath
+                    val archBase = SvdConfig.defaultBackupDir + nameProxy
 
-                val symlinkMetadataFile = "/." + trimmedFileName + "-archive-metadata.symlinks"
-                val symlinkArchiveFileName = SvdConfig.temporaryDir + symlinkMetadataFile
-                val symlinkArchFile = new TFile(symlinkArchiveFileName)
+                    val symlinkMetadataFile = "/." + trimmedFileName + "-archive-metadata.symlinks"
+                    val symlinkArchiveFileName = SvdConfig.temporaryDir + symlinkMetadataFile
+                    val symlinkArchFile = new TFile(symlinkArchiveFileName)
 
-                val fos = new FileOutputStream(symlinkArchFile, true) // append mode true
-                val dos = new DataOutputStream(fos)
+                    val fos = new FileOutputStream(symlinkArchFile, true) // append mode true
+                    val dos = new DataOutputStream(fos)
 
-                allSrc.par.map {
-                    src =>
-                        val srcFile = new TFile(srcBase + src)
-                        val archFile = new TFile(archBase + src)
-                        val difference = srcFile.lastModified - archFile.lastModified // NOTE: .lastModified() on non existant file will return 0, hence we can use it to add new files really fast
+                    allSrc.par.map {
+                        src =>
+                            val srcFile = new TFile(srcBase + src)
+                            val archFile = new TFile(archBase + src)
+                            val difference = srcFile.lastModified - archFile.lastModified // NOTE: .lastModified() on non existant file will return 0, hence we can use it to add new files really fast
 
-                        if (SvdSymlink.isSymlink(srcFile)) {
-                            log.trace("File " + src + " is a symlink pointing to: " + SvdSymlink.getSymlinkDestination(srcFile))
-                            try {
-                                dos.writeBytes(src + "**" + SvdSymlink.getSymlinkDestination(srcFile) + "\n")
-                            } catch {
-                                case e: Exception =>
-                                    log.error("Caught exception while writing to " + symlinkArchFile + ": " + e)
-                            }
-
-                        } else {
-                            if (difference > 1000) { // XXX : hardcode?
+                            if (SvdSymlink.isSymlink(srcFile)) {
+                                log.trace("File " + src + " is a symlink pointing to: " + SvdSymlink.getSymlinkDestination(srcFile))
                                 try {
-                                    TFile.cp_p(
-                                        srcFile,
-                                        archFile)
-                                    log.trace("Added/Changed file: %s. Difference: %d".format(src, difference))
+                                    dos.writeBytes(src + "**" + SvdSymlink.getSymlinkDestination(srcFile) + "\n")
                                 } catch {
-                                    case e: FileNotFoundException =>
-                                        if (srcFile.isDirectory) {
-                                            archFile.mkdirs()
-                                        }
+                                    case e: Exception =>
+                                        log.error("Caught exception while writing to " + symlinkArchFile + ": " + e)
                                 }
+
                             } else {
-                                log.trace("File unchanged: %s Difference: %d".format(src, difference))
+                                if (difference > 1000) { // XXX : hardcode?
+                                    try {
+                                        TFile.cp_p(
+                                            srcFile,
+                                            archFile)
+                                        log.trace("Added/Changed file: %s. Difference: %d".format(src, difference))
+                                    } catch {
+                                        case e: FileNotFoundException =>
+                                            if (srcFile.isDirectory) {
+                                                archFile.mkdirs()
+                                            }
+                                    }
+                                } else {
+                                    log.trace("File unchanged: %s Difference: %d".format(src, difference))
+                                }
                             }
-                        }
-                }
-                fos.close
-                dos.close
+                    }
+                    fos.close
+                    dos.close
 
-                log.debug("Copying symlink metadata: %s to archive".format(symlinkArchFile))
-                TFile.cp_p(
-                    symlinkArchFile,
-                    new TFile(archBase + symlinkMetadataFile))
+                    log.debug("Copying symlink metadata: %s to archive".format(symlinkArchFile))
+                    TFile.cp_p(
+                        symlinkArchFile,
+                        new TFile(archBase + symlinkMetadataFile))
 
-                log.debug("Deleting symlink metadata temporary file: %s".format(symlinkArchFile))
-                symlinkArchiveFileName.delete
+                    log.debug("Deleting symlink metadata temporary file: %s".format(symlinkArchFile))
+                    symlinkArchiveFileName.delete
 
                 }
                 val perSecond = amountOfFiles * 1000.0 / timeOfRun
