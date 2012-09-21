@@ -12,7 +12,7 @@ object SvdSymlink {
 
 
     def makeSymlink(source: File, destination: File) = {
-        CLibrary.instance.symlink(source, destination) match {
+        CLibrary.instance.symlink(destination, source) match {
             case 0 => true
             case _ => false
         }
