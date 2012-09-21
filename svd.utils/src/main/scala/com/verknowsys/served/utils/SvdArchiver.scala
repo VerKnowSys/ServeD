@@ -177,17 +177,16 @@ object SvdArchiver extends Logging {
                 val fos = new FileOutputStream(symlinkArchFile, true) // append mode true
                 val dos = new DataOutputStream(fos)
 
-                allSrc.map {
+                allSrc.par.map {
                     src =>
                         val srcFile = new TFile(srcBase + src)
-                        val srcFileTrimmed = (srcBase + src).replaceFirst("^.*?" + fileOrDirectoryPath, "")
                         val archFile = new TFile(archBase + src)
                         val difference = srcFile.lastModified - archFile.lastModified // NOTE: .lastModified() on non existant file will return 0, hence we can use it to add new files really fast
 
                         if (SvdSymlink.isSymlink(srcFile)) {
-                            log.trace("File " + srcFile + " is a symlink pointing to: " + SvdSymlink.getSymlinkDestination(srcFile))
+                            log.trace("File " + src + " is a symlink pointing to: " + SvdSymlink.getSymlinkDestination(srcFile))
                             try {
-                                dos.writeBytes(srcFileTrimmed + "**" + SvdSymlink.getSymlinkDestination(srcFile) + "\n")
+                                dos.writeBytes(src + "**" + SvdSymlink.getSymlinkDestination(srcFile) + "\n")
                             } catch {
                                 case e: Exception =>
                                     log.error("Caught exception while writing to " + symlinkArchFile + ": " + e)
@@ -336,9 +335,9 @@ object SvdArchiver extends Logging {
 
             case false =>
                 // case 2: compression of whatever given as path
-                val trimmedFileName = prefix + fileOrDirectoryPath.split("/").last
+                // val trimmedFileName = prefix + fileOrDirectoryPath.split("/").last
                 val sourceFilesCore = new TFile(fileOrDirectoryPath)
-                val virtualRootDestination = "%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)
+                // val virtualRootDestination = "%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)
                 if (sourceFilesCore.isFile)
                     // packaging a single file
                     SvdUtils.throwException[SvdArchiveUnsupportedActionException]("File given as source is currently unsupported".format(fileOrDirectoryPath))
