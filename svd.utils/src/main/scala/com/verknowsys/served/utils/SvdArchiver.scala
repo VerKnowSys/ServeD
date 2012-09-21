@@ -185,7 +185,7 @@ object SvdArchiver extends Logging {
                         val difference = srcFile.lastModified - archFile.lastModified // NOTE: .lastModified() on non existant file will return 0, hence we can use it to add new files really fast
 
                         if (SvdSymlink.isSymlink(srcFile)) {
-                            // log.trace("File " + srcFile + " is a symlink pointing to: " + SvdSymlink.getSymlinkDestination(srcFile))
+                            log.trace("File " + srcFile + " is a symlink pointing to: " + SvdSymlink.getSymlinkDestination(srcFile))
                             try {
                                 dos.writeBytes(srcFileTrimmed + "**" + SvdSymlink.getSymlinkDestination(srcFile) + "\n")
                             } catch {
@@ -199,7 +199,7 @@ object SvdArchiver extends Logging {
                                     TFile.cp_p(
                                         srcFile,
                                         archFile)
-                                    // log.trace("Added/Changed file: %s. Difference: %d".format(src, difference))
+                                    log.trace("Added/Changed file: %s. Difference: %d".format(src, difference))
                                 } catch {
                                     case e: FileNotFoundException =>
                                         if (srcFile.isDirectory) {
@@ -207,7 +207,7 @@ object SvdArchiver extends Logging {
                                         }
                                 }
                             } else {
-                                // log.trace("File unchanged: %s -> %s. Difference: %d".format(src, dst, difference))
+                                log.trace("File unchanged: %s -> %s. Difference: %d".format(src, dst, difference))
                             }
                         }
                 }
@@ -226,9 +226,9 @@ object SvdArchiver extends Logging {
                 val perSecond = amountOfFiles * 1000.0 / timeOfRun
                 val perMinute = amountOfFiles * 60000.0 / timeOfRun
                 if (perSecond == perMinute)
-                    log.trace("Changed files check took: %dms.".format(timeOfRun))
+                    log.debug("Changed files check took: %dms.".format(timeOfRun))
                 else
-                    log.trace("Changed files check took: %dms. So it's %2.2f per minute or %2.2f per second.".format(timeOfRun, perMinute, perSecond))
+                    log.debug("Changed files check took: %dms. So it's %2.2f per minute or %2.2f per second.".format(timeOfRun, perMinute, perSecond))
             }
         }
     }
@@ -291,7 +291,7 @@ object SvdArchiver extends Logging {
                     diffRemoved.foreach{ diffPath =>
                         val result = new TFile(baseName + diffPath).delete
                         log.debug("Removed file: " + diffPath + " (" + result + ")")
-                        // log.trace("Removed list: %s".format(diffRemoved.mkString(", ")))
+                        log.trace("Removed list: %s".format(diffRemoved.mkString(", ")))
                     }
                 }
                 log.debug("Compacting archive took: %dms".format(diffTimeOfRun))
@@ -324,7 +324,7 @@ object SvdArchiver extends Logging {
                     log.debug("Files unpacked. Now reading symlinks metadata from archive")
                     val symlinkMetadataFile = "/." + fileOrDirectoryPath.split("/").last.replaceFirst(".%s".format(SvdConfig.defaultBackupFileExtension), "") + "-archive-metadata.symlinks"
                     val symlinksMetadata = Source.fromFile(unpackDir + symlinkMetadataFile).getLines.toList
-                    // log.trace("Symlink metadata: %s".format(symlinksMetadata.mkString(", ")))
+                    log.trace("Symlink metadata: %s".format(symlinksMetadata.mkString(", ")))
                     symlinksMetadata.map{ _.split("\\*\\*") }.foreach {
                         entry =>
                             val result = SvdSymlink.makeSymlink(unpackDir + entry.head, entry.tail.head)
@@ -332,7 +332,7 @@ object SvdArchiver extends Logging {
                     }
 
                 }
-                log.trace("Decompression of archive: %s took: %dms. It's unpacked in: %s".format(fileOrDirectoryPath, timeOfRun, unpackDir))
+                log.debug("Decompression of archive: %s took: %dms. It's unpacked in: %s".format(fileOrDirectoryPath, timeOfRun, unpackDir))
 
             case false =>
                 // case 2: compression of whatever given as path
