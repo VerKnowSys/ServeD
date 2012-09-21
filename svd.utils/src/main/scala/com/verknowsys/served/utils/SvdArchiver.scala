@@ -207,7 +207,7 @@ object SvdArchiver extends Logging {
                                         }
                                 }
                             } else {
-                                log.trace("File unchanged: %s -> %s. Difference: %d".format(src, dst, difference))
+                                log.trace("File unchanged: %s Difference: %d".format(src, difference))
                             }
                         }
                 }
