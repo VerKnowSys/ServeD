@@ -36,9 +36,9 @@ class SvdAESKeyProvider extends AesKeyProvider with Logging {
         SvdUtils.throwException[SvdArchiveInvalidRAESKeyException]("Security key is invalid or archive is broken!")
     }
 
-    def getKeyStrength = AesKeyProvider.KEY_STRENGTH_128
+    def getKeyStrength = AesKeyProvider.KEY_STRENGTH_256
 
-    def setKeyStrength(keyStrength: Int) = AesKeyProvider.KEY_STRENGTH_128
+    def setKeyStrength(keyStrength: Int) = AesKeyProvider.KEY_STRENGTH_256
 }
 
 
