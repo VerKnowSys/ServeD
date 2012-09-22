@@ -4,6 +4,8 @@
 package com.verknowsys.served.utils
 
 import com.verknowsys.served._
+import com.verknowsys.served.api._
+
 import de.schlichtherle.io._
 import de.schlichtherle.key._
 import de.schlichtherle.crypto.io.raes._
@@ -121,8 +123,17 @@ object SvdArchiver extends Logging {
         This will use disk IO _write_ only if differences were found in existing files timestamps.
         WARNING: This function wont delete old files!
     */
-    def updateByTimeStampDiff(fileOrDirectoryPath: String, prefix: String = "svd-archive-") = {
-        val trimmedFileName = prefix + fileOrDirectoryPath.split("/").last
+    def updateByTimeStampDiff(fileOrDirectoryPath: String, userAccount: Option[SvdAccount] = None) = {
+
+        val backupDir = userAccount match {
+            case Some(account) =>
+                log.debug("Running userside action for user: %s".format(account))
+                "%s%d%s".format(SvdConfig.userHomeDir, account.uid, SvdConfig.defaultBackupDir)
+            case None =>
+                SvdConfig.defaultBackupDir
+        }
+
+        val trimmedFileName = fileOrDirectoryPath.split("/").last
         // log.info("Found archive with name: %s.".format(trimmedFileName))
         // log.debug("Source directory path: %s".format(fileOrDirectoryPath))
 
@@ -136,7 +147,7 @@ object SvdArchiver extends Logging {
 
         } else {
             val sourceDirs = sourceFiles.filter{_.isDirectory}
-            val virtualRootDestination = "%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)
+            val virtualRootDestination = "%s%s.%s".format(backupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)
             val virtualRootFile = new TFile(virtualRootDestination)
             if (!virtualRootFile.exists) {
                 log.debug("Virtual archive root doesn't exists and will be created")
@@ -146,7 +157,7 @@ object SvdArchiver extends Logging {
             //     SvdUtils.throwException[SvdArchiveNonExistantException]("Destination archive not found: %s. Nothing to add nor remove. Operation is aborted.".format(fileOrDirectoryPath))
 
             val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList) //.map{_.asInstanceOf[TFile]}
-            val rawArchiveList = new TFile("%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)).listFiles
+            val rawArchiveList = new TFile("%s%s.%s".format(backupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)).listFiles
             if (rawArchiveList != null) {
                 val rootArchiveDirs = rawArchiveList.filter{_.isDirectory} //.toList
                 val allArchiveDirs = gatherAllDirsRecursively(rootArchiveDirs.toList) //.map{_.asInstanceOf[TFile]}
@@ -168,7 +179,7 @@ object SvdArchiver extends Logging {
                 log.debug("Searching for changed files.")
                 val timeOfRun = SvdUtils.bench {
                     val srcBase = fileOrDirectoryPath
-                    val archBase = SvdConfig.defaultBackupDir + nameProxy
+                    val archBase = backupDir + nameProxy
 
                     val symlinkMetadataFile = "/." + trimmedFileName + "-archive-metadata.symlinks"
                     val symlinkArchiveFileName = SvdConfig.temporaryDir + symlinkMetadataFile
@@ -202,7 +213,7 @@ object SvdArchiver extends Logging {
                                     } catch {
                                         case e: FileNotFoundException =>
                                             if (srcFile.isDirectory) {
-                                                archFile.mkdirs()
+                                                archFile.mkdirs
                                             }
                                     }
                                 } else {
@@ -238,10 +249,18 @@ object SvdArchiver extends Logging {
         This will use disk IO _read_, only for reading archive file list.
         This will use disk IO _write_, only for removing files from archive which were already deleted from file system.
     */
-    def compact(fileOrDirectoryPath: String, prefix: String = "svd-archive-") = {
-        val trimmedFileName = prefix + fileOrDirectoryPath.split("/").last
+    def compact(fileOrDirectoryPath: String, userAccount: Option[SvdAccount] = None) = {
+        val trimmedFileName = fileOrDirectoryPath.split("/").last
         log.debug("Source directory path: %s".format(fileOrDirectoryPath))
         log.info("Found archive with name: %s.".format(trimmedFileName))
+
+        val backupDir = userAccount match {
+            case Some(account) =>
+                log.debug("Running userside action for user: %s".format(account))
+                "%s%d%s".format(SvdConfig.userHomeDir, account.uid, SvdConfig.defaultBackupDir)
+            case None =>
+                SvdConfig.defaultBackupDir
+        }
 
         val sourceFilesCore = new TFile(fileOrDirectoryPath)
         val sourceFiles = sourceFilesCore.listFiles
@@ -253,14 +272,14 @@ object SvdArchiver extends Logging {
 
         } else {
             val sourceDirs = sourceFiles.filter{_.isDirectory}
-            val virtualRootDestination = "%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)
+            val virtualRootDestination = "%s%s.%s".format(backupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)
             val virtualRootFile = new TFile(virtualRootDestination)
             if (!virtualRootFile.exists) {
                 SvdUtils.throwException[SvdArchiveNonExistantException]("Destination archive not found: %s. Nothing to add nor remove. Operation is aborted.".format(fileOrDirectoryPath))
             }
 
             val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList) //.map{_.asInstanceOf[TFile]}
-            val rawArchiveList = new TFile(SvdConfig.defaultBackupDir + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension).listFiles
+            val rawArchiveList = new TFile(backupDir + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension).listFiles
             val symlinkMetadataFile = "/." + trimmedFileName + "-archive-metadata.symlinks"
             if (rawArchiveList != null) {
                 val diffTimeOfRun = SvdUtils.bench {
@@ -286,7 +305,7 @@ object SvdArchiver extends Logging {
                     log.info(" - %d removed".format(diffRemoved.length))
                     log.trace("Source files total: " + allSrc.length)
                     log.trace("Archived files total: " + allDst.length)
-                    val baseName = SvdConfig.defaultBackupDir + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension
+                    val baseName = backupDir + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension
                     diffRemoved.foreach{ diffPath =>
                         val result = new TFile(baseName + diffPath).delete
                         log.debug("Removed file: " + diffPath + " (" + result + ")")
@@ -304,11 +323,24 @@ object SvdArchiver extends Logging {
 
     /**
         @author dmilith
-        Call it to compress or decompress AES ZIP archive.
+        Call it to compress or decompress AES-256 ZIP archive.
     */
-    def apply(fileOrDirectoryPath: String, prefix: String = "svd-archive-", unpackDir: String = SvdConfig.defaultBackupDir + "CURRENT", exclude: List[String] = List(".lock", ".sock")) { // TODO: implement exclude list
+    def apply(fileOrDirectoryPath: String, destinationDir: Option[String] = None, exclude: List[String] = List(".lock", ".sock"), userAccount: Option[SvdAccount] = None) { // TODO: implement exclude list
 
-        val trimmedFileName = prefix + fileOrDirectoryPath.split("/").last
+        val trimmedFileName = fileOrDirectoryPath.split("/").last
+        val unpackDir = userAccount match {
+            case Some(account) =>
+                log.debug("Running userside action for user: %s".format(account))
+                val userDir = "%s%d%s".format(SvdConfig.userHomeDir, account.uid, SvdConfig.defaultBackupDir)
+                if (!new File(userDir).isDirectory) {
+                    log.debug("User backup dir: %s doesn't exists. Creating it.".format(userDir))
+                    new File(userDir).mkdirs
+                }
+                "%s%d%s".format(SvdConfig.userHomeDir, account.uid, SvdConfig.defaultBackupDir)
+            case None =>
+                SvdConfig.defaultBackupDir + destinationDir.getOrElse(trimmedFileName)
+        }
+
         trimmedFileName.matches(SvdConfig.defaultBackupFileMatcher) match {
             case true =>
                 // case 1: decompression cause matched extension found
@@ -317,17 +349,18 @@ object SvdArchiver extends Logging {
 
                 val timeOfRun = SvdUtils.bench {
                     val from = new TFile(fileOrDirectoryPath)
-                    val to = new TFile("%s".format(unpackDir))
+                    val strippedDestinationDir = destinationDir.getOrElse(trimmedFileName).replaceFirst(".%s".format(SvdConfig.defaultBackupFileExtension), "")
+                    val to = new TFile("%s".format(unpackDir / strippedDestinationDir))
                     from.archiveCopyAllTo(to, ArchiveDetector.NULL) // NOTE: don't unpack archives recursively
-
                     log.debug("Files unpacked. Now reading symlinks metadata from archive")
                     val symlinkMetadataFile = "/." + fileOrDirectoryPath.split("/").last.replaceFirst(".%s".format(SvdConfig.defaultBackupFileExtension), "") + "-archive-metadata.symlinks"
-                    val symlinksMetadata = Source.fromFile(unpackDir + symlinkMetadataFile).getLines.toList
+                    val metadataTargetFile = unpackDir / strippedDestinationDir + symlinkMetadataFile
+                    val symlinksMetadata = Source.fromFile(metadataTargetFile).getLines.toList
                     log.trace("Symlink metadata: %s".format(symlinksMetadata.mkString(", ")))
                     symlinksMetadata.map{ _.split("\\*\\*") }.foreach {
                         entry =>
-                            val result = SvdSymlink.makeSymlink(unpackDir + entry.head, entry.tail.head)
-                            log.trace("Creating %s with destination %s. Result: %s".format(unpackDir + entry.head, entry.tail.head, result))
+                            val result = SvdSymlink.makeSymlink(unpackDir / strippedDestinationDir / entry.head, entry.tail.head)
+                            log.trace("Creating %s with destination %s. Result: %s".format(unpackDir / strippedDestinationDir / entry.head, entry.tail.head, result))
                     }
 
                 }
@@ -349,7 +382,7 @@ object SvdArchiver extends Logging {
                             SvdUtils.throwException[SvdArchiveACLException]("ACL access failure to file: %s. Operation is aborted.".format(fileOrDirectoryPath))
 
                         log.debug("Composing archive from source files")
-                        updateByTimeStampDiff(fileOrDirectoryPath, prefix)
+                        updateByTimeStampDiff(fileOrDirectoryPath, userAccount)
 
                     }
                     log.debug("Whole operation took: %dms".format(wholeOperationTime))
