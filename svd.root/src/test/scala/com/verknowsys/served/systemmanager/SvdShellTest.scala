@@ -34,7 +34,6 @@ class SvdShellTest extends DefaultTest {
         sh.dead should be(false)
         sh.close
         sh.dead should be(true)
-        evaluating { sh.exec(shr("")) } should produce [SvdShellException]
     }
 
 
