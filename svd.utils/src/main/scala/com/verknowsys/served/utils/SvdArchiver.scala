@@ -327,6 +327,9 @@ object SvdArchiver extends Logging {
     */
     def apply(fileOrDirectoryPath: String, destinationDir: Option[String] = None, exclude: List[String] = List(".lock", ".sock"), userAccount: Option[SvdAccount] = None) { // TODO: implement exclude list
 
+        if (fileOrDirectoryPath == null)
+            SvdUtils.throwException[SvdArchiveUnsupportedActionException]("Null source given".format(fileOrDirectoryPath))
+
         val trimmedFileName = fileOrDirectoryPath.split("/").last
         val unpackDir = userAccount match {
             case Some(account) =>
@@ -345,7 +348,7 @@ object SvdArchiver extends Logging {
             case true =>
                 // case 1: decompression cause matched extension found
                 if (!new TFile(fileOrDirectoryPath).exists)
-                    SvdUtils.throwException[SvdArchiveACLException]("Given source archive doesn't exists: %s. Operation is aborted.".format(fileOrDirectoryPath))
+                    SvdUtils.throwException[SvdArchiveNonExistantException]("Given source archive doesn't exists: %s. Operation is aborted.".format(fileOrDirectoryPath))
 
                 val timeOfRun = SvdUtils.bench {
                     val from = new TFile(fileOrDirectoryPath)
@@ -371,15 +374,21 @@ object SvdArchiver extends Logging {
                 // val trimmedFileName = prefix + fileOrDirectoryPath.split("/").last
                 val sourceFilesCore = new TFile(fileOrDirectoryPath)
                 // val virtualRootDestination = "%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)
+                if (!sourceFilesCore.exists)
+                    SvdUtils.throwException[SvdArchiveNonExistantException]("Source folder wasn't found: %s. Nothing to add nor remove. Operation is aborted.".format(fileOrDirectoryPath))
+
                 if (sourceFilesCore.isFile)
                     // packaging a single file
                     SvdUtils.throwException[SvdArchiveUnsupportedActionException]("File given as source is currently unsupported".format(fileOrDirectoryPath))
+
+
+                if (!sourceFilesCore.canRead)
+                    SvdUtils.throwException[SvdArchiveACLException]("ACL access failure to file: %s. Operation is aborted.".format(fileOrDirectoryPath))
+
                 else {
                     val wholeOperationTime = SvdUtils.bench {
                         // packaging a directory
                         log.trace("Directory given as source")
-                        if (!sourceFilesCore.canRead)
-                            SvdUtils.throwException[SvdArchiveACLException]("ACL access failure to file: %s. Operation is aborted.".format(fileOrDirectoryPath))
 
                         log.debug("Composing archive from source files")
                         updateByTimeStampDiff(fileOrDirectoryPath, userAccount)
