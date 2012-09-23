@@ -17,11 +17,12 @@ import com.verknowsys.served.utils.SvdSystemManagerUtils._
 class SvdArchiverTest extends DefaultTest with Logging {
     val defaultTestUserID = 501
     val tempDir = System.getProperty("user.dir") / "tmp"
+    val defaultUser = Some(SvdAccount(uid = defaultTestUserID))
 
 
-    it should "be able to create archive from svd directories and respond properly on exceptions" in {
+    it should "be able to archive and unarchive given directory from svd directories and react properly in case of exceptions" in {
         evaluating { // not exists
-            SvdArchiver(tempDir / "nothing", userAccount = Some(SvdAccount(uid = defaultTestUserID)))
+            SvdArchiver(tempDir / "nothing", userAccount = defaultUser)
         } should produce [SvdArchiveNonExistantException]
 
         {
@@ -30,7 +31,11 @@ class SvdArchiverTest extends DefaultTest with Logging {
             chmod(f, 0)
 
             evaluating { // exists but cannot read
-                SvdArchiver(f, userAccount = Some(SvdAccount(uid = defaultTestUserID)))
+                SvdArchiver(f, userAccount = defaultUser)
+            } should produce [SvdArchiveACLException]
+
+            evaluating {
+                SvdArchiver.compact(f, userAccount = defaultUser)
             } should produce [SvdArchiveACLException]
 
             chmod(f, 0x777)
@@ -39,23 +44,37 @@ class SvdArchiverTest extends DefaultTest with Logging {
 
         evaluating {
             touch(tempDir / "somefile")
-            SvdArchiver(System.getProperty("user.dir") / "somefile", userAccount = Some(SvdAccount(uid = defaultTestUserID)))
+            SvdArchiver(System.getProperty("user.dir") / "somefile", userAccount = defaultUser)
         } should produce [SvdArchiveNonExistantException]
 
         evaluating {
-            SvdArchiver(null, userAccount = Some(SvdAccount(uid = defaultTestUserID)))
+            touch(tempDir / "somefile")
+            SvdArchiver.compact(System.getProperty("user.dir") / "somefile", userAccount = defaultUser)
+        } should produce [SvdArchiveNonExistantException]
+
+        evaluating {
+            SvdArchiver(null, userAccount = defaultUser)
         } should produce [SvdArchiveUnsupportedActionException]
 
         implicit def convTFtoS(a: File) = a.toString
         val baseDir = new File(System.getProperty("user.dir") / "svd.user")
         val destFile = new File(SvdConfig.userHomeDir / "%d".format(defaultTestUserID) / SvdConfig.defaultBackupDir / "svd.user." + SvdConfig.defaultBackupFileExtension)
-        SvdArchiver(baseDir, userAccount = Some(SvdAccount(uid = defaultTestUserID))) // ServeD source directory
-        SvdArchiver(baseDir, userAccount = Some(SvdAccount(uid = defaultTestUserID)))
+        SvdArchiver(baseDir, userAccount = defaultUser) // ServeD source directory
+        SvdArchiver(baseDir, userAccount = defaultUser)
         destFile.exists should be(true)
         destFile.isFile should be(true)
         destFile.canRead should be(true)
         (destFile.length > 1000) should be(true)
+
+        // unpack:
+        SvdArchiver(destFile, userAccount = defaultUser)
+        val resultFile = new File(SvdConfig.userHomeDir / "%d".format(defaultTestUserID) / SvdConfig.defaultBackupDir / "svd.user")
+        resultFile.isDirectory should be(true)
+        (resultFile.list.length > 2) should be(true)
+
+        SvdArchiver.compact(baseDir, userAccount = defaultUser)
         SvdUtils.rmdir(destFile)
+        SvdUtils.rmdir(resultFile)
     }
 
 
