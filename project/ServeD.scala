@@ -62,7 +62,7 @@ object Dependencies {
     val messadmin = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
     val jna = "net.java.dev.jna" % "jna" % "3.2.5"
     val jline = "jline" % "jline" % "0.9.9"
-    val scalatest = "org.scalatest" % "scalatest_2.9.2" % "1.6.1"
+    val scalatest = "org.scalatest" %% "scalatest" % "1.8"
     val expect4j = "net.sourceforge.expectj" % "expectj" % "2.0.1"
     val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "1.0.0.201106090707-r"
     val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
@@ -76,7 +76,7 @@ object Dependencies {
     val slf4japi = "org.slf4j" % "slf4j-api" % "1.5.8"
     val commonsio = "commons-io" % "commons-io" % "1.3.2"
     val webbit = "org.webbitserver" % "webbit" % "0.3.8"
-    val scalaz = "org.scalaz" %% "scalaz-core" % "6.0.3"
+    val scalaz = "org.scalaz" % "scalaz-core_2.9.2" % "7.0.0-M3"
 
     val tzip = "de.schlichtherle" % "truezip" % "6.8.4"
     val bouncycastle = "bouncycastle" % "bcprov-jdk14" % "138"
@@ -139,7 +139,7 @@ object ServeD extends Build {
     lazy val utils = Project("utils", file("svd.utils"),
         settings = buildSettings ++ Seq(
             compileOrder        := CompileOrder.Mixed,
-            libraryDependencies ++= Seq(messadmin, jna, slf4japi, tzip, bouncycastle)
+            libraryDependencies ++= Seq(messadmin, jna, slf4japi, tzip, bouncycastle, scalaz)
         )
     ) dependsOn(api, testing % "test")
 
@@ -155,7 +155,7 @@ object ServeD extends Build {
 
     lazy val testing = Project("testkit", file("svd.testing"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(specs, scalatest, akkaTestkit, commonsio)
+            libraryDependencies ++= Seq(specs, scalatest, akkaTestkit, commonsio, scalaz)
         )
     )
 }
