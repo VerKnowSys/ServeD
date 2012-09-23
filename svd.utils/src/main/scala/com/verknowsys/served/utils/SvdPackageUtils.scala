@@ -52,10 +52,12 @@ package object utils {
      * @author teamon
      */
     implicit def repl4str(s: String) = new {
-        def $(args: Any*) = args.foldLeft(s){ case (s, a) => a match {
-            case (key, value) => s.replace("${" + key + "}", value.toString)
-            case value => s.replaceFirst("$", value.toString)
-        } }
+        def %(args: Any*) = args.foldLeft(s) {
+            case (s, a) => a match {
+                case (key, value) => s.replace("%{" + key + "}", value.toString)
+                case value => s.replaceFirst("%", value.toString)
+            }
+        }
     }
 
     /**

@@ -1,7 +1,7 @@
 package com.verknowsys.served.utils
 
 
-import com.verknowsys.served.systemmanager.SvdSystemManagerUtils
+import com.verknowsys.served.utils.SvdSystemManagerUtils
 import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.testing._
 import com.verknowsys.served.utils._

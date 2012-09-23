@@ -6,7 +6,7 @@ import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.api.{SvdAccount, SvdShellOperation}
 import com.verknowsys.served.systemmanager.native.SvdShell
-import com.verknowsys.served.systemmanager.SvdSystemManagerUtils
+import com.verknowsys.served.utils.SvdSystemManagerUtils
 
 import org.apache.commons.io.FileUtils
 

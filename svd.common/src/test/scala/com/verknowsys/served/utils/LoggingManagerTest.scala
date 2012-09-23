@@ -2,7 +2,8 @@ package com.verknowsys.served.utils
 
 import com.verknowsys.served.testing._
 import com.verknowsys.served.api.Logger
-import com.verknowsys.served.systemmanager.managers.LoggingManager
+import com.verknowsys.served.managers.LoggingManager
+
 
 object TestLogger extends LoggingMachine
 
@@ -15,7 +16,7 @@ class LoggingManagerTest extends DefaultTest {
         (ref !! Logger.ListEntries) should be (Some(Logger.Entries(Map())))
         ref.stop
     }
-    
+
     it should "add entry" in {
         ref !! Logger.AddEntry("com.verknowsys.served", Logger.Levels.Trace)
         val res1 = ref !! Logger.ListEntries
@@ -38,7 +39,7 @@ class LoggingManagerTest extends DefaultTest {
 
         ref.stop
     }
-    
+
     it should "remove entry" in {
         ref !! Logger.AddEntry("com.verknowsys.served.a", Logger.Levels.Trace)
         ref !! Logger.AddEntry("com.verknowsys.served.b", Logger.Levels.Info)
