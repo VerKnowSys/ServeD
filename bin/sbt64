@@ -4,7 +4,6 @@ exec java \
 -d64 \
 -Djna.library.path=$(pwd)/lib \
 -XX:+UseCompressedOops \
--XX:+UseCompressedStrings \
 -XX:+AggressiveOpts \
 -Dcom.sun.management.jmxremote=true \
 -Dcom.sun.management.jmxremote.ssl=false \
