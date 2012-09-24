@@ -1,6 +1,6 @@
 /*
     Author: Daniel (dmilith) Dettlaff
-    © 2011 - VerKnowSys
+    © 2011-2012 - VerKnowSys
 */
 
 
@@ -85,7 +85,7 @@ int main(int argc, char const *argv[]) {
     ifs.close();
 
     chdir(homeDir.c_str());
-    
+
     if (uid == 0)
         params.javaPath = DEFAULT_JAVA64_BIN;
     else

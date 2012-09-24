@@ -1,6 +1,6 @@
 /*
     Author: Daniel (dmilith) Dettlaff
-    © 2012 - VerKnowSys
+    © 2011-2012 - VerKnowSys
 */
 
 #include "core.h"
