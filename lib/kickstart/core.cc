@@ -54,6 +54,7 @@ const static string coreDir = currentDir();
                 (char*)"-jar",
                 (char*)params.jar.c_str(),
             #else
+                (char*)"-javaagent:/lib/jrebel/jrebel.jar", // XXX: hardcoded
                 /* when devel, use classes from compile folders */
                 (char*)"-cp",
                 (char*)getClassPath(params.classPathFile).c_str(),
@@ -94,6 +95,7 @@ const static string coreDir = currentDir();
                 (char*)"-jar",
                 (char*)params.jar.c_str(),
             #else
+                (char*)"-javaagent:/lib/jrebel/jrebel.jar", // XXX
                 /* when devel, use classes from compile folders */
                 (char*)"-cp",
                 (char*)getClassPath(params.classPathFile).c_str(),
