@@ -79,7 +79,7 @@ object Dependencies {
     val scalaz = "org.scalaz" % "scalaz-core_2.9.2" % "7.0.0-M3"
 
     val tzip = "de.schlichtherle" % "truezip" % "6.8.4"
-    val bouncycastle = "bouncycastle" % "bcprov-jdk14" % "138"
+    val bouncycastle = "bouncycastle" % "bcprov-jdk15" % "140"
 
 
     // val servlet = "javax.servlet" % "servlet-api" % "2.5"
@@ -117,7 +117,7 @@ object ServeD extends Build {
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis, expect4j, scalaz)
+            libraryDependencies ++= Seq(neodatis, expect4j, scalaz, bouncycastle)
         )
     ) dependsOn(utils, testing % "test")
 
@@ -155,7 +155,7 @@ object ServeD extends Build {
 
     lazy val testing = Project("testkit", file("svd.testing"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(specs, scalatest, akkaTestkit, commonsio, scalaz)
+            libraryDependencies ++= Seq(specs, scalatest, akkaTestkit, commonsio, scalaz, bouncycastle)
         )
     )
 }

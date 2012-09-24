@@ -34,9 +34,11 @@
     0.6 - pIRCbot library (for IRC Notifications)
         >= 1.4.2
 
-    0.7 - List of currently supported platforms:
+    0.7 - Any of currently supported platforms:
         Mac OSX (100% features, development),
-        Free BSD (100% features, production),
+        Free BSD (100% features, production)
+
+    0.8 - JRebel (http://zeroturnaround.com/software/jrebel/) for Scala is required for development mode. It's not required in production.
 
 
 

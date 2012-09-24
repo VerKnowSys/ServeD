@@ -7,14 +7,12 @@
 
 
 	Notes, golden throughts, annotations, helpful sources:
-	
+
 
 	== Must read ==
-	http://www.scala-lang.org/docu/files/actors-api/actors_api_guide.html#
-	http://www.scala-lang.org/docu/files/collections-api/collections.html
-	
 
-/** 
+
+/**
 *   This is closed code project. You may not redistribute it without permission of author.
 *   Copyright © 2010-2012 verknowsys.com. ® All rights reserved
 */
