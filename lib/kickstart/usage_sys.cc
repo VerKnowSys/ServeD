@@ -6,6 +6,28 @@
 #include "core.h"
 
 
+std::string escapeJsonString(const std::string& input) {
+    std::ostringstream ss;
+    // C++11:
+    // for (auto iter = input.cbegin(); iter != input.cend(); iter++) {
+    // C++98/03:
+    for (std::string::const_iterator iter = input.begin(); iter != input.end(); iter++) {
+        switch (*iter) {
+            case '\\': ss << "\\\\"; break;
+            case '"': ss << "\\\""; break;
+            case '/': ss << "\\/"; break;
+            case '\b': ss << "\\b"; break;
+            case '\f': ss << "\\f"; break;
+            case '\n': ss << "\\n"; break;
+            case '\r': ss << "\\r"; break;
+            case '\t': ss << "\\t"; break;
+            default: ss << *iter; break;
+        }
+    }
+    return ss.str();
+}
+
+
 extern "C" {
 
 
@@ -188,19 +210,27 @@ extern "C" {
                     << "| " << netinfo
                     << endl;
             } else {
-                out << (procs->ki_pid)
-                    << "|" << (procs->ki_ppid)
-                    << "|" << (procs->ki_comm)
-                    << "|" << (command)
-                    << "|" << (procs->ki_rssize * pagesize)
-                    << "|" << (procs->ki_rusage.ru_maxrss * pagesize)
-                    << "|" << (procs->ki_runtime / 1000)
-                    << "|" << (procs->ki_rusage.ru_inblock)
-                    << "|" << (procs->ki_rusage.ru_oublock)
-                    << "|" << (procs->ki_numthreads)
-                    << "|" << ord(procs->ki_pri.pri_level)
-                    << "|" << netinfo
-                    << endl;
+                if (i == 0) {
+                    out << "[";
+                }
+                out << "{\"pid\":" << (procs->ki_pid) << ","
+                    << "\"ppid\":" << (procs->ki_ppid) << ","
+                    << "\"name\":\"" << escapeJsonString(procs->ki_comm) << "\","
+                    << "\"cmd\":\"" << escapeJsonString(command) << "\","
+                    << "\"rss\":" << (procs->ki_rssize * pagesize) << ","
+                    << "\"mrss\":" << (procs->ki_rusage.ru_maxrss * pagesize) << ","
+                    << "\"runtime\":" << (procs->ki_runtime / 1000) << ","
+                    << "\"blk-in\":" << (procs->ki_rusage.ru_inblock) << ","
+                    << "\"blk-out\":" << (procs->ki_rusage.ru_oublock) << ","
+                    << "\"thr\":" << (procs->ki_numthreads) << ","
+                    << "\"pri-nrml\":" << ord(procs->ki_pri.pri_level) << ","
+                    << "\"netinfo\":\"" << escapeJsonString(netinfo) << "\"}";
+
+                if (i == count - 1) {
+                    out << "]";
+                } else {
+                    out << ",";
+                }
             }
 
             args = NULL;
