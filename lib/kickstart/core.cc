@@ -35,9 +35,8 @@ const static string coreDir = currentDir();
 
     void load_svd64(execParams params) {
         string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
-        int count = 13;
         #ifdef DEVEL
-            count = 14;
+            int count = 15;
         #endif
         char *args[] = {
             (char*)"java",
@@ -77,9 +76,8 @@ const static string coreDir = currentDir();
 
     void load_svd(execParams params) {
         // string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
-        int count = 11;
         #ifdef DEVEL
-            count = 12;
+            int count = 13;
         #endif
         char *args[] = {
             (char*)"java",
