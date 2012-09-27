@@ -1,7 +1,7 @@
 package com.verknowsys.served.managers
 
 import com.verknowsys.served.services._
-import com.verknowsys.served.LocalAccountsManager
+// import com.verknowsys.served.LocalAccountsManager
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.api.accountkeys._
 import com.verknowsys.served.api.git._
@@ -10,8 +10,14 @@ import com.verknowsys.served.db.{DBServer, DBClient, DB}
 import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
 
-import akka.actor.Actor.{remote, actorOf, registry}
-import akka.actor.{Actor, ActorRef}
+import akka.actor._
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.util.duration._
+import akka.actor._
 
 
 case class AccountKeys(keys: Set[AccessKey] = Set.empty, uuid: UUID = randomUUID) extends Persistent
@@ -26,49 +32,51 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
     class DBServerInitializationException extends Exception
 
+
     log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
 
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val sh = new SvdShell(account)
+    val accountsManager = context.actorFor("/core/managers/SvdAccountsManager")
 
     // Only for closing in postStop
     private var _dbServer: Option[DBServer] = None // XXX: Refactor
     private var _dbClient: Option[DBClient] = None // XXX: Refactor
 
-    lazy val _passenger = new SvdService(
-        SvdUserServices.rackWebAppConfig(
-            account,
-            domain = SvdUserDomain("delda") // NOTE: it's also tells about app root dir set to /Users/501/WebApps/delda
-        ),
-        account
-    )
+    // lazy val _passenger = new SvdService(
+    //     SvdUserServices.rackWebAppConfig(
+    //         account,
+    //         domain = SvdUserDomain("delda") // NOTE: it's also tells about app root dir set to /Users/501/WebApps/delda
+    //     ),
+    //     account
+    // )
 
-    lazy val _postgres = new SvdService(
-        SvdUserServices.postgresDatabaseConfig(
-            account
-        ),
-        account
-    )
+    // lazy val _postgres = new SvdService(
+    //     SvdUserServices.postgresDatabaseConfig(
+    //         account
+    //     ),
+    //     account
+    // )
 
-    val _apps =
-        try {
-            actorOf(_passenger)
-        } catch {
-            case e: Throwable =>
-                log.error("EXCPT in %s".format(e))
-                // 2011-09-09 21:12:09 - dmilith - TODO: FIXME: PENDING: make notifications about eceptions to user
-                Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
-        }
+    // val _apps =
+    //     try {
+    //         // actorFor("/user/app/passenger")
+    //     } catch {
+    //         case e: Throwable =>
+    //             log.error("EXCPT in %s".format(e))
+    //             // 2011-09-09 21:12:09 - dmilith - TODO: FIXME: PENDING: make notifications about eceptions to user
+    //             // Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
+    //     }
 
-    val _dbs =
-        try {
-            actorOf(_postgres)
-        } catch {
-            case e: Throwable =>
-                log.error("EXCPT in %s".format(e))
-                // 2011-09-09 21:12:09 - dmilith - TODO: FIXME: PENDING: make notifications about eceptions to user
-                Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
-        }
+    // val _dbs =
+    //     try {
+    //         // actorOf(_postgres)
+    //     } catch {
+    //         case e: Throwable =>
+    //             log.error("EXCPT in %s".format(e))
+    //             // 2011-09-09 21:12:09 - dmilith - TODO: FIXME: PENDING: make notifications about eceptions to user
+    //             // Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
+    //     }
 
 
 
@@ -79,15 +87,16 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
         case Init =>
             log.info("SvdAccountManager received Init.")
 
-            log.info("Spawning user databases: %s".format(_dbs))
-            _dbs.start
-            _dbs !! Run /* temporary call due to lack of web interface */
-            self startLink _dbs
+            // log.info("Spawning user databases: %s".format(_dbs))
+            // _dbs.start
+            // _dbs !! Run /* temporary call due to lack of web interface */
+            // self startLink _dbs
 
             // Connect to database
             // Get port from pool
             log.debug("Getting database port from AccountsManager")
-            (LocalAccountsManager !! GetPort) match {
+
+            (accountsManager ? GetPort) map {
                 case Some(dbPort: Int) =>
                     log.debug("Got database port %d", dbPort)
                     // Start database server
@@ -95,31 +104,31 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
                     val db = server.openClient
 
                     log.info(SvdUserServices.newPhpWebAppEntry("Php", SvdUserDomain("deldaphp", false), account))
-                    
-                    _dbServer = Some(server)
-                    _dbClient = Some(db)
 
-                    log.info("Spawning user app: %s".format(_apps))
-                    _apps.start
-                    _apps !! Run /* temporary call due to lack of web interface */
+                    // _dbServer = Some(server)
+                    // _dbClient = Some(db)
+
+                    // log.info("Spawning user app: %s".format(_apps))
+                    // _apps.start
+                    // _apps !! Run /* temporary call due to lack of web interface */
                     // _apps !! Reload /* temporary call due to lack of web interface */
-                    self startLink _apps
+                    // self startLink _apps
 
 
 
                     // Start GitManager for this account
-                    val gitManager = Actor.actorOf(new SvdGitManager(account, db, homeDir / "git"))
-                    self startLink gitManager
+                    val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
+                    // self startLink gitManager
 
-                    self reply Success
+                    sender ! Success
 
                     // Start the real work
                     log.trace("Becaming started")
-                    LocalAccountsManager ! Alive(account.uid)
-                    become(started(db, gitManager))
+                    accountsManager ! Alive(account.uid)
+                    context.become(started(db, gitManager))
 
                 case _ =>
-                    self reply Error
+                    sender ! Error("DB initialization error")
                     throw new DBServerInitializationException
             }
 
@@ -131,14 +140,14 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
         //     log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
 
         case GetAccount =>
-            self reply account
+            sender ! account
 
         case AuthorizeWithKey(key) =>
             log.trace("Trying to find key in account: %s", account)
-            self reply accountKeys(db).keys.find(_.key == key).isDefined
+            sender ! accountKeys(db).keys.find(_.key == key).isDefined
 
         case ListKeys =>
-            self reply accountKeys(db).keys
+            sender ! accountKeys(db).keys
 
         case AddKey(key) =>
             val ak = accountKeys(db)
@@ -161,8 +170,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
     override def postStop {
         log.debug("Executing postStop for user svd UID: %s".format(account.uid))
-        _apps.stop
-        _dbs.stop
+        // _apps.stop
+        // _dbs.stop
         sh.close
         _dbClient.foreach(_.close)
         _dbServer.foreach(_.close)

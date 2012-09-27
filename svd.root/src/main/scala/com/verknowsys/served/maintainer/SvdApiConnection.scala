@@ -1,8 +1,7 @@
 package com.verknowsys.served.maintainer
 
 import akka.actor.Actor
-import akka.routing.Dispatcher
-import akka.serialization.RemoteActorSerialization.toRemoteActorRefProtocol
+// import akka.serialization.RemoteActorSerialization.toRemoteActorRefProtocol
 
 import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.utils.SvdExceptionHandler
@@ -14,7 +13,9 @@ class SvdApiConnection extends Actor with SvdExceptionHandler {
 
     def receive = {
         case General.CreateSession =>
-            log.trace("Create new session for remote client")
-            self.reply(toRemoteActorRefProtocol(self.spawnLink[SvdApiSession]))
+            log.debug("Create new session for remote client")
+            // XXX: CHECKME
+            // sender ! SvdApiSession
+            // sender linkWith SvdApiSession
     }
 }

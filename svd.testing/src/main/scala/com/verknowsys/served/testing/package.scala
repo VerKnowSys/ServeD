@@ -47,7 +47,7 @@ package object testing {
 
     trait DefaultTest extends FlatSpec
                          with ShouldMatchers
-                         with TestKit
+                         // with TestKit
                          with TestLogger
                          with OneInstancePerTest
                          with BeforeAndAfterEach

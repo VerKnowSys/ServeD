@@ -1,11 +1,18 @@
 package com.verknowsys.served.utils
 
 
+import com.verknowsys.served._
 import com.verknowsys.served.api._
 
 import scala.collection.mutable.{HashMap => MutableMap, ListBuffer}
-import akka.actor.{Actor, ActorRef}
-import akka.actor.Actor.actorOf
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.util.duration._
+import akka.actor._
+
 import com.sun.jna.NativeLong
 import com.sun.jna.{Native, Library}
 import events._
@@ -58,17 +65,20 @@ trait SvdFileEventsReactor extends SvdExceptionHandler {
     self: Actor with Logging =>
 
     def registerFileEventFor(path: String, flags: Int){
-        Actor.registry.actorFor[SvdFileEventsManager] match {
-            case Some(fem) => fem ! SvdRegisterFileEvent(path, flags, this.self)
-            case None => log.warn("Could not register file event. FileEventsManager worker not found.")
-        }
+        val fem = context.actorOf(Props[SvdFileEventsManager]) // , name = "SvdFileEventsManager"
+        fem ! SvdRegisterFileEvent(path, flags, this.self)
+        // val res = Await.result(future, timeout.duration).asInstanceOf[ActorRef]
+        // XXX: CHECKME
+        // res match {
+        //     case Some(fem) => fem ! SvdRegisterFileEvent(path, flags, this.self)
+        //     case None => log.warn("Could not register file event. FileEventsManager worker not found.")
+        // }
     }
 
     def unregisterFileEvents {
-        Actor.registry.actorFor[SvdFileEventsManager] match {
-            case Some(fem) => fem ! SvdUnregisterFileEvent(this.self)
-            case None => log.warn("Could not unregister file event. FileEventsManager worker not found.")
-        }
+        val fem = context.actorOf(Props[SvdFileEventsManager])
+        fem ! SvdUnregisterFileEvent(this.self)
+        // XXX: CHECKME
         super.postStop // 2011-01-30 01:06:54 - dmilith - NOTE: execute SvdExceptionHandler's code
     }
 
@@ -148,7 +158,8 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
 
             log.trace("Registered new file event: %s / %s for %s", path, flags, ref)
             log.trace("Registered file events: %s", idents)
-            self reply Success
+            sender ! Success
+            // self reply Success
 
         case SvdUnregisterFileEvent(ref) =>
             idents.foreach { case ((ident, (path, list))) =>

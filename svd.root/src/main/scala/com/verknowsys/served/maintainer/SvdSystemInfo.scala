@@ -1,12 +1,14 @@
 package com.verknowsys.served.maintainer
 
 
+import com.verknowsys.served._
 import com.verknowsys.served.api.Admin._
+import com.verknowsys.served.api._
 import com.verknowsys.served.utils.Logging
 import scala.collection.JavaConversions._
 import com.verknowsys.served.utils._
 
-import akka.actor.{Actor, ActorRef, SupervisorActor}
+import akka.actor._
 
 
 /**
@@ -15,18 +17,21 @@ import akka.actor.{Actor, ActorRef, SupervisorActor}
  *  @author teamon
  */
 class SvdSystemInfo extends SvdExceptionHandler {
+
     log.info("Starting SvdSystemInfo")
-    
+
     def receive = {
         case ListTreeActors =>
-            self reply ActorsList(Actor.registry.actorsFor[SupervisorActor].map(ref2info))
+            sender ! Error("not yet implemented")
+            // sender ! ActorsList(system.actorOf(Props[SupervisorActor])) //.map(ref2info))
+            // XXX: CHECKME
     }
-    
-    protected def ref2info(ref: ActorRef): ActorInfo = 
+
+    protected def ref2info(ref: ActorRef): ActorInfo =
         ActorInfo(
-            uuid            = ref.uuid.toString,
-            className       = ref.actorClassName,
-            status          = ref.isRunning.toString,
-            linkedActors    = ref.linkedActors.values.toList.map(ref2info)
+            uuid            = ref.path.toString,
+            className       = ref.getClass.getName,
+            status          = ref.toString,
+            linkedActors    = Nil //ref.linkedActors.values.toList.map(ref2info)
         )
 }

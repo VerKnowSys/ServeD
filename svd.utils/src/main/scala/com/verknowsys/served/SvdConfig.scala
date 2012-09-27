@@ -27,7 +27,8 @@ object SvdConfig {
     def rootPidFile                     = "0.pid"
     def coreSvdDatabaseName             = "svd.db"
     def coreSvdAccountsDatabaseName     = "accounts.db"
-    def served                          = "ServeD v" + version
+    def served                          = "ServeD"
+    def servedFull                      = "%s v%s".format(served, version)
     def systemConfDir                   = "/etc"
     def temporaryDir                    = "/tmp"
     def systemHomeDir                   = "/SystemUsers/"

@@ -22,8 +22,8 @@ trait SvdExceptionHandler extends Actor with Logging {
      *
      *
      */
-    override def preRestart(reason: Throwable) = {
-        super.preRestart(reason)
+    def preRestart(reason: Throwable) = {
+        super.preRestart(reason, None) // XXX: CHECKME
         log.trace("preRestart executed in %s".format(this.getClass))
         log.error(
             """

@@ -1,21 +1,32 @@
 package com.verknowsys.served
 
 
+import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.managers.LoggingManager
 import com.verknowsys.served.managers.SvdAccountManager
 import com.verknowsys.served.api._
 
+import com.typesafe.config.ConfigFactory
 import akka.actor._
-import akka.actor.Actor.{remote, actorOf, registry}
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.util.duration._
+import akka.actor._
 
 
-
-object LocalAccountsManager extends GlobalActorRef(
-    remote.actorFor("service:accounts-manager", SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
-)
+// object LocalAccountsManager //extends GlobalActorRef(
+//     remote.actorFor("service:accounts-manager", SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
+// )
 
 object userboot extends Logging {
+
+    val system = ActorSystem(SvdConfig.served, ConfigFactory.load.getConfig("ServeDremote")) // XXX: TODO: FIXME: this will require dynamically added user system (port)
+    val accountsManager = system.actorFor("akka://%s/user/SvdAccountsManager".format(SvdConfig.served)) // XXX: hardcode
+
     def run(userUID: Int){
         log.info("ServeD v" + SvdConfig.version)
         log.info(SvdConfig.copyright)
@@ -32,33 +43,37 @@ object userboot extends Logging {
 
         log.debug("Getting account for uid %d", userUID)
 
-        val accountOpt = (LocalAccountsManager !! GetAccount(userUID)) collect { case Some(account: SvdAccount) => account }
-        val portOpt = (LocalAccountsManager !! GetPort) collect { case i: Int => i }
+        val accountOpt = (accountsManager ? GetAccount(userUID)) map {
+            case Some(account: SvdAccount) => account
+        }
+        val portOpt = (accountsManager ? GetPort) map {
+            case i: Int => i
+        }
 
-        (for {
+        for {
             account <- accountOpt
             port <- portOpt
         } yield {
             log.debug("Got account, starting AccountManager for %s at port %d", account, port)
-            val am = actorOf(new SvdAccountManager(account)).start
-
-            val loggingManager = actorOf(new LoggingManager(GlobalLogger)).start
-            am !! Init
-            remote.start(SvdConfig.defaultHost, port) // XXX: hack: both defaultHost and port
-            remote.register("service:account-manager", am)
-            remote.register("service:logging-manager", loggingManager)
+            val am = system.actorOf(Props(new SvdAccountManager(account)))
+            // SvdAccountsManager ask SetAccountManager(account.uid, am)
+            val loggingManager = system.actorOf(Props(new LoggingManager(GlobalLogger)))
+            am ! Init
+            // remote.start(SvdConfig.defaultHost, port) // XXX: hack: both defaultHost and port
+            // remote.register("service:account-manager", am)
+            // remote.register("service:logging-manager", loggingManager)
 
             SvdUtils.addShutdownHook {
                 log.info("Shutdown of user svd requested")
-                am.stop
+                // am.shutdown
             }
 
             log.info("Spawned UserBoot for UID: %d", userUID)
-
-        }) getOrElse {
-            log.error("Account for uid %d does not exist", userUID)
-            sys.exit(1)
         }
+        // }) getOrElse {
+        //     log.error("Account for uid %d does not exist", userUID)
+        //     sys.exit(1)
+        // }
     }
 
 

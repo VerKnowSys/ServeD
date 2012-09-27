@@ -54,11 +54,12 @@ object Resolvers {
 }
 
 object Dependencies {
-    val akkaVersion = "1.3.1"
+    val akkaVersion = "2.0.3"
 
-    val akkaActor = "se.scalablesolutions.akka" % "akka-actor" % akkaVersion
-    val akkaRemote = "se.scalablesolutions.akka" % "akka-remote" % akkaVersion
-    val akkaTestkit = "se.scalablesolutions.akka" % "akka-testkit" % akkaVersion
+    val akkaActor = "com.typesafe.akka" % "akka-actor" % akkaVersion
+    val akkaRemote = "com.typesafe.akka" % "akka-remote" % akkaVersion
+    val akkaTestkit = "com.typesafe.akka" % "akka-testkit" % akkaVersion
+
     val messadmin = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
     val jna = "net.java.dev.jna" % "jna" % "3.2.5"
     val jline = "jline" % "jline" % "0.9.9"
@@ -133,7 +134,7 @@ object ServeD extends Build {
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(jline)
         )
-    ) dependsOn(api)
+    ) dependsOn(api, utils)
 
 
     lazy val utils = Project("utils", file("svd.utils"),

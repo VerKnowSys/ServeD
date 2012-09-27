@@ -10,13 +10,34 @@ import com.verknowsys.served.systemmanager.SvdSystemManager
 // import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.sshd.SSHD
 import com.verknowsys.served.api._
+import com.typesafe.config.ConfigFactory
 
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.util.duration._
 import akka.actor._
-import akka.config.Supervision._
-import akka.actor.Actor.{remote, actorOf, registry}
 
 
 object rootboot extends Logging {
+
+    // override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 100, withinTimeRange = 1 minute)
+    // {
+    //         case _: ArithmeticException      =>
+    //             log.error("ArithmeticException")
+    //         case _: NullPointerException     =>
+    //             log.error("NullPointerException")
+    //         case _: IllegalArgumentException =>
+    //             log.error("IllegalArgumentException")
+    //         case _: Exception                =>
+    //             log.error("Exception")
+    // }
+
+    val system = ActorSystem(SvdConfig.served, ConfigFactory.load.getConfig(SvdConfig.served))
+
+
     def run {
         println()
         println()
@@ -26,43 +47,45 @@ object rootboot extends Logging {
         println()
         println()
 
-        val sshd = actorOf(new SSHD(SvdConfig.sshPort))
+        val sshd = system.actorOf(Props(new SSHD(SvdConfig.sshPort)), "SvdSSHD") //, new SSHD(SvdConfig.sshPort))
+        val ssm = system.actorOf(Props[SvdSystemManager], "SvdSystemManager")
+        val sam = system.actorOf(Props[SvdAccountsManager], "SvdAccountsManager") //"akka://%s@deldagorin:5555/user/SvdAccountsManager".format(SvdConfig.served))
 
         val list = (
-            actorOf[SvdFileEventsManager] ::
-            LoggingManager() ::
-            SvdSystemManager() ::
-            SvdAccountsManager() ::
-            actorOf[SvdSystemInfo] ::
+            system.actorOf(Props[SvdFileEventsManager], "SvdFileEventsManager") ::
+            // system.actorOf(Props(new LoggingManager())) ::
+            ssm ::
+            sam ::
+            system.actorOf(Props[SvdSystemInfo], "SvdSystemInfo") ::
             // actorOf[SvdNotificationCenter] ::
             sshd ::
-            Nil).map(Supervise(_, Permanent))
+            Nil) //.map(Supervise(_, Permanent))
 
         // supervise and autostart
-        val supervisor = Supervisor(
-            SupervisorConfig(
-                OneForOneStrategy(List(classOf[Exception], classOf[RuntimeException], classOf[NullPointerException]), 50, 1000),
-                list
-            )
-        )
+        // val supervisor = Supervisor(
+        //     SupervisorConfig(
+        //         OneForOneStrategy(List(classOf[Exception], classOf[RuntimeException], classOf[NullPointerException]), 50, 1000),
+        //         list
+        //     )
+        // )
 
         SvdUtils.addShutdownHook {
             log.info("Shutdown requested")
-            supervisor.shutdown
+            system.shutdown
         }
 
-        SvdSystemManager ! Init
-        SvdAccountsManager ! Init
+        ssm ! Init
+        sam ! Init
 
 
         // Remote services
-        remote.start(SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
-        remote.registerPerSession("service:api", actorOf[SvdApiConnection])
-        remote.register("service:accounts-manager", SvdAccountsManager())
+        // remote.start(SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
+        // remote.registerPerSession("service:api", actorOf[SvdApiConnection])
+        // remote.register("service:accounts-manager", SvdAccountsManager())
     }
 
     def main(args: Array[String]) {
-        log.info("ServeD v" + SvdConfig.version)
+        log.info(SvdConfig.servedFull)
         log.info(SvdConfig.copyright)
 
         // handle signals

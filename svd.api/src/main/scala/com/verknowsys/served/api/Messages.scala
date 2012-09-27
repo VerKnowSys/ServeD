@@ -1,5 +1,9 @@
 package com.verknowsys.served.api
 
+
+import akka.actor.ActorRef
+
+
 /*sealed*/ abstract class ApiMessage
 /*sealed*/ abstract class ApiResponse extends ApiMessage
 
@@ -46,5 +50,6 @@ object Admin {
 
 // XXX: Temporary place for those messages
 case class GetAccountManager(userUid: Int)
+case class SetAccountManager(userUid: Int)
 case object GetPort
 case class Alive(userUid: Int)

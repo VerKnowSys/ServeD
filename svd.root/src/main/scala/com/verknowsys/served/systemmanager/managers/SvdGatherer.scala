@@ -11,9 +11,7 @@ import com.verknowsys.served.db._
 import com.verknowsys.served.utils.Logging
 
 import org.apache.commons.io.FileUtils
-import akka.actor.Actor
-import akka.actor.Actor.actorOf
-import akka.actor.Actor.registry
+import akka.actor._
 
 
 /**
@@ -86,7 +84,7 @@ class SvdGatherer(account: SvdAccount) extends SvdManager {
     def receive = {
         case x =>
             log.warn("SvdGatherer received unhandled signal: %s".format(x))
-            self reply Nil
+            sender ! Error("SvdGatherer unknown signal")
 
     }
 

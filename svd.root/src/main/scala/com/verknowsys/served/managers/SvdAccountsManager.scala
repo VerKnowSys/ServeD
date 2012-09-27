@@ -1,6 +1,7 @@
 package com.verknowsys.served.managers
 
 
+import com.verknowsys.served._
 import com.verknowsys.served.db._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils._
@@ -11,8 +12,7 @@ import com.verknowsys.served.api._
 import com.verknowsys.served.api.pools._
 import com.verknowsys.served.services._
 
-import akka.actor.{Actor, ActorRef}
-import akka.actor.Actor.{remote, actorOf, registry}
+import akka.actor._
 import scala.io.Source
 import java.io.File
 import scala.util._
@@ -145,7 +145,7 @@ class SvdAccountUtils(db: DBClient) {
 
 }
 
-object SvdAccountsManager extends GlobalActorRef(actorOf[SvdAccountsManager])
+// object SvdAccountsManager // extends GlobalActorRef(actorOf[SvdAccountsManager])
 
 class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
@@ -160,8 +160,8 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
     log.info("SvdAccountsManager (v%s) is loading".format(SvdConfig.version))
 
-    log.info("Registering Coreginx")
-    val coreginx = actorOf(new SvdService(SvdRootServices.coreginxConfig(), rootAccount))
+    // log.info("Registering Coreginx")
+    // val coreginx = actorOf(new SvdService(SvdRootServices.coreginxConfig(), rootAccount))
 
     log.debug("User accounts registered in Account database: %s".format(SvdAccounts(db).mkString(", ")))
     log.debug("User ports registered in Account database: %s".format(SvdUserPorts(db).mkString(", ")))
@@ -169,15 +169,15 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     log.debug("User uids registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
 
 
-    private val accountManagers = scala.collection.mutable.Map[Int, ActorRef]() // UID => AccountManager ref
+    // private val accountManagers = scala.collection.mutable.Map[Int, ActorRef]() // UID => AccountManager ref
 
     // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
 
     override def postStop {
         super.postStop
 
-        log.debug("Stopping Coreginx")
-        coreginx.stop
+        // log.debug("Stopping Coreginx")
+        // coreginx.stop
 
         log.info("Stopping spawned user workers")
         SvdAccounts(db).foreach{
@@ -214,9 +214,6 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
         case Init =>
             log.debug("SvdAccountsManager received Init. Running default task..")
 
-            log.info("Spawning Coreginx")
-            coreginx.start
-            coreginx ! Run
 
             // registerFileEventFor(SvdConfig.systemHomeDir, Modified)
 
@@ -224,26 +221,42 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
             if (!userUIDRegistered(501))
                 registerUserAccount(501)
 
+            // log.info("Spawning Coreginx")
+            // coreginx.start
+            // coreginx ! Run
+
             respawnUsersActors
-            self reply_? Success
+            sender ! Success
 
         case GetAccount(uid) =>
             val account = SvdAccounts(db)(_.uid == uid).headOption
-            log.trace("GetAccount(%d): %s", uid, account)
-            self reply account
+            log.debug("GetAccount(%d): %s", uid, account)
+            sender ! account
+
+        case GetAccountByName(name) =>
+            val account = SvdAccounts(db)(_.userName == name).headOption
+            log.debug("GetAccountByName(%s): %s", name, account)
+            sender ! account
+
+        case SetAccountManager(uid) =>
+            // SvdGlobalRegistry.ActorManagers.values += (uid -> self)
+            log.info("User worker spawned successfully and mounted in SvdGlobalRegistry. Current store: %s", SvdGlobalRegistry.ActorManagers.values)
+            sender ! Success
 
         case GetAccountManager(uid) =>
             log.trace("GetAccountManager(%d)", uid)
-            self reply (accountManagers get uid getOrElse AccountNotFound)
+            sender ! (SvdGlobalRegistry.ActorManagers.values get uid getOrElse AccountNotFound)
 
         case Alive(uid) =>
-            self.sender foreach (accountManagers(uid) = _)
+            sender ! Error("Not yet implemented")
+            // sender foreach (SvdGlobalRegistry.ActorManagers.values(uid) = _)
 
         case GetPort =>
-            self reply randomUserPort
+            sender ! randomUserPort
 
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
+            sender ! Error("Unknown signal %s".format(x))
 
     }
 

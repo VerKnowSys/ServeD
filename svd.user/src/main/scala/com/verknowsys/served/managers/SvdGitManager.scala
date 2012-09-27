@@ -7,8 +7,8 @@ import com.verknowsys.served.git._
 import com.verknowsys.served.db.DBClient
 
 import akka.actor._
-import akka.config.Supervision._
-import akka.actor.Actor.{remote, actorOf, registry}
+// import akka.config.Supervision._
+// import akka.actor.Actor.{remote, actorOf, registry}
 
 
 /**
@@ -28,25 +28,25 @@ class SvdGitManager(
     def receive = traceReceive {
         case ListRepositories =>
             log.trace("Listing git repositories in %s", gitRepositoriesLocation)
-            self reply Repositories(RepositoryDB(db).toList)
+            sender ! Repositories(RepositoryDB(db).toList)
 
         case GetRepositoryByName(name) =>
-            self reply RepositoryDB(db)(_.name == name).headOption
+            sender ! RepositoryDB(db)(_.name == name).headOption
 
         case GetRepositoryByUUID(uuid) =>
-            self reply RepositoryDB(db)(uuid)
+            sender ! RepositoryDB(db)(uuid)
 
         case CreateRepository(name) =>
             RepositoryDB(db)(_.name == name).headOption match {
                 case Some(repo) =>
-                    self reply RepositoryExistsError
+                    sender ! RepositoryExistsError
 
                 case None =>
                     log.trace("Creating new git repository: %s for account: %s".format(name, account.userName))
                     val repo = Repository(name)
                     Git.init(gitRepositoriesLocation / repo.name, bare = true)
                     db << repo
-                    self reply repo
+                    sender ! repo
             }
 
         case RemoveRepository(uuid) =>
@@ -67,7 +67,7 @@ class SvdGitManager(
             }
     }
 
-    def withRepo(uuid: UUID)(f: (Repository) => Unit) = self reply (RepositoryDB(db)(uuid) match {
+    def withRepo(uuid: UUID)(f: (Repository) => Unit) = sender ! (RepositoryDB(db)(uuid) match {
         case Some(repo) =>
             f(repo)
             Success

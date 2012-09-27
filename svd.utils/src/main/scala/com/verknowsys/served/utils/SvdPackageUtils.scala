@@ -72,6 +72,6 @@ package object utils {
         case _ => None
     }
 
-    implicit def GlobalActorRef2ActorRef(global: GlobalActorRef) = global.actor
+    // implicit def GlobalActorRef2ActorRef(global: GlobalActorRef) = global.actor
 
 }

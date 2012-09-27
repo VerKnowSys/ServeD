@@ -27,7 +27,7 @@ case class SvdAccount (
 case object AccountNotFound
 
 case class GetAccount(uid: Int)
-
+case class GetAccountByName(name: String)
 
 /**
  *  @author dmilith

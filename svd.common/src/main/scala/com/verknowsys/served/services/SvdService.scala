@@ -135,7 +135,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                     log.trace("reloadHook: %s".format(hook))
                     shell.exec(hook)
             }
-            self reply Success
+            sender ! Success
 
         /**
          *  @author dmilith
@@ -154,7 +154,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                     log.trace("afterStartHook: %s".format(hook))
                     shell.exec(hook)
             }
-            self reply Success
+            sender ! Success
 
         /**
          *  @author dmilith
@@ -173,7 +173,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                     shell.exec(hook)
             }
             // shell.close
-            self reply Success
+            sender ! Success
 
     }
 

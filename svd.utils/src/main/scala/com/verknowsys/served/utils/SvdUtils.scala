@@ -339,8 +339,9 @@ object SvdUtils extends Logging {
                 val file = iterator.next
                 file match {
                     case f: File =>
-                        if (filter.accept(root, file.toString))
-                            return file.getAbsolutePath
+                        if (filter.accept(root, f.toString))
+                            return f.getAbsolutePath
+
                 }
             }
 
