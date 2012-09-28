@@ -22,7 +22,7 @@ import org.webbitserver._
 import org.webbitserver.handler._
 
 
-object SvdSystemManager //extends GlobalActorRef(actorOf[SvdSystemManager])
+// object SvdSystemManager //extends GlobalActorRef(actorOf[SvdSystemManager])
 
 
 /**
@@ -79,12 +79,12 @@ class SvdSystemManager extends SvdExceptionHandler {
 
         case Chown(what, userId, recursive) =>
             log.debug("Chown called on location: '%s' with uid: %s, recursive: %s".format(what, userId, recursive))
-            SvdSystemManagerUtils.chown(what, userId, SvdConfig.defaultUserGroup, recursive)
+            SvdUtils.chown(what, userId, SvdConfig.defaultUserGroup, recursive)
             sender ! Success
 
         case Chmod(what, mode, recursive) =>
             log.debug("Chmod called on location: '%s' with mode: %s (recursively: %s)".format(what, mode, recursive))
-            SvdSystemManagerUtils.chmod(what, mode, recursive)
+            SvdUtils.chmod(what, mode, recursive)
             sender ! Success
 
         case x: Any =>

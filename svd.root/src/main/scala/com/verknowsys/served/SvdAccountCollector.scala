@@ -6,7 +6,7 @@ import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.api.{SvdAccount, SvdShellOperation}
 import com.verknowsys.served.systemmanager.native.SvdShell
-import com.verknowsys.served.utils.SvdSystemManagerUtils
+import com.verknowsys.served.utils.SvdUtils
 
 import org.apache.commons.io.FileUtils
 
@@ -64,7 +64,7 @@ object SvdAccountCollector extends Logging {
                         case x: java.io.FileNotFoundException =>
                             log.warn("Problem: %s".format(x))
                     }
-                    SvdSystemManagerUtils.chown(homeDir, owner, SvdConfig.defaultUserGroup, true)
+                    SvdUtils.chown(homeDir, owner, SvdConfig.defaultUserGroup, true)
                 } else
                     log.warn("Account already imported: %s. Skipping.".format(account))
         }

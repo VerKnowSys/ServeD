@@ -37,7 +37,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val sh = new SvdShell(account)
-    val accountsManager = context.actorFor("/core/managers/SvdAccountsManager")
+    val accountsManager = context.actorFor("akka://%s@127.0.0.1:5555/user/SvdAccountsManager".format(SvdConfig.served)) // XXX: hardcode
 
     // Only for closing in postStop
     private var _dbServer: Option[DBServer] = None // XXX: Refactor
@@ -96,8 +96,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             // Get port from pool
             log.debug("Getting database port from AccountsManager")
 
-            (accountsManager ? GetPort) map {
-                case Some(dbPort: Int) =>
+            (accountsManager ? GetPort) onSuccess {
+                case dbPort: Int =>
                     log.debug("Got database port %d", dbPort)
                     // Start database server
                     val server = new DBServer(dbPort, SvdConfig.userHomeDir / "%s".format(account.uid) / "%s.db".format(account.uid))
@@ -127,10 +127,18 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
                     accountsManager ! Alive(account.uid)
                     context.become(started(db, gitManager))
 
-                case _ =>
-                    sender ! Error("DB initialization error")
+                case x =>
+                    sender ! Error("DB initialization error. Got param: %s".format(x))
                     throw new DBServerInitializationException
             }
+
+
+        case Success =>
+            log.debug("Got success")
+
+
+        case x =>
+            log.error("Error - Unknown SvdAccountManager message: %s".format(x))
 
     }
 
@@ -156,6 +164,9 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
         case RemoveKey(key) =>
             val ak = accountKeys(db)
             db << ak.copy(keys = ak.keys - key)
+
+        case Success =>
+            log.debug("Got success")
 
         case msg: git.Base =>
             gitManager forward msg

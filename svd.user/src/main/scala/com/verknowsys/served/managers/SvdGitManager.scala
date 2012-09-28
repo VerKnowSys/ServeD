@@ -53,7 +53,7 @@ class SvdGitManager(
             withRepo(uuid) { repo =>
                 log.trace("Removing git repository: %s for account: %s".format(repo.name, account.userName))
                 db ~ repo
-                SvdUtils.rmdir(gitRepositoriesLocation / repo.name + ".git")
+                SvdUtils.rm_r(gitRepositoriesLocation / repo.name + ".git")
             }
 
         case AddAuthorizedKey(uuid, key) =>
