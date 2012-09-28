@@ -7,12 +7,21 @@ import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.events.SvdFileEvent
 import com.verknowsys.served.systemmanager.native._
+import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.api._
 import com.verknowsys.served.api.pools._
 import com.verknowsys.served.services._
 
 import akka.actor._
+import akka.actor._
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.util.duration._
+
 import scala.io.Source
 import java.io.File
 import scala.util._
@@ -172,39 +181,30 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     // private val accountManagers = scala.collection.mutable.Map[Int, ActorRef]() // UID => AccountManager ref
 
     // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
-
-    override def postStop {
-        super.postStop
-
-        // log.debug("Stopping Coreginx")
-        // coreginx.stop
-
+    SvdUtils.addShutdownHook {
+        log.warn("Got termination signal")
         log.info("Stopping spawned user workers")
         SvdAccounts(db).foreach{
             account =>
                 val pidFile = SvdConfig.userHomeDir / "%d".format(account.uid) / "%d.pid".format(account.uid)
                 log.trace("PIDFile: %s".format(pidFile))
-                try {
-                    val pid = Source.fromFile(pidFile).mkString
-                    log.trace("Client VM PID to be killed: %s".format(pid))
-                    new SvdShell(account).exec(new SvdShellOperation(
-                        """
-                        /bin/kill -INT %s
-                        /bin/rm %s
-                        """.format(pid, pidFile)
-                    ))
-                } catch {
-                    case e: java.io.FileNotFoundException =>
-                        log.warn("User pid file not found in %s!".format(pidFile))
+                if (new java.io.File(pidFile).exists) {
+                    log.trace("Reading VM pid.")
+                    val pid = Source.fromFile(pidFile).mkString.trim.toInt
+                    log.debug("Client VM PID to be killed: %d".format(pid))
+                    SvdUtils.kill(pid, SIGTERM)
+                    log.debug("Client VM PID file to be deleted: %s".format(pidFile))
+                    SvdUtils.rm_r(pidFile)
+                } else {
+                    log.warn("File not found: %s".format(pidFile))
                 }
         }
 
         // removing also pid file of root core of svd:
         val corePid = SvdConfig.systemHomeDir / SvdConfig.rootPidFile
-        log.trace("Cleaning core pid file: %s with content: %s".format(corePid, Source.fromFile(corePid).mkString))
-        new SvdShell(rootAccount).exec(new SvdShellOperation("/bin/rm %s".format(corePid))) // XXX: hardcoded
-
-        log.trace("Invoking postStop in SvdAccountsManager")
+        log.debug("Cleaning core pid file: %s with content: %s".format(corePid, Source.fromFile(corePid).mkString))
+        SvdUtils.rm_r(corePid)
+        log.info("Shutting down SvdAccountsManager")
         db.close
         server.close
     }
@@ -213,7 +213,6 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     def receive = {
         case Init =>
             log.debug("SvdAccountsManager received Init. Running default task..")
-
 
             // registerFileEventFor(SvdConfig.systemHomeDir, Modified)
 
@@ -227,6 +226,10 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
             respawnUsersActors
             sender ! Success
+
+        case Shutdown =>
+            log.debug("Got Shutdown")
+            sender ! Shutdown
 
         case GetAccount(uid) =>
             val account = SvdAccounts(db)(_.uid == uid).headOption
@@ -248,11 +251,15 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
             sender ! (SvdGlobalRegistry.ActorManagers.values get uid getOrElse AccountNotFound)
 
         case Alive(uid) =>
-            sender ! Error("Not yet implemented")
-            // sender foreach (SvdGlobalRegistry.ActorManagers.values(uid) = _)
+            // sender ! Error("Not yet implemented")
+            sender ! Success
 
         case GetPort =>
             sender ! randomUserPort
+
+        case Success =>
+            log.debug("Got success")
+
 
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
