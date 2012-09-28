@@ -73,7 +73,7 @@ object Dependencies {
     val h2 = "com.h2database" % "h2" % "1.3.154"
     // val jetty = "org.mortbay.jetty" % "jetty" % "6.1.22" % "container"
     // val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.4.1.v20110513"
-    val sshd = "org.apache.sshd" % "sshd-core" % "0.5.0"
+    val sshd = "org.apache.sshd" % "sshd-core" % "0.7.0"
     val slf4japi = "org.slf4j" % "slf4j-api" % "1.5.8"
     val commonsio = "commons-io" % "commons-io" % "1.3.2"
     val webbit = "org.webbitserver" % "webbit" % "0.3.8"
