@@ -82,6 +82,9 @@ class SvdGatherer(account: SvdAccount) extends SvdManager {
 
 
     def receive = {
+        case Init =>
+            sender ! Success
+
         case x =>
             log.warn("SvdGatherer received unhandled signal: %s".format(x))
             sender ! Error("SvdGatherer unknown signal")

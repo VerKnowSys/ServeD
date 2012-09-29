@@ -54,10 +54,19 @@ class SvdGathererTest(_system: ActorSystem) extends TestKit(_system) with Defaul
 
 
     it should "create more than one instance of SvdGatherer" in {
-        gather1 ! "Test signal 1"
-        expectMsg(Nil)
-        gather2 ! "Test signal 2"
-        expectMsg(Nil)
+        (gather1 ? ("Test signal 1")) onSuccess {
+            case Error(y) =>
+                (gather2 ? Init) onSuccess {
+                    case Success =>
+                        true must be(true)
+
+                    case x =>
+                        fail("Problem: %s".format(x))
+                }
+
+            case x =>
+                fail("Problem: %s".format(x))
+        }
     }
 
 
