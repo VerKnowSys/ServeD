@@ -55,9 +55,9 @@ class LoggingManagerTest(_system: ActorSystem) extends TestKit(_system) with Def
         (ref ? Logger.AddEntry("com.verknowsys.served", Logger.Levels.Trace)) onSuccess {
             case _ =>
                 (ref ? Logger.ListEntries) onSuccess {
-                    case Some(Logger.Entries(x)) =>
+                    case Logger.Entries(x) =>
 
-                        x must be(Logger.Entries(Map("com.verknowsys.served" -> Logger.Levels.Trace)))
+                        x must be(Map("com.verknowsys.served" -> Logger.Levels.Trace))
                         TestLogger.levelFor("com.verknowsys.served") should be(Logger.Levels.Trace)
 
                     case x =>
@@ -68,9 +68,9 @@ class LoggingManagerTest(_system: ActorSystem) extends TestKit(_system) with Def
         (ref ? Logger.AddEntry("com.verknowsys.served", Logger.Levels.Error)) onSuccess {
             case _ =>
                 (ref ? Logger.ListEntries) onSuccess {
-                    case Some(Logger.Entries(x)) =>
+                    case Logger.Entries(x) =>
 
-                        x must be(Logger.Entries(Map("com.verknowsys.served" -> Logger.Levels.Error)))
+                        Logger.Entries(x) must be(Logger.Entries(Map("com.verknowsys.served" -> Logger.Levels.Error)))
                         TestLogger.levelFor("com.verknowsys.served") should be(Logger.Levels.Error)
 
                     case x =>
@@ -81,9 +81,9 @@ class LoggingManagerTest(_system: ActorSystem) extends TestKit(_system) with Def
         (ref ? Logger.AddEntry("com.verknowsys.served", Logger.Levels.Warn)) onSuccess {
             case _ =>
                 (ref ? Logger.ListEntries) onSuccess {
-                    case Some(Logger.Entries(x)) =>
+                    case Logger.Entries(x) =>
 
-                        x must be(Logger.Entries(
+                        Logger.Entries(x) must be(Logger.Entries(
                             Map(
                                 "com.verknowsys.served" -> Logger.Levels.Error,
                                 "com.verknowsys.served.foobar" -> Logger.Levels.Warn
