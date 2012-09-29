@@ -14,7 +14,7 @@ import com.verknowsys.served.testing._
 class NestedObjectsTest extends DatabaseTest with DefaultTest {
 
     override def beforeAll {
-        connect
+        reconnect
     }
 
     override def afterAll {
@@ -28,11 +28,11 @@ class NestedObjectsTest extends DatabaseTest with DefaultTest {
 
         reconnect
 
-        EmbeddedList(db)(obj.uuid) must be theSameInstanceAs(obj)
+        EmbeddedList(db)(obj.uuid) must be (Some(obj))
     }
 
 
-    it should "Persist object with empty list embedded" in {
+    it should "Persist object with empty list embedded multiple times" in {
         val i1 = new Item(1,1)
         val i2 = new Item(2,2)
         val i3 = new Item(3,3)
@@ -42,7 +42,7 @@ class NestedObjectsTest extends DatabaseTest with DefaultTest {
 
         reconnect
 
-        EmbeddedList(db)(obj.uuid) must be theSameInstanceAs(obj)
+        EmbeddedList(db)(obj.uuid) must be (Some(obj))
     }
 
 
@@ -60,7 +60,7 @@ class NestedObjectsTest extends DatabaseTest with DefaultTest {
 
         reconnect
 
-        EmbeddedList(db)(obj.uuid) must be theSameInstanceAs(newobj)
+        EmbeddedList(db)(obj.uuid) must be (Some(newobj))
 
         EmbeddedList(db).historyFor(obj.uuid) must have size(1)
         EmbeddedList(db).historyFor(obj.uuid) must contain(obj)
