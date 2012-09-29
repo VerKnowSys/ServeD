@@ -42,68 +42,95 @@ class TestProcess(val worker: ActorRef, val cmd: String) extends Actor {
 class WorkerTest(_system: ActorSystem) extends TestKit(_system) with DefaultTest {
 
     def this() = this(ActorSystem("svd-test-system"))
+    implicit val timeout = Timeout(30 seconds)
+
 
     it should "return Success with empty history when given empty task list" in {
         val worker = system.actorOf(Props(new TestWorker(Nil)))
-        worker ! Build
-        expectMsg(BuildSucceed(Nil))
-        worker should be('shutdown)
+        (worker ? Build) onSuccess {
+            case BuildSucceed(x) =>
+                x must be(Nil)
+                // worker should be('shutdown)
+
+            case x =>
+                fail("Shouldn't happen")
+        }
+
     }
 
+
     it should "return Success with one item in history when given one task" in {
-         val worker = system.actorOf(Props(new TestWorker(TestTask("foo") :: Nil)))
-         worker ! Build
-         expectMsg(BuildSucceed(
-             ProcessFinished(0, "stdout: foo", "stderr: foo") :: Nil
-         ))
-         worker should be('shutdown)
-     }
+        val worker = system.actorOf(Props(new TestWorker(TestTask("foo") :: Nil)))
+        (worker ? Build) onSuccess {
+            case BuildSucceed(x :: Nil) =>
+                x must be(ProcessFinished(0, "stdout: foo", "stderr: foo"))
+                // worker should be('shutdown)
 
-     it should "return Success with full history reversed when given list" in {
-         val tasks = TestTask("a") :: TestTask("b") :: TestTask("c") :: Nil
-         val worker = system.actorOf(Props(new TestWorker(tasks)))
-         worker ! Build
-         expectMsg(BuildSucceed(
-             ProcessFinished(0, "stdout: c", "stderr: c") ::
-             ProcessFinished(0, "stdout: b", "stderr: b") ::
-             ProcessFinished(0, "stdout: a", "stderr: a") ::
-             Nil
-         ))
-         worker should be('shutdown)
-     }
+            case x =>
+                fail("Problem: %s".format(x))
+        }
+    }
 
-     it should "return Failure when given one failing task" in {
-         val worker = system.actorOf(Props(new TestWorker(TestTask("foo-fail") :: Nil)))
-         worker ! Build
-         expectMsg(BuildFailed(
-             ProcessFinished(1, "stdout: foo-fail", "stderr: foo-fail") :: Nil
-         ))
-         worker should be('shutdown)
-     }
 
-     it should "return Failure with full history when given list of tasks with last one failing" in {
-         val tasks = TestTask("good") :: TestTask("nice") :: TestTask("cute") :: TestTask("fail") :: Nil
-         val worker = system.actorOf(Props(new TestWorker(tasks)))
-         worker ! Build
-         expectMsg(BuildFailed(
-             ProcessFinished(1, "stdout: fail", "stderr: fail") ::
-             ProcessFinished(0, "stdout: cute", "stderr: cute") ::
-             ProcessFinished(0, "stdout: nice", "stderr: nice") ::
-             ProcessFinished(0, "stdout: good", "stderr: good") ::
-             Nil
-         ))
-         worker should be('shutdown)
-     }
+    it should "return Success with full history reversed when given list" in {
+        val tasks = TestTask("a") :: TestTask("b") :: TestTask("c") :: Nil
+        val worker = system.actorOf(Props(new TestWorker(tasks)))
+        (worker ? Build) onSuccess {
+            case BuildSucceed(x :: y :: z :: Nil) =>
+                x must be(ProcessFinished(0, "stdout: c", "stderr: c"))
+                y must be(ProcessFinished(0, "stdout: b", "stderr: b"))
+                z must be(ProcessFinished(0, "stdout: a", "stderr: a"))
+                // worker should be('shutdown)
 
-     it should "return Failure with partial history when given list of tasks with middle one failing" in {
-         val tasks = TestTask("good") :: TestTask("failing one") :: TestTask("cute") :: TestTask("fail") :: Nil
-         val worker = system.actorOf(Props(new TestWorker(tasks)))
-         worker ! Build
-         expectMsg(BuildFailed(
-             ProcessFinished(1, "stdout: failing one", "stderr: failing one") ::
-             ProcessFinished(0, "stdout: good", "stderr: good") ::
-             Nil
-         ))
-         worker should be('shutdown)
-     }
+            case x =>
+                fail("Problem: %s".format(x))
+        }
+    }
+
+
+    it should "return Failure when given one failing task" in {
+        val worker = system.actorOf(Props(new TestWorker(TestTask("foo-fail") :: Nil)))
+        (worker ? Build) onSuccess {
+            case BuildFailed(x :: Nil) =>
+                x must be(ProcessFinished(1, "stdout: foo-fail", "stderr: foo-fail"))
+                // worker should be('shutdown)
+
+            case x =>
+                fail("Problem: %s".format(x))
+        }
+    }
+
+
+    it should "return Failure with full history when given list of tasks with last one failing" in {
+        val tasks = TestTask("good") :: TestTask("nice") :: TestTask("cute") :: TestTask("fail") :: Nil
+        val worker = system.actorOf(Props(new TestWorker(tasks)))
+        (worker ? Build) onSuccess {
+            case BuildFailed(x :: y :: z :: a :: Nil) =>
+                x must be(ProcessFinished(1, "stdout: fail", "stderr: fail"))
+                y must be(ProcessFinished(0, "stdout: cute", "stderr: cute"))
+                z must be(ProcessFinished(0, "stdout: nice", "stderr: nice"))
+                a must be(ProcessFinished(0, "stdout: good", "stderr: good"))
+                // worker should be('shutdown)
+
+            case x =>
+                fail("Problem: %s".format(x))
+        }
+    }
+
+
+    it should "return Failure with partial history when given list of tasks with middle one failing" in {
+        val tasks = TestTask("good") :: TestTask("failing one") :: TestTask("cute") :: TestTask("fail") :: Nil
+        val worker = system.actorOf(Props(new TestWorker(tasks)))
+        (worker ? Build) onSuccess {
+            case BuildFailed(x :: y :: Nil) =>
+                x must be(ProcessFinished(1, "stdout: failing one", "stderr: failing one"))
+                y must be(ProcessFinished(0, "stdout: good", "stderr: good"))
+                // worker should be('shutdown)
+
+            case x =>
+                fail("Problem: %s".format(x))
+        }
+    }
+
+
 }
