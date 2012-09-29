@@ -53,4 +53,5 @@ object Admin {
 case class GetAccountManager(userUid: Int)
 case class SetAccountManager(userUid: Int)
 case object GetPort
+case class GetSysUsage(userUid: Int)
 case class Alive(userUid: Int)
