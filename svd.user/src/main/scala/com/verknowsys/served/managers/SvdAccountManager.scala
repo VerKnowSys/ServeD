@@ -138,7 +138,9 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
 
         case x =>
-            log.error("Error - Unknown SvdAccountManager message: %s".format(x))
+            val m = "Unknown SvdAccountManager message: %s".format(x)
+            log.error("%s".format(m))
+            sender ! Error(m)
 
     }
 
