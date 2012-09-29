@@ -2,8 +2,6 @@ package com.verknowsys.served.systemmanager.managers
 
 
 import com.verknowsys.served.systemmanager.native._
-import com.verknowsys.served.SvdSpecHelpers._
-import com.verknowsys.served.testing._
 import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.api._
@@ -12,13 +10,25 @@ import com.verknowsys.served._
 
 import java.io._
 import java.util.{Calendar, GregorianCalendar}
-import akka.actor.Actor.{actorOf, registry}
-import akka.actor.ActorRef
+import akka.actor._
 import akka.testkit.TestKit
 import org.specs._
+import akka.testkit.TestActorRef
+import com.typesafe.config.ConfigFactory
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.testkit.TestKit
+import akka.util.duration._
+import akka.actor.{ActorSystem, Props, ActorRef}
+import com.verknowsys.served.testing._
 
 
-class SvdGathererTest extends Specification with TestKit {
+class SvdGathererTest(_system: ActorSystem) extends TestKit(_system) with DefaultTest {
+
+    def this() = this(ActorSystem("svd-test-system"))
 
     val homeDir1 = randomPath //testPath("home/teamon")
     val homeDir2 = randomPath //testPath("home/dmilith")
@@ -30,53 +40,52 @@ class SvdGathererTest extends Specification with TestKit {
     var gather2: ActorRef = null
 
 
-    "SvdGatherer" should {
-        doBefore {
-            gather1 = actorOf(new SvdGatherer(account1)).start
-            gather2 = actorOf(new SvdGatherer(account2)).start
-            mkdir(homeDir1)
-            mkdir(homeDir2)
-        }
+    override def beforeAll {
+        gather1 = system.actorOf(Props(new SvdGatherer(account1)))
+        gather2 = system.actorOf(Props(new SvdGatherer(account2)))
+        mkdir(homeDir1)
+        mkdir(homeDir2)
+    }
 
-        doAfter {
-            registry.shutdownAll
-            rmdir(homeDir1)
-            rmdir(homeDir2)
-        }
+    override def afterAll {
+        rmdir(homeDir1)
+        rmdir(homeDir2)
+    }
 
-        "create more than one instance of SvdGatherer" in {
-            gather1 ! "Test signal 1"
-            expectMsg(Nil)
 
-            gather2 ! "Test signal 2"
-            expectMsg(Nil)
-        }
+    it should "create more than one instance of SvdGatherer" in {
+        gather1 ! "Test signal 1"
+        expectMsg(Nil)
+        gather2 ! "Test signal 2"
+        expectMsg(Nil)
+    }
 
-        "Calendar should give correct values" in {
-            val calendar0 = new GregorianCalendar(0,0,0,0,0,0)
-            calendar0.get(Calendar.HOUR) must beEqual(0)
-            calendar0.get(Calendar.MINUTE) must beEqual(0)
-            calendar0.get(Calendar.SECOND) must beEqual(0)
 
-            val calendar1 = new GregorianCalendar(0,0,0,0,0,0)
-            calendar1.set(Calendar.SECOND, 3666)
-            calendar1.get(Calendar.HOUR) must beEqual(1)
-            calendar1.get(Calendar.MINUTE) must beEqual(1)
-            calendar1.get(Calendar.SECOND) must beEqual(6)
+    it should "Calendar should give correct values" in {
+        val calendar0 = new GregorianCalendar(0,0,0,0,0,0)
+        calendar0.get(Calendar.HOUR) must be(0)
+        calendar0.get(Calendar.MINUTE) must be(0)
+        calendar0.get(Calendar.SECOND) must be(0)
 
-            val calendar2 = new GregorianCalendar(0,0,0,0,0,0)
-            calendar2.set(Calendar.SECOND, 3667)
-            calendar2.get(Calendar.HOUR) must beEqual(1)
-            calendar2.get(Calendar.MINUTE) must beEqual(1)
-            calendar2.get(Calendar.SECOND) must beEqual(7)
-        }
+        val calendar1 = new GregorianCalendar(0,0,0,0,0,0)
+        calendar1.set(Calendar.SECOND, 3666)
+        calendar1.get(Calendar.HOUR) must be(1)
+        calendar1.get(Calendar.MINUTE) must be(1)
+        calendar1.get(Calendar.SECOND) must be(6)
 
-        "SvdUtils.secondsToHMS() should give correct values" in {
-            val matcher = SvdUtils.secondsToHMS(3666)
-            matcher must beMatching("01h:01m:06s")
-            val matcher2 = SvdUtils.secondsToHMS(3667L.toInt)
-            matcher2 must beMatching("01h:01m:07s")
-        }
+        val calendar2 = new GregorianCalendar(0,0,0,0,0,0)
+        calendar2.set(Calendar.SECOND, 3667)
+        calendar2.get(Calendar.HOUR) must be(1)
+        calendar2.get(Calendar.MINUTE) must be(1)
+        calendar2.get(Calendar.SECOND) must be(7)
+    }
+
+    it should "SvdUtils.secondsToHMS() should give correct values" in {
+        val matcher = SvdUtils.secondsToHMS(3666)
+        matcher must be("01h:01m:06s")
+        val matcher2 = SvdUtils.secondsToHMS(3667L.toInt)
+        matcher2 must be("01h:01m:07s")
+    }
 
         // "we should be able to check when it's worth to compress String" in {
         //     val in = new BufferedReader(new FileReader("/dev/urandom"))
@@ -110,5 +119,4 @@ class SvdGathererTest extends Specification with TestKit {
         //     chplen must beGreaterThan(complen)
         // }
 
-    }
 }

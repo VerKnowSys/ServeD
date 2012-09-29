@@ -1,13 +1,31 @@
 package com.verknowsys.served.ci
 
+
+import akka.testkit.TestActorRef
+import com.typesafe.config.ConfigFactory
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.testkit.TestKit
+import akka.util.duration._
+import akka.actor.ActorSystem
+import akka.actor.Props
+
+
+import com.verknowsys.served._
+import com.verknowsys.served.utils._
+import com.verknowsys.served.api.Logger
+import com.verknowsys.served.managers.LoggingManager
 import com.verknowsys.served.testing._
-import Actor._
+
 
 case class TestTask(c: String) extends Task(c)
 
 class TestWorker(tasks: List[Task]) extends Worker(tasks) {
     protected override def runTask(task: Task) {
-        val process = actorOf(new TestProcess(self, task.cmd)).start
+        val process = context.actorOf(Props(new TestProcess(self, task.cmd)))
         process ! Build
     }
 }
@@ -20,26 +38,30 @@ class TestProcess(val worker: ActorRef, val cmd: String) extends Actor {
     }
 }
 
-class WorkerTest extends DefaultTest { 
+
+class WorkerTest(_system: ActorSystem) extends TestKit(_system) with DefaultTest {
+
+    def this() = this(ActorSystem("svd-test-system"))
+
     it should "return Success with empty history when given empty task list" in {
-        val worker = actorOf(new TestWorker(Nil)).start
+        val worker = system.actorOf(Props(new TestWorker(Nil)))
         worker ! Build
         expectMsg(BuildSucceed(Nil))
         worker should be('shutdown)
     }
-    
+
     it should "return Success with one item in history when given one task" in {
-         val worker = actorOf(new TestWorker(TestTask("foo") :: Nil)).start
+         val worker = system.actorOf(Props(new TestWorker(TestTask("foo") :: Nil)))
          worker ! Build
          expectMsg(BuildSucceed(
              ProcessFinished(0, "stdout: foo", "stderr: foo") :: Nil
          ))
          worker should be('shutdown)
      }
-     
+
      it should "return Success with full history reversed when given list" in {
          val tasks = TestTask("a") :: TestTask("b") :: TestTask("c") :: Nil
-         val worker = actorOf(new TestWorker(tasks)).start
+         val worker = system.actorOf(Props(new TestWorker(tasks)))
          worker ! Build
          expectMsg(BuildSucceed(
              ProcessFinished(0, "stdout: c", "stderr: c") ::
@@ -49,19 +71,19 @@ class WorkerTest extends DefaultTest {
          ))
          worker should be('shutdown)
      }
-     
+
      it should "return Failure when given one failing task" in {
-         val worker = actorOf(new TestWorker(TestTask("foo-fail") :: Nil)).start
+         val worker = system.actorOf(Props(new TestWorker(TestTask("foo-fail") :: Nil)))
          worker ! Build
          expectMsg(BuildFailed(
              ProcessFinished(1, "stdout: foo-fail", "stderr: foo-fail") :: Nil
          ))
          worker should be('shutdown)
      }
-     
+
      it should "return Failure with full history when given list of tasks with last one failing" in {
          val tasks = TestTask("good") :: TestTask("nice") :: TestTask("cute") :: TestTask("fail") :: Nil
-         val worker = actorOf(new TestWorker(tasks)).start
+         val worker = system.actorOf(Props(new TestWorker(tasks)))
          worker ! Build
          expectMsg(BuildFailed(
              ProcessFinished(1, "stdout: fail", "stderr: fail") ::
@@ -72,10 +94,10 @@ class WorkerTest extends DefaultTest {
          ))
          worker should be('shutdown)
      }
-     
+
      it should "return Failure with partial history when given list of tasks with middle one failing" in {
          val tasks = TestTask("good") :: TestTask("failing one") :: TestTask("cute") :: TestTask("fail") :: Nil
-         val worker = actorOf(new TestWorker(tasks)).start
+         val worker = system.actorOf(Props(new TestWorker(tasks)))
          worker ! Build
          expectMsg(BuildFailed(
              ProcessFinished(1, "stdout: failing one", "stderr: failing one") ::

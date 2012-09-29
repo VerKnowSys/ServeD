@@ -1,8 +1,9 @@
 package com.verknowsys.served.git
 
+
 import com.verknowsys.served.testing._
-import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.utils._
+
 
 class GitStatsTest extends DefaultTest {
     val path = randomPath
@@ -22,13 +23,13 @@ class GitStatsTest extends DefaultTest {
             repo.add("README")
             repo.commit("changed " + i, author = me)
         }
-        
+
         (4 to 10) foreach { i=>
             writeFile(repo.path / "README", "Changed to " + i)
             repo.add("README")
             repo.commit("changed " + i, author = him)
         }
-        
+
         val stats = new GitStats(repo)
         stats.authors.mapValues(_.size) should equal (Map("T. Tobolski" -> 3, "D. Dettlaff" -> 7))
     }

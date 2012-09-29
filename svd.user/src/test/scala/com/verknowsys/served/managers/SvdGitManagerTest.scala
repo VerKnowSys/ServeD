@@ -1,198 +1,258 @@
 package com.verknowsys.served.managers
 
+
+import akka.testkit.TestActorRef
+import com.typesafe.config.ConfigFactory
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.testkit.TestKit
+import akka.util.duration._
+import akka.actor.{ActorSystem, Props}
+
 import com.verknowsys.served._
-import com.verknowsys.served.testing._
-import com.verknowsys.served.SvdSpecHelpers._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.git._
 import com.verknowsys.served.db._
 import com.verknowsys.served.api._
 import com.verknowsys.served.api.git._
-
-import Actor._
-import akka.util.duration._
+import com.verknowsys.served.testing._
 
 
-class SvdGitManagerTest extends DefaultTest {
+/**
+*   @author dmilith
+*   @author teamon
+*
+*/
+
+class SvdGitManagerTest(_system: ActorSystem) extends TestKit(_system) with DefaultTest {
+
+    def this() = this(ActorSystem("svd-test-system"))
+    // val ref = system.actorOf(Props(new LoggingManager(GlobalLogger)))
 
     val account = currentAccount
     val homeDir = tmpDir / account.uid.toString
     val dbServer = new DBServer(randomPort, randomPath)
     val db = dbServer.openClient
-    val manager = actorOf(new SvdGitManager(account, db, homeDir / "git")).start
-    mkdir(homeDir / "git")
+    var manager: ActorRef = null
 
-    def newRepo = {
-        manager ! CreateRepository("foo")
-        within(timeout){
-             expectMsgClass(classOf[Repository])
-        }
+
+    override def afterAll {
+        // system.stop(manager)
+        // db.close
+        // dbServer.close
+        rmdir(homeDir / "git")
+        system.shutdown
     }
 
-    def timeout = 3.seconds
 
     override def afterEach {
-        manager.stop
-        db.close
-        dbServer.close
-        rmdir(homeDir / "git")
+        // system.stop(manager)
+        system.stop(manager)
+        // rmdir(homeDir / "git")
     }
+
+
+    override def beforeEach {
+        mkdir(homeDir / "git")
+        manager = system.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
+    }
+
 
     it should "return empty repository list" in {
-        manager ! ListRepositories
-
-        within(timeout){
-            expectMsg(Repositories(Nil))
+        (manager ? ListRepositories) onSuccess {
+            case Repositories(x) =>
+                x must be(Nil)
         }
     }
+
 
     it should "create new bare repository under git directory" in {
-        manager ! CreateRepository("foo")
-        val repo = within(timeout){
-            val repo = expectMsgClass(classOf[Repository])
-            repo.name should be("foo")
-            repo.authorizedKeys should be ('empty)
-            repo
-        }
+        (manager ? CreateRepository("foo")) onSuccess {
+            case repo: Repository =>
+                repo.name should be("foo")
+                repo.authorizedKeys should be ('empty)
+                homeDir / "git" should (exist)
+                homeDir / "git" / "foo.git" should (exist)
 
-        homeDir / "git" should (exist)
-        homeDir / "git" / "foo.git" should (exist)
-
-        new GitRepository(homeDir / "git" / "foo.git") should be ('bare)
-
-        manager ! ListRepositories
-        within(timeout){
-            expectMsg(Repositories(repo :: Nil))
+                (manager ? ListRepositories) onSuccess {
+                    case x: Repositories =>
+                        x must be(repo :: Nil)
+                        // make sure it's bare repo:
+                        new GitRepository(homeDir / "git" / "foo.git") should be ('bare)
+                }
         }
     }
+
 
     it should "do not allow creating repository with existing name" in {
-        manager ! CreateRepository("foo")
-        within(timeout){
-            val repo = expectMsgClass(classOf[Repository])
-            repo.name should equal ("foo")
-            repo.authorizedKeys should be ('empty)
-            repo
+        (manager ? CreateRepository("foo")) onSuccess {
+            case repo: Repository =>
+                repo.name should be ("foo")
+                repo.authorizedKeys should be ('empty)
+                (manager ? CreateRepository("foo")) onSuccess {
+                    case RepositoryExistsError =>
+                        true must be(true)
+                    case _ =>
+                        fail("Shouldn't happen")
+                }
         }
-
-        manager ! CreateRepository("foo")
-        expectMsg(RepositoryExistsError)
     }
+
 
     it should "remove repository" in {
-        manager ! CreateRepository("foo")
-        val foo = within(timeout){
-             expectMsgClass(classOf[Repository])
-        }
+        (manager ? CreateRepository("foo")) onSuccess {
+            case repo: Repository =>
+                (manager ? RemoveRepository(repo.uuid)) onSuccess {
+                    case Success =>
+                        homeDir / "git" / "foo.git" should not (exist)
+                        (manager ? ListRepositories) onSuccess {
+                            case Repositories(Nil) =>
+                                true must be(true)
 
-        manager ! RemoveRepository(foo.uuid)
+                            case _ =>
+                                fail("Shouldn't happen")
+                        }
+                    case _ =>
+                        fail("Shouldn't happen")
+                }
 
-        within(timeout){
-             expectMsg(Success)
-        }
-        homeDir / "git" / "foo.git" should not (exist)
-
-        manager ! ListRepositories
-        within(timeout){
-             expectMsg(Repositories(Nil))
+            case _ =>
+                fail("Shouldn't happen")
         }
     }
+
 
     it should "retrieve repository by name" in {
-        manager ! CreateRepository("foo")
-        val foo = within(timeout){
-             expectMsgClass(classOf[Repository])
-        }
+        (manager ? CreateRepository("foo")) onSuccess {
+            case repo: Repository =>
+                (manager ? GetRepositoryByName("foo")) onSuccess {
+                    case Some(x: Repository) =>
+                        (manager ? GetRepositoryByName("blaaah")) onSuccess {
+                            case Nil =>
+                                true must be(true)
 
-        manager ! GetRepositoryByName("foo")
-        within(timeout){
-             expectMsg(Some(foo))
-        }
+                            case _ =>
+                                fail("Shouldn't happen")
+                        }
+                    case _ =>
+                        fail("Shouldn't happen")
+                }
 
-        manager ! GetRepositoryByName("blaaah")
-        within(timeout){
-             expectMsg(None)
+            case _ =>
+                fail("Shouldn't happen")
         }
     }
+
 
     it should "retrieve repository by uuid" in {
-        manager ! CreateRepository("foo")
-        val foo = within(timeout){
-             expectMsgClass(classOf[Repository])
-        }
+        (manager ? CreateRepository("foo")) onSuccess {
+            case repo: Repository =>
+                (manager ? GetRepositoryByUUID(repo.uuid)) onSuccess {
+                    case Some(x: Repository) =>
+                        (manager ? GetRepositoryByUUID(java.util.UUID.randomUUID)) onSuccess {
+                            case None =>
+                                true must be(true)
 
-        manager ! GetRepositoryByUUID(foo.uuid)
-        within(timeout){
-             expectMsg(Some(foo))
-        }
+                            case _ =>
+                                fail("Shouldn't happen")
+                        }
 
-        manager ! GetRepositoryByUUID(java.util.UUID.randomUUID)
-        within(timeout){
-             expectMsg(None)
+                    case _ =>
+                        fail("Shouldn't happen")
+                }
+
+            case _ =>
+                fail("Shouldn't happen")
         }
     }
+
 
     it should "raise error when removing non existing repository" in {
-        manager ! RemoveRepository(java.util.UUID.randomUUID)
-        within(timeout){
-            expectMsg(RepositoryDoesNotExistError)
+        (manager ? RemoveRepository(java.util.UUID.randomUUID)) onSuccess {
+            case RepositoryDoesNotExistError =>
+                true must be(true)
+            case _ =>
+                fail("Shouldn't happen")
         }
     }
+
 
     it should "add new key to config" in {
-        val repo = newRepo
-        val key = AccessKey("default", KeyUtils.load(testPublicKey).get) // we are sure this is valid key
+        (manager ? CreateRepository("foo")) onSuccess {
+            case repo: Repository =>
 
-        manager ! AddAuthorizedKey(repo.uuid, key)
-        within(timeout){
-            expectMsg(Success)
+                val key = AccessKey("default", KeyUtils.load(testPublicKey).get) // we are sure this is valid key
+                (manager ? AddAuthorizedKey(repo.uuid, key)) onSuccess {
+                    case Success =>
+                        (manager ? GetRepositoryByUUID(repo.uuid)) onSuccess {
+                            case Some(res: Repository) =>
+                                res.authorizedKeys should have size(1)
+                                res.authorizedKeys should contain (key)
+                                res should equal (repo.copy(authorizedKeys = Set() + key))
+
+                                manager ! AddAuthorizedKey(repo.uuid, key)
+                                expectMsg(Success)
+
+                                (manager ? GetRepositoryByUUID(repo.uuid)) onSuccess {
+                                    case Some(res2: Repository) =>
+                                        res2.authorizedKeys should have size(1)
+                                        res2.authorizedKeys should contain (key)
+                                        res2 should equal (res)
+
+                                    case _ =>
+                                        fail("Shouldn't happen")
+                                }
+
+                            case _ =>
+                                fail("Shouldn't happen")
+                        }
+
+                    case _ =>
+                        fail("Shouldn't happen")
+                }
+
+            case RepositoryExistsError =>
+                fail("Shouldn't happen")
+
         }
-
-        manager ! GetRepositoryByUUID(repo.uuid)
-        val res = within(timeout){
-            expectMsgClass(classOf[Some[Repository]])
-        }.get
-
-        res.authorizedKeys should have size(1)
-        res.authorizedKeys should contain (key)
-        res should equal (repo.copy(authorizedKeys = Set() + key))
-
-        manager ! AddAuthorizedKey(repo.uuid, key)
-        within(timeout){
-            expectMsg(Success)
-        }
-
-        manager ! GetRepositoryByUUID(repo.uuid)
-        val res2 = within(timeout){
-            expectMsgClass(classOf[Some[Repository]])
-        }.get
-
-        res2.authorizedKeys should have size(1)
-        res2.authorizedKeys should contain (key)
-        res2 should equal (res)
     }
+
 
     it should "remove key from config" in {
-        val repo = newRepo
-        val key = AccessKey("default", KeyUtils.load(testPublicKey).get) // we are sure this is valid key
+        (manager ? CreateRepository("foo")) onSuccess {
+            case repo: Repository =>
 
-        manager ! AddAuthorizedKey(repo.uuid, key)
-        within(timeout){
-            expectMsg(Success)
+                val key = AccessKey("default", KeyUtils.load(testPublicKey).get) // we are sure this is valid key
+
+                (manager ? AddAuthorizedKey(repo.uuid, key)) onSuccess {
+                    case Success =>
+                    case _ =>
+                        fail("Shouldn't happen")
+                }
+
+                (manager ? RemoveAuthorizedKey(repo.uuid, key)) onSuccess {
+                    case Success =>
+                    case _ =>
+                        fail("Shouldn't happen")
+                }
+
+                (manager ? GetRepositoryByUUID(repo.uuid)) onSuccess {
+                    case Some(res: Repository) =>
+                        res.authorizedKeys should have size(0)
+                        res.authorizedKeys should not contain (key)
+                        res should equal (repo.copy(authorizedKeys = Set()))
+
+                    case _ =>
+                        fail("Shouldn't happen")
+                }
+
+            case _ =>
+                fail("Shouldn't happen")
         }
-
-        manager ! RemoveAuthorizedKey(repo.uuid, key)
-        within(timeout){
-            expectMsg(Success)
-        }
-
-        manager ! GetRepositoryByUUID(repo.uuid)
-        val res = within(timeout){
-            expectMsgClass(classOf[Some[Repository]])
-        }.get
-
-        res.authorizedKeys should have size(0)
-        res.authorizedKeys should not contain (key)
-        res should equal (repo.copy(authorizedKeys = Set()))
     }
+
+
 }

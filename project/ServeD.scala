@@ -158,5 +158,5 @@ object ServeD extends Build {
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(specs, scalatest, akkaTestkit, commonsio, scalaz, bouncycastle)
         )
-    )
+    ) dependsOn(api)
 }
