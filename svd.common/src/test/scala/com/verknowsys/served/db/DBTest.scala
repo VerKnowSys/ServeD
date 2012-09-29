@@ -11,7 +11,7 @@ import com.verknowsys.served.testing._
 class DBTest extends DatabaseTest with DefaultTest {
 
     override def beforeAll {
-        connect
+        reconnect
     }
 
     override def afterAll {
