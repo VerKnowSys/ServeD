@@ -52,19 +52,28 @@ class SvdGitManager(
         case RemoveRepository(uuid) =>
             withRepo(uuid) { repo =>
                 log.trace("Removing git repository: %s for account: %s".format(repo.name, account.userName))
-                db ~ repo
-                SvdUtils.rm_r(gitRepositoriesLocation / repo.name + ".git")
+                val repoLocation = gitRepositoriesLocation / repo.name + ".git"
+                if (!new java.io.File(repoLocation).exists) {
+                    sender ! RepositoryDoesNotExistError
+                } else {
+                    log.trace("Removing repository: %s".format(repoLocation))
+                    db ~ repo
+                    SvdUtils.rm_r(repoLocation)
+                    sender ! Success
+                }
             }
 
         case AddAuthorizedKey(uuid, key) =>
             withRepo(uuid) { repo =>
                 db << repo.copy(authorizedKeys = repo.authorizedKeys + key)
             }
+            sender ! Success
 
         case RemoveAuthorizedKey(uuid, key) =>
             withRepo(uuid) { repo =>
                 db << repo.copy(authorizedKeys = repo.authorizedKeys - key)
             }
+            sender ! Success
     }
 
     def withRepo(uuid: UUID)(f: (Repository) => Unit) = sender ! (RepositoryDB(db)(uuid) match {
