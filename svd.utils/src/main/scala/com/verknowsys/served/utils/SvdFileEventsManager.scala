@@ -1,9 +1,6 @@
 package com.verknowsys.served.utils
 
 
-import com.verknowsys.served._
-import com.verknowsys.served.api._
-
 import scala.collection.mutable.{HashMap => MutableMap, ListBuffer}
 import akka.dispatch._
 import akka.pattern.ask
@@ -12,10 +9,20 @@ import akka.util.Duration
 import akka.util.Timeout
 import akka.util.duration._
 import akka.actor._
-
 import com.sun.jna.NativeLong
 import com.sun.jna.{Native, Library}
 import events._
+
+import events._
+import com.verknowsys.served.utils.events._
+import java.io._
+import org.apache.commons.io.FileUtils
+import events._
+import akka.actor._
+import akka.actor.Actor._
+import com.verknowsys.served.api._
+import com.verknowsys.served.api.git._
+import com.verknowsys.served._
 
 
 object events {
@@ -65,8 +72,8 @@ trait SvdFileEventsReactor extends SvdExceptionHandler {
     self: Actor with Logging =>
 
     def registerFileEventFor(path: String, flags: Int){
-        val fem = context.actorOf(Props[SvdFileEventsManager]) // , name = "SvdFileEventsManager"
-        fem ! SvdRegisterFileEvent(path, flags, this.self)
+        val fem = context.actorFor("akka://%s@127.0.0.1:5555/user/SvdFileEventsManager".format(SvdConfig.served)) // , name = "SvdFileEventsManager"
+        fem ! SvdRegisterFileEvent(path, flags, fem)
         // val res = Await.result(future, timeout.duration).asInstanceOf[ActorRef]
         // XXX: CHECKME
         // res match {
@@ -77,7 +84,7 @@ trait SvdFileEventsReactor extends SvdExceptionHandler {
 
     def unregisterFileEvents {
         val fem = context.actorOf(Props[SvdFileEventsManager])
-        fem ! SvdUnregisterFileEvent(this.self)
+        fem ! SvdUnregisterFileEvent(fem)
         // XXX: CHECKME
         super.postStop // 2011-01-30 01:06:54 - dmilith - NOTE: execute SvdExceptionHandler's code
     }
@@ -203,7 +210,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
                     null)
 
         val nev = clib.kevent(kq, event, 1, null, 0, null)
-        if(nev == -1){
+        if (nev == -1){
             registerNewFileEvent(path, flags, ref) // XXX: try again, not really safe
             // throw new SvdKeventException
         } else {
