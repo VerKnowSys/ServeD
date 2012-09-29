@@ -26,7 +26,7 @@ import akka.actor.{ActorSystem, Props, ActorRef}
 import com.verknowsys.served.testing._
 
 
-class SvdGathererTest(_system: ActorSystem) extends TestKit(_system) with DefaultTest {
+class SvdGathererTest(_system: ActorSystem) extends TestKit(_system) with DefaultTest with Logging {
 
     def this() = this(ActorSystem("svd-test-system"))
 
@@ -50,6 +50,7 @@ class SvdGathererTest(_system: ActorSystem) extends TestKit(_system) with Defaul
     override def afterAll {
         rmdir(homeDir1)
         rmdir(homeDir2)
+        system.shutdown
     }
 
 
@@ -89,11 +90,24 @@ class SvdGathererTest(_system: ActorSystem) extends TestKit(_system) with Defaul
         calendar2.get(Calendar.SECOND) must be(7)
     }
 
+
     it should "SvdUtils.secondsToHMS() should give correct values" in {
         val matcher = SvdUtils.secondsToHMS(3666)
         matcher must be("01h:01m:06s")
         val matcher2 = SvdUtils.secondsToHMS(3667L.toInt)
         matcher2 must be("01h:01m:07s")
+    }
+
+
+    it should "Gather JSON from usage sys (executed on FreeBSD hosts only)" in {
+        if (SvdUtils.isBSD)
+            (gather1 ? GetSysUsage(501)) onSuccess {
+                case Some(x: String) =>
+                    log.info("GATHERED: %s".format(x))
+
+                case None =>
+                    fail("None? Wtf?")
+            }
     }
 
         // "we should be able to check when it's worth to compress String" in {
