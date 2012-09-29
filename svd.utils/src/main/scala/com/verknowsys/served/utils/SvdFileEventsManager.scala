@@ -210,8 +210,10 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
                     null)
 
         val nev = clib.kevent(kq, event, 1, null, 0, null)
-        if (nev == -1){
-            registerNewFileEvent(path, flags, ref) // XXX: try again, not really safe
+        if (nev == -1) {
+            log.error("Failed to register kevent!")
+            SvdUtils.throwException[Exception]("Failed to register kevent!")
+            // registerNewFileEvent(path, flags, ref) // XXX: try again, not really safe
             // throw new SvdKeventException
         } else {
             val list = new ActorRefList()
