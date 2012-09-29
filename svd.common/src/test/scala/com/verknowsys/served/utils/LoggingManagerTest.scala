@@ -102,21 +102,29 @@ class LoggingManagerTest(_system: ActorSystem) extends TestKit(_system) with Def
 
     it should "remove entry" in {
         val ref = system.actorOf(Props(new LoggingManager(TestLogger)))
-        ref ! Logger.AddEntry("com.verknowsys.served.a", Logger.Levels.Trace)
-        ref ! Logger.AddEntry("com.verknowsys.served.b", Logger.Levels.Info)
-        ref ! Logger.AddEntry("com.verknowsys.served.c", Logger.Levels.Error)
-        ref ! Logger.RemoveEntry("com.verknowsys.served.b")
-        (ref ? Logger.ListEntries) onSuccess {
-            case Logger.Entries(x) =>
-                Logger.Entries(x) must be(Logger.Entries(
-                    Map(
-                        "com.verknowsys.served.a" -> Logger.Levels.Trace,
-                        "com.verknowsys.served.c" -> Logger.Levels.Error
-                    )
-                ))
+        (ref ? Logger.AddEntry("com.verknowsys.served.a", Logger.Levels.Trace)) onSuccess {
+            case _ =>
+                (ref ? Logger.AddEntry("com.verknowsys.served.b", Logger.Levels.Info)) onSuccess {
+                    case _ =>
+                        (ref ? Logger.AddEntry("com.verknowsys.served.c", Logger.Levels.Error)) onSuccess {
+                            case _ =>
+                                (ref ? Logger.RemoveEntry("com.verknowsys.served.b")) onSuccess {
+                                        case _ =>
+                                            (ref ? Logger.ListEntries) onSuccess {
+                                                case Logger.Entries(x) =>
+                                                    Logger.Entries(x) must be(Logger.Entries(
+                                                        Map(
+                                                            "com.verknowsys.served.a" -> Logger.Levels.Trace,
+                                                            "com.verknowsys.served.c" -> Logger.Levels.Error
+                                                        )
+                                                    ))
 
-            case x =>
-                fail("Shouldn't happen: %s".format(x))
+                                                case x =>
+                                                    fail("Shouldn't happen: %s".format(x))
+                                            }
+                                }
+                        }
+                    }
         }
         system.stop(ref)
     }
