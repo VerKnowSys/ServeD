@@ -61,7 +61,7 @@ class SvdAccountsManagerTest(_system: ActorSystem) extends TestKit(_system) with
         am = system.actorOf(Props(new SvdAccountsManager))
         (am ? Init) onSuccess {
             case Success =>
-                expectMsg(Success)
+                true must be(true)
         }
 
         // system.system.actorFor(Props(new SvdAccountManager)) must haveSize(0)
