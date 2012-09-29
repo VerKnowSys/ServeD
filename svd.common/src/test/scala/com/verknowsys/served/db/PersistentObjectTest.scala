@@ -24,7 +24,7 @@ class PersistentObjectTest extends DatabaseTest with DefaultTest {
         val teamon  = User("teamon")
         teamon.createdAt must not be(null)
         val dmilith = User("dmilith")
-        teamon.createdAt.compareTo(dmilith.createdAt) must be <(0)
+        teamon.createdAt.compareTo(dmilith.createdAt) must be <=(0)
     }
 
 
