@@ -58,7 +58,7 @@ class DBTest extends DatabaseTest with DefaultTest {
 
         db ~ teamon
 
-        Users(db).count must be()
+        Users(db).count must be(1)
         val users1 = Users(db)
         users1 must have size(1)
         users1 must not contain(teamon)
@@ -153,8 +153,8 @@ class DBTest extends DatabaseTest with DefaultTest {
 
         reconnect
 
-        Users(db)(uuid1) must be theSameInstanceAs(teamon)
-        Users(db)(uuid2) must be theSameInstanceAs(dmilith)
+        Users(db)(uuid1) must be (Some(teamon))
+        Users(db)(uuid2) must be (Some(dmilith))
         Users(db)(uuid3) must be(None)
     }
 
@@ -188,8 +188,8 @@ class DBTest extends DatabaseTest with DefaultTest {
         reconnect
 
         Users(db) must have size(2)
-        Users(db)(uuid1) must be theSameInstanceAs(teamon2)
-        Users(db)(uuid2) must be theSameInstanceAs(dmilith)
+        Users(db)(uuid1) must be (Some(teamon2))
+        Users(db)(uuid2) must be (Some(dmilith))
         Users(db)(uuid3) must be(None)
         Users(db).historyFor(uuid1) must have size(1)
         Users(db).historyFor(uuid1) must contain(teamon)
@@ -202,8 +202,8 @@ class DBTest extends DatabaseTest with DefaultTest {
         reconnect
 
         Users(db) must have size(2)
-        Users(db)(uuid1) must be theSameInstanceAs(teamon3)
-        Users(db)(uuid2) must be theSameInstanceAs(dmilith)
+        Users(db)(uuid1) must be (Some(teamon3))
+        Users(db)(uuid2) must be (Some(dmilith))
         Users(db)(uuid3) must be(None)
         Users(db).historyFor(uuid1) must have size(2)
         Users(db).historyFor(uuid1) must contain(teamon)
@@ -217,8 +217,8 @@ class DBTest extends DatabaseTest with DefaultTest {
         reconnect
 
         Users(db) must have size(2)
-        Users(db)(uuid1) must be theSameInstanceAs(teamon3)
-        Users(db)(uuid2) must be theSameInstanceAs(dmilith2)
+        Users(db)(uuid1) must be (Some(teamon3))
+        Users(db)(uuid2) must be (Some(dmilith2))
         Users(db)(uuid3) must be(None)
         Users(db).historyFor(uuid1) must have size(2)
         Users(db).historyFor(uuid1) must contain(teamon)
