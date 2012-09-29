@@ -16,6 +16,7 @@ public interface CLibrary extends Library {
     public int kill(long pid, int signal);
     public int chmod(String filename, int mode);
     public int chown(String filename, int user, int group);
+    public int mkdir(String folder);
     public int getuid();
 
     // see sys/event.h header file
