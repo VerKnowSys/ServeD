@@ -1,5 +1,6 @@
 package com.verknowsys.served.systemmanager.managers
 
+
 import com.verknowsys.served.managers.SvdManager
 
 import com.verknowsys.served.SvdConfig
@@ -24,6 +25,11 @@ import akka.actor._
 class SvdGatherer(account: SvdAccount) extends SvdManager {
     log.info("Starting Gatherer for account: " + account)
 
+    import com.verknowsys.served.utils.CUsageSys._
+    lazy val usagesys = CUsageSys.instance
+    // String getProcessUsage(int uid, boolean consoleOutput);
+
+    def gather(uid: Int) = usagesys.getProcessUsage(uid, false)
 
     // private def gather = SvdUtils.loopThread {
     //     log.trace("Time elapsed on gather(): %d".format(
@@ -84,6 +90,9 @@ class SvdGatherer(account: SvdAccount) extends SvdManager {
     def receive = {
         case Init =>
             sender ! Success
+
+        case GetSysUsage(uid: Int) =>
+            sender ! Some(gather(uid))
 
         case x =>
             log.warn("SvdGatherer received unhandled signal: %s".format(x))
