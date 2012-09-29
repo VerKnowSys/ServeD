@@ -34,7 +34,7 @@ class SSHD(port: Int) extends Actor with SvdExceptionHandler {
     val sshd = ApacheSSHServer.setUpDefaultServer()
     sshd.setPort(port)
     sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("hostkey.ser"))
-    val ssm = context.actorFor("/user/SvdAccountsManager")
+    val ssm = context.actorFor("akka://%s@127.0.0.1:5555/user/SvdAccountsManager".format(SvdConfig.served))
     sshd.setPublickeyAuthenticator(new PublicKeyAuth(ssm))
     sshd.setShellFactory(new SvdShellFactory(Array(SvdConfig.servedShell)))
 
