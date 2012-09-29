@@ -41,10 +41,10 @@ class LoggingManagerTest(_system: ActorSystem) extends TestKit(_system) with Def
     it should "list logger entries" in {
         val ref = system.actorOf(Props(new LoggingManager(TestLogger)))
         (ref ? Logger.ListEntries) onSuccess {
-            case Some(Logger.Entries) =>
+            case Logger.Entries(x) =>
                 true must be(true)
-            case _ =>
-                fail("Shouldn't happen")
+            case x =>
+                fail("Shouldn't happen. Problem: %s".format(x))
         }
         system.stop(ref)
     }
@@ -107,8 +107,8 @@ class LoggingManagerTest(_system: ActorSystem) extends TestKit(_system) with Def
         ref ! Logger.AddEntry("com.verknowsys.served.c", Logger.Levels.Error)
         ref ! Logger.RemoveEntry("com.verknowsys.served.b")
         (ref ? Logger.ListEntries) onSuccess {
-            case Some(Logger.Entries(x)) =>
-                x must be(Logger.Entries(
+            case Logger.Entries(x) =>
+                Logger.Entries(x) must be(Logger.Entries(
                     Map(
                         "com.verknowsys.served.a" -> Logger.Levels.Trace,
                         "com.verknowsys.served.c" -> Logger.Levels.Error
