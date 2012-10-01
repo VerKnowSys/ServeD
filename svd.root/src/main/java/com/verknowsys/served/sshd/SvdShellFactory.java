@@ -66,7 +66,7 @@ public class SvdShellFactory implements Factory<Command> {
         private TtyFilterOutputStream in;
         private TtyFilterInputStream out;
         private TtyFilterInputStream err;
-        
+
         public void start(Map<String,String> env) throws IOException {
             int size = command.length;
             String[] buf = new String[size + 1];
@@ -76,26 +76,26 @@ public class SvdShellFactory implements Factory<Command> {
             ProcessBuilder builder = new ProcessBuilder(buf);
 
             builder.environment().clear();
-            builder.environment().put("SHELL", "/usr/local/bin/zsh");
-            builder.environment().put("LOGNAME", env.get("USER"));
-            builder.environment().put("USER", env.get("USER"));
-            builder.environment().put("HOME", "/Users/" + env.get("USER"));
-            builder.environment().put("TERM", "xterm-256color");
-            builder.environment().put("HISTCONTROL", "erasedups");
-            builder.environment().put("HISTFILE", "~/.shell_history");
-            builder.environment().put("HISTSIZE", "8192");
-            builder.environment().put("SAVEHIST", "10000");
-            builder.environment().put("LC_CTYPE", "UTF-8");
-            builder.environment().put("LSCOLORS", "cxfxcxdxbxegedabagacad");
-            builder.environment().put("EDITOR", "/usr/bin/vi");
-            builder.environment().put("PS1", "%M:[${PR_GREEN}%n${PR_WHITE}:${PR_YELLOW}%$PR_PWDLEN<...<%~% ${PR_GREEN}${GITBRANCH}${PR_RESET}]: (%T) →");
+            // builder.environment().put("SHELL", "/usr/local/bin/zsh");
+            // builder.environment().put("LOGNAME", env.get("USER"));
+            // builder.environment().put("USER", env.get("USER"));
+            // builder.environment().put("HOME", "/Users/" + env.get("USER"));
+            // builder.environment().put("TERM", "xterm-256color");
+            // builder.environment().put("HISTCONTROL", "erasedups");
+            // builder.environment().put("HISTFILE", "~/.shell_history");
+            // builder.environment().put("HISTSIZE", "8192");
+            // builder.environment().put("SAVEHIST", "10000");
+            // builder.environment().put("LC_CTYPE", "UTF-8");
+            // builder.environment().put("LSCOLORS", "cxfxcxdxbxegedabagacad");
+            // builder.environment().put("EDITOR", "/usr/bin/vi");
+            // builder.environment().put("PS1", "%M:[${PR_GREEN}%n${PR_WHITE}:${PR_YELLOW}%$PR_PWDLEN<...<%~% ${PR_GREEN}${GITBRANCH}${PR_RESET}]: (%T) →");
             LOG.info("Starting shell with command: '{}' and env: {}", builder.command(), builder.environment());
             process = builder.start();
-            
+
             out = new TtyFilterInputStream(process.getInputStream());
             err = new TtyFilterInputStream(process.getErrorStream());
             in = new TtyFilterOutputStream(process.getOutputStream(), err);
-                
+
         }
 
         public OutputStream getInputStream() {
@@ -132,7 +132,7 @@ public class SvdShellFactory implements Factory<Command> {
             private int lastChar;
             public TtyFilterInputStream(InputStream in) {
                 super(in);
-                buffer = new Buffer(32);
+                buffer = new Buffer(64);
             }
             synchronized void write(int c) {
                 buffer.putByte((byte) c);
