@@ -9,6 +9,7 @@ import com.verknowsys.served.api._
 import com.verknowsys.served.db.{DBServer, DBClient, DB}
 import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
+import java.security.PublicKey
 
 import akka.actor._
 import akka.dispatch._
@@ -118,19 +119,25 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
                     // Start GitManager for this account
                     val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
-                    // self startLink gitManager
-
-                    sender ! Success
+                    (gitManager ? Init) onSuccess {
+                        case _ =>
+                            log.debug("Setting log watch on git manager.")
+                            context.watch(gitManager)
+                    }
 
                     // Start the real work
                     log.trace("Becaming started")
                     accountsManager ! Alive(account.uid)
                     context.become(started(db, gitManager))
+                    sender ! Success
 
                 case x =>
                     sender ! Error("DB initialization error. Got param: %s".format(x))
-                    throw new DBServerInitializationException
+                    SvdUtils.throwException[DBServerInitializationException]("DB initialization error. Got param: %s".format(x))
             }
+
+        // case AuthorizeWithKey(key: PublicKey) =>
+        //     log.debug("WTF? Not started manager!")
 
 
         case Success =>
@@ -153,7 +160,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             sender ! account
 
         case AuthorizeWithKey(key) =>
-            log.trace("Trying to find key in account: %s", account)
+            log.debug("Trying to find key in account: %s", account)
             sender ! accountKeys(db).keys.find(_.key == key).isDefined
 
         case ListKeys =>
@@ -168,7 +175,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             db << ak.copy(keys = ak.keys - key)
 
         case Success =>
-            log.debug("Got success")
+            log.debug("Become started with success")
 
         case msg: git.Base =>
             gitManager forward msg
