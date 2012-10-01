@@ -36,6 +36,27 @@ object SvdUtils extends Logging {
 
 
     /**
+      * A way to get default shell path depended on currently running operating system
+      *
+      * @author dmilith
+      *
+      */
+    def defaultShell = {
+        System.getProperty("os.name") match {
+            case "FreeBSD" =>
+                "/Software/Zsh/exports/zsh"
+
+            case "Mac OS X" =>
+                "/usr/local/bin/zsh"
+
+            case _ =>
+                "/usr/bin/zsh"
+
+        }
+    }
+
+
+    /**
       * Kills system process with given pid and signal
       *
       * @author dmilith
