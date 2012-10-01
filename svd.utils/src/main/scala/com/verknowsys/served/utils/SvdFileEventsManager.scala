@@ -156,6 +156,12 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
 
 
     def receive = {
+
+        case Init =>
+            log.debug("SvdFileEventsManager initialized")
+            sender ! Success
+
+
         // register new file event, sent from any actor
         case SvdRegisterFileEvent(path, flags, ref) =>
             idents.find { case(i, (p, l)) => p == path } match {
@@ -166,7 +172,6 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
             log.trace("Registered new file event: %s / %s for %s", path, flags, ref)
             log.trace("Registered file events: %s", idents)
             sender ! Success
-            // self reply Success
 
         case SvdUnregisterFileEvent(ref) =>
             idents.foreach { case ((ident, (path, list))) =>
@@ -178,7 +183,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
 
             log.trace("Unregistered file events for %s", ref)
             log.trace("Registered file events: %s", idents)
-            // self reply Success
+            sender ! Success
 
         // Forward event sent by kqueue to file watchers
         case SvdKqueueFileEvent(ident, flags) =>
@@ -189,9 +194,11 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
                     case ((fl, ref)) if (fl & flags) > 0 => ref ! SvdFileEvent(path, flags)
                 }
             }
+            sender ! Success
 
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
+            sender ! Error("Unknown signal: %s".format(x))
 
     }
 
