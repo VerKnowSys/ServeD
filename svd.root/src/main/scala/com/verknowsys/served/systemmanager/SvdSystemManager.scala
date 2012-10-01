@@ -50,6 +50,7 @@ class SvdSystemManager extends SvdExceptionHandler {
               .start
             log.info("WebSockets Server running at " + webServer.getUri)
 
+            sender ! Success
 
             // log.info("Sigar version loaded: %s".format(core.getVersion))
             // log.debug("System Resources Availability: [%s]".format(SvdLowLevelSystemAccess))
@@ -63,10 +64,11 @@ class SvdSystemManager extends SvdExceptionHandler {
             if (SvdUtils.isBSD)
                 sender ! SvdLowLevelSystemAccess.usagesys(uid)
             else
-                sender ! "NOT-IMPLEMENTED"
+                sender ! Error("NOT-IMPLEMENTED")
 
 
         case GetNetstat =>
+            sender ! Error("Not implemented")
             // XXX: NOTE: TODO: this function causes SIGSEGV on FreeBSD. This requires some investigation!
 
             // SvdLowLevelSystemAccess.netstat.stat(SvdLowLevelSystemAccess.core)
