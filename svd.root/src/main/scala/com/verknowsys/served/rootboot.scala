@@ -10,8 +10,8 @@ import com.verknowsys.served.systemmanager.SvdSystemManager
 // import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.sshd.SSHD
 import com.verknowsys.served.api._
-import com.typesafe.config.ConfigFactory
 
+import com.typesafe.config.ConfigFactory
 import akka.dispatch._
 import akka.pattern.ask
 import akka.remote._
@@ -26,16 +26,18 @@ class RootBoot extends Logging with SvdExceptionHandler {
 
     val system = ActorSystem(SvdConfig.served, ConfigFactory.load.getConfig(SvdConfig.served))
 
-    val sshd = system.actorOf(Props(new SSHD(SvdConfig.sshPort)).withDispatcher("svd-core-dispatcher"), "SvdSSHD") //, new SSHD(SvdConfig.sshPort))
+    // core svd actors:
+    val sshd = system.actorOf(Props[SSHD].withDispatcher("svd-single-dispatcher"), "SvdSSHD") // .withDispatcher("svd-core-dispatcher")
     val ssm = system.actorOf(Props[SvdSystemManager].withDispatcher("svd-core-dispatcher"), "SvdSystemManager")
     val sam = system.actorOf(Props[SvdAccountsManager].withDispatcher("svd-core-dispatcher"), "SvdAccountsManager") //"akka://%s@deldagorin:5555/user/SvdAccountsManager".format(SvdConfig.served))
+    val fem = system.actorOf(Props[SvdFileEventsManager].withDispatcher("svd-core-dispatcher"), "SvdFileEventsManager")
 
     val list = (
-        system.actorOf(Props[SvdFileEventsManager].withDispatcher("svd-core-dispatcher"), "SvdFileEventsManager") ::
+        fem ::
         // system.actorOf(Props(new LoggingManager())) ::
         ssm ::
         sam ::
-        system.actorOf(Props[SvdSystemInfo].withDispatcher("svd-core-dispatcher"), "SvdSystemInfo") ::
+        // system.actorOf(Props[SvdSystemInfo].withDispatcher("svd-core-dispatcher"), "SvdSystemInfo") ::
         // actorOf[SvdNotificationCenter] ::
         sshd ::
         Nil) //.map(Supervise(_, Permanent))
@@ -51,17 +53,32 @@ class RootBoot extends Logging with SvdExceptionHandler {
 
     def receive = {
         case Init =>
-            ssm ! Init
-            sam ! Init
-            context.watch(sshd)
-            context.watch(ssm)
-            context.watch(sam)
-            log.info("RootBoot initialized")
+            (fem ? Init) onSuccess {
+                case _ =>
+                    context.watch(fem)
+                    (sam ? Init) onSuccess {
+                        case _ =>
+                            context.watch(sam)
+                            (ssm ? Init) onSuccess {
+                                case _ =>
+                                    context.watch(ssm)
+                                    (sshd ? Init) onSuccess {
+                                        case _ =>
+                                            context.watch(sshd)
+
+                                            log.info("RootBoot initialized")
+                                    }
+                            }
+                    }
+            }
+
 
         case Success =>
-            log.debug("Got success")
+            log.debug("RootBoot success")
 
         case Shutdown =>
+            sshd ! Shutdown
+            system.shutdown
             log.debug("Got shutdown")
 
     }
@@ -89,9 +106,13 @@ object rootboot extends Logging {
         println("===   ServeD - core   ===")
         println("=========================")
         println()
-        println()
-        val rb = system.actorOf(Props(new RootBoot))
+        val rb = system.actorOf(Props[RootBoot].withDispatcher("svd-core-dispatcher"))
         rb ! Init
+
+        SvdUtils.addShutdownHook {
+            rb ! Shutdown
+        }
+
         // ssm ! Init
         // sam ! Init
         // Remote services
