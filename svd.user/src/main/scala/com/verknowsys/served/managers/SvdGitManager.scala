@@ -26,6 +26,10 @@ class SvdGitManager(
 
 
     def receive = traceReceive {
+        case Init =>
+            log.debug("Initializing repositories of %s in: %s".format(gitRepositoriesLocation, Repositories(RepositoryDB(db).toList)))
+            sender ! Success
+
         case ListRepositories =>
             log.trace("Listing git repositories in %s", gitRepositoriesLocation)
             sender ! Repositories(RepositoryDB(db).toList)
