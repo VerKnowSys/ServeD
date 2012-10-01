@@ -13,112 +13,150 @@ import akka.util.Duration
 import akka.util.Timeout
 import akka.util.duration._
 
-
 import java.security.PublicKey
 import org.apache.sshd.{SshServer => ApacheSSHServer}
-import org.apache.sshd.server.PublickeyAuthenticator
-import org.apache.sshd.server.session.ServerSession
-import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider
-import org.apache.sshd.server.shell.ProcessShellFactory
+import org.apache.sshd._
+import org.apache.sshd.server._
+import org.apache.sshd.server.session._
+import org.apache.sshd.server.command._
+import org.apache.sshd.server.keyprovider._
+import org.apache.sshd.server.shell._
 import com.typesafe.config.ConfigFactory
-// import org.apache.sshd.server.PasswordAuthenticator
-// import org.apache.sshd.server.CommandFactory
-// import org.apache.sshd.server.CommandFactory._
-// import org.apache.sshd.server.command.UnknownCommand
 
 
-class SSHD(port: Int) extends Actor with SvdExceptionHandler {
+sealed class SSHD(port: Int) extends SvdExceptionHandler {
 
-    // implicit val timeout = Timeout(30 seconds)
+    def this() = this(SvdConfig.sshPort)
 
-    val sshd = ApacheSSHServer.setUpDefaultServer()
-    sshd.setPort(port)
-    sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("hostkey.ser"))
+    val sshd = SshServer.setUpDefaultServer()
     val ssm = context.actorFor("akka://%s@127.0.0.1:5555/user/SvdAccountsManager".format(SvdConfig.served))
-    sshd.setPublickeyAuthenticator(new PublicKeyAuth(ssm))
-    sshd.setShellFactory(new SvdShellFactory(Array(SvdConfig.servedShell)))
+    // val acm = context.actorFor("akka://%s@127.0.0.1:5556/remote/SvdAccountManager".format(SvdConfig.served + "remote")) // port of fixed account!
 
-    override def preStart {
-        log.info("Starting SSHD on port %d", port)
-        sshd.start
-    }
+    sshd.setCommandFactory(new ScpCommandFactory(
+        new CommandFactory {
+            def createCommand(command: String) = new ProcessShellFactory(command.split(" ")).create
+        }))
+    sshd.setPort(port)
+    sshd.setKeyPairProvider(new PEMGeneratorHostKeyProvider("svd-ssh-key.pem"))
+    sshd.setPublickeyAuthenticator(new PublicKeyAuth)
 
 
     def receive = {
-        case msg => log.warn("I dont know message %s", msg)
+        case Init =>
+            sshd.setShellFactory(new SvdShellFactory(
+                Array(
+                    SvdConfig.servedShell,
+                    "501", // XXX: FIXME: default test user hardcoded!
+                    SvdUtils.defaultShell,
+                    "-i",
+                    "-s"
+                )
+            )) //, "'%s %d'".format())))
+            sshd.start
+            log.info("SSHD started on port %d", port)
+            sender ! Success
+
+        case Shutdown =>
+            sshd.stop
+
+
+        case msg =>
+            log.warn("I dont know message %s", msg)
+
     }
 
-    override def postStop {
-        log.debug("Stopping SSHD")
-        super.postStop
-        sshd.stop
-    }
+    // override def postStop {
+    //     log.debug("Stopping SSHD")
+    //     super.postStop
+    //     sshd.stop
+    // }
 }
 
-class PublicKeyAuth(ssm: ActorRef) extends PublickeyAuthenticator with Logging {
 
-
+class PublicKeyAuth extends PublickeyAuthenticator with Logging {
 
     def authenticate(username: String, key: PublicKey, session: ServerSession): Boolean = {
-        log.debug("User with name alias: %s is trying to connect with key: %s", username, key)
+        return true
+        // (ssm ? GetAccountByName(username)) onSuccess {
+        //     case Some(x: SvdAccount) =>
+        //         log.warn("Got actor ref to remote account! Account UID is %d".format(x.uid))
+        //         return true
 
-        catchException { username } map { userName =>
-            log.debug("User name %s".format(userName))
+        //         // log.warn("Checking uid: %d".format(x.uid))
+        //         // (acm ? AuthorizeWithKey(key)) onSuccess {
+        //         //     case x =>
+        //         //         log.debug("Menager responded with: %s", x)
+        //         // } onFailure {
+        //         //     case x =>
+        //         //         log.debug("Something bad happened? You got: %s", x)
+        //         // }
+        //         // ) onSuccess {
+        //             // case res: Boolean =>
+        //         // log.debug("RES! %s".format(res))
+        //         // val shell = "%s %d".format(SvdConfig.servedShell, x.uid)
+        //         // sshd.setShellFactory(new SvdShellFactory(shell.split(" ")))
+
+        //         // log.debug("returning true")
+        //                 // return res
+
+        //         //     case x =>
+        //         //         log.debug("NO KEY AUTH: %s", x)
+        //         //         return false
+
+        //         // } onFailure {
+        //         //     case x =>
+        //         //         log.debug("Failure with: %s", x)
+        //         //         return false
+        //         // }
+
+        //     case x =>
+        //         log.error("Wtf? No account? : %s", x)
+        //         return false
+
+        // } onFailure {
+        //     case x =>
+        //         log.warn("Failure lookup for SvdAccount: %s. reason %s", username, x)
+        //         return false
+        // }
+        // log.warn("WTF?")
+        // return false
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             // convert name to uid
             // get user id
             // val userUid = 501 // XXX: hack
+            // log.trace("Remote client trying to connect with UID: %s", userUid)
+            // val man = context.actorFor("akka://%s/user/SvdAccountsManager".format(SvdConfig.served))
+            // (man ? GetAccountManager(userUid)) onSuccess {
+            //     case Some(x: SvdAccountsManager) =>
+            //         context.become(dispatch)
+            //         log.info("Remote client successfully connected with UID: %s", userUid)
+            //         sender ! Success
 
-            (ssm ? GetAccountByName(userName)) onSuccess {
-                case Some(x: SvdAccount) =>
-                    log.debug("Got actor ref to remote account!")
-                    log.debug("Checking name: %s vs %s".format(userName, x.userName))
-                    return true
-                case None =>
-                    log.error("Wtf? No account")
-                    false
-
-            } onFailure {
-                case x =>
-                    log.warn("Failure lookup for SvdAccount: %s. reason %s", userName, x)
-                    false
-            }
-            false
-
-            // (ssm ? GetAccountManager(userUid)) onSuccess {
-            //     case Some(x: ActorRef) =>
-            //         log.debug("Account found: %s", x)
-            //         log.trace("Found manager")
-            //         (x ? AuthorizeWithKey(key)) onSuccess {
-            //             case res: Boolean =>
-            //                 log.debug("RES! %s".format(res))
-            //                 return res
-            //             case _ =>
-            //                 log.debug("NO KEY AUTH HACK: RES! %s")
-            //                 return true
-            //                 // false
-            //         }
-            //     case _ =>
-            //         log.debug("Account NOT found: %s", userName)
-            //         false
+            //     case None =>
+            //         sender ! Error("No remote client found")
 
             // } onFailure {
-            //     case _ =>
-            //         log.error("Failed connection to get account manager")
-            // }
-            // false
-            // val res = Await.result(future, timeout.duration)
-
-            // log.debug("res: %s", res)
-
-            //     case _ =>
-            //         log.warn("AccountManager for userUid %d not found", userUid)
-            //         false
+            //     case x =>
+            //         sender ! Error("Failure linking to remote client, cause of %s".format(x))
             // }
 
-        } getOrElse {
-            log.warn("Username %s is not a valid userUid", username)
-            false
-        }
+            // (ssm ? GetAccountManager(userUID)) onSuccess {
+                // case Some(x: ActorRef) =>
+                    // log.debug("Account manager found: %s", x)
+                    // log.trace("Found manager")
     }
 }
