@@ -25,10 +25,9 @@ import org.apache.sshd.server.shell._
 import com.typesafe.config.ConfigFactory
 
 
-sealed class SSHD(account: SvdAccount, port: Int) extends SvdExceptionHandler {
+sealed class SSHD(port: Int) extends SvdExceptionHandler {
 
-    def this() = this(SvdAccount(uid = 501), SvdConfig.sshPort)
-    def this(account: SvdAccount) = this(account, SvdConfig.sshPort)
+    def this() = this(SvdConfig.sshPort)
 
     val sshd = SshServer.setUpDefaultServer()
     val ssm = context.actorFor("akka://%s@127.0.0.1:5555/user/SvdAccountsManager".format(SvdConfig.served))
@@ -51,6 +50,10 @@ sealed class SSHD(account: SvdAccount, port: Int) extends SvdExceptionHandler {
                 )
             ))
             sshd.start
+
+        case Shutdown =>
+            context.unbecome
+            sshd.stop
 
         case _ =>
             sender ! Taken(account.uid)
@@ -77,13 +80,13 @@ sealed class SSHD(account: SvdAccount, port: Int) extends SvdExceptionHandler {
             log.debug("SSHD Got shell base for uid: %d", forUID)
             (sender ? ListKeys) onSuccess {
 
-                case set: Set[AccessKey] =>
+                case set: Set[_] =>
                     log.debug("Listing user SSH keys: %s", set)
 
                     (ssm ? GetAccount(forUID)) onSuccess {
                         case Some(account: SvdAccount) =>
-                            context.become(started(set, account))
-                            self ! Init
+                            context.become(started(set.asInstanceOf[Set[AccessKey]], account))
+                            self ! Init // hit message after it became listening state
 
                         case x =>
                             log.debug("We don't like this: %s", x)
@@ -104,7 +107,8 @@ sealed class SSHD(account: SvdAccount, port: Int) extends SvdExceptionHandler {
 
 
         case Shutdown =>
-            sshd.stop
+            log.debug("Shutdown requested. Bye")
+            context.stop(self)
 
 
         case msg =>
