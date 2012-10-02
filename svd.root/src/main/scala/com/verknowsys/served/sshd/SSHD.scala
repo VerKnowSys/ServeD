@@ -30,7 +30,7 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
     def this() = this(SvdConfig.sshPort)
 
     val sshd = SshServer.setUpDefaultServer()
-    val ssm = context.actorFor("akka://%s@127.0.0.1:5555/user/SvdAccountsManager".format(SvdConfig.served))
+    val ssm = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
     // val acm = context.actorFor("akka://%s@127.0.0.1:5556/remote/SvdAccountManager".format(SvdConfig.served + "remote")) // port of fixed account!
 
 
@@ -141,87 +141,6 @@ class PublicKeyAuth(setOfAccessKeys: Set[AccessKey], account: SvdAccount) extend
 
             username == account.userName
         }
-        // true
-        // (ssm ? GetAccountByName(username)) onSuccess {
-        //     case Some(x: SvdAccount) =>
-        //         log.warn("Got actor ref to remote account! Account UID is %d".format(x.uid))
-        //         return true
-
-        //         // log.warn("Checking uid: %d".format(x.uid))
-        //         // (acm ? AuthorizeWithKey(key)) onSuccess {
-        //         //     case x =>
-        //         //         log.debug("Menager responded with: %s", x)
-        //         // } onFailure {
-        //         //     case x =>
-        //         //         log.debug("Something bad happened? You got: %s", x)
-        //         // }
-        //         // ) onSuccess {
-        //             // case res: Boolean =>
-        //         // log.debug("RES! %s".format(res))
-        //         // val shell = "%s %d".format(SvdConfig.servedShell, x.uid)
-        //         // sshd.setShellFactory(new SvdShellFactory(shell.split(" ")))
-
-        //         // log.debug("returning true")
-        //                 // return res
-
-        //         //     case x =>
-        //         //         log.debug("NO KEY AUTH: %s", x)
-        //         //         return false
-
-        //         // } onFailure {
-        //         //     case x =>
-        //         //         log.debug("Failure with: %s", x)
-        //         //         return false
-        //         // }
-
-        //     case x =>
-        //         log.error("Wtf? No account? : %s", x)
-        //         return false
-
-        // } onFailure {
-        //     case x =>
-        //         log.warn("Failure lookup for SvdAccount: %s. reason %s", username, x)
-        //         return false
-        // }
-        // log.warn("WTF?")
-        // return false
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // convert name to uid
-            // get user id
-            // val userUid = 501 // XXX: hack
-            // log.trace("Remote client trying to connect with UID: %s", userUid)
-            // val man = context.actorFor("akka://%s/user/SvdAccountsManager".format(SvdConfig.served))
-            // (man ? GetAccountManager(userUid)) onSuccess {
-            //     case Some(x: SvdAccountsManager) =>
-            //         context.become(dispatch)
-            //         log.info("Remote client successfully connected with UID: %s", userUid)
-            //         sender ! Success
-
-            //     case None =>
-            //         sender ! Error("No remote client found")
-
-            // } onFailure {
-            //     case x =>
-            //         sender ! Error("Failure linking to remote client, cause of %s".format(x))
-            // }
-
-            // (ssm ? GetAccountManager(userUID)) onSuccess {
-                // case Some(x: ActorRef) =>
-                    // log.debug("Account manager found: %s", x)
-                    // log.trace("Found manager")
     }
+
 }
