@@ -32,6 +32,7 @@ object userboot extends Logging {
         system.shutdown
     }
 
+
     def run(userUID: Int){
         log.info("ServeD v" + SvdConfig.version)
         log.info(SvdConfig.copyright)
@@ -46,14 +47,12 @@ object userboot extends Logging {
 
         // Get account form remote service
         log.debug("Getting account for uid %d", userUID)
-        val akkaConfig = Source.fromFile(SvdConfig.userHomeDir / "%s".format(userUID) / "akka.conf").getLines.mkString("\n")
-        log.trace("Read akka configuration for account: %s", akkaConfig)
+        val configFile = SvdConfig.userHomeDir / "%d".format(userUID) / "akka.conf"
+        val akkaConfigContent = Source.fromFile(configFile).getLines.mkString("\n")
+        log.trace("Read akka configuration for account: %s", akkaConfigContent)
 
-        val system = ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfig).getConfig("ServeDremote"))
-        // implicit val timeout = Timeout(30 seconds)
+        val system = ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDremote"))
         val accountsManager = system.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
-
-        accountsManager ! Alive(501)
 
         (accountsManager ? GetAccount(userUID)) onSuccess {
 
