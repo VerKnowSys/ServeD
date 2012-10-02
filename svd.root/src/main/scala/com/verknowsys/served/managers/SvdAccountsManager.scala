@@ -23,7 +23,7 @@ import akka.util.Timeout
 import akka.util.duration._
 
 import scala.io.Source
-import java.io.File
+import java.io._
 import scala.util._
 
 
@@ -32,7 +32,7 @@ case object SvdUserPorts extends DB[SvdUserPort]
 case object SvdSystemPorts extends DB[SvdSystemPort]
 case object SvdUserUIDs extends DB[SvdUserUID]
 
-class SvdAccountUtils(db: DBClient) {
+class SvdAccountUtils(db: DBClient) extends Logging {
     /**
      *  @author dmilith
      *
@@ -81,11 +81,53 @@ class SvdAccountUtils(db: DBClient) {
     /**
      *  @author dmilith
      *
+     *   creates akka configuration file for given user
+     */
+    def createAkkaUserConfIfNotExistant(uid: Int, userManagerPort: Int) = {
+        val configFile = SvdConfig.userHomeDir / "%d".format(uid) / "akka.conf"
+
+        if (!new File(configFile).exists) {
+            log.debug("Akka config: %s not found. Generating default one", configFile)
+
+            def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
+                try { f(param) } finally { param.close() }
+
+            def writeToFile(fileName: String, data: String) =
+                using (new FileWriter(fileName)) {
+                    fileWriter => fileWriter.write(data)
+            }
+            val defaultConfig = Source.fromURL(
+                getClass.getResource(
+                    SvdConfig.defaultUserAkkaConf
+                )
+            ).getLines.mkString("\n").replaceAll("USER_NETTY_PORT", "%d".format(userManagerPort))
+            writeToFile(configFile, defaultConfig)
+        } else {
+            log.debug("Akka config found: %s", configFile)
+        }
+    }
+
+
+    /**
+     *  @author dmilith
+     *
      *   registers user UID with given number in svd database
      */
-    def registerUserAccount(uid: Int) = {
-        registerUserUID(uid)
-        db << SvdAccount(uid = uid)
+    def registerUserAccount(uid: Int): Unit = {
+        if (!userUIDRegistered(uid)) {
+            val userManagerPort = randomUserPort
+            log.trace("Generated user namanager port: %d for account with uid: %d", userManagerPort, uid)
+
+            if (!userPortRegistered(userManagerPort))
+                registerUserPort(userManagerPort)
+
+            registerUserUID(uid)
+            createAkkaUserConfIfNotExistant(uid, userManagerPort)
+            db << SvdAccount(uid = uid, accountManagerPort = userManagerPort)
+
+        } else {
+            log.trace("User already registered")
+        }
     }
 
 
@@ -216,9 +258,10 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
             // registerFileEventFor(SvdConfig.systemHomeDir, Modified)
 
-            //if (SvdUtils.isOSX) /* 2011-06-26 18:17:00 - dmilith - NOTE: XXX: default user definition only for OSX hosts: */
-            if (!userUIDRegistered(501))
-                registerUserAccount(501)
+            registerUserAccount(500)
+            registerUserAccount(501)
+            registerUserAccount(502)
+
 
             // log.info("Spawning Coreginx")
             // coreginx.start
@@ -241,17 +284,19 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
             log.debug("GetAccountByName(%s): %s", name, account)
             sender ! account
 
-        case SetAccountManager(uid) =>
-            // SvdGlobalRegistry.ActorManagers.values += (uid -> self)
-            log.info("User worker spawned successfully and mounted in SvdGlobalRegistry. Current store: %s", SvdGlobalRegistry.ActorManagers.values)
-            sender ! Success
+        // case SetAccountManager(uid) =>
+        //     // SvdGlobalRegistry.ActorManagers.values += (uid -> self)
+        //     log.info("User worker spawned successfully and mounted in SvdGlobalRegistry. Current store: %s", SvdGlobalRegistry.ActorManagers.values)
+        //     sender ! Success
 
-        case GetAccountManager(uid) =>
-            log.trace("GetAccountManager(%d)", uid)
-            sender ! (SvdGlobalRegistry.ActorManagers.values get uid getOrElse AccountNotFound)
+        // case GetAccountManager(uid) =>
+        //     log.trace("GetAccountManager(%d)", uid)
+        //     sender ! (SvdGlobalRegistry.ActorManagers.values get uid getOrElse AccountNotFound)
 
         case Alive(uid) =>
             // sender ! Error("Not yet implemented")
+            // add uid manager to list of active managers?
+            log.trace("UID %d is alive", uid)
             sender ! Success
 
         case GetPort =>
