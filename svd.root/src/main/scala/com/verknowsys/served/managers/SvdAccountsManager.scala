@@ -122,6 +122,9 @@ class SvdAccountUtils(db: DBClient) extends Logging {
                 registerUserPort(userManagerPort)
 
             registerUserUID(uid)
+            val userHomeDir = SvdConfig.userHomeDir / "%d".format(uid)
+            SvdUtils.checkOrCreateDir(userHomeDir)
+            SvdUtils.chown(userHomeDir, uid)
             createAkkaUserConfIfNotExistant(uid, userManagerPort)
             db << SvdAccount(uid = uid, accountManagerPort = userManagerPort)
 
@@ -258,9 +261,9 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
             // registerFileEventFor(SvdConfig.systemHomeDir, Modified)
 
-            registerUserAccount(500)
+            // registerUserAccount(500)
             registerUserAccount(501)
-            registerUserAccount(502)
+            // registerUserAccount(502)
 
 
             // log.info("Spawning Coreginx")
