@@ -63,6 +63,7 @@ object SvdConfig {
     def kqueueWaitInterval              = 200
     def sleepDefaultPause               = 1000
     def gatherTimeout                   = 1000
+    def defaultUserAkkaConf             = "/defaultUserAkkaConf.conf"
     def standardShellEnvironment        = ". /etc/profile\nulimit -u 120\n"
     def notificationXmppRecipients      = "dmilith@verknowsys.com,i@teamon.eu"
     def notificationXmppHost            = "verknowsys.com"
