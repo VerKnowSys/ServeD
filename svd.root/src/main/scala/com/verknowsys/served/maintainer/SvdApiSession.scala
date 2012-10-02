@@ -26,7 +26,7 @@ class SvdApiSession extends SvdManager {
 
         case General.Connect(userUid) =>
             log.trace("Remote client trying to connect with UID: %s", userUid)
-            val man = context.actorFor("akka://%s/user/SvdAccountsManager".format(SvdConfig.served))
+            val man = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
             (man ? GetAccountManager(userUid)) onSuccess {
                 case Some(x: SvdAccountsManager) =>
                     context.become(dispatch)

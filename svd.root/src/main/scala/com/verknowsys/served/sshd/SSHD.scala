@@ -31,13 +31,11 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
 
     val sshd = SshServer.setUpDefaultServer()
     val ssm = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
-    // val acm = context.actorFor("akka://%s@127.0.0.1:5556/remote/SvdAccountManager".format(SvdConfig.served + "remote")) // port of fixed account!
 
 
     def started(listOfKeys: Set[AccessKey], account: SvdAccount): Receive = {
 
         case Init =>
-
             log.debug("SSHD Becoming available for uid %d", account.uid)
             sshd.setPublickeyAuthenticator(new PublicKeyAuth(listOfKeys, account))
             sshd.setShellFactory(new SvdShellFactory(

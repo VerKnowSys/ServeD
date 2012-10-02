@@ -64,7 +64,7 @@ class SvdSystemManager extends SvdExceptionHandler {
             if (SvdUtils.isBSD)
                 sender ! SvdLowLevelSystemAccess.usagesys(uid)
             else
-                sender ! Error("NOT-IMPLEMENTED")
+                sender ! Error("NOT-IMPLEMENTED on this OS! Do it on FreeBSD host.")
 
 
         case GetNetstat =>
