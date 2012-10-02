@@ -21,7 +21,7 @@ case class SvdAccount (
         uuid: UUID = randomUUID
     ) extends Persistent {
 
-    override def toString = "SvdAccount(%s)[%s]".format(userName, uid)
+    override def toString = "SvdAccount(%s)[%s]{%s}".format(userName, uid, accountManagerPort)
 
 }
 
