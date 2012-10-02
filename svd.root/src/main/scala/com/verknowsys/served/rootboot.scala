@@ -28,8 +28,8 @@ class RootBoot extends Logging with SvdExceptionHandler {
 
     // core svd actors:
     val sshd = system.actorOf(Props[SSHD].withDispatcher("svd-single-dispatcher"), "SvdSSHD") // .withDispatcher("svd-core-dispatcher")
-    val ssm = system.actorOf(Props[SvdSystemManager].withDispatcher("svd-core-dispatcher"), "SvdSystemManager")
-    val sam = system.actorOf(Props[SvdAccountsManager].withDispatcher("svd-core-dispatcher"), "SvdAccountsManager") //"akka://%s@deldagorin:5555/user/SvdAccountsManager".format(SvdConfig.served))
+    val ssm = system.actorOf(Props[SvdSystemManager].withDispatcher("svd-single-dispatcher"), "SvdSystemManager")
+    val sam = system.actorOf(Props[SvdAccountsManager].withDispatcher("svd-single-dispatcher"), "SvdAccountsManager") //"akka://%s@deldagorin:10/user/SvdAccountsManager".format(SvdConfig.served))
     val fem = system.actorOf(Props[SvdFileEventsManager].withDispatcher("svd-core-dispatcher"), "SvdFileEventsManager")
 
     val list = (
@@ -55,18 +55,21 @@ class RootBoot extends Logging with SvdExceptionHandler {
         case Init =>
             (fem ? Init) onSuccess {
                 case _ =>
+                    log.info("FEM initialized")
                     context.watch(fem)
                     (sam ? Init) onSuccess {
                         case _ =>
+                            log.info("SAM initialized")
                             context.watch(sam)
                             (ssm ? Init) onSuccess {
                                 case _ =>
+                                    log.info("SSM initialized")
                                     context.watch(ssm)
                                     (sshd ? Init) onSuccess {
                                         case _ =>
+                                            log.info("SSHD initialized")
                                             context.watch(sshd)
 
-                                            log.info("RootBoot initialized")
                                     }
                             }
                     }

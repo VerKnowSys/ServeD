@@ -72,8 +72,9 @@ trait SvdFileEventsReactor extends SvdExceptionHandler {
     self: Actor with Logging =>
 
     def registerFileEventFor(path: String, flags: Int){
-        val fem = context.actorFor("akka://%s@127.0.0.1:5555/user/SvdFileEventsManager".format(SvdConfig.served)) // , name = "SvdFileEventsManager"
+        val fem = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // , name = "SvdFileEventsManager"
         fem ! SvdRegisterFileEvent(path, flags, fem)
+
         // val res = Await.result(future, timeout.duration).asInstanceOf[ActorRef]
         // XXX: CHECKME
         // res match {

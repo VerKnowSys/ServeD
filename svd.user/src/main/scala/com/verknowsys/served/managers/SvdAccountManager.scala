@@ -38,8 +38,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val sh = new SvdShell(account)
-    val accountsManager = context.actorFor("akka://%s@127.0.0.1:5555/user/SvdAccountsManager".format(SvdConfig.served)) // XXX: hardcode
-    val sshd = context.actorFor("akka://%s@127.0.0.1:5555/user/SvdSSHD".format(SvdConfig.served)) // XXX: hardcode
+    val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
+    val sshd = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
 
 
     // Only for closing in postStop
