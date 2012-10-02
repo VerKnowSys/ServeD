@@ -5,6 +5,7 @@ import com.verknowsys.served.managers.SvdAccountsManager
 import com.verknowsys.served.utils._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.api._
+import com.verknowsys.served.api.accountkeys._
 import akka.actor._
 import akka.dispatch._
 import akka.pattern.ask
@@ -24,37 +25,83 @@ import org.apache.sshd.server.shell._
 import com.typesafe.config.ConfigFactory
 
 
-sealed class SSHD(port: Int) extends SvdExceptionHandler {
+sealed class SSHD(account: SvdAccount, port: Int) extends SvdExceptionHandler {
 
-    def this() = this(SvdConfig.sshPort)
+    def this() = this(SvdAccount(uid = 501), SvdConfig.sshPort)
+    def this(account: SvdAccount) = this(account, SvdConfig.sshPort)
 
     val sshd = SshServer.setUpDefaultServer()
     val ssm = context.actorFor("akka://%s@127.0.0.1:5555/user/SvdAccountsManager".format(SvdConfig.served))
     // val acm = context.actorFor("akka://%s@127.0.0.1:5556/remote/SvdAccountManager".format(SvdConfig.served + "remote")) // port of fixed account!
 
-    sshd.setCommandFactory(new ScpCommandFactory(
-        new CommandFactory {
-            def createCommand(command: String) = new ProcessShellFactory(command.split(" ")).create
-        }))
-    sshd.setPort(port)
-    sshd.setKeyPairProvider(new PEMGeneratorHostKeyProvider("svd-ssh-key.pem"))
-    sshd.setPublickeyAuthenticator(new PublicKeyAuth)
 
+    def started(listOfKeys: Set[AccessKey], account: SvdAccount): Receive = {
 
-    def receive = {
         case Init =>
+
+            log.debug("SSHD Becoming available for uid %d", account.uid)
+            sshd.setPublickeyAuthenticator(new PublicKeyAuth(listOfKeys, account))
             sshd.setShellFactory(new SvdShellFactory(
                 Array(
                     SvdConfig.servedShell,
-                    "501", // XXX: FIXME: default test user hardcoded!
+                    "%d".format(account.uid),
                     SvdUtils.defaultShell,
                     "-i",
                     "-s"
                 )
-            )) //, "'%s %d'".format())))
+            ))
             sshd.start
-            log.info("SSHD started on port %d", port)
+
+        case _ =>
+            sender ! Taken(account.uid)
+
+    }
+
+
+    def receive = {
+
+        case Init =>
+            sshd.setCommandFactory(new ScpCommandFactory(
+                new CommandFactory {
+                    def createCommand(command: String) = new ProcessShellFactory(command.split(" ")).create
+                }
+            ))
+            sshd.setPort(port)
+            sshd.setKeyPairProvider(new PEMGeneratorHostKeyProvider("svd-ssh-key.pem"))
+
+            log.info("SSHD prepared on port %d but not listening yet", port)
             sender ! Success
+
+
+        case InitSSHChannelForUID(forUID: Int) =>
+            log.debug("SSHD Got shell base for uid: %d", forUID)
+            (sender ? ListKeys) onSuccess {
+
+                case set: Set[AccessKey] =>
+                    log.debug("Listing user SSH keys: %s", set)
+
+                    (ssm ? GetAccount(forUID)) onSuccess {
+                        case Some(account: SvdAccount) =>
+                            context.become(started(set, account))
+                            self ! Init
+
+                        case x =>
+                            log.debug("We don't like this: %s", x)
+
+                    } onFailure {
+                        case x =>
+                            log.debug("I'm trying, but, come on. Wtf?: %s", x)
+                    }
+
+                case x =>
+                    log.debug("Got something weird for uid %d - %s", forUID, x)
+
+
+            } onFailure {
+                case x =>
+                    sender ! Error("Failed to ask for user SSHD keys")
+            }
+
 
         case Shutdown =>
             sshd.stop
@@ -73,10 +120,24 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
 }
 
 
-class PublicKeyAuth extends PublickeyAuthenticator with Logging {
+class PublicKeyAuth(setOfAccessKeys: Set[AccessKey], account: SvdAccount) extends PublickeyAuthenticator with Logging {
 
-    def authenticate(username: String, key: PublicKey, session: ServerSession): Boolean = {
-        return true
+
+    def authenticate(username: String, key: PublicKey, session: ServerSession) = {
+        log.debug("Pending SSH Authentication username: %s, key: %s, session: %s", username, key, session)
+
+        val set = setOfAccessKeys.filter{
+            _.key == key
+        }
+        if (set.isEmpty) {
+            log.debug("Set empty. No matching keys")
+            false
+        } else {
+            log.debug("Set not empty. Matching key found. Checking user name: %s", username == account.userName)
+
+            username == account.userName
+        }
+        // true
         // (ssm ? GetAccountByName(username)) onSuccess {
         //     case Some(x: SvdAccount) =>
         //         log.warn("Got actor ref to remote account! Account UID is %d".format(x.uid))
