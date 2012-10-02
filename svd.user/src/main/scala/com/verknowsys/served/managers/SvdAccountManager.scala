@@ -39,6 +39,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val sh = new SvdShell(account)
     val accountsManager = context.actorFor("akka://%s@127.0.0.1:5555/user/SvdAccountsManager".format(SvdConfig.served)) // XXX: hardcode
+    val sshd = context.actorFor("akka://%s@127.0.0.1:5555/user/SvdSSHD".format(SvdConfig.served)) // XXX: hardcode
+
 
     // Only for closing in postStop
     private var _dbServer: Option[DBServer] = None // XXX: Refactor
@@ -126,9 +128,15 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
                     }
 
                     // Start the real work
-                    log.trace("Becaming started")
+                    log.debug("Becaming started")
                     accountsManager ! Alive(account.uid)
                     context.become(started(db, gitManager))
+                    self ! Init
+
+                    // little hacky but gives ability to load default key
+                    // def defaultUserPublicKey = scala.io.Source.fromURL(getClass.getResource("/defaultUserKey.pub")).getLines.mkString("\n")
+                    // val key = KeyUtils.load(defaultUserPublicKey)
+                    // self ! AddKey(AccessKey(name = "guest", key = key.get))
                     sender ! Success
 
                 case x =>
@@ -155,6 +163,11 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
         // case GetUserProcessList =>
         //     val psAll = SvdLowLevelSystemAccess.processList(false)
         //     log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
+        case Init =>
+            log.debug("Sending init to SSHD manager")
+            // send availability of user to sshd manager
+            sshd ! InitSSHChannelForUID(account.uid)
+
 
         case GetAccount =>
             sender ! account
