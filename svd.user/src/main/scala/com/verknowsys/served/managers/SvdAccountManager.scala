@@ -166,8 +166,12 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
         case Init =>
             log.debug("Sending init to SSHD manager")
             // send availability of user to sshd manager
-            sshd ! InitSSHChannelForUID(account.uid)
-
+            (sshd ? InitSSHChannelForUID(account.uid)) onSuccess {
+                case Taken(x) =>
+                    log.trace("SSHD taken by x: %s", x)
+                    sshd ! Shutdown
+                    sshd ! InitSSHChannelForUID(account.uid)
+            }
 
         case GetAccount =>
             sender ! account
