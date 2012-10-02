@@ -83,7 +83,7 @@ const static string coreDir = currentDir();
             int count = 13;
         #endif
         char *args[] = {
-            (char*)"java",
+            (char*)DEFAULT_JAVA_BIN,
             (char*)"-d32",
             (char*)"-client",
             (char*)"-Xmn1m",
