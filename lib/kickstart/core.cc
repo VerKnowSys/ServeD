@@ -36,14 +36,12 @@ const static string coreDir = currentDir();
     void load_svd64(execParams params) {
         string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
         #ifdef DEVEL
-            int count = 19;
+            int count = 17;
         #endif
         char *args[] = {
-            (char*)"java",
+            (char*)DEFAULT_JAVA64_BIN,
             (char*)"-d64",
-            (char*)"-client",
             (char*)"-Xmn2m",
-            (char*)"-XX:NewRatio=1",
             (char*)"-Xms8m",
             (char*)"-Xmx128m",
             (char*)"-XX:+UseCompressedOops",
