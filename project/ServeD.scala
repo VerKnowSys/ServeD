@@ -65,19 +65,18 @@ object Dependencies {
     val jline = "jline" % "jline" % "0.9.9"
     val scalatest = "org.scalatest" %% "scalatest" % "1.8"
     val expect4j = "net.sourceforge.expectj" % "expectj" % "2.0.1"
-    val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "1.0.0.201106090707-r"
+    val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "2.1.0.201209190230-r" // "1.0.0.201106090707-r"
     val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
     val smack = "jivesoftware" % "smack" % "3.0.4"
-    val specs = "org.scala-tools.testing" % "specs_2.8.1" % "1.6.8"
+    // val specs = "org.scala-tools.testing" % "specs" % "1.6.9"
     // val specs = "org.scala-tools.testing" %% "specs" % "1.6.9"
-    val h2 = "com.h2database" % "h2" % "1.3.154"
     // val jetty = "org.mortbay.jetty" % "jetty" % "6.1.22" % "container"
     // val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.4.1.v20110513"
     val sshd = "org.apache.sshd" % "sshd-core" % "0.7.0"
-    val slf4japi = "org.slf4j" % "slf4j-api" % "1.5.8"
+    // val slf4japi = "org.slf4j" % "slf4j-api" % "1.7.1" // WARN: api change
     val commonsio = "commons-io" % "commons-io" % "1.3.2"
     val webbit = "org.webbitserver" % "webbit" % "0.3.8"
-    val scalaz = "org.scalaz" % "scalaz-core_2.9.2" % "7.0.0-M3"
+    // val scalaz = "org.scalaz" % "scalaz-core_2.9.2" % "7.0.0-M3"
 
     val tzip = "de.schlichtherle" % "truezip" % "6.8.4"
     val bouncycastle = "bouncycastle" % "bcprov-jdk15" % "140"
@@ -102,10 +101,10 @@ object ServeD extends Build {
     lazy val root = Project("root", file("svd.root"),
         settings = coreBuildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
-            libraryDependencies ++= Seq(jline, h2, expect4j, sshd, webbit),
+            libraryDependencies ++= Seq(jline, expect4j, sshd, webbit),
             mainClass in assembly := Some("com.verknowsys.served.rootboot")
         )
-    ) dependsOn(common, testing % "test")
+    ) dependsOn(api, common, testing % "test")
 
 
     lazy val user = Project("user", file("svd.user"),
@@ -113,14 +112,14 @@ object ServeD extends Build {
             parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(jline, jgit, smack)
         )
-    ) dependsOn(common, testing % "test")
+    ) dependsOn(api, common, testing % "test")
 
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis, expect4j, scalaz, bouncycastle)
+            libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle)
         )
-    ) dependsOn(utils, testing % "test")
+    ) dependsOn(api, utils, testing % "test")
 
 
     lazy val api = Project("api", file("svd.api"),
@@ -134,13 +133,13 @@ object ServeD extends Build {
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(jline)
         )
-    ) dependsOn(api, utils)
+    ) dependsOn(api, utils, testing % "test")
 
 
     lazy val utils = Project("utils", file("svd.utils"),
         settings = buildSettings ++ Seq(
             compileOrder        := CompileOrder.Mixed,
-            libraryDependencies ++= Seq(messadmin, jna, slf4japi, tzip, bouncycastle, scalaz)
+            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd) // slf4japi/
         )
     ) dependsOn(api, testing % "test")
 
@@ -156,7 +155,7 @@ object ServeD extends Build {
 
     lazy val testing = Project("testkit", file("svd.testing"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(specs, scalatest, akkaTestkit, commonsio, scalaz, bouncycastle)
+            libraryDependencies ++= Seq(scalatest, akkaTestkit, commonsio, bouncycastle)
         )
     ) dependsOn(api)
 }
