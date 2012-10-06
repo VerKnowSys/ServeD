@@ -264,8 +264,8 @@ extern "C" {
         for (int i = 0; i < count; ++i) {
             stringstream out;
             args = kvm_getargv(kd, procs, 0);
-            out << (procs->ki_comm) << "#"
-                // << (procs->ki_pid) << "#"
+            out << (procs->ki_comm) << " "
+                << (procs->ki_pid) << "#"
                 << (procs->ki_runtime / 1000) << " "
                 << (procs->ki_rusage.ru_inblock) << " "
                 << (procs->ki_rusage.ru_oublock) << " "

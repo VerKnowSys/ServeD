@@ -75,7 +75,7 @@ int main(int argc, char const *argv[]) {
     } else {
         // writer mode. Gather information from process for each second
         ofstream file;
-        file.open("output_all_processes.training", ios::app);
+        file.open("output_raw_processes.training", ios::app);
         int maxVal = 1200; // every second in 20 minutes
         for (int i = 0; i < maxVal; ++i) {
             cout << i + 1 << " of " << maxVal << endl;
@@ -84,8 +84,6 @@ int main(int argc, char const *argv[]) {
         }
         file.close();
     }
-
-
 
     return 0;
 }
