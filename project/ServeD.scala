@@ -29,7 +29,7 @@ object BuildSettings {
         // javacOptions     += "-encoding UTF-8",
         // javacOptions     += "-source 1.6",
         // javacOptions     += "-target 1.6",
-        // javacOptions     += "-Xlint:unchecked",
+        javacOptions     += "-Xlint:unchecked",
         javacOptions    += "-Xlint:deprecation"
 
     ) ++ Tasks.all
@@ -61,7 +61,7 @@ object Dependencies {
     val akkaTestkit = "com.typesafe.akka" % "akka-testkit" % akkaVersion
 
     val messadmin = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
-    val jna = "net.java.dev.jna" % "jna" % "3.2.5"
+    val jna = "net.java.dev.jna" % "jna" % "3.2.7"
     val jline = "jline" % "jline" % "0.9.9"
     val scalatest = "org.scalatest" %% "scalatest" % "1.8"
     val expect4j = "net.sourceforge.expectj" % "expectj" % "2.0.1"
