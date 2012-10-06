@@ -24,6 +24,7 @@
 #include <sys/un.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 #ifdef __FreeBSD__
     #include <kvm.h>
@@ -52,7 +53,7 @@
 
     /* global constants */
 
-    // #define DEVEL true
+    #define DEVEL
     #define APP_VERSION "0.2.4"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
@@ -128,6 +129,7 @@
 
         int getOwner(char* path);
         const char* getProcessUsage(int uid, bool consoleOutput = false);
+        const char* processDataToLearn(int uid);
 
     }
 

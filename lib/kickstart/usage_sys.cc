@@ -243,6 +243,46 @@ extern "C" {
     }
 
 
+    const char* processDataToLearn(int uid) {
+
+        int count = 0;
+        char** args = NULL;
+        string output;
+        const int pagesize = getpagesize();
+        const int totalMem = pagesize * sysconf(_SC_PHYS_PAGES);
+
+        kvm_t* kd = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL);
+        if (kd == 0) {
+            return (char*)"KDERR";
+        }
+
+        kinfo_proc* procs = kvm_getprocs(kd, KERN_PROC_UID, uid, &count); // get processes directly from BSD kernel
+        if (count <= 0) {
+            return (char*)"NOPCS";
+        }
+
+        for (int i = 0; i < count; ++i) {
+            stringstream out;
+            args = kvm_getargv(kd, procs, 0);
+            out << (procs->ki_comm) << "#"
+                // << (procs->ki_pid) << "#"
+                << (procs->ki_runtime / 1000) << " "
+                << (procs->ki_rusage.ru_inblock) << " "
+                << (procs->ki_rusage.ru_oublock) << " "
+                << (procs->ki_rssize * pagesize) << " "
+                << count << " "
+                << totalMem
+                << endl;
+
+            args = NULL;
+            output += out.str();
+            procs++;
+        }
+
+        kvm_close(kd);
+        return output.c_str();
+    }
+
 } // extern
 
 
