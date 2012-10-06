@@ -90,7 +90,7 @@ fi
 
 
 # FANN library build:
-FANN_FLAGS="-pedantic -ansi"
+FANN_FLAGS="-pedantic"
 $CC $FLAGS $FANN_FLAGS -c lib/fann/fann_cascade.c -o lib/fann_cascade.o
 check $? "FANN cascade"
 $CC $FLAGS $FANN_FLAGS -c lib/fann/doublefann.c -o lib/doublefann.o
@@ -115,24 +115,24 @@ if [ "$system" = "Darwin" ]; then
     check $? "FANN library"
 
     $CC $FLAGS $FANN_FLAGS -arch x86_64 -shared -o lib/libfann-fixed.dylib lib/fixedfann.o
-    check $? "FANN fixed library"
+    check $? "FANN fixed library" "lib/libfann-fixed.dylib"
 
     $CC $FLAGS $FANN_FLAGS -arch x86_64 -shared -o lib/libfann-float.dylib lib/floatfann.o
-    check $? "FANN float library"
+    check $? "FANN float library" "lib/libfann-float.dylib"
 
     $CC $FLAGS $FANN_FLAGS -arch x86_64 -shared -o lib/libfann-double.dylib lib/doublefann.o
-    check $? "FANN double library"
+    check $? "FANN double library" "lib/libfann-double.dylib"
 else
     $CC $FLAGS $FANN_FLAGS -shared -o lib/libfann.so lib/fann.o lib/fann_train_data.o lib/fann_train.o lib/fann_io.o lib/fann_error.o lib/fann_cascade.o
-    check $? "FANN library"
+    check $? "FANN library" "lib/libfann.so"
 
     $CC $FLAGS $FANN_FLAGS -shared -o lib/libfann-fixed.so lib/fixedfann.o
-    check $? "FANN fixed library"
+    check $? "FANN fixed library" "lib/libfann-fixed.so"
 
     $CC $FLAGS $FANN_FLAGS -shared -o lib/libfann-float.so lib/floatfann.o
-    check $? "FANN float library"
+    check $? "FANN float library" "lib/libfann-float.so"
 
     $CC $FLAGS $FANN_FLAGS -shared -o lib/libfann-double.so lib/doublefann.o
-    check $? "FANN double library"
+    check $? "FANN double library" "lib/libfann-double.so"
 fi
 
