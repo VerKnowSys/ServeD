@@ -78,6 +78,8 @@
     #define CORE_HOMEDIR "/SystemUsers/"
     #define USERS_HOME_DIR "/Users/"
     #define LIBRARIES_DIR "/lib/"
+    #define DEFAULT_BEHAVIORS_DIR "basesystem/behaviors"
+    #define DEFAULT_BEHAVIORS_RAW "/output_raw_processes.raw.input"
 
     #define CORE_SVD_ID "boot"
     #define SOCK_FILE "svd.sock"
@@ -87,6 +89,9 @@
     #define ROOT_JAR_FILE "/sbin/root.core"
     #define USER_JAR_FILE "/bin/user.core"
 
+    #define DEFAULT_USER_UID 500
+    #define DEFAULT_GATHERING_PAUSE_MICROSECONDS 500000 // half a second
+    #define DEFAULT_COUNT_OF_ROUNDS_OF_GATHERING 7200 // waiting half a second, hence 7200 is 60 minutes of gathering
     #define DEFAULT_USER_GROUP 0
     #define SOCK_DATA_PACKET_SIZE 32
     #define LOCK_FILE_OCCUPIED_ERROR 100

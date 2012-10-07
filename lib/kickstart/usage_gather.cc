@@ -20,7 +20,7 @@ int main(int argc, char const *argv[]) {
             if (argc >= 3)
                 argument = atoi(argv[2]);
             else
-                argument = 500;
+                argument = DEFAULT_USER_UID;
             SVDWRITER = 1;
         } else {
             argument = atoi(argv[1]);
@@ -87,10 +87,12 @@ int main(int argc, char const *argv[]) {
     } else {
         // writer mode. Gather information from process for each second
         ofstream file, file_per_process;
-        file.open("output_raw_processes.before-train", ios::app);
-        int maxVal = 7200; // waiting half a second, hence 60 minutes of gathering
-        for (int i = 0; i < maxVal; ++i) {
-            cout << "Iteration " << i + 1 << " of " << maxVal << endl;
+        string defaultBehavRAW = string(DEFAULT_BEHAVIORS_DIR) + string(DEFAULT_BEHAVIORS_RAW);
+        mkdir(DEFAULT_BEHAVIORS_DIR, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
+        file.open(defaultBehavRAW.c_str(), ios::app);
+        for (int i = 0; i < DEFAULT_COUNT_OF_ROUNDS_OF_GATHERING; ++i) {
+            cout << "Iteration " << i + 1 << " of " << DEFAULT_COUNT_OF_ROUNDS_OF_GATHERING << endl;
             const string data = processDataToLearn(argument);
             const vector<string> values = split(data, "\n");
             for (int it = 0; it < values.size(); it++) {
@@ -98,9 +100,9 @@ int main(int argc, char const *argv[]) {
                 const vector<string> process_name_and_pid = split(two_sides.front(), " ");
                 const string procName = process_name_and_pid.front();
                 const string procPid = process_name_and_pid.back();
-                if (procName != "") {
-                    mkdir("basesystem/behaviors", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-                    string fileName = "basesystem/behaviors/" + procName + "-" + procPid + ".input";
+                if (!procName.empty()) {
+
+                    string fileName = string(DEFAULT_BEHAVIORS_DIR) + "/" + procName + "-" + procPid + ".input";
 
                     file_per_process.open(fileName.c_str(), ios::app);
                     file_per_process << two_sides.back() << endl; // write list of pid states
@@ -110,7 +112,7 @@ int main(int argc, char const *argv[]) {
             }
 
             file << "PROC_BEGIN" << endl << data << "PROC_END" << endl << endl;
-            usleep(500000);
+            usleep(DEFAULT_GATHERING_PAUSE_MICROSECONDS);
         }
         file.close();
     }

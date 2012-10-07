@@ -15,7 +15,8 @@ if [ -e "/usr/bin/clang++" ]; then
 fi
 
 echo "System: $system"
-echo "Compiler: $CXX"
+echo "C compiler: $CC"
+echo "C++ compiler: $CXX"
 echo "Flags: $FLAGS"
 echo "Devel: $DEVEL"
 echo
