@@ -11,6 +11,10 @@ extern vector<string> split(const string& s, const string& delim, const bool kee
 
 int main(int argc, char const *argv[]) {
 
+#ifdef __APPLE__
+    cout << "Apple systems unsupported yet." << endl;
+    return 1;
+#else
     int SVDWRITER = 0;
     int argument = 0;
     if (argc == 1) {
@@ -69,16 +73,12 @@ int main(int argc, char const *argv[]) {
                 count = COUNT_TIMES;
                 tS.tv_sec = 0;
                 tS.tv_nsec = 0;
-                #ifndef __APPLE__
                 clock_settime(CLOCK_REALTIME, &tS);
-                #endif
                 while (count > 0) {
                     processDataToLearn(argument);
                     --count;
                 }
-                #ifndef __APPLE__
                 clock_gettime(CLOCK_REALTIME, &tS);
-                #endif
                 cout << "Time taken for " << COUNT_TIMES << " rounds of processDataToLearn() is: " << tS.tv_sec << "s, " << tS.tv_nsec/1000 << "us (" << tS.tv_nsec/1000000 << "ms)" << endl;
 
                 COUNT_TIMES /= 2;
@@ -118,4 +118,7 @@ int main(int argc, char const *argv[]) {
     }
 
     return 0;
+
+#endif
 }
+

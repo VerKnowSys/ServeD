@@ -6,30 +6,11 @@
 #include "core.h"
 
 
-std::string escapeJsonString(const std::string& input) {
-    std::ostringstream ss;
-    // C++11:
-    // for (auto iter = input.cbegin(); iter != input.cend(); iter++) {
-    // C++98/03:
-    for (std::string::const_iterator iter = input.begin(); iter != input.end(); iter++) {
-        switch (*iter) {
-            case '\\': ss << "\\\\"; break;
-            case '"': ss << "\\\""; break;
-            // case '/': ss << "\\/"; break;
-            case '\b': ss << "\\b"; break;
-            case '\f': ss << "\\f"; break;
-            case '\n': ss << "\\n"; break;
-            case '\r': ss << "\\r"; break;
-            case '\t': ss << "\\t"; break;
-            default: ss << *iter; break;
-        }
-    }
-    return ss.str();
-}
+extern std::string escapeJsonString(const std::string& input);
 
 
+#ifndef __APPLE__
 extern "C" {
-
 
     #define ord(c) ((int)(unsigned char)(c))
 
@@ -283,6 +264,8 @@ extern "C" {
         return output.c_str();
     }
 
+
 } // extern
 
+#endif
 
