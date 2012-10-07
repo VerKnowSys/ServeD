@@ -88,8 +88,7 @@ int main(int argc, char const *argv[]) {
         // writer mode. Gather information from process for each second
         ofstream file, file_per_process;
         file.open("output_raw_processes.before-train", ios::app);
-        // file2.open("output_raw_processes.training", ios::app);
-        int maxVal = 1200, oldPid = 0, pid = 0; // every second in 20 minutes
+        int maxVal = 7200; // waiting half a second, hence 60 minutes of gathering
         for (int i = 0; i < maxVal; ++i) {
             cout << "Iteration " << i + 1 << " of " << maxVal << endl;
             const string data = processDataToLearn(argument);
@@ -100,29 +99,20 @@ int main(int argc, char const *argv[]) {
                 const string procName = process_name_and_pid.front();
                 const string procPid = process_name_and_pid.back();
                 if (procName != "") {
-                    stringstream(procPid) >> pid;
-
                     mkdir("basesystem/behaviors", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-                    string fileName = "basesystem/behaviors/" + procName + ".input";
+                    string fileName = "basesystem/behaviors/" + procName + "-" + procPid + ".input";
 
                     file_per_process.open(fileName.c_str(), ios::app);
-                    file_per_process << two_sides.back(); // write list of pid states
-                    if (oldPid == pid)
-                        file_per_process << endl << endl;
-                    else
-                        file_per_process << endl;
+                    file_per_process << two_sides.back() << endl; // write list of pid states
                     file_per_process.close();
                     // cout << "name: " << procName << ", pid: " << procPid << ", file: " << fileName << endl;
-
-                    stringstream(procPid) >> oldPid; // store current pid number
                 }
             }
 
             file << "PROC_BEGIN" << endl << data << "PROC_END" << endl << endl;
-            sleep(1);
+            usleep(500000);
         }
         file.close();
-        // file2.close();
     }
 
     return 0;
