@@ -54,7 +54,7 @@
     /* global constants */
 
     #define DEVEL
-    #define APP_VERSION "0.2.4"
+    #define APP_VERSION "0.2.5"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -63,6 +63,7 @@
         #define DEFAULT_JAVA_BIN "/Software/Openjdk/bin/java"
         #define DEFAULT_JAVA64_BIN "/Software/Openjdk64/bin/java"
     #elif __APPLE__
+        #define CLOCK_REALTIME REALTIME_CLOCK
         #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
         #define DEFAULT_JAVA64_BIN "/usr/bin/java"

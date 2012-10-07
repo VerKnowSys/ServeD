@@ -7,7 +7,7 @@
 
 
 // #ifdef DEVEL
-    
+
     // int getdir (string dir, vector<string> &files) {
     //     DIR *dp;
     //     struct dirent *dirp;
@@ -15,7 +15,7 @@
     //         cerr << "Error opening directory: " << dir << endl;
     //         return DIRECTORY_OPEN_ERROR;
     //     }
-    // 
+    //
     //     while ((dirp = readdir(dp)) != NULL) {
     //         files.push_back(string(dirp->d_name));
     //     }
@@ -66,25 +66,25 @@ string escape(string input) {
         while (position != string::npos) {
             input.replace(position, 1, "_");
             position = input.find(toBeEscaped[ind], position + 1);
-        }  
+        }
     }
     return input;
 }
 
 
-bool fileExists(string strFilename) { 
-    struct stat stFileInfo; 
-    bool blnReturn; 
-    int intStat; 
+bool fileExists(string strFilename) {
+    struct stat stFileInfo;
+    bool blnReturn;
+    int intStat;
 
-    intStat = stat(strFilename.c_str(), &stFileInfo); 
-    if(intStat == 0) { 
-        blnReturn = true; 
-    } else { 
-        blnReturn = false; 
-    } 
+    intStat = stat(strFilename.c_str(), &stFileInfo);
+    if(intStat == 0) {
+        blnReturn = true;
+    } else {
+        blnReturn = false;
+    }
 
-    return blnReturn; 
+    return blnReturn;
 }
 
 
@@ -98,6 +98,28 @@ void defaultSignalHandler(int sig) {
     		system(rmCmd.c_str());
     		exit(0);
     		break;
-    		
+
 	}
+}
+
+
+vector<string> split(const string& s, const string& delim, const bool keep_empty = true) {
+    vector<string> result;
+    if (delim.empty()) {
+        result.push_back(s);
+        return result;
+    }
+    string::const_iterator substart = s.begin(), subend;
+    while (true) {
+        subend = search(substart, s.end(), delim.begin(), delim.end());
+        string temp(substart, subend);
+        if (keep_empty || !temp.empty()) {
+            result.push_back(temp);
+        }
+        if (subend == s.end()) {
+            break;
+        }
+        substart = subend + delim.size();
+    }
+    return result;
 }
