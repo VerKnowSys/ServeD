@@ -41,12 +41,16 @@ int main(int argc, char const *argv[]) {
                 count = COUNT_TIMES;
                 tS.tv_sec = 0;
                 tS.tv_nsec = 0;
+                #ifndef __APPLE__
                 clock_settime(CLOCK_REALTIME, &tS);
+                #endif
                 while (count > 0) {
                     getProcessUsage(argument);
                     --count;
                 }
+                #ifndef __APPLE__
                 clock_gettime(CLOCK_REALTIME, &tS);
+                #endif
                 cout << "Time taken for " << COUNT_TIMES << " rounds of getProcessUsage() is: " << tS.tv_sec << "s, " << tS.tv_nsec/1000 << "us (" << tS.tv_nsec/1000000 << "ms)" << endl;
 
                 COUNT_TIMES /= 2;
@@ -65,12 +69,16 @@ int main(int argc, char const *argv[]) {
                 count = COUNT_TIMES;
                 tS.tv_sec = 0;
                 tS.tv_nsec = 0;
+                #ifndef __APPLE__
                 clock_settime(CLOCK_REALTIME, &tS);
+                #endif
                 while (count > 0) {
                     processDataToLearn(argument);
                     --count;
                 }
+                #ifndef __APPLE__
                 clock_gettime(CLOCK_REALTIME, &tS);
+                #endif
                 cout << "Time taken for " << COUNT_TIMES << " rounds of processDataToLearn() is: " << tS.tv_sec << "s, " << tS.tv_nsec/1000 << "us (" << tS.tv_nsec/1000000 << "ms)" << endl;
 
                 COUNT_TIMES /= 2;
@@ -78,9 +86,9 @@ int main(int argc, char const *argv[]) {
         }
     } else {
         // writer mode. Gather information from process for each second
-        ofstream file, file2;
+        ofstream file, file_per_process;
         file.open("output_raw_processes.before-train", ios::app);
-        file2.open("output_raw_processes.training", ios::app);
+        // file2.open("output_raw_processes.training", ios::app);
         int maxVal = 1200, oldPid = 0, pid = 0; // every second in 20 minutes
         for (int i = 0; i < maxVal; ++i) {
             cout << "Iteration " << i + 1 << " of " << maxVal << endl;
@@ -91,19 +99,30 @@ int main(int argc, char const *argv[]) {
                 const vector<string> process_name_and_pid = split(two_sides.front(), " ");
                 const string procName = process_name_and_pid.front();
                 const string procPid = process_name_and_pid.back();
-                cout << "name: " << procName << ", pid: " << procPid << endl;
-                stringstream(procPid) >> pid;
-                if (oldPid != pid)
-                    file2 << endl;
-                file2 << two_sides.back(); // write list of pid states
-                stringstream(procPid) >> oldPid; // store current pid number
+                if (procName != "") {
+                    stringstream(procPid) >> pid;
+
+                    mkdir("basesystem/behaviors", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                    string fileName = "basesystem/behaviors/" + procName + ".input";
+
+                    file_per_process.open(fileName.c_str(), ios::app);
+                    file_per_process << two_sides.back(); // write list of pid states
+                    if (oldPid == pid)
+                        file_per_process << endl << endl;
+                    else
+                        file_per_process << endl;
+                    file_per_process.close();
+                    // cout << "name: " << procName << ", pid: " << procPid << ", file: " << fileName << endl;
+
+                    stringstream(procPid) >> oldPid; // store current pid number
+                }
             }
 
             file << "PROC_BEGIN" << endl << data << "PROC_END" << endl << endl;
             sleep(1);
         }
         file.close();
-        file2.close();
+        // file2.close();
     }
 
     return 0;
