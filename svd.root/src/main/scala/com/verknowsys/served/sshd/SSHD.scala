@@ -75,9 +75,8 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
 
 
         case InitSSHChannelForUID(forUID: Int) =>
-            log.debug("SSHD Got shell base for uid: %d", forUID)
+            log.debug("Got shell base for uid: %d", forUID)
             (sender ? ListKeys) onSuccess {
-
                 case set: Set[_] =>
                     log.debug("Listing user SSH keys: %s", set)
 
@@ -87,20 +86,19 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
                             self ! Init // hit message after it became listening state
 
                         case x =>
-                            log.debug("We don't like this: %s", x)
+                            sender ! Error("We don't like this: %s".format(x))
 
                     } onFailure {
                         case x =>
-                            log.debug("I'm trying, but, come on. Wtf?: %s", x)
+                            sender ! Error("I'm trying, but, come on. Wtf?: %s".format(x))
                     }
 
                 case x =>
-                    log.debug("Got something weird for uid %d - %s", forUID, x)
-
+                    sender ! Error("Got something weird for uid %d - %s".format(forUID, x))
 
             } onFailure {
                 case x =>
-                    sender ! Error("Failed to ask for user SSHD keys")
+                    sender ! Error("Failed to ask for user SSHD keys with error: %s".format(x))
             }
 
 
