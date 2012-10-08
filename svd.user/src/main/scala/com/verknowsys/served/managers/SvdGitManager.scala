@@ -24,6 +24,9 @@ class SvdGitManager(
 
     log.info("Starting GitManager for account: %s in home dir: %s".format(account, gitRepositoriesLocation))
 
+    log.debug("Checking existance of %s", gitRepositoriesLocation)
+    SvdUtils.checkOrCreateDir(gitRepositoriesLocation)
+
 
     def receive = traceReceive {
         case Init =>
