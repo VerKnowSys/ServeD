@@ -293,7 +293,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
         case RegisterAccount(name) =>
             log.trace("Registering default account if not present")
-            if (name == "guest") {
+            if (name == SvdConfig.defaultUserName) {
                 if (!userUIDRegistered(SvdConfig.defaultUserUID)) {
                     registerUserAccount(name, SvdConfig.defaultUserUID) // XXX: hardcoded
                     sender ! Success

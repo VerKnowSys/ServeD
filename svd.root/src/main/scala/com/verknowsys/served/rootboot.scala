@@ -60,7 +60,7 @@ class RootBoot extends Logging with SvdExceptionHandler {
                     (sam ? Init) onSuccess {
                         case _ =>
                             def spawnSAM {
-                                (sam ? RegisterAccount("guest")) onSuccess {
+                                (sam ? RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
                                     case _ =>
                                         log.trace("Spawning Account Manager for each user.")
                                         (sam ? RespawnAccounts) onSuccess {
