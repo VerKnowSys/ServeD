@@ -111,9 +111,9 @@ class SvdAccountUtils(db: DBClient) extends Logging {
     /**
      *  @author dmilith
      *
-     *   registers user UID with given number in svd database
+     *   registers user with given name and uid number in svd database
      */
-    def registerUserAccount(uid: Int): Unit = {
+    def registerUserAccount(name: String, uid: Int): Unit = {
         val userManagerPort = randomUserPort
         val userHomeDir = SvdConfig.userHomeDir / "%d".format(uid)
 
@@ -131,12 +131,12 @@ class SvdAccountUtils(db: DBClient) extends Logging {
                 log.trace("Registered user manager port: %s", userManagerPort)
             } else {
                 log.trace("Registering once again cause of port dup: %s", userManagerPort)
-                registerUserAccount(uid)
+                registerUserAccount(name, uid)
             }
             registerUserUID(uid)
             performChecks()
             log.debug("Writing account data of uid: %d", uid)
-            db << SvdAccount(uid = uid, accountManagerPort = userManagerPort)
+            db << SvdAccount(userName = name, uid = uid, accountManagerPort = userManagerPort)
         } else {
             val userAccount = SvdAccounts(db).filter{_.uid == uid}.head
             val userManagerPort = userAccount.accountManagerPort
@@ -273,21 +273,37 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
             // registerFileEventFor(SvdConfig.systemHomeDir, Modified)
 
-            // registerUserAccount(500)
-            registerUserAccount(501)
-            // registerUserAccount(502)
-
 
             // log.info("Spawning Coreginx")
             // coreginx.start
             // coreginx ! Run
 
-
+            self ! RespawnAccounts
             sender ! Success
+
 
         case Shutdown =>
             log.debug("Got Shutdown")
             sender ! Shutdown
+
+        case RespawnAccounts =>
+            log.trace("Respawning accounts")
+            respawnUsersActors
+            sender ! Success
+
+        case RegisterAccount(name) =>
+            log.trace("Registering default account if not present")
+            if (name == "guest") {
+                if (!userUIDRegistered(SvdConfig.defaultUserUID)) {
+                    registerUserAccount(name, SvdConfig.defaultUserUID) // XXX: hardcoded
+                    sender ! Success
+                }
+            } else {
+                val userUID = randomUserUid
+                log.debug("Registering account with name: %s and uid: %d", name, userUID)
+                registerUserAccount(name, userUID)
+                sender ! Success
+            }
 
         case GetAccount(uid) =>
             val account = SvdAccounts(db)(_.uid == uid).headOption
@@ -331,6 +347,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     private def respawnUsersActors {
         userAccounts.foreach{
             account =>
+                // TODO: add routine to respawn only non spawned/new accounts? Currently it's handled by kickstart
                 log.warn("Spawning account: %s".format(account))
                 new SvdShell(account).exec(new SvdShellOperation(SvdConfig.kickApp + " " + account.uid))
         }

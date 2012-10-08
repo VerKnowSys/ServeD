@@ -48,6 +48,7 @@ object SvdConfig {
     def defaultBackupFileMatcher        = """(.*)\.zip\.raes$"""
     def defaultHost                     = "127.0.0.1"
     def defaultDomain                   = "localhost"
+    def defaultUserUID                  = 501
     def remoteApiServerHost             = "127.0.0.1" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
     def sshPort                         = 22
     def remoteApiServerPort             = 10
