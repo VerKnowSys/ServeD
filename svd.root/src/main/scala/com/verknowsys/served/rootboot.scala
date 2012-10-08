@@ -60,15 +60,15 @@ class RootBoot extends Logging with SvdExceptionHandler {
                     (sam ? Init) onSuccess {
                         case _ =>
                             log.info("SAM initialized")
+                            log.info("SSM initialized")
+                            (sam ? RegisterAccount("guest")) onSuccess {
+                                case _ =>
+                                    log.trace("Respawning actors")
+                                    sam ! RespawnAccounts
+                            }
                             context.watch(sam)
                             (ssm ? Init) onSuccess {
                                 case _ =>
-                                    log.info("SSM initialized")
-                                    (ssm ? RegisterAccount("guest")) onSuccess {
-                                        case _ =>
-                                            log.trace("Respawning actors")
-                                            ssm ! RespawnAccounts
-                                    }
                                     context.watch(ssm)
                                     (sshd ? Init) onSuccess {
                                         case _ =>
