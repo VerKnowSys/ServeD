@@ -9,10 +9,18 @@ if [ "$1" = "deep" ]; then
     rm -rf ~/.ivy2
 fi
 
+if [ "$1" = "sysdeep" ]; then
+  echo "Deep clean of user and system databases"
+  for i in /Users/*; do
+    rm -vf /Users/$i/$i.db*
+  done
+  rm -vf /SystemUsers/accounts.db_*
+fi
+
 bin/sbt clean
 echo "Project source cleaned.."
 
-rm -f ./kick ./shell
+rm -f ./kick ./shell ./usage_gather
 rm -f lib/*.o*
 rm -f lib/*.so
 rm -f lib/*.dylib
