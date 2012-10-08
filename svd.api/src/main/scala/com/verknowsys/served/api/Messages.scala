@@ -9,6 +9,8 @@ import akka.actor.ActorRef
 
 // ServeD -> Client messages
 // common responses
+case object RespawnAccounts extends ApiResponse
+case class RegisterAccount(name: String) extends ApiResponse
 case object Success extends ApiResponse
 case object Shutdown extends ApiResponse
 case class Error(val message: String) extends ApiResponse
