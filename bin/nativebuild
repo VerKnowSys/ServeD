@@ -54,7 +54,7 @@ $CXX $FLAGS lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
 check $? "KickStart" "kick"
 
 if [ "$system" = "FreeBSD" ]; then
-    $CXX $FLAGS -shared lib/kickstart/usage_sys.cc -o lib/libusagesys.so -lutil -lprocstat -lkvm
+    $CXX $FLAGS -shared lib/kickstart/usage_sys.cc -o lib/libusagesys.so lib/utils.o -lutil -lprocstat -lkvm
     check $? "UsageSysLib" "lib/libusagesys.so"
 
     $CXX $FLAGS lib/kickstart/usage_gather.cc -o usage_gather lib/libusagesys.so lib/utils.o -lutil -lprocstat -lkvm
