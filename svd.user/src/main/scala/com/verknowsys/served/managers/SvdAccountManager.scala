@@ -131,13 +131,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
                     log.debug("Becaming started")
                     accountsManager ! Alive(account.uid)
                     context.become(started(db, gitManager))
+                    log.trace("Sending Init once again")
                     self ! Init
-
-                    // little hacky but gives ability to load default key
-                    // def defaultUserPublicKey = scala.io.Source.fromURL(getClass.getResource("/defaultUserKey.pub")).getLines.mkString("\n")
-                    // val key = KeyUtils.load(defaultUserPublicKey)
-                    // self ! AddKey(AccessKey(name = "guest", key = key.get))
-                    sender ! Success
 
                 case x =>
                     sender ! Error("DB initialization error. Got param: %s".format(x))
@@ -159,19 +154,40 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
     }
 
-    def started(db: DBClient, gitManager: ActorRef): Receive = traceReceive {
+
+    protected def addDefaultAccessKey(db: DBClient) = {
+        def defaultUserPublicKey = scala.io.Source.fromURL(getClass.getResource("/defaultUserKey.pub")).getLines.mkString("\n")
+        val key = KeyUtils.load(defaultUserPublicKey)
+        if (accountKeys(db).keys.find(_.key == key.get).isDefined) {
+            log.trace("Already defined default AccessKey.")
+        } else {
+            log.trace("Adding default AccessKey.")
+            self ! AddKey(AccessKey(name = SvdConfig.defaultUserName, key = key.get))
+        }
+    }
+
+
+    private def started(db: DBClient, gitManager: ActorRef): Receive = traceReceive {
         // case GetUserProcessList =>
         //     val psAll = SvdLowLevelSystemAccess.processList(false)
         //     log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
         case Init =>
-            log.debug("Sending init to SSHD manager")
+            log.debug("Sending init to SSHD manager with uid: %d", account.uid)
             // send availability of user to sshd manager
-            (sshd ? InitSSHChannelForUID(account.uid)) onSuccess {
-                case Taken(x) =>
-                    log.trace("SSHD taken by x: %s", x)
-                    sshd ! Shutdown
-                    sshd ! InitSSHChannelForUID(account.uid)
-            }
+            addDefaultAccessKey(db)
+
+            sshd ! InitSSHChannelForUID(account.uid)
+
+            // adding default key:
+
+            sender ! Success
+
+                //) onSuccess {
+            //     case Taken(x) =>
+            //         log.trace("SSHD taken by x: %s", x)
+            //         sshd ! Shutdown
+            //         sshd ! InitSSHChannelForUID(account.uid)
+            // }
 
         case GetAccount =>
             sender ! account
@@ -185,6 +201,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
         case AddKey(key) =>
             val ak = accountKeys(db)
+            // log.debug("Adding key to user database: %s".format(ak))
             db << ak.copy(keys = ak.keys + key)
 
         case RemoveKey(key) =>

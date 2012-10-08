@@ -36,7 +36,6 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
     def started(listOfKeys: Set[AccessKey], account: SvdAccount): Receive = {
 
         case Init =>
-            log.debug("SSHD Becoming available for uid %d", account.uid)
             sshd.setPublickeyAuthenticator(new PublicKeyAuth(listOfKeys, account))
             sshd.setShellFactory(new SvdShellFactory(
                 Array(
@@ -47,6 +46,7 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
                     "-s"
                 )
             ))
+            log.debug("Become available for uid %d", account.uid)
             sshd.start
 
         case Shutdown =>
@@ -78,7 +78,7 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
             log.debug("Got shell base for uid: %d", forUID)
             (sender ? ListKeys) onSuccess {
                 case set: Set[_] =>
-                    log.debug("Listing user SSH keys: %s", set)
+                    log.trace("Listing user SSH keys: %s", set)
 
                     (ssm ? GetAccount(forUID)) onSuccess {
                         case Some(account: SvdAccount) =>
