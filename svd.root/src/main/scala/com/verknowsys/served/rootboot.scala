@@ -59,27 +59,50 @@ class RootBoot extends Logging with SvdExceptionHandler {
                     context.watch(fem)
                     (sam ? Init) onSuccess {
                         case _ =>
-                            log.info("Account Manager initialized")
-                            (sam ? RegisterAccount("guest")) onSuccess {
+                            def spawnSAM {
+                                (sam ? RegisterAccount("guest")) onSuccess {
+                                    case _ =>
+                                        log.trace("Spawning Account Manager for each user.")
+                                        (sam ? RespawnAccounts) onSuccess {
+                                            case _ =>
+                                                log.info("Account Manager initialized and accounts should be spawned.")
+                                        } onFailure {
+                                            case x =>
+                                                log.error("Failure spawning accounts: %s", x)
+                                                sys.exit(1)
+                                        }
+                                }
+                            }
+                            (sshd ? Init) onSuccess { // spawn sshd after user accounts were started
                                 case _ =>
-                                    log.trace("Spawning Account Manager for each user.")
-                                    (sam ? RespawnAccounts) onSuccess {
-                                        case _ =>
-                                            (sshd ? Init) onSuccess { // spawn sshd after user accounts were started
-                                                case _ =>
-                                                    log.info("SSHD initialized")
-                                                    context.watch(sshd)
-                                            }
-                                    }
+                                    log.info("SSHD initialized")
+                                    context.watch(sshd)
+                                    spawnSAM
+
+                            } onFailure { // spawn accounts no matter if SSHD failed or not
+                                case x =>
+                                    log.error("SSHD init failure: %s", x)
+                                    spawnSAM
                             }
                             context.watch(sam)
-                            context.watch(sshd) // XXX: should it be here?
                             (ssm ? Init) onSuccess {
                                 case _ =>
                                     log.info("System Manager initialized")
                                     context.watch(ssm)
+                            } onFailure {
+                                case x =>
+                                    log.error("Failure spawning SystemManager: %s", x)
+                                    sys.exit(1)
                             }
+                    } onFailure {
+                        case x =>
+                            log.error("Failure spawning AccountsManager: %s", x)
+                            sys.exit(1)
                     }
+            } onFailure {
+                case x =>
+                    log.error("Failure spawning File Events Manager: %s", x)
+                    sys.exit(1)
             }
 
 
