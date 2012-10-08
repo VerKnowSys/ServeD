@@ -42,6 +42,8 @@ class SvdSystemManager extends SvdExceptionHandler {
             if (SvdUtils.isBSD)
                 log.warn("SYSUSAGE: " + SvdLowLevelSystemAccess.usagesys(0))
 
+            log.debug("Updating system time")
+            SvdNtpSync()
 
             log.info("Spawning Webbit WebSockets Server")
             val webServer = WebServers.createWebServer(60006)
