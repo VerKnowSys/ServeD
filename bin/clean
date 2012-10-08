@@ -9,15 +9,20 @@ if [ "$1" = "deep" ]; then
     rm -rf ~/.ivy2
 fi
 
-if [ "$1" = "sysdeep" ]; then
+if [ "$1" = "sysonly" ]; then
   echo "Deep clean of user and system databases"
   cwd=`pwd`
   cd /Users
   for i in *; do
     rm -vf /Users/$i/$i.db*
+    rm -vf /Users/$i/$i-svd*
+    rm -vf /Users/$i/$i.pid
   done
   rm -vf /SystemUsers/accounts.db_*
+  rm -vf /SystemUsers/0.pid
+  rm -vf /SystemUsers/boot-svd*
   cd $cwd
+  exit
 fi
 
 bin/sbt clean
