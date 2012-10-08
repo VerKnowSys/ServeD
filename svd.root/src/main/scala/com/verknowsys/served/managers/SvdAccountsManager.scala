@@ -117,32 +117,31 @@ class SvdAccountUtils(db: DBClient) extends Logging {
         val userManagerPort = randomUserPort
         val userHomeDir = SvdConfig.userHomeDir / "%d".format(uid)
 
-        def performAllChecks(managerPort: Int = userManagerPort) {
+        def performChecks(managerPort: Int = userManagerPort) {
             log.trace("Performing user registration checks and making missing directories")
             SvdUtils.checkOrCreateDir(userHomeDir)
             SvdUtils.chown(userHomeDir, uid)
             createAkkaUserConfIfNotExistant(uid, managerPort)
         }
 
-        if (!userPortRegistered(userManagerPort)) {
-            log.trace("Registering user manager port: %s", userManagerPort)
-            registerUserPort(userManagerPort)
-        } else {
-            log.trace("Trying to register once again cause of port dup: %s", userManagerPort)
-            registerUserAccount(uid)
-        }
-
         if (!userUIDRegistered(uid)) {
             log.trace("Generated user manager port: %d for account with uid: %d", userManagerPort, uid)
+            if (!userPortRegistered(userManagerPort)) {
+                registerUserPort(userManagerPort)
+                log.trace("Registered user manager port: %s", userManagerPort)
+            } else {
+                log.trace("Registering once again cause of port dup: %s", userManagerPort)
+                registerUserAccount(uid)
+            }
             registerUserUID(uid)
-            performAllChecks()
+            performChecks()
+            log.debug("Writing account data of uid: %d", uid)
             db << SvdAccount(uid = uid, accountManagerPort = userManagerPort)
-
         } else {
             val userAccount = SvdAccounts(db).filter{_.uid == uid}.head
             val userManagerPort = userAccount.accountManagerPort
             log.trace("User already registered with manager port: %d, but still validating existance of akka user file and home directory: %s", userManagerPort, userHomeDir)
-            performAllChecks(userManagerPort)
+            performChecks(userManagerPort)
         }
     }
 
@@ -283,7 +282,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
             // coreginx.start
             // coreginx ! Run
 
-            respawnUsersActors
+
             sender ! Success
 
         case Shutdown =>
