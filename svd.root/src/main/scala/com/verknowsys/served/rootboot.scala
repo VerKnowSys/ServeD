@@ -55,27 +55,29 @@ class RootBoot extends Logging with SvdExceptionHandler {
         case Init =>
             (fem ? Init) onSuccess {
                 case _ =>
-                    log.info("FEM initialized")
+                    log.info("File Events Manager initialized")
                     context.watch(fem)
                     (sam ? Init) onSuccess {
                         case _ =>
-                            log.info("SAM initialized")
-                            log.info("SSM initialized")
+                            log.info("Account Manager initialized")
                             (sam ? RegisterAccount("guest")) onSuccess {
                                 case _ =>
-                                    log.trace("Respawning actors")
-                                    sam ! RespawnAccounts
+                                    log.trace("Spawning Account Manager for each user.")
+                                    (sam ? RespawnAccounts) onSuccess {
+                                        case _ =>
+                                            (sshd ? Init) onSuccess { // spawn sshd after user accounts were started
+                                                case _ =>
+                                                    log.info("SSHD initialized")
+                                                    context.watch(sshd)
+                                            }
+                                    }
                             }
                             context.watch(sam)
+                            context.watch(sshd) // XXX: should it be here?
                             (ssm ? Init) onSuccess {
                                 case _ =>
+                                    log.info("System Manager initialized")
                                     context.watch(ssm)
-                                    (sshd ? Init) onSuccess {
-                                        case _ =>
-                                            log.info("SSHD initialized")
-                                            context.watch(sshd)
-
-                                    }
                             }
                     }
             }
