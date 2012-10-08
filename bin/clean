@@ -11,10 +11,13 @@ fi
 
 if [ "$1" = "sysdeep" ]; then
   echo "Deep clean of user and system databases"
-  for i in /Users/*; do
+  cwd=`pwd`
+  cd /Users
+  for i in *; do
     rm -vf /Users/$i/$i.db*
   done
   rm -vf /SystemUsers/accounts.db_*
+  cd $cwd
 fi
 
 bin/sbt clean
