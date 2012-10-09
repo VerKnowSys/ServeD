@@ -197,9 +197,23 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
             }
             sender ! Success
 
+        case Success =>
+            log.trace("Success in SEM")
+
+
+        case SvdFileEvent(path, flags) =>
+            log.warn("REACT on file event: %s, %s.".format(path, flags))
+
+        // case x: SvdFileEvent =>
+        //     log.trace("REACT on file event: %s.".format(x))
+
+        // case x: events.SvdFileEvent =>
+        //     sender forward x
+        //     // log.trace("REACT on file event on path: %s. Flags: %s".format(path, flags))
+
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
-            sender ! Error("Unknown signal: %s".format(x))
+            // sender ! Error("Unknown signal: %s".format(x))
 
     }
 

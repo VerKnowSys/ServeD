@@ -271,7 +271,6 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
         case Init =>
             log.debug("SvdAccountsManager received Init. Running default task..")
 
-            // registerFileEventFor(SvdConfig.systemHomeDir, Modified)
 
 
             // log.info("Spawning Coreginx")
@@ -336,6 +335,8 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
         case Success =>
             log.debug("Got success")
 
+        // case SvdFileEvent(path, flags) =>
+        //     log.trace("REACT on file event on path: %s. Flags: %s".format(path, flags))
 
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
@@ -347,7 +348,16 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     private def respawnUsersActors {
         userAccounts.foreach{
             account =>
+
                 // TODO: add routine to respawn only non spawned/new accounts? Currently it's handled by kickstart
+                val authKeysFile = SvdConfig.userHomeDir / "%s".format(account.uid) / ".ssh" / "authorized_keys"
+                if (new java.io.File(authKeysFile).exists) {
+                    log.debug("Registering file event routine for %s", authKeysFile)
+                    registerFileEventFor(authKeysFile, Modified)
+                } else {
+                    log.warn("Not registering file event for file: %s cause it doesn't exists", authKeysFile)
+                }
+
                 log.warn("Spawning account: %s".format(account))
                 new SvdShell(account).exec(new SvdShellOperation(SvdConfig.kickApp + " " + account.uid))
         }
