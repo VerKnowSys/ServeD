@@ -217,7 +217,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
     protected def accountKeys(db: DBClient) = {
         val ak = AccountKeysDB(db).headOption
-        log.debug("accountKeys: %s", ak)
+        // log.debug("accountKeys: %s", ak)
         ak getOrElse AccountKeys()
     }
 
