@@ -1,0 +1,21 @@
+<html>
+  <body>
+
+    <!-- Results -->
+    <div id="message"></div>
+
+    <script>
+
+      function showMessage(text) {
+        document.getElementById('message').innerHTML = text;
+      }
+
+      var ws = new WebSocket('ws://fiend.verknowsys.com:60006/livemonitor');
+      showMessage('Connecting...');
+      ws.onopen = function() { showMessage('Connected!'); };
+      ws.onclose = function() { showMessage('Lost connection'); };
+      ws.onmessage = function(msg) { showMessage(msg.data); };
+
+    </script>
+  </body>
+</html>

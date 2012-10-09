@@ -1,0 +1,58 @@
+/Skeleton/
+  common/
+    beforeStart
+    start
+    afterStart
+    beforeStop
+    stop
+    afterStop
+    validate
+    configure
+    install
+    afterInstall
+    reload
+    prapareandunpack
+
+  ruby/
+    rails/
+    rack/
+
+  node/
+    expressjs/
+
+  php/
+    zend/
+    symfony/
+    phpcake/
+
+  java/
+    play/
+    unfiltered/
+    war/
+
+  python/
+    pylons/
+    django/
+    grok/
+    zope/
+
+  perl/
+    catalyst/
+    jifty/
+
+
+Use cases:
+  A.
+    0. aplikacja po uploadzie ma konfigurację, lub generuje ją na podstawie informacji od użytkownika
+    1. svdshell 505 rails start appname
+                            |      \_______>  $HOME/WebApps/appname
+                            \______________>  /Skeleton/ruby/rails/start
+
+
+Test cases:
+  1. odpalanie apki zew
+  2. odpalanie skyptu w innym języku skryptowym
+  3. instalacja softu
+  4. uruchamianie softu interaktywnego
+  5. return codes odpalanych aplikacji
+  6. sprawdzanie czy nie ma już aplikacji wpiętej pod daną domenę
