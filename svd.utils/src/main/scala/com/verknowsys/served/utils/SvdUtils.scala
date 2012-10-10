@@ -92,7 +92,7 @@ trait SvdUtils extends Logging {
             for (file <- files) {
                 log.trace("chowning: %s".format(file.getAbsolutePath))
                 if (clib.chown(file.getAbsolutePath, user, group) != 0)
-                    throw new Exception("Error occured while chowning: %s".format(file))
+                    throwException[Exception]("Error occured while chowning: %s".format(file))
             }
             true
         }
@@ -126,7 +126,7 @@ trait SvdUtils extends Logging {
         @author dmilith
         Unified & DRY method of throwing exceptions
     */
-    def throwException[T <: Exception : Manifest](message: String) {
+    def throwException[T <: Throwable : Manifest](message: String) {
         val exception = implicitly[Manifest[T]].erasure.getConstructor(classOf[String]).newInstance(message).asInstanceOf[T]
         // log.error("Error occured in %s.\nException: %s\n\n%s".format(this.getClass.getName, exception, exception.getStackTrace.mkString("\n")))
         throw exception

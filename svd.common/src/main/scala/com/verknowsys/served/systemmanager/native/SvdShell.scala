@@ -11,7 +11,7 @@ import expectj._
 class SvdShellException(reason: String) extends Exception(reason)
 
 
-class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
+class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUtils {
 
     val expectinator = if (timeout > 0)
         new ExpectJ(timeout)
@@ -40,7 +40,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging {
             log.trace("Found dead shell: %s".format(shell))
             shell = expectinator.spawn(SvdConfig.defaultShell)
             if (dead)
-                throw new SvdShellException("Found dead shell where it should be alive!")
+                throwException[SvdShellException]("Found dead shell where it should be alive!")
         }
         shell.send(operation.commands + "\n")
         if (operation.expectStdOut.size != 0) operation.expectStdOut.foreach {

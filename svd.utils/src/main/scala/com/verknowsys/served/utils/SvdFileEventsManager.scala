@@ -140,7 +140,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler w
     protected val clib = CLibrary.instance
     protected lazy val kq = {
         val k = clib.kqueue() // NOTE: C call
-        if(k == -1) throw new SvdKqueueException // check kqueue
+        if(k == -1) throwException[SvdKqueueException]("kQueue system call failed!") // check kqueue
         k
     }
 
@@ -255,7 +255,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler w
 
         val event = new kevent(new NativeLong(ident),
                     (EVFILT_VNODE).toShort,
-                    (EV_ADD | EV_ENABLE | EV_CLEAR).toShort,
+                    (EV_ADD | EV_ENABLE | EV_CLEAR).toShort, // TODO: think about ONESHOT option with parametter
                     flags,
                     new NativeLong(),
                     null)
