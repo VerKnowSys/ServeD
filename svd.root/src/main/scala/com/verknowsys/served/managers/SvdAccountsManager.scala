@@ -239,7 +239,9 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
     // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
     SvdUtils.addShutdownHook {
-        log.warn("Got termination signal")
+        log.warn("Got termination signal. Unregistering file events")
+        unregisterFileEvents(self)
+
         log.info("Stopping spawned user workers")
         SvdAccounts(db).foreach{
             account =>
@@ -335,8 +337,22 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
         case Success =>
             log.debug("Got success")
 
-        // case SvdFileEvent(path, flags) =>
-        //     log.trace("REACT on file event on path: %s. Flags: %s".format(path, flags))
+        case SvdFileEvent(path, flags) =>
+            log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))
+            flags match {
+                case Modified =>
+                    log.trace("File event type: Modified")
+                case Deleted =>
+                    log.trace("File event type: Deleted")
+                case Renamed =>
+                    log.trace("File event type: Renamed")
+                case AttributesChanged =>
+                    log.trace("File event type: AttributesChanged")
+                case Revoked =>
+                    log.trace("File event type: Revoked")
+                case x =>
+                    log.trace("Got event: %s", x)
+            }
 
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
@@ -351,12 +367,8 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
                 // TODO: add routine to respawn only non spawned/new accounts? Currently it's handled by kickstart
                 val authKeysFile = SvdConfig.userHomeDir / "%s".format(account.uid) / ".ssh" / "authorized_keys"
-                if (new java.io.File(authKeysFile).exists) {
-                    log.debug("Registering file event routine for %s", authKeysFile)
-                    registerFileEventFor(authKeysFile, Modified)
-                } else {
-                    log.warn("Not registering file event for file: %s cause it doesn't exists", authKeysFile)
-                }
+                log.debug("Registering file event routine for %s", authKeysFile)
+                registerFileEventFor(authKeysFile, All) // Modified | Deleted | Renamed | AttributesChanged
 
                 log.warn("Spawning account: %s".format(account))
                 new SvdShell(account).exec(new SvdShellOperation(SvdConfig.kickApp + " " + account.uid))

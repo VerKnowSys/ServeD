@@ -39,6 +39,11 @@ object events {
     final val Deleted           = CLibrary.NOTE_DELETE
     final val Renamed           = CLibrary.NOTE_RENAME
     final val AttributesChanged = CLibrary.NOTE_ATTRIB
+    final val Revoked           = CLibrary.NOTE_REVOKE
+    final val Linked            = CLibrary.NOTE_LINK
+    final val All               = CLibrary.NOTE_WRITE | CLibrary.NOTE_EXTEND | CLibrary.NOTE_DELETE | CLibrary.NOTE_RENAME | CLibrary.NOTE_ATTRIB | CLibrary.NOTE_REVOKE | CLibrary.NOTE_LINK
+
+    final val EvError           = CLibrary.EV_ERROR
 }
 
 
@@ -67,13 +72,30 @@ object events {
  * }}}
  *
  * @author teamon
+ * @author dmilith
+ *
  */
-trait SvdFileEventsReactor extends SvdExceptionHandler {
-    self: Actor with Logging =>
+trait SvdFileEventsReactor extends SvdExceptionHandler with Logging {
 
-    def registerFileEventFor(path: String, flags: Int){
-        val fem = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // , name = "SvdFileEventsManager"
-        fem ! SvdRegisterFileEvent(path, flags, fem)
+    def registerFileEventFor(path: String, flags: Int, ref: ActorRef = self, uid: Int = 0) {
+        def bindEvent {
+            val fem = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
+            fem ! SvdRegisterFileEvent(path, flags, ref)
+        }
+
+        val file = new java.io.File(path)
+        if (file.exists) {
+            log.debug("File to watch exists: %s.", path)
+            bindEvent
+        } else {
+            log.debug("File to watch doesn't exists. Will be created and watch set: %s", path)
+            file.createNewFile // XXX: only for root? how about some chmod and other event owners?
+            if (uid > 0) {
+                log.debug("Chowning file for uid: %d", uid)
+                SvdUtils.chown(path, uid)
+            }
+            bindEvent
+        }
 
         // val res = Await.result(future, timeout.duration).asInstanceOf[ActorRef]
         // XXX: CHECKME
@@ -83,15 +105,22 @@ trait SvdFileEventsReactor extends SvdExceptionHandler {
         // }
     }
 
-    def unregisterFileEvents {
-        val fem = context.actorOf(Props[SvdFileEventsManager])
-        fem ! SvdUnregisterFileEvent(fem)
-        // XXX: CHECKME
+    def unregisterFileEvents(ref: ActorRef = self) {
+        val fem = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
+        fem ! SvdUnregisterFileEvent(ref)
+        log.debug("Unregistering events for Account Manager: %s", ref)
+        // ) onSuccess {
+        //     case _ =>
+        //         log.debug("Unregistered event.")
+        // } onFailure {
+        //     case x =>
+        //         log.error("Failure: %s", x)
+        // }
         super.postStop // 2011-01-30 01:06:54 - dmilith - NOTE: execute SvdExceptionHandler's code
     }
 
-    override def preRestart(reason: Throwable) = unregisterFileEvents
-    override def postStop = unregisterFileEvents
+    override def preRestart(reason: Throwable) = unregisterFileEvents()
+    override def postStop = unregisterFileEvents()
 }
 
 
@@ -138,7 +167,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
             if(nev > 0 && event != null && self != null){
                 self ! SvdKqueueFileEvent(event.ident.intValue, event.fflags)
             } else if(nev == -1){
-                throw new SvdKeventException // TODO: Catch this somehow
+                SvdUtils.throwException[SvdKeventException]("kEvent exception!")
             }
         }
     }
@@ -170,8 +199,8 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
                 case None => registerNewFileEvent(path, flags, ref)
             }
 
-            log.trace("Registered new file event: %s / %s for %s", path, flags, ref)
-            log.trace("Registered file events: %s", idents)
+            log.debug("Registered new file event: %s / %s for %s", path, flags, ref)
+            log.debug("Registered file events: %s", idents)
             sender ! Success
 
         case SvdUnregisterFileEvent(ref) =>
@@ -182,8 +211,8 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
                 }
             }
 
-            log.trace("Unregistered file events for %s", ref)
-            log.trace("Registered file events: %s", idents)
+            log.debug("Unregistered file events for %s", ref)
+            log.debug("Registered file events: %s", idents)
             sender ! Success
 
         // Forward event sent by kqueue to file watchers
@@ -201,8 +230,8 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
             log.trace("Success in SEM")
 
 
-        case SvdFileEvent(path, flags) =>
-            log.warn("REACT on file event: %s, %s.".format(path, flags))
+        // case SvdFileEvent(path, flags) =>
+        //     log.warn("REACT on file event: %s, %s.".format(path, flags))
 
         // case x: SvdFileEvent =>
         //     log.trace("REACT on file event: %s.".format(x))
@@ -221,7 +250,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
     protected def registerNewFileEvent(path: String, flags: Int, ref: ActorRef): Unit = synchronized {
         val ident = clib.open(path, O_RDONLY)
         if(ident == -1){
-            throw new SvdFileOpenException
+            SvdUtils.throwException[SvdFileOpenException]("Failed to register file event on %s with flags: %s!".format(path, flags))
         }
 
         val event = new kevent(new NativeLong(ident),

@@ -26,13 +26,6 @@ import scala.io.Source
 object userboot extends Logging {
 
 
-    SvdUtils.addShutdownHook {
-        log.warn("Got termination signal")
-        log.info("Shutdown of userboot requested")
-        system.shutdown
-    }
-
-
     def run(userUID: Int){
         log.info("ServeD v" + SvdConfig.version)
         log.info(SvdConfig.copyright)

@@ -29,10 +29,11 @@ object AccountKeysDB extends DB[AccountKeys]
  *
  * @author teamon
  */
-class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
+class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler with SvdFileEventsReactor {
+
+    import com.verknowsys.served.utils.events._
 
     class DBServerInitializationException extends Exception
-
 
     log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
 
@@ -90,6 +91,10 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
         case Init =>
             log.info("SvdAccountManager received Init.")
 
+            val userHomePath = SvdConfig.userHomeDir / "%s".format(account.uid)
+            log.debug("Registering file events for 'watchfile'")
+            registerFileEventFor(userHomePath / "watchfile", All, uid = account.uid)
+
             // log.info("Spawning user databases: %s".format(_dbs))
             // _dbs.start
             // _dbs !! Run /* temporary call due to lack of web interface */
@@ -97,13 +102,13 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
 
             // Connect to database
             // Get port from pool
-            log.debug("Getting database port from AccountsManager")
 
+            log.debug("Getting database port from AccountsManager")
             (accountsManager ? GetPort) onSuccess {
                 case dbPort: Int =>
                     log.debug("Got database port %d", dbPort)
                     // Start database server
-                    val server = new DBServer(dbPort, SvdConfig.userHomeDir / "%s".format(account.uid) / "%s.db".format(account.uid))
+                    val server = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
                     val db = server.openClient
 
                     log.info(SvdUserServices.newPhpWebAppEntry("Php", SvdUserDomain("deldaphp", false), account))
@@ -209,7 +214,24 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
             db << ak.copy(keys = ak.keys - key)
 
         case Success =>
-            log.debug("Become started with success")
+            log.debug("Received Success")
+
+        case SvdFileEvent(path, flags) =>
+            log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))
+            flags match {
+                case Modified =>
+                    log.trace("File event type: Modified")
+                case Deleted =>
+                    log.trace("File event type: Deleted")
+                case Renamed =>
+                    log.trace("File event type: Renamed")
+                case AttributesChanged =>
+                    log.trace("File event type: AttributesChanged")
+                case Revoked =>
+                    log.trace("File event type: Revoked")
+                case x =>
+                    log.trace("Got event: %s", x)
+            }
 
         case msg: git.Base =>
             gitManager forward msg
@@ -230,6 +252,15 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler {
         _dbClient.foreach(_.close)
         _dbServer.foreach(_.close)
         super.postStop
+    }
+
+
+    SvdUtils.addShutdownHook {
+        log.warn("Got termination signal")
+        log.info("Shutdown of Account Manager requested")
+        log.debug("Shutting down Account Manager")
+        unregisterFileEvents(self)
+        system.shutdown // shutting down main account actor manager
     }
 
 }
