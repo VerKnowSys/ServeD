@@ -221,6 +221,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
             flags match {
                 case Modified =>
                     log.trace("File event type: Modified")
+                    gitManager ! CreateRepository("somerepository")
                 case Deleted =>
                     log.trace("File event type: Deleted")
                 case Renamed =>

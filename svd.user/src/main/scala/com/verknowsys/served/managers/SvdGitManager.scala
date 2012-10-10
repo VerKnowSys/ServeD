@@ -81,6 +81,14 @@ class SvdGitManager(
                 db << repo.copy(authorizedKeys = repo.authorizedKeys - key)
             }
             sender ! Success
+
+        case Repository(name, authorizedKeys, uuid) =>
+            log.debug("Got new repository named: %s with keys: %s", name, authorizedKeys)
+
+        case RepositoryExistsError =>
+            log.warn("Repository already exists!")
+
+
     }
 
     def withRepo(uuid: UUID)(f: (Repository) => Unit) = sender ! (RepositoryDB(db)(uuid) match {

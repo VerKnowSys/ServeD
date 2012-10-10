@@ -29,7 +29,7 @@ case class GetRepositoryByUUID(uuid: UUID) extends Base
 
 case class CreateRepository(name: String) extends Base
     // Repository
-    case object RepositoryExistsError
+case object RepositoryExistsError extends Base
 
 
 case class UpdateRepositoryConfiguration(repository: Repository) extends Base
@@ -38,11 +38,11 @@ case class UpdateRepositoryConfiguration(repository: Repository) extends Base
 
 case class RemoveRepository(uuid: UUID) extends Base
     // Success
-    case object RepositoryDoesNotExistError
+case object RepositoryDoesNotExistError extends Base
 
 
 case object ListRepositories extends Base
-    case class Repositories(repositories: List[Repository])
+case class Repositories(repositories: List[Repository]) extends Base
 
 case class AddAuthorizedKey(uuid: UUID, key: AccessKey) extends Base
 case class RemoveAuthorizedKey(uuid: UUID, key: AccessKey) extends Base
