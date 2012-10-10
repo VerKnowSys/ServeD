@@ -1,5 +1,6 @@
 package com.verknowsys.served.sshd
 
+import com.verknowsys.served._
 import com.verknowsys.served.sshd._
 import com.verknowsys.served.managers.SvdAccountsManager
 import com.verknowsys.served.utils._
@@ -15,8 +16,8 @@ import akka.util.Timeout
 import akka.util.duration._
 
 import java.security.PublicKey
-import org.apache.sshd.{SshServer => ApacheSSHServer}
 import org.apache.sshd._
+import org.apache.sshd.{SshServer => ApacheSSHServer}
 import org.apache.sshd.server._
 import org.apache.sshd.server.session._
 import org.apache.sshd.server.command._
@@ -41,7 +42,7 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
                 Array(
                     SvdConfig.servedShell,
                     "%d".format(account.uid),
-                    SvdUtils.defaultShell,
+                    defaultShell,
                     "-i",
                     "-s"
                 )

@@ -27,6 +27,7 @@ object AccountKeysDB extends DB[AccountKeys]
 /**
  * Account Manager - owner of all managers
  *
+ * @author dmilith
  * @author teamon
  */
 class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler with SvdFileEventsReactor {
@@ -41,11 +42,11 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
     val sh = new SvdShell(account)
     val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
     val sshd = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
-
+    val userHomePath = SvdConfig.userHomeDir / "%s".format(account.uid)
 
     // Only for closing in postStop
-    private var _dbServer: Option[DBServer] = None // XXX: Refactor
-    private var _dbClient: Option[DBClient] = None // XXX: Refactor
+    // private var _dbServer: Option[DBServer] = None // XXX: Refactor
+    // private var _dbClient: Option[DBClient] = None // XXX: Refactor
 
     // lazy val _passenger = new SvdService(
     //     SvdUserServices.rackWebAppConfig(
@@ -90,8 +91,6 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
     def receive = traceReceive {
         case Init =>
             log.info("SvdAccountManager received Init.")
-
-            val userHomePath = SvdConfig.userHomeDir / "%s".format(account.uid)
             log.debug("Registering file events for 'watchfile'")
             registerFileEventFor(userHomePath / "watchfile", All, uid = account.uid)
 
@@ -108,8 +107,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                 case dbPort: Int =>
                     log.debug("Got database port %d", dbPort)
                     // Start database server
-                    val server = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
-                    val db = server.openClient
+                    val dbServer = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
+                    val db = dbServer.openClient
 
                     log.info(SvdUserServices.newPhpWebAppEntry("Php", SvdUserDomain("deldaphp", false), account))
 
@@ -130,18 +129,21 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                         case _ =>
                             log.debug("Setting log watch on git manager.")
                             context.watch(gitManager)
+                    } onFailure {
+                        case x =>
+                            log.debug("Failed git manager init: %s", x)
                     }
 
                     // Start the real work
                     log.debug("Becaming started")
                     accountsManager ! Alive(account.uid)
-                    context.become(started(db, gitManager))
+                    context.become(started(db, dbServer, gitManager))
                     log.trace("Sending Init once again")
                     self ! Init
 
                 case x =>
                     sender ! Error("DB initialization error. Got param: %s".format(x))
-                    SvdUtils.throwException[DBServerInitializationException]("DB initialization error. Got param: %s".format(x))
+                    throwException[DBServerInitializationException]("DB initialization error. Got param: %s".format(x))
             }
 
         // case AuthorizeWithKey(key: PublicKey) =>
@@ -172,7 +174,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
     }
 
 
-    private def started(db: DBClient, gitManager: ActorRef): Receive = traceReceive {
+    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef): Receive = traceReceive {
         // case GetUserProcessList =>
         //     val psAll = SvdLowLevelSystemAccess.processList(false)
         //     log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
@@ -226,13 +228,41 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                     log.trace("File event type: Deleted")
                 case Renamed =>
                     log.trace("File event type: Renamed")
+                    gitManager ! Shutdown
                 case AttributesChanged =>
                     log.trace("File event type: AttributesChanged")
+                    // gitManager ! RemoveRepository("somerepository")
                 case Revoked =>
                     log.trace("File event type: Revoked")
                 case x =>
                     log.trace("Got event: %s", x)
             }
+
+        case Terminated(ref) =>
+            context.unwatch(ref)
+            context.stop(ref)
+            (accountsManager ? GetPort) onSuccess {
+                case dbPort: Int =>
+                    log.debug("Actor restart pending")
+                    // val server = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
+                    val db = dbServer.openClient
+                    val gm = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
+                    gm ! Init
+
+                case x =>
+                    log.error("Wtf?: %s", x)
+
+            } onFailure {
+                case x =>
+                    log.debug("Failure after Terminated signal")
+            }
+            // context.stop(ref)
+            // val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
+            // (gitManager ? Init) onSuccess {
+            //     case _ =>
+            //         log.debug("Setting log watch on git manager.")
+            //         context.watch(gitManager)
+            // }
 
         case msg: git.Base =>
             gitManager forward msg
@@ -250,13 +280,13 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
         // _apps.stop
         // _dbs.stop
         sh.close
-        _dbClient.foreach(_.close)
-        _dbServer.foreach(_.close)
+        // _dbClient.foreach(_.close)
+        // _dbServer.foreach(_.close)
         super.postStop
     }
 
 
-    SvdUtils.addShutdownHook {
+    addShutdownHook {
         log.warn("Got termination signal")
         log.info("Shutdown of Account Manager requested")
         log.debug("Shutting down Account Manager")

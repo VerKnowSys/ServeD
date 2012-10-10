@@ -11,7 +11,7 @@ import scala.io.Source
 import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.testing._
-import com.verknowsys.served.utils.SvdUtils._
+import com.verknowsys.served.utils._
 
 
 class SvdArchiverTest extends DefaultTest with Logging {
@@ -27,7 +27,7 @@ class SvdArchiverTest extends DefaultTest with Logging {
 
         {
             val f = tempDir / "123"
-            SvdUtils.checkOrCreateDir(f)
+            checkOrCreateDir(f)
             chmod(f, 0)
 
             evaluating { // exists but cannot read
@@ -39,7 +39,7 @@ class SvdArchiverTest extends DefaultTest with Logging {
             } should produce [SvdArchiveACLException]
 
             chmod(f, 0x777)
-            SvdUtils.rm_r(f)
+            rm_r(f)
         }
 
         evaluating {
@@ -73,8 +73,8 @@ class SvdArchiverTest extends DefaultTest with Logging {
         (resultFile.list.length > 2) should be(true)
 
         SvdArchiver.compact(baseDir, userAccount = defaultUser)
-        SvdUtils.rm_r(destFile)
-        SvdUtils.rm_r(resultFile)
+        rm_r(destFile)
+        rm_r(resultFile)
     }
 
 

@@ -23,7 +23,7 @@ import scala.io.Source
 //     remote.actorFor("service:accounts-manager", SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
 // )
 
-object userboot extends Logging {
+object userboot extends Logging with SvdUtils {
 
 
     def run(userUID: Int){
@@ -61,7 +61,7 @@ object userboot extends Logging {
                 // remote.register("service:account-manager", am)
                 // remote.register("service:logging-manager", loggingManager)
 
-                // SvdUtils.addShutdownHook {
+                // addShutdownHook {
                 //     log.info("Shutdown of user svd requested")
                 //     system.shutdown
                 //     // am.shutdown
@@ -75,7 +75,7 @@ object userboot extends Logging {
         } onFailure {
             case x =>
                 log.error("Error occured in userboot with: %s".format(x))
-                SvdUtils.throwException[RuntimeException]("Cannot spawn user boot for UID: %s!".format(userUID))
+                throwException[RuntimeException]("Cannot spawn user boot for UID: %s!".format(userUID))
         }
 
         // val portOpt = (accountsManager ? GetPort) onSuccess {
@@ -96,8 +96,8 @@ object userboot extends Logging {
 
     def main(args: Array[String]) {
         // handle signals
-        SvdUtils.handleSignal("ABRT") { SvdUtils.getAllLiveThreads }
-        SvdUtils.handleSignal("USR2") { log.warn("TODO: implement USR2 handling (show svd config values)") }
+        handleSignal("ABRT") { getAllLiveThreads }
+        handleSignal("USR2") { log.warn("TODO: implement USR2 handling (show svd config values)") }
 
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
 

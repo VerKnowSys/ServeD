@@ -13,7 +13,7 @@ import com.verknowsys.served.utils._
  *
  *   This trait should be used by all ServeD actors
  */
-trait SvdExceptionHandler extends Actor with Logging {
+trait SvdExceptionHandler extends Actor with Logging with SvdUtils {
 
     // 2011-01-30 01:36:28 - dmilith - NOTE: txmt protocol example: txmt://open/?url=file://~/.bash_profile&line=11&column=2
 
@@ -42,7 +42,7 @@ Throwable details: (%s).
                         """.format(
                                 if (traceElement.getFileName.contains("Svd")) // 2011-01-30 03:34:13 - dmilith - NOTE: all project files will include Svd prefix
                                     "txmt://open/?url=file://%s&line=%s".format(
-                                        SvdUtils.findFileInDir(traceElement.getFileName),
+                                        findFileInDir(traceElement.getFileName),
                                         traceElement.getLineNumber
                                     )
                                 else "No source",

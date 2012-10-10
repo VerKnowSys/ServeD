@@ -118,7 +118,7 @@ class RootBoot extends Logging with SvdExceptionHandler {
 }
 
 
-object rootboot extends Logging {
+object rootboot extends Logging with SvdUtils {
 
     // override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 100, withinTimeRange = 1 minute)
     // {
@@ -142,7 +142,7 @@ object rootboot extends Logging {
         val rb = system.actorOf(Props[RootBoot].withDispatcher("svd-core-dispatcher"))
         rb ! Init
 
-        SvdUtils.addShutdownHook {
+        addShutdownHook {
             rb ! Shutdown
         }
 
@@ -160,8 +160,8 @@ object rootboot extends Logging {
         log.info(SvdConfig.copyright)
 
         // handle signals
-        SvdUtils.handleSignal("ABRT") { SvdUtils.getAllLiveThreads }
-        SvdUtils.handleSignal("USR2") { log.warn("TODO: implement USR2 handling (show svd config values)") }
+        handleSignal("ABRT") { getAllLiveThreads }
+        handleSignal("USR2") { log.warn("TODO: implement USR2 handling (show svd config values)") }
 
         log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
 

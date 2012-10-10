@@ -4,6 +4,7 @@
 package com.verknowsys.served.systemmanager
 
 
+import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import org.webbitserver._
 import org.webbitserver.handler._
@@ -86,7 +87,7 @@ class SvdProcessQueue extends DQueue[SvdProcessUsage] {
 }
 
 
-class SvdWebSocketsHandler extends WebSocketHandler with Logging {
+class SvdWebSocketsHandler extends WebSocketHandler with Logging with SvdUtils {
 
     import com.verknowsys.served.systemmanager.native._
 
@@ -100,8 +101,8 @@ class SvdWebSocketsHandler extends WebSocketHandler with Logging {
         log.debug("WebSocket connection %s (no: %s) opened".format(connection, connectionCount))
 
         while (connectionCount > 0) {
-            if (SvdUtils.isBSD) {
-                val raw =  SvdLowLevelSystemAccess.usagesys(0) //.split("|")
+            if (isBSD) {
+                val raw =  SvdLowLevelSystemAccess.usagesys(SvdConfig.defaultUserUID) //.split("|")
                 // val pu = SvdProcessUsage(pid = raw(0).toInt, name = raw(2), rss = raw(4).toInt)
                 connection.send("%d<br/>%s".format(connectionCount, raw.replaceAll("\n","<br/>")))
                 Thread.sleep(500)

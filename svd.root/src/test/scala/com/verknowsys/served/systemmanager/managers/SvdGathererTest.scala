@@ -91,16 +91,16 @@ class SvdGathererTest(_system: ActorSystem) extends TestKit(_system) with Defaul
     }
 
 
-    it should "SvdUtils.secondsToHMS() should give correct values" in {
-        val matcher = SvdUtils.secondsToHMS(3666)
+    it should "secondsToHMS() should give correct values" in {
+        val matcher = secondsToHMS(3666)
         matcher must be("01h:01m:06s")
-        val matcher2 = SvdUtils.secondsToHMS(3667L.toInt)
+        val matcher2 = secondsToHMS(3667L.toInt)
         matcher2 must be("01h:01m:07s")
     }
 
 
     it should "Gather JSON from usage sys (executed on FreeBSD hosts only)" in {
-        if (SvdUtils.isBSD)
+        if (isBSD)
             (gather1 ? GetSysUsage(501)) onSuccess {
                 case Some(x: String) =>
                     log.info("GATHERED: %s".format(x))
@@ -114,7 +114,7 @@ class SvdGathererTest(_system: ActorSystem) extends TestKit(_system) with Defaul
         //     val in = new BufferedReader(new FileReader("/dev/urandom"))
         //
         //     val str = new StringBuilder("")
-        //     println(SvdUtils.bench {
+        //     println(bench {
         //         for (i <- 1.to(150)) {
         //             str.append(in.read)
         //         }
@@ -123,8 +123,8 @@ class SvdGathererTest(_system: ActorSystem) extends TestKit(_system) with Defaul
         //     val chpoint = str.toString
         //     // println("str: %s".format(chpoint))
         //     val chplen = chpoint.length
-        //     val complen = SvdUtils.compress(chpoint).length
-        //     val decomplen = SvdUtils.decompress(SvdUtils.compress(chpoint)).length
+        //     val complen = compress(chpoint).length
+        //     val decomplen = decompress(compress(chpoint)).length
         //     println("chpoint (length): %d".format(chplen))
         //     println("chpoint (compress): %d".format(complen))
         //     println("chpoint (decompress): %d".format(decomplen))
@@ -133,8 +133,8 @@ class SvdGathererTest(_system: ActorSystem) extends TestKit(_system) with Defaul
         //     }
         //     println("Will compress String of length: %d".format(str.toString.length))
         //     println("####################################################################\n" +
-        //         SvdUtils.bench {
-        //             SvdUtils.decompress(SvdUtils.compress(str.toString))
+        //         bench {
+        //             decompress(compress(str.toString))
         //         }
         //     )
         //     in.close

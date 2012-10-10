@@ -31,9 +31,9 @@ class SvdGatherer(account: SvdAccount) extends SvdManager {
 
     def gather(uid: Int) = usagesys.getProcessUsage(uid, false)
 
-    // private def gather = SvdUtils.loopThread {
+    // private def gather = loopThread {
     //     log.trace("Time elapsed on gather(): %d".format(
-    //         SvdUtils.bench {
+    //         bench {
     //             try {
     //                 val core = new Sigar
     //                 val userPs = core.getProcList.filter{ p => core.getProcCredName(p).getUser == account.userName }
@@ -53,7 +53,7 @@ class SvdGatherer(account: SvdAccount) extends SvdManager {
     //                 //                         rec =>
     //                 //                             val value = PSData(rec._1.toInt, rec._2, rec._3.toInt, rec._4.toInt)
     //                 //                             db << value
-    //                 //                             log.trace("DB single object size: %d".format(SvdUtils.sizeof(value)))
+    //                 //                             log.trace("DB single object size: %d".format(sizeof(value)))
     //                 //                     }
     //
     //
@@ -67,7 +67,7 @@ class SvdGatherer(account: SvdAccount) extends SvdManager {
     //                     userPsWithAllData.map{
     //                         elem =>
     //                             "%10d - %30s - %15s - %10d MiB".format(
-    //                                 elem._1, elem._2, SvdUtils.secondsToHMS(elem._3.toInt), elem._4) // 2011-03-13 03:28:20 - dmilith - NOTE: in very unusual cases it may lead to truncation of Long value, but I've never ever seen pid bigger than Integer value.
+    //                                 elem._1, elem._2, secondsToHMS(elem._3.toInt), elem._4) // 2011-03-13 03:28:20 - dmilith - NOTE: in very unusual cases it may lead to truncation of Long value, but I've never ever seen pid bigger than Integer value.
     //                     }.mkString("\n")
     //                 ))
     //

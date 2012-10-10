@@ -25,7 +25,7 @@ class SvdGitManager(
     log.info("Starting GitManager for account: %s in home dir: %s".format(account, gitRepositoriesLocation))
 
     log.debug("Checking existance of %s", gitRepositoriesLocation)
-    SvdUtils.checkOrCreateDir(gitRepositoriesLocation)
+    checkOrCreateDir(gitRepositoriesLocation)
 
 
     def receive = traceReceive {
@@ -65,7 +65,7 @@ class SvdGitManager(
                 } else {
                     log.trace("Removing repository: %s".format(repoLocation))
                     db ~ repo
-                    SvdUtils.rm_r(repoLocation)
+                    rm_r(repoLocation)
                     sender ! Success
                 }
             }
@@ -88,6 +88,9 @@ class SvdGitManager(
         case RepositoryExistsError =>
             log.warn("Repository already exists!")
 
+        case Shutdown =>
+            log.debug("Shutting down Git Manager")
+            context.stop(self)
 
     }
 

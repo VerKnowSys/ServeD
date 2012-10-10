@@ -27,7 +27,7 @@ class SvdArchiveUnsupportedActionException(message: String) extends Exception(me
     @author dmilith
     AES Key provider
 */
-class SvdAESKeyProvider extends AesKeyProvider with Logging {
+class SvdAESKeyProvider extends AesKeyProvider with Logging with SvdUtils {
 
     def getCreateKey = SvdConfig.backupKey.toCharArray
 
@@ -35,7 +35,7 @@ class SvdAESKeyProvider extends AesKeyProvider with Logging {
 
     def invalidOpenKey = {
         // This method is called whenever a key for an existing protected resource is invalid.
-        SvdUtils.throwException[SvdArchiveInvalidRAESKeyException]("Security key is invalid or archive is broken!")
+        throwException[SvdArchiveInvalidRAESKeyException]("Security key is invalid or archive is broken!")
     }
 
     def getKeyStrength = AesKeyProvider.KEY_STRENGTH_256
@@ -57,7 +57,7 @@ class SvdArchiverKeyManager extends KeyManager {
     @author dmilith
     SvdArchiver object to compress and decompress AES encrypted ZIP files with ease.
 */
-object SvdArchiver extends Logging {
+object SvdArchiver extends Logging with SvdUtils {
 
     System.setProperty("de.schlichtherle.key.KeyManager", SvdConfig.defaultBackupKeyManager)
     TFile.setDefaultArchiveDetector(new DefaultArchiveDetector(SvdConfig.defaultBackupFileExtension))
@@ -74,7 +74,7 @@ object SvdArchiver extends Logging {
             val dir = rootDir.head
             val dirListCore = dir.listFiles
             if ((dirListCore == null) && dir.isDirectory) {
-                SvdUtils.throwException[SvdArchiveACLException]("Invalid ACL on dir: %s. User must be owner of all archived files.".format(dir))
+                throwException[SvdArchiveACLException]("Invalid ACL on dir: %s. User must be owner of all archived files.".format(dir))
                 Nil
             } else {
                 val dirList = dirListCore.filter{_.isDirectory}
@@ -95,7 +95,7 @@ object SvdArchiver extends Logging {
     def unmountVFS =
         try {
             log.trace("Unmounting VFS")
-            val umountTime = SvdUtils.bench {
+            val umountTime = bench {
                 TFile.update
                 // TFile.umount // unmount archive vfs
             }
@@ -142,9 +142,9 @@ object SvdArchiver extends Logging {
         val sourceFiles = sourceFilesCore.listFiles
         if (sourceFiles == null) {
             if (sourceFilesCore.exists)
-                SvdUtils.throwException[SvdArchiveACLException]("ACL access failure to file: %s. Operation is aborted.".format(fileOrDirectoryPath))
+                throwException[SvdArchiveACLException]("ACL access failure to file: %s. Operation is aborted.".format(fileOrDirectoryPath))
             else
-                SvdUtils.throwException[SvdArchiveNonExistantException]("Given source directory doesn't exists: %s. Operation is aborted.".format(fileOrDirectoryPath))
+                throwException[SvdArchiveNonExistantException]("Given source directory doesn't exists: %s. Operation is aborted.".format(fileOrDirectoryPath))
 
         } else {
             val sourceDirs = sourceFiles.filter{_.isDirectory}
@@ -155,7 +155,7 @@ object SvdArchiver extends Logging {
                 virtualRootFile.mkdirs
             }
             // if (!new TFile(virtualRootDestination).exists)
-            //     SvdUtils.throwException[SvdArchiveNonExistantException]("Destination archive not found: %s. Nothing to add nor remove. Operation is aborted.".format(fileOrDirectoryPath))
+            //     throwException[SvdArchiveNonExistantException]("Destination archive not found: %s. Nothing to add nor remove. Operation is aborted.".format(fileOrDirectoryPath))
 
             val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList) //.map{_.asInstanceOf[TFile]}
             val rawArchiveList = new TFile("%s%s.%s".format(backupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)).listFiles
@@ -178,7 +178,7 @@ object SvdArchiver extends Logging {
                 val nameProxy = trimmedFileName + ".%s".format(SvdConfig.defaultBackupFileExtension)
                 log.info("Total files in archive: %d".format(amountOfFiles))
                 log.debug("Searching for changed files.")
-                val timeOfRun = SvdUtils.bench {
+                val timeOfRun = bench {
                     val srcBase = fileOrDirectoryPath
                     val archBase = backupDir + nameProxy
 
@@ -267,23 +267,23 @@ object SvdArchiver extends Logging {
         val sourceFiles = sourceFilesCore.listFiles
         if (sourceFiles == null) {
             if (sourceFilesCore.exists)
-                SvdUtils.throwException[SvdArchiveACLException]("ACL access failure to file: %s. Operation is aborted.".format(fileOrDirectoryPath))
+                throwException[SvdArchiveACLException]("ACL access failure to file: %s. Operation is aborted.".format(fileOrDirectoryPath))
             else
-                SvdUtils.throwException[SvdArchiveNonExistantException]("Given source directory doesn't exists: %s. Operation is aborted.".format(fileOrDirectoryPath))
+                throwException[SvdArchiveNonExistantException]("Given source directory doesn't exists: %s. Operation is aborted.".format(fileOrDirectoryPath))
 
         } else {
             val sourceDirs = sourceFiles.filter{_.isDirectory}
             val virtualRootDestination = "%s%s.%s".format(backupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)
             val virtualRootFile = new TFile(virtualRootDestination)
             if (!virtualRootFile.exists) {
-                SvdUtils.throwException[SvdArchiveNonExistantException]("Destination archive not found: %s. Nothing to add nor remove. Operation is aborted.".format(fileOrDirectoryPath))
+                throwException[SvdArchiveNonExistantException]("Destination archive not found: %s. Nothing to add nor remove. Operation is aborted.".format(fileOrDirectoryPath))
             }
 
             val gatheredDirList = gatherAllDirsRecursively(sourceDirs.toList) //.map{_.asInstanceOf[TFile]}
             val rawArchiveList = new TFile(backupDir + trimmedFileName + "." + SvdConfig.defaultBackupFileExtension).listFiles
             val symlinkMetadataFile = "/." + trimmedFileName + "-archive-metadata.symlinks"
             if (rawArchiveList != null) {
-                val diffTimeOfRun = SvdUtils.bench {
+                val diffTimeOfRun = bench {
                     val rootArchiveDirs = rawArchiveList.filter{_.isDirectory}
                     val allArchiveDirs = gatherAllDirsRecursively(rootArchiveDirs.toList) //.map{_.asInstanceOf[TFile]}
 
@@ -329,7 +329,7 @@ object SvdArchiver extends Logging {
     def apply(fileOrDirectoryPath: String, destinationDir: Option[String] = None, exclude: List[String] = List(".lock", ".sock"), userAccount: Option[SvdAccount] = None) { // TODO: implement exclude list
 
         if (fileOrDirectoryPath == null)
-            SvdUtils.throwException[SvdArchiveUnsupportedActionException]("Null source given".format(fileOrDirectoryPath))
+            throwException[SvdArchiveUnsupportedActionException]("Null source given".format(fileOrDirectoryPath))
 
         val trimmedFileName = fileOrDirectoryPath.split("/").last
         val unpackDir = userAccount match {
@@ -349,9 +349,9 @@ object SvdArchiver extends Logging {
             case true =>
                 // case 1: decompression cause matched extension found
                 if (!new TFile(fileOrDirectoryPath).exists)
-                    SvdUtils.throwException[SvdArchiveNonExistantException]("Given source archive doesn't exists: %s. Operation is aborted.".format(fileOrDirectoryPath))
+                    throwException[SvdArchiveNonExistantException]("Given source archive doesn't exists: %s. Operation is aborted.".format(fileOrDirectoryPath))
 
-                val timeOfRun = SvdUtils.bench {
+                val timeOfRun = bench {
                     val from = new TFile(fileOrDirectoryPath)
                     val strippedDestinationDir = destinationDir.getOrElse(trimmedFileName).replaceFirst(".%s".format(SvdConfig.defaultBackupFileExtension), "")
                     val to = new TFile("%s".format(unpackDir / strippedDestinationDir))
@@ -376,18 +376,18 @@ object SvdArchiver extends Logging {
                 val sourceFilesCore = new TFile(fileOrDirectoryPath)
                 // val virtualRootDestination = "%s%s.%s".format(SvdConfig.defaultBackupDir, trimmedFileName, SvdConfig.defaultBackupFileExtension)
                 if (!sourceFilesCore.exists)
-                    SvdUtils.throwException[SvdArchiveNonExistantException]("Source folder wasn't found: %s. Nothing to add nor remove. Operation is aborted.".format(fileOrDirectoryPath))
+                    throwException[SvdArchiveNonExistantException]("Source folder wasn't found: %s. Nothing to add nor remove. Operation is aborted.".format(fileOrDirectoryPath))
 
                 if (sourceFilesCore.isFile)
                     // packaging a single file
-                    SvdUtils.throwException[SvdArchiveUnsupportedActionException]("File given as source is currently unsupported".format(fileOrDirectoryPath))
+                    throwException[SvdArchiveUnsupportedActionException]("File given as source is currently unsupported".format(fileOrDirectoryPath))
 
 
                 if (!sourceFilesCore.canRead)
-                    SvdUtils.throwException[SvdArchiveACLException]("ACL access failure to file: %s. Operation is aborted.".format(fileOrDirectoryPath))
+                    throwException[SvdArchiveACLException]("ACL access failure to file: %s. Operation is aborted.".format(fileOrDirectoryPath))
 
                 else {
-                    val wholeOperationTime = SvdUtils.bench {
+                    val wholeOperationTime = bench {
                         // packaging a directory
                         log.trace("Directory given as source")
 

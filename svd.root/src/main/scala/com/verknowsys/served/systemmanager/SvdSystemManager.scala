@@ -39,7 +39,7 @@ class SvdSystemManager extends SvdExceptionHandler {
         case Init =>
             log.debug("SvdSystemManager ready")
 
-            if (SvdUtils.isBSD)
+            if (isBSD)
                 log.warn("SYSUSAGE: " + SvdLowLevelSystemAccess.usagesys(0))
 
             log.debug("Updating system time")
@@ -63,7 +63,7 @@ class SvdSystemManager extends SvdExceptionHandler {
 
         case GetUserProcesses(uid: Int) =>
             log.debug("Gathering user processes of %s".format(uid))
-            if (SvdUtils.isBSD)
+            if (isBSD)
                 sender ! SvdLowLevelSystemAccess.usagesys(uid)
             else
                 sender ! Error("NOT-IMPLEMENTED on this OS! Do it on FreeBSD host.")
@@ -83,12 +83,12 @@ class SvdSystemManager extends SvdExceptionHandler {
 
         case Chown(what, userId, recursive) =>
             log.debug("Chown called on location: '%s' with uid: %s, recursive: %s".format(what, userId, recursive))
-            SvdUtils.chown(what, userId, SvdConfig.defaultUserGroup, recursive)
+            chown(what, userId, SvdConfig.defaultUserGroup, recursive)
             sender ! Success
 
         case Chmod(what, mode, recursive) =>
             log.debug("Chmod called on location: '%s' with mode: %s (recursively: %s)".format(what, mode, recursive))
-            SvdUtils.chmod(what, mode, recursive)
+            chmod(what, mode, recursive)
             sender ! Success
 
         case x: Any =>

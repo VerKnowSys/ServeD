@@ -32,7 +32,7 @@ case object SvdUserPorts extends DB[SvdUserPort]
 case object SvdSystemPorts extends DB[SvdSystemPort]
 case object SvdUserUIDs extends DB[SvdUserUID]
 
-class SvdAccountUtils(db: DBClient) extends Logging {
+class SvdAccountUtils(db: DBClient) extends Logging with SvdUtils {
     /**
      *  @author dmilith
      *
@@ -41,7 +41,7 @@ class SvdAccountUtils(db: DBClient) extends Logging {
     def randomUserPort: Int = {
         val rnd = new Random(System.currentTimeMillis)
         val port = SvdPools.userPortPool.start + rnd.nextInt(SvdPools.userPortPool.end - SvdPools.userPortPool.start)
-        if (SvdUtils.portAvailable(port) && !userPortRegistered(port)) {
+        if (portAvailable(port) && !userPortRegistered(port)) {
             port
         } else
             randomUserPort
@@ -56,7 +56,7 @@ class SvdAccountUtils(db: DBClient) extends Logging {
     def randomSystemPort: Int = {
         val rnd = new Random(System.currentTimeMillis)
         val port = SvdPools.systemPortPool.start + rnd.nextInt(SvdPools.systemPortPool.end - SvdPools.systemPortPool.start)
-        if (SvdUtils.portAvailable(port) && !systemPortRegistered(port)) {
+        if (portAvailable(port) && !systemPortRegistered(port)) {
             port
         } else
             randomSystemPort
@@ -119,8 +119,8 @@ class SvdAccountUtils(db: DBClient) extends Logging {
 
         def performChecks(managerPort: Int = userManagerPort) {
             log.trace("Performing user registration checks and making missing directories")
-            SvdUtils.checkOrCreateDir(userHomeDir)
-            SvdUtils.chown(userHomeDir, uid)
+            checkOrCreateDir(userHomeDir)
+            chown(userHomeDir, uid)
             createAkkaUserConfIfNotExistant(uid, managerPort)
         }
 
@@ -238,7 +238,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     // private val accountManagers = scala.collection.mutable.Map[Int, ActorRef]() // UID => AccountManager ref
 
     // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
-    SvdUtils.addShutdownHook {
+    addShutdownHook {
         log.warn("Got termination signal. Unregistering file events")
         unregisterFileEvents(self)
 
@@ -251,9 +251,9 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
                     log.trace("Reading VM pid.")
                     val pid = Source.fromFile(pidFile).mkString.trim.toInt
                     log.debug("Client VM PID to be killed: %d".format(pid))
-                    SvdUtils.kill(pid, SIGTERM)
+                    kill(pid, SIGTERM)
                     log.debug("Client VM PID file to be deleted: %s".format(pidFile))
-                    SvdUtils.rm_r(pidFile)
+                    rm_r(pidFile)
                 } else {
                     log.warn("File not found: %s".format(pidFile))
                 }
@@ -262,7 +262,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
         // removing also pid file of root core of svd:
         val corePid = SvdConfig.systemHomeDir / SvdConfig.rootPidFile
         log.debug("Cleaning core pid file: %s with content: %s".format(corePid, Source.fromFile(corePid).mkString))
-        SvdUtils.rm_r(corePid)
+        rm_r(corePid)
         log.info("Shutting down SvdAccountsManager")
         db.close
         server.close

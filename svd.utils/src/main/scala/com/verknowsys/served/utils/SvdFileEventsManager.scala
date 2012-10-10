@@ -75,7 +75,7 @@ object events {
  * @author dmilith
  *
  */
-trait SvdFileEventsReactor extends SvdExceptionHandler with Logging {
+trait SvdFileEventsReactor extends SvdExceptionHandler with Logging with SvdUtils {
 
     def registerFileEventFor(path: String, flags: Int, ref: ActorRef = self, uid: Int = 0) {
         def bindEvent {
@@ -92,7 +92,7 @@ trait SvdFileEventsReactor extends SvdExceptionHandler with Logging {
             file.createNewFile // XXX: only for root? how about some chmod and other event owners?
             if (uid > 0) {
                 log.debug("Chowning file for uid: %d", uid)
-                SvdUtils.chown(path, uid)
+                chown(path, uid)
             }
             bindEvent
         }
@@ -132,7 +132,7 @@ trait SvdFileEventsReactor extends SvdExceptionHandler with Logging {
  *
  * @author teamon
  */
-class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
+class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler with SvdUtils {
     import CLibrary._
 
     log.info("SvdFileEventsManager is loading")
@@ -159,7 +159,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
      *
      * @author teamon
      */
-    protected lazy val readerThread = SvdUtils.loopThread {
+    protected lazy val readerThread = loopThread {
         if(self != null){
             val event = new kevent
             val nev = clib.kevent(kq, null, 0, event, 1, null)
@@ -167,7 +167,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
             if(nev > 0 && event != null && self != null){
                 self ! SvdKqueueFileEvent(event.ident.intValue, event.fflags)
             } else if(nev == -1){
-                SvdUtils.throwException[SvdKeventException]("kEvent exception!")
+                throwException[SvdKeventException]("kEvent exception!")
             }
         }
     }
@@ -250,7 +250,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
     protected def registerNewFileEvent(path: String, flags: Int, ref: ActorRef): Unit = synchronized {
         val ident = clib.open(path, O_RDONLY)
         if(ident == -1){
-            SvdUtils.throwException[SvdFileOpenException]("Failed to register file event on %s with flags: %s!".format(path, flags))
+            throwException[SvdFileOpenException]("Failed to register file event on %s with flags: %s!".format(path, flags))
         }
 
         val event = new kevent(new NativeLong(ident),
@@ -263,7 +263,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler {
         val nev = clib.kevent(kq, event, 1, null, 0, null)
         if (nev == -1) {
             log.error("Failed to register kevent!")
-            SvdUtils.throwException[Exception]("Failed to register kevent!")
+            throwException[Exception]("Failed to register kevent!")
             // registerNewFileEvent(path, flags, ref) // XXX: try again, not really safe
             // throw new SvdKeventException
         } else {

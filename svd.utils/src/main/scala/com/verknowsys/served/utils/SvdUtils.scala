@@ -27,12 +27,12 @@ import sun.misc.Signal
 
 
 /**
- * SvdUtils object containing common functions
+ * SvdUtils trait containing common functions
  *
  * @author dmilith
  *
  */
-object SvdUtils extends Logging {
+trait SvdUtils extends Logging {
 
 
     /**
@@ -86,7 +86,7 @@ object SvdUtils extends Logging {
         } else {
             import CLibrary._
             val clib = CLibrary.instance
-            val files = if (recursive) SvdUtils.recursiveListFilesFromPath(new File(path)) else List(new File(path))
+            val files = if (recursive) recursiveListFilesFromPath(new File(path)) else List(new File(path))
             log.trace("chown(path: %s, user: %d, group: %d, recursion: %s): File list: %s. Amount of files: %s".format(path, user, group, recursive, files.mkString(", "), files.length))
 
             for (file <- files) {
@@ -110,13 +110,13 @@ object SvdUtils extends Logging {
         } else {
             import CLibrary._
             val clib = CLibrary.instance
-            val files = if (recursive) SvdUtils.recursiveListFilesFromPath(new File(path))else List(new File(path))
+            val files = if (recursive) recursiveListFilesFromPath(new File(path))else List(new File(path))
             log.trace("chmod(path: %s, mode: %d, recursion: %s)".format(path, mode, recursive))
 
             for (file <- files) {
                 log.trace("chmoding: %s".format(file.getAbsolutePath))
                 if (clib.chmod(file.getAbsolutePath, mode) != 0)
-                    throw new Exception("Error occured while chmoding: %s".format(file))
+                    throwException[Exception]("Error occured while chmoding: %s".format(file))
             }
             true
         }
