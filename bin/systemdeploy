@@ -29,7 +29,7 @@ requirementscheck() {
 system="$(uname)"
 requirementscheck
 
-bin/clean
+# bin/clean
 bin/current
 bin/sbt compile
 if [ "$?" = "0" ]; then

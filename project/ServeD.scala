@@ -4,11 +4,13 @@ import sbt.Keys._
 import scala.io.Source
 // import com.github.siasia.WebPlugin._
 // import coffeescript.CoffeeScript
+import sbtassembly._
 import sbtassembly.Plugin._
 import AssemblyKeys._
 
 
 object BuildSettings {
+
 
     val buildSettings = Defaults.defaultSettings ++ Seq( // ++ GrowlingTests.growlSettings
         organization    := "VerKnowSys",
@@ -35,7 +37,43 @@ object BuildSettings {
     ) ++ Tasks.all
 
     val coreBuildSettings = buildSettings ++ assemblySettings ++ Seq(
-        test in assembly := false
+        test in assembly := false,
+
+        mergeStrategy in assembly := {
+            case "reference.conf" | "application.conf" | "NOTICE" =>
+                MergeStrategy.concat
+
+            case "build.number" =>
+                MergeStrategy.discard
+
+            case "jboss-beans.xml" =>
+                MergeStrategy.first
+
+            case PathList("META-INF", xs @ _*) =>
+                (xs map {_.toLowerCase}) match {
+                    case ("manifest.mf" :: Nil) | ("index.list" :: Nil) | ("dependencies" :: Nil) | ("NOTICE" :: Nil) =>
+                        MergeStrategy.discard
+
+                    case ps @ (x :: xs) if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") || ps.last.endsWith(".txt") =>
+                        MergeStrategy.discard
+
+                    case "plexus" :: xs =>
+                        MergeStrategy.discard
+
+                    case "services" :: xs =>
+                        MergeStrategy.filterDistinctLines
+
+                    case ("spring.schemas" :: Nil) | ("spring.handlers" :: Nil) =>
+                        MergeStrategy.filterDistinctLines
+
+                    case _ =>
+                        MergeStrategy.first
+                }
+
+            case _ =>
+                MergeStrategy.first
+        }
+
     )
 }
 
