@@ -1,9 +1,9 @@
 package com.verknowsys.served.notifications
 
 
-/** 
- * Abstract interface for all notification gates 
- * 
+/**
+ * Abstract interface for all notification gates
+ *
  * @author teamon
  */
 trait Gate {

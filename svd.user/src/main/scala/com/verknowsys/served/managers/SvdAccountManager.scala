@@ -9,8 +9,9 @@ import com.verknowsys.served.api._
 import com.verknowsys.served.db.{DBServer, DBClient, DB}
 import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
-import java.security.PublicKey
+import com.verknowsys.served.notifications._
 
+import java.security.PublicKey
 import akka.actor._
 import akka.dispatch._
 import akka.pattern.ask
@@ -30,7 +31,7 @@ object AccountKeysDB extends DB[AccountKeys]
  * @author dmilith
  * @author teamon
  */
-class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler with SvdFileEventsReactor {
+class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler with SvdFileEventsReactor with SvdUtils {
 
     import com.verknowsys.served.utils.events._
 
@@ -110,7 +111,9 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                     val dbServer = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
                     val db = dbServer.openClient
 
-                    log.info(SvdUserServices.newPhpWebAppEntry("Php", SvdUserDomain("deldaphp", false), account))
+                    // log.info(SvdUserServices.newPhpWebAppEntry("Php", SvdUserDomain("deldaphp", false), account))
+
+
 
                     // _dbServer = Some(server)
                     // _dbClient = Some(db)
@@ -134,10 +137,20 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                             log.debug("Failed git manager init: %s", x)
                     }
 
+                    val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)))
+                    (notificationsManager ? Init) onSuccess {
+                        case _ =>
+                            log.debug("Launching Notification Center")
+                            context.watch(notificationsManager)
+                    } onFailure {
+                        case x =>
+                            log.error("Failed to contact with Notification center! %s", x)
+                    }
+
                     // Start the real work
                     log.debug("Becaming started")
                     accountsManager ! Alive(account.uid)
-                    context.become(started(db, dbServer, gitManager))
+                    context.become(started(db, dbServer, gitManager, notificationsManager))
                     log.trace("Sending Init once again")
                     self ! Init
 
@@ -174,7 +187,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
     }
 
 
-    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef): Receive = traceReceive {
+    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef): Receive = traceReceive {
         // case GetUserProcessList =>
         //     val psAll = SvdLowLevelSystemAccess.processList(false)
         //     log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
@@ -223,6 +236,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
             flags match {
                 case Modified =>
                     log.trace("File event type: Modified")
+                    notificationsManager ! Notify.Message("File event notification: Modified on path: %s on host: %s".format(path, currentHost.getHostName))
                     gitManager ! CreateRepository("somerepository")
                 case Deleted =>
                     log.trace("File event type: Deleted")

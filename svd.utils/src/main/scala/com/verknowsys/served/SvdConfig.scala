@@ -67,15 +67,14 @@ object SvdConfig {
     def gatherTimeout                   = 1000
     def defaultUserAkkaConf             = "/defaultUserAkkaConf.conf"
     def standardShellEnvironment        = ". /etc/profile\nulimit -u 120\n"
-    def notificationXmppRecipients      = "dmilith@verknowsys.com,i@teamon.eu"
+    def notificationXmppRecipients      = "dmilith@verknowsys.com,michal.lipski@gmail.com"
     def notificationXmppHost            = "verknowsys.com"
-    def notificationXmppPort            = 5222
-    def notificationXmppLogin           = "svd-bot"
-    def notificationXmppPassword        = "svd-bot-no-passwd"
+    def notificationXmppLogin           = "notifications"
+    def notificationXmppPassword        = "mkonjibhu"
     def notificationXmppResource        = "svd"
-    def notificationXmppDebug           = false
-    def notificationXmppCompression     = true
-    def notificationXmppUseSasl         = true
+    def notificationXmppPort            = 65222
+    def notificationXmppCompression     = false
+    def notificationXmppUseSasl         = false
 
     def defaultNtpHost                  = "ntp.task.gda.pl"
 
