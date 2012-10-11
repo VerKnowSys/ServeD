@@ -58,6 +58,30 @@ class TrainingGroundTest extends DefaultTest with Logging {
         uuid.length should be(36)
     }
 
+    it should "be able to use Either model for Exception handling" in {
+        val a: Either[Throwable,Any] = Right("Nothing")
+
+        def tryDangerous(some: => Any) = {
+            try {
+                Right(some)
+            } catch {
+                case e: Exception =>
+                    Left(e)
+            }
+        }
+
+        val exc = new Exception("Dangerous exception")
+        def dangerousAction = {
+            throw exc
+        }
+        def safeAction = {
+            "something"
+        }
+
+        tryDangerous(dangerousAction) should be(Left(exc))
+        tryDangerous(safeAction) should be(Right("something"))
+    }
+
 
     it should "understand apply and unapply in type classes with implicit converters" in {
         type UUID = java.util.UUID
