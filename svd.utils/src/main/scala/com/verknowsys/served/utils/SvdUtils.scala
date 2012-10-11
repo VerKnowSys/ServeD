@@ -116,7 +116,8 @@ trait SvdUtils extends Logging {
             for (file <- files) {
                 log.trace("chmoding: %s".format(file.getAbsolutePath))
                 if (clib.chmod(file.getAbsolutePath, mode) != 0)
-                    throwException[Exception]("Error occured while chmoding: %s".format(file))
+                    log.error("Couldn't chmod file: %s. Check file access?", file)
+                    // throwException[Exception]("Error occured while chmoding: %s".format(file))
             }
             true
         }
