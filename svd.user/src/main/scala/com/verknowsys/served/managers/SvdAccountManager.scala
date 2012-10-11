@@ -252,7 +252,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                     log.trace("Got event: %s", x)
             }
 
-        case Terminated(ref) =>
+        case Terminated(ref) => // XXX: it seems to be super fucked up way to maintain actors. Use supervision Luke!
             context.unwatch(ref)
             context.stop(ref)
             (accountsManager ? GetPort) onSuccess {
