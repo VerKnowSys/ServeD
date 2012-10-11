@@ -29,7 +29,7 @@ object BuildSettings {
         // javacOptions     += "-encoding UTF-8",
         // javacOptions     += "-source 1.6",
         // javacOptions     += "-target 1.6",
-        javacOptions     += "-Xlint:unchecked",
+        // javacOptions     += "-Xlint:unchecked",
         javacOptions    += "-Xlint:deprecation"
 
     ) ++ Tasks.all
@@ -68,8 +68,8 @@ object Dependencies {
     val expect4j = "net.sourceforge.expectj" % "expectj" % "2.0.1"
     val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "2.1.0.201209190230-r" // "1.0.0.201106090707-r"
     val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
-    val javax = "javax.media" % "jai-core" % "1.1.3"
-    val javaxjmf = "javax.media" % "jmf" % "2.1.1b"
+    // val javax = "javax.media" % "jai-core" % "1.1.3"
+    // val javaxjmf = "javax.media" % "jmf" % "2.1.1b"
     // val smack = "jivesoftware" % "smack" % "3.0.4"
     // val smackx = "jivesoftware" % "smackx" % "3.0.4"
     // val specs = "org.scala-tools.testing" % "specs" % "1.6.9"
@@ -114,7 +114,7 @@ object ServeD extends Build {
     lazy val user = Project("user", file("svd.user"),
         settings = coreBuildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
-            libraryDependencies ++= Seq(jline, jgit, javax, javaxjmf)
+            libraryDependencies ++= Seq(jline, jgit)
         )
     ) dependsOn(api, common, utils, testing % "test")
 
