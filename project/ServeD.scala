@@ -48,9 +48,10 @@ object Resolvers {
     val sonatype = "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
     val guiceyfruit = "guiceyfruit repo" at "http://guiceyfruit.googlecode.com/svn/repo/releases"
     val mediavks = "Media VKS" at "http://media.verknowsys.com/maven2-repository/"
+    val jboss = "JBoss Repo" at "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases"
     val repoVks = "VerKnowSys Public Repository" at "http://maven.verknowsys.com/repository"
 
-    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, mediavks, repoVks)
+    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, mediavks, repoVks, jboss)
 }
 
 object Dependencies {
@@ -67,7 +68,10 @@ object Dependencies {
     val expect4j = "net.sourceforge.expectj" % "expectj" % "2.0.1"
     val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "2.1.0.201209190230-r" // "1.0.0.201106090707-r"
     val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
-    val smack = "jivesoftware" % "smack" % "3.0.4"
+    val javax = "javax.media" % "jai-core" % "1.1.3"
+    val javaxjmf = "javax.media" % "jmf" % "2.1.1b"
+    // val smack = "jivesoftware" % "smack" % "3.0.4"
+    // val smackx = "jivesoftware" % "smackx" % "3.0.4"
     // val specs = "org.scala-tools.testing" % "specs" % "1.6.9"
     // val specs = "org.scala-tools.testing" %% "specs" % "1.6.9"
     // val jetty = "org.mortbay.jetty" % "jetty" % "6.1.22" % "container"
@@ -110,9 +114,9 @@ object ServeD extends Build {
     lazy val user = Project("user", file("svd.user"),
         settings = coreBuildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
-            libraryDependencies ++= Seq(jline, jgit, smack)
+            libraryDependencies ++= Seq(jline, jgit, javax, javaxjmf)
         )
-    ) dependsOn(api, common, testing % "test")
+    ) dependsOn(api, common, utils, testing % "test")
 
 
     lazy val common = Project("common", file("svd.common"),
