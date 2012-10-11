@@ -18,6 +18,14 @@ case class Error(val message: String) extends ApiResponse
 // General errors
 case object NotImplementedError
 
+object Notify {
+    // generic notification center messages:
+    sealed abstract class Base extends ApiMessage
+
+    case class Message(content: String) extends Base
+    case class Status(content: String) extends Base
+}
+
 object General {
     sealed abstract class Base extends ApiMessage
 
