@@ -12,7 +12,6 @@ import java.io._
 import java.util.{Calendar, GregorianCalendar}
 import akka.actor._
 import akka.testkit.TestKit
-import org.specs._
 import akka.testkit.TestActorRef
 import com.typesafe.config.ConfigFactory
 import akka.dispatch._
@@ -26,7 +25,7 @@ import akka.actor.{ActorSystem, Props, ActorRef}
 import com.verknowsys.served.testing._
 
 
-class SvdGathererTest(_system: ActorSystem) extends TestKit(_system) with DefaultTest with Logging {
+class SvdGathererTest(_system: ActorSystem) extends TestKit(_system) with DefaultTest with Logging  with SvdUtils {
 
     def this() = this(ActorSystem("svd-test-system"))
 

@@ -9,7 +9,7 @@ import org.apache.commons.io.FileUtils
 import java.io.File
 
 
-class SvdUtilsTest extends DefaultTest with Logging {
+class SvdUtilsTest extends DefaultTest with Logging with SvdUtils {
 
 
     it should "return true if file exists" in {

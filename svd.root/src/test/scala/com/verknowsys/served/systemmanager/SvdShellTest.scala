@@ -10,7 +10,6 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
 
 import org.apache.commons.io.FileUtils
-import org.specs._
 import java.lang._
 import java.io._
 
