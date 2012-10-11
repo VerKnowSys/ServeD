@@ -71,7 +71,7 @@ object SvdConfig {
     def notificationXmppHost            = "verknowsys.com"
     def notificationXmppLogin           = "notifications"
     def notificationXmppPassword        = "mkonjibhu"
-    def notificationXmppResource        = "svd"
+    def notificationXmppResource        = "svd-" + java.util.UUID.randomUUID
     def notificationXmppPort            = 65222
     def notificationXmppCompression     = false
     def notificationXmppUseSasl         = false
