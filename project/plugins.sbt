@@ -18,9 +18,15 @@ libraryDependencies <+= sbtVersion(v => v match {
 
 resolvers += Resolver.url("artifactory", url("http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases"))(Resolver.ivyStylePatterns)
 
+resolvers += "spray repo" at "http://repo.spray.cc"
+
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.8.4")
 
 addSbtPlugin("org.ensime" % "ensime-sbt-cmd" % "0.0.10")
+
+addSbtPlugin("cc.spray" % "sbt-revolver" % "0.6.1")
+
+addSbtPlugin("me.lessis" % "coffeescripted-sbt" % "0.2.3")
 
 // addSbtPlugin("me.lessis" % "sbt-growl-plugin" % "0.1.3")
 

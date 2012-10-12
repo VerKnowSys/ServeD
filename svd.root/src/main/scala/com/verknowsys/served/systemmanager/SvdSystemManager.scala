@@ -48,8 +48,8 @@ class SvdSystemManager extends SvdExceptionHandler {
             log.info("Spawning Webbit WebSockets Server")
             val webServer = WebServers.createWebServer(60006)
               .add("/livemonitor", new SvdWebSocketsHandler)
-              .add(new StaticFileHandler("/web"))
-              .start
+              // .add(new StaticFileHandler("/web"))
+              .start.get
             log.info("WebSockets Server running at " + webServer.getUri)
 
             sender ! Success
