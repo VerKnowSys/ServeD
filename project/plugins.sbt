@@ -26,6 +26,8 @@ addSbtPlugin("org.ensime" % "ensime-sbt-cmd" % "0.0.10")
 
 addSbtPlugin("cc.spray" % "sbt-revolver" % "0.6.1")
 
+addSbtPlugin("me.lessis" % "coffeescripted-sbt" % "0.2.3")
+
 // addSbtPlugin("me.lessis" % "sbt-growl-plugin" % "0.1.3")
 
 // libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % (v+"-0.2.11"))

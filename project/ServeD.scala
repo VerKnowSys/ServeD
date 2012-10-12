@@ -8,6 +8,9 @@ import sbtassembly._
 import sbtassembly.Plugin._
 import AssemblyKeys._
 import cc.spray.revolver.RevolverPlugin._
+import coffeescript.Plugin.coffeeSettings
+import coffeescript.Plugin.CoffeeKeys
+import coffeescript.Plugin.CoffeeKeys._
 
 
 object BuildSettings {
@@ -170,7 +173,8 @@ object ServeD extends Build {
 
 
     lazy val web = Project("web", file("svd.web"),
-        settings = buildSettings ++ Revolver.settings ++ Seq(
+        settings = buildSettings ++ coffeeSettings ++ Revolver.settings ++ Seq(
+                (resourceManaged in (Compile, CoffeeKeys.coffee)) <<= (crossTarget in Compile)(_ / "classes" / "public" / "js"),
                 libraryDependencies ++= Seq(
                     unfilteredFilter, unfilteredJetty, scalate, scalateUtil, liftJson, liftUtil
                 )
