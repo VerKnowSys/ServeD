@@ -127,15 +127,6 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
 
 
                     // Start GitManager for this account
-                    val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
-                    (gitManager ? Init) onSuccess {
-                        case _ =>
-                            log.debug("Setting log watch on git manager.")
-                            context.watch(gitManager)
-                    } onFailure {
-                        case x =>
-                            log.debug("Failed git manager init: %s", x)
-                    }
 
                     val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)))
                     (notificationsManager ? Init) onSuccess {
@@ -147,10 +138,30 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                             log.error("Failed to contact with Notification center! %s", x)
                     }
 
+                    val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
+                    (gitManager ? Init) onSuccess {
+                        case _ =>
+                            log.debug("Setting log watch on git manager.")
+                            context.watch(gitManager)
+                    } onFailure {
+                        case x =>
+                            log.debug("Failed git manager init: %s", x)
+                    }
+
+                    val webManager = context.actorOf(Props(new SvdWebManager(account)))
+                    (webManager ? Init) onSuccess {
+                        case _ =>
+                            log.debug("Launching Web Manager")
+                            context.watch(webManager)
+                    } onFailure {
+                        case x =>
+                            log.error("Failed to contact with Web Manager! %s", x)
+                    }
+
                     // Start the real work
                     log.debug("Becaming started")
                     accountsManager ! Alive(account.uid)
-                    context.become(started(db, dbServer, gitManager, notificationsManager))
+                    context.become(started(db, dbServer, gitManager, notificationsManager, webManager))
                     log.trace("Sending Init once again")
                     self ! Init
 
@@ -187,7 +198,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
     }
 
 
-    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef): Receive = traceReceive {
+    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef): Receive = traceReceive {
         // case GetUserProcessList =>
         //     val psAll = SvdLowLevelSystemAccess.processList(false)
         //     log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
@@ -197,8 +208,6 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
             addDefaultAccessKey(db)
 
             sshd ! InitSSHChannelForUID(account.uid)
-
-            // com.verknowsys.served.web.Server(51234)
 
             // adding default key:
 
