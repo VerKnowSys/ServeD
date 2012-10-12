@@ -12,13 +12,14 @@ import akka.actor.Actor
 class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler with SvdUtils with Logging {
     log.info("SvdNotificationCenter is loading")
 
-    val gates: List[Gate] = new SvdXMPPGate(
-        host = SvdConfig.notificationXmppHost,
-        port = SvdConfig.notificationXmppPort,
-        login = SvdConfig.notificationXmppLogin,
-        password = SvdConfig.notificationXmppPassword,
-        resource = SvdConfig.notificationXmppResource
-    ) :: Nil
+    val gates: List[Gate] =
+        new SvdXMPPGate(
+            host = SvdConfig.notificationXmppHost,
+            port = SvdConfig.notificationXmppPort,
+            login = SvdConfig.notificationXmppLogin,
+            password = SvdConfig.notificationXmppPassword,
+            resource = SvdConfig.notificationXmppResource
+        ) :: new SvdMailGate :: Nil
 
     override def preStart {
         gates.foreach(_.connect)

@@ -32,7 +32,7 @@ class Orders extends Plan with Database with Logging with SvdUtils {
                     case Some(Cookie(_, cart, _, _, _, _, _, _)) =>
                         val cartJSON = ("cartUUID" -> cartUUID) ~ ("contains" -> cart)
                         val json = cartJSON ~ ("email" -> userEmail) ~ ("confirmed" -> false) ~ ("orderUUID" -> "%s".format(UUID.randomUUID()))
-                        Mail("Wiadomość mailowa", "dmilith@verknowsys.com")
+                        // Mail("Wiadomość mailowa", "dmilith@verknowsys.com")
                         JsonContent ~> ResponseString(json)
 
                     case _ =>

@@ -67,7 +67,10 @@ object SvdConfig {
     def gatherTimeout                   = 1000
     def defaultUserAkkaConf             = "/defaultUserAkkaConf.conf"
     def standardShellEnvironment        = ". /etc/profile\nulimit -u 120\n"
-    def notificationXmppRecipients      = "dmilith@verknowsys.com,michal.lipski@gmail.com"
+    def notificationMailUser            = "notifications"
+    def notificationMailPassword        = "mkonjibhu"
+    def notificationMailRecipients      = "dmilith@verknowsys.com" :: "michal.lipski@gmail.com" :: Nil
+    def notificationXmppRecipients      = "dmilith@verknowsys.com" :: "michal.lipski@gmail.com" :: Nil
     def notificationXmppHost            = "verknowsys.com"
     def notificationXmppLogin           = "notifications"
     def notificationXmppPassword        = "mkonjibhu"

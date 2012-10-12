@@ -170,7 +170,7 @@ object ServeD extends Build {
     lazy val utils = Project("utils", file("svd.utils"),
         settings = buildSettings ++ Seq(
             compileOrder        := CompileOrder.Mixed,
-            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd) // slf4japi/
+            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd, liftUtil) // slf4japi/
         )
     ) dependsOn(api, testing % "test")
 
@@ -179,7 +179,7 @@ object ServeD extends Build {
         settings = buildSettings ++ coffeeSettings ++ Revolver.settings ++ Seq(
                 (resourceManaged in (Compile, CoffeeKeys.coffee)) <<= (crossTarget in Compile)(_ / "classes" / "public" / "js"),
                 libraryDependencies ++= Seq(
-                    unfilteredFilter, unfilteredJetty, scalate, scalateUtil, liftJson, liftUtil
+                    unfilteredFilter, unfilteredJetty, scalate, scalateUtil, liftJson
                 )
             )
         ) dependsOn(api, common, utils, testing % "test")

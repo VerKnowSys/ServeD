@@ -37,7 +37,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
 
         val chatmanager = connection.getChatManager
 
-        jids.foreach { user =>
+        SvdConfig.notificationXmppRecipients.foreach { user =>
             try {
                 chats += chatmanager.createChat(user, this)
             } catch {
@@ -89,10 +89,6 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
         //     }
         // }
     }
-
-
-
-    def jids = SvdConfig.notificationXmppRecipients.split(",")
 
 
 }

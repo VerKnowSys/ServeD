@@ -198,7 +198,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
 
             sshd ! InitSSHChannelForUID(account.uid)
 
-            com.verknowsys.served.web.Server(51234)
+            // com.verknowsys.served.web.Server(51234)
 
             // adding default key:
 

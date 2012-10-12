@@ -1,7 +1,7 @@
-package com.verknowsys.served.web
+package com.verknowsys.served.utils
 
 
-import com.verknowsys.served.web.merch._
+// import com.verknowsys.served.web.merch._
 
 
 object Dict {
