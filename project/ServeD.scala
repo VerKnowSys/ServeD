@@ -47,6 +47,9 @@ object BuildSettings {
             case "reference.conf" | "application.conf" | "svd.logger.properties" | "META-INF/NOTICE.txt" | "META-INF/LICENSE" | "META-INF/LICENSE.txt" | "META-INF/NOTICE" =>
                 MergeStrategy.concat
 
+            case some @ x if some.endsWith(".coffee") =>
+                MergeStrategy.discard
+
             case "about.html" | "build.number" | "META-INF/MANIFEST.MF" | "META-INF/DEPENDENCIES" | "META-INF/INDEX.LIST" =>
                 MergeStrategy.discard
 
