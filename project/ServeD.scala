@@ -7,6 +7,7 @@ import scala.io.Source
 import sbtassembly._
 import sbtassembly.Plugin._
 import AssemblyKeys._
+import cc.spray.revolver.RevolverPlugin._
 
 
 object BuildSettings {
@@ -40,38 +41,14 @@ object BuildSettings {
         test in assembly := false,
 
         mergeStrategy in assembly := {
-            case "reference.conf" | "application.conf" | "NOTICE" =>
+            case "reference.conf" | "application.conf" | "svd.logger.properties" | "META-INF/NOTICE.txt" | "META-INF/LICENSE" | "META-INF/LICENSE.txt" | "META-INF/NOTICE" =>
                 MergeStrategy.concat
 
-            case "build.number" =>
+            case "about.html" | "build.number" | "META-INF/MANIFEST.MF" | "META-INF/DEPENDENCIES" | "META-INF/INDEX.LIST" =>
                 MergeStrategy.discard
 
-            case "jboss-beans.xml" =>
-                MergeStrategy.first
-
-            case PathList("META-INF", xs @ _*) =>
-                (xs map {_.toLowerCase}) match {
-                    case ("manifest.mf" :: Nil) | ("index.list" :: Nil) | ("dependencies" :: Nil) | ("NOTICE" :: Nil) =>
-                        MergeStrategy.discard
-
-                    case ps @ (x :: xs) if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") || ps.last.endsWith(".txt") =>
-                        MergeStrategy.discard
-
-                    case "plexus" :: xs =>
-                        MergeStrategy.discard
-
-                    case "services" :: xs =>
-                        MergeStrategy.filterDistinctLines
-
-                    case ("spring.schemas" :: Nil) | ("spring.handlers" :: Nil) =>
-                        MergeStrategy.filterDistinctLines
-
-                    case _ =>
-                        MergeStrategy.first
-                }
-
             case _ =>
-                MergeStrategy.first
+                MergeStrategy.deduplicate
         }
 
     )
@@ -106,18 +83,24 @@ object Dependencies {
     val expect4j = "net.sourceforge.expectj" % "expectj" % "2.0.1"
     val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "2.1.0.201209190230-r" // "1.0.0.201106090707-r"
     val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
+    val unfilteredFilter = "net.databinder" %% "unfiltered-filter" % "0.6.4"
+    val unfilteredJetty = "net.databinder" %% "unfiltered-jetty" % "0.6.4"
+    val unfilteredSpec = "net.databinder" %% "unfiltered-spec" % "0.6.4" % "test"
+    val scalate = "org.fusesource.scalate" % "scalate-core" % "1.5.3"
+    val scalateUtil = "org.fusesource.scalate" % "scalate-util" % "1.5.3" % "test"
+    val liftJson = "net.liftweb" % "lift-json_2.9.1" % "2.4" % "compile->default"
+    val liftUtil = "net.liftweb" % "lift-util_2.9.1" % "2.4" % "compile->default"
+
     // val javax = "javax.media" % "jai-core" % "1.1.3"
     // val javaxjmf = "javax.media" % "jmf" % "2.1.1b"
     // val smack = "jivesoftware" % "smack" % "3.0.4"
     // val smackx = "jivesoftware" % "smackx" % "3.0.4"
-    // val specs = "org.scala-tools.testing" % "specs" % "1.6.9"
-    // val specs = "org.scala-tools.testing" %% "specs" % "1.6.9"
     // val jetty = "org.mortbay.jetty" % "jetty" % "6.1.22" % "container"
     // val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.4.1.v20110513"
     val sshd = "org.apache.sshd" % "sshd-core" % "0.7.0"
     // val slf4japi = "org.slf4j" % "slf4j-api" % "1.7.1" // WARN: api change
     val commonsio = "commons-io" % "commons-io" % "1.3.2"
-    val webbit = "org.webbitserver" % "webbit" % "0.3.8"
+    val webbit = "org.webbitserver" % "webbit" % "0.4.14"
     // val scalaz = "org.scalaz" % "scalaz-core_2.9.2" % "7.0.0-M3"
 
     val tzip = "de.schlichtherle" % "truezip" % "6.8.4"
@@ -136,7 +119,7 @@ object ServeD extends Build {
 
 
     lazy val served = Project("served", file("."), settings = buildSettings) aggregate(
-        api, cli, utils, testing, root, user, common // web,
+        api, cli, utils, testing, root, user, common, web
     )
 
 
@@ -146,7 +129,7 @@ object ServeD extends Build {
             libraryDependencies ++= Seq(jline, expect4j, sshd, webbit),
             mainClass in assembly := Some("com.verknowsys.served.rootboot")
         )
-    ) dependsOn(api, common, testing % "test")
+    ) dependsOn(api, common, utils, web, testing % "test")
 
 
     lazy val user = Project("user", file("svd.user"),
@@ -154,7 +137,7 @@ object ServeD extends Build {
             parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(jline, jgit)
         )
-    ) dependsOn(api, common, utils, testing % "test")
+    ) dependsOn(api, common, utils, web, testing % "test")
 
 
     lazy val common = Project("common", file("svd.common"),
@@ -185,6 +168,14 @@ object ServeD extends Build {
         )
     ) dependsOn(api, testing % "test")
 
+
+    lazy val web = Project("web", file("svd.web"),
+        settings = buildSettings ++ Revolver.settings ++ Seq(
+                libraryDependencies ++= Seq(
+                    unfilteredFilter, unfilteredJetty, scalate, scalateUtil, liftJson, liftUtil
+                )
+            )
+        ) dependsOn(api, common, utils, testing % "test")
 
     // lazy val web = Project("web", file("svd.web"),
     //     settings = buildSettings ++ webSettings ++ Seq(

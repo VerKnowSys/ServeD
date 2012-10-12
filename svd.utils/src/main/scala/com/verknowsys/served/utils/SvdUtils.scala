@@ -506,5 +506,19 @@ trait SvdUtils extends Logging {
     }
 
 
+    /**
+     *  @autor dmilith
+     *
+     *  Get list of fields of case class using reflection
+     */
+    def caseClassFields(cc: AnyRef) =
+        (Map[String, String]() /: cc.getClass.getDeclaredFields) {
+            (a, f) =>
+                f.setAccessible(true)
+                a + (f.getName -> f.get(cc).toString)
+        }
+
+
+
 }
 
