@@ -87,45 +87,45 @@ class SvdProcessQueue extends DQueue[SvdProcessUsage] {
 }
 
 
-class SvdWebSocketsHandler extends WebSocketHandler with Logging with SvdUtils {
+class SvdWebSocketsHandler extends BaseWebSocketHandler with Logging with SvdUtils {
 
     import com.verknowsys.served.systemmanager.native._
 
-    var connectionCount = 0
-    var queue: SvdProcessQueue = null
+    // var queue: SvdProcessQueue = null
 
 
-    def onOpen(connection: WebSocketConnection) {
-        connection.send("Hello! There are " + connectionCount + " other connections active")
-        connectionCount += 1
-        log.debug("WebSocket connection %s (no: %s) opened".format(connection, connectionCount))
+    override def onOpen(connection: WebSocketConnection) {
+        // connection.send("Hello! There are " + connectionCount + " other connections active")
+        log.debug("WebSocket connection opened".format(connection))
 
-        while (connectionCount > 0) {
+        // while (true) {
             if (isBSD) {
                 val raw =  SvdLowLevelSystemAccess.usagesys(SvdConfig.defaultUserUID) //.split("|")
                 // val pu = SvdProcessUsage(pid = raw(0).toInt, name = raw(2), rss = raw(4).toInt)
-                connection.send("%d<br/>%s".format(connectionCount, raw.replaceAll("\n","<br/>")))
-                Thread.sleep(500)
+                connection.send("%d<br/>%s".format(123, raw.replaceAll("\n","<br/>")))
+            } else {
+                connection.send(new java.util.Date().toString)
             }
-        }
+            // Thread.sleep(500) // XXX: hardcode
+        // }
     }
 
-    def onClose(connection: WebSocketConnection) {
+    override def onClose(connection: WebSocketConnection) {
         log.debug("WebSocket connection closed: " + connection)
-        connectionCount -= 1
+
     }
 
-    def onMessage(connection: WebSocketConnection, message: String) {
+    override def onMessage(connection: WebSocketConnection, message: String) {
         log.debug("WebSocket text message (" + message + ") received on connection: " + connection)
         connection.send(message.toUpperCase)
     }
 
-    def onMessage(connection: WebSocketConnection, message: Array[Byte]) {
+    override def onMessage(connection: WebSocketConnection, message: Array[Byte]) {
         log.debug("WebSocket byte message (" + message + ") received on connection: " + connection)
     }
 
-    def onPong(connection: WebSocketConnection, message: String) {
-        log.debug("WebSocket pong message (" + message + ") received on connection: " + connection)
-    }
+    // override def onPong(connection: WebSocketConnection, message: String) {
+    //     log.debug("WebSocket pong message (" + message + ") received on connection: " + connection)
+    // }
 
 }

@@ -198,6 +198,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
 
             sshd ! InitSSHChannelForUID(account.uid)
 
+            com.verknowsys.served.web.Server(51234)
+
             // adding default key:
 
             sender ! Success
@@ -302,8 +304,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
 
     addShutdownHook {
         log.warn("Got termination signal")
-        log.info("Shutdown of Account Manager requested")
-        log.debug("Shutting down Account Manager")
+        log.info("Shutting down Account Manager")
         unregisterFileEvents(self)
         system.shutdown // shutting down main account actor manager
     }
