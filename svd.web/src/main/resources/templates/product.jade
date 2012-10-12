@@ -1,0 +1,62 @@
+- import com.verknowsys.served.web.Dict
+- import com.verknowsys.served.web.merch._
+- import com.verknowsys.served.web.merch.implicits._
+- include("layout.jade")
+
+h2= Dict("Define new product")
+
+- // Zdefiniuj swój własny produkt
+- // Wybierz
+script(type="text/javascript")(src="/assets/js/tshirt.js")
+section#shirt
+
+
+section.messages
+  = messages
+section.product
+  form(name="product_form")(action="/product")(method="POST")
+    label(for="product_class")= Dict("Product class")
+    select(name="product_class")
+      option(value="Clothing")(selected={productClass == "Clothing"})= Dict("Clothing")
+      option(value="Sticker")(selected={productClass == "Sticker"})= Dict("Sticker")
+      option(value="SpatialLetter")(selected={productClass == "SpatialLetter"})= Dict("SpatialLetter")
+
+    label(for="product_category")= Dict("Product category")
+    ul(name="product_category")
+      - for {category <- ClothingCategory.values}
+        li(value=category)(selected={productCategory == category})= Dict(category)
+
+    label(for="product_color")= Dict("Product color")
+    ul(name="product_color")
+      - for {color <- Color.values}
+        li(value=color)(selected={productColor == color})= Dict(color)
+
+    label(for="product_print_size")= Dict("Product print size")
+    ul(name="product_print_size")
+      - for {printsize <- PrintSize.values}
+        li(value=printsize)(selected={productPrintSize == printsize})= Dict(printsize)
+
+    label(for="product_print_placement")= Dict("Product print placement")
+    ul(name="product_print_placement")
+      - for {printplacement <- TshirtPrintPlacement.values}
+        li(value=printplacement)(selected={productPrintPlacement == printplacement})= Dict(printplacement)
+
+    label(for="product_project")= Dict("Product project")
+    ul(name="product_project")
+      - for {project <- ProjectType.values}
+        li(value=project)(selected={productProject == project})= Dict(project)
+
+    label(for="product_size")= Dict("Product size")
+    ul(name="product_size")
+      - for {size <- Size.values}
+        li(value=size)(selected={productSize == size})= Dict(size)
+
+    label(for="product_sticker_type")= Dict("Product sticker type")
+    ul(name="product_sticker_type")
+      - for {stickerType <- StickerType.values}
+        li(value=stickerType)(selected={productStickerType == stickerType})= Dict(stickerType)
+
+    label(for="product_description")= Dict("Product description")
+    input(name="product_description")(value=productDescription)
+
+    input(type="submit")(value={Dict("Create product")})
