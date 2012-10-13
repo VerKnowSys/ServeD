@@ -31,6 +31,19 @@ class SvdGitManager(
     }
 
 
+    override def preRestart(cause: Throwable) = {
+        log.debug("preRestart of account: %s caused by: %s", account, cause)
+        super.preRestart(cause)
+    }
+
+
+    override def postStop = {
+        db.close
+        log.debug("postStop of account: %s", account)
+        super.postStop
+    }
+
+
     def receive = traceReceive {
 
         case ListRepositories =>
@@ -88,11 +101,8 @@ class SvdGitManager(
         case RepositoryExistsError =>
             log.warn("Repository already exists!")
 
-        case Shutdown =>
-            log.debug("Shutting down Git Manager")
-            context.stop(self)
-
     }
+
 
     def withRepo(uuid: UUID)(f: (Repository) => Unit) = sender ! (RepositoryDB(db)(uuid) match {
         case Some(repo) =>
