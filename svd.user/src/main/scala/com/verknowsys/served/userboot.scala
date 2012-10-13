@@ -65,6 +65,13 @@ object userboot extends Logging with SvdUtils {
                 throwException[RuntimeException]("Cannot spawn user boot for UID: %s!".format(userUID))
         }
 
+        addShutdownHook {
+            log.warn("Got termination signal")
+            log.info("Shutting down userboot")
+            system.shutdown // shutting down main account actor manager
+            Thread.sleep(SvdConfig.shutdownTimeout)
+        }
+
         // val portOpt = (accountsManager ? GetPort) onSuccess {
         //     case i: Int => i
         // }

@@ -78,7 +78,8 @@ class SvdRootBoot extends Logging with SvdExceptionHandler {
         case Shutdown =>
             sshd ! Shutdown
             system.shutdown
-            log.debug("Got shutdown")
+            log.warn("Got shutdown. Telling whole system to stop itself.")
+            Thread.sleep(SvdConfig.shutdownTimeout)
 
     }
 }
