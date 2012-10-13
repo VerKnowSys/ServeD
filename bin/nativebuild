@@ -1,9 +1,16 @@
 #!/bin/sh
+# @author dmilith
 
+DEVEL="false"
+if [ "$1" = "devel" ]; then
+DEVEL="true"
+fi
 
 system="$(uname)"
-DEVEL="false"
 FLAGS="-Os -fPIC"
+if [ "DEVEL" = "true" ]; then
+    export FLAGS="-Os -fPIC -DDEVEL"
+fi
 CC="gcc"
 CXX="g++"
 STRIP="strip"
