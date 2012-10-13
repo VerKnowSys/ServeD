@@ -1,15 +1,16 @@
 #!/bin/sh
 # @author dmilith
 
-DEVEL="false"
+export DEVEL="false"
 if [ "$1" = "devel" ]; then
-DEVEL="true"
+    export DEVEL="true"
 fi
 
 system="$(uname)"
-FLAGS="-Os -fPIC"
-if [ "DEVEL" = "true" ]; then
-    export FLAGS="-Os -fPIC -DDEVEL"
+export FLAGS="-Os -fPIC"
+if [ "$DEVEL" = "true" ]; then
+    echo "Devel enabled"
+    export FLAGS="$FLAGS -DDEVEL"
 fi
 CC="gcc"
 CXX="g++"
@@ -25,7 +26,6 @@ echo "System: $system"
 echo "C compiler: $CC"
 echo "C++ compiler: $CXX"
 echo "Flags: $FLAGS"
-echo "Devel: $DEVEL"
 echo
 
 check() {
