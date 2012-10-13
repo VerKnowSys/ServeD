@@ -32,6 +32,8 @@ resolvers += Resolver.url("sbt-plugin-releases", new URL("http://scalasbt.artifa
 
 addSbtPlugin("com.jsuereth" % "xsbt-gpg-plugin" % "0.6")
 
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.6.0")
+
 // addSbtPlugin("me.lessis" % "sbt-growl-plugin" % "0.1.3")
 
 // libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % (v+"-0.2.11"))

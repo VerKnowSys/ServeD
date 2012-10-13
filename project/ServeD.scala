@@ -124,7 +124,7 @@ object ServeD extends Build {
     import BuildSettings._
     import Dependencies._
 
-    lazy val served = Project("served", file("."), settings = buildSettings) aggregate(
+    lazy val served = Project("served", file("."), settings = buildSettings).settings(net.virtualvoid.sbt.graph.Plugin.graphSettings: _*) aggregate(
 
         api, cli, utils, testing, root, user, common, web
     )
@@ -136,7 +136,7 @@ object ServeD extends Build {
             libraryDependencies ++= Seq(jline, expect4j, sshd, webbit),
             mainClass in assembly := Some("com.verknowsys.served.rootboot")
         )
-    ) dependsOn(api, common, utils, web, testing % "test")
+    ).settings(net.virtualvoid.sbt.graph.Plugin.graphSettings: _*) dependsOn(api, common, utils, web, testing % "test")
 
 
     lazy val user = Project("user", file("svd.user"),
@@ -144,28 +144,28 @@ object ServeD extends Build {
             parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(jline, jgit)
         )
-    ) dependsOn(api, common, utils, web, testing % "test")
+    ).settings(net.virtualvoid.sbt.graph.Plugin.graphSettings: _*) dependsOn(api, common, utils, web, testing % "test")
 
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle)
         )
-    ) dependsOn(api, utils, testing % "test")
+    ).settings(net.virtualvoid.sbt.graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test")
 
 
     lazy val api = Project("api", file("svd.api"),
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(akkaRemote)
         )
-    )
+    ).settings(net.virtualvoid.sbt.graph.Plugin.graphSettings: _*)
 
 
     lazy val cli = Project("cli", file("svd.cli"),
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(jline)
         )
-    ) dependsOn(api, utils, testing % "test")
+    ).settings(net.virtualvoid.sbt.graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test")
 
 
     lazy val utils = Project("utils", file("svd.utils"),
@@ -173,7 +173,7 @@ object ServeD extends Build {
             compileOrder        := CompileOrder.Mixed,
             libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd, liftUtil) // slf4japi/
         )
-    ) dependsOn(api, testing % "test")
+    ).settings(net.virtualvoid.sbt.graph.Plugin.graphSettings: _*) dependsOn(api, testing % "test")
 
 
     lazy val web = Project("web", file("svd.web"),
@@ -183,7 +183,7 @@ object ServeD extends Build {
                     unfilteredFilter, unfilteredJetty, scalate, scalateUtil, liftJson
                 )
             )
-        ) dependsOn(api, common, utils, testing % "test")
+        ).settings(net.virtualvoid.sbt.graph.Plugin.graphSettings: _*) dependsOn(api, common, utils, testing % "test")
 
     // lazy val web = Project("web", file("svd.web"),
     //     settings = buildSettings ++ webSettings ++ Seq(
@@ -198,5 +198,5 @@ object ServeD extends Build {
         settings = buildSettings ++ Seq(
             libraryDependencies ++= Seq(scalatest, akkaTestkit, commonsio, bouncycastle)
         )
-    ) dependsOn(api)
+    ).settings(net.virtualvoid.sbt.graph.Plugin.graphSettings: _*) dependsOn(api)
 }
