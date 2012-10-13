@@ -2,8 +2,8 @@
 
 . /etc/rc.subr
 
-export PATH="$PATH:/Software/Openjdk7/bin"
-export JAVA_HOME="/Software/Openjdk7"
+export PATH="$PATH:/Software/Openjdk64/bin"
+export JAVA_HOME="/Software/Openjdk64"
 
 if [ ! -e $JAVA_HOME/bin/java ]; then
     echo "Cannot find OpenJDK"
@@ -58,7 +58,7 @@ served_restart() {
         if [ "$amount" -eq "0" ]; then
             break
         fi
-        sleep 1
+        sleep 10
     done
     for i in $(jot 10); do
         amount=$(ps -Au |grep java | grep -v grep | wc -l)

@@ -1,0 +1,28 @@
+arch:
+
+0. przypadek domyślny. UNIX Sockets
+
+1. user wrzuca do ~/WebApps/ katalog "dupa.com" z rack apką.
+
+2. wykrywamy ten event po stronie usera (lub robimy jako hook na deployu katalogu apki "dupa.com")
+
+3. SvdAccountManager po stronie usera odpala serwis dla apki (passenger standalone):
+
+    // kod wykonywany po stronie usera:
+    new SvdService(
+        SvdUserServices.rackWebAppConfig(
+            userAccountObject,
+            domain = SvdUserDomain("dupa.com")
+        ),
+        userAccountObject
+    )
+
+4. Jeśli walidacja domeny przechodzi, to SvdAccountManager po stronie usera wysyła żądanie do SvdAccountsManager'a (po stronie root'a):
+
+    // kod wykonywany po stronie roota:
+    newWebAppEntry(
+        SvdUserDomain("dupa.com"),
+        userAccountObject
+    )
+
+5. Reload Coreginx'a

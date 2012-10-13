@@ -7,14 +7,13 @@ import com.verknowsys.served.git._
 import com.verknowsys.served.db.DBClient
 
 import akka.actor._
-import akka.config.Supervision._
-import akka.actor.Actor.{remote, actorOf, registry}
 
 
 /**
  * Git Manager
  *
  * @author teamon
+ * @author dmilith
  */
 class SvdGitManager(
         val account: SvdAccount,
@@ -22,52 +21,80 @@ class SvdGitManager(
         val gitRepositoriesLocation: String
     ) extends SvdManager with DatabaseAccess {
 
-    log.info("Starting GitManager for account: %s in home dir: %s".format(account, gitRepositoriesLocation))
+
+    override def preStart = {
+        super.preStart
+        log.info("Starting GitManager for account: %s in home dir: %s".format(account, gitRepositoriesLocation))
+        log.debug("Checking existance of %s", gitRepositoriesLocation)
+        checkOrCreateDir(gitRepositoriesLocation)
+        log.debug("Initializing repositories of %s in: %s".format(gitRepositoriesLocation, Repositories(RepositoryDB(db).toList)))
+    }
 
 
     def receive = traceReceive {
+
         case ListRepositories =>
             log.trace("Listing git repositories in %s", gitRepositoriesLocation)
-            self reply Repositories(RepositoryDB(db).toList)
+            sender ! Repositories(RepositoryDB(db).toList)
 
         case GetRepositoryByName(name) =>
-            self reply RepositoryDB(db)(_.name == name).headOption
+            sender ! RepositoryDB(db)(_.name == name).headOption
 
         case GetRepositoryByUUID(uuid) =>
-            self reply RepositoryDB(db)(uuid)
+            sender ! RepositoryDB(db)(uuid)
 
         case CreateRepository(name) =>
             RepositoryDB(db)(_.name == name).headOption match {
                 case Some(repo) =>
-                    self reply RepositoryExistsError
+                    sender ! RepositoryExistsError
 
                 case None =>
                     log.trace("Creating new git repository: %s for account: %s".format(name, account.userName))
                     val repo = Repository(name)
                     Git.init(gitRepositoriesLocation / repo.name, bare = true)
                     db << repo
-                    self reply repo
+                    sender ! repo
             }
 
         case RemoveRepository(uuid) =>
             withRepo(uuid) { repo =>
                 log.trace("Removing git repository: %s for account: %s".format(repo.name, account.userName))
-                db ~ repo
-                SvdUtils.rmdir(gitRepositoriesLocation / repo.name + ".git")
+                val repoLocation = gitRepositoriesLocation / repo.name + ".git"
+                if (!new java.io.File(repoLocation).exists) {
+                    sender ! RepositoryDoesNotExistError
+                } else {
+                    log.trace("Removing repository: %s".format(repoLocation))
+                    db ~ repo
+                    rm_r(repoLocation)
+                    sender ! Success
+                }
             }
 
         case AddAuthorizedKey(uuid, key) =>
             withRepo(uuid) { repo =>
                 db << repo.copy(authorizedKeys = repo.authorizedKeys + key)
             }
+            sender ! Success
 
         case RemoveAuthorizedKey(uuid, key) =>
             withRepo(uuid) { repo =>
                 db << repo.copy(authorizedKeys = repo.authorizedKeys - key)
             }
+            sender ! Success
+
+        case Repository(name, authorizedKeys, uuid) =>
+            log.debug("Got new repository named: %s with keys: %s", name, authorizedKeys)
+
+        case RepositoryExistsError =>
+            log.warn("Repository already exists!")
+
+        case Shutdown =>
+            log.debug("Shutting down Git Manager")
+            context.stop(self)
+
     }
 
-    def withRepo(uuid: UUID)(f: (Repository) => Unit) = self reply (RepositoryDB(db)(uuid) match {
+    def withRepo(uuid: UUID)(f: (Repository) => Unit) = sender ! (RepositoryDB(db)(uuid) match {
         case Some(repo) =>
             f(repo)
             Success

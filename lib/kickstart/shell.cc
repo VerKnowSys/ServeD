@@ -3,6 +3,7 @@
  *
  *   Shell wrapper with UID given as argument to main.
  *   This helper is used by SSHD side of ServeD
+ *   © 2011-2012 - VerKnowSys
  *
  */
 
@@ -24,20 +25,35 @@ void parse(char *line, char **argv) {
 }
 
 
-void execute(char **argv) {
-    int    status;
+void execute(char **argv, int uid) {
+    int status;
     pid_t  pid;
     if ((pid = fork()) < 0) {
         cerr << "Error forking child process failed!" << endl;
         exit(FORK_ERROR);
     } else if (pid == 0) {
+        stringstream hd, usr;
+        hd << USERS_HOME_DIR << uid;
+        usr << uid;
+        chdir(hd.str().c_str());
+        setenv("HOME", hd.str().c_str(), 1);
+        setenv("PWD", hd.str().c_str(), 1);
+        setenv("OLDPWD", hd.str().c_str(), 1);
+        setenv("USER", usr.str().c_str(), 1);
+        setenv("LOGNAME", usr.str().c_str(), 1);
+        unsetenv("USERNAME");
+        unsetenv("SUDO_USERNAME");
+        unsetenv("SUDO_USER");
+        unsetenv("SUDO_UID");
+        unsetenv("SUDO_GID");
+        unsetenv("SUDO_COMMAND");
+        unsetenv("MAIL");
         if (execvp(*argv, argv) < 0) {
             cerr << "Exec failed!" << endl;
             exit(EXEC_ERROR);
         }
-    } else {
+    } else
         while (wait(&status) != pid); /* wait for process */
-    }
 }
 
 
@@ -65,8 +81,9 @@ int main(int argc, char const *argv[]) {
     }
 
     /* Checking uid validity */
-    uid_t uid = atoi(arg.c_str());
-    if (uid == NULL) {
+    uid_t uid;
+    bool valid_uid = istringstream(arg) >> uid;
+    if (!uid || !valid_uid) {
         cerr << "Ambigous uid given!" << endl;
         exit(AMBIGOUS_ENTRY_ERROR);
     }
@@ -101,20 +118,23 @@ int main(int argc, char const *argv[]) {
         cerr << "Error setgid to gid: " << gid << endl;
         exit(SETGID_ERROR);
     }
-    chdir(homeDir.c_str());
+    // chdir(homeDir.c_str());
 
+    // count and gather arguments
+    string appArguments = "";
+    for (int i = 2; i < argc; i++) {
+        appArguments += string(argv[i]) + " ";
+    }
     string command = string(DEFAULT_SHELL_COMMAND) + " -i -s";
+    if (argc > 2) { // additional arguments => spawn custom command with uid privileges
+        command = appArguments;
+    }
     #ifdef DEVEL
-        cerr << "Spawning command: " << command << ", for uid: " << uid << " and gid: " << gid << endl;
+        cerr << "Spawning command for uid: " << uid << ", gid: " << gid << endl;
+        cerr << "Command line: " << command << endl;
     #endif
 
-    char *arguments[2];
+    char *arguments[argc];
     parse((char*)(command.c_str()), arguments);
-    #ifdef DEVEL
-        cout << "Arguments: ";
-        for (int i = 0; arguments[i] != NULL; ++i)
-            cout << arguments[i] << " ";
-        cout << endl;
-    #endif
-    execute(arguments);
+    execute(arguments, uid);
 }

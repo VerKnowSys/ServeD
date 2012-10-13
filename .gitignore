@@ -87,6 +87,10 @@ ctrlcli
 /docs/SpawnLib.out
 /docs/SpawnLib.pdf
 /docs/SpawnLib.synctex.gz
+/daemon
 /kick
 /shell
-/svd.common/src/main/resources/VERSION
+/svd.common/src/main/resources/FULLVERSION
+.project
+.history
+.ensime_port

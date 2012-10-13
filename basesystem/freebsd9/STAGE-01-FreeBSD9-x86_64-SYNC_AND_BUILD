@@ -1,0 +1,99 @@
+#!/bin/sh
+
+BSD_VERSION="9.1"
+BSD_GIT_REPOSITORY="git://github.com/VerKnowSys/freebsd.git"
+
+LOGIN_CONF_FILE="/etc/login.conf"
+CSUP_BIN="/usr/bin/csup"
+BSDMAKE_BIN="/usr/bin/make"
+READ_BIN="/usr/bin/read"
+REBOOT_BIN="/sbin/reboot"
+PWD_BIN="/bin/pwd"
+CP_BIN="/bin/cp"
+DATE_BIN="/bin/date"
+MKDIR_BIN="/bin/mkdir"
+TIME_BIN="/usr/bin/time"
+WHICH_BIN="/usr/bin/which"
+RM_BIN="/bin/rm"
+
+KERNEL_CONFIG_PATH="/usr/src/sys/amd64/conf/"
+CURRENT_DIR="$(${PWD_BIN})"
+PREFILES="${CURRENT_DIR}/prefiles/"
+KERNEL_CONFIG_FILE="${CURRENT_DIR}/kernel/VerKnowSys"
+
+
+check_result () {
+  if [ "$1" != "0" ]; then
+    echo "FAILURE"
+    exit 666
+  fi
+}
+
+echo "Checking current directory"
+if [ ! -d "${PREFILES}" ]; then
+  echo "This script must be running in ServeD/basesystem/freebsdX directory to run properly!"
+  exit 666
+fi
+
+if [ ! -e "${KERNEL_CONFIG_FILE}" ]; then
+  echo "No kernel config file found! WTF? Go fishing"
+  exit 666
+fi
+
+echo "Looking for GIT SCM"
+${WHICH_BIN} git
+check_result $?
+
+if [ ! -d "/usr/src/sys" ]; then
+  echo "No system sources found"
+  ${RM_BIN} -rf /usr/src
+  cd /usr
+  echo "Cloning FreeBSD base system"
+  ${TIME_BIN} git clone ${BSD_GIT_REPOSITORY} src
+  check_result $?
+  cd src
+  echo "Checking out ${BSD_VERSION}"
+  git checkout releng/${BSD_VERSION}
+  check_result $?
+else
+  cd /usr/src
+  echo "Updating kernel source"
+  ${TIME_BIN} git pull
+  check_result $?
+fi
+
+echo "Copying VERKNOWSYS kernel config to ${KERNEL_CONFIG_PATH}"
+${CP_BIN} ${KERNEL_CONFIG_FILE} ${KERNEL_CONFIG_PATH}VerKnowSys
+check_result $?
+
+echo "Building world"
+
+unset LDFLAGS
+unset LD_LIBRARY_PATH
+unset CXXFLAGS
+unset CFLAGS
+unset PATH
+
+cd /usr/src
+${TIME_BIN} $BSDMAKE_BIN -j8 buildworld
+check_result $?
+
+${TIME_BIN} $BSDMAKE_BIN buildkernel KERNCONF=VerKnowSys
+check_result $?
+
+datenow="$(${DATE_BIN} +"%y_%m_%d-%H_%M_%S")"
+oldkernel_dir="/boot/kernel_old_${datenow}"
+echo "Making copy of actual kernel to: ${oldkernel_dir}"
+${MKDIR_BIN} -p ${oldkernel_dir}
+${CP_BIN} -r /boot/kernel ${oldkernel_dir}
+
+echo "Installing kernel"
+${TIME_BIN} $BSDMAKE_BIN installkernel KERNCONF=VerKnowSys
+check_result $?
+
+echo "Reboot is required to run new kernel, after which You need to execute STAGE-TWO script"
+echo "... If you're believer, you may start to pray now."
+echo
+echo "[Hit Enter to reboot machine]"
+${READ_BIN} reply
+${REBOOT_BIN}

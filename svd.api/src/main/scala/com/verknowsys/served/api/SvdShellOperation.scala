@@ -1,5 +1,16 @@
 package com.verknowsys.served.api
 
+
+/**
+ *  @author dmilith
+ *
+ *   Defines software requirement to be downloaded from binary repository for actual OS, set by SvdConfig.binarySoftwareRepository
+ */
+case class SvdSoftwareRequirement(
+        name: String
+    )
+
+
 /**
  *  @author dmilith
  *
@@ -7,12 +18,14 @@ package com.verknowsys.served.api
  */
 case class SvdServiceConfig(
         name: String,
+        requirements: List[SvdSoftwareRequirement] = Nil,
         install: List[SvdShellOperation] = Nil,
         configure: List[SvdShellOperation] = Nil,
         start: List[SvdShellOperation] = Nil,
         afterStart: List[SvdShellOperation] = Nil,
         stop: List[SvdShellOperation] = Nil,
         afterStop: List[SvdShellOperation] = Nil,
+        reload: List[SvdShellOperation] = Nil,
         validate: List[SvdShellOperation] = Nil,
         uuid: UUID = randomUUID
     ) extends Persistent

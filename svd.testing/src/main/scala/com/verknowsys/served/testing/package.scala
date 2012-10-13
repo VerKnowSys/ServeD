@@ -6,13 +6,28 @@ package com.verknowsys.served
 
 import org.scalatest._
 import org.scalatest.matchers._
-import akka.testkit.TestKit
+// import akka.testkit.TestKit
+import akka.testkit.TestActorRef
 import java.io.File
 import scala.io.Source
 import org.apache.commons.io.FileUtils
+import com.typesafe.config.ConfigFactory
+import org.apache.commons.io.FileUtils
+import akka.actor.ActorRef
+import com.verknowsys.served.api.SvdAccount
 
 
 package object testing {
+
+
+    // import akka.dispatch._
+    // import akka.pattern.ask
+    // import akka.util.Duration
+    // import akka.util.Timeout
+    // import akka.util.duration._
+    // import akka.actor._
+
+
     trait TestLogger {
         // LoggerUtils.addEntry("com.verknowsys.served", Logger.Levels.Warn)
     }
@@ -46,12 +61,14 @@ package object testing {
     }
 
     trait DefaultTest extends FlatSpec
-                         with ShouldMatchers
-                         with TestKit
-                         with TestLogger
-                         with OneInstancePerTest
-                         with BeforeAndAfterEach
-                         with CustomMatchers
+                        with ShouldMatchers
+                         // with TestKit
+                        with TestLogger
+                        with OneInstancePerTest
+                        with BeforeAndAfterEach
+                        with CustomMatchers
+                        with MustMatchers
+                        with BeforeAndAfterAll
                          // with Logging
 
 
@@ -106,5 +123,21 @@ package object testing {
     }
 
     def waitFor(time: Int) = Thread.sleep(time)
+
+
+    implicit def ItemToSeq[T](a: T) = a :: Nil
+
+    val usedPorts = scala.collection.mutable.ListBuffer[Int]()
+    def randomPort: Int = {
+        val port = util.Random.nextInt(60000) + 2000
+        if(usedPorts.contains(port)) {
+            randomPort
+        } else {
+            usedPorts += port
+            port
+        }
+    }
+
+    def currentAccount = SvdAccount(uid = randomPort, userName = System.getProperty("user.name"))
 
 }

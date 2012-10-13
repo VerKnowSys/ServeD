@@ -6,28 +6,29 @@ import com.verknowsys.served.api.pools._
 
 /**
  * SvdAccount describes one virtual svd User
- * 
+ *
  * @author dmilith
  * @author teamon
- * 
+ *
  */
 case class SvdAccount (
         userName: String = "guest",
         pass: String = "",
         uid: Int,
+        accountManagerPort: Int = -1,
         information: String = "",
         shell: String = "",
         uuid: UUID = randomUUID
     ) extends Persistent {
-    
-    override def toString = "SvdAccount(" + userName + ")"
+
+    override def toString = "SvdAccount(%s)[%s]{%s}".format(userName, uid, accountManagerPort)
 
 }
 
 case object AccountNotFound
 
 case class GetAccount(uid: Int)
-
+case class GetAccountByName(name: String)
 
 /**
  *  @author dmilith
@@ -77,7 +78,8 @@ case class SvdUserUID(
  */
 case class SvdUserDomain(
         name: String,
+        wildcard: Boolean = true,
         uuid: UUID = randomUUID
     ) extends Persistent {
-        override def toString = "SvdUserDomain(" + name + ")"
+        override def toString = "SvdUserDomain(%s)[wldcrd: %s]".format(name, wildcard)
     }

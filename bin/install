@@ -6,9 +6,10 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 system="$(uname)"
+version="$(cat VERSION)"
 
 # XXX: hardcoded version:
-src_root="./svd.root/target/root-assembly-0.2.0.jar"
+src_root="./svd.root/target/root-assembly-${version}.jar"
 dst_root="/sbin/root.core"
 if [ -e "$src_root" ]; then
     echo "* Installing root core to /sbin"
@@ -17,7 +18,7 @@ if [ -e "$src_root" ]; then
 fi
 
 # XXX: hardcoded version:
-src_user="./svd.user/target/user-assembly-0.2.0.jar"
+src_user="./svd.user/target/user-assembly-${version}.jar"
 dst_user="/bin/user.core"
 if [ -e "$src_user" ]; then
     echo "* Installing user core to /bin"

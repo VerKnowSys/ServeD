@@ -1,6 +1,6 @@
-/* 
+/*
     Author: Daniel (dmilith) Dettlaff
-    © 2011 - VerKnowSys
+    © 2011-2012 - VerKnowSys
 */
 
 #include "core.h"
@@ -20,5 +20,5 @@ extern "C" {
             return -1;
         }
     }
-    
+
 }

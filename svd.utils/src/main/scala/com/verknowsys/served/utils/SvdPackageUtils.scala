@@ -42,7 +42,7 @@ package object utils {
     }
 
     /**
-     * Replace string usign key-value
+     * Replace string using key-value
      *
      * {{{
      *    scala> "foo %{bar} and %{baz}" % ("bar" -> "xxx", "baz" -> "blah")
@@ -52,10 +52,12 @@ package object utils {
      * @author teamon
      */
     implicit def repl4str(s: String) = new {
-        def %(args: Any*) = args.foldLeft(s){ case (s, a) => a match {
-            case (key, value) => s.replace("%{" + key + "}", value.toString)
-            case value => s.replaceFirst("%", value.toString)
-        } }
+        def %(args: Any*) = args.foldLeft(s) {
+            case (s, a) => a match {
+                case (key, value) => s.replace("%{" + key + "}", value.toString)
+                case value => s.replaceFirst("%", value.toString)
+            }
+        }
     }
 
     /**
@@ -70,6 +72,6 @@ package object utils {
         case _ => None
     }
 
-    implicit def GlobalActorRef2ActorRef(global: GlobalActorRef) = global.actor
+    // implicit def GlobalActorRef2ActorRef(global: GlobalActorRef) = global.actor
 
 }

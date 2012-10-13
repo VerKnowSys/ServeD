@@ -1,0 +1,263 @@
+#!/bin/sh
+
+KERNEL_CONFIG_PATH="/usr/src/sys/amd64/conf/"
+PREFILES="$(${PWD_BIN})/prefiles/"
+
+CSUP_FILE="/etc/csup"
+MOTD_FILE="/etc/motd"
+PROFILE_FILE="/etc/profile"
+ZSHRC_FILE="/etc/zshrc"
+LOGIN_CONF_FILE="/etc/login.conf"
+SRC_CONF_FILE="/etc/src.conf"
+MAKE_CONF_FILE="/etc/make.conf"
+
+READ_BIN="/usr/bin/read"
+PWD_BIN="/bin/pwd"
+CP_BIN="/bin/cp"
+CAP_MKDB="/usr/bin/cap_mkdb"
+
+echo "Creating ${LOGIN_CONF_FILE}"
+echo "
+default:\\
+  :charset=UTF-8:\\
+  :lang=pl_PL.UTF-8:\\
+  :passwd_format=md5:\\
+  :copyright=/etc/COPYRIGHT:\\
+  :welcome=/etc/motd:\\
+  :setenv=MAIL=/var/mail/$,BLOCKSIZE=K,FTP_PASSIVE_MODE=YES,LC_COLLATE=C:\\
+  :path=/sbin /bin /usr/sbin /usr/bin ~/Apps:\\
+  :nologin=/var/run/nologin:\\
+  :cputime=unlimited:\\
+  :datasize=unlimited:\\
+  :stacksize=unlimited:\\
+  :memorylocked=unlimited:\\
+  :memoryuse=unlimited:\\
+  :filesize=unlimited:\\
+  :coredumpsize=unlimited:\\
+  :openfiles=unlimited:\\
+  :maxproc=unlimited:\\
+  :sbsize=unlimited:\\
+  :vmemoryuse=unlimited:\\
+  :swapuse=unlimited:\\
+  :pseudoterminals=unlimited:\\
+  :priority=0:\\
+  :ignoretime@:\\
+  :umask=022:
+
+standard:\\
+  :tc=default:
+xuser:\\
+  :tc=default:
+staff:\\
+  :tc=default:
+daemon:\\
+  :tc=default:
+news:\\
+  :tc=default:
+dialer:\\
+  :tc=default:
+
+#
+root:\\
+  :ignorenologin:\\
+  :tc=default:
+" > "${LOGIN_CONF_FILE}"
+
+echo "Reloading login rules"
+${CAP_MKDB} -v ${LOGIN_CONF_FILE}
+
+echo "Creating ${ZSHRC_FILE} if doesn't exists"
+if [ ! -e "${ZSHRC_FILE}" ]; then
+echo "
+autoload colors zsh/terminfo
+colors
+
+#Completion online
+autoload -U compinit
+compinit
+
+#ZSH completion caching
+#ie, cache things so they show up faster next time
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh/cache
+
+#if colordiff is installed, prefer it
+if [[ -x /usr/bin/colordiff || -x /usr/local/bin/colordiff ]]; then
+  alias diff='colordiff'
+fi
+
+setprompt () {
+    # Need this, so the prompt will work
+    setopt prompt_subst
+
+    for COLOR in RED GREEN YELLOW WHITE BLACK BLUE CYAN MAGENTA; do
+        eval PR_\$COLOR='%{\$fg[\${(L)COLOR}]%}'
+        eval PR_BRIGHT_\$COLOR='%{\$fg_bold[\${(L)COLOR}]%}'
+    done
+
+    PR_RESET=\"%{\$reset_color%}\"
+
+    # Finally, let's set the prompt
+    if [ `/usr/bin/id -u` -eq \"0\" ]; then
+        PS1='\${PR_RED}%m \${PR_YELLOW}%\$PR_PWDLEN<...<%~% \${PR_RESET} %# '
+    else
+      PS1='\${PR_GREEN}%m \${PR_YELLOW}%\$PR_PWDLEN<...<%~% \${PR_RESET} (id: \$(/usr/bin/id -u)) %% '
+    fi
+}
+
+setprompt
+
+export LSCOLORS=cxfxcxdxbxegedabagacad
+
+setopt share_history
+setopt appendhistory
+setopt autocd
+setopt automenu
+setopt autopushd
+setopt autoresume
+setopt complete_in_word
+setopt extended_glob
+setopt hist_ignoredups
+setopt hist_ignorespace
+setopt list_types
+setopt mailwarning
+setopt no_flowcontrol
+setopt no_hup
+setopt no_notify
+setopt printexitvalue
+setopt pushd_ignoredups
+setopt pushd_silent
+
+export HISTFILE=\$HOME/.zsh_history
+export HISTSIZE=8192
+export SAVEHIST=8192
+
+export HISTCONTROL=erasedups
+export HISTSIZE=10000
+setopt histappend
+
+# zgitinit and prompt_wunjo_setup must be somewhere in your \$fpath, see README for more.
+
+setopt promptsubst
+
+# Load the prompt theme system
+autoload -U promptinit
+promptinit
+
+export LANGUAGE=\"en_US.UTF-8\"
+export LANG=\"en_US.UTF-8\"
+export LC_CTYPE=\"en_US.UTF-8\"
+export LC_NUMERIC=\"en_US.UTF-8\"
+export LC_TIME=\"en_US.UTF-8\"
+export LC_COLLATE=\"en_US.UTF-8\"
+export LC_MONETARY=\"en_US.UTF-8\"
+export LC_MESSAGES=\"en_US.UTF-8\"
+export TERM=xterm-color
+export PAGER=less
+
+alias top='top -a -i -u -S -ores'
+alias ls='ls -G'
+alias grep='grep --color=auto'
+alias w=\"w -din\"
+alias pstree='pstree -g 3'
+
+unset TMUX
+ulimit -c 0
+. /etc/profile
+. /etc/profile_sofin
+
+if [ \"$(/usr/bin/id -u)\" = \"0\" ]; then
+    trap \"source /etc/profile_sofin\" USR2
+else
+    if [ -e \$HOME/.profile ]; then
+        . \$HOME/.profile
+    fi
+    trap \"source \$HOME/.profile\" USR2
+fi
+export SHELL_PID=\"\$\$\"
+" > "${ZSHRC_FILE}"
+fi
+
+echo "Creating default ${PROFILE_FILE} if doesn't exists"
+if [ ! -e "${PROFILE_FILE}" ]; then
+echo ". /etc/profile_sofin
+" > "${PROFILE_FILE}"
+fi
+
+echo "Creating ${MOTD_FILE}"
+if [ ! -e "${MOTD_FILE}" ]; then
+echo "Welcome on ServeD™ system
+" > "${MOTD_FILE}"
+fi
+
+echo "Creating ${SRC_CONF_FILE}"
+echo "
+WITHOUT_CALENDAR='YES'
+WITHOUT_GAMES='YES'
+WITHOUT_IPX='YES'
+WITHOUT_IPX_SUPPORT='YES'
+WITHOUT_IPFW='YES'
+WITHOUT_INFO='YES'
+WITHOUT_HTML='YES'
+WITHOUT_FLOPPY='YES'
+WITHOUT_EXAMPLES='YES'
+WITHOUT_DICT='YES'
+WITHOUT_LPR='YES'
+WITHOUT_AT='YES'
+WITHOUT_ASSERT_DEBUG='YES'
+WITHOUT_SENDMAIL='YES'
+WITHOUT_RCMDS='YES'
+WITHOUT_WPA_SUPPLICANT_EAPOL='YES'
+WITHOUT_BLUETOOTH='YES'
+WITHOUT_MAIL='YES'
+WITHOUT_USB='YES'
+WITHOUT_WIRELESS='YES'
+WITHOUT_WIRELESS_SUPPORT='YES'
+WITHOUT_MAILWRAPPER='YES'
+WITHOUT_LOCATE='YES'
+WITHOUT_SOUND='YES'
+WITHOUT_NFS='YES'
+WITHOUT_EXAMPLES='YES'
+WITHOUT_CTM='YES'
+WITHOUT_LEGACY_CONSOLE='YES'
+WITHOUT_LOCALES='YES'
+WITHOUT_LOCATE='YES'
+WITHOUT_NLS='YES'
+WITHOUT_NLS_CATALOGS='YES'
+WITHOUT_PAM='YES'
+WITHOUT_PAM_SUPPORT='YES'
+WITHOUT_PROFILE='YES'
+WITHOUT_QUOTAS='YES'
+WITHOUT_RCS='YES'
+WITHOUT_SHAREDOCS='YES'
+WITHOUT_SYSINSTALL='YES'
+" > "${SRC_CONF_FILE}"
+
+
+echo "Creating ${MAKE_CONF_FILE}"
+echo "
+NO_PROFILE='YES'
+WITHOUT_MODULES = sound ntfs msdosfs usb nfs nfsclient nfs_common nfslock
+
+.if !defined(CC) || \${CC} == \"cc\"
+CC=clang
+.endif
+.if !defined(CXX) || \${CXX} == \"c++\"
+CXX=clang++
+.endif
+.if !defined(CPP) || \${CPP} == \"cpp\"
+CPP=clang-cpp
+.endif
+
+# Don't die on warnings
+NO_WERROR=
+WERROR=
+
+# Don't forget this when using Jails!
+NO_FSCHG=
+" > "${MAKE_CONF_FILE}"
+
+
+echo "Copying prefiles from ServeD…"
+${CP_BIN} -R "${PREFILES}" /
+

@@ -1,21 +1,19 @@
 /**
 *   ServeD - NOTES
 *
-*   © Copyright 2009-2011 Daniel Dettlaff and Tymon Tobolski. ® All Rights Reserved.
+*   © Copyright 2009-2012 Daniel Dettlaff and Tymon Tobolski. ® All Rights Reserved.
 *   This Software is a close code project. You may not redistribute this code without permission of author.
 */
 
 
 	Notes, golden throughts, annotations, helpful sources:
-	
+
 
 	== Must read ==
-	http://www.scala-lang.org/docu/files/actors-api/actors_api_guide.html#
-	http://www.scala-lang.org/docu/files/collections-api/collections.html
-	
 
-/** 
+
+/**
 *   This is closed code project. You may not redistribute it without permission of author.
-*   Copyright © 2010-2011 verknowsys.com. ® All rights reserved
+*   Copyright © 2010-2012 verknowsys.com. ® All rights reserved
 */
 

@@ -1,77 +1,144 @@
 package com.verknowsys.served.sshd
 
-
+import com.verknowsys.served._
+import com.verknowsys.served.sshd._
 import com.verknowsys.served.managers.SvdAccountsManager
 import com.verknowsys.served.utils._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.api._
-import akka.actor.{Actor, ActorRef}
-
+import com.verknowsys.served.api.accountkeys._
+import akka.actor._
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.util.duration._
 
 import java.security.PublicKey
+import org.apache.sshd._
 import org.apache.sshd.{SshServer => ApacheSSHServer}
-import org.apache.sshd.server.PublickeyAuthenticator
-import org.apache.sshd.server.session.ServerSession
-import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider
-import org.apache.sshd.server.shell.ProcessShellFactory
-// import org.apache.sshd.server.PasswordAuthenticator
-// import org.apache.sshd.server.CommandFactory
-// import org.apache.sshd.server.CommandFactory._
-// import org.apache.sshd.server.command.UnknownCommand
+import org.apache.sshd.server._
+import org.apache.sshd.server.session._
+import org.apache.sshd.server.command._
+import org.apache.sshd.server.keyprovider._
+import org.apache.sshd.server.shell._
+import com.typesafe.config.ConfigFactory
 
 
-class SSHD(port: Int) extends Actor with SvdExceptionHandler {
+sealed class SSHD(port: Int) extends SvdExceptionHandler {
 
-    val sshd = ApacheSSHServer.setUpDefaultServer()
+    def this() = this(SvdConfig.sshPort)
 
-    sshd.setPort(port)
-    sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("hostkey.ser"))
-    sshd.setPublickeyAuthenticator(new PublicKeyAuth())
-    sshd.setShellFactory(new SvdShellFactory(Array(SvdConfig.servedShell)))
+    val sshd = SshServer.setUpDefaultServer()
+    val ssm = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
 
-    override def preStart {
-        log.info("Starting SSHD on port %d", port)
-        sshd.start
+
+    override def preStart = {
+        super.preStart
+        sshd.setCommandFactory(new ScpCommandFactory(
+            new CommandFactory {
+                def createCommand(command: String) = new ProcessShellFactory(command.split(" ")).create
+            }
+        ))
+        sshd.setPort(port)
+        sshd.setKeyPairProvider(new PEMGeneratorHostKeyProvider("svd-ssh-key.pem"))
+
+        log.info("SSHD prepared on port %d but not listening yet", port)
+    }
+
+
+    def started(listOfKeys: Set[AccessKey], account: SvdAccount): Receive = {
+
+        case Init =>
+            sshd.setPublickeyAuthenticator(new PublicKeyAuth(listOfKeys, account))
+            sshd.setShellFactory(new SvdShellFactory(
+                Array(
+                    SvdConfig.servedShell,
+                    "%d".format(account.uid),
+                    defaultShell,
+                    "-i",
+                    "-s"
+                )
+            ))
+            log.debug("Become available for uid %d", account.uid)
+            sshd.start
+
+        case Shutdown =>
+            context.unbecome
+            sshd.stop
+
+        case _ =>
+            sender ! Taken(account.uid)
+
     }
 
 
     def receive = {
-        case msg => log.warn("I dont know message %s", msg)
+
+        case InitSSHChannelForUID(forUID: Int) =>
+            log.debug("Got shell base for uid: %d", forUID)
+            (sender ? ListKeys) onSuccess {
+                case set: Set[_] =>
+                    log.trace("Listing user SSH keys: %s", set)
+
+                    (ssm ? GetAccount(forUID)) onSuccess {
+                        case Some(account: SvdAccount) =>
+                            context.become(started(set.asInstanceOf[Set[AccessKey]], account))
+                            self ! Init // hit message after it became listening state
+
+                        case x =>
+                            sender ! Error("We don't like this: %s".format(x))
+
+                    } onFailure {
+                        case x =>
+                            sender ! Error("I'm trying, but, come on. Wtf?: %s".format(x))
+                    }
+
+                case x =>
+                    sender ! Error("Got something weird for uid %d - %s".format(forUID, x))
+
+            } onFailure {
+                case x =>
+                    sender ! Error("Failed to ask for user SSHD keys with error: %s".format(x))
+            }
+
+
+        case Shutdown =>
+            log.debug("Shutdown requested. Bye")
+            context.stop(self)
+
+
+        case msg =>
+            log.warn("I dont know message %s", msg)
+
     }
 
-    override def postStop {
-        log.debug("Stopping SSHD")
-        super.postStop
-        sshd.stop
-    }
+    // override def postStop {
+    //     log.debug("Stopping SSHD")
+    //     super.postStop
+    //     sshd.stop
+    // }
 }
 
-class PublicKeyAuth extends PublickeyAuthenticator with Logging {
+
+class PublicKeyAuth(setOfAccessKeys: Set[AccessKey], account: SvdAccount) extends PublickeyAuthenticator with Logging {
+
 
     def authenticate(username: String, key: PublicKey, session: ServerSession) = {
-        log.debug("User: %s trying to connect with key: %s", username, key)
+        log.debug("Pending SSH Authentication username: %s, key: %s, session: %s", username, key, session)
 
-        catchException { username.toInt } map { userUid =>
-            log.trace("UserId %d", userUid)
-
-            val res = (SvdAccountsManager !! GetAccountManager(userUid))
-
-            log.debug("res: %s", res)
-
-            res match {
-                case Some(manager: ActorRef) =>
-                    log.trace("Found manager")
-                    (manager !! AuthorizeWithKey(key)) match {
-                        case Some(res: Boolean) => res
-                        case _ => false
-                    }
-                case _ =>
-                    log.warn("AccountManager for userUid %d not found", userUid)
-                    false
-            }
-        } getOrElse {
-            log.warn("Username %s is not a valid userUid", username)
+        val set = setOfAccessKeys.filter{
+            _.key == key
+        }
+        if (set.isEmpty) {
+            log.debug("Set empty. No matching keys")
             false
+        } else {
+            log.debug("Set not empty. Matching key found. Checking user name: %s", username == account.userName)
+
+            username == account.userName
         }
     }
+
 }

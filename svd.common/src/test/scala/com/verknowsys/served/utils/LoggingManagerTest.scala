@@ -1,53 +1,133 @@
 package com.verknowsys.served.utils
 
-import com.verknowsys.served.testing._
+import akka.testkit.TestActorRef
+import com.typesafe.config.ConfigFactory
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.testkit.TestKit
+import akka.util.duration._
+import akka.actor.ActorSystem
+import akka.actor._
+
+import com.verknowsys.served._
+import com.verknowsys.served.utils._
 import com.verknowsys.served.api.Logger
-import com.verknowsys.served.systemmanager.managers.LoggingManager
+import com.verknowsys.served.managers.LoggingManager
+import com.verknowsys.served.testing._
+
 
 object TestLogger extends LoggingMachine
 
-class LoggingManagerTest extends DefaultTest {
-    TestLogger.clear
 
-    val ref = Actor.actorOf(new LoggingManager(TestLogger)).start
+class LoggingManagerTest(_system: ActorSystem) extends TestKit(_system) with DefaultTest {
+
+    def this() = this(ActorSystem("svd-test-system"))
+
+    implicit val timeout = Timeout(30 seconds)
+
+
+    override def afterAll {
+        system.shutdown
+    }
+
+    override def beforeEach {
+        TestLogger.clear
+    }
+
 
     it should "list logger entries" in {
-        (ref !! Logger.ListEntries) should be (Some(Logger.Entries(Map())))
-        ref.stop
+        val ref = system.actorOf(Props(new LoggingManager(TestLogger)))
+        (ref ? Logger.ListEntries) onSuccess {
+            case Logger.Entries(x) =>
+                true must be(true)
+            case x =>
+                fail("Shouldn't happen. Problem: %s".format(x))
+        }
+        system.stop(ref)
     }
-    
-    it should "add entry" in {
-        ref !! Logger.AddEntry("com.verknowsys.served", Logger.Levels.Trace)
-        val res1 = ref !! Logger.ListEntries
-        res1 should be(Some(Logger.Entries(Map("com.verknowsys.served" -> Logger.Levels.Trace))))
-        TestLogger.levelFor("com.verknowsys.served") should be(Logger.Levels.Trace)
 
-        ref !! Logger.AddEntry("com.verknowsys.served", Logger.Levels.Error)
-        val res2 = ref !! Logger.ListEntries
-        res2 should be(Some(Logger.Entries(Map("com.verknowsys.served" -> Logger.Levels.Error))))
-        TestLogger.levelFor("com.verknowsys.served") should be(Logger.Levels.Error)
 
-        ref !! Logger.AddEntry("com.verknowsys.served.foobar", Logger.Levels.Warn)
-        val res3 = ref !! Logger.ListEntries
-        res3 should be(Some(Logger.Entries(Map(
-            "com.verknowsys.served" -> Logger.Levels.Error,
-            "com.verknowsys.served.foobar" -> Logger.Levels.Warn
-        ))))
-        TestLogger.levelFor("com.verknowsys.served") should be(Logger.Levels.Error)
-        TestLogger.levelFor("com.verknowsys.served.foobar") should be(Logger.Levels.Warn)
+    it should "add entry and check logger levels" in {
+        val ref = system.actorOf(Props(new LoggingManager(GlobalLogger)))
+        (ref ? Logger.AddEntry("com.verknowsys.served", Logger.Levels.Trace)) onSuccess {
+            case _ =>
+                (ref ? Logger.ListEntries) onSuccess {
+                    case Logger.Entries(x) =>
 
-        ref.stop
+                        x must be(Map("com.verknowsys.served" -> Logger.Levels.Trace))
+                        TestLogger.levelFor("com.verknowsys.served") should be(Logger.Levels.Trace)
+
+                    case x =>
+                        fail("Shouldn't happen: %s".format(x))
+                }
+        }
+
+        (ref ? Logger.AddEntry("com.verknowsys.served", Logger.Levels.Error)) onSuccess {
+            case _ =>
+                (ref ? Logger.ListEntries) onSuccess {
+                    case Logger.Entries(x) =>
+
+                        Logger.Entries(x) must be(Logger.Entries(Map("com.verknowsys.served" -> Logger.Levels.Error)))
+                        TestLogger.levelFor("com.verknowsys.served") should be(Logger.Levels.Error)
+
+                    case x =>
+                        fail("Shouldn't happen: %s".format(x))
+                }
+        }
+
+        (ref ? Logger.AddEntry("com.verknowsys.served", Logger.Levels.Warn)) onSuccess {
+            case _ =>
+                (ref ? Logger.ListEntries) onSuccess {
+                    case Logger.Entries(x) =>
+
+                        Logger.Entries(x) must be(Logger.Entries(
+                            Map(
+                                "com.verknowsys.served" -> Logger.Levels.Error,
+                                "com.verknowsys.served.foobar" -> Logger.Levels.Warn
+                            )
+                        ))
+                        TestLogger.levelFor("com.verknowsys.served") should be(Logger.Levels.Error)
+                        TestLogger.levelFor("com.verknowsys.served.foobar") should be(Logger.Levels.Warn)
+
+                    case x =>
+                        fail("Shouldn't happen: %s".format(x))
+                }
+        }
+        system.stop(ref)
     }
-    
+
+
     it should "remove entry" in {
-        ref !! Logger.AddEntry("com.verknowsys.served.a", Logger.Levels.Trace)
-        ref !! Logger.AddEntry("com.verknowsys.served.b", Logger.Levels.Info)
-        ref !! Logger.AddEntry("com.verknowsys.served.c", Logger.Levels.Error)
-        ref !! Logger.RemoveEntry("com.verknowsys.served.b")
-        val res1 = ref !! Logger.ListEntries
-        res1 should be(Some(Logger.Entries(Map(
-            "com.verknowsys.served.a" -> Logger.Levels.Trace,
-            "com.verknowsys.served.c" -> Logger.Levels.Error
-        ))))
+        val ref = system.actorOf(Props(new LoggingManager(TestLogger)))
+        (ref ? Logger.AddEntry("com.verknowsys.served.a", Logger.Levels.Trace)) onSuccess {
+            case _ =>
+                (ref ? Logger.AddEntry("com.verknowsys.served.b", Logger.Levels.Info)) onSuccess {
+                    case _ =>
+                        (ref ? Logger.AddEntry("com.verknowsys.served.c", Logger.Levels.Error)) onSuccess {
+                            case _ =>
+                                (ref ? Logger.RemoveEntry("com.verknowsys.served.b")) onSuccess {
+                                        case _ =>
+                                            (ref ? Logger.ListEntries) onSuccess {
+                                                case Logger.Entries(x) =>
+                                                    Logger.Entries(x) must be(Logger.Entries(
+                                                        Map(
+                                                            "com.verknowsys.served.a" -> Logger.Levels.Trace,
+                                                            "com.verknowsys.served.c" -> Logger.Levels.Error
+                                                        )
+                                                    ))
+
+                                                case x =>
+                                                    fail("Shouldn't happen: %s".format(x))
+                                            }
+                                }
+                        }
+                    }
+        }
+        system.stop(ref)
     }
+
+
 }

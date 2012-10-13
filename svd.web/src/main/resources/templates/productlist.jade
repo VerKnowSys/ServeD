@@ -1,0 +1,20 @@
+- import com.verknowsys.served.utils.Dict
+- import com.verknowsys.served.web.merch._
+- include("layout.jade")
+
+h1= Dict("Product list")
+h3
+  a(href="/product")= Dict("Add new product")
+
+.tshirts
+  - for (cloth <- clothings)
+    p= cloth
+
+.stickers
+  - for (sticker <- stickers)
+    p= sticker
+
+.letters
+  - for (letter <- letters)
+    p= letter
+

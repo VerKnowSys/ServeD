@@ -1,56 +1,99 @@
 /*
     Author: Daniel (dmilith) Dettlaff
-    © 2011 - VerKnowSys
+    © 2011-2012 - VerKnowSys
 */
+
+
+#ifndef __CORE__
+#define __CORE__
 
 
 #include <iostream>
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <algorithm>
-#include <iterator>
 #include <vector>
+#include <iomanip>
+
+#include <time.h>
+#include <errno.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include <signal.h>
+#include <sys/user.h>
+#include <sys/socket.h>
+#include <sys/sysctl.h>
+#include <sys/un.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
+#ifdef __FreeBSD__
+    #include <kvm.h>
+    #include <sys/capability.h>
+    #include <libprocstat.h>
+#endif
+
+#ifdef __APPLE__
+    #include <mach/clock.h>
+    #include <mach/clock_priv.h>
+    #include <mach/clock_types.h>
+    #include <sys/fcntl.h>
+#endif
+
+#ifdef __linux__
+    #include <stdlib.h>
+    #include <signal.h>
+    #include <limits.h>
+    #include <sys/wait.h>
+    #include <sys/fcntl.h>
+    #define MAXPATHLEN PATH_MAX
+#endif
 
 
-using namespace std;
+    using namespace std;
 
+    /* global constants */
 
-/* global constants */
-#ifndef __CORE__
-#define __CORE__
-
-    // #define DEVEL
-    #define APP_VERSION "0.1.1"
-    #define COPYRIGHT "Copyright © 2oo9-2o11 VerKnowSys.com - All Rights Reserved."
+    #define DEVEL
+    #define APP_VERSION "0.2.6"
+    #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     #ifdef __FreeBSD__
-        #define DEFAULT_SHELL_COMMAND "/Software/Zsh-4.3.10/bin/zsh"
-        #define DEFAULT_JAVA_BIN "/Software/Openjdk7/bin/java"
-    #else
+        #define DEFAULT_SHELL_COMMAND "/Software/Zsh/bin/zsh"
+        #define DEFAULT_JAVA_BIN "/Software/Openjdk/bin/java"
+        #define DEFAULT_JAVA64_BIN "/Software/Openjdk64/bin/java"
+    #elif __APPLE__
+        #define CLOCK_REALTIME REALTIME_CLOCK
         #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
+        #define DEFAULT_JAVA64_BIN "/usr/bin/java"
+    #elif __linux__
+        #define DEFAULT_SHELL_COMMAND "/bin/zsh"
+        #define DEFAULT_JAVA_BIN "/usr/bin/java"
+        #define DEFAULT_JAVA64_BIN "/usr/bin/java"
+    #else
+        #error No supported OS found!
     #endif
 
     #define CORE_HOMEDIR "/SystemUsers/"
     #define USERS_HOME_DIR "/Users/"
     #define LIBRARIES_DIR "/lib/"
+    #define DEFAULT_BEHAVIORS_DIR "basesystem/behaviors"
+    #define DEFAULT_BEHAVIORS_RAW "/output_raw_processes.raw.input"
 
     #define CORE_SVD_ID "boot"
     #define SOCK_FILE "svd.sock"
-    #define LOCK_FILE   "svd-core.lock"
+    #define LOCK_FILE "svd-core.lock"
     #define SOCKET_LOCK_FILE "svd-ss.lock"
     #define INTERNAL_LOG_FILE "svd-diagnostics.log"
     #define ROOT_JAR_FILE "/sbin/root.core"
     #define USER_JAR_FILE "/bin/user.core"
 
+    #define DEFAULT_USER_UID 500
+    #define DEFAULT_GATHERING_PAUSE_MICROSECONDS 500000 // half a second
+    #define DEFAULT_COUNT_OF_ROUNDS_OF_GATHERING 7200 // waiting half a second, hence 7200 is 60 minutes of gathering
     #define DEFAULT_USER_GROUP 0
     #define SOCK_DATA_PACKET_SIZE 32
-    #define MAXPATHLEN  512
     #define LOCK_FILE_OCCUPIED_ERROR 100
     #define CANNOT_LOCK_ERROR 101
     #define POPEN_ERROR 102
@@ -91,6 +134,8 @@ using namespace std;
     extern "C" {
 
         int getOwner(char* path);
+        const char* getProcessUsage(int uid, bool consoleOutput = false);
+        const char* processDataToLearn(int uid);
 
     }
 

@@ -1,32 +1,32 @@
-package com.verknowsys.served.utils
+// package com.verknowsys.served.utils
 
-import akka.actor.ActorRef
+// import akka.actor.ActorRef
 
-/**
- * Handle global reference to actor
- *
- * Usage:
- *    object MyGlobal extends GlobalActorRef(Actor.registry.actorFor[MyActor])
- *    object MyGlobal extends GlobalActorRef(Some(Actor.remove.actorFor[MyActor]))
- *
- * @author teamon
- */
-abstract class GlobalActorRef(actorFun: => ActorRef) {
-    lazy val actor = actorFun
+// /**
+//  * Handle global reference to actor
+//  *
+//  * Usage:
+//  *    object MyGlobal extends GlobalActorRef(Actor.registry.actorFor[MyActor])
+//  *    object MyGlobal extends GlobalActorRef(Some(Actor.remove.actorFor[MyActor]))
+//  *
+//  * @author teamon
+//  */
+// abstract class GlobalActorRef(actorFun: => ActorRef) {
+//     lazy val actor = actorFun
 
-    def apply() = actor
+//     def apply() = actor
 
-    // HACK: This should be donw with implicit conversion
-    def !(message: Any)(implicit sender: Option[ActorRef] = None) = actor ! message
-    def !!(message: Any)(implicit sender: Option[ActorRef] = None) = actor !! message
-}
+//     // HACK: This should be donw with implicit conversion
+//     def !(message: Any)(implicit sender: Option[ActorRef] = None) = actor ! message
+//     def !!(message: Any)(implicit sender: Option[ActorRef] = None) = actor !! message
+// }
 
-abstract class OptionalGlobalActorRef(actorFun: => Option[ActorRef]) {
-    lazy val actor = actorFun
+// abstract class OptionalGlobalActorRef(actorFun: => Option[ActorRef]) {
+//     lazy val actor = actorFun
 
-    def apply() = actor
+//     def apply() = actor
 
-    def !(message: Any)(implicit sender: Option[ActorRef] = None) = actor.foreach { _ ! message }
-    def !!(message: Any)(implicit sender: Option[ActorRef] = None) = actor.foreach { _ !! message }
-}
+//     def !(message: Any)(implicit sender: Option[ActorRef] = None) = actor.foreach { _ ! message }
+//     def !!(message: Any)(implicit sender: Option[ActorRef] = None) = actor.foreach { _ !! message }
+// }
 

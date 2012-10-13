@@ -1,7 +1,8 @@
 #!/bin/sh
 
 pwd=$(pwd)
-jar="${pwd}/svd.core/target/scala_2.9.0/core_2.9.0-1.0-onejar.jar"
+version="$(cat VERSION)"
+jar="${pwd}/svd.root/target/root-assembly-${version}.jar"
 
 if [ "$(id -u)" != "0" ]; then
     echo "ServeD Core requires root privileges to run!"
@@ -9,7 +10,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 if [ -e "${jar}" ]; then
     echo "Executing: ${jar}"
-    java -XX:+UseCompressedOops -XX:MaxPermSize=512M -XX:+UseParallelGC -Xms64m -Xmx768m -Dfile.encoding=UTF-8 -noverify -server -Djna.library.path=$(pwd)/lib -jar "${jar}" svd "$@"
+    java -d64 -XX:+UseCompressedOops -XX:MaxPermSize=512M -XX:+UseParallelGC -Xms64m -Xmx768m -Dfile.encoding=UTF-8 -noverify -server -Djna.library.path=$(pwd)/lib -jar "${jar}" svd "$@"
 else
     echo "Assembly not found. Use build script!"
 fi

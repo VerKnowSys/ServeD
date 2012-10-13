@@ -28,3 +28,13 @@ case class AccessKey(name: String, key: PublicKey){
  * @response Boolean
  */
 case class AuthorizeWithKey(key: PublicKey)
+
+
+/**
+ * SSHD response to set channel for given uid
+ *
+ */
+case class InitSSHChannelForUID(userUid: Int) extends ApiResponse
+
+// sshd channel taken
+case class Taken(byUid: Int) extends ApiResponse

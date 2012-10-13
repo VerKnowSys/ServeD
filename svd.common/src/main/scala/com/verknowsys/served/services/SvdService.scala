@@ -7,10 +7,20 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.api._
 
+import java.io.File
 import akka.actor.Actor
 
 
 class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExceptionHandler {
+
+
+    lazy val shell = new SvdShell(account)
+    lazy val installIndicator = new File(
+        if (account.uid == 0)
+            SvdConfig.systemHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / SvdConfig.installed
+        else
+            SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / SvdConfig.installed
+    )
 
 
     /**
@@ -59,7 +69,16 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
      *   installHook - Software prepare / install hook.
      *   Will be executed only on demand, by sending Install signal to SvdService
      */
-    def installHook = config.install
+    def installHook = config.install ::: SvdShellOperation("touch %s".format(installIndicator)) :: Nil
+
+
+    /**
+     *  @author dmilith
+     *
+     *   reloadHook - Service reloading command
+     *   Will be executed only on demand, by sending Reload signal to SvdService
+     */
+    def reloadHook = config.reload
 
 
     /**
@@ -71,12 +90,26 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
     def validateHook = config.validate
 
 
-    lazy val shell = new SvdShell(account)
-    configureHook.foreach {
-        hook =>
-            log.trace("configureHook: %s".format(hook))
-            shell.exec(hook)
+    log.debug("SvdService install started for: %s".format(config.name))
+
+    /* check for previous installation */
+    log.trace("Looking for %s file to check software installation status".format(installIndicator))
+    if (!installIndicator.exists) {
+        log.info("Performing installation of software: %s".format(config.name))
+        installHook.foreach {
+            hook =>
+                log.trace("installHook: %s".format(hook))
+                shell.exec(hook)
+        }
+        configureHook.foreach {
+            hook =>
+                log.trace("configureHook: %s".format(hook))
+                shell.exec(hook)
+        }
+    } else {
+        log.info("Software already installed: %s".format(config.name))
     }
+
     validateHook.foreach {
         hook =>
             log.trace("validateHook: %s".format(hook))
@@ -89,24 +122,28 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
         /**
          *  @author dmilith
          *
-         *   Install should be sent to install required software for service.
+         *   Reload by default should be SIGHUP signal sent to process pid
          */
-        case Install =>
-            log.debug("SvdService install started for: %s".format(config.name))
-            installHook.foreach {
+        case Reload =>
+            validateHook.foreach {
                 hook =>
-                    log.trace("installHook: %s".format(hook))
+                    log.trace("validateHook: %s".format(hook))
                     shell.exec(hook)
             }
-            self reply Success
+            reloadHook.foreach {
+                hook =>
+                    log.trace("reloadHook: %s".format(hook))
+                    shell.exec(hook)
+            }
+            sender ! Success
 
         /**
          *  @author dmilith
          *
-         *   Run should be sent when we want to start this service
+         *   Run should be sent when we want to start this service.
          */
         case Run =>
-            log.debug("SvdService with name %s has been started".format(config.name))
+            log.info("SvdService with name %s has been started".format(config.name))
             startHook.foreach {
                 hook =>
                     log.trace("startHook: %s".format(hook))
@@ -117,7 +154,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                     log.trace("afterStartHook: %s".format(hook))
                     shell.exec(hook)
             }
-            self reply Success
+            sender ! Success
 
         /**
          *  @author dmilith
@@ -135,8 +172,8 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                     log.trace("afterStopHook: %s".format(hook))
                     shell.exec(hook)
             }
-            shell.close
-            self reply Success
+            // shell.close
+            sender ! Success
 
     }
 
@@ -154,7 +191,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                 shell.exec(hook)
         }
         shell.close
-        log.info("Stopping SvdService: %s".format(config))
+        log.info("Stopped SvdService: %s".format(config.name))
     }
 
 

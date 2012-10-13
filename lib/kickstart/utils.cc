@@ -1,13 +1,13 @@
-/* 
+/*
     Author: Daniel (dmilith) Dettlaff
-    © 2011 - VerKnowSys
+    © 2011-2012 - VerKnowSys
 */
 
 #include "core.h"
 
 
 // #ifdef DEVEL
-    
+
     // int getdir (string dir, vector<string> &files) {
     //     DIR *dp;
     //     struct dirent *dirp;
@@ -15,7 +15,7 @@
     //         cerr << "Error opening directory: " << dir << endl;
     //         return DIRECTORY_OPEN_ERROR;
     //     }
-    // 
+    //
     //     while ((dirp = readdir(dp)) != NULL) {
     //         files.push_back(string(dirp->d_name));
     //     }
@@ -66,25 +66,25 @@ string escape(string input) {
         while (position != string::npos) {
             input.replace(position, 1, "_");
             position = input.find(toBeEscaped[ind], position + 1);
-        }  
+        }
     }
     return input;
 }
 
 
-bool fileExists(string strFilename) { 
-    struct stat stFileInfo; 
-    bool blnReturn; 
-    int intStat; 
+bool fileExists(string strFilename) {
+    struct stat stFileInfo;
+    bool blnReturn;
+    int intStat;
 
-    intStat = stat(strFilename.c_str(), &stFileInfo); 
-    if(intStat == 0) { 
-        blnReturn = true; 
-    } else { 
-        blnReturn = false; 
-    } 
+    intStat = stat(strFilename.c_str(), &stFileInfo);
+    if(intStat == 0) {
+        blnReturn = true;
+    } else {
+        blnReturn = false;
+    }
 
-    return blnReturn; 
+    return blnReturn;
 }
 
 
@@ -98,6 +98,50 @@ void defaultSignalHandler(int sig) {
     		system(rmCmd.c_str());
     		exit(0);
     		break;
-    		
+
 	}
+}
+
+
+vector<string> split(const string& s, const string& delim, const bool keep_empty = true) {
+    vector<string> result;
+    if (delim.empty()) {
+        result.push_back(s);
+        return result;
+    }
+    string::const_iterator substart = s.begin(), subend;
+    while (true) {
+        subend = search(substart, s.end(), delim.begin(), delim.end());
+        string temp(substart, subend);
+        if (keep_empty || !temp.empty()) {
+            result.push_back(temp);
+        }
+        if (subend == s.end()) {
+            break;
+        }
+        substart = subend + delim.size();
+    }
+    return result;
+}
+
+
+std::string escapeJsonString(const std::string& input) {
+    std::ostringstream ss;
+    // C++11:
+    // for (auto iter = input.cbegin(); iter != input.cend(); iter++) {
+    // C++98/03:
+    for (std::string::const_iterator iter = input.begin(); iter != input.end(); iter++) {
+        switch (*iter) {
+            case '\\': ss << "\\\\"; break;
+            case '"': ss << "\\\""; break;
+            // case '/': ss << "\\/"; break;
+            case '\b': ss << "\\b"; break;
+            case '\f': ss << "\\f"; break;
+            case '\n': ss << "\\n"; break;
+            case '\r': ss << "\\r"; break;
+            case '\t': ss << "\\t"; break;
+            default: ss << *iter; break;
+        }
+    }
+    return ss.str();
 }

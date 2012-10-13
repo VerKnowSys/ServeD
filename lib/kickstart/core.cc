@@ -1,6 +1,6 @@
 /*
     Author: Daniel (dmilith) Dettlaff
-    © 2011 - VerKnowSys
+    © 2011-2012 - VerKnowSys
 */
 
 #include "core.h"
@@ -32,21 +32,19 @@ const static string coreDir = currentDir();
 
     #endif
 
-    void load_svd(execParams params) {
+
+    void load_svd64(execParams params) {
         string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
         #ifdef DEVEL
-            #define COUNT 13
-        #else
-            #define COUNT 12
+            int count = 17;
         #endif
         char *args[] = {
-            (char*)"java",
-            (char*)"-d32",
-            (char*)"-client",
-            (char*)"-Xmn1m",
-            (char*)"-XX:NewRatio=1",
-            (char*)"-Xms2m",
-            (char*)"-Xmx32m",
+            (char*)DEFAULT_JAVA64_BIN,
+            (char*)"-d64",
+            (char*)"-Xmn2m",
+            (char*)"-Xms8m",
+            (char*)"-Xmx128m",
+            (char*)"-XX:+UseCompressedOops",
             (char*)"-Dfile.encoding=UTF-8",
             (char*)jnalp.c_str(),
             #ifndef DEVEL
@@ -54,6 +52,52 @@ const static string coreDir = currentDir();
                 (char*)"-jar",
                 (char*)params.jar.c_str(),
             #else
+                (char*)"-javaagent:/lib/jrebel/jrebel.jar", // XXX: hardcoded
+                (char*)"-Dcom.sun.management.jmxremote=true",
+                (char*)"-Dcom.sun.management.jmxremote.ssl=false",
+                (char*)"-Dcom.sun.management.jmxremote.authenticate=false", // XXX: TODO: Security hole
+                (char*)"-Dcom.sun.management.jmxremote.port=55555",
+                /* when devel, use classes from compile folders */
+                (char*)"-cp",
+                (char*)getClassPath(params.classPathFile).c_str(),
+                (char*)params.mainClass.c_str(),
+            #endif
+            (char*)params.svdArg.c_str(),
+            (char*)0
+        };
+
+        #ifdef DEVEL
+            cerr << "Loading svd-64, with opts: [";
+            for (int i = 0; i < count; i++) {
+                cerr << args[i] << " ";
+            }
+            cerr << "]" << endl;
+        #endif
+        execv((char*)params.javaPath.c_str(), args);
+    }
+
+
+    void load_svd(execParams params) {
+        // string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
+        #ifdef DEVEL
+            int count = 13;
+        #endif
+        char *args[] = {
+            (char*)DEFAULT_JAVA_BIN,
+            (char*)"-d32",
+            (char*)"-client",
+            (char*)"-Xmn1m",
+            (char*)"-XX:NewRatio=1",
+            (char*)"-Xms16m",
+            (char*)"-Xmx64m",
+            (char*)"-Dfile.encoding=UTF-8",
+            // (char*)jnalp.c_str(),
+            #ifndef DEVEL
+                /* when not devel, use classes from assembly jar */
+                (char*)"-jar",
+                (char*)params.jar.c_str(),
+            #else
+                (char*)"-javaagent:/lib/jrebel/jrebel.jar", // XXX
                 /* when devel, use classes from compile folders */
                 (char*)"-cp",
                 (char*)getClassPath(params.classPathFile).c_str(),
@@ -65,7 +109,7 @@ const static string coreDir = currentDir();
 
         #ifdef DEVEL
             cerr << "Loading svd, with opts: [";
-            for (int i = 0; i < COUNT; i++) {
+            for (int i = 0; i < count; i++) {
                 cerr << args[i] << " ";
             }
             cerr << "]" << endl;
@@ -73,8 +117,9 @@ const static string coreDir = currentDir();
         execv((char*)params.javaPath.c_str(), args);
     }
 
+
     void spawnBackgroundTask(execParams params, string lockFileName) {
-        int i, lfp;
+        int lfp;
         char str[32];
 
         setsid(); /* obtain a new process group */
@@ -99,7 +144,7 @@ const static string coreDir = currentDir();
 
         lfp = open(lockFileName.c_str(), O_RDWR | O_CREAT, 0600);
         if (lfp < 0) {
-            cerr << "Lock file occupied: " << lockFileName << ". Cannot open." << endl;
+            cerr << "Lock file occupied: " << lockFileName << ". Error: " << strerror(errno) << endl;
             exit(LOCK_FILE_OCCUPIED_ERROR); /* can not open */
         }
 
@@ -120,13 +165,19 @@ const static string coreDir = currentDir();
         signal(SIGINT, defaultSignalHandler);
 
         /* spawn svd */
-        #ifndef DEVEL
-            if (userSpawn)
-                params.jar = USER_JAR_FILE;
-            else
-                params.jar = ROOT_JAR_FILE;
-        #else
+        #ifdef DEVEL
             chdir(coreDir.c_str()); /* change running directory before spawning svd in devel mode */
         #endif
-        load_svd(params);
+
+        if (userSpawn) {
+            #ifndef DEVEL
+                params.jar = USER_JAR_FILE;
+            #endif
+            load_svd(params);
+        } else {
+            #ifndef DEVEL
+                params.jar = ROOT_JAR_FILE;
+            #endif
+            load_svd64(params);
+        }
     }

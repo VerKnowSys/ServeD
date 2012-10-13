@@ -1,11 +1,12 @@
 #!/bin/sh
 
 pwd=$(pwd)
-jar="${pwd}/svd.core/target/scala_2.9.0/core_2.9.0-1.0-onejar.jar"
+version="$(cat VERSION)"
+jar="${pwd}/svd.user/target/user-assembly-${version}.jar"
 
 if [ -e "${jar}" ]; then
     echo "Executing: ${jar}"
-    java -XX:+UseCompressedOops -XX:MaxPermSize=512M -XX:+UseParallelGC -Xms64m -Xmx768m -Dfile.encoding=UTF-8 -noverify -server -Djna.library.path=$(pwd)/lib -jar "${jar}" user "$@"
+    java -d32 -XX:MaxPermSize=64M -XX:+UseParallelGC -Xms8m -Xmx128m -Dfile.encoding=UTF-8 -noverify -client -Djna.library.path=$(pwd)/lib -jar "${jar}" $(id -u) "$@"
 else
     echo "Assembly not found. Use build script!"
 fi

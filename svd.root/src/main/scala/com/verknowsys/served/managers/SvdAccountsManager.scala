@@ -1,20 +1,29 @@
 package com.verknowsys.served.managers
 
 
+import com.verknowsys.served._
 import com.verknowsys.served.db._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.events.SvdFileEvent
 import com.verknowsys.served.systemmanager.native._
+import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.api._
 import com.verknowsys.served.api.pools._
 import com.verknowsys.served.services._
 
-import akka.actor.{Actor, ActorRef}
-import akka.actor.Actor.{remote, actorOf, registry}
+import akka.actor._
+import akka.actor._
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.util.duration._
+
 import scala.io.Source
-import java.io.File
+import java.io._
 import scala.util._
 
 
@@ -23,7 +32,7 @@ case object SvdUserPorts extends DB[SvdUserPort]
 case object SvdSystemPorts extends DB[SvdSystemPort]
 case object SvdUserUIDs extends DB[SvdUserUID]
 
-class SvdAccountUtils(db: DBClient) {
+class SvdAccountUtils(db: DBClient) extends Logging with SvdUtils {
     /**
      *  @author dmilith
      *
@@ -32,7 +41,7 @@ class SvdAccountUtils(db: DBClient) {
     def randomUserPort: Int = {
         val rnd = new Random(System.currentTimeMillis)
         val port = SvdPools.userPortPool.start + rnd.nextInt(SvdPools.userPortPool.end - SvdPools.userPortPool.start)
-        if (SvdUtils.portAvailable(port) && !userPortRegistered(port)) {
+        if (portAvailable(port) && !userPortRegistered(port)) {
             port
         } else
             randomUserPort
@@ -47,7 +56,7 @@ class SvdAccountUtils(db: DBClient) {
     def randomSystemPort: Int = {
         val rnd = new Random(System.currentTimeMillis)
         val port = SvdPools.systemPortPool.start + rnd.nextInt(SvdPools.systemPortPool.end - SvdPools.systemPortPool.start)
-        if (SvdUtils.portAvailable(port) && !systemPortRegistered(port)) {
+        if (portAvailable(port) && !systemPortRegistered(port)) {
             port
         } else
             randomSystemPort
@@ -72,11 +81,68 @@ class SvdAccountUtils(db: DBClient) {
     /**
      *  @author dmilith
      *
-     *   registers user UID with given number in svd database
+     *   creates akka configuration file for given user
      */
-    def registerUserAccount(uid: Int) = {
-        registerUserUID(uid)
-        db << SvdAccount(uid = uid)
+    def createAkkaUserConfIfNotExistant(uid: Int, userManagerPort: Int) = {
+        val configFile = SvdConfig.userHomeDir / "%d".format(uid) / "akka.conf"
+
+        if (!new File(configFile).exists) {
+            log.debug("Akka config: %s not found. Generating default one", configFile)
+
+            def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
+                try { f(param) } finally { param.close() }
+
+            def writeToFile(fileName: String, data: String) =
+                using (new FileWriter(fileName)) {
+                    fileWriter => fileWriter.write(data)
+            }
+            val defaultConfig = Source.fromURL(
+                getClass.getResource(
+                    SvdConfig.defaultUserAkkaConf
+                )
+            ).getLines.mkString("\n").replaceAll("USER_NETTY_PORT", "%d".format(userManagerPort))
+            writeToFile(configFile, defaultConfig)
+        } else {
+            log.debug("Akka config found: %s", configFile)
+        }
+    }
+
+
+    /**
+     *  @author dmilith
+     *
+     *   registers user with given name and uid number in svd database
+     */
+    def registerUserAccount(name: String, uid: Int): Unit = {
+        val userManagerPort = randomUserPort
+        val userHomeDir = SvdConfig.userHomeDir / "%d".format(uid)
+
+        def performChecks(managerPort: Int = userManagerPort) {
+            log.trace("Performing user registration checks and making missing directories")
+            checkOrCreateDir(userHomeDir)
+            chown(userHomeDir, uid)
+            createAkkaUserConfIfNotExistant(uid, managerPort)
+        }
+
+        if (!userUIDRegistered(uid)) {
+            log.trace("Generated user manager port: %d for account with uid: %d", userManagerPort, uid)
+            if (!userPortRegistered(userManagerPort)) {
+                registerUserPort(userManagerPort)
+                log.trace("Registered user manager port: %s", userManagerPort)
+            } else {
+                log.trace("Registering once again cause of port dup: %s", userManagerPort)
+                registerUserAccount(name, uid)
+            }
+            registerUserUID(uid)
+            performChecks()
+            log.debug("Writing account data of uid: %d", uid)
+            db << SvdAccount(userName = name, uid = uid, accountManagerPort = userManagerPort)
+        } else {
+            val userAccount = SvdAccounts(db).filter{_.uid == uid}.head
+            val userManagerPort = userAccount.accountManagerPort
+            log.trace("User already registered with manager port: %d, but still validating existance of akka user file and home directory: %s", userManagerPort, userHomeDir)
+            performChecks(userManagerPort)
+        }
     }
 
 
@@ -145,7 +211,7 @@ class SvdAccountUtils(db: DBClient) {
 
 }
 
-object SvdAccountsManager extends GlobalActorRef(actorOf[SvdAccountsManager])
+// object SvdAccountsManager // extends GlobalActorRef(actorOf[SvdAccountsManager])
 
 class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
@@ -158,10 +224,10 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     val svdAccountUtils = new SvdAccountUtils(db)
     import svdAccountUtils._
 
-    log.info("SvdAccountsManager is loading")
+    log.info("SvdAccountsManager (v%s) is loading".format(SvdConfig.version))
 
-    log.info("Registering Coreginx")
-    val coreginx = actorOf(new SvdService(SvdRootServices.coreginxConfig, rootAccount))
+    // log.info("Registering Coreginx")
+    // val coreginx = actorOf(new SvdService(SvdRootServices.coreginxConfig(), rootAccount))
 
     log.debug("User accounts registered in Account database: %s".format(SvdAccounts(db).mkString(", ")))
     log.debug("User ports registered in Account database: %s".format(SvdUserPorts(db).mkString(", ")))
@@ -169,92 +235,123 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     log.debug("User uids registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
 
 
-    private val accountManagers = scala.collection.mutable.Map[Int, ActorRef]() // UID => AccountManager ref
+    // private val accountManagers = scala.collection.mutable.Map[Int, ActorRef]() // UID => AccountManager ref
 
     // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
+    addShutdownHook {
+        log.warn("Got termination signal. Unregistering file events")
+        unregisterFileEvents(self)
 
-    override def postStop {
-        super.postStop
         log.info("Stopping spawned user workers")
         SvdAccounts(db).foreach{
             account =>
                 val pidFile = SvdConfig.userHomeDir / "%d".format(account.uid) / "%d.pid".format(account.uid)
                 log.trace("PIDFile: %s".format(pidFile))
-                val pid = Source.fromFile(pidFile).mkString
-                log.trace("Client VM PID to be killed: %s".format(pid))
-                new SvdShell(account).exec(new SvdShellOperation(
-                    """
-                    /bin/kill -INT %s
-                    /bin/rm %s
-                    """.format(pid, pidFile)
-                ))
+                if (new java.io.File(pidFile).exists) {
+                    log.trace("Reading VM pid.")
+                    val pid = Source.fromFile(pidFile).mkString.trim.toInt
+                    log.debug("Client VM PID to be killed: %d".format(pid))
+                    kill(pid, SIGTERM)
+                    log.debug("Client VM PID file to be deleted: %s".format(pidFile))
+                    rm_r(pidFile)
+                } else {
+                    log.warn("File not found: %s".format(pidFile))
+                }
         }
-        log.debug("Coreginx STOP")
-        coreginx.stop
 
         // removing also pid file of root core of svd:
         val corePid = SvdConfig.systemHomeDir / SvdConfig.rootPidFile
-        log.trace("Cleaning core pid file: %s with content: %s".format(corePid, Source.fromFile(corePid).mkString))
-        new SvdShell(rootAccount).exec(new SvdShellOperation("/bin/rm %s".format(corePid))) // XXX: hardcoded
-
-        log.trace("Invoking postStop in SvdAccountsManager")
+        log.debug("Cleaning core pid file: %s with content: %s".format(corePid, Source.fromFile(corePid).mkString))
+        rm_r(corePid)
+        log.info("Shutting down SvdAccountsManager")
         db.close
         server.close
     }
 
 
+    override def preStart = {
+        super.preStart
+        log.debug("SvdAccountsManager is starting. Running default task..")
+        respawnUsersActors
+    }
+
+
     def receive = {
-        case Init =>
-            log.debug("SvdAccountsManager received Init. Running default task..")
 
-            log.info("Spawning Coreginx")
-            coreginx.start
-            coreginx ! Run
+        case Shutdown =>
+            log.debug("Got Shutdown")
+            sender ! Shutdown
 
-            // registerFileEventFor(SvdConfig.systemHomeDir, Modified)
-
-            // 2011-06-26 18:17:00 - dmilith - HACK: XXX: HARDCODE: default user definition hack moved here now ;]
-            // 2011-06-27 02:46:10 - dmilith - FIXME: PENDING: TODO: find out WTF in neodatis bug when more than two elements are inserted at once:
-            // (1 to 10) foreach {
-                // _ =>
-                    if (!userUIDRegistered(501)) {
-                        registerUserAccount(501)
-                    }
-
-                    if (!userUIDRegistered(10001)) {
-                        registerUserAccount(10001)
-                    }
-
-
-                    // val ruid = randomUserUid
-                    // log.trace("Adding user for %d", ruid)
-                    // if (!userUIDRegistered(ruid)) {
-                    //     log.trace("Added")
-                    //     registerUserAccount(ruid, "żółć")
-                    // }
-
-            // }
-
+        case RespawnAccounts =>
+            log.trace("Respawning accounts")
             respawnUsersActors
-            self reply_? Success
+            sender ! Success
+
+        case RegisterAccount(name) =>
+            log.trace("Registering default account if not present")
+            if (name == SvdConfig.defaultUserName) {
+                if (!userUIDRegistered(SvdConfig.defaultUserUID)) {
+                    registerUserAccount(name, SvdConfig.defaultUserUID) // XXX: hardcoded
+                    sender ! Success
+                }
+            } else {
+                val userUID = randomUserUid
+                log.debug("Registering account with name: %s and uid: %d", name, userUID)
+                registerUserAccount(name, userUID)
+                sender ! Success
+            }
 
         case GetAccount(uid) =>
             val account = SvdAccounts(db)(_.uid == uid).headOption
-            log.trace("GetAccount(%d): %s", uid, account)
-            self reply account
+            log.debug("GetAccount(%d): %s", uid, account)
+            sender ! account
 
-        case GetAccountManager(uid) =>
-            log.trace("GetAccountManager(%d)", uid)
-            self reply (accountManagers get uid getOrElse AccountNotFound)
+        case GetAccountByName(name) =>
+            val account = SvdAccounts(db)(_.userName == name).headOption
+            log.debug("GetAccountByName(%s): %s", name, account)
+            sender ! account
+
+        // case SetAccountManager(uid) =>
+        //     // SvdGlobalRegistry.ActorManagers.values += (uid -> self)
+        //     log.info("User worker spawned successfully and mounted in SvdGlobalRegistry. Current store: %s", SvdGlobalRegistry.ActorManagers.values)
+        //     sender ! Success
+
+        // case GetAccountManager(uid) =>
+        //     log.trace("GetAccountManager(%d)", uid)
+        //     sender ! (SvdGlobalRegistry.ActorManagers.values get uid getOrElse AccountNotFound)
 
         case Alive(uid) =>
-            self.sender foreach (accountManagers(uid) = _)
+            // sender ! Error("Not yet implemented")
+            // add uid manager to list of active managers?
+            log.trace("UID %d is alive", uid)
+            sender ! Success
 
         case GetPort =>
-            self reply randomUserPort
+            sender ! randomUserPort
+
+        case Success =>
+            log.debug("Got success")
+
+        case SvdFileEvent(path, flags) =>
+            log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))
+            flags match {
+                case Modified =>
+                    log.trace("File event type: Modified")
+                case Deleted =>
+                    log.trace("File event type: Deleted")
+                case Renamed =>
+                    log.trace("File event type: Renamed")
+                case AttributesChanged =>
+                    log.trace("File event type: AttributesChanged")
+                case Revoked =>
+                    log.trace("File event type: Revoked")
+                case x =>
+                    log.trace("Got event: %s", x)
+            }
 
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
+            sender ! Error("Unknown signal %s".format(x))
 
     }
 
@@ -262,8 +359,14 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     private def respawnUsersActors {
         userAccounts.foreach{
             account =>
+
+                // TODO: add routine to respawn only non spawned/new accounts? Currently it's handled by kickstart
+                val authKeysFile = SvdConfig.userHomeDir / "%s".format(account.uid) / ".ssh" / "authorized_keys"
+                log.debug("Registering file event routine for %s", authKeysFile)
+                registerFileEventFor(authKeysFile, All) // Modified | Deleted | Renamed | AttributesChanged
+
                 log.warn("Spawning account: %s".format(account))
-                new SvdShell(account).exec(new SvdShellOperation(SvdConfig.kickApp + " " + account.uid)) // HACK
+                new SvdShell(account).exec(new SvdShellOperation(SvdConfig.kickApp + " " + account.uid))
         }
     }
 

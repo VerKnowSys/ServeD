@@ -1,16 +1,36 @@
 #!/bin/sh
 
-sudo rm -rf ~/.ivy2
+if [ "$(id -u)" != "0" ]; then
+	echo "Consider running this script as root to be sure of cleaning non current user / root old files."
+fi
 
-for i in *; do
-    if [ -d "$i" ]; then
-        sudo rm -rf "$i/lib_managed"
-        rm -rf "$i/target"
-    fi
-done
+if [ "$1" = "deep" ]; then
+    echo "Deep clean"
+    rm -rf ~/.ivy2
+fi
+
+if [ "$1" = "sysonly" ]; then
+  echo "Deep clean of user and system databases"
+  cwd=`pwd`
+  cd /Users
+  for i in *; do
+    rm -vf /Users/$i/$i.db*
+    rm -vf /Users/$i/$i-svd*
+    rm -vf /Users/$i/$i.pid
+    rm -vf /Users/$i/akka.conf
+  done
+  rm -vf /SystemUsers/accounts.db_*
+  rm -vf /SystemUsers/0.pid
+  rm -vf /SystemUsers/boot-svd*
+  cd $cwd
+  exit
+fi
 
 bin/sbt clean
 echo "Project source cleaned.."
 
-rm -rf lib/*.o
-echo "Native library cleaned."
+rm -f ./kick ./shell ./usage_gather
+rm -f lib/*.o*
+rm -f lib/*.so
+rm -f lib/*.dylib
+echo "Native code and libraries wiped out."

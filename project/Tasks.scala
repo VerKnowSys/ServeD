@@ -6,7 +6,7 @@ object Tasks {
     import scala.Console._
 
     val notes = TaskKey[Unit]("notes", "Shows code notes")
-    val cp = TaskKey[Analysis]("cp", "Write full classpath to ${module}.classhpath file")
+    val cp = TaskKey[Analysis]("cp", "Write full classpath to ${module}.classpath file")
 
 
     val XXX  = ".*//.*(?i:xxx)(.*):?".r

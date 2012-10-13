@@ -4,14 +4,14 @@ import akka.actor.{Actor, ActorRef}
 import com.verknowsys.served.api.{Success, Error, General, RemoteSession}
 
 
-/** 
- * CLI 
- * 
+/**
+ * CLI
+ *
  * @author teamon
  */
 class ApiClient(svd: Svd) {
     implicit val served = svd
-    
+
     val commands = (
         LoggerCommands ::
         GitCommands ::
@@ -20,17 +20,17 @@ class ApiClient(svd: Svd) {
     ).map(_.commands).reduce(_ orElse _)
 
     // Connect to ServeD
-    request(General.Connect(userUid)) {
-        case Success => 
-            info("ServeD interactive shell. Welcome %s", userUid)
-            prompt(new Prompt)
-        case Error(message) =>
-            error(message)
-            quit
-    }
-    
+    // request(General.Connect(userUid)) {
+    //     case Success =>
+    //         info("ServeD interactive shell. Welcome %s", userUid)
+    //         prompt(new Prompt)
+    //     case Error(message) =>
+    //         error(message)
+    //         quit
+    // }
 
-    
+
+
     /**
      * Show prompt and read arguments
      *
@@ -46,7 +46,7 @@ class ApiClient(svd: Svd) {
      * Get system username
      *
      * @author teamon
-     */ 
+     */
     private lazy val userUid = 501 // 2011-07-07 23:20:40 - dmilith - XXX: yet another place requiring code which is available in utils (getuid)
 }
 
@@ -57,7 +57,7 @@ object Runner {
                 case Some(svd) => new ApiClient(svd)
                 case None => error("Unable to connect to ServeD")
             }
-        } else { 
+        } else {
             error("Usage: com.verknowsys.served.cli.Runner HOST PORT")
         }
     }

@@ -1,0 +1,21 @@
+/**
+ *  @author dmilith
+ *
+ *   Hooks definition
+ */
+
+/*
+
+
+User Software dir file hooks:
+
+/Users
+    /SomeUID
+        /SomeService        - name from SvdServiceConfig.
+            /INSTALLED      - empty file determining that user application is already installed.
+                            To reinstall application, remove this file and rerun SvdService.
+
+            /UNAVAILABLE    - application is installed, nor configured, but disabled by some reason.
+
+
+*/

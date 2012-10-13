@@ -1,7 +1,9 @@
 #!/bin/sh
 
 pwd=$(pwd)
-jar="${pwd}/svd.web/target/scala_2.9.0/web_2.9.0-1.0.war"
+scala=$(cat VERSION-SCALA)
+version=$(cat VERSION)
+jar="${pwd}/svd.web/target/scala-${scala}/web_${scala}-${version}.war"
 
 rm -rf "$jar"
 bin/sbt "project web" compile package
@@ -10,5 +12,5 @@ if [ -e "${jar}" ]; then
     echo "Executing: ${jar}"
     java -XX:+UseCompressedOops -XX:MaxPermSize=128M -XX:+UseParallelGC -Xms64m -Xmx256m -Dfile.encoding=UTF-8 -noverify -jar "${jar}" "$@"
 else
-    echo "Assembly not found. Use build script!"
+    echo "Assembly not found: ${jar}. Use build script!"
 fi

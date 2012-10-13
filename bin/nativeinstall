@@ -35,9 +35,9 @@ if [ "$system" = "FreeBSD" ]; then
 fi
 if [ "$system" = "Darwin" ]; then
     cp -fv lib/*.dylib /lib
+    chmod 0755 /lib
+    # chmod 0644 /lib/*
 fi
-chmod 0755 /lib
-chmod 0644 /lib/*
 
 if [ "$system" = "FreeBSD" ]; then
     echo "Installing ServeD rc script for FreeBSD"

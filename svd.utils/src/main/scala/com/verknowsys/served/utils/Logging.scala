@@ -1,8 +1,11 @@
 package com.verknowsys.served.utils
 
 import akka.actor.{Actor, ActorRef}
-import akka.event.EventHandler
+// import akka.event.EventHandler
+import akka.event.{Logging => AkkaLogging}
 import java.io.FileWriter
+import akka.event.Logging.InitializeLogger
+import akka.event.Logging.LoggerInitialized
 
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.api._
@@ -121,21 +124,21 @@ abstract class AbstractLogger(klazz: String) {
 class LoggingEventHandler extends Actor with Logging {
     import Logger.Levels._
 
-    self.dispatcher = EventHandler.EventHandlerDispatcher
+    // self.dispatcher = EventHandlerDispatcher
 
     def receive = {
-        case EventHandler.Error(cause, instance, message) =>
+        case AkkaLogging.Error(cause, "Error", instance, message) =>
             log.log(Error, message.toString, resolveClassName(instance))
             log.log(Error, cause.toString, resolveClassName(instance))
             cause.printStackTrace(System.out)
 
-        case EventHandler.Warning(instance, message) =>
+        case AkkaLogging.Warning("Warning", instance, message) =>
             log.log(Warn, message.toString, resolveClassName(instance.getClass.getName))
 
-        case EventHandler.Info(instance, message) =>
+        case AkkaLogging.Info("Warning", instance, message) =>
             log.log(Info, message.toString, resolveClassName(instance.getClass.getName))
 
-        case EventHandler.Debug(instance, message) =>
+        case AkkaLogging.Debug("Warning", instance, message) =>
             log.log(Debug, message.toString, resolveClassName(instance.getClass.getName))
 
         case event =>
@@ -144,7 +147,7 @@ class LoggingEventHandler extends Actor with Logging {
 
     def resolveClassName(x: AnyRef) = {
         val name = x match {
-            case ar: ActorRef => ar.actorClassName
+            case ar: ActorRef => ar.getClass.getName //actorClassName
             case _ => x.getClass.getName
         }
         name + "(akka)"

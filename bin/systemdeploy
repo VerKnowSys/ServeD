@@ -7,25 +7,45 @@ rootcheck() {
     fi
 }
 
-system="$(uname)"
-branch="$(git name-rev --name-only HEAD)"
-sha="$(cat .git/refs/heads/${branch})"
-destination="${branch}-${sha}"
-echo $destination > svd.common/src/main/resources/VERSION
-echo "Getting current sha: $destination"
-bin/sbt assembly && \
-if [ $system = "Darwin" ]; then
-    sudo bin/install
-else
-    rootcheck && \
-    bin/install
-fi
-bin/nativebuild && \
-if [ $system = "Darwin" ]; then
-    sudo bin/nativeinstall
-else
-    rootcheck && \
-    bin/nativeinstall
-fi
+requirementscheck() {
 
-echo "Done. Success!"
+    $(java -d32 -version)
+    if [ "$?" != "0" ]; then
+        echo "System Deployer requires 32bit JDK available in PATH!"
+        exit 1
+    fi
+
+    $(git --version)
+    if [ "$?" != "0" ]; then
+        echo "System Deployer requires GIT available in PATH!"
+        exit 1
+    fi
+
+}
+
+
+system="$(uname)"
+requirementscheck
+
+# bin/clean
+bin/current
+bin/sbt compile
+if [ "$?" = "0" ]; then
+    bin/sbt assembly && \
+    if [ $system = "Darwin" ]; then
+        sudo bin/install
+    else
+        rootcheck && \
+        bin/install
+    fi
+    bin/nativebuild && \
+    if [ $system = "Darwin" ]; then
+        sudo bin/nativeinstall
+    else
+        rootcheck && \
+        bin/nativeinstall
+    fi
+    echo "Done. Success!"
+else
+    echo "Done. Failure!"
+fi

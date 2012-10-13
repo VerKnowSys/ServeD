@@ -1,10 +1,11 @@
 #!/bin/sh
 
 pwd=$(pwd)
-jar="${pwd}/svd.core/target/scala_2.9.0/core_2.9.0-1.0-onejar.jar"
+version="$(cat VERSION)"
+jar="${pwd}/svd.root/target/root-assembly-${version}.jar"
 
 if [ "$(id -u)" != "0" ]; then
-    echo "ServeD Account Collector requires root privileges to run!"
+    echo "ServeD Account Collector v${version}, requires root privileges to run!"
     exit 1
 fi
 

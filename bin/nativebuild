@@ -2,47 +2,138 @@
 
 
 system="$(uname)"
-if [ $system = "Darwin" ]; then
-    export CXX="clang++"
-else
-    export CXX="g++"
+DEVEL="false"
+FLAGS="-Os -fPIC"
+CC="gcc"
+CXX="g++"
+STRIP="strip"
+
+
+if [ -e "/usr/bin/clang++" ]; then
+    CXX="clang++"
+    CC="clang"
 fi
 
 echo "System: $system"
-echo "Compiler: $CXX"
+echo "C compiler: $CC"
+echo "C++ compiler: $CXX"
+echo "Flags: $FLAGS"
+echo "Devel: $DEVEL"
 echo
 
 check() {
     if [ "$1" = "0" ]; then
         echo "* $2 => Compiled Sucessfully"
+        if [ "$DEVEL" != "true" ]; then
+            if [ "$3" != "" ]; then
+                echo "  Stripping $3"
+                $STRIP $3
+            fi
+        fi
     else
         echo "* $2 => Failure"
         exit 1
     fi
 }
 
-$CXX -Os -fPIC lib/kickstart/shell.cc -o shell
-check $? "UserShell"
 
-if [ "$1" = "sh" ]; then
-    exit
+$CXX $FLAGS -c lib/kickstart/core.cc -o lib/core.o
+check $? "Core"
+
+$CXX $FLAGS -c lib/kickstart/utils.cc -o lib/utils.o
+check $? "Utils"
+
+$CXX $FLAGS lib/kickstart/shell.cc -o shell
+check $? "UserShell" "shell"
+
+$CXX $FLAGS lib/kickstart/daemon.cc -o daemon
+check $? "UserDaemon" "daemon"
+
+
+$CXX $FLAGS lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
+check $? "KickStart" "kick"
+
+if [ "$system" = "FreeBSD" ]; then
+    $CXX $FLAGS -shared lib/kickstart/usage_sys.cc -o lib/libusagesys.so lib/utils.o -lutil -lprocstat -lkvm
+    check $? "UsageSysLib" "lib/libusagesys.so"
+
+    $CXX $FLAGS lib/kickstart/usage_gather.cc -o usage_gather lib/libusagesys.so lib/utils.o -lutil -lprocstat -lkvm
+    check $? "UsageGather" "usage_gather"
+
+    $CXX $FLAGS -shared lib/kickstart/stat.cc -o lib/libstat.so
+    check $? "StatLib" "lib/libstat.so"
+
+    $CXX $FLAGS -shared lib/kickstart/system_time.cc -o lib/libsystemtime.so -lrt
+    check $? "SystemTimeLib" "lib/libsystemtime.so"
+
+    $CXX $FLAGS -shared lib/kickstart/symlink.cc -o lib/libsymlink.so
+    check $? "SymlinkLib" "lib/libsymlink.so"
 fi
 
 if [ "$system" = "Darwin" ]; then
-    $CXX -Os -arch i386 -arch x86_64 -fPIC -shared lib/kickstart/stat.cc -o lib/libstat.dylib
-else
-    echo "Skipping build for $system"
-    # $CXX -Os -fPIC -shared lib/kickstart/stat.cc -o lib/libstat.so
+    $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/stat.cc -o lib/libstat.dylib
+    check $? "StatLib"
+
+    $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/system_time.cc -o lib/libsystemtime.dylib
+    check $? "SystemTimeLib"
+
+    $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/symlink.cc -o lib/libsymlink.dylib
+    check $? "SymlinkLib"
 fi
-check $? "StatLib"
 
-$CXX -Os -c -fPIC lib/kickstart/utils.cc -o lib/utils.o
-check $? "Utils"
+if [ "$system" = "Linux" ]; then
+    $CXX $FLAGS -shared lib/kickstart/system_time.cc -o lib/libsystemtime.so -lrt
+    check $? "SystemTimeLib" "lib/libsystemtime.so"
 
-$CXX -Os -c -fPIC lib/kickstart/core.cc -o lib/core.o
-check $? "Core"
+    $CXX $FLAGS -shared lib/kickstart/symlink.cc -o lib/libsymlink.so
+    check $? "SymlinkLib" "lib/libsymlink.so"
+fi
 
-$CXX -Os -fPIC lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
-check $? "KickStart"
 
-# rm -rf lib/*.o
+# FANN library build:
+FANN_FLAGS="-pedantic"
+$CC $FLAGS $FANN_FLAGS -c lib/fann/fann_cascade.c -o lib/fann_cascade.o
+check $? "FANN cascade"
+$CC $FLAGS $FANN_FLAGS -c lib/fann/doublefann.c -o lib/doublefann.o
+check $? "FANN double"
+$CC $FLAGS $FANN_FLAGS -c lib/fann/fann_error.c -o lib/fann_error.o
+check $? "FANN error"
+$CC $FLAGS $FANN_FLAGS -c lib/fann/fann_io.c -o lib/fann_io.o
+check $? "FANN IO"
+$CC $FLAGS $FANN_FLAGS -c lib/fann/fann_train.c -o lib/fann_train.o
+check $? "FANN train"
+$CC $FLAGS $FANN_FLAGS -c lib/fann/fann_train_data.c -o lib/fann_train_data.o
+check $? "FANN train data"
+$CC $FLAGS $FANN_FLAGS -c lib/fann/fixedfann.c -o lib/fixedfann.o
+check $? "FANN fixed"
+$CC $FLAGS $FANN_FLAGS -c lib/fann/floatfann.c -o lib/floatfann.o
+check $? "FANN float"
+$CC $FLAGS $FANN_FLAGS -c lib/fann/fann.c -o lib/fann.o
+check $? "FANN main"
+
+if [ "$system" = "Darwin" ]; then
+    $CC $FLAGS $FANN_FLAGS -arch x86_64 -shared -o lib/libfann.dylib lib/fann.o lib/fann_train_data.o lib/fann_train.o lib/fann_io.o lib/fann_error.o lib/fann_cascade.o
+    check $? "FANN library"
+
+    $CC $FLAGS $FANN_FLAGS -arch x86_64 -shared -o lib/libfann-fixed.dylib lib/fixedfann.o
+    check $? "FANN fixed library" "lib/libfann-fixed.dylib"
+
+    $CC $FLAGS $FANN_FLAGS -arch x86_64 -shared -o lib/libfann-float.dylib lib/floatfann.o
+    check $? "FANN float library" "lib/libfann-float.dylib"
+
+    $CC $FLAGS $FANN_FLAGS -arch x86_64 -shared -o lib/libfann-double.dylib lib/doublefann.o
+    check $? "FANN double library" "lib/libfann-double.dylib"
+else
+    $CC $FLAGS $FANN_FLAGS -shared -o lib/libfann.so lib/fann.o lib/fann_train_data.o lib/fann_train.o lib/fann_io.o lib/fann_error.o lib/fann_cascade.o
+    check $? "FANN library" "lib/libfann.so"
+
+    $CC $FLAGS $FANN_FLAGS -shared -o lib/libfann-fixed.so lib/fixedfann.o
+    check $? "FANN fixed library" "lib/libfann-fixed.so"
+
+    $CC $FLAGS $FANN_FLAGS -shared -o lib/libfann-float.so lib/floatfann.o
+    check $? "FANN float library" "lib/libfann-float.so"
+
+    $CC $FLAGS $FANN_FLAGS -shared -o lib/libfann-double.so lib/doublefann.o
+    check $? "FANN double library" "lib/libfann-double.so"
+fi
+

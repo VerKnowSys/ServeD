@@ -6,7 +6,7 @@ import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.api.{SvdAccount, SvdShellOperation}
 import com.verknowsys.served.systemmanager.native.SvdShell
-import com.verknowsys.served.systemmanager.SvdSystemManagerUtils
+import com.verknowsys.served.utils.SvdUtils
 
 import org.apache.commons.io.FileUtils
 
@@ -20,7 +20,7 @@ import org.apache.commons.io.FileUtils
 case object SvdAccounts extends DB[SvdAccount]
 
 
-object SvdAccountCollector extends Logging {
+object SvdAccountCollector extends Logging with SvdUtils {
 
     def main(args: Array[String]): Unit = {
 
@@ -33,14 +33,14 @@ object SvdAccountCollector extends Logging {
         val server = new DBServer(SvdConfig.remoteAccountServerPort, SvdConfig.systemHomeDir / SvdConfig.coreSvdAccountsDatabaseName)
         val db = server.openClient
 
-        val homeDirectories = SvdUtils.listDirectories(argument)
+        val homeDirectories = listDirectories(argument)
         log.debug("Home directories: %s".format(homeDirectories.mkString(", ")))
 
         homeDirectories.foreach {
             dir =>
                 val element = dir.getPath
                 val userName = element.split("/").last
-                val owner = SvdUtils.getOwner(element)
+                val owner = getOwner(element)
                 if (owner == 0) {
                     log.error("Security violation! Cannot create user with UID == 0!")
                     sys.exit(1)
@@ -64,7 +64,7 @@ object SvdAccountCollector extends Logging {
                         case x: java.io.FileNotFoundException =>
                             log.warn("Problem: %s".format(x))
                     }
-                    SvdSystemManagerUtils.chown(homeDir, owner, SvdConfig.defaultUserGroup, true)
+                    chown(homeDir, owner, SvdConfig.defaultUserGroup, true)
                 } else
                     log.warn("Account already imported: %s. Skipping.".format(account))
         }

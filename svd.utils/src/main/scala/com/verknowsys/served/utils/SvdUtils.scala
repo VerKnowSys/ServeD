@@ -2,6 +2,10 @@ package com.verknowsys.served.utils
 
 
 import com.verknowsys.served._
+import com.verknowsys.served.utils.signals._
+import com.verknowsys.served.utils._
+import com.verknowsys.served._
+import SvdPOSIX._
 
 import org.apache.commons.io.FileUtils
 import clime.messadmin.providers.sizeof.ObjectProfiler
@@ -23,12 +27,118 @@ import sun.misc.Signal
 
 
 /**
- * SvdUtils object containing common functions
+ * SvdUtils trait containing common functions
  *
  * @author dmilith
  *
  */
-object SvdUtils extends Logging {
+trait SvdUtils extends Logging {
+
+
+    /**
+      * A way to get default shell path depended on currently running operating system
+      *
+      * @author dmilith
+      *
+      */
+    def defaultShell = {
+        System.getProperty("os.name") match {
+            case "FreeBSD" =>
+                "/Software/Zsh/exports/zsh"
+
+            case "Mac OS X" =>
+                "/usr/local/bin/zsh"
+
+            case _ =>
+                "/usr/bin/zsh"
+
+        }
+    }
+
+
+    /**
+      * Kills system process with given pid and signal
+      *
+      * @author dmilith
+      *
+      * @return true if succeeded, false if failed
+      *
+      */
+    def kill(pid: Long, signal: SvdPOSIX.Value = SIGINT) = {
+        import CLibrary._
+        val clib = CLibrary.instance
+        if (clib.kill(pid, signal.id) == 0)
+            true
+        else
+            false
+    }
+
+
+    /**
+     * Changes owner of file at given path
+     *
+     * @author dmilith
+     */
+    def chown(path: String, user: Int, group: Int = SvdConfig.defaultUserGroup, recursive: Boolean = true) =
+        if (!(new File(path)).exists) {
+            log.warn("Chown: File/ path doesn't exists! Cannot chown non existant file/ directory! IGNORING!")
+            false
+        } else {
+            import CLibrary._
+            val clib = CLibrary.instance
+            val files = if (recursive) recursiveListFilesFromPath(new File(path)) else List(new File(path))
+            log.trace("chown(path: %s, user: %d, group: %d, recursion: %s): File list: %s. Amount of files: %s".format(path, user, group, recursive, files.mkString(", "), files.length))
+
+            for (file <- files) {
+                log.trace("chowning: %s".format(file.getAbsolutePath))
+                if (clib.chown(file.getAbsolutePath, user, group) != 0)
+                    throwException[Exception]("Error occured while chowning: %s".format(file))
+            }
+            true
+        }
+
+
+    /**
+     * Changes permissions of file at given path
+     *
+     * @author dmilith
+     */
+    def chmod(path: String, mode: Int, recursive: Boolean = true) =
+        if (!(new File(path)).exists) {
+            log.warn("Chmod: File or directory doesn't exists! Cannot chmod non existant file: '%s'! IGNORING!".format(path))
+            false
+        } else {
+            import CLibrary._
+            val clib = CLibrary.instance
+            val files = if (recursive) recursiveListFilesFromPath(new File(path))else List(new File(path))
+            log.trace("chmod(path: %s, mode: %d, recursion: %s)".format(path, mode, recursive))
+
+            for (file <- files) {
+                log.trace("chmoding: %s".format(file.getAbsolutePath))
+                if (clib.chmod(file.getAbsolutePath, mode) != 0)
+                    log.error("Couldn't chmod file: %s. Check file access?", file)
+                    // throwException[Exception]("Error occured while chmoding: %s".format(file))
+            }
+            true
+        }
+
+
+    /**
+     *  @author dmilith
+     *  Returns real host name (not "localhost")
+     */
+    def currentHost = java.net.InetAddress.getLocalHost
+
+
+    /**
+        @author dmilith
+        Unified & DRY method of throwing exceptions
+    */
+    def throwException[T <: Throwable : Manifest](message: String) {
+        val exception = implicitly[Manifest[T]].erasure.getConstructor(classOf[String]).newInstance(message).asInstanceOf[T]
+        // log.error("Error occured in %s.\nException: %s\n\n%s".format(this.getClass.getName, exception, exception.getStackTrace.mkString("\n")))
+        // throw exception
+    }
 
 
     /**
@@ -53,6 +163,14 @@ object SvdUtils extends Logging {
      *   returns true if running system matches BSD
      */
     def isBSD = System.getProperty("os.name").contains("BSD")
+
+
+    /**
+     *  @author dmilith
+     *
+     *   returns true if running system matches Darwin
+     */
+    def isOSX = System.getProperty("os.name").contains("Darwin")
 
 
     /**
@@ -186,7 +304,22 @@ object SvdUtils extends Logging {
      *  Get all live threads of ServeD. Useful only when debugging.
      *
      */
-    def getAllLiveThreads = log.trace("Live threads list:\n%s".format(Thread.getAllStackTraces.toList.map{ th => "%s - %s\n".format(th._1, th._2.toList.map{ elem => "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(elem.getFileName, elem.getClassName, elem.getMethodName, elem.getLineNumber, elem.isNativeMethod)})}))
+    def getAllLiveThreads = log.trace("Live threads list:\n%s".format(
+        Thread.getAllStackTraces.toList.map{
+            th =>
+                "%s - %s\n".format(
+                    th._1,
+                    th._2.toList.map{
+                        elem =>
+                            "File name: %s, Class name: %s, Method name: %s, Line number: %d, (is Native? %b)\n".format(
+                                elem.getFileName,
+                                elem.getClassName,
+                                elem.getMethodName,
+                                elem.getLineNumber,
+                                elem.isNativeMethod)
+                    }
+                )
+        }))
 
 
     /**
@@ -271,11 +404,12 @@ object SvdUtils extends Logging {
 
 
     /**
-     * Removes directory
+     * Removes any file or directory
      *
      * @author teamon
+     * @author dmilith
      */
-    def rmdir(path: String) = try { FileUtils.forceDelete(path) } catch { case x: Throwable => log.warn(x.getMessage) }
+    def rm_r(path: String) = try { FileUtils.forceDelete(path) } catch { case x: Throwable => log.warn(x.getMessage) }
 
 
     /**
@@ -294,13 +428,22 @@ object SvdUtils extends Logging {
                     aName.lastIndexOf(name) != -1
             }
             val iterator = files.iterator
-            log.trace("Looking for: %s in %s. Extensions: %s, Recursive: %s".format(name, root, extensions.mkString(" "), recursive))
+            log.trace("Looking for: %s in %s. Extensions: %s, Recursive: %s".format(
+                name,
+                root,
+                extensions.mkString(" "),
+                recursive))
+
             while (iterator.hasNext) {
-                val file = iterator.next.asInstanceOf[File] // 2011-02-01 06:44:08 - dmilith - XXX: try matcher here
-                if (filter.accept(root, file.toString)) {
-        			return file.getAbsolutePath
-        		}
+                val file = iterator.next
+                file match {
+                    case f: File =>
+                        if (filter.accept(root, f.toString))
+                            return f.getAbsolutePath
+
+                }
             }
+
         ""
     }
 
@@ -361,6 +504,20 @@ object SvdUtils extends Logging {
         }
         false
     }
+
+
+    /**
+     *  @autor dmilith
+     *
+     *  Get list of fields of case class using reflection
+     */
+    def caseClassFields(cc: AnyRef) =
+        (Map[String, String]() /: cc.getClass.getDeclaredFields) {
+            (a, f) =>
+                f.setAccessible(true)
+                a + (f.getName -> f.get(cc).toString)
+        }
+
 
 
 }

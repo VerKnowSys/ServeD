@@ -1,0 +1,13 @@
+~ -> /Users/UID/
+
+/Public/        -> owner: nobody, prawa: rwx-wx-wx (733)
+                    example socket: /Public/b71bb213-8b8f-4895-b39c-8fd8a9baf052-deldaphp-Php.sock;
+                    socket name rules: /Public/ account.uuid - domain.name - AppName.sock
+
+~/Apps/         -> Applications
+~/Apps/UserGinx -> User side Nginx
+~/WebApps/      -> Web Applications (php, rails, etc)
+                    ~/WebApps/user_app_name/public -> public dir
+~/WebConfig/    -> Reusable web configurations available "outside" (nginx sites definition files) -> *.conf files
+~/Services ...
+
