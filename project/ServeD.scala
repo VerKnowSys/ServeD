@@ -71,8 +71,9 @@ object Resolvers {
     val mediavks = "Media VKS" at "http://media.verknowsys.com/maven2-repository/"
     val jboss = "JBoss Repo" at "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases"
     val repoVks = "VerKnowSys Public Repository" at "http://maven.verknowsys.com/repository"
+    val repo1 = "Repo1 Maven" at "http://repo1.maven.org/maven2"
 
-    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, mediavks, repoVks, jboss)
+    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, mediavks, repoVks, jboss, repo1)
 }
 
 object Dependencies {
@@ -110,7 +111,7 @@ object Dependencies {
     // val scalaz = "org.scalaz" % "scalaz-core_2.9.2" % "7.0.0-M3"
 
     val tzip = "de.schlichtherle" % "truezip" % "6.8.4"
-    val bouncycastle = "bouncycastle" % "bcprov-jdk15" % "140"
+    val bouncycastle = "org.bouncycastle" % "bcprov-jdk16" % "1.46"
 
 
     // val servlet = "javax.servlet" % "servlet-api" % "2.5"
@@ -123,8 +124,8 @@ object ServeD extends Build {
     import BuildSettings._
     import Dependencies._
 
-
     lazy val served = Project("served", file("."), settings = buildSettings) aggregate(
+
         api, cli, utils, testing, root, user, common, web
     )
 
