@@ -94,5 +94,4 @@ ctrlcli
 .project
 .history
 .ensime_port
-
-/BUILD
+/svd.common/src/main/resources/BUILD

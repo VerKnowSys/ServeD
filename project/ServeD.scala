@@ -17,8 +17,8 @@ import net.virtualvoid.sbt._
 
 object BuildSettings {
 
-    val buildnFile = "BUILD"
-    lazy val buildNumber = if (new File(buildnFile).exists) {
+    val buildnFile = "svd.common/src/main/resources/BUILD"
+    val buildNumber = if (new File(buildnFile).exists) {
         val value = Source.fromFile(buildnFile).mkString.trim.toInt + 1
         val outFile = new FileWriter(buildnFile)
         val out = new PrintWriter(outFile)
