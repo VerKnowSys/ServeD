@@ -34,24 +34,44 @@ class SvdWebManager(val account: SvdAccount) extends SvdExceptionHandler with Sv
 
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
+    val accountManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountManager".format(SvdConfig.served, account.accountManagerPort))
+
+
+    override def postStop = {
+        super.postStop
+    }
+
+    override def preStart = {
+        super.preStart
+        log.info("Launching SvdWebManager")
+        log.debug("Getting web panel port from AccountsManager")
+        (accountsManager ? GetPort) onSuccess {
+            case webPort: Int =>
+                log.trace("Got web panel port %d", webPort)
+
+                (accountManager ? Notify.Message("Web panel started for you on port: %d".format(webPort))
+                ) onSuccess {
+                    case _ =>
+                        log.debug("Success notifying")
+                } onFailure {
+                    case x =>
+                        log.debug("Failure: %s", x)
+                }
+                // context.become(started(webPort))
+                log.debug("Launching jetty for UID: %d", account.uid)
+                sender ! Success
+                web.Server(webPort) // this one is blocking
+
+            case x =>
+                log.error("Web Panel failed: %s", x)
+        }
+    }
 
 
     def receive = traceReceive {
-        case Init =>
-            log.info("SvdWebManager received Init. Launching panel")
 
-            log.debug("Getting web panel port from AccountsManager")
-            (accountsManager ? GetPort) onSuccess {
-                case webPort: Int =>
-                    log.debug("Got web panel port %d", webPort)
-                    context.become(started(webPort))
-
-                    log.trace("Sending Init once again")
-                    self ! Init
-
-                case x =>
-                    log.error("Web Panel failed: %s", x)
-            }
+        case Success =>
+            log.debug("Success in WebManager")
 
         case x =>
             val m = "Unknown SvdWebManager message: %s".format(x)
@@ -60,15 +80,6 @@ class SvdWebManager(val account: SvdAccount) extends SvdExceptionHandler with Sv
 
     }
 
-
-    private def started(webPort: Int): Receive = traceReceive {
-
-        case Init =>
-            log.debug("Launching jetty for UID: %d", account.uid)
-            sender ! Success
-            web.Server(webPort) // this one is blocking
-
-    }
 
 
 }

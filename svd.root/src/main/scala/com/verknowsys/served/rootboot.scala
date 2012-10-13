@@ -45,31 +45,19 @@ object rootboot extends Logging with SvdUtils with App {
         println()
 
         val rb = system.actorOf(Props(new SvdRootBoot).withDispatcher("svd-core-dispatcher"))
-        rb ! Init
-
         addShutdownHook {
             rb ! Shutdown
         }
 
-        // ssm ! Init
-        // sam ! Init
-        // Remote services
-        // remote.start(SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
-        // remote.registerPerSession("service:api", actorOf[SvdApiConnection])
-        // remote.register("service:accounts-manager", SvdAccountsManager())
     }
 
 
-    // def main(args: Array[String]) = {
-        log.info(SvdConfig.servedFull)
-        log.info(SvdConfig.copyright)
+    log.info(SvdConfig.servedFull)
+    log.info(SvdConfig.copyright)
 
-        // handle signals
-        handleSignal("ABRT") { getAllLiveThreads }
-        handleSignal("USR2") { log.warn("TODO: implement USR2 handling (show svd config values)") }
+    // handle signals
+    handleSignal("ABRT") { getAllLiveThreads }
+    handleSignal("USR2") { log.warn("TODO: implement USR2 handling (show svd config values)") }
 
-        // log.debug("Params: " + args.mkString(", ") + ". Params length: " + args.length)
-
-        run
-    // }
+    run
 }

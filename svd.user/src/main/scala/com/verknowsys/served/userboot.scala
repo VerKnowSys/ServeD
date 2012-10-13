@@ -52,21 +52,8 @@ object userboot extends Logging with SvdUtils {
             case Some(account: SvdAccount) =>
 
                 log.debug("Got account, starting AccountManager for %s on account manager port: %d", account, account.accountManagerPort)
-                val am = system.actorOf(Props(new SvdAccountManager(account)).withDispatcher("svd-single-dispatcher"))
-                // SvdAccountsManager ask SetAccountManager(account.uid, am)
+                val am = system.actorOf(Props(new SvdAccountManager(account)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
                 val loggingManager = system.actorOf(Props(new LoggingManager(GlobalLogger)))
-                am ! Init
-
-                // remote.start(SvdConfig.defaultHost, port) // XXX: hack: both defaultHost and port
-                // remote.register("service:account-manager", am)
-                // remote.register("service:logging-manager", loggingManager)
-
-                // addShutdownHook {
-                //     log.info("Shutdown of user svd requested")
-                //     system.shutdown
-                //     // am.shutdown
-                // }
-
                 log.info("Spawned UserBoot for UID: %d", userUID)
 
             case None =>

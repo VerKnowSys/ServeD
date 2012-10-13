@@ -34,6 +34,20 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
     val ssm = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
 
 
+    override def preStart = {
+        super.preStart
+        sshd.setCommandFactory(new ScpCommandFactory(
+            new CommandFactory {
+                def createCommand(command: String) = new ProcessShellFactory(command.split(" ")).create
+            }
+        ))
+        sshd.setPort(port)
+        sshd.setKeyPairProvider(new PEMGeneratorHostKeyProvider("svd-ssh-key.pem"))
+
+        log.info("SSHD prepared on port %d but not listening yet", port)
+    }
+
+
     def started(listOfKeys: Set[AccessKey], account: SvdAccount): Receive = {
 
         case Init =>
@@ -61,19 +75,6 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
 
 
     def receive = {
-
-        case Init =>
-            sshd.setCommandFactory(new ScpCommandFactory(
-                new CommandFactory {
-                    def createCommand(command: String) = new ProcessShellFactory(command.split(" ")).create
-                }
-            ))
-            sshd.setPort(port)
-            sshd.setKeyPairProvider(new PEMGeneratorHostKeyProvider("svd-ssh-key.pem"))
-
-            log.info("SSHD prepared on port %d but not listening yet", port)
-            sender ! Success
-
 
         case InitSSHChannelForUID(forUID: Int) =>
             log.debug("Got shell base for uid: %d", forUID)

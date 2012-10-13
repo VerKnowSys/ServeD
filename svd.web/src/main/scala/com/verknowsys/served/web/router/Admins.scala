@@ -208,7 +208,7 @@ class Admins extends Plan with Database with Logging with SvdUtils {
                         ("productDescription", param("product_description")) ::
                         ("messages", failures.mkString(", ")) :: Nil
 
-                    Ok ~> Scalate(req, "product.jade")
+                    Ok ~> Scalate(req, "/templates/product.jade")
             }
 
 

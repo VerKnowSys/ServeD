@@ -10,7 +10,13 @@ import akka.actor._
 // XXX: CHECKME
 
 class LoggingManager(val loggingMachine: LoggingMachine) extends SvdManager {
-    log.info("Starting LoggingManager")
+
+
+    override def preStart = {
+        super.preStart
+        log.info("Starting LoggingManager")
+    }
+
 
     def receive = {
         case Logger.ListEntries =>

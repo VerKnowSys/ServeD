@@ -1,16 +1,17 @@
 package com.verknowsys.served.web
 
 
+import com.verknowsys.served._
 import com.verknowsys.served.utils._
 
 
-object DatabaseServer {
+object DatabaseServer { // XXX: HACK: should use user database from accountmanager instead of this fucked up way
 
     import com.verknowsys.served.db._
     import com.verknowsys.served.web.merch._
 
-    val dbPostfix = "db/database"
-    val dbPort = 34569
+    val dbPostfix = SvdConfig.userHomeDir / "%d".format(SvdConfig.defaultUserUID) / "db" / "database" // XXX: testing user only for now!
+    val dbPort = 34569 // XXX: hardcoded port!
     val server = new DBServer(dbPort, dbPostfix)
 
 }

@@ -7,14 +7,13 @@ import com.verknowsys.served.git._
 import com.verknowsys.served.db.DBClient
 
 import akka.actor._
-// import akka.config.Supervision._
-// import akka.actor.Actor.{remote, actorOf, registry}
 
 
 /**
  * Git Manager
  *
  * @author teamon
+ * @author dmilith
  */
 class SvdGitManager(
         val account: SvdAccount,
@@ -22,16 +21,17 @@ class SvdGitManager(
         val gitRepositoriesLocation: String
     ) extends SvdManager with DatabaseAccess {
 
-    log.info("Starting GitManager for account: %s in home dir: %s".format(account, gitRepositoriesLocation))
 
-    log.debug("Checking existance of %s", gitRepositoriesLocation)
-    checkOrCreateDir(gitRepositoriesLocation)
+    override def preStart = {
+        super.preStart
+        log.info("Starting GitManager for account: %s in home dir: %s".format(account, gitRepositoriesLocation))
+        log.debug("Checking existance of %s", gitRepositoriesLocation)
+        checkOrCreateDir(gitRepositoriesLocation)
+        log.debug("Initializing repositories of %s in: %s".format(gitRepositoriesLocation, Repositories(RepositoryDB(db).toList)))
+    }
 
 
     def receive = traceReceive {
-        case Init =>
-            log.debug("Initializing repositories of %s in: %s".format(gitRepositoriesLocation, Repositories(RepositoryDB(db).toList)))
-            sender ! Success
 
         case ListRepositories =>
             log.trace("Listing git repositories in %s", gitRepositoriesLocation)

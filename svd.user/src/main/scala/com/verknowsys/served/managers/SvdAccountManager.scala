@@ -84,95 +84,52 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
     //             // Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
     //     }
 
+    override def preStart = {
+        super.preStart
+        log.info("SvdAccountManager is loading.")
+        log.debug("Registering file events for 'watchfile'")
+        registerFileEventFor(userHomePath / "watchfile", All, uid = account.uid)
 
+        log.debug("Getting database port from AccountsManager")
+        (accountsManager ? GetPort) onSuccess {
+            case dbPort: Int =>
+                log.debug("Got database port %d", dbPort)
+                // Start database server
+                val dbServer = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
+                val db = dbServer.openClient
 
-    log.info("Spawning applications of uid: %s".format(account.uid))
+                // log.info(SvdUserServices.newPhpWebAppEntry("Php", SvdUserDomain("deldaphp", false), account))
+
+                // log.info("Spawning user app: %s".format(_apps))
+                // _apps.start
+                // _apps !! Run /* temporary call due to lack of web interface */
+                // _apps !! Reload /* temporary call due to lack of web interface */
+                // self startLink _apps
+
+                val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)))
+                val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
+                val webManager = context.actorOf(Props(new SvdWebManager(account)))
+
+                // Start the real work
+                log.debug("Becaming started")
+                accountsManager ! Alive(account.uid)
+                context.become(started(db, dbServer, gitManager, notificationsManager, webManager))
+                log.trace("Sending Init once again")
+                self ! Init
+
+            case x =>
+                sender ! Error("DB initialization error. Got param: %s".format(x))
+                throwException[DBServerInitializationException]("DB initialization error. Got param: %s".format(x))
+        }
+
+    }
+
     // TODO: gather list of configurations from user config
 
     def receive = traceReceive {
-        case Init =>
-            log.info("SvdAccountManager received Init.")
-            log.debug("Registering file events for 'watchfile'")
-            registerFileEventFor(userHomePath / "watchfile", All, uid = account.uid)
-
-            // log.info("Spawning user databases: %s".format(_dbs))
-            // _dbs.start
-            // _dbs !! Run /* temporary call due to lack of web interface */
-            // self startLink _dbs
-
-            // Connect to database
-            // Get port from pool
-
-            log.debug("Getting database port from AccountsManager")
-            (accountsManager ? GetPort) onSuccess {
-                case dbPort: Int =>
-                    log.debug("Got database port %d", dbPort)
-                    // Start database server
-                    val dbServer = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
-                    val db = dbServer.openClient
-
-                    // log.info(SvdUserServices.newPhpWebAppEntry("Php", SvdUserDomain("deldaphp", false), account))
-
-
-
-                    // _dbServer = Some(server)
-                    // _dbClient = Some(db)
-
-                    // log.info("Spawning user app: %s".format(_apps))
-                    // _apps.start
-                    // _apps !! Run /* temporary call due to lack of web interface */
-                    // _apps !! Reload /* temporary call due to lack of web interface */
-                    // self startLink _apps
-
-
-
-                    // Start GitManager for this account
-
-                    val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)))
-                    (notificationsManager ? Init) onSuccess {
-                        case _ =>
-                            log.debug("Launching Notification Center")
-                            context.watch(notificationsManager)
-                    } onFailure {
-                        case x =>
-                            log.error("Failed to contact with Notification center! %s", x)
-                    }
-
-                    val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
-                    (gitManager ? Init) onSuccess {
-                        case _ =>
-                            log.debug("Setting log watch on git manager.")
-                            context.watch(gitManager)
-                    } onFailure {
-                        case x =>
-                            log.debug("Failed git manager init: %s", x)
-                    }
-
-                    val webManager = context.actorOf(Props(new SvdWebManager(account)))
-                    (webManager ? Init) onSuccess {
-                        case _ =>
-                            log.debug("Launching Web Manager")
-                            context.watch(webManager)
-                    } onFailure {
-                        case x =>
-                            log.error("Failed to contact with Web Manager! %s", x)
-                    }
-
-                    // Start the real work
-                    log.debug("Becaming started")
-                    accountsManager ! Alive(account.uid)
-                    context.become(started(db, dbServer, gitManager, notificationsManager, webManager))
-                    log.trace("Sending Init once again")
-                    self ! Init
-
-                case x =>
-                    sender ! Error("DB initialization error. Got param: %s".format(x))
-                    throwException[DBServerInitializationException]("DB initialization error. Got param: %s".format(x))
-            }
 
         // case AuthorizeWithKey(key: PublicKey) =>
         //     log.debug("WTF? Not started manager!")
-
 
         case Success =>
             log.debug("Got success")
@@ -272,7 +229,6 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                     // val server = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
                     val db = dbServer.openClient
                     val gm = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
-                    gm ! Init
 
                 case x =>
                     log.error("Wtf?: %s", x)
@@ -289,9 +245,16 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
             //         context.watch(gitManager)
             // }
 
+
+        // redirect user notification messages directly to notification center
+        case msg: Notify.Message =>
+            log.trace("Forwarding notification to Notification Center")
+            notificationsManager forward msg
+
         case msg: git.Base =>
             gitManager forward msg
     }
+
 
     protected def accountKeys(db: DBClient) = {
         val ak = AccountKeysDB(db).headOption

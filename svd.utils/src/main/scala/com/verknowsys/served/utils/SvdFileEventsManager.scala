@@ -173,7 +173,9 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler w
     }
 
     override def preStart {
+        super.preStart
         readerThread.start
+        log.info("SvdFileEventsManager initialized")
     }
 
     override def preRestart(reason: Throwable) {
@@ -186,11 +188,6 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler w
 
 
     def receive = {
-
-        case Init =>
-            log.debug("SvdFileEventsManager initialized")
-            sender ! Success
-
 
         // register new file event, sent from any actor
         case SvdRegisterFileEvent(path, flags, ref) =>

@@ -10,7 +10,6 @@ import akka.actor.Actor
 
 
 class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler with SvdUtils with Logging {
-    log.info("SvdNotificationCenter is loading")
 
     val gates: List[Gate] =
         new SvdXMPPGate(
@@ -21,25 +20,30 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler wit
             resource = SvdConfig.notificationXmppResource
         ) :: new SvdMailGate :: Nil
 
+
     override def preStart {
-        gates.foreach(_.connect)
         super.preStart
+        log.info("SvdNotificationCenter is loading")
+        gates.foreach(_.connect)
     }
 
 
     def receive = {
 
-        case Init =>
-            log.info("Initializing Notification Center")
-            sender ! Success
-
         case Notify.Status(status) =>
             log.debug("Setting status %s", status)
             gates.foreach(_ setStatus status)
+            sender ! Success
 
         case Notify.Message(msg) =>
             log.debug("Sending message %s", msg)
             gates.foreach(_ send msg)
+            sender ! Success
+
+        case x =>
+            log.debug("Unknown message: %s", x)
+            sender ! Success
+
     }
 
     override def postStop {

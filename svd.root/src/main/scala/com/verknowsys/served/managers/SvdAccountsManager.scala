@@ -269,19 +269,14 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     }
 
 
+    override def preStart = {
+        super.preStart
+        log.debug("SvdAccountsManager is starting. Running default task..")
+        respawnUsersActors
+    }
+
+
     def receive = {
-        case Init =>
-            log.debug("SvdAccountsManager received Init. Running default task..")
-
-
-
-            // log.info("Spawning Coreginx")
-            // coreginx.start
-            // coreginx ! Run
-
-            self ! RespawnAccounts
-            sender ! Success
-
 
         case Shutdown =>
             log.debug("Got Shutdown")
