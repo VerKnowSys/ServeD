@@ -109,18 +109,20 @@ trait SvdFileEventsReactor extends SvdExceptionHandler with Logging with SvdUtil
         val fem = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
         fem ! SvdUnregisterFileEvent(ref)
         log.debug("Unregistering events for Account Manager: %s", ref)
-        // ) onSuccess {
-        //     case _ =>
-        //         log.debug("Unregistered event.")
-        // } onFailure {
-        //     case x =>
-        //         log.error("Failure: %s", x)
-        // }
-        super.postStop // 2011-01-30 01:06:54 - dmilith - NOTE: execute SvdExceptionHandler's code
     }
 
-    override def preRestart(reason: Throwable) = unregisterFileEvents()
-    override def postStop = unregisterFileEvents()
+
+    override def preRestart(reason: Throwable) = {
+        log.warn("preRestart caused by reason: %s", reason)
+        unregisterFileEvents()
+        super.preRestart(reason)
+    }
+
+
+    override def postStop = {
+        unregisterFileEvents()
+        super.postStop
+    }
 }
 
 
