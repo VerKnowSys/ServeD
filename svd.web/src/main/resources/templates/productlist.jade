@@ -7,6 +7,9 @@ h3
   a(href="/product")= Dict("Add new product")
 
 .tshirts
+  - if (clothings.length == 0)
+    p= Dict("No clothing available")
+
   - for (cloth <- clothings)
     p= cloth
 
