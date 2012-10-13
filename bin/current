@@ -1,8 +1,9 @@
 #!/bin/sh
 
 version="$(cat VERSION)"
+build="$(cat BUILD)"
 branch="$(git name-rev --name-only HEAD)"
 sha="$(cat .git/refs/heads/${branch})"
-destination="${version}-${branch}-${sha}"
+destination="${version}-b${build}-${branch}-${sha}"
 echo $destination > svd.common/src/main/resources/FULLVERSION
 echo "Storing version of current sha into $destination"

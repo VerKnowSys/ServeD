@@ -54,7 +54,7 @@
     /* global constants */
 
     // #define DEVEL
-    #define APP_VERSION "0.2.7"
+    #define APP_VERSION "0.2.8"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -89,7 +89,7 @@
     #define ROOT_JAR_FILE "/sbin/root.core"
     #define USER_JAR_FILE "/bin/user.core"
 
-    #define DEFAULT_USER_UID 500
+    #define DEFAULT_USER_UID 501
     #define DEFAULT_GATHERING_PAUSE_MICROSECONDS 500000 // half a second
     #define DEFAULT_COUNT_OF_ROUNDS_OF_GATHERING 7200 // waiting half a second, hence 7200 is 60 minutes of gathering
     #define DEFAULT_USER_GROUP 0

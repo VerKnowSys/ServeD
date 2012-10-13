@@ -1,6 +1,7 @@
 import sbt._
 import sbt.Keys._
 
+import java.io.{File => JFile, FileWriter, PrintWriter}
 import scala.io.Source
 // import com.github.siasia.WebPlugin._
 // import coffeescript.CoffeeScript
@@ -16,10 +17,25 @@ import net.virtualvoid.sbt._
 
 object BuildSettings {
 
+    val buildnFile = "BUILD"
+    lazy val buildNumber = if (new File(buildnFile).exists) {
+        val value = Source.fromFile(buildnFile).mkString.trim.toInt + 1
+        val outFile = new FileWriter(buildnFile)
+        val out = new PrintWriter(outFile)
+        out.println(value)
+        out.close
+        value
+    } else {
+        val outFile = new FileWriter(buildnFile)
+        val out = new PrintWriter(outFile)
+        out.println("1")
+        out.close
+        1
+    }
 
     val buildSettings = Defaults.defaultSettings ++ Seq( // ++ GrowlingTests.growlSettings
         organization    := "VerKnowSys",
-        version         := Source.fromFile("VERSION").mkString,
+        version         := Source.fromFile("VERSION").mkString + "-b%d".format(buildNumber),
         scalaVersion    := Source.fromFile("VERSION-SCALA").mkString,
         resolvers       := Resolvers.all,
         logLevel        := Level.Info,
