@@ -18,7 +18,7 @@ import com.verknowsys.served.utils._
  *  @author dmilith
  */
 class SvdArchiverTest extends DefaultTest with Logging with SvdUtils {
-    val defaultTestUserID = 501
+    val defaultTestUserID = SvdConfig.defaultUserUID
     val tempDir = System.getProperty("user.dir") / "tmp"
     val defaultUser = Some(SvdAccount(uid = defaultTestUserID))
 
