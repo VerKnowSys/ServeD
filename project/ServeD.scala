@@ -122,7 +122,7 @@ object Dependencies {
     // val jetty = "org.mortbay.jetty" % "jetty" % "6.1.22" % "container"
     // val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.4.1.v20110513"
     val sshd = "org.apache.sshd" % "sshd-core" % "0.7.0"
-    val slf4japi = "org.slf4j" % "slf4j-api" % "1.7.1" // WARN: api change
+    val slf4japi = "org.slf4j" % "slf4j-api" % "1.6.6"
     val commonsio = "commons-io" % "commons-io" % "1.3.2"
     val webbit = "org.webbitserver" % "webbit" % "0.4.14"
     // val scalaz = "org.scalaz" % "scalaz-core_2.9.2" % "7.0.0-M3"
