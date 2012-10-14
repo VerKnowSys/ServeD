@@ -35,31 +35,26 @@ class SvdSystemManager extends SvdExceptionHandler {
     log.info("SvdSystemManager is loading")
 
 
+    override def preStart = {
+        super.preStart
+        log.debug("SvdSystemManager ready")
+
+        if (isBSD)
+            log.warn("SYSUSAGE: " + SvdLowLevelSystemAccess.usagesys(0))
+
+        log.debug("Updating system time")
+        SvdNtpSync()
+
+        log.info("Spawning Webbit WebSockets Server")
+        val webServer = WebServers.createWebServer(60006)
+          .add("/livemonitor", new SvdWebSocketsHandler)
+          // .add(new StaticFileHandler("/web"))
+          .start.get
+        log.info("WebSockets Server running at " + webServer.getUri)
+    }
+
+
     def receive = {
-        case Init =>
-            log.debug("SvdSystemManager ready")
-
-            if (isBSD)
-                log.warn("SYSUSAGE: " + SvdLowLevelSystemAccess.usagesys(0))
-
-            log.debug("Updating system time")
-            SvdNtpSync()
-
-            log.info("Spawning Webbit WebSockets Server")
-            val webServer = WebServers.createWebServer(60006)
-              .add("/livemonitor", new SvdWebSocketsHandler)
-              // .add(new StaticFileHandler("/web"))
-              .start.get
-            log.info("WebSockets Server running at " + webServer.getUri)
-
-            sender ! Success
-
-            // log.info("Sigar version loaded: %s".format(core.getVersion))
-            // log.debug("System Resources Availability: [%s]".format(SvdLowLevelSystemAccess))
-            // log.debug("Current PID: %d. System Information:\n%s".format(SvdLowLevelSystemAccess.getCurrentProcessPid, SvdLowLevelSystemAccess.getProcessInfo(SvdLowLevelSystemAccess.getCurrentProcessPid)))
-            // log.debug("Network configuration: GW: %s, DOMAIN: %s, HOST: %s, DNS1: %s, DNS2: %s",
-            //     SvdLowLevelSystemAccess.net.getDefaultGateway, SvdLowLevelSystemAccess.net.getDomainName, SvdLowLevelSystemAccess.net.getHostName, SvdLowLevelSystemAccess.net.getPrimaryDns, SvdLowLevelSystemAccess.net.getSecondaryDns
-            // )
 
         case GetUserProcesses(uid: Int) =>
             log.debug("Gathering user processes of %s".format(uid))

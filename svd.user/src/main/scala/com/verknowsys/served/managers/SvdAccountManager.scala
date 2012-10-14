@@ -112,10 +112,12 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
 
                 // Start the real work
                 log.debug("Becaming started")
-                accountsManager ! Alive(account.uid)
                 context.become(started(db, dbServer, gitManager, notificationsManager, webManager))
-                log.trace("Sending Init once again")
-                self ! Init
+                accountsManager ! Alive(account.uid)
+
+                // send availability of user to sshd manager
+                addDefaultAccessKey(db)
+                sshd ! InitSSHChannelForUID(account.uid)
 
             case x =>
                 sender ! Error("DB initialization error. Got param: %s".format(x))
@@ -164,13 +166,6 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
         //     log.warn("Shutting down Account manager of: %s", account)
         //     db.close
         //     dbServer.close
-
-        case Init =>
-            log.debug("Sending init to SSHD manager with uid: %d", account.uid)
-            // send availability of user to sshd manager
-            addDefaultAccessKey(db)
-            sshd ! InitSSHChannelForUID(account.uid)
-            sender ! Success
 
         case GetAccount =>
             sender ! account
