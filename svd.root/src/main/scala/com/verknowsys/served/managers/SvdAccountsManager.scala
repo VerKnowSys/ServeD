@@ -37,14 +37,15 @@ case object SvdUserUIDs extends DB[SvdUserUID]
  */
 class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
-    import events._
-
     val server = new DBServer(SvdConfig.remoteAccountServerPort, SvdConfig.systemHomeDir / SvdConfig.coreSvdAccountsDatabaseName)
     val db = server.openClient
 
     val rootAccount = SvdAccount("root", uid = 0)
     val svdAccountUtils = new SvdAccountUtils(db)
+
+    import events._
     import svdAccountUtils._
+
 
     log.info("SvdAccountsManager (v%s) is loading".format(SvdConfig.version))
 
@@ -93,21 +94,17 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
 
     override def preStart = {
         super.preStart
-        log.debug("SvdAccountsManager is starting. Running default task..")
+        log.debug("SvdAccountsManager is starting. Respawning per user Account Managers")
         respawnUsersActors
     }
 
 
     def receive = {
 
-        case Shutdown =>
-            log.debug("Got Shutdown")
-            sender ! Shutdown
-
-        case RespawnAccounts =>
-            log.trace("Respawning accounts")
-            respawnUsersActors
-            sender ! Success
+        // case RespawnAccounts =>
+        //     log.trace("Respawning accounts")
+        //     respawnUsersActors
+        //     sender ! Success
 
         case RegisterAccount(name) =>
             log.trace("Registering default account if not present")

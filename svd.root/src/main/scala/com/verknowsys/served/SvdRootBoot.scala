@@ -52,21 +52,21 @@ class SvdRootBoot extends Logging with SvdExceptionHandler {
     override def preStart = {
         super.preStart
         context.watch(fem)
+        context.watch(ssm)
         context.watch(sshd)
         context.watch(sam)
-        context.watch(ssm)
-        (sam ? RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
-            case _ =>
-                log.trace("Spawning Account Manager for each user.")
-                (sam ? RespawnAccounts) onSuccess {
-                    case _ =>
-                        log.info("Account Manager initialized and accounts should be spawned.")
-                } onFailure {
-                    case x =>
-                        log.error("Failure spawning accounts: %s", x)
-                        sys.exit(1)
-                }
-        }
+        // (sam ? RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
+        //     case _ =>
+        //         log.trace("Spawning Account Manager for each user.")
+        //         (sam ? RespawnAccounts) onSuccess {
+        //             case _ =>
+        //                 log.info("Account Manager initialized and accounts should be spawned.")
+        //         } onFailure {
+        //             case x =>
+        //                 log.error("Failure spawning accounts: %s", x)
+        //                 sys.exit(1)
+        //         }
+        // }
     }
 
 
