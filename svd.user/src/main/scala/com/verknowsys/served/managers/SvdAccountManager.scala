@@ -42,6 +42,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val sh = new SvdShell(account)
     val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
+    val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)))
     val sshd = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
     val userHomePath = SvdConfig.userHomeDir / "%s".format(account.uid)
 
@@ -106,9 +107,12 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                 // _apps !! Reload /* temporary call due to lack of web interface */
                 // self startLink _apps
 
-                val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)))
                 val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
                 val webManager = context.actorOf(Props(new SvdWebManager(account)))
+
+                context.watch(notificationsManager)
+                context.watch(gitManager)
+                context.watch(webManager)
 
                 // Start the real work
                 log.debug("Becaming started")
