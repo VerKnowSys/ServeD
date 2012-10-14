@@ -28,7 +28,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
 
         try {
             connection.login(login, password, resource)
-            log.info("XMPP login: " + login + ", pass:" + password + ", resource:" + resource)
+            log.trace("XMPP server: %s:%d, login: %s, resource: %s", host, port, login, resource)
         } catch {
             case x: Throwable =>
                 log.error("Error while connecting to Xmpp server. Please check login / password.")
@@ -46,7 +46,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
             }
         }
 
-        log.info("Number of users bound to be notified with repository changes: %s".format(chats.length))
+        log.debug("Number of users bound to be notified with repository changes: %s".format(chats.length))
         presence.setStatus("ServeD® XMPP Notification Plugin")
         presence.setMode(Presence.Mode.dnd)
         connection.sendPacket(presence)
@@ -61,19 +61,19 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
     def send(message: String) {
         chats.foreach { chatRecipient =>
             try {
-                log.info("Trying to send messages, to User: " + chatRecipient.getParticipant)
+                log.debug("Trying to send messages, to User: " + chatRecipient.getParticipant)
                 chatRecipient.sendMessage(message)
-                log.info("Sent message: " + message + " length: " + message.length)
+                log.trace("Sent message: " + message + " length: " + message.length)
             } catch {
                 case e: Throwable =>
-                    log.error("### Error " + e + "\nTrying to put commit onto list cause errors.")
+                    log.error("Error sending message caused: %s", e)
             }
         }
     }
 
 
     def processMessage(chat: Chat, message: org.jivesoftware.smack.packet.Message) {
-        log.trace("Received message: " + message + " (\"" + message.getBody + "\")")
+        log.trace("Received message: (\"" + message.getBody + "\")")
         // send(message.getBody)
         // if (message.getFrom.contains("verknowsys.com")) {
         //     trace("Message contains verknowsys: " + message.getFrom)
