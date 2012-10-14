@@ -28,6 +28,19 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler wit
     }
 
 
+    override def preRestart(reason: Throwable) {
+        log.debug("preRestart down Notification Center")
+        super.preRestart(reason)
+    }
+
+
+    override def postStop {
+        log.debug("Shutting down Notification Center. Disconnecting all gates.")
+        gates.foreach(_.disconnect)
+        super.postStop
+    }
+
+
     def receive = {
 
         case Notify.Status(status) =>
@@ -46,10 +59,6 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler wit
 
     }
 
-    override def postStop {
-        log.debug("Shutting down Notification Center. Disconnecting all gates.")
-        gates.foreach(_.disconnect)
-        super.postStop
-    }
+
 }
 

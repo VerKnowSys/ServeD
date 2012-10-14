@@ -112,14 +112,14 @@ trait SvdFileEventsReactor extends SvdExceptionHandler with Logging with SvdUtil
     }
 
 
-    override def preRestart(reason: Throwable) = {
+    override def preRestart(reason: Throwable) {
         log.warn("preRestart caused by reason: %s", reason)
         unregisterFileEvents()
         super.preRestart(reason)
     }
 
 
-    override def postStop = {
+    override def postStop {
         unregisterFileEvents()
         super.postStop
     }

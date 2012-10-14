@@ -159,23 +159,18 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
         // case GetUserProcessList =>
         //     val psAll = SvdLowLevelSystemAccess.processList(false)
         //     log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
+
+        // case Shutdown =>
+        //     log.warn("Shutting down Account manager of: %s", account)
+        //     db.close
+        //     dbServer.close
+
         case Init =>
             log.debug("Sending init to SSHD manager with uid: %d", account.uid)
             // send availability of user to sshd manager
             addDefaultAccessKey(db)
-
             sshd ! InitSSHChannelForUID(account.uid)
-
-            // adding default key:
-
             sender ! Success
-
-                //) onSuccess {
-            //     case Taken(x) =>
-            //         log.trace("SSHD taken by x: %s", x)
-            //         sshd ! Shutdown
-            //         sshd ! InitSSHChannelForUID(account.uid)
-            // }
 
         case GetAccount =>
             sender ! account
@@ -210,7 +205,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                     log.trace("File event type: Deleted")
                 case Renamed =>
                     log.trace("File event type: Renamed")
-                    gitManager ! Shutdown
+                    // gitManager ! Shutdown
                 case AttributesChanged =>
                     log.trace("File event type: AttributesChanged")
                     // gitManager ! RemoveRepository("somerepository")
@@ -220,23 +215,23 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                     log.trace("Got event: %s", x)
             }
 
-        case Terminated(ref) => // XXX: it seems to be super fucked up way to maintain actors. Use supervision Luke!
-            context.unwatch(ref)
-            context.stop(ref)
-            (accountsManager ? GetPort) onSuccess {
-                case dbPort: Int =>
-                    log.debug("Actor restart pending")
-                    // val server = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
-                    val db = dbServer.openClient
-                    val gm = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
+        // case Terminated(ref) => // XXX: it seems to be super fucked up way to maintain actors. Use supervision Luke!
+        //     context.unwatch(ref)
+        //     context.stop(ref)
+        //     (accountsManager ? GetPort) onSuccess {
+        //         case dbPort: Int =>
+        //             log.debug("Actor restart pending")
+        //             // val server = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
+        //             val db = dbServer.openClient
+        //             val gm = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
 
-                case x =>
-                    log.error("Wtf?: %s", x)
+        //         case x =>
+        //             log.error("Wtf?: %s", x)
 
-            } onFailure {
-                case x =>
-                    log.debug("Failure after Terminated signal")
-            }
+        //     } onFailure {
+        //         case x =>
+        //             log.debug("Failure after Terminated signal")
+        //     }
             // context.stop(ref)
             // val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
             // (gitManager ? Init) onSuccess {
@@ -264,21 +259,17 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
 
 
     override def postStop {
-        log.debug("Executing postStop for user svd UID: %s".format(account.uid))
-        // _apps.stop
-        // _dbs.stop
         sh.close
-        // _dbClient.foreach(_.close)
-        // _dbServer.foreach(_.close)
+        context.unbecome
+        log.debug("Executing postStop for user svd UID: %s".format(account.uid))
         super.postStop
     }
 
 
-    addShutdownHook {
-        log.warn("Got termination signal")
-        log.info("Shutting down Account Manager")
-        unregisterFileEvents(self)
-        system.shutdown // shutting down main account actor manager
+    override def preRestart(reason: Throwable) = {
+        log.warn("preRestart caused by reason: %s", reason)
+        super.preRestart(reason)
     }
+
 
 }
