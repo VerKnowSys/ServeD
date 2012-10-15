@@ -142,6 +142,13 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
             log.info("Becoming aware of new account: %s", account)
             log.debug("Alive accounts: %s".format(account :: accountsAlive))
 
+        case Admin.Dead(account) =>
+            val accountsWithoutThisOne = accountsAlive.filterNot{_.uuid == account.uuid}
+            context.become(
+                awareOfUserManagers(accountsWithoutThisOne))
+            log.info("Becoming aware of removed account: %s", account)
+            log.debug("Alive accounts: %s".format(accountsWithoutThisOne))
+
         case Admin.RespawnAccounts =>
             log.trace("Respawning accounts")
             respawnUsersActors

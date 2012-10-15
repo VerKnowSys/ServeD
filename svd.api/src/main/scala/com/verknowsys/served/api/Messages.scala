@@ -49,6 +49,7 @@ object Admin {
     case object GetPort extends Base
     case class GetSysUsage(userUid: Int) extends Base
     case class Alive(account: SvdAccount) extends Base
+    case class Dead(account: SvdAccount) extends Base
     case object AliveAccounts extends Base
 
     // Request
