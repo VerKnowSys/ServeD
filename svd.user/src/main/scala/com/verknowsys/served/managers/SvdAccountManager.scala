@@ -267,9 +267,9 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
     }
 
 
-    override def preRestart(reason: Throwable) = {
-        log.warn("preRestart caused by reason: %s", reason)
-        super.preRestart(reason)
+    override def preRestart(reason: Throwable, message: Option[Any]) = {
+        log.warn("preRestart caused by reason: %s and message: %s", reason, message)
+        super.preRestart(reason, message)
     }
 
 

@@ -31,9 +31,9 @@ class SvdGitManager(
     }
 
 
-    override def preRestart(cause: Throwable) = {
-        log.debug("preRestart of account: %s caused by: %s", account, cause)
-        super.preRestart(cause)
+    override def preRestart(cause: Throwable, message: Option[Any]) = {
+        log.debug("preRestart of account: %s caused by: %s with message: %s", account, cause, message)
+        super.preRestart(cause, message)
     }
 
 

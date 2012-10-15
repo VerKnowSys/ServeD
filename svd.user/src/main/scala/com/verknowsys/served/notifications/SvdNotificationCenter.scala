@@ -28,9 +28,9 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler wit
     }
 
 
-    override def preRestart(reason: Throwable) {
-        log.debug("preRestart down Notification Center")
-        super.preRestart(reason)
+    override def preRestart(reason: Throwable, message: Option[Any]) {
+        log.debug("preRestart down Notification Center with reason: %s and message: %s", reason, message)
+        super.preRestart(reason, message)
     }
 
 

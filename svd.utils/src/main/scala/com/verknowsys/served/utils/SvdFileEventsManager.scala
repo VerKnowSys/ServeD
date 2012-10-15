@@ -112,10 +112,10 @@ trait SvdFileEventsReactor extends SvdExceptionHandler with Logging with SvdUtil
     }
 
 
-    override def preRestart(reason: Throwable) {
-        log.warn("preRestart caused by reason: %s", reason)
+    override def preRestart(reason: Throwable, message: Option[Any]) {
+        log.warn("preRestart caused by reason: %s with message: %s", reason, message)
         unregisterFileEvents()
-        super.preRestart(reason)
+        super.preRestart(reason, message)
     }
 
 
@@ -180,7 +180,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler w
         log.info("SvdFileEventsManager initialized")
     }
 
-    override def preRestart(reason: Throwable) {
+    override def preRestart(reason: Throwable, message: Option[Any]) {
         readerThread.kill
     }
 
