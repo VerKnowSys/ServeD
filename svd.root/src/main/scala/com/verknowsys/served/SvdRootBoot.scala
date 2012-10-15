@@ -24,6 +24,16 @@ import akka.actor._
 
 class SvdRootBoot extends Logging with SvdExceptionHandler {
 
+    import akka.actor.OneForOneStrategy
+    import akka.actor.SupervisorStrategy._
+
+
+    override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 1 minute) {
+        case _: ArithmeticException      => Resume
+        case _: NullPointerException     => Restart
+        case _: IllegalArgumentException => Stop
+        case _: Exception                => Escalate
+    }
 
     val system = ActorSystem(SvdConfig.served, ConfigFactory.load.getConfig(SvdConfig.served))
     // core svd actors:

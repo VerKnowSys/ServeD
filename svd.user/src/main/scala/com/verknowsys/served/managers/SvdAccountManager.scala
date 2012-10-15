@@ -33,11 +33,21 @@ object AccountKeysDB extends DB[AccountKeys]
  */
 class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFileEventsReactor {
 
+    import akka.actor.OneForOneStrategy
+    import akka.actor.SupervisorStrategy._
+
+    override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 1 minute) {
+        case _: ArithmeticException      => Resume
+        case _: NullPointerException     => Restart
+        case _: IllegalArgumentException => Stop
+        case _: Exception                => Escalate
+    }
+
+
     import com.verknowsys.served.utils.events._
 
     class DBServerInitializationException extends Exception
 
-    log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
 
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val sh = new SvdShell(account)
@@ -87,7 +97,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
 
     override def preStart = {
         super.preStart
-        log.info("SvdAccountManager is loading.")
+        log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
         log.debug("Registering file events for 'watchfile'")
         registerFileEventFor(userHomePath / "watchfile", All, uid = account.uid)
 
