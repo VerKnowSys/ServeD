@@ -5,6 +5,7 @@ import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.api._
+import com.verknowsys.served.api.Admin._
 import com.verknowsys.served.db._
 import com.verknowsys.served._
 

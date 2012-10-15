@@ -9,8 +9,6 @@ import akka.actor.ActorRef
 
 // ServeD -> Client messages
 // common responses
-case object RespawnAccounts extends ApiResponse
-case class RegisterAccount(name: String) extends ApiResponse
 case object Success extends ApiResponse
 case object Shutdown extends ApiResponse
 case class Error(val message: String) extends ApiResponse
@@ -44,6 +42,15 @@ object General {
 object Admin {
     sealed abstract class Base extends ApiMessage
 
+    case object RespawnAccounts extends ApiResponse
+    case class RegisterAccount(name: String) extends ApiResponse
+    case class GetAccountManager(userUid: Int) extends Base
+
+    case object GetPort extends Base
+    case class GetSysUsage(userUid: Int) extends Base
+    case class Alive(account: SvdAccount) extends Base
+    case object AliveAccounts extends Base
+
     // Request
     case object ListTreeActors extends Base
     case object ListActors extends Base
@@ -58,10 +65,3 @@ object Admin {
         linkedActors: List[ActorInfo]
     )
 }
-
-// XXX: Temporary place for those messages
-case class GetAccountManager(userUid: Int)
-case class SetAccountManager(userUid: Int)
-case object GetPort
-case class GetSysUsage(userUid: Int)
-case class Alive(userUid: Int)

@@ -92,7 +92,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
         registerFileEventFor(userHomePath / "watchfile", All, uid = account.uid)
 
         log.debug("Getting database port from AccountsManager")
-        (accountsManager ? GetPort) onSuccess {
+        (accountsManager ? Admin.GetPort) onSuccess {
             case dbPort: Int =>
                 log.debug("Got database port %d", dbPort)
                 // Start database server
@@ -117,7 +117,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                 // Start the real work
                 log.debug("Becaming started")
                 context.become(started(db, dbServer, gitManager, notificationsManager, webManager))
-                accountsManager ! Alive(account.uid)
+
+                accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
 
                 // send availability of user to sshd manager
                 addDefaultAccessKey(db)
@@ -171,7 +172,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
         //     db.close
         //     dbServer.close
 
-        case GetAccount =>
+        case User.GetAccount =>
             sender ! account
 
         case AuthorizeWithKey(key) =>
