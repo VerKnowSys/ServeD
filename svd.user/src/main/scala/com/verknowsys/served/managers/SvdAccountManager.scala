@@ -31,7 +31,7 @@ object AccountKeysDB extends DB[AccountKeys]
  * @author dmilith
  * @author teamon
  */
-class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler with SvdFileEventsReactor with SvdUtils {
+class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFileEventsReactor {
 
     import com.verknowsys.served.utils.events._
 

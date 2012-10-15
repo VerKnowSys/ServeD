@@ -5,11 +5,11 @@ package com.verknowsys.served.systemmanager
 
 
 import com.verknowsys.served._
+import com.verknowsys.served.managers._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.api._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.Logging
-// import com.verknowsys.served.utils.GlobalActorRef
 
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -22,15 +22,12 @@ import org.webbitserver._
 import org.webbitserver.handler._
 
 
-// object SvdSystemManager //extends GlobalActorRef(actorOf[SvdSystemManager])
-
-
 /**
 *   @author dmilith
 *
 *   SvdSystemManager - responsible for System managment and monitoring
 */
-class SvdSystemManager extends SvdExceptionHandler {
+class SvdSystemManager extends SvdManager {
 
 
     override def preStart = {
