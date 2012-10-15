@@ -10,6 +10,7 @@ import com.verknowsys.served.systemmanager.SvdSystemManager
 // import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.sshd.SSHD
 import com.verknowsys.served.api._
+import com.verknowsys.served.api.Admin._
 
 import com.typesafe.config.ConfigFactory
 import akka.dispatch._
@@ -55,18 +56,21 @@ class SvdRootBoot extends Logging with SvdExceptionHandler {
         context.watch(ssm)
         context.watch(sshd)
         context.watch(sam)
-        // (sam ? RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
-        //     case _ =>
-        //         log.trace("Spawning Account Manager for each user.")
-        //         (sam ? RespawnAccounts) onSuccess {
-        //             case _ =>
-        //                 log.info("Account Manager initialized and accounts should be spawned.")
-        //         } onFailure {
-        //             case x =>
-        //                 log.error("Failure spawning accounts: %s", x)
-        //                 sys.exit(1)
-        //         }
-        // }
+        (sam ? RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
+            case _ =>
+                log.trace("Spawning Account Manager for each user.")
+                sam ! RegisterAccount("stefan") // XXX: hardcoded
+                sam ! RegisterAccount("waldek") // XXX: hardcoded
+                (sam ? RespawnAccounts) onSuccess {
+                    case _ =>
+                        log.info("Account Manager initialized and accounts should be spawned.")
+                } onFailure {
+                    case x =>
+                        log.error("Failure spawning accounts: %s", x)
+                        sys.exit(1)
+                }
+        }
+
     }
 
 

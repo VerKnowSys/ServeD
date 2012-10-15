@@ -88,10 +88,8 @@ class SvdGatherer(account: SvdAccount) extends SvdManager {
 
 
     def receive = {
-        case Init =>
-            sender ! Success
 
-        case GetSysUsage(uid: Int) =>
+        case Admin.GetSysUsage(uid: Int) =>
             sender ! Some(gather(uid))
 
         case x =>

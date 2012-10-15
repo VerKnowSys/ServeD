@@ -5,6 +5,19 @@ import com.verknowsys.served.api.pools._
 
 
 /**
+ *  API object for user messages:
+ */
+object User {
+
+    case object AccountNotFound
+
+    case class GetAccount(uid: Int)
+    case class GetAccountByName(name: String)
+
+}
+
+
+/**
  * SvdAccount describes one virtual svd User
  *
  * @author dmilith
@@ -25,10 +38,6 @@ case class SvdAccount (
 
 }
 
-case object AccountNotFound
-
-case class GetAccount(uid: Int)
-case class GetAccountByName(name: String)
 
 /**
  *  @author dmilith

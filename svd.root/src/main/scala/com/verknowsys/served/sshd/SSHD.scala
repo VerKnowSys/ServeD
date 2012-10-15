@@ -63,43 +63,43 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
     def receive = {
 
         case InitSSHChannelForUID(forUID: Int) =>
-            log.debug("Got shell base for uid: %d", forUID)
-            (sender ? ListKeys) onSuccess {
-                case set: Set[_] =>
-                    log.trace("Listing user SSH keys: %s", set)
+            // log.debug("Got shell base for uid: %d", forUID)
+            // (sender ? ListKeys) onSuccess {
+            //     case set: Set[_] =>
+            //         log.trace("Listing user SSH keys: %s", set)
 
-                    (ssm ? GetAccount(forUID)) onSuccess {
-                        case Some(account: SvdAccount) =>
-                            val list = set.asInstanceOf[Set[AccessKey]]
-                            log.debug("Become available for uid %d", account.uid)
-                            context.become(started(list, account))
-                            sshd.setPublickeyAuthenticator(new PublicKeyAuth(list, account))
-                            sshd.setShellFactory(new SvdShellFactory(
-                                Array(
-                                    SvdConfig.servedShell,
-                                    "%d".format(account.uid),
-                                    defaultShell,
-                                    "-i",
-                                    "-s"
-                                )
-                            ))
-                            sshd.start
+            //         (ssm ? GetAccount(forUID)) onSuccess {
+            //             case Some(account: SvdAccount) =>
+            //                 val list = set.asInstanceOf[Set[AccessKey]]
+            //                 log.debug("Become available for uid %d", account.uid)
+            //                 context.become(started(list, account))
+            //                 sshd.setPublickeyAuthenticator(new PublicKeyAuth(list, account))
+            //                 sshd.setShellFactory(new SvdShellFactory(
+            //                     Array(
+            //                         SvdConfig.servedShell,
+            //                         "%d".format(account.uid),
+            //                         defaultShell,
+            //                         "-i",
+            //                         "-s"
+            //                     )
+            //                 ))
+            //                 sshd.start
 
-                        case x =>
-                            sender ! Error("We don't like this: %s".format(x))
+            //             case x =>
+            //                 sender ! Error("We don't like this: %s".format(x))
 
-                    } onFailure {
-                        case x =>
-                            sender ! Error("I'm trying, but, come on. Wtf?: %s".format(x))
-                    }
+            //         } onFailure {
+            //             case x =>
+            //                 sender ! Error("I'm trying, but, come on. Wtf?: %s".format(x))
+            //         }
 
-                case x =>
-                    sender ! Error("Got something weird for uid %d - %s".format(forUID, x))
+            //     case x =>
+            //         sender ! Error("Got something weird for uid %d - %s".format(forUID, x))
 
-            } onFailure {
-                case x =>
-                    sender ! Error("Failed to ask for user SSHD keys with error: %s".format(x))
-            }
+            // } onFailure {
+            //     case x =>
+            //         sender ! Error("Failed to ask for user SSHD keys with error: %s".format(x))
+            // }
 
 
         case Shutdown =>

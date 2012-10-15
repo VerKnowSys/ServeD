@@ -47,7 +47,7 @@ object userboot extends Logging with SvdUtils {
         val system = ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDremote"))
         val accountsManager = system.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
 
-        (accountsManager ? GetAccount(userUID)) onSuccess {
+        (accountsManager ? User.GetAccount(userUID)) onSuccess {
 
             case Some(account: SvdAccount) =>
 

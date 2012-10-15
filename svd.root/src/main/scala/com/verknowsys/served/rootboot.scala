@@ -43,6 +43,7 @@ object rootboot extends Logging with SvdUtils with App {
         println("===   ServeD - core   ===")
         println("=========================")
         println()
+        println()
         log.info(SvdConfig.servedFull)
         log.info(SvdConfig.copyright)
 
