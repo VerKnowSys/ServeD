@@ -73,9 +73,6 @@ class SvdWebManager(account: SvdAccount) extends SvdExceptionHandler with SvdFil
                 // sender ! Success
                 // web.Server(webPort) // this one is blocking
                 spawnServer(webPort)
-
-            case x =>
-                log.error("Web Panel failed: %s", x)
         }
     }
 
@@ -84,6 +81,10 @@ class SvdWebManager(account: SvdAccount) extends SvdExceptionHandler with SvdFil
 
         case Success =>
             log.debug("Success in WebManager")
+
+        case x: Notify.Message => // forward Notify messages from web panel
+            log.debug("Web Panel got a message: %s. Forwarding to Account Manager", x)
+            accountManager forward x
 
         case x =>
             val m = "Unknown SvdWebManager message: %s".format(x)
