@@ -99,14 +99,19 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     }
 
 
-    def receive = {
+    def awareOfUserManagers(accountsAlive: List[SvdAccount]): Receive = {
 
-        // case RespawnAccounts =>
-        //     log.trace("Respawning accounts")
-        //     respawnUsersActors
-        //     sender ! Success
+        case User.GetAccount(uid) =>
+            val account = SvdAccounts(db)(_.uid == uid).headOption
+            log.debug("GetAccount(%d): %s", uid, account)
+            sender ! account
 
-        case RegisterAccount(name) =>
+        case User.GetAccountByName(name) =>
+            val account = SvdAccounts(db)(_.userName == name).headOption
+            log.debug("GetAccountByName(%s): %s", name, account)
+            sender ! account
+
+        case Admin.RegisterAccount(name) =>
             log.trace("Registering default account if not present")
             if (name == SvdConfig.defaultUserName) {
                 if (!userUIDRegistered(SvdConfig.defaultUserUID)) {
@@ -120,16 +125,6 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
                 sender ! Success
             }
 
-        case GetAccount(uid) =>
-            val account = SvdAccounts(db)(_.uid == uid).headOption
-            log.debug("GetAccount(%d): %s", uid, account)
-            sender ! account
-
-        case GetAccountByName(name) =>
-            val account = SvdAccounts(db)(_.userName == name).headOption
-            log.debug("GetAccountByName(%s): %s", name, account)
-            sender ! account
-
         // case SetAccountManager(uid) =>
         //     // SvdGlobalRegistry.ActorManagers.values += (uid -> self)
         //     log.info("User worker spawned successfully and mounted in SvdGlobalRegistry. Current store: %s", SvdGlobalRegistry.ActorManagers.values)
@@ -139,17 +134,21 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
         //     log.trace("GetAccountManager(%d)", uid)
         //     sender ! (SvdGlobalRegistry.ActorManagers.values get uid getOrElse AccountNotFound)
 
-        case Alive(uid) =>
+        case Admin.Alive(account) =>
             // sender ! Error("Not yet implemented")
             // add uid manager to list of active managers?
-            log.trace("UID %d is alive", uid)
+            context.become(
+                awareOfUserManagers(account :: accountsAlive))
+            log.info("Becoming aware of new account: %s", account)
+            log.debug("Alive accounts: %s".format(account :: accountsAlive))
+
+        case Admin.RespawnAccounts =>
+            log.trace("Respawning accounts")
+            respawnUsersActors
             sender ! Success
 
-        case GetPort =>
+        case Admin.GetPort =>
             sender ! randomUserPort
-
-        case Success =>
-            log.debug("Got success")
 
         case SvdFileEvent(path, flags) =>
             log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))
@@ -168,6 +167,9 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
                     log.trace("Got event: %s", x)
             }
 
+        case Success =>
+            log.debug("Got success")
+
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
             sender ! Error("Unknown signal %s".format(x))
@@ -175,14 +177,17 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
     }
 
 
+    def receive = { awareOfUserManagers(Nil) }
+
+
     private def respawnUsersActors {
         userAccounts.foreach{
             account =>
 
                 // TODO: add routine to respawn only non spawned/new accounts? Currently it's handled by kickstart
-                val authKeysFile = SvdConfig.userHomeDir / "%s".format(account.uid) / ".ssh" / "authorized_keys"
-                log.debug("Registering file event routine for %s", authKeysFile)
-                registerFileEventFor(authKeysFile, All) // Modified | Deleted | Renamed | AttributesChanged
+                // val authKeysFile = SvdConfig.userHomeDir / "%s".format(account.uid) / ".ssh" / "authorized_keys"
+                // log.debug("Registering file event routine for %s", authKeysFile)
+                // registerFileEventFor(authKeysFile, All) // Modified | Deleted | Renamed | AttributesChanged
 
                 log.warn("Spawning account: %s".format(account))
                 new SvdShell(account).exec(new SvdShellOperation(SvdConfig.kickApp + " " + account.uid))
