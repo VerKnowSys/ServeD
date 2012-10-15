@@ -26,7 +26,7 @@ import net.liftweb.json._
 import akka.actor._
 
 
-class SvdAccountPanel(webManager: ActorRef, account: SvdAccount) extends Plan with Logging with SvdUtils {
+class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Plan with Logging with SvdUtils {
 
     import QParams._
     import net.liftweb.json.JsonAST._
@@ -34,78 +34,6 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount) extends Plan wi
     import webImplicits._
     import com.verknowsys.served.db._
     import com.verknowsys.served.web.merch._
-
-
-    // def defineSomeRandomProducts = {
-    //     val letter = new SpatialLetter(
-    //         color = Color.Yellow,
-    //         project = ProjectType.Predefined
-    //         )
-    //     val sticker = new Sticker(
-    //         color = Color.Blue,
-    //         project = ProjectType.UserDefined,
-    //         stickerType = StickerType.Wall
-    //         )
-    //     val tshirt = new Tshirt(
-    //         category = ClothingCategory.Polo,
-    //         color = Color.Red,
-    //         printSize = PrintSize.A5,
-    //         printPlacement = TshirtPrintPlacement.Sleeve,
-    //         project = ProjectType.UserDefined,
-    //         size = Size.S
-    //         )
-    //     val letter2 = new SpatialLetter(
-    //         color = Color.Red,
-    //         project = ProjectType.UserDefined
-    //         )
-    //     val sticker2 = new Sticker(
-    //         color = Color.Black,
-    //         project = ProjectType.PredefinedVe,
-    //         stickerType = StickerType.Standard
-    //         )
-    //     val tshirt2 = new Tshirt(
-    //         category = ClothingCategory.Blouse,
-    //         color = Color.Yellow,
-    //         printSize = PrintSize.A6,
-    //         printPlacement = TshirtPrintPlacement.Rear,
-    //         project = ProjectType.Predefined,
-    //         size = Size.XL
-    //         )
-
-    //     db << letter
-    //     db << sticker
-    //     db << tshirt
-    //     db << tshirt2
-    //     db << sticker2
-    //     db << letter2
-    //     log.info("Products defined")
-    // }
-
-
-    // def productBindings =
-    //     Binding(name = "productClass", className = "String") ::
-    //     Binding(name = "productCategory", className = "com.verknowsys.served.web.merch.ClothingCategory") ::
-    //     Binding(name = "productColor", className = "com.verknowsys.served.web.merch.Color") ::
-    //     Binding(name = "productPrintSize", className = "com.verknowsys.served.web.merch.PrintSize") ::
-    //     Binding(name = "productPrintPlacement", className = "com.verknowsys.served.web.merch.TshirtPrintPlacement") ::
-    //     Binding(name = "productProject", className = "com.verknowsys.served.web.merch.ProjectType") ::
-    //     Binding(name = "productStickerType", className = "com.verknowsys.served.web.merch.StickerType") ::
-    //     Binding(name = "productSize", className = "com.verknowsys.served.web.merch.Size") ::
-    //     Binding(name = "productDescription", className = "String") ::
-    //     Binding(name = "messages", className = "String") :: Nil
-
-
-    // def productDefaultAttributes =
-    //     ("productClass", "Clothing") ::
-    //     ("productCategory", ClothingCategory.Tshirt) ::
-    //     ("productColor", Color.White) ::
-    //     ("productPrintSize", PrintSize.A4) ::
-    //     ("productPrintPlacement", TshirtPrintPlacement.Front) ::
-    //     ("productProject", ProjectType.PredefinedVector) ::
-    //     ("productSize", Size.XXL) ::
-    //     ("productStickerType", StickerType.Standard) ::
-    //     ("productDescription", Dict("Product description")) ::
-    //     ("messages", Dict("Enter new product information")) :: Nil
 
 
     def intent = {
@@ -116,7 +44,6 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount) extends Plan wi
                 Binding(name = "account", className = "com.verknowsys.served.api.SvdAccount") :: Nil
             implicit val additionalAttributes = ("account", account) :: Nil
 
-            webManager ! Notify.Message("Siema")
             log.debug("GET /")
             Ok ~> Scalate(req, "/templates/index.jade")
 
