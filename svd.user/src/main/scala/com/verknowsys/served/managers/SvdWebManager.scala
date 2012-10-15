@@ -45,26 +45,26 @@ class SvdWebManager(val account: SvdAccount) extends SvdExceptionHandler with Sv
         super.preStart
         log.info("Launching SvdWebManager")
         log.debug("Getting web panel port from AccountsManager")
-        (accountsManager ? GetPort) onSuccess {
-            case webPort: Int =>
-                log.trace("Got web panel port %d", webPort)
+        // (accountsManager ? GetPort) onSuccess {
+        //     case webPort: Int =>
+        //         log.trace("Got web panel port %d", webPort)
 
-                (accountManager ? Notify.Message("Web panel started for you on port: %d".format(webPort))
-                ) onSuccess {
-                    case _ =>
-                        log.debug("Success notifying")
-                } onFailure {
-                    case x =>
-                        log.debug("Failure: %s", x)
-                }
-                // context.become(started(webPort))
-                log.debug("Launching jetty for UID: %d", account.uid)
-                sender ! Success
-                web.Server(webPort) // this one is blocking
+        //         (accountManager ? Notify.Message("Web panel started for you on port: %d".format(webPort))
+        //         ) onSuccess {
+        //             case _ =>
+        //                 log.debug("Success notifying")
+        //         } onFailure {
+        //             case x =>
+        //                 log.debug("Failure: %s", x)
+        //         }
+        //         // context.become(started(webPort))
+        //         log.debug("Launching jetty for UID: %d", account.uid)
+        //         sender ! Success
+        //         web.Server(webPort) // this one is blocking
 
-            case x =>
-                log.error("Web Panel failed: %s", x)
-        }
+        //     case x =>
+        //         log.error("Web Panel failed: %s", x)
+        // }
     }
 
 
