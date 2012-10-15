@@ -43,6 +43,9 @@ object rootboot extends Logging with SvdUtils with App {
         println("===   ServeD - core   ===")
         println("=========================")
         println()
+        println()
+        log.info(SvdConfig.servedFull)
+        log.info(SvdConfig.copyright)
 
         val rb = system.actorOf(Props(new SvdRootBoot).withDispatcher("svd-core-dispatcher"))
         addShutdownHook {
@@ -50,10 +53,6 @@ object rootboot extends Logging with SvdUtils with App {
         }
 
     }
-
-
-    log.info(SvdConfig.servedFull)
-    log.info(SvdConfig.copyright)
 
     // handle signals
     handleSignal("ABRT") { getAllLiveThreads }
