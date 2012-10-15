@@ -108,7 +108,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                 // self startLink _apps
 
                 val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
-                val webManager = context.actorOf(Props(new SvdWebManager(account)))
+                val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"))
 
                 context.watch(notificationsManager)
                 context.watch(gitManager)
@@ -116,7 +116,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
 
                 // Start the real work
                 log.debug("Becaming started")
-                context.become(started(db, dbServer, gitManager, notificationsManager, webManager))
+                context.become(
+                    started(db, dbServer, gitManager, notificationsManager, webManager))
 
                 accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
 

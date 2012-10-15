@@ -97,29 +97,16 @@ class SvdWebManager(account: SvdAccount) extends SvdExceptionHandler with SvdFil
     def spawnServer(port: Int) = {
         val base = new URL(getClass.getResource("/public/"), ".")
         val http = Http(port)
-        val panel = new SvdAccountPanel(self, account)
+        val panel = new SvdAccountPanel(self, account, port)
 
-        val th = new Thread {
-            override def run = {
-                http
-                    .context("/assets") {
-                        _.resources(base)
-                    }
-                    .filter(panel)
-                    .run({
-                        svr =>
-                            Browser.open(http.url) // TODO: if development
-                    }, {
-                        svr =>
-                            // panel.terminate
-                            log.info("Shutting down Web Panel for account: %s", account)
-                    })
+        http
+            .context("/assets") {
+                _.resources(base)
             }
-        }
-        th.setDaemon(true)
-        th.start
-        th.join
+            .filter(panel)
+            .start // spawn embeded version of server
 
+        self ! Notify.Message("Your panel has been started for user: %s at: http://%s:%d".format(account.userName, "127.0.0.1", port)) // XXX : hardcoded host.
     }
 
 
