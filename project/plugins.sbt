@@ -23,3 +23,5 @@ addSbtPlugin("com.jsuereth" % "xsbt-gpg-plugin" % "0.6")
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.6.0")
 
 addSbtPlugin("me.lessis" % "sbt-growl-plugin" % "0.1.3")
+
+addSbtPlugin("me.lessis" % "less-sbt" % "0.1.10")

@@ -1,11 +1,7 @@
 import sbt._
 import sbt.Keys._
-
 import java.io.{File => JFile, FileWriter, PrintWriter}
 import scala.io.Source
-// import com.github.siasia.WebPlugin._
-// import coffeescript.CoffeeScript
-import sbtassembly._
 import sbtassembly.Plugin._
 import AssemblyKeys._
 import cc.spray.revolver.RevolverPlugin._
@@ -13,6 +9,7 @@ import coffeescript.Plugin.coffeeSettings
 import coffeescript.Plugin.CoffeeKeys
 import coffeescript.Plugin.CoffeeKeys._
 import net.virtualvoid.sbt._
+import less.Plugin._
 
 
 object BuildSettings {
@@ -195,21 +192,14 @@ object ServeD extends Build {
 
 
     lazy val web = Project("web", file("svd.web"),
-        settings = buildSettings ++ coffeeSettings ++ Revolver.settings ++ Seq(
+        settings = buildSettings ++ coffeeSettings ++ lessSettings ++ Revolver.settings ++ Seq(
                 (resourceManaged in (Compile, CoffeeKeys.coffee)) <<= (crossTarget in Compile)(_ / "classes" / "public" / "js"),
+                (resourceManaged in (Compile, LessKeys.less)) <<= (crossTarget in Compile)(_ / "classes" / "public" / "css"),
                 libraryDependencies ++= Seq(
                     unfilteredFilter, unfilteredJetty, scalate, scalateUtil, liftJson
                 )
             )
         ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, common, utils, testing % "test")
-
-    // lazy val web = Project("web", file("svd.web"),
-    //     settings = buildSettings ++ webSettings ++ Seq(
-    //         libraryDependencies ++= Seq(
-    //             scalate, servlet, jetty
-    //         )
-    //     ) //++ CoffeeScript.coffeeSettings
-    // ) dependsOn(utils, testing % "test")
 
 
     lazy val testing = Project("testkit", file("svd.testing"),
@@ -217,5 +207,6 @@ object ServeD extends Build {
             libraryDependencies ++= Seq(scalatest, akkaTestkit, commonsio, bouncycastle)
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api)
+
 
 }
