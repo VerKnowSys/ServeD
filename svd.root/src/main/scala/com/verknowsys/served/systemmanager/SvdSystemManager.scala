@@ -32,18 +32,16 @@ import org.webbitserver.handler._
 */
 class SvdSystemManager extends SvdExceptionHandler {
 
-    log.info("SvdSystemManager is loading")
-
 
     override def preStart = {
         super.preStart
-        log.debug("SvdSystemManager ready")
+        log.info("SvdSystemManager is loading")
 
         if (isBSD)
             log.warn("SYSUSAGE: " + SvdLowLevelSystemAccess.usagesys(0))
 
         log.debug("Updating system time")
-        SvdNtpSync()
+        SvdNtpSync
 
         log.info("Spawning Webbit WebSockets Server")
         val webServer = WebServers.createWebServer(60006)
@@ -72,9 +70,9 @@ class SvdSystemManager extends SvdExceptionHandler {
             // log.warn("Network usage (bytes): IN: %s, OUT: %s".format(SvdLowLevelSystemAccess.netstat.getTcpInboundTotal, SvdLowLevelSystemAccess.netstat.getTcpOutboundTotal))
             // self reply Success
 
-        case Quit =>
-            log.info("Quitting SvdSystemManager")
-            sys.exit(0)
+        // case Quit =>
+        //     log.info("Quitting SvdSystemManager")
+        //     sys.exit(0)
 
         case Chown(what, userId, recursive) =>
             log.debug("Chown called on location: '%s' with uid: %s, recursive: %s".format(what, userId, recursive))

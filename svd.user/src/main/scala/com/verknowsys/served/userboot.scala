@@ -27,8 +27,6 @@ object userboot extends Logging with SvdUtils {
 
 
     def run(userUID: Int){
-        log.info("ServeD v" + SvdConfig.version)
-        log.info(SvdConfig.copyright)
 
         println()
         println()
@@ -37,6 +35,8 @@ object userboot extends Logging with SvdUtils {
         println("=========================")
         println()
         println()
+        log.info("ServeD v" + SvdConfig.version)
+        log.info(SvdConfig.copyright)
 
         // Get account form remote service
         log.debug("Getting account for uid %d", userUID)
