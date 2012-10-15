@@ -76,6 +76,10 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
             log.debug("Web Panel got a message: %s. Forwarding to Account Manager", x)
             accountManager forward x
 
+        case x: UserWeb.RegisterDomain =>
+            log.debug("Web Panel requested RegisterDomain. Forwarding to Account Manager")
+            accountManager forward x
+
         case x =>
             val m = "Unknown SvdWebManager message: %s".format(x)
             log.warn("%s".format(m))

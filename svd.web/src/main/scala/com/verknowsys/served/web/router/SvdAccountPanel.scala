@@ -82,7 +82,7 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
                     log.debug("Given domain: %s", domain)
                     (webManager ? UserWeb.RegisterDomain(domain)) onSuccess {
                         case _ =>
-                            log.info("Registered user domain: %s", domain)
+                            log.info("Succesfully answered api request for domain: %s", domain)
                     } onFailure {
                         case x =>
                             log.error("A problem occured: %s", x)
