@@ -139,14 +139,14 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
             // add uid manager to list of active managers?
             context.become(
                 awareOfUserManagers(account :: accountsAlive))
-            log.info("Becoming aware of new account: %s", account)
+            log.info("Becoming aware of alive account: %s", account)
             log.debug("Alive accounts: %s".format(account :: accountsAlive))
 
         case Admin.Dead(account) =>
             val accountsWithoutThisOne = accountsAlive.filterNot{_.uuid == account.uuid}
             context.become(
                 awareOfUserManagers(accountsWithoutThisOne))
-            log.info("Becoming aware of removed account: %s", account)
+            log.info("Becoming aware of dead account: %s", account)
             log.debug("Alive accounts: %s".format(accountsWithoutThisOne))
 
         case Admin.RespawnAccounts =>
@@ -196,7 +196,7 @@ class SvdAccountsManager extends SvdExceptionHandler with SvdFileEventsReactor {
                 // log.debug("Registering file event routine for %s", authKeysFile)
                 // registerFileEventFor(authKeysFile, All) // Modified | Deleted | Renamed | AttributesChanged
 
-                log.warn("Spawning account: %s".format(account))
+                log.trace("Spawning account: %s".format(account))
                 new SvdShell(account).exec(new SvdShellOperation(SvdConfig.kickApp + " " + account.uid))
         }
     }
