@@ -60,7 +60,7 @@ class SvdRootBoot extends Logging with SvdExceptionHandler {
             case _ =>
                 log.trace("Spawning Account Manager for each user.")
                 sam ! RegisterAccount("stefan") // XXX: hardcoded
-                sam ! RegisterAccount("waldek") // XXX: hardcoded
+                // sam ! RegisterAccount("waldek") // XXX: hardcoded
                 (sam ? RespawnAccounts) onSuccess {
                     case _ =>
                         log.info("Account Manager initialized and accounts should be spawned.")
