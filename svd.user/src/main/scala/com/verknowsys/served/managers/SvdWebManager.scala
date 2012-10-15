@@ -50,6 +50,7 @@ class SvdWebManager(account: SvdAccount) extends SvdExceptionHandler with SvdFil
         super.postStop
     }
 
+
     override def preStart = {
         super.preStart
         log.info("Starting Web Manager for uid: %s".format(account.uid))
@@ -59,19 +60,7 @@ class SvdWebManager(account: SvdAccount) extends SvdExceptionHandler with SvdFil
             case webPort: Int =>
                 log.trace("Got web panel port %d", webPort)
 
-                // (accountManager ? Notify.Message("Web panel started for you on port: %d".format(webPort))
-                // ) onSuccess {
-                //     case _ =>
-                //         log.debug("Success notifying")
-                // } onFailure {
-                //     case x =>
-                //         log.debug("Failure: %s", x)
-                // }
-
-                // context.become(started(webPort))
                 log.debug("Launching Web Panel for UID: %d", account.uid)
-                // sender ! Success
-                // web.Server(webPort) // this one is blocking
                 spawnServer(webPort)
         }
     }
