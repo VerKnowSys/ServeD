@@ -24,6 +24,15 @@ import java.net.URL
 import unfiltered.filter.Plan
 import net.liftweb.json._
 import akka.actor._
+import akka.dispatch._
+import akka.pattern.ask
+
+
+/**
+ *  @author dmilith
+ *
+ *  Web API is used to perform communication with web manager
+ */
 
 
 class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Plan with Logging with SvdUtils {
@@ -36,18 +45,57 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
     import com.verknowsys.served.web.merch._
 
 
+    implicit val bindings: List[Binding] =
+            Binding(name = "account", className = "com.verknowsys.served.api.SvdAccount") :: Nil
+
+    implicit val additionalAttributes = ("account", account) :: Nil
+
+
     def intent = {
 
-        case req @ _ =>
 
-            implicit val bindings: List[Binding] =
-                Binding(name = "account", className = "com.verknowsys.served.api.SvdAccount") :: Nil
-            implicit val additionalAttributes = ("account", account) :: Nil
+        case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil))) =>
+            log.debug("POST /RegisterDomain by path")
+
+            log.debug("Given domain: %s", domain)
+            (webManager ? UserWeb.RegisterDomain(domain)) onSuccess {
+                case _ =>
+                    log.info("Registered user domain: %s", domain)
+                    JsonContent ~> ResponseString("{\"message\": \"Domain registered by path.\"}")
+
+            } onFailure {
+                case x =>
+                    log.error("Failure happened: %s", x)
+                    JsonContent ~> ResponseString("{\"message\": \"Failure registering domain.\"}")
+            }
+            JsonContent ~> ResponseString("{\"message\": \"Finished\"}")
+
+
+
+        case req @ POST(Path(Seg("RegisterDomain" :: Nil)) & Params(params)) =>
+            log.debug("POST /RegisterDomain from params")
+
+            def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
+
+            param("RegisterDomain") match {
+                case domain: String =>
+                    log.debug("Given domain: %s", domain)
+                    (webManager ? UserWeb.RegisterDomain(domain)) onSuccess {
+                        case _ =>
+                            log.info("Registered user domain: %s", domain)
+                    } onFailure {
+                        case x =>
+                            log.error("A problem occured: %s", x)
+                    }
+            }
+            JsonContent ~> ResponseString("{\"message\": \"Domain registered from params.\"}")
+
+
+        case req @ _ =>
 
             log.debug("GET /")
             Ok ~> Scalate(req, "/templates/index.jade")
 
-        // case req @ GET(Path(Seg("productlist" :: Nil))) =>
         //     log.debug("GET /productlist")
 
         //     val clothings = Clothings(db)

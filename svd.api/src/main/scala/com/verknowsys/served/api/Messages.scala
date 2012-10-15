@@ -24,6 +24,7 @@ object Notify {
     case class Status(content: String) extends Base
 }
 
+
 object General {
     sealed abstract class Base extends ApiMessage
 
@@ -38,6 +39,15 @@ object General {
         val Connected, Disconnected = Value
     }
 }
+
+
+object UserWeb {
+    sealed abstract class Base extends ApiMessage
+
+    case class RegisterDomain(domain: String) extends Base
+
+}
+
 
 object Admin {
     sealed abstract class Base extends ApiMessage
