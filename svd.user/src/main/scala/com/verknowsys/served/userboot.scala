@@ -19,10 +19,6 @@ import akka.actor._
 import scala.io.Source
 
 
-// object LocalAccountsManager //extends GlobalActorRef(
-//     remote.actorFor("service:accounts-manager", SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
-// )
-
 object userboot extends Logging with SvdUtils {
 
 
