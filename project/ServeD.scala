@@ -4,7 +4,7 @@ import java.io.{File => JFile, FileWriter, PrintWriter}
 import scala.io.Source
 import sbtassembly.Plugin._
 import AssemblyKeys._
-import cc.spray.revolver.RevolverPlugin._
+// import cc.spray.revolver.RevolverPlugin._
 import coffeescript.Plugin.coffeeSettings
 import coffeescript.Plugin.CoffeeKeys
 import coffeescript.Plugin.CoffeeKeys._
@@ -192,7 +192,7 @@ object ServeD extends Build {
 
 
     lazy val web = Project("web", file("svd.web"),
-        settings = buildSettings ++ coffeeSettings ++ lessSettings ++ Revolver.settings ++ Seq(
+        settings = buildSettings ++ coffeeSettings ++ lessSettings ++ Seq( // ++ Revolver.settings
                 (resourceManaged in (Compile, CoffeeKeys.coffee)) <<= (crossTarget in Compile)(_ / "classes" / "public" / "js"),
                 (resourceManaged in (Compile, LessKeys.less)) <<= (crossTarget in Compile)(_ / "classes" / "public" / "css"),
                 libraryDependencies ++= Seq(
