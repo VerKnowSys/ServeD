@@ -18,7 +18,7 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler wit
             login = SvdConfig.notificationXmppLogin,
             password = SvdConfig.notificationXmppPassword,
             resource = SvdConfig.notificationXmppResource
-        ) :: new SvdMailGate :: Nil
+        ) :: Nil // new SvdMailGate :: Nil
 
 
     override def preStart {
