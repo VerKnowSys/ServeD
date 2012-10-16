@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ `uname -s` = "Darwin" ]; then
+  kill `cat /Users/501/501.pid`
+  sudo chown dmilith /Users/501/akka.conf
+  sleep 2
+  /usr/bin/java -d32 -client -Xmn1m -XX:NewRatio=1 -Xms16m -Xmx64m -Dfile.encoding=UTF-8 -javaagent:/lib/jrebel/jrebel.jar -cp $(cat tmp/user.classpath) com.verknowsys.served.userboot 501
+else
+  echo "Not implemented"
+fi
+
