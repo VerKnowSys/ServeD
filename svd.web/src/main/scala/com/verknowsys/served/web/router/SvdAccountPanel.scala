@@ -56,9 +56,8 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
 
         case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil))) =>
             log.debug("POST /RegisterDomain by path")
-
-            log.debug("Given domain: %s", domain)
-            (webManager ? UserWeb.RegisterDomain(domain)) onSuccess {
+            log.info("Given domain to be registered: %s", domain)
+            (webManager ? System.RegisterDomain(domain)) onSuccess {
                 case _ =>
                     log.info("Registered user domain: %s", domain)
                     JsonContent ~> ResponseString("{\"message\": \"Domain registered by path.\"}")
@@ -80,7 +79,7 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
             param("RegisterDomain") match {
                 case domain: String =>
                     log.debug("Given domain: %s", domain)
-                    (webManager ? UserWeb.RegisterDomain(domain)) onSuccess {
+                    (webManager ? System.RegisterDomain(domain)) onSuccess {
                         case _ =>
                             log.info("Succesfully answered api request for domain: %s", domain)
                     } onFailure {

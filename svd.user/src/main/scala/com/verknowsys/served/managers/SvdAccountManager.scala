@@ -205,7 +205,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
         case Success =>
             log.debug("Received Success")
 
-        case UserWeb.RegisterDomain(domain) =>
+        case System.RegisterDomain(domain) =>
             log.info("Registering domain: %s", domain)
             log.warn("NYI")
             sender ! Success
