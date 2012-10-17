@@ -41,14 +41,6 @@ object General {
 }
 
 
-object UserWeb {
-    sealed abstract class Base extends ApiMessage
-
-    case class RegisterDomain(domain: String) extends Base
-
-}
-
-
 object Admin {
     sealed abstract class Base extends ApiMessage
 
@@ -75,4 +67,20 @@ object Admin {
         status: String,
         linkedActors: List[ActorInfo]
     )
+}
+
+
+object System {
+    sealed abstract class Base extends ApiMessage
+
+    case object GetRunningProcesses extends Base
+    case object GetNetstat extends Base
+
+    case class GetUserProcesses(uid: Int) extends Base
+    case class SpawnProcess(cmd: String) extends Base
+    case class KillProcess(what: Int, signal: Any) extends Base
+    case class Chmod(what: String, mode: Int, recursive: Boolean) extends Base
+    case class Chown(what: String, userId: Int, recursive: Boolean) extends Base
+
+    case class RegisterDomain(domain: String) extends Base
 }
