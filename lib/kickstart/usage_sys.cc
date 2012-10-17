@@ -9,7 +9,18 @@
 extern std::string escapeJsonString(const std::string& input);
 
 
-#ifndef __APPLE__
+#ifdef __APPLE__
+extern "C" {
+    const char* getProcessUsage(int uid, bool consoleOutput) {
+        stringstream out;
+        mach_timespec_t ts;
+        clock_get_time(REALTIME_CLOCK, &ts);
+        out << "{\"time\": \"" << ts.tv_sec << "\"}";
+        return out.str().c_str();
+    }
+}
+#else
+
 extern "C" {
 
     #define ord(c) ((int)(unsigned char)(c))
