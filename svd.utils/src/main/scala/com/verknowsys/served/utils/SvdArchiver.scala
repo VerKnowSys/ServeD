@@ -4,7 +4,7 @@
 package com.verknowsys.served.utils
 
 import com.verknowsys.served._
-import com.verknowsys.served.api._
+import com.verknowsys.served.api.SvdAccount
 
 import de.schlichtherle.io._
 import de.schlichtherle.key._

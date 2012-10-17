@@ -8,7 +8,7 @@ import com.verknowsys.served.utils.events._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.systemmanager.managers._
-import com.verknowsys.served.api._
+import com.verknowsys.served.api.{SvdUserPort, SvdUserUID, SvdAccount, SvdSystemPort}
 import com.verknowsys.served.api.pools._
 import com.verknowsys.served.services._
 

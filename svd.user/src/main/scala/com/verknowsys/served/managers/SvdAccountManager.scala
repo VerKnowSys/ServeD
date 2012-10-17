@@ -52,6 +52,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val sh = new SvdShell(account)
     val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
+    val systemManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSystemManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
     val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)))
     val sshd = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
     val userHomePath = SvdConfig.userHomeDir / "%s".format(account.uid)
@@ -205,10 +206,14 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
         case Success =>
             log.debug("Received Success")
 
-        case UserWeb.RegisterDomain(domain) =>
+        case System.RegisterDomain(domain) =>
             log.info("Registering domain: %s", domain)
             log.warn("NYI")
             sender ! Success
+
+        case x: System.Base =>
+            log.debug("Forwarding message: %s to System Manager", x)
+            systemManager forward x
 
         case SvdFileEvent(path, flags) =>
             log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))

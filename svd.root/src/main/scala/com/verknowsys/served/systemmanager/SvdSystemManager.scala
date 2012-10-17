@@ -33,9 +33,7 @@ class SvdSystemManager extends SvdManager {
     override def preStart = {
         super.preStart
         log.info("SvdSystemManager is loading")
-
-        if (isBSD)
-            log.warn("SYSUSAGE: " + SvdLowLevelSystemAccess.usagesys(0))
+        log.warn("SYSUSAGE: " + SvdLowLevelSystemAccess.usagesys(0))
 
         log.debug("Updating system time")
         SvdNtpSync
@@ -51,15 +49,12 @@ class SvdSystemManager extends SvdManager {
 
     def receive = {
 
-        case GetUserProcesses(uid: Int) =>
+        case System.GetUserProcesses(uid: Int) =>
             log.debug("Gathering user processes of %s".format(uid))
-            if (isBSD)
-                sender ! SvdLowLevelSystemAccess.usagesys(uid)
-            else
-                sender ! Error("NOT-IMPLEMENTED on this OS! Do it on FreeBSD host.")
+            sender ! SvdLowLevelSystemAccess.usagesys(uid)
 
 
-        case GetNetstat =>
+        case System.GetNetstat =>
             sender ! Error("Not implemented")
             // XXX: NOTE: TODO: this function causes SIGSEGV on FreeBSD. This requires some investigation!
 
@@ -71,12 +66,12 @@ class SvdSystemManager extends SvdManager {
         //     log.info("Quitting SvdSystemManager")
         //     sys.exit(0)
 
-        case Chown(what, userId, recursive) =>
+        case System.Chown(what, userId, recursive) =>
             log.debug("Chown called on location: '%s' with uid: %s, recursive: %s".format(what, userId, recursive))
             chown(what, userId, SvdConfig.defaultUserGroup, recursive)
             sender ! Success
 
-        case Chmod(what, mode, recursive) =>
+        case System.Chmod(what, mode, recursive) =>
             log.debug("Chmod called on location: '%s' with mode: %s (recursively: %s)".format(what, mode, recursive))
             chmod(what, mode, recursive)
             sender ! Success

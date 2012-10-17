@@ -25,6 +25,8 @@ import unfiltered.filter.Plan
 import net.liftweb.json._
 import akka.actor._
 import akka.dispatch._
+import akka.util.Timeout
+import akka.util.duration._
 import akka.pattern.ask
 
 
@@ -53,12 +55,22 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
 
     def intent = {
 
+        case req @ POST(Path(Seg("GetUserProcesses" :: Nil))) =>
+            log.debug("POST on GetUserProcesses")
+            implicit val timeout = Timeout(5 seconds)
+            val res = (webManager ? System.GetUserProcesses(account.uid)) onSuccess {
+                case x: String =>
+                    log.info("Got usage data: %s", x)
+                    x
+            }
+            val result = Await.result(res, timeout.duration).asInstanceOf[String]
+            JsonContent ~> ResponseString(result)
+
 
         case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil))) =>
             log.debug("POST /RegisterDomain by path")
-
-            log.debug("Given domain: %s", domain)
-            (webManager ? UserWeb.RegisterDomain(domain)) onSuccess {
+            log.info("Given domain to be registered: %s", domain)
+            (webManager ? System.RegisterDomain(domain)) onSuccess {
                 case _ =>
                     log.info("Registered user domain: %s", domain)
                     JsonContent ~> ResponseString("{\"message\": \"Domain registered by path.\"}")
@@ -73,14 +85,14 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
 
 
         case req @ POST(Path(Seg("RegisterDomain" :: Nil)) & Params(params)) =>
-            log.debug("POST /RegisterDomain from params")
+            log.debug("POST /RegisterDomain from form params")
 
             def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
 
             param("RegisterDomain") match {
                 case domain: String =>
                     log.debug("Given domain: %s", domain)
-                    (webManager ? UserWeb.RegisterDomain(domain)) onSuccess {
+                    (webManager ? System.RegisterDomain(domain)) onSuccess {
                         case _ =>
                             log.info("Succesfully answered api request for domain: %s", domain)
                     } onFailure {
