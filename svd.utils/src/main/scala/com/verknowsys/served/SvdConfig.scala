@@ -67,6 +67,7 @@ object SvdConfig {
     def sleepDefaultPause               = 1000
     def gatherTimeout                   = 1000
     def defaultUserAkkaConf             = "/defaultUserAkkaConf.conf"
+    def defaultAkkaConfName             = ".akka.conf"
     def standardShellEnvironment        = ". /etc/profile\nulimit -u 120\n"
     def notificationMailUser            = "notifications"
     def notificationMailPassword        = "mkonjibhu"

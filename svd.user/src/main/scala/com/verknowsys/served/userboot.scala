@@ -36,7 +36,7 @@ object userboot extends Logging with SvdUtils {
 
         // Get account form remote service
         log.debug("Getting account for uid %d", userUID)
-        val configFile = SvdConfig.userHomeDir / "%d".format(userUID) / "akka.conf"
+        val configFile = SvdConfig.userHomeDir / "%d".format(userUID) / SvdConfig.defaultAkkaConfName
         val akkaConfigContent = Source.fromFile(configFile).getLines.mkString("\n")
         log.trace("Read akka configuration for account: %s", akkaConfigContent)
 

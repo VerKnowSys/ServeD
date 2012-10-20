@@ -70,7 +70,7 @@ class SvdAccountUtils(db: DBClient) extends Logging with SvdUtils {
      *   creates akka configuration file for given user
      */
     def createAkkaUserConfIfNotExistant(uid: Int, userManagerPort: Int) = {
-        val configFile = SvdConfig.userHomeDir / "%d".format(uid) / "akka.conf"
+        val configFile = SvdConfig.userHomeDir / "%d".format(uid) / SvdConfig.defaultAkkaConfName
 
         if (!new File(configFile).exists) {
             log.debug("Akka config: %s not found. Generating default one", configFile)
