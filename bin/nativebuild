@@ -1,21 +1,31 @@
 #!/bin/sh
 # @author dmilith
 
-export DEVEL="false"
-if [ "$1" = "devel" ]; then
-    export DEVEL="true"
-fi
+unset JDK7
 
 system="$(uname)"
-export FLAGS="-Os -fPIC"
+CC="gcc"
+CXX="g++"
+STRIP="strip"
+FLAGS="-Os -fPIC"
+DEVEL="false"
+
+if [ "$1" = "devel" ]; then
+    export DEVEL="true"
+elif [ "$1" = "7" ]; then
+    export JDK7=1
+    export FLAGS="$FLAGS -DJDK7"
+fi
+
 if [ "$DEVEL" = "true" ]; then
     echo "Devel enabled"
     export FLAGS="$FLAGS -DDEVEL"
 fi
-CC="gcc"
-CXX="g++"
-STRIP="strip"
 
+if [ "$2" = "7" ]; then
+    export JDK7=1
+    export FLAGS="$FLAGS -DJDK7"
+fi
 
 if [ -e "/usr/bin/clang++" ]; then
     CXX="clang++"
@@ -26,6 +36,11 @@ echo "System: $system"
 echo "C compiler: $CC"
 echo "C++ compiler: $CXX"
 echo "Flags: $FLAGS"
+if [ -z "$JDK7" ]; then
+    echo "Platform: Java 1.6"
+else
+    echo "Platform: Java: 1.7"
+fi
 echo
 
 check() {
