@@ -99,6 +99,10 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
     override def preStart = {
         super.preStart
         log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
+        log.debug("Starting user redis service")
+        val redis = context.actorOf(Props(new SvdService("Redis", account)))
+        redis ! Run
+
         log.debug("Registering file events for 'watchfile'")
         registerFileEventFor(userHomePath / "watchfile", All, uid = account.uid)
 

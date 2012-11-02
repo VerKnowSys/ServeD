@@ -50,6 +50,8 @@ if [ "$?" = "0" ]; then
         rootcheck && \
         bin/nativeinstall
     fi
+    bin/ignitersuninstall
+    bin/ignitersinstall
     echo "Done. Success!"
 else
     echo "Done. Failure!"
