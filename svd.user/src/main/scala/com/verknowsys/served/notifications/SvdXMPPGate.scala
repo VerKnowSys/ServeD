@@ -61,7 +61,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
     def send(message: String) {
         chats.foreach { chatRecipient =>
             try {
-                log.debug("Trying to send messages, to User: " + chatRecipient.getParticipant)
+                log.trace("Trying to send messages, to User: " + chatRecipient.getParticipant)
                 chatRecipient.sendMessage(message)
                 log.trace("Sent message: " + message + " length: " + message.length)
             } catch {
