@@ -1,8 +1,8 @@
 {
     "name": "Redis",
     "install": {
-        "commands": ["if [ `uname` = 'Darwin' ]; then sofin install redis; fi"],
-        "expectStdOut": [""],
+        "commands": ["echo 'dupa'"],
+        "expectStdOut": ["dupa"],
         "expectStdErr": [],
         "expectOutputTimeout": 2
     },
