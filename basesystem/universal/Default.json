@@ -9,48 +9,48 @@
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 30
+        "expectOutputTimeout": 0
     },
     "configure":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 30
+        "expectOutputTimeout": 0
     },
     "start":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 30
+        "expectOutputTimeout": 0
     },
     "afterStart":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 30
+        "expectOutputTimeout": 0
     },
     "stop":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 30
+        "expectOutputTimeout": 0
     },
     "afterStop":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 30
+        "expectOutputTimeout": 0
     },
     "reload":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 30
+        "expectOutputTimeout": 0
     },
     "validate": {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 30
+        "expectOutputTimeout": 0
     }
 }
