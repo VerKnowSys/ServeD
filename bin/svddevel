@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ `uname -s` = "Darwin" ]; then
-  sudo mkdir /Users/Common
+  sudo mkdir -p /Users/Common
   sudo chown 501 /Users/Common
   bin/ignitersuninstall && bin/ignitersinstall
   kill `cat /Users/501/501.pid`
