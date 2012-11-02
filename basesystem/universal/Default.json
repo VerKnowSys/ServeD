@@ -1,58 +1,56 @@
 {
-    "auto-restart": true,
-    "report-all-errors": true,
-    "report-all-warnings": true,
-    "report-all-infos": false,
-    "report-all-debugs": false,
-    "report-all-traces": false,
+    "autoStart": true,
+    "autoRestart": true,
+    "reportAllErrors": true,
+    "reportAllInfos": true,
 
     "name": "service-name",
     "install": {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "waitForOutputFor": 30
+        "expectOutputTimeout": 30
     },
     "configure":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "waitForOutputFor": 30
+        "expectOutputTimeout": 30
     },
     "start":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "waitForOutputFor": 30
+        "expectOutputTimeout": 30
     },
     "afterStart":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "waitForOutputFor": 30
+        "expectOutputTimeout": 30
     },
     "stop":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "waitForOutputFor": 30
+        "expectOutputTimeout": 30
     },
     "afterStop":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "waitForOutputFor": 30
+        "expectOutputTimeout": 30
     },
     "reload":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "waitForOutputFor": 30
+        "expectOutputTimeout": 30
     },
     "validate": {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "waitForOutputFor": 30
+        "expectOutputTimeout": 30
     }
 }

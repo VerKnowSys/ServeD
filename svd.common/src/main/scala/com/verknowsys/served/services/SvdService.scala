@@ -10,7 +10,7 @@ import com.verknowsys.served.utils._
 import net.liftweb.json._
 import scala.io._
 import java.io.File
-import akka.actor.Actor
+import akka.actor._
 
 
 /**
@@ -40,63 +40,66 @@ class SvdServiceConfigLoader(name: String) extends Logging {
 
     val config = SvdServiceConfig( // OPTIMIZE: this should be done automatically
         name = (appTemplateMerged \ "name").extract[String],
+        autoRestart = (appTemplateMerged \ "autoRestart").extract[Boolean],
+        autoStart = (appTemplateMerged \ "autoStart").extract[Boolean],
+        reportAllErrors = (appTemplateMerged \ "reportAllErrors").extract[Boolean],
+        reportAllInfos = (appTemplateMerged \ "reportAllInfos").extract[Boolean],
         install = SvdShellOperations(
                 commands = (appTemplateMerged \ "install" \ "commands").extract[List[String]],
                 expectStdOut = (appTemplateMerged \ "install" \ "expectStdOut").extract[List[String]],
                 expectStdErr = (appTemplateMerged \ "install" \ "expectStdErr").extract[List[String]],
-                waitForOutputFor = (appTemplateMerged \ "install" \ "waitForOutputFor").extract[Int]
+                expectOutputTimeout = (appTemplateMerged \ "install" \ "expectOutputTimeout").extract[Int]
             ),
         configure = SvdShellOperations(
                 commands = (appTemplateMerged \ "configure" \ "commands").extract[List[String]],
                 expectStdOut = (appTemplateMerged \ "configure" \ "expectStdOut").extract[List[String]],
                 expectStdErr = (appTemplateMerged \ "configure" \ "expectStdErr").extract[List[String]],
-                waitForOutputFor = (appTemplateMerged \ "configure" \ "waitForOutputFor").extract[Int]
+                expectOutputTimeout = (appTemplateMerged \ "configure" \ "expectOutputTimeout").extract[Int]
             ),
         start = SvdShellOperations(
                 commands = (appTemplateMerged \ "start" \ "commands").extract[List[String]],
                 expectStdOut = (appTemplateMerged \ "start" \ "expectStdOut").extract[List[String]],
                 expectStdErr = (appTemplateMerged \ "start" \ "expectStdErr").extract[List[String]],
-                waitForOutputFor = (appTemplateMerged \ "start" \ "waitForOutputFor").extract[Int]
+                expectOutputTimeout = (appTemplateMerged \ "start" \ "expectOutputTimeout").extract[Int]
             ),
         afterStart = SvdShellOperations(
                 commands = (appTemplateMerged \ "afterStart" \ "commands").extract[List[String]],
                 expectStdOut = (appTemplateMerged \ "afterStart" \ "expectStdOut").extract[List[String]],
                 expectStdErr = (appTemplateMerged \ "afterStart" \ "expectStdErr").extract[List[String]],
-                waitForOutputFor = (appTemplateMerged \ "afterStart" \ "waitForOutputFor").extract[Int]
+                expectOutputTimeout = (appTemplateMerged \ "afterStart" \ "expectOutputTimeout").extract[Int]
             ),
         stop = SvdShellOperations(
                 commands = (appTemplateMerged \ "stop" \ "commands").extract[List[String]],
                 expectStdOut = (appTemplateMerged \ "stop" \ "expectStdOut").extract[List[String]],
                 expectStdErr = (appTemplateMerged \ "stop" \ "expectStdErr").extract[List[String]],
-                waitForOutputFor = (appTemplateMerged \ "stop" \ "waitForOutputFor").extract[Int]
+                expectOutputTimeout = (appTemplateMerged \ "stop" \ "expectOutputTimeout").extract[Int]
             ),
         afterStop = SvdShellOperations(
                 commands = (appTemplateMerged \ "afterStop" \ "commands").extract[List[String]],
                 expectStdOut = (appTemplateMerged \ "afterStop" \ "expectStdOut").extract[List[String]],
                 expectStdErr = (appTemplateMerged \ "afterStop" \ "expectStdErr").extract[List[String]],
-                waitForOutputFor = (appTemplateMerged \ "afterStop" \ "waitForOutputFor").extract[Int]
+                expectOutputTimeout = (appTemplateMerged \ "afterStop" \ "expectOutputTimeout").extract[Int]
             ),
         reload = SvdShellOperations(
                 commands = (appTemplateMerged \ "reload" \ "commands").extract[List[String]],
                 expectStdOut = (appTemplateMerged \ "reload" \ "expectStdOut").extract[List[String]],
                 expectStdErr = (appTemplateMerged \ "reload" \ "expectStdErr").extract[List[String]],
-                waitForOutputFor = (appTemplateMerged \ "reload" \ "waitForOutputFor").extract[Int]
+                expectOutputTimeout = (appTemplateMerged \ "reload" \ "expectOutputTimeout").extract[Int]
             ),
         validate = SvdShellOperations(
                 commands = (appTemplateMerged \ "validate" \ "commands").extract[List[String]],
                 expectStdOut = (appTemplateMerged \ "validate" \ "expectStdOut").extract[List[String]],
                 expectStdErr = (appTemplateMerged \ "validate" \ "expectStdErr").extract[List[String]],
-                waitForOutputFor = (appTemplateMerged \ "validate" \ "waitForOutputFor").extract[Int]
+                expectOutputTimeout = (appTemplateMerged \ "validate" \ "expectOutputTimeout").extract[Int]
             )
         )
 
 }
 
 
-class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExceptionHandler {
+class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsManager: ActorRef) extends SvdExceptionHandler {
 
-
-    val shell = new SvdShell(account)
+    lazy val shell = new SvdShell(account)
     lazy val installIndicator = new File(
         if (account.uid == 0)
             SvdConfig.systemHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / config.name.toLowerCase + "." + SvdConfig.installed
@@ -172,26 +175,52 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
     def validateHook = config.validate
 
 
+    /**
+     *  @author dmilith
+     *
+     *   hookShot is a safe way to launch service hooks
+     */
+    def hookShot(hook: SvdShellOperations, hookName: String) {
+        // catch exceptions from expectinator:
+        try {
+            shell.exec(hook)
+            val msg = "--- INFO ---\nPerforming %s of service: %s\n------------\n".format(hookName, config.name)
+            log.trace(msg)
+            if (config.reportAllInfos)
+                notificationsManager ! Notify.Message(msg)
+        } catch {
+            case x: expectj.TimeoutException =>
+                val msg = "=== ERROR ===\nHook %s of service: %s failed to pass expectations: CMD: '%s', OUT: '%s', ERR: '%s'.\n=============\n".format(hookName, config.name, hook.commands.mkString(" "), hook.expectStdOut, hook.expectStdErr)
+                log.error(msg)
+                if (config.reportAllErrors)
+                    notificationsManager ! Notify.Message(msg)
+
+            case x: Exception =>
+                val msg = "### FATAL ###\nThrown exception in hook: %s of service: %s an exception content below:\n%s\n#############\n".format(hookName, config.name, x)
+                log.error(msg)
+                if (config.reportAllErrors)
+                    notificationsManager ! Notify.Message(msg)
+        }
+    }
+
+
     override def preStart = {
         log.debug("SvdService install started for: %s".format(config.name))
 
         /* check for previous installation */
         log.trace("Looking for %s file to check software installation status".format(installIndicator))
         if (!installIndicator.exists) {
-            log.info("Performing installation of software: %s".format(config.name))
-            log.trace("Installing service: %s".format(installHook))
-            shell.exec(installHook)
-            log.trace("Configuring service: %s".format(configureHook))
-            shell.exec(configureHook)
+            hookShot(installHook, "install")
+            hookShot(configureHook, "configure")
         } else {
             log.info("Service software already installed and configured: %s".format(config.name))
         }
-
-        log.trace("Performing validation of service for software: %s".format(validateHook))
-        shell.exec(validateHook)
-
+        hookShot(validateHook, "validate")
+        if (config.autoStart) {
+            hookShot(startHook, "start")
+            hookShot(afterStartHook, "afterStart")
+        }
     }
-
 
 
     def receive = {
@@ -202,24 +231,17 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
          *   Reload by default should be SIGHUP signal sent to process pid
          */
         case Reload =>
-            log.trace("Validating service configuration: %s".format(validateHook))
-            shell.exec(validateHook)
-            log.trace("Reloading service: %s".format(reloadHook))
-            shell.exec(reloadHook)
-            sender ! Success
+            hookShot(validateHook, "validate")
+            hookShot(reloadHook, "reload")
 
         /**
          *  @author dmilith
          *
-         *   Run should be sent when we want to start this service.
+         *   Explicit method to launch service
          */
         case Run =>
-            log.info("SvdService with name %s has been started".format(config.name))
-            log.trace("startHook: %s".format(startHook))
-            shell.exec(startHook)
-            log.trace("afterStartHook: %s".format(afterStartHook))
-            shell.exec(afterStartHook)
-            sender ! Success
+            hookShot(startHook, "start")
+            hookShot(afterStartHook, "afterStart")
 
         /**
          *  @author dmilith
@@ -227,23 +249,18 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
          *   Quit should be sent when we want to stop this service
          */
         case Quit =>
-            log.trace("Executing stopHook command: %s", stopHook)
-            shell.exec(stopHook)
-            log.trace("Executing afterStopHook command: %s", afterStopHook)
-            shell.exec(afterStopHook)
+            hookShot(stopHook, "stop")
+            hookShot(afterStopHook, "afterStop")
 
-            // shell.close
-            sender ! Success
-
+        case Success =>
+            log.trace("Success in SvdService from %s".format(sender.getClass.getName))
     }
 
 
     override def postStop {
-        log.trace("stopHook: %s".format(stopHook))
-        shell.exec(stopHook)
-        log.trace("afterStopHook: %s".format(afterStopHook))
-        shell.exec(afterStopHook)
-        shell.close
+        hookShot(stopHook, "stop")
+        hookShot(afterStopHook, "afterStop")
+        // shell.close
         log.info("Stopped SvdService: %s".format(config.name))
         super.postStop
     }

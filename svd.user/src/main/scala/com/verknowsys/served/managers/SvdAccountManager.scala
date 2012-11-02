@@ -53,7 +53,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
     val sh = new SvdShell(account)
     val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
     val systemManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSystemManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
-    val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)))
+    val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)), "SvdNotificationCenter")
     val sshd = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
     val userHomePath = SvdConfig.userHomeDir / "%s".format(account.uid)
 
@@ -99,9 +99,6 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
     override def preStart = {
         super.preStart
         log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
-        log.debug("Starting user redis service")
-        val redis = context.actorOf(Props(new SvdService("Redis", account)))
-        redis ! Run
 
         log.debug("Registering file events for 'watchfile'")
         registerFileEventFor(userHomePath / "watchfile", All, uid = account.uid)
@@ -139,6 +136,10 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
                 // send availability of user to sshd manager
                 addDefaultAccessKey(db)
                 sshd ! InitSSHChannelForUID(account.uid)
+
+                // user services start from this point:
+                log.debug("Starting user redis service")
+                val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager)))
 
             case x =>
                 sender ! Error("DB initialization error. Got param: %s".format(x))

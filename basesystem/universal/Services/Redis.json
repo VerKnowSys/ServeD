@@ -1,9 +1,9 @@
 {
     "name": "Redis",
     "install": {
-        "commands": ["sofin install redis"],
-        "expectStdOut": ["All done. Reloading configuration of"],
+        "commands": ["echo 'dupa'"],
+        "expectStdOut": ["dupa"],
         "expectStdErr": [],
-        "waitForOutputFor": 10
+        "expectOutputTimeout": 2
     },
 }
