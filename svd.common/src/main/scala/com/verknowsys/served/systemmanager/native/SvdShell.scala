@@ -68,7 +68,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
             shell.stop
         } catch {
             case e: Exception =>
-                log.error(e.getMessage + " on exit")
+                log.warn("%s on exit from shell.".format(e))
         }
     }
 
