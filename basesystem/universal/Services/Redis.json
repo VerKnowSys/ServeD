@@ -1,0 +1,9 @@
+{
+    "name": "Redis",
+    "install": {
+        "commands": ["sofin install redis"],
+        "expectStdOut": ["All done. Reloading configuration of"],
+        "expectStdErr": [],
+        "waitForOutputFor": 10
+    },
+}
