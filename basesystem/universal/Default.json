@@ -1,10 +1,8 @@
 {
-    "auto-restart": true,
-    "report-all-errors": true,
-    "report-all-warnings": true,
-    "report-all-infos": false,
-    "report-all-debugs": false,
-    "report-all-traces": false,
+    "autoStart": true,
+    "autoRestart": true,
+    "reportAllErrors": true,
+    "reportAllInfos": true,
 
     "name": "service-name",
     "install": {
