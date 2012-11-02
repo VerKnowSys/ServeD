@@ -34,9 +34,9 @@ class SvdServiceConfigLoader(name: String) extends Logging {
 
     // val svcName = (appSpecificTemplate \\ "name").extract[String]
     log.debug("Extracted SvdServiceConfig from igniter: %s.".format(name))
-    log.trace("Default template: %s".format(defaultTemplate))
-    log.trace("App template: %s".format(appSpecificTemplate))
-    log.trace("Merged template: %s".format(appTemplateMerged))
+    // log.trace("Default template: %s".format(defaultTemplate))
+    // log.trace("App template: %s".format(appSpecificTemplate))
+    log.trace("Merged template: %s".format(compact(render(appTemplateMerged))))
 
     val config = SvdServiceConfig( // OPTIMIZE: this should be done automatically
         name = (appTemplateMerged \ "name").extract[String],
