@@ -35,21 +35,25 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     def dead = shell.isClosed
 
 
-    def exec(operation: SvdShellOperation) {
+    def exec(operations: SvdShellOperations) {
         if (dead) { // if shell is dead, respawn it! It MUST live no matter what
             log.trace("Found dead shell: %s".format(shell))
             shell = expectinator.spawn(SvdConfig.defaultShell)
             if (dead)
                 throwException[SvdShellException]("Found dead shell where it should be alive!")
         }
-        shell.send(operation.commands + "\n")
-        if (operation.expectStdOut.size != 0) operation.expectStdOut.foreach {
-            expect =>
-                shell.expect(expect, operation.waitForOutputFor)
+        operations.commands.foreach {
+            cmd =>
+                shell.send(cmd + "\n") // send commands one by one to shell
         }
-        if (operation.expectStdErr.size != 0) operation.expectStdErr.foreach {
+
+        if (operations.expectStdOut.size != 0) operations.expectStdOut.foreach {
             expect =>
-                shell.expectErr(expect, operation.waitForOutputFor)
+                shell.expect(expect, operations.waitForOutputFor)
+        }
+        if (operations.expectStdErr.size != 0) operations.expectStdErr.foreach {
+            expect =>
+                shell.expectErr(expect, operations.waitForOutputFor)
         }
     }
 

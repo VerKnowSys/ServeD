@@ -197,7 +197,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor {
                 // registerFileEventFor(authKeysFile, All) // Modified | Deleted | Renamed | AttributesChanged
 
                 log.trace("Spawning account: %s".format(account))
-                new SvdShell(account).exec(new SvdShellOperation(SvdConfig.kickApp + " " + account.uid))
+                new SvdShell(account).exec(new SvdShellOperations(SvdConfig.kickApp + " " + account.uid))
         }
     }
 

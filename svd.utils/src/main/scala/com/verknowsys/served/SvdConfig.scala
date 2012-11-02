@@ -50,6 +50,9 @@ object SvdConfig {
     def defaultDomain                   = "localhost"
     def defaultUserName                 = "guest"
     def defaultUserUID                  = 501
+    def defaultSoftwareTemplateExt      = ".json"
+    def defaultSoftwareTemplate         = "/Users/Common/Igniters/Default"
+    def defaultSoftwareTemplatesDir     = "/Users/Common/Igniters/Services/"
     def remoteApiServerHost             = "127.0.0.1" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
     def sshPort                         = 22
     def remoteApiServerPort             = 10
