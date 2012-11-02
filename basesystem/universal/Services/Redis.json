@@ -1,9 +1,9 @@
 {
     "name": "Redis",
     "install": {
-        "commands": ["sofin install redis"],
-        "expectStdOut": ["All done. Reloading configuration of"],
+        "commands": ["if [ `uname` = 'Darwin' ]; then sofin install redis; fi"],
+        "expectStdOut": [""],
         "expectStdErr": [],
-        "waitForOutputFor": 10
+        "expectOutputTimeout": 2
     },
 }

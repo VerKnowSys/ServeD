@@ -43,10 +43,10 @@ case class SvdShellOperations(
         commands: List[String],
         expectStdOut: List[String] = Nil,
         expectStdErr: List[String] = Nil,
-        waitForOutputFor: Int = 5,
+        expectOutputTimeout: Int = 0,
         uuid: UUID = randomUUID
     ) extends Persistent {
 
-    override def toString = "Commands: %s, Expecting OUT: '%s', Expecting ERR: '%s', Expected in: %d seconds".format(commands.mkString("' or '"), expectStdOut.mkString("' or '"), expectStdErr.mkString(", "), waitForOutputFor)
+    override def toString = "Commands: %s, Expecting OUT: '%s', Expecting ERR: '%s', Expected in: %d seconds".format(commands.mkString("' or '"), expectStdOut.mkString("' or '"), expectStdErr.mkString(", "), expectOutputTimeout)
 
 }
