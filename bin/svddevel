@@ -1,6 +1,7 @@
 #!/bin/sh
 
 if [ `uname -s` = "Darwin" ]; then
+  bin/ignitersuninstall && bin/ignitersinstall
   kill `cat /Users/501/501.pid`
   sudo chown dmilith /Users/501/.akka.conf
   sleep 2
