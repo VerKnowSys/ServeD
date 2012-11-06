@@ -1,9 +1,32 @@
 {
     "name": "Redis",
+    "reportAllInfos": true,
     "install": {
-        "commands": ["echo 'dupa'"],
-        "expectStdOut": ["dupa"],
-        "expectStdErr": [],
-        "expectOutputTimeout": 2
+        "commands": ["sofin get redis"],
+        "expectStdOut": ["Preparing application: Redis", "All done."],
+        "expectOutputTimeout": 90
     },
+    "configure": {
+        "commands": ["mkdir -p SERVICE_PREFIX/database; printf '
+# Default Redis service configuration
+port SERVICE_PORT
+pidfile SERVICE_PREFIX/service.pid
+dir SERVICE_PREFIX/database
+dbfilename database.rdf
+daemonize yes
+rdbcompression yes
+save 900 1
+save 300 10
+save 60 10000
+appendonly no
+appendfsync everysec
+activerehashing yes
+' > SERVICE_PREFIX/service.conf"]
+    },
+    "start": {
+        "commands": ["redis-server SERVICE_PREFIX/service.conf"]
+    },
+    "stop": {
+        "commands": ["kill $(cat SERVICE_PREFIX/service.pid)"]
+    }
 }
