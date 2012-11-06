@@ -1,5 +1,7 @@
 #!/bin/sh
 
+unset DYLD_LIBRARY_PATH
+
 exec java \
 -d32 \
 -Djna.library.path=$(pwd)/lib \
