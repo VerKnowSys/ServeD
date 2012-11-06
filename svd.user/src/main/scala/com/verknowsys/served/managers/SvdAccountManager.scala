@@ -138,7 +138,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
 
                 // user services start from this point:
                 log.debug("Starting user redis service")
-                // val nginx = context.actorOf(Props(new SvdService("Nginx", account, notificationsManager, accountsManager)))
+                val nginx = context.actorOf(Props(new SvdService("Nginx", account, notificationsManager, accountsManager)))
                 val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager, accountsManager)))
                 val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, accountsManager)))
                 val memcached = context.actorOf(Props(new SvdService("Memcached", account, notificationsManager, accountsManager)))
