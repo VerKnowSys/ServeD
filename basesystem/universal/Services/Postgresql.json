@@ -1,0 +1,39 @@
+{
+    "name": "Postgresql",
+    "reportAllInfos": true,
+    "install": {
+        "commands": ["sofin get postgresql"],
+        "expectStdOut": ["Preparing application: Postgresql", "All done."],
+        "expectOutputTimeout": 1200
+    },
+    "configure": {
+        "commands": [
+            "mkdir -p SERVICE_PREFIX/database",
+            "initdb -D SERVICE_PREFIX/database; printf '
+# Default Postgresql service configuration
+local all all trust
+host all all 127.0.0.1/32 password
+
+# host all all 0.0.0.0/0 ident
+host all all 0.0.0.0/0 password
+
+' > SERVICE_PREFIX/database/pg_hba.conf",
+            "printf '
+port = SERVICE_PORT
+max_connections = 200
+checkpoint_segments = 24
+password_encryption = on
+shared_buffers = 128MB
+temp_buffers = 32MB
+work_mem = 16MB
+max_stack_depth = 16MB
+
+' > SERVICE_PREFIX/database/postgresql.conf"]
+    },
+    "start": {
+        "commands": ["pg_ctl start -D SERVICE_PREFIX/database"]
+    },
+    "stop": {
+        "commands": ["pg_ctl stop -w --timeout=60 -D SERVICE_PREFIX/database"]
+    }
+}
