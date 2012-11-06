@@ -1,16 +1,28 @@
 package com.verknowsys.served.services
 
 
+import com.verknowsys.served._
 import com.verknowsys.served.db._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.systemmanager.native._
-import com.verknowsys.served.api._
 import com.verknowsys.served.utils._
+import com.verknowsys.served.utils.events._
+import com.verknowsys.served.utils.signals.SvdPOSIX._
+import com.verknowsys.served.services._
+import com.verknowsys.served.api._
+import com.verknowsys.served.api.accountkeys._
+import com.verknowsys.served.api.pools._
 
 import net.liftweb.json._
 import scala.io._
 import java.io.File
 import akka.actor._
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.util.duration._
 
 
 /**
@@ -97,7 +109,7 @@ class SvdServiceConfigLoader(name: String) extends Logging {
 }
 
 
-class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsManager: ActorRef) extends SvdExceptionHandler {
+class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsManager: ActorRef, accountManager: ActorRef) extends SvdExceptionHandler with  SvdUtils {
 
     lazy val shell = new SvdShell(account)
     lazy val installIndicator = new File(
@@ -106,6 +118,8 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
         else
             SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / config.name.toLowerCase + "." + SvdConfig.installed
     )
+    lazy val servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
+    checkOrCreateDir(servicePrefix)
 
 
     /**
@@ -180,10 +194,25 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
      *
      *   hookShot is a safe way to launch service hooks
      */
-    def hookShot(hook: SvdShellOperations, hookName: String) {
-        // catch exceptions from expectinator:
+    def hookShot(hook: SvdShellOperations, hookName: String) { // XXX: this should be done better. String should be replaced
         try {
-            shell.exec(hook)
+            implicit val timeout = Timeout(10 seconds) // XXX: hardcode
+            val future = accountManager ? Admin.GetPort
+            val resultPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
+            shell.exec(
+                hook.copy(
+                    // replace special values for valuable data by user account and service name
+                    commands = hook.commands.map {
+                        _.replaceAll("SERVICE_PREFIX", servicePrefix)
+                         .replaceAll("SERVICE_PORT", "%d".format(resultPort))
+                         // .replaceAll("SERVICE_VERSION", try {
+                         //        Source.fromFile(installIndicator).mkString
+                         //    } catch {
+                         //        case _: Exception => "0.0"
+                         //    })
+                    }
+                ))
+
             val msg = "--- INFO ---\nPerforming %s of service: %s\n------------\n".format(hookName, config.name)
             log.trace(msg)
             if (config.reportAllInfos)
