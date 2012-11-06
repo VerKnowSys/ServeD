@@ -1,11 +1,10 @@
 package com.verknowsys.served.managers
 
-import com.verknowsys.served.services._
-// import com.verknowsys.served.LocalAccountsManager
 import com.verknowsys.served.SvdConfig
+import com.verknowsys.served.api._
 import com.verknowsys.served.api.accountkeys._
 import com.verknowsys.served.api.git._
-import com.verknowsys.served.api._
+import com.verknowsys.served.services._
 import com.verknowsys.served.db.{DBServer, DBClient, DB}
 import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
@@ -139,7 +138,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
 
                 // user services start from this point:
                 log.debug("Starting user redis service")
-                val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager)))
+                val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager, accountsManager)))
 
             case x =>
                 sender ! Error("DB initialization error. Got param: %s".format(x))
@@ -215,6 +214,10 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
             log.info("Registering domain: %s", domain)
             log.warn("NYI")
             sender ! Success
+
+        case x: Admin.Base =>
+            log.debug("Forwarding message: %s to Accounts Manager", x)
+            accountsManager forward x
 
         case x: System.Base =>
             log.debug("Forwarding message: %s to System Manager", x)
