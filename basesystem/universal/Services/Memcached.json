@@ -1,0 +1,15 @@
+{
+    "name": "Memcached",
+    "reportAllInfos": false,
+    "install": {
+        "commands": ["sofin get memcached"],
+        "expectStdOut": ["Preparing application: Memcached", "All done."],
+        "expectOutputTimeout": 256
+    },
+    "start": {
+        "commands": ["memcached -p SERVICE_PORT -P SERVICE_PREFIX/service.pid"]
+    },
+    "stop": {
+        "commands": ["kill $(cat SERVICE_PREFIX/service.pid)"]
+    }
+}
