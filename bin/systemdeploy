@@ -50,8 +50,15 @@ if [ "$?" = "0" ]; then
         rootcheck && \
         bin/nativeinstall
     fi
-    bin/ignitersuninstall
-    bin/ignitersinstall
+    if [ $system = "Darwin" ]; then
+        sudo bin/ignitersuninstall
+        sudo bin/ignitersinstall
+        sudo mkdir -p /Software/.cache
+    else
+        bin/ignitersuninstall
+        bin/ignitersinstall
+        mkdir -p /Software/.cache
+    fi
     echo "Done. Success!"
 else
     echo "Done. Failure!"
