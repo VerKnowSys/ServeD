@@ -1,13 +1,15 @@
 {
     "name": "Redis",
-    "reportAllInfos": true,
+    "reportAllInfos": false,
     "install": {
         "commands": ["sofin get redis"],
         "expectStdOut": ["Preparing application: Redis", "All done."],
         "expectOutputTimeout": 90
     },
     "configure": {
-        "commands": ["mkdir -p SERVICE_PREFIX/database; printf '
+        "commands": [
+            "mkdir -p SERVICE_PREFIX/database",
+            "printf '
 # Default Redis service configuration
 port SERVICE_PORT
 pidfile SERVICE_PREFIX/service.pid
