@@ -41,9 +41,9 @@ const static string coreDir = currentDir();
         char *args[] = {
             (char*)DEFAULT_JAVA64_BIN,
             (char*)"-d64",
-            (char*)"-Xmn2m",
-            (char*)"-Xms8m",
-            (char*)"-Xmx128m",
+            (char*)"-Xmn4m",
+            (char*)"-Xms16m",
+            (char*)"-Xmx256m",
             (char*)"-XX:+UseCompressedOops",
             (char*)"-Dfile.encoding=UTF-8",
             (char*)jnalp.c_str(),
@@ -89,7 +89,7 @@ const static string coreDir = currentDir();
             (char*)"-Xmn1m",
             (char*)"-XX:NewRatio=1",
             (char*)"-Xms16m",
-            (char*)"-Xmx64m",
+            (char*)"-Xmx96m",
             (char*)"-Dfile.encoding=UTF-8",
             // (char*)jnalp.c_str(),
             #ifndef DEVEL

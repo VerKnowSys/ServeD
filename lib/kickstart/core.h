@@ -53,12 +53,12 @@
 
     /* global constants */
 
-    #define APP_VERSION "0.2.10"
+    #define APP_VERSION "0.2.12"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
+    #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh"
     #ifdef __FreeBSD__
-        #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh"
         #ifndef JDK7
             #define DEFAULT_JAVA_BIN "/Software/Openjdk6-i386/exports/java"
             #define DEFAULT_JAVA64_BIN "/Software/Openjdk6-amd64/exports/java"
@@ -68,7 +68,6 @@
         #endif
     #elif __APPLE__
         #define CLOCK_REALTIME REALTIME_CLOCK
-        #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
         #define DEFAULT_JAVA64_BIN "/usr/bin/java"
     #elif __linux__
