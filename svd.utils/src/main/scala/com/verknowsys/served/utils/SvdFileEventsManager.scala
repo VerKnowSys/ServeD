@@ -139,7 +139,6 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler w
 
     log.info("SvdFileEventsManager is loading")
 
-    protected val clib = CLibrary.instance
     protected lazy val kq = {
         val k = clib.kqueue() // NOTE: C call
         if(k == -1) throwException[SvdKqueueException]("kQueue system call failed!") // check kqueue

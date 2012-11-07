@@ -34,6 +34,8 @@ import sun.misc.Signal
  */
 trait SvdUtils extends Logging {
 
+    import CLibrary._
+    lazy val clib = CLibrary.instance
 
     /**
       * A way to get default shell path depended on currently running operating system
@@ -84,15 +86,16 @@ trait SvdUtils extends Logging {
             log.warn("Chown: File/ path doesn't exists! Cannot chown non existant file/ directory! IGNORING!")
             false
         } else {
-            import CLibrary._
-            val clib = CLibrary.instance
-            val files = if (recursive) recursiveListFilesFromPath(new File(path)) else List(new File(path))
-            log.trace("chown(path: %s, user: %d, group: %d, recursion: %s): File list: %s. Amount of files: %s".format(path, user, group, recursive, files.mkString(", "), files.length))
 
-            for (file <- files) {
-                log.trace("chowning: %s".format(file.getAbsolutePath))
-                if (clib.chown(file.getAbsolutePath, user, group) != 0)
-                    throwException[Exception]("Error occured while chowning: %s".format(file))
+            val files =
+                if (recursive) recursiveListFilesFromPath(new File(path))
+                    else List(
+                        new File(path))
+
+            files.map {
+                file =>
+                    if (clib.chown(file.getAbsolutePath, user, group) != 0)
+                        log.warn("Chown failed on file: %s. Ignoring", file)
             }
             true
         }
