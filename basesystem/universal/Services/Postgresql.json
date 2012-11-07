@@ -1,6 +1,6 @@
 {
     "name": "Postgresql",
-    "reportAllInfos": true,
+    "reportAllInfos": false,
     "install": {
         "commands": ["sofin get postgresql"],
         "expectStdOut": ["Preparing application: Postgresql", "All done."],
@@ -8,8 +8,9 @@
     },
     "configure": {
         "commands": [
-            "mkdir -p SERVICE_PREFIX/database",
-            "initdb -D SERVICE_PREFIX/database; printf '
+            "test ! -d SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database",
+            "test ! -d SERVICE_PREFIX/database/base && initdb -D SERVICE_PREFIX/database",
+            "test ! -f SERVICE_PREFIX/database/pg_hba.conf && printf '
 # Default Postgresql service configuration
 local all all trust
 host all all 127.0.0.1/32 password
@@ -18,7 +19,7 @@ host all all 127.0.0.1/32 password
 host all all 0.0.0.0/0 password
 
 ' > SERVICE_PREFIX/database/pg_hba.conf",
-            "printf '
+            "test ! -f SERVICE_PREFIX/database/postgresql.conf && printf '
 port = SERVICE_PORT
 max_connections = 200
 checkpoint_segments = 24

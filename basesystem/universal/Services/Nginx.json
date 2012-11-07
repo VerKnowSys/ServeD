@@ -1,13 +1,13 @@
 {
     "name": "Nginx",
-    "reportAllInfos": true,
+    "reportAllInfos": false,
     "install": {
         "commands": ["sofin get nginx"],
         "expectStdOut": ["Preparing application: Nginx", "All done."],
         "expectOutputTimeout": 360
     },
     "configure": {
-        "commands": ["printf '
+        "commands": ["test ! -f SERVICE_PREFIX/service.conf && printf '
 worker_processes  2;
 events {
     worker_connections  1024;
@@ -27,7 +27,6 @@ http {
         }
     }
 }
-
 ' > SERVICE_PREFIX/service.conf"]
     },
     "start": {
@@ -35,5 +34,8 @@ http {
     },
     "stop": {
         "commands": ["nginx -c SERVICE_PREFIX/service.conf -s stop"]
+    },
+    "validate": {
+        "commands": ["nginx -t -c SERVICE_PREFIX/service.conf"]
     }
 }
