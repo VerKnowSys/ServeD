@@ -82,12 +82,11 @@ object Resolvers {
     val jgitRepo = "jgit-repository" at "http://download.eclipse.org/jgit/maven"
     val sonatype = "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
     val guiceyfruit = "guiceyfruit repo" at "http://guiceyfruit.googlecode.com/svn/repo/releases"
-    val mediavks = "Media VKS" at "http://media.verknowsys.com/maven2-repository/"
     val jboss = "JBoss Repo" at "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases"
-    // val repoVks = "VerKnowSys Public Repository" at "http://maven.verknowsys.com/repository"
+    val repoVks = "VerKnowSys Public Repository" at "http://maven.verknowsys.com/repository"
     val repo1 = "Repo1 Maven" at "http://repo1.maven.org/maven2"
 
-    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, mediavks, jboss, repo1)
+    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, repoVks, jboss, repo1)
 }
 
 object Dependencies {
