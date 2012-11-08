@@ -7,7 +7,6 @@
     },
     "configure": {
         "commands": [
-            "test ! -d SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database",
             "test ! -d SERVICE_PREFIX/database/base && SERVICE_ROOT/exports/initdb -D SERVICE_PREFIX/database && rm -f SERVICE_PREFIX/database/pg_hba.conf && rm -f SERVICE_PREFIX/database/postgresql.conf",
         ]
     },
