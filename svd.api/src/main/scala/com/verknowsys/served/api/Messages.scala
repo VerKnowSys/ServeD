@@ -44,8 +44,8 @@ object General {
 object Admin {
     sealed abstract class Base extends ApiMessage
 
-    case object RespawnAccounts extends ApiResponse
-    case class RegisterAccount(name: String) extends ApiResponse
+    case object RespawnAccounts extends Base
+    case class RegisterAccount(name: String) extends Base
     case class GetAccountManager(userUid: Int) extends Base
 
     case object GetPort extends Base
