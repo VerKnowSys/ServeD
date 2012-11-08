@@ -109,17 +109,19 @@ class SvdServiceConfigLoader(name: String) extends Logging {
 }
 
 
-class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsManager: ActorRef, accountManager: ActorRef) extends SvdExceptionHandler with  SvdUtils {
+class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsManager: ActorRef, accountManager: ActorRef) extends SvdExceptionHandler with SvdUtils {
 
-    lazy val shell = new SvdShell(account)
-    lazy val installIndicator = new File(
+    val installIndicator = new File(
         if (account.uid == 0)
             SvdConfig.systemHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / config.name.toLowerCase + "." + SvdConfig.installed
         else
             SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / config.name.toLowerCase + "." + SvdConfig.installed
     )
-    lazy val servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
+    val servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
     checkOrCreateDir(servicePrefix)
+
+
+    def shell = new SvdShell(account)
 
 
     /**
@@ -195,38 +197,65 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
      *   hookShot is a safe way to launch service hooks
      */
     def hookShot(hook: SvdShellOperations, hookName: String) { // XXX: this should be done better. String should be replaced
-        try {
-            implicit val timeout = Timeout(10 seconds) // XXX: hardcode
-            val future = accountManager ? Admin.GetPort
-            val resultPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
-            shell.exec(
-                hook.copy(
-                    // replace special values for valuable data by user account and service name
-                    commands = hook.commands.map {
-                        _.replaceAll("SERVICE_PREFIX", servicePrefix)
-                         .replaceAll("SERVICE_PORT", "%d".format(resultPort))
-                         .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
-                         // .replaceAll("SERVICE_VERSION", try {
-                         //        Source.fromFile(installIndicator).mkString
-                         //    } catch {
-                         //        case _: Exception => "0.0"
-                         //    })
-                    }
-                ))
+        try { // OPTIMIZE CAUSE THIS CODE SUCKS BADLY
+            if (!hook.commands.isEmpty) { // don't report empty / undefined hooks
+                if ((hookName == "validate") || (hookName == "start")) {
+                    implicit val timeout = Timeout(10 seconds) // XXX: hardcode
+                    val future = accountManager ? Admin.GetPort // XXX: it registers port on each hook.. which is bad idea
+                    val resultPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
+                    shell.exec(
+                        hook.copy(
+                            // replace special values for valuable data by user account and service name
+                            commands = hook.commands.map {
+                                _.replaceAll("SERVICE_PREFIX", servicePrefix)
+                                 .replaceAll("SERVICE_PORT", "%d".format(resultPort))
+                                 .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
+                                 .replaceAll("SERVICE_VERSION", try {
+                                        Source.fromFile(installIndicator).mkString
+                                    } catch {
+                                        case _: Exception => "no-version"
+                                    })
+                            }
+                        )
+                    )
+                } else // for rest of hooks, port isn't required
+                    shell.exec(
+                        hook.copy(
+                            // replace special values for valuable data by user account and service name
+                            commands = hook.commands.map {
+                                _.replaceAll("SERVICE_PREFIX", servicePrefix)
+                                 // .replaceAll("SERVICE_PORT", "%d".format(resultPort))
+                                 .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
+                                 .replaceAll("SERVICE_VERSION", try {
+                                        Source.fromFile(installIndicator).mkString
+                                    } catch {
+                                        case _: Exception => "no-version"
+                                    })
+                            }
+                        )
+                    )
 
-            val msg = "--- INFO ---\nPerforming %s of service: %s\n------------\n".format(hookName, config.name)
-            log.trace(msg)
-            if (config.reportAllInfos)
-                notificationsManager ! Notify.Message(msg)
+                val msg = "--- INFO ---\nPerforming %s of service: %s\n------------\n".format(hookName, config.name)
+                log.trace(msg)
+                if (config.reportAllInfos)
+                    notificationsManager ! Notify.Message(msg)
+            } else {
+                log.debug("Hook undefined: %s", hookName)
+            }
         } catch {
             case x: expectj.TimeoutException =>
-                val msg = "=== ERROR ===\nHook %s of service: %s failed to pass expectations: CMD: '%s', OUT: '%s', ERR: '%s'.\n=============\n".format(hookName, config.name, hook.commands.mkString(" "), hook.expectStdOut, hook.expectStdErr)
+                val hk = hook.copy( commands = hook.commands.map { // map values for better message
+                    _.replaceAll("SERVICE_PREFIX", servicePrefix)
+                     .replaceAll("SERVICE_PORT", "*(masked)*")
+                     .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
+                })
+                val msg = "=== ERROR ===\nHook %s of service: %s failed to pass expectations: CMD: '%s', OUT: '%s', ERR: '%s'.\n=============\n".format(hookName, config.name, hk.commands.mkString(" "), hk.expectStdOut, hk.expectStdErr)
                 log.error(msg)
                 if (config.reportAllErrors)
                     notificationsManager ! Notify.Message(msg)
 
             case x: Exception =>
-                val msg = "### FATAL ###\nThrown exception in hook: %s of service: %s an exception content below:\n%s\n#############\n".format(hookName, config.name, x)
+                val msg = "### FATAL ###\nThrown exception in hook: %s of service: %s an exception content below:\n%s\n#############\n".format(hookName, config.name, x.getMessage + " " + x.getStackTrace)
                 log.error(msg)
                 if (config.reportAllErrors)
                     notificationsManager ! Notify.Message(msg)
@@ -235,10 +264,10 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
 
 
     override def preStart = {
-        log.debug("SvdService install started for: %s".format(config.name))
+        // log.debug("SvdService install started for: %s".format(config.name))
 
         /* check for previous installation */
-        log.trace("Looking for %s file to check software installation status".format(installIndicator))
+        log.info("Looking for %s file to check software installation status".format(installIndicator))
         if (!installIndicator.exists) {
             hookShot(installHook, "install")
             hookShot(configureHook, "configure")
@@ -247,6 +276,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
         }
         hookShot(validateHook, "validate")
         if (config.autoStart) {
+            log.info("Starting service: %s", config.name)
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
         }
@@ -272,6 +302,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
         case Run =>
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
+            sender ! Success
 
         /**
          *  @author dmilith
@@ -281,6 +312,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
         case Quit =>
             hookShot(stopHook, "stop")
             hookShot(afterStopHook, "afterStop")
+            sender ! Success
 
         case Success =>
             log.trace("Success in SvdService from %s".format(sender.getClass.getName))
@@ -288,9 +320,9 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
 
 
     override def postStop {
+        log.info("PostStop in SvdService: %s".format(config.name))
         hookShot(stopHook, "stop")
         hookShot(afterStopHook, "afterStop")
-        // shell.close
         log.info("Stopped SvdService: %s".format(config.name))
         super.postStop
     }
