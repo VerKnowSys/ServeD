@@ -66,29 +66,24 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor {
         unregisterFileEvents(self)
 
         log.info("Stopping spawned user workers")
-        SvdAccounts(db).foreach{
+        userAccounts.foreach{
             account =>
                 val pidFile = SvdConfig.userHomeDir / "%d".format(account.uid) / "%d.pid".format(account.uid)
                 log.trace("PIDFile: %s".format(pidFile))
                 if (new java.io.File(pidFile).exists) {
-                    log.trace("Reading VM pid.")
-                    val pid = Source.fromFile(pidFile).mkString.trim.toInt
+                    val pid = Source.fromFile(pidFile).getLines.toList.head.trim.toInt
                     log.debug("Client VM PID to be killed: %d".format(pid))
-                    kill(pid, SIGTERM)
+
+                    // XXX: TODO: define death watch daemon:
+                    kill(pid)
+
                     log.debug("Client VM PID file to be deleted: %s".format(pidFile))
                     rm_r(pidFile)
                 } else {
                     log.warn("File not found: %s".format(pidFile))
                 }
         }
-
-        // removing also pid file of root core of svd:
-        val corePid = SvdConfig.systemHomeDir / SvdConfig.rootPidFile
-        log.debug("Cleaning core pid file: %s with content: %s".format(corePid, Source.fromFile(corePid).mkString))
-        rm_r(corePid)
-        log.info("Shutting down SvdAccountsManager")
-        db.close
-        server.close
+        log.info("All done.")
     }
 
 
@@ -115,12 +110,12 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor {
             log.trace("Registering default account if not present")
             if (name == SvdConfig.defaultUserName) {
                 if (!userUIDRegistered(SvdConfig.defaultUserUID)) {
-                    registerUserAccount(name, SvdConfig.defaultUserUID) // XXX: hardcoded
-                    sender ! Success
+                    registerUserAccount(SvdConfig.defaultUserName, SvdConfig.defaultUserUID) // XXX: hardcoded
                 }
+                sender ! Success
             } else {
                 val userUID = randomUserUid
-                log.debug("Registering account with name: %s and uid: %d", name, userUID)
+                log.debug("Registering account with name: %s and uid: %d".format(name, userUID))
                 registerUserAccount(name, userUID)
                 sender ! Success
             }
@@ -146,6 +141,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor {
             val accountsWithoutThisOne = accountsAlive.filterNot{_.uuid == account.uuid}
             context.become(
                 awareOfUserManagers(accountsWithoutThisOne))
+            sender ! Success
             log.info("Becoming aware of dead account: %s", account)
             log.debug("Alive accounts: %s".format(accountsWithoutThisOne))
 
@@ -155,7 +151,9 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor {
             sender ! Success
 
         case Admin.GetPort =>
-            sender ! randomUserPort
+            val port = randomUserPort
+            // registerUserPort(port)
+            sender ! port
 
         case SvdFileEvent(path, flags) =>
             log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))
@@ -179,7 +177,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor {
 
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
-            sender ! Error("Unknown signal %s".format(x))
+            // sender ! Error("Unknown signal %s".format(x))
 
     }
 

@@ -43,13 +43,21 @@ object userboot extends Logging with SvdUtils {
         val system = ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDremote"))
         val accountsManager = system.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
 
+
+        // addShutdownHook {
+        //     log.warn("Got termination signal")
+        //     log.info("Shutting down userboot")
+        //     system.shutdown // shutting down main account actor manager
+        //     Thread.sleep(SvdConfig.shutdownTimeout + 15000)
+        // }
+
         (accountsManager ? User.GetAccount(userUID)) onSuccess {
 
             case Some(account: SvdAccount) =>
 
                 log.debug("Got account, starting AccountManager for %s on account manager port: %d", account, account.accountManagerPort)
                 val am = system.actorOf(Props(new SvdAccountManager(account)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
-                val loggingManager = system.actorOf(Props(new LoggingManager(GlobalLogger)))
+                // val loggingManager = system.actorOf(Props(new LoggingManager(GlobalLogger)))
                 log.info("Spawned UserBoot for UID: %d", userUID)
 
             case None =>
@@ -62,25 +70,10 @@ object userboot extends Logging with SvdUtils {
         }
 
         addShutdownHook {
-            log.warn("Got termination signal")
-            log.info("Shutting down userboot")
-            system.shutdown // shutting down main account actor manager
+            log.warn("userboot Shutdown Hook invoked")
             Thread.sleep(SvdConfig.shutdownTimeout)
+            system.shutdown // shutting down main account actor manager
         }
-
-        // val portOpt = (accountsManager ? GetPort) onSuccess {
-        //     case i: Int => i
-        // }
-
-        // for {
-        //     account <- accountOpt
-        //     port <- portOpt
-        // } yield {
-        // }
-        // }) getOrElse {
-        //     log.error("Account for uid %d does not exist", userUID)
-        //     sys.exit(1)
-        // }
     }
 
 
