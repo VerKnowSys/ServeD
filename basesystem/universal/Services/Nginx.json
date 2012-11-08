@@ -3,10 +3,17 @@
     "install": {
         "commands": ["sofin get nginx"],
         "expectStdOut": ["Preparing application: Nginx", "All done."],
-        "expectOutputTimeout": 360
+        "expectOutputTimeout": 1200
     },
-    "configure": {
-        "commands": ["test ! -f SERVICE_PREFIX/service.conf && printf '
+    "start": {
+        "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf"]
+    },
+    "stop": {
+        "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s stop"]
+    },
+    "validate": {
+        "commands": [
+            "test ! -f SERVICE_PREFIX/service.conf && printf '
 worker_processes  2;
 events {
     worker_connections  1024;
@@ -26,16 +33,9 @@ http {
         }
     }
 }
-' > SERVICE_PREFIX/service.conf"]
-    },
-    "start": {
-        "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf"]
-    },
-    "stop": {
-        "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s stop"]
-    },
-    "validate": {
-        "commands": ["SERVICE_ROOT/exports/nginx -t -c SERVICE_PREFIX/service.conf"],
+' > SERVICE_PREFIX/service.conf",
+            "SERVICE_ROOT/exports/nginx -t -c SERVICE_PREFIX/service.conf"
+        ],
         "expectStdErr": ["test is successful"]
     },
     "reload": {
