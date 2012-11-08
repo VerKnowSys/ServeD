@@ -240,7 +240,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
                 if (config.reportAllInfos)
                     notificationsManager ! Notify.Message(msg)
             } else {
-                log.debug("Hook undefined: %s", hookName)
+                log.debug("Hook undefined: %s for service: %s".format(hookName, config.name))
             }
         } catch {
             case x: expectj.TimeoutException =>
