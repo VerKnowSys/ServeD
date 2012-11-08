@@ -69,6 +69,7 @@ trait SvdUtils extends Logging {
     def kill(pid: Long, signal: SvdPOSIX.Value = SIGINT) = {
         import CLibrary._
         val clib = CLibrary.instance
+        log.trace("Sending %d signal to pid %d".format(signal.id, pid))
         if (clib.kill(pid, signal.id) == 0)
             true
         else
@@ -83,7 +84,7 @@ trait SvdUtils extends Logging {
      */
     def chown(path: String, user: Int, group: Int = SvdConfig.defaultUserGroup, recursive: Boolean = true) =
         if (!(new File(path)).exists) {
-            log.warn("Chown: File/ path doesn't exists! Cannot chown non existant file/ directory! IGNORING!")
+            log.warn("Chown: File/ path doesn't exists! Cannot chown non existant file/ directory! Ignoring!")
             false
         } else {
 
@@ -92,7 +93,7 @@ trait SvdUtils extends Logging {
                     else List(
                         new File(path))
 
-            files.map {
+            files.par.map {
                 file =>
                     if (clib.chown(file.getAbsolutePath, user, group) != 0)
                         log.warn("Chown failed on file: %s. Ignoring", file)
@@ -461,7 +462,7 @@ trait SvdUtils extends Logging {
             if (file.isDirectory)
                 Option(file.listFiles).map(
                     e =>
-                        e.toList.flatMap(recursiveListFilesFromPath)
+                        e.par.toList.flatMap(recursiveListFilesFromPath)
                 ) getOrElse Nil
             else Nil)
     }
