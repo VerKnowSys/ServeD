@@ -254,7 +254,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
                 case Modified =>
                     log.trace("File event type: Modified")
                     notificationsManager ! Notify.Message("File event notification: Modified on path: %s on host: %s".format(path, currentHost.getHostName))
-                    gitManager ! CreateRepository("somerepository")
+                    gitManager ! Git.CreateRepository("somerepository")
                 case Deleted =>
                     log.trace("File event type: Deleted")
                 case Renamed =>
@@ -268,6 +268,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
                 case x =>
                     log.trace("Got event: %s", x)
             }
+
 
         //     (accountsManager ? GetPort) onSuccess {
         //         case dbPort: Int =>
@@ -297,7 +298,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
             log.trace("Forwarding notification to Notification Center")
             notificationsManager forward msg
 
-        case msg: git.Base =>
+        case msg: Git.Base =>
+            log.trace("Forwarding Git message to Git Manager")
             gitManager forward msg
     }
 

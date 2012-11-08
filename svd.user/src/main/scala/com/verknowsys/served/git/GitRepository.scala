@@ -9,14 +9,14 @@ import org.eclipse.jgit.revwalk.{RevCommit}
 import org.eclipse.jgit.transport.{RemoteConfig, RefSpec}
 import java.io.File
 
-/** 
- * Common methods for setting up git repository. 
- * 
+/**
+ * Common methods for setting up git repository.
+ *
  * `git init, git init --bare, git clone`
- * 
+ *
  * @author teamon
  */
-object Git {
+object GitCore {
     /**
      * Create git repository for specified directory
      * @author teamon
@@ -26,11 +26,11 @@ object Git {
         JGit.init().setDirectory(new File(directory)).setBare(bare).call
         new GitRepository(directory) // XXX: Handle Caused by: java.lang.IllegalStateException: Repository already exists:
     }
-    
+
     /**
      * Clone git repository to specified directory
      * clone is init + add remote + pull
-     * 
+     *
      * @author teamon
     */
     def clone(dir: String, remote: String) = {
@@ -39,7 +39,7 @@ object Git {
         repo.pull
         repo
     }
-    
+
     /**
      * List git repositories for specified directory
      * @author teamon
@@ -64,93 +64,93 @@ class GitRepository(dir: String) extends Logging {
     lazy val git = new JGit(gitRepo)
 
     // lazy val (headPath, headFile) = if(isBare) (dir + "/refs/heads", "master") else (dir + "/.git/logs", "HEAD")
-    
+
     def isBare = gitRepo.isBare
-    
-    /** 
+
+    /**
      * Return git repository name (actually it is the name of directory)
-     * 
+     *
      * @author teamon
      */
     def name = new File(dir).getName.replace(".git", "")
-    
-    /** 
+
+    /**
      * Return git repository name path
-     * 
+     *
      * @author teamon
      */
     def path = gitRepo.getWorkTree.getPath
-    
+
     /**
      * Returns git ref for HEAD
      *
      * @author teamon
      */
     def head = gitRepo.getRef("HEAD")
-    
+
     /**
      * Returns current branch name
      *
      * @author teamon
      */
     def currentBranch = gitRepo.getBranch
-    
-    
+
+
     // Basic git commands (close to command line)
-    
-    
-    /** 
+
+
+    /**
      * Same as `git add [path]`
      *
      * {{{
      * repo.add("README") // relative path
      * }}}
-     * 
+     *
      * @param path path added to git
      * @author teamon
      */
     def add(path: String) = git.add.addFilepattern(path).call
 
-    /** 
+    /**
      * Same as `git commit -m [message]`
      *
      * {{{
      * repo.commit("First commit")
      * }}}
-     * 
+     *
      * @param message commit message
      * @author teamon
      */
-    def commit(message: String, author: PersonIdent = null, committer: PersonIdent = null) = 
+    def commit(message: String, author: PersonIdent = null, committer: PersonIdent = null) =
         git.commit.setMessage(message).setAuthor(author).setCommitter(committer).call
-    
-    
-    /** 
+
+
+    /**
      * Same as `git branch [name]`
      *
      * {{{
      * repo.branch("newbranch")
      * }}}
-     * 
+     *
      * @param name name of new branch
      * @author teamon
      */
     def branch(name: String) = git.branchCreate.setName(name).call
-    
-    /** 
+
+    /**
      * Returns list of all branches
-     * 
+     *
      * @author teamon
      */
     def branchList = git.branchList.call.toList
-    
-    /** 
+
+    /**
      * Same as `git checkout [name]`
      *
      * {{{
      * repo.checkout("somebranch")
      * }}}
-     * 
+     *
      * @param name name of branch or commit sha1
      * @author teamon
      */
@@ -162,7 +162,7 @@ class GitRepository(dir: String) extends Logging {
      * @author teamon
      */
     def history: Iterator[RevCommit] = git.log.call.iterator
-    
+
     /**
      * Returns commit history for specified range
      * @example
