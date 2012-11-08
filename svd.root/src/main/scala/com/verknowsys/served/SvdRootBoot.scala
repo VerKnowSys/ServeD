@@ -66,19 +66,19 @@ class SvdRootBoot extends Logging with SvdExceptionHandler {
         context.watch(ssm)
         context.watch(sshd)
         context.watch(sam)
-        (sam ? RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
+        (sam ? Admin.RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
             case _ =>
                 log.trace("Spawning Account Manager for each user.")
                 // sam ! RegisterAccount("stefan") // XXX: hardcoded
                 // sam ! RegisterAccount("waldek") // XXX: hardcoded
-                (sam ? RespawnAccounts) onSuccess {
-                    case _ =>
-                        log.info("Account Manager initialized and accounts should be spawned.")
-                } onFailure {
-                    case x =>
-                        log.error("Failure spawning accounts: %s", x)
-                        sys.exit(1)
-                }
+                // (sam ? Admin.RespawnAccounts) onSuccess {
+                //     case _ =>
+                //         log.info("Account Manager initialized and accounts should be spawned.")
+                // } onFailure {
+                //     case x =>
+                //         log.error("Failure spawning accounts: %s", x)
+                //         sys.exit(1)
+                // }
         }
 
     }
@@ -89,11 +89,9 @@ class SvdRootBoot extends Logging with SvdExceptionHandler {
         case Success =>
             log.debug("RootBoot success")
 
-        case Shutdown =>
-            sshd ! Shutdown
-            system.shutdown
-            log.warn("Got shutdown. Telling whole system to stop itself.")
-            Thread.sleep(SvdConfig.shutdownTimeout)
-
+        // case Shutdown =>
+        //     sshd ! Shutdown
+        //     log.warn("Got shutdown. Told whole system to stop itself.")
+            // Thread.sleep(SvdConfig.shutdownTimeout)
     }
 }

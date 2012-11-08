@@ -49,7 +49,8 @@ object rootboot extends Logging with SvdUtils with App {
 
         val rb = system.actorOf(Props(new SvdRootBoot).withDispatcher("svd-core-dispatcher"))
         addShutdownHook {
-            rb ! Shutdown
+            log.warn("rootboot shutdown hook")
+            system.shutdown
         }
 
     }
