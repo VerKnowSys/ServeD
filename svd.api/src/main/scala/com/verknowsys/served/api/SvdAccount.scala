@@ -11,6 +11,10 @@ object User {
 
     case object AccountNotFound
 
+    case object SpawnServices
+    case object TerminateServices
+    case object GetServices
+
     case class GetAccount(uid: Int)
     case class GetAccountByName(name: String)
 
