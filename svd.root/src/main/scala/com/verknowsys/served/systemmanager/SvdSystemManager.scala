@@ -78,7 +78,7 @@ class SvdSystemManager extends SvdManager {
 
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
-            sender ! Error("Unknown signal %s".format(x))
+            // sender ! Error("Unknown signal %s".format(x))
 
     }
 

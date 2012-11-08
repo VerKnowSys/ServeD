@@ -143,7 +143,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
                 sshd ! InitSSHChannelForUID(account.uid)
 
             case x =>
-                sender ! Error("DB initialization error. Got param: %s".format(x))
+                // sender ! Error("DB initialization error. Got param: %s".format(x))
                 throwException[DBServerInitializationException]("DB initialization error. Got param: %s".format(x))
         }
 
@@ -165,9 +165,9 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
             context.stop(ref)
 
         case x =>
-            val m = "Unknown SvdAccountManager message: %s".format(x)
+            val m = "SvdAccountManager is in turned off stage but still receives message: %s".format(x)
             log.warn("%s".format(m))
-            sender ! Error(m)
+            // sender ! Error(m)
 
     }
 

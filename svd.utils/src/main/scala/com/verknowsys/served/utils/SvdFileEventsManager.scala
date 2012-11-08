@@ -120,6 +120,7 @@ trait SvdFileEventsReactor extends SvdExceptionHandler with Logging with SvdUtil
 
 
     override def postStop {
+        log.debug("Post Stop in SvdFileEventsManager")
         unregisterFileEvents()
         super.postStop
     }
@@ -184,6 +185,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler w
     }
 
     override def postStop {
+        log.debug("PostStop in FileEventsManager")
         readerThread.kill
     }
 
