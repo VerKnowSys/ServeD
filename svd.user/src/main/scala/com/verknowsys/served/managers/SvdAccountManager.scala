@@ -120,10 +120,10 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
                 context.watch(webManager)
 
                 // user services start from this point:
-                val nginx = context.actorOf(Props(new SvdService("Nginx", account, notificationsManager, self)))
-                val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager, self)))
-                val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)))
-                val memcached = context.actorOf(Props(new SvdService("Memcached", account, notificationsManager, self)))
+                val nginx = context.actorOf(Props(new SvdService("Nginx", account, notificationsManager, self)), "Nginx")
+                val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager, self)), "Redis")
+                val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)), "Postgresql")
+                val memcached = context.actorOf(Props(new SvdService("Memcached", account, notificationsManager, self)), "Memcached")
 
                 // Start the real work
                 log.info("(NYI) Checking installed services")
