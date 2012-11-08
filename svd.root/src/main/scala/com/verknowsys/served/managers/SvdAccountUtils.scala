@@ -106,7 +106,12 @@ class SvdAccountUtils(db: DBClient) extends Logging with SvdUtils {
         def performChecks(managerPort: Int = userManagerPort) {
             log.trace("Performing user registration checks and making missing directories")
             checkOrCreateDir(userHomeDir)
-            chown(userHomeDir, uid)
+            ("Backup" :: "SoftwareData" :: "WebApps" :: Nil).map { // XXX: HARDCODE
+                sub =>
+                    log.trace("Chowning %s", userHomeDir / sub)
+                    chown(userHomeDir / sub, uid)
+            }
+            log.debug("Creating Akka configuration…")
             createAkkaUserConfIfNotExistant(uid, managerPort)
         }
 
