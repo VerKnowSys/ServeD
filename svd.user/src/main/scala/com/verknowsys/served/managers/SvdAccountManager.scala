@@ -32,15 +32,16 @@ object AccountKeysDB extends DB[AccountKeys]
  */
 class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFileEventsReactor {
 
-    import akka.actor.OneForOneStrategy
-    import akka.actor.SupervisorStrategy._
+    // import akka.actor.OneForOneStrategy
+    // import akka.actor.SupervisorStrategy._
 
-    override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 1 minute) {
-        case _: ArithmeticException      => Resume
-        case _: NullPointerException     => Restart
-        case _: IllegalArgumentException => Stop
-        case _: Exception                => Escalate
-    }
+    // override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 1 minute) {
+    //     // case _: Terminated               => Escalate
+    //     case _: ArithmeticException      => Resume
+    //     case _: NullPointerException     => Restart
+    //     case _: IllegalArgumentException => Stop
+    //     case _: Exception                => Escalate
+    // }
 
 
     import com.verknowsys.served.utils.events._
@@ -49,7 +50,6 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
 
 
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
-    val sh = new SvdShell(account)
     val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
     val systemManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSystemManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
     val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)), "SvdNotificationCenter")
@@ -106,18 +106,12 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
         (accountsManager ? Admin.GetPort) onSuccess {
             case dbPort: Int =>
                 log.debug("Got database port %d", dbPort)
+
                 // Start database server
                 val dbServer = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
                 val db = dbServer.openClient
 
-                // log.info(SvdUserServices.newPhpWebAppEntry("Php", SvdUserDomain("deldaphp", false), account))
-
-                // log.info("Spawning user app: %s".format(_apps))
-                // _apps.start
-                // _apps !! Run /* temporary call due to lack of web interface */
-                // _apps !! Reload /* temporary call due to lack of web interface */
-                // self startLink _apps
-
+                // start managers
                 val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
                 val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"))
 
@@ -125,23 +119,28 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
                 context.watch(gitManager)
                 context.watch(webManager)
 
+                // user services start from this point:
+                val nginx = context.actorOf(Props(new SvdService("Nginx", account, notificationsManager, self)))
+                val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager, self)))
+                val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)))
+                val memcached = context.actorOf(Props(new SvdService("Memcached", account, notificationsManager, self)))
+
                 // Start the real work
+                log.info("(NYI) Checking installed services")
+                // TODO: Checking installed services
+                val services = (nginx :: redis :: postgres :: memcached :: Nil)
+
+
                 log.debug("Becaming started")
                 context.become(
-                    started(db, dbServer, gitManager, notificationsManager, webManager))
+                    started(db, dbServer, gitManager, notificationsManager, webManager, services))
 
                 accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
+                self ! User.SpawnServices // spawn userside services
 
                 // send availability of user to sshd manager
                 addDefaultAccessKey(db)
                 sshd ! InitSSHChannelForUID(account.uid)
-
-                // user services start from this point:
-                log.debug("Starting user redis service")
-                val nginx = context.actorOf(Props(new SvdService("Nginx", account, notificationsManager, accountsManager)))
-                val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager, accountsManager)))
-                val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, accountsManager)))
-                val memcached = context.actorOf(Props(new SvdService("Memcached", account, notificationsManager, accountsManager)))
 
             case x =>
                 sender ! Error("DB initialization error. Got param: %s".format(x))
@@ -160,6 +159,10 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
         case Success =>
             log.debug("Got success")
 
+        case Terminated(ref) => // XXX: it seems to be super fucked up way to maintain actors. Use supervision Luke!
+            log.debug("! Terminated service actor: %s".format(ref))
+            context.unwatch(ref)
+            context.stop(ref)
 
         case x =>
             val m = "Unknown SvdAccountManager message: %s".format(x)
@@ -181,7 +184,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
     }
 
 
-    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef): Receive = traceReceive {
+    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, services: List[ActorRef] = Nil): Receive = traceReceive {
         // case GetUserProcessList =>
         //     val psAll = SvdLowLevelSystemAccess.processList(false)
         //     log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
@@ -190,6 +193,25 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
         //     log.warn("Shutting down Account manager of: %s", account)
         //     db.close
         //     dbServer.close
+
+        // case User.LaunchService(service) =>
+        case User.TerminateServices =>
+            services.foreach {
+                service =>
+                    log.debug("Terminating Service: %s".format(service))
+                    context.stop(service)
+            }
+            sender ! Success
+
+        case User.GetServices =>
+            sender ! services
+
+        case User.SpawnServices =>
+            services.foreach {
+                service =>
+                    log.debug("Launching Service through SpawnServices: %s".format(service))
+                    context.watch(service)
+            }
 
         case User.GetAccount =>
             sender ! account
@@ -247,9 +269,6 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
                     log.trace("Got event: %s", x)
             }
 
-        // case Terminated(ref) => // XXX: it seems to be super fucked up way to maintain actors. Use supervision Luke!
-        //     context.unwatch(ref)
-        //     context.stop(ref)
         //     (accountsManager ? GetPort) onSuccess {
         //         case dbPort: Int =>
         //             log.debug("Actor restart pending")
@@ -290,12 +309,25 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
     }
 
 
-    override def postStop {
-        sh.close
+    addShutdownHook {
+        log.warn("Forcing POST Stop in Account Manager")
         accountsManager ! Admin.Dead(account)
-        context.unbecome
-        log.debug("Executing postStop for user svd UID: %s".format(account.uid))
-        super.postStop
+        postStop
+    }
+
+
+    override def postStop {
+        log.info("Stopping services")
+        (self ? User.TerminateServices) onSuccess {
+            case _ =>
+                log.debug("Terminated successfully")
+                context.unbecome
+                super.postStop
+
+        } onFailure {
+            case x =>
+                log.error("TerminateServices fail: %s".format(x))
+        }
     }
 
 
