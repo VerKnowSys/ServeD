@@ -1,6 +1,5 @@
 {
     "name": "Nginx",
-    "reportAllInfos": false,
     "install": {
         "commands": ["sofin get nginx"],
         "expectStdOut": ["Preparing application: Nginx", "All done."],
@@ -30,12 +29,16 @@ http {
 ' > SERVICE_PREFIX/service.conf"]
     },
     "start": {
-        "commands": ["nginx -c SERVICE_PREFIX/service.conf"]
+        "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf"]
     },
     "stop": {
-        "commands": ["nginx -c SERVICE_PREFIX/service.conf -s stop"]
+        "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s stop"]
     },
     "validate": {
-        "commands": ["nginx -t -c SERVICE_PREFIX/service.conf"]
+        "commands": ["SERVICE_ROOT/exports/nginx -t -c SERVICE_PREFIX/service.conf"],
+        "expectStdErr": ["test is successful"]
+    },
+    "reload": {
+        "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s reload"]
     }
 }

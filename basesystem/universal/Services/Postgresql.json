@@ -1,6 +1,5 @@
 {
     "name": "Postgresql",
-    "reportAllInfos": false,
     "install": {
         "commands": ["sofin get postgresql"],
         "expectStdOut": ["Preparing application: Postgresql", "All done."],
@@ -9,7 +8,22 @@
     "configure": {
         "commands": [
             "test ! -d SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database",
-            "test ! -d SERVICE_PREFIX/database/base && initdb -D SERVICE_PREFIX/database",
+            "test ! -d SERVICE_PREFIX/database/base && SERVICE_ROOT/exports/initdb -D SERVICE_PREFIX/database && rm -f SERVICE_PREFIX/database/pg_hba.conf && rm -f SERVICE_PREFIX/database/postgresql.conf",
+        ]
+    },
+    "start": {
+        "commands": [
+            "SERVICE_ROOT/exports/pg_ctl -D SERVICE_PREFIX/database start"
+        ],
+        "expectStdOut": ["database system is ready to accept connections"],
+    },
+    "stop": {
+        "commands": [
+            "SERVICE_ROOT/exports/pg_ctl --timeout=60 -w -D SERVICE_PREFIX/database stop",
+        ],
+    },
+    "validate": {
+        "commands": [
             "test ! -f SERVICE_PREFIX/database/pg_hba.conf && printf '
 # Default Postgresql service configuration
 local all all trust
@@ -30,11 +44,5 @@ work_mem = 16MB
 max_stack_depth = 16MB
 
 ' > SERVICE_PREFIX/database/postgresql.conf"]
-    },
-    "start": {
-        "commands": ["pg_ctl start -D SERVICE_PREFIX/database"]
-    },
-    "stop": {
-        "commands": ["pg_ctl stop -w --timeout=60 -D SERVICE_PREFIX/database"]
     }
 }

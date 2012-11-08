@@ -5,52 +5,53 @@
     "reportAllInfos": true,
 
     "name": "service-name",
+    "version": "no-version",
     "install": {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 0
+        "expectOutputTimeout": 10
     },
     "configure":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 0
+        "expectOutputTimeout": 10
     },
     "start":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 0
+        "expectOutputTimeout": 10
     },
     "afterStart":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 0
+        "expectOutputTimeout": 10
     },
     "stop":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 0
+        "expectOutputTimeout": 10
     },
     "afterStop":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 0
+        "expectOutputTimeout": 10
     },
     "reload":  {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 0
+        "expectOutputTimeout": 10
     },
     "validate": {
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 0
+        "expectOutputTimeout": 10
     }
 }

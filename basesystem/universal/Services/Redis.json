@@ -1,15 +1,23 @@
 {
     "name": "Redis",
-    "reportAllInfos": false,
     "install": {
         "commands": ["sofin get redis"],
         "expectStdOut": ["Preparing application: Redis", "All done."],
-        "expectOutputTimeout": 90
+        "expectOutputTimeout": 360
     },
     "configure": {
         "commands": [
-            "test ! -d SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database",
-            "test ! -f SERVICE_PREFIX/service.conf && printf '
+            "test ! -d SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database"
+        ]
+    },
+    "start": {
+        "commands": ["SERVICE_ROOT/exports/redis-server SERVICE_PREFIX/service.conf"]
+    },
+    "stop": {
+        "commands": ["kill $(cat SERVICE_PREFIX/service.pid)"]
+    },
+    "validate": {
+        "commands": ["test ! -f SERVICE_PREFIX/service.conf && printf '
 # Default Redis service configuration
 port SERVICE_PORT
 pidfile SERVICE_PREFIX/service.pid
@@ -24,11 +32,5 @@ appendonly no
 appendfsync everysec
 activerehashing yes
 ' > SERVICE_PREFIX/service.conf"]
-    },
-    "start": {
-        "commands": ["redis-server SERVICE_PREFIX/service.conf"]
-    },
-    "stop": {
-        "commands": ["kill $(cat SERVICE_PREFIX/service.pid)"]
     }
 }
