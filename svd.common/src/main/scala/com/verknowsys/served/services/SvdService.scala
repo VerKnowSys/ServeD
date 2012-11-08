@@ -224,7 +224,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
                             // replace special values for valuable data by user account and service name
                             commands = hook.commands.map {
                                 _.replaceAll("SERVICE_PREFIX", servicePrefix)
-                                 // .replaceAll("SERVICE_PORT", "%d".format(resultPort))
+                                 .replaceAll("SERVICE_PORT", "*masked*")
                                  .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
                                  .replaceAll("SERVICE_VERSION", try {
                                         Source.fromFile(installIndicator).mkString
