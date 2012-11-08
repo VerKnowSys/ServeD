@@ -53,30 +53,41 @@
 
     /* global constants */
 
-    #define APP_VERSION "0.2.12"
+    #define APP_VERSION "0.2.13"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
+
+    // default BSD case:
     #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh"
-    #ifdef __FreeBSD__
-        #ifndef JDK7
-            #define DEFAULT_JAVA_BIN "/Software/Openjdk6-i386/exports/java"
-            #define DEFAULT_JAVA64_BIN "/Software/Openjdk6-amd64/exports/java"
-        #else
-            #define DEFAULT_JAVA_BIN "/Software/Openjdk7-i386/exports/java"
-            #define DEFAULT_JAVA64_BIN "/Software/Openjdk7-amd64/exports/java"
-        #endif
-    #elif __APPLE__
+    #ifndef JDK7
+        #define DEFAULT_JAVA_BIN "/Software/Openjdk6-i386/exports/java"
+        #define DEFAULT_JAVA64_BIN "/Software/Openjdk6-amd64/exports/java"
+    #else
+        #define DEFAULT_JAVA_BIN "/Software/Openjdk7-i386/exports/java"
+        #define DEFAULT_JAVA64_BIN "/Software/Openjdk7-amd64/exports/java"
+    #endif
+
+    // Darwin case:
+    #ifdef __APPLE__
+        #undef DEFAULT_JAVA_BIN
+        #undef DEFAULT_JAVA64_BIN
         #define CLOCK_REALTIME REALTIME_CLOCK
+        // NOTE: Darwin uses same zsh path as BSD
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
         #define DEFAULT_JAVA64_BIN "/usr/bin/java"
-    #elif __linux__
+    #endif
+
+    // Linux case:
+    #ifdef __linux__
+        #undef DEFAULT_JAVA_BIN
+        #undef DEFAULT_JAVA64_BIN
+        #undef DEFAULT_SHELL_COMMAND
         #define DEFAULT_SHELL_COMMAND "/bin/zsh"
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
         #define DEFAULT_JAVA64_BIN "/usr/bin/java"
-    #else
-        #error No supported OS found!
     #endif
+
 
     #define CORE_HOMEDIR "/SystemUsers/"
     #define USERS_HOME_DIR "/Users/"
