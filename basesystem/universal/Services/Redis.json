@@ -2,8 +2,7 @@
     "name": "Redis",
     "install": {
         "commands": ["sofin get redis"],
-        "expectStdOut": ["Preparing application: Redis", "All done."],
-        "expectOutputTimeout": 360
+        "expectStdOut": ["Preparing application: Redis", "All done."]
     },
     "configure": {
         "commands": [

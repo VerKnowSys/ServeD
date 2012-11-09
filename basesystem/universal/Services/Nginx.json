@@ -2,8 +2,7 @@
     "name": "Nginx",
     "install": {
         "commands": ["sofin get nginx"],
-        "expectStdOut": ["Preparing application: Nginx", "All done."],
-        "expectOutputTimeout": 1200
+        "expectStdOut": ["Preparing application: Nginx", "All done."]
     },
     "start": {
         "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf"]

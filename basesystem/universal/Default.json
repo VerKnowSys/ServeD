@@ -10,7 +10,7 @@
         "commands": [],
         "expectStdOut": [],
         "expectStdErr": [],
-        "expectOutputTimeout": 10
+        "expectOutputTimeout": 0
     },
     "configure":  {
         "commands": [],

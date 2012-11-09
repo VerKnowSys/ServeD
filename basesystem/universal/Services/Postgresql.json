@@ -2,8 +2,7 @@
     "name": "Postgresql",
     "install": {
         "commands": ["sofin get postgresql"],
-        "expectStdOut": ["Preparing application: Postgresql", "All done."],
-        "expectOutputTimeout": 1200
+        "expectStdOut": ["Preparing application: Postgresql", "All done."]
     },
     "configure": {
         "commands": [
