@@ -53,7 +53,7 @@
 
     /* global constants */
 
-    #define APP_VERSION "0.2.13"
+    #define APP_VERSION "0.2.14"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 

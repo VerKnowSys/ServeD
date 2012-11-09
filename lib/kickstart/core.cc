@@ -36,7 +36,7 @@ const static string coreDir = currentDir();
     void load_svd64(execParams params) {
         string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
         #ifdef DEVEL
-            int count = 17;
+            int count = 13;
         #endif
         char *args[] = {
             (char*)DEFAULT_JAVA64_BIN,
@@ -53,11 +53,11 @@ const static string coreDir = currentDir();
                 (char*)params.jar.c_str(),
             #else
                 (char*)"-javaagent:/lib/jrebel/jrebel.jar", // XXX: hardcoded
-                (char*)"-Dcom.sun.management.jmxremote=true",
-                (char*)"-Dcom.sun.management.jmxremote.ssl=false",
-                (char*)"-Dcom.sun.management.jmxremote.authenticate=false", // XXX: TODO: Security hole
-                (char*)"-Dcom.sun.management.jmxremote.port=55555",
-                /* when devel, use classes from compile folders */
+                // (char*)"-Dcom.sun.management.jmxremote=false",
+                // (char*)"-Dcom.sun.management.jmxremote.ssl=false",
+                // (char*)"-Dcom.sun.management.jmxremote.authenticate=false", // XXX: TODO: Security hole
+                // (char*)"-Dcom.sun.management.jmxremote.port=55555",
+                // /* when devel, use classes from compile folders */
                 (char*)"-cp",
                 (char*)getClassPath(params.classPathFile).c_str(),
                 (char*)params.mainClass.c_str(),
