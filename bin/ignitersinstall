@@ -5,8 +5,8 @@ default_igniters_dir="/Users/Common/Igniters"
 
 if [ ! -d "${default_igniters_dir}" ]; then
     mkdir -p "${default_igniters_dir}"
-    echo "* Installing SvdService Igniters to ${default_igniters_dir}"
-    cp -vr $(pwd)/basesystem/universal/* ${default_igniters_dir}/
+    echo "Installing SvdService Igniters to ${default_igniters_dir}"
+    cp -r $(pwd)/basesystem/universal/* ${default_igniters_dir}/
 else
-    echo "* Igniters already installed."
+    echo "Igniters already installed."
 fi

@@ -4,8 +4,8 @@
 default_igniters_dir="/Users/Common/Igniters"
 
 if [ -d "${default_igniters_dir}" ]; then
-    echo "* Removing SvdService Igniters from ${default_igniters_dir}"
-    rm -frv "${default_igniters_dir}"
+    echo "Removing SvdService Igniters from ${default_igniters_dir}"
+    rm -fr "${default_igniters_dir}"
 else
-    echo "* Igniters already removed."
+    echo "Igniters already removed."
 fi
