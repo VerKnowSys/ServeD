@@ -30,7 +30,8 @@ object AccountKeysDB extends DB[AccountKeys]
  * @author dmilith
  * @author teamon
  */
-class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFileEventsReactor {
+class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) extends SvdManager with SvdFileEventsReactor {
+    // TODO: implement headless mode
 
     // import akka.actor.OneForOneStrategy
     // import akka.actor.SupervisorStrategy._
@@ -102,49 +103,90 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
         log.debug("Registering file events for 'watchfile'")
         registerFileEventFor(userHomePath / "watchfile", All, uid = account.uid)
 
-        log.debug("Getting database port from AccountsManager")
-        (accountsManager ? Admin.GetPort) onSuccess {
-            case dbPort: Int =>
-                log.debug("Got database port %d", dbPort)
-
-                // Start database server
-                val dbServer = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
-                val db = dbServer.openClient
-
-                // start managers
-                val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
-                val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"))
-
-                context.watch(notificationsManager)
-                context.watch(gitManager)
-                context.watch(webManager)
-
-                // user services start from this point:
-                val nginx = context.actorOf(Props(new SvdService("Nginx", account, notificationsManager, self)), "Nginx")
-                val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager, self)), "Redis")
-                val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)), "Postgresql")
-                val memcached = context.actorOf(Props(new SvdService("Memcached", account, notificationsManager, self)), "Memcached")
-
-                // Start the real work
-                log.info("(NYI) Checking installed services")
-                // TODO: Checking installed services
-                val services = (nginx :: redis :: postgres :: memcached :: Nil)
+        if (headless) {
+            // headless mode
+            val headlessPort = account.uid + 1024 // choose one above 0:1024 range
+            val dbPort = account.uid + 1025
+            log.info("Headless mode assumes that machine services ports remains static for given user.")
+            log.info("Headless port for this user is: %d. Database port: %d".format(headlessPort, dbPort))
+            val dbServer = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
+            val db = dbServer.openClient
 
 
-                log.debug("Becaming started")
-                context.become(
-                    started(db, dbServer, gitManager, notificationsManager, webManager, services))
+            // NON DRY NON DRY NON DRY:
 
-                accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
-                self ! User.SpawnServices // spawn userside services
+            val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
+            val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"))
 
-                // send availability of user to sshd manager
-                addDefaultAccessKey(db)
-                sshd ! InitSSHChannelForUID(account.uid)
+            context.watch(notificationsManager)
+            context.watch(gitManager)
+            context.watch(webManager)
 
-            case x =>
-                // sender ! Error("DB initialization error. Got param: %s".format(x))
-                throwException[DBServerInitializationException]("DB initialization error. Got param: %s".format(x))
+            val nginx = context.actorOf(Props(new SvdService("Nginx", account, notificationsManager, self)), "Nginx")
+            val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager, self)), "Redis")
+            // val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)), "Postgresql")
+            val memcached = context.actorOf(Props(new SvdService("Memcached", account, notificationsManager, self)), "Memcached")
+
+            // Start the real work
+            log.info("(NYI) Checking installed services")
+            // TODO: Checking installed services
+            val services = (nginx :: redis :: memcached :: Nil) // :: postgres
+
+            log.debug("Becaming headless with started")
+            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, services))
+
+            self ! User.SpawnServices // spawn userside services
+
+            // send availability of user to sshd manager
+            // addDefaultAccessKey(db)
+            // sshd ! InitSSHChannelForUID(account.uid)
+
+        } else  {
+            // normal mode
+            log.debug("Getting database port from AccountsManager")
+            (accountsManager ? Admin.GetPort) onSuccess {
+                case dbPort: Int =>
+                    log.debug("Got database port %d", dbPort)
+
+                    // Start database server
+                    val dbServer = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
+                    val db = dbServer.openClient
+
+                    // start managers
+                    val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
+                    val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"))
+
+                    context.watch(notificationsManager)
+                    context.watch(gitManager)
+                    context.watch(webManager)
+
+                    // user services start from this point:
+                    val nginx = context.actorOf(Props(new SvdService("Nginx", account, notificationsManager, self)), "Nginx")
+                    val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager, self)), "Redis")
+                    // val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)), "Postgresql")
+                    val memcached = context.actorOf(Props(new SvdService("Memcached", account, notificationsManager, self)), "Memcached")
+
+                    // Start the real work
+                    log.info("(NYI) Checking installed services")
+                    // TODO: Checking installed services
+                    val services = (nginx :: redis :: memcached :: Nil) // :: postgres
+
+
+                    log.debug("Becaming started")
+                    context.become(
+                        started(db, dbServer, gitManager, notificationsManager, webManager, services))
+
+                    accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
+                    self ! User.SpawnServices // spawn userside services
+
+                    // send availability of user to sshd manager
+                    addDefaultAccessKey(db)
+                    sshd ! InitSSHChannelForUID(account.uid)
+
+                case x =>
+                    // sender ! Error("DB initialization error. Got param: %s".format(x))
+                    throwException[DBServerInitializationException]("DB initialization error. Got param: %s".format(x))
+            }
         }
 
     }
@@ -185,16 +227,7 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
 
 
     private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, services: List[ActorRef] = Nil): Receive = traceReceive {
-        // case GetUserProcessList =>
-        //     val psAll = SvdLowLevelSystemAccess.processList(false)
-        //     log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
 
-        // case Shutdown =>
-        //     log.warn("Shutting down Account manager of: %s", account)
-        //     db.close
-        //     dbServer.close
-
-        // case User.LaunchService(service) =>
         case User.TerminateServices =>
             services.foreach {
                 service =>
@@ -232,21 +265,10 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
             val ak = accountKeys(db)
             db << ak.copy(keys = ak.keys - key)
 
-        case Success =>
-            log.debug("Received Success")
-
         case System.RegisterDomain(domain) =>
             log.info("Registering domain: %s", domain)
             log.warn("NYI")
             sender ! Success
-
-        case x: Admin.Base =>
-            log.debug("Forwarding message: %s to Accounts Manager", x)
-            accountsManager forward x
-
-        case x: System.Base =>
-            log.debug("Forwarding message: %s to System Manager", x)
-            systemManager forward x
 
         case SvdFileEvent(path, flags) =>
             log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))
@@ -269,29 +291,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
                     log.trace("Got event: %s", x)
             }
 
-
-        //     (accountsManager ? GetPort) onSuccess {
-        //         case dbPort: Int =>
-        //             log.debug("Actor restart pending")
-        //             // val server = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
-        //             val db = dbServer.openClient
-        //             val gm = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
-
-        //         case x =>
-        //             log.error("Wtf?: %s", x)
-
-        //     } onFailure {
-        //         case x =>
-        //             log.debug("Failure after Terminated signal")
-        //     }
-            // context.stop(ref)
-            // val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
-            // (gitManager ? Init) onSuccess {
-            //     case _ =>
-            //         log.debug("Setting log watch on git manager.")
-            //         context.watch(gitManager)
-            // }
-
+        case Success =>
+            log.debug("Received Success")
 
         // redirect user notification messages directly to notification center
         case msg: Notify.Message =>
@@ -301,6 +302,34 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
         case msg: Git.Base =>
             log.trace("Forwarding Git message to Git Manager")
             gitManager forward msg
+
+        case x: Admin.Base =>
+            if (headless) {
+                x match {
+                    case Admin.GetPort => // allow getting static port for headless account manager
+                        val numServices = services.length + 1
+                        sender ! 1024 + account.uid + numServices // hacky but should work in headless mode
+
+                    case _ =>
+                        val err = "Forwarding to Accounts Manager can't work in headless mode."
+                        log.error(err)
+                        notificationsManager ! Notify.Message(err)
+                }
+            } else {
+                log.debug("Forwarding message: %s to Accounts Manager", x)
+                accountsManager forward x
+            }
+
+        case x: System.Base =>
+            if (headless) {
+                log.debug("Forwarding message: %s to System Manager", x)
+                systemManager forward x
+            } else {
+                val err = "Forwarding to System Manager can't work in headless mode."
+                log.error(err)
+                notificationsManager ! Notify.Message(err)
+            }
+
     }
 
 
@@ -313,7 +342,8 @@ class SvdAccountManager(val account: SvdAccount) extends SvdManager with SvdFile
 
     addShutdownHook {
         log.warn("Forcing POST Stop in Account Manager")
-        accountsManager ! Admin.Dead(account)
+        if (!headless)
+            accountsManager ! Admin.Dead(account)
         postStop
     }
 
