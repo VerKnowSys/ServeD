@@ -1,16 +1,38 @@
 #!/bin/sh
 
 unset DYLD_LIBRARY_PATH
+unset LD_LIBRARY_PATH
 
-if [ `uname -s` = "Darwin" ]; then
-  sudo mkdir -p /Users/Common
-  sudo chown 501 /Users/Common
-  bin/ignitersuninstall && bin/ignitersinstall
-  kill `cat /Users/501/501.pid`
-  sudo chown 501 /Users/501/.akka.conf
-  sleep 2
-  /usr/bin/java -d32 -client -Xmn1m -XX:NewRatio=1 -Xms16m -Xmx64m -Dfile.encoding=UTF-8 -javaagent:/lib/jrebel/jrebel.jar -cp $(cat tmp/user.classpath) com.verknowsys.served.userboot 501
-else
-  echo "Not implemented"
+SYSTEM_NAME="$(uname -s)"
+DEFAULT_COMMON_PATH="/Users/Common"
+DEFAULT_USER_UID="501"
+JAVA_PATH=/Software/Openjdk6-i386/exports/java
+
+if [ "$SYSTEM_NAME" = "Darwin" ]; then
+  export JAVA_PATH=/usr/bin/java
 fi
 
+
+echo "Host: ${SYSTEM_NAME}, ServeD UID: ${DEFAULT_USER_UID}, Common path: ${DEFAULT_COMMON_PATH}, JDK: ${JAVA_PATH}."
+
+case "${SYSTEM_NAME}" in
+  Darwin)
+    sudo mkdir -p "${DEFAULT_COMMON_PATH}"
+    sudo chown ${DEFAULT_USER_UID} "${DEFAULT_COMMON_PATH}"
+    bin/ignitersuninstall && bin/ignitersinstall
+    kill `cat /Users/${DEFAULT_USER_UID}/${DEFAULT_USER_UID}.pid`
+    sudo chown ${DEFAULT_USER_UID} /Users/${DEFAULT_USER_UID}/.akka.conf
+    sleep 5
+    "${JAVA_PATH}" -d32 -client -Xmn1m -XX:NewRatio=1 -Xms16m -Xmx64m -Dfile.encoding=UTF-8 -javaagent:/lib/jrebel/jrebel.jar -cp "$(cat tmp/user.classpath)" com.verknowsys.served.userboot ${DEFAULT_USER_UID}
+    ;;
+
+  *)
+    chown ${DEFAULT_USER_UID} "${DEFAULT_COMMON_PATH}"
+    bin/ignitersuninstall && bin/ignitersinstall
+    kill `cat /Users/${DEFAULT_USER_UID}/${DEFAULT_USER_UID}.pid`
+    chown ${DEFAULT_USER_UID} /Users/${DEFAULT_USER_UID}/.akka.conf
+    sleep 5
+    "${JAVA_PATH}" -d32 -client -Xmn1m -XX:NewRatio=1 -Xms16m -Xmx64m -Dfile.encoding=UTF-8 -cp "$(cat tmp/user.classpath)" com.verknowsys.served.userboot ${DEFAULT_USER_UID}
+    ;;
+
+esac
