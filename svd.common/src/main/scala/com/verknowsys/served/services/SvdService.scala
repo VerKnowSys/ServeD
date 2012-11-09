@@ -300,6 +300,9 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
             log.trace("Success in SvdService from %s".format(sender.getClass.getName))
     }
 
+    addShutdownHook {
+        log.warn("SvdService: %s shutdown hook invoked".format(config.name))
+    }
 
     override def postStop {
         log.info("PostStop in SvdService: %s".format(config.name))

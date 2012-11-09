@@ -307,8 +307,14 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             if (headless) {
                 x match {
                     case Admin.GetPort => // allow getting static port for headless account manager
+                        import java.lang._
+
                         val numServices = services.length + 1
-                        sender ! 1024 + account.uid + numServices // hacky but should work in headless mode
+
+                        Thread.sleep(Math.abs(new scala.util.Random().nextInt % 100))
+                        val randomPort = ((1024 + account.uid) + java.lang.System.currentTimeMillis % 10000).toInt// XXX: almost random in range of max 10000 service ports
+
+                        sender ! Math.abs(randomPort)
 
                     case _ =>
                         val err = "Forwarding to Accounts Manager can't work in headless mode."

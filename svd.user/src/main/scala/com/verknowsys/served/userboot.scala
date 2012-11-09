@@ -43,14 +43,7 @@ object userboot extends Logging with SvdUtils {
         val system = ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDremote"))
         val accountsManager = system.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
 
-
-        // addShutdownHook {
-        //     log.warn("Got termination signal")
-        //     log.info("Shutting down userboot")
-        //     system.shutdown // shutting down main account actor manager
-        //     Thread.sleep(SvdConfig.shutdownTimeout + 15000)
-        // }
-
+        implicit val timeout = Timeout(SvdConfig.headlessTimeout / 1000 seconds) // cause of standard of milisecond value in SvdConfig
         (accountsManager ? User.GetAccount(userUID)) onSuccess {
 
             case Some(account: SvdAccount) =>
@@ -65,8 +58,14 @@ object userboot extends Logging with SvdUtils {
 
         } onFailure {
             case x =>
-                log.error("Error occured in userboot with: %s".format(x))
-                throwException[RuntimeException]("Cannot spawn user boot for UID: %s!".format(userUID))
+                log.warn("Couldn't connect to SvdROOT with UID: %s, cause of %s".format(userUID, x))
+
+                log.info("Launching headless mode for UID: %d".format(userUID))
+                val account = SvdAccount(uid = userUID, userName = "headless %s".format(userUID))
+
+                val am = system.actorOf(Props(new SvdAccountManager(account, headless = true)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager")
+                log.info("Spawned Headless UserBoot for UID: %d", userUID)
+
         }
 
         addShutdownHook {
