@@ -46,6 +46,11 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
     val accountManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountManager".format(SvdConfig.served, account.accountManagerPort))
 
 
+    addShutdownHook {
+        log.warn("Shutdown hook in Web Manager")
+        postStop
+    }
+
     override def postStop = {
         log.info("Stopping Web Manager for uid: %s".format(account.uid))
         super.postStop

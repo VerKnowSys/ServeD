@@ -8,16 +8,11 @@ import akka.remote._
 import akka.util.Duration
 import akka.util.Timeout
 import akka.util.duration._
-import akka.actor._
-import com.sun.jna.NativeLong
-import com.sun.jna.{Native, Library}
-import events._
-
-import events._
-import com.verknowsys.served.utils.events._
+import com.sun.jna.{Native, Library, NativeLong}
+import com.verknowsys.served.utils.Events._
 import java.io._
 import org.apache.commons.io.FileUtils
-import events._
+import Events._
 import akka.actor._
 import akka.actor.Actor._
 import com.verknowsys.served.api._
@@ -25,11 +20,12 @@ import com.verknowsys.served.api.git._
 import com.verknowsys.served._
 
 
-object events {
-    case class SvdKqueueFileEvent(ident: Int, flags: Int)
-    case class SvdFileEvent(path: String, flags: Int)
-    case class SvdRegisterFileEvent(path: String, flags: Int, ref: ActorRef)
-    case class SvdUnregisterFileEvent(ref: ActorRef)
+object Events {
+    abstract class Base extends ApiMessage
+    case class SvdKqueueFileEvent(ident: Int, flags: Int) extends Base
+    case class SvdFileEvent(path: String, flags: Int) extends Base
+    case class SvdRegisterFileEvent(path: String, flags: Int, ref: ActorRef) extends Base
+    case class SvdUnregisterFileEvent(ref: ActorRef) extends Base
 
     class SvdKqueueException extends Exception
     class SvdKeventException extends Exception
@@ -79,8 +75,7 @@ trait SvdFileEventsReactor extends SvdExceptionHandler with Logging with SvdUtil
 
     def registerFileEventFor(path: String, flags: Int, ref: ActorRef = self, uid: Int = 0) {
         def bindEvent {
-            val fem = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
-            fem ! SvdRegisterFileEvent(path, flags, ref)
+            self ! SvdRegisterFileEvent(path, flags, ref)
         }
 
         val file = new java.io.File(path)
@@ -137,6 +132,7 @@ trait SvdFileEventsReactor extends SvdExceptionHandler with Logging with SvdUtil
  */
 class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler with SvdUtils {
     import CLibrary._
+    import Events._
 
     log.info("SvdFileEventsManager is loading")
 

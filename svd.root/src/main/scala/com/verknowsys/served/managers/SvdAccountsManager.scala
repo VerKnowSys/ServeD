@@ -4,7 +4,7 @@ package com.verknowsys.served.managers
 import com.verknowsys.served._
 import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.events._
+import com.verknowsys.served.utils.Events._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.systemmanager.managers._
@@ -43,7 +43,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor {
     val rootAccount = SvdAccount("root", uid = 0)
     val svdAccountUtils = new SvdAccountUtils(db)
 
-    import events._
+    import Events._
     import svdAccountUtils._
 
 
@@ -84,6 +84,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor {
                 }
         }
         log.info("All done.")
+        postStop
     }
 
 
@@ -207,5 +208,12 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor {
     */
     protected def userAccounts = SvdAccounts(db).toList
 
+
+    override def postStop = {
+        log.debug("Accounts Manager postStop. Closing database")
+        db.close
+        server.close
+        super.postStop
+    }
 
 }

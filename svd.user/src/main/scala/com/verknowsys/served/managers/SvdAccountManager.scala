@@ -45,7 +45,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     // }
 
 
-    import com.verknowsys.served.utils.events._
+    import com.verknowsys.served.utils.Events._
 
     class DBServerInitializationException extends Exception
 
@@ -53,7 +53,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
     val systemManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSystemManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
-    val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)), "SvdNotificationCenter")
+    val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-core-dispatcher"), "SvdFileEventsManagerUser") // XXX: hardcode
+    val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
     val sshd = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
     val userHomePath = SvdConfig.userHomeDir / "%s".format(account.uid)
 
@@ -103,6 +104,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         log.debug("Registering file events for 'watchfile'")
         registerFileEventFor(userHomePath / "watchfile", All, uid = account.uid)
 
+        log.debug("Registering file events for 'restart'")
+        registerFileEventFor(userHomePath / "restart", All, uid = account.uid)
+
         if (headless) {
             // headless mode
             val headlessPort = account.uid + 1024 // choose one above 0:1024 range
@@ -114,7 +118,6 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
 
             // NON DRY NON DRY NON DRY:
-
             val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
             val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"))
 
@@ -202,7 +205,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             log.debug("Got success")
 
         case Terminated(ref) => // XXX: it seems to be super fucked up way to maintain actors. Use supervision Luke!
-            log.debug("! Terminated service actor: %s".format(ref))
+            log.debug("Terminated service actor: %s".format(ref))
             context.unwatch(ref)
             context.stop(ref)
 
@@ -289,6 +292,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     log.trace("File event type: Revoked")
                 case x =>
                     log.trace("Got event: %s", x)
+
             }
 
         case Success =>
@@ -302,6 +306,10 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         case msg: Git.Base =>
             log.trace("Forwarding Git message to Git Manager")
             gitManager forward msg
+
+        case x: Events.Base =>
+            log.trace("Forwarding Events message to File Event Manager")
+            fem forward x
 
         case x: Admin.Base =>
             if (headless) {
@@ -355,6 +363,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
 
     override def postStop {
+        // log.debug("Stopping database server and client")
+        // db.close
+        // dbServer.close
         log.info("Stopping services")
         (self ? User.TerminateServices) onSuccess {
             case _ =>

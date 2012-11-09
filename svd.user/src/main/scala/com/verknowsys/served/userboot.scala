@@ -63,6 +63,7 @@ object userboot extends Logging with SvdUtils {
                 log.info("Launching headless mode for UID: %d".format(userUID))
                 val account = SvdAccount(uid = userUID, userName = "headless %s".format(userUID))
 
+                // launching headless mode
                 val am = system.actorOf(Props(new SvdAccountManager(account, headless = true)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager")
                 log.info("Spawned Headless UserBoot for UID: %d", userUID)
 
