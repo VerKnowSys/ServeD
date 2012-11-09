@@ -120,6 +120,10 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
     val servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
     checkOrCreateDir(servicePrefix)
 
+    implicit val timeout = Timeout(60 seconds) // XXX: hardcode
+    val future = accountManager ? Admin.GetPort
+    val servicePort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
+    log.trace("Expected port from Account Manager arrived: %d".format(servicePort))
 
     def shell = new SvdShell(account)
 
@@ -197,68 +201,46 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
      *   hookShot is a safe way to launch service hooks
      */
     def hookShot(hook: SvdShellOperations, hookName: String) { // XXX: this should be done better. String should be replaced
-        try { // OPTIMIZE CAUSE THIS CODE SUCKS BADLY
-            if (!hook.commands.isEmpty) { // don't report empty / undefined hooks
-                if ((hookName == "validate") || (hookName == "start")) {
-                    implicit val timeout = Timeout(10 seconds) // XXX: hardcode
-                    val future = accountManager ? Admin.GetPort // XXX: it registers port on each hook.. which is bad idea
-                    val resultPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
-                    shell.exec(
-                        hook.copy(
-                            // replace special values for valuable data by user account and service name
-                            commands = hook.commands.map {
-                                _.replaceAll("SERVICE_PREFIX", servicePrefix)
-                                 .replaceAll("SERVICE_PORT", "%d".format(resultPort))
-                                 .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
-                                 .replaceAll("SERVICE_VERSION", try {
-                                        Source.fromFile(installIndicator).mkString
-                                    } catch {
-                                        case _: Exception => "no-version"
-                                    })
-                            }
-                        )
-                    )
-                } else // for rest of hooks, port isn't required
-                    shell.exec(
-                        hook.copy(
-                            // replace special values for valuable data by user account and service name
-                            commands = hook.commands.map {
-                                _.replaceAll("SERVICE_PREFIX", servicePrefix)
-                                 .replaceAll("SERVICE_PORT", "*masked*")
-                                 .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
-                                 .replaceAll("SERVICE_VERSION", try {
-                                        Source.fromFile(installIndicator).mkString
-                                    } catch {
-                                        case _: Exception => "no-version"
-                                    })
-                            }
-                        )
-                    )
-
+        if (!hook.commands.isEmpty) { // don't report empty / undefined hooks
+            try {
+                val execCommands = hook.commands.map {
+                    _.replaceAll("SERVICE_PREFIX", servicePrefix)
+                     .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
+                     .replaceAll("SERVICE_VERSION", try {
+                            Source.fromFile(installIndicator).mkString
+                        } catch {
+                            case _: Exception => "no-version"
+                        })
+                    .replaceAll("SERVICE_PORT", "%d".format(servicePort))
+                }
+                shell.exec(
+                    hook.copy(commands = execCommands)
+                )
                 val msg = "--- INFO ---\nPerforming %s of service: %s\n------------\n".format(hookName, config.name)
                 log.trace(msg)
                 if (config.reportAllInfos)
                     notificationsManager ! Notify.Message(msg)
-            } else {
-                log.debug("Hook undefined: %s for service: %s".format(hookName, config.name))
-            }
-        } catch {
-            case x: expectj.TimeoutException =>
-                val hk = hook.copy( commands = hook.commands.map { // map values for better message
-                    _.replaceAll("SERVICE_PREFIX", servicePrefix)
-                     .replaceAll("SERVICE_PORT", "*(masked)*")
-                     .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
-                })
-                val msg = "=== ERROR ===\nHook %s of service: %s failed to pass expectations: CMD: '%s', OUT: '%s', ERR: '%s'.\n=============\n".format(hookName, config.name, hk.commands.mkString(" "), hk.expectStdOut, hk.expectStdErr)
-                log.error(msg)
-                if (config.reportAllErrors)
-                    notificationsManager ! Notify.Message(msg)
 
-            case x: Exception =>
-                val msg = "### FATAL ###\nThrown exception in hook: %s of service: %s an exception content below:\n%s\n#############\n".format(hookName, config.name, x.getMessage + " " + x.getStackTrace)
-                log.error(msg)
-                if (config.reportAllErrors)
-                    notificationsManager ! Notify.Message(msg)
+            } catch {
+                case x: expectj.TimeoutException =>
+                    val hk = hook.copy( commands = hook.commands.map { // map values for better message
+                        _.replaceAll("SERVICE_PREFIX", servicePrefix)
+                         .replaceAll("SERVICE_PORT", "*(masked-random-user-port)*")
+                         .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
+                    })
+                    val msg = "=== ERROR ===\nHook %s of service: %s failed to pass expectations: CMD: '%s', OUT: '%s', ERR: '%s'.\n=============\n".format(hookName, config.name, hk.commands.mkString(" "), hk.expectStdOut, hk.expectStdErr)
+                    log.error(msg)
+                    if (config.reportAllErrors)
+                        notificationsManager ! Notify.Message(msg)
+
+                case x: Exception =>
+                    val msg = "### FATAL ###\nThrown exception in hook: %s of service: %s an exception content below:\n%s\n#############\n".format(hookName, config.name, x.getMessage + " " + x.getStackTrace)
+                    log.error(msg)
+                    if (config.reportAllErrors)
+                        notificationsManager ! Notify.Message(msg)
+            }
+        } else {
+            log.trace("Command list empty.")
         }
     }
 
