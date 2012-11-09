@@ -6,12 +6,16 @@ unset LD_LIBRARY_PATH
 SYSTEM_NAME="$(uname -s)"
 DEFAULT_COMMON_PATH="/Users/Common"
 DEFAULT_USER_UID="501"
-JAVA_PATH=/Software/Openjdk6-i386/exports/java
+JAVA_PATH="/Software/Openjdk6-i386/exports/java"
 
 if [ "$SYSTEM_NAME" = "Darwin" ]; then
-  export JAVA_PATH=/usr/bin/java
+  export JAVA_PATH="/usr/bin/java"
 fi
 
+if [ "$1" != "" ]; then
+  echo "Explicit UID given: $1."
+  export DEFAULT_USER_UID="$1"
+fi
 
 echo "Host: ${SYSTEM_NAME}, ServeD UID: ${DEFAULT_USER_UID}, Common path: ${DEFAULT_COMMON_PATH}, JDK: ${JAVA_PATH}."
 

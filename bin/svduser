@@ -2,11 +2,15 @@
 
 pwd=$(pwd)
 version="$(cat VERSION)"
-jar="${pwd}/svd.user/target/user-assembly-${version}.jar"
+JAR="${pwd}/svd.user/target/user-assembly-${version}.jar"
+UID="$(id -u)"
+if [ "$1" != "" ]; then
+  export UID="$1"
+fi
 
 if [ -e "${jar}" ]; then
-    echo "Executing: ${jar}"
-    java -d32 -XX:MaxPermSize=64M -XX:+UseParallelGC -Xms8m -Xmx128m -Dfile.encoding=UTF-8 -noverify -client -Djna.library.path=$(pwd)/lib -jar "${jar}" $(id -u) "$@"
+  echo "Executing: ${jar}"
+  java -d32 -XX:MaxPermSize=64M -XX:+UseParallelGC -Xms8m -Xmx128m -Dfile.encoding=UTF-8 -noverify -client -Djna.library.path=$(pwd)/lib -jar "${JAR}" "${UID}" "$@"
 else
-    echo "Assembly not found. Use build script!"
+  echo "Assembly not found. Use build script!"
 fi
