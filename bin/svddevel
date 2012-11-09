@@ -18,24 +18,26 @@ if [ "$1" != "" ]; then
 fi
 
 echo "Host: ${SYSTEM_NAME}, ServeD UID: ${DEFAULT_USER_UID}, Common path: ${DEFAULT_COMMON_PATH}, JDK: ${JAVA_PATH}."
+bin/current
+echo "Killing currently spawned user boot for UID: ${DEFAULT_USER_UID}"
+kill `cat /Users/${DEFAULT_USER_UID}/${DEFAULT_USER_UID}.pid` > /dev/null 2>&1
+
 
 case "${SYSTEM_NAME}" in
   Darwin)
     sudo mkdir -p "${DEFAULT_COMMON_PATH}"
     sudo chown ${DEFAULT_USER_UID} "${DEFAULT_COMMON_PATH}"
     bin/ignitersuninstall && bin/ignitersinstall
-    kill `cat /Users/${DEFAULT_USER_UID}/${DEFAULT_USER_UID}.pid`
     sudo chown ${DEFAULT_USER_UID} /Users/${DEFAULT_USER_UID}/.akka.conf
-    sleep 5
+    sleep 3
     "${JAVA_PATH}" -d32 -client -Xmn1m -XX:NewRatio=1 -Xms16m -Xmx64m -Dfile.encoding=UTF-8 -javaagent:/lib/jrebel/jrebel.jar -cp "$(cat tmp/user.classpath)" com.verknowsys.served.userboot ${DEFAULT_USER_UID}
     ;;
 
   *)
     chown ${DEFAULT_USER_UID} "${DEFAULT_COMMON_PATH}"
     bin/ignitersuninstall && bin/ignitersinstall
-    kill `cat /Users/${DEFAULT_USER_UID}/${DEFAULT_USER_UID}.pid`
     chown ${DEFAULT_USER_UID} /Users/${DEFAULT_USER_UID}/.akka.conf
-    sleep 5
+    sleep 3
     "${JAVA_PATH}" -d32 -client -Xmn1m -XX:NewRatio=1 -Xms16m -Xmx64m -Dfile.encoding=UTF-8 -cp "$(cat tmp/user.classpath)" com.verknowsys.served.userboot ${DEFAULT_USER_UID}
     ;;
 
