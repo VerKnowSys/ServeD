@@ -12,13 +12,13 @@ import com.verknowsys.served.api.{SvdUserPort, SvdUserUID, SvdAccount, SvdSystem
 import com.verknowsys.served.api.pools._
 import com.verknowsys.served.services._
 
-
 import scala.io.Source
 import java.io._
 import scala.util._
 
 
-class SvdAccountUtils(db: DBClient) extends Logging with SvdUtils {
+class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
+
     /**
      *  @author dmilith
      *
@@ -61,36 +61,6 @@ class SvdAccountUtils(db: DBClient) extends Logging with SvdUtils {
             uid
         } else
             randomUserUid
-    }
-
-
-    /**
-     *  @author dmilith
-     *
-     *   creates akka configuration file for given user
-     */
-    def createAkkaUserConfIfNotExistant(uid: Int, userManagerPort: Int) = {
-        val configFile = SvdConfig.userHomeDir / "%d".format(uid) / SvdConfig.defaultAkkaConfName
-
-        if (!new File(configFile).exists) {
-            log.debug("Akka config: %s not found. Generating default one", configFile)
-
-            def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
-                try { f(param) } finally { param.close() }
-
-            def writeToFile(fileName: String, data: String) =
-                using (new FileWriter(fileName)) {
-                    fileWriter => fileWriter.write(data)
-            }
-            val defaultConfig = Source.fromURL(
-                getClass.getResource(
-                    SvdConfig.defaultUserAkkaConf
-                )
-            ).getLines.mkString("\n").replaceAll("USER_NETTY_PORT", "%d".format(userManagerPort))
-            writeToFile(configFile, defaultConfig)
-        } else {
-            log.debug("Akka config found: %s", configFile)
-        }
     }
 
 

@@ -39,7 +39,7 @@ import net.liftweb.json._
  *
  * @author dmilith
  */
-class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsReactor with SvdUtils {
+class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsReactor with SvdUtils with Logging {
 
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode

@@ -17,9 +17,10 @@ import akka.util.Timeout
 import akka.util.duration._
 import akka.actor._
 import scala.io.Source
+import java.io.File
 
 
-object userboot extends Logging with SvdUtils {
+object userboot extends SvdAkkaSupport with Logging {
 
 
     def run(userUID: Int){
@@ -36,10 +37,17 @@ object userboot extends Logging with SvdUtils {
 
         // Get account form remote service
         log.debug("Getting account for uid %d", userUID)
+
         val configFile = SvdConfig.userHomeDir / "%d".format(userUID) / SvdConfig.defaultAkkaConfName
+
+        if (!new File(configFile).exists) {
+            log.info("Spawning headless".format(userUID))
+            val account = SvdAccount(uid = userUID, userName = "headless %s".format(userUID))
+            createAkkaUserConfIfNotExistant(userUID, userUID + 1026)
+        }
+
         val akkaConfigContent = Source.fromFile(configFile).getLines.mkString("\n")
         log.trace("Read akka configuration for account: %s", akkaConfigContent)
-
         val system = ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDremote"))
         val accountsManager = system.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
 
@@ -58,7 +66,7 @@ object userboot extends Logging with SvdUtils {
 
         } onFailure {
             case x =>
-                log.warn("Couldn't connect to SvdROOT with UID: %s, cause of %s".format(userUID, x))
+                log.info("Couldn't connect to SvdROOT with UID: %s".format(userUID))
 
                 log.info("Launching headless mode for UID: %d".format(userUID))
                 val account = SvdAccount(uid = userUID, userName = "headless %s".format(userUID))

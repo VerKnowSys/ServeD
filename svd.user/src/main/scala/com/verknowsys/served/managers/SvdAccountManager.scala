@@ -30,8 +30,7 @@ object AccountKeysDB extends DB[AccountKeys]
  * @author dmilith
  * @author teamon
  */
-class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) extends SvdManager with SvdFileEventsReactor {
-    // TODO: implement headless mode
+class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) extends SvdManager with SvdFileEventsReactor with Logging {
 
     // import akka.actor.OneForOneStrategy
     // import akka.actor.SupervisorStrategy._
@@ -99,6 +98,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
     override def preStart = {
         super.preStart
+        context.watch(fem)
+
         log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
 
         log.debug("Registering file events for 'watchfile'")

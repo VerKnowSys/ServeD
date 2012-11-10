@@ -150,7 +150,7 @@ object ServeD extends Build {
             libraryDependencies ++= Seq(jline, expect4j, sshd, webbit),
             mainClass in assembly := Some("com.verknowsys.served.rootboot")
         )
-    ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, common, utils, web, testing % "test")
+    ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, common, user, utils, web, testing % "test")
 
 
     lazy val user = Project("user", file("svd.user"),

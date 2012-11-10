@@ -27,7 +27,7 @@ import org.webbitserver.handler._
 *
 *   SvdSystemManager - responsible for System managment and monitoring
 */
-class SvdSystemManager extends SvdManager {
+class SvdSystemManager extends SvdManager with Logging {
 
 
     override def preStart = {

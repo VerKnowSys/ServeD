@@ -35,7 +35,7 @@ case object SvdUserUIDs extends DB[SvdUserUID]
  *  @author dmilith
  *
  */
-class SvdAccountsManager extends SvdManager with SvdFileEventsReactor {
+class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Logging {
 
     val server = new DBServer(SvdConfig.remoteAccountServerPort, SvdConfig.systemHomeDir / SvdConfig.coreSvdAccountsDatabaseName)
     val db = server.openClient
