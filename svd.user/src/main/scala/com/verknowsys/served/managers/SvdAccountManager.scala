@@ -83,10 +83,10 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             context.watch(gitManager)
             context.watch(webManager)
 
-            val nginx = context.actorOf(Props(new SvdService("Nginx", account)), "Nginx")
-            val redis = context.actorOf(Props(new SvdService("Redis", account)), "Redis")
+            // val nginx = context.actorOf(Props(new SvdService("Nginx", account)), "Nginx")
+            // val redis = context.actorOf(Props(new SvdService("Redis", account)), "Redis")
             // val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)), "Postgresql")
-            val memcached = context.actorOf(Props(new SvdService("Memcached", account)), "Memcached")
+            // val memcached = context.actorOf(Props(new SvdService("Memcached", account)), "Memcached")
 
             log.debug("Registering file events for 'watchfile'")
             registerFileEventFor(userHomeDir / "watchfile", Modified, uid = account.uid)
@@ -97,7 +97,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             // Start the real work
             log.info("(NYI) Checking installed services")
             // TODO: Checking installed services
-            val services = (nginx :: redis :: memcached :: Nil) // :: postgres
+            val services = ("Nginx" :: "Redis" :: "Memcached" :: Nil) // :: postgres
 
             log.debug("Becaming headless with started")
             context.become(started(db, dbServer, gitManager, notificationsManager, webManager, services))
@@ -111,7 +111,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             //   .start.get
             // log.info("WebSockets Server running at " + websocketsServer.getUri)
 
-            self ! User.SpawnServices // spawn userside services
+            self ! User.SpawnServices // spawn userside services automatically
 
             // send availability of user to sshd manager
             // addDefaultAccessKey(db)
@@ -138,16 +138,15 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     context.watch(webManager)
 
                     // user services start from this point:
-                    val nginx = context.actorOf(Props(new SvdService("Nginx", account)), "Nginx")
-                    val redis = context.actorOf(Props(new SvdService("Redis", account)), "Redis")
+                    // val nginx = context.actorOf(Props(new SvdService("Nginx", account)), "Nginx")
+                    // val redis = context.actorOf(Props(new SvdService("Redis", account)), "Redis")
                     // val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)), "Postgresql")
-                    val memcached = context.actorOf(Props(new SvdService("Memcached", account)), "Memcached")
+                    // val memcached = context.actorOf(Props(new SvdService("Memcached", account)), "Memcached")
 
                     // Start the real work
                     log.info("(NYI) Checking installed services")
                     // TODO: Checking installed services
-                    val services = (nginx :: redis :: memcached :: Nil) // :: postgres
-
+                    val services = ("Nginx" :: "Redis" :: "Memcached" :: Nil) // :: postgres
 
                     log.debug("Becaming started")
                     context.become(
@@ -207,13 +206,15 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     }
 
 
-    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, services: List[ActorRef] = Nil): Receive = traceReceive {
+    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, services: List[String] = Nil): Receive = traceReceive {
 
         case User.TerminateServices =>
             services.foreach {
-                service =>
-                    log.debug("Terminating Service: %s".format(service))
-                    context.stop(service)
+                serviceName =>
+                    log.debug("Terminating Service: %s".format(serviceName))
+                    val serv = context.actorFor("/user/SvdAccountManager/%s".format(serviceName))
+                    context.unwatch(serv)
+                    context.stop(serv)
             }
             sender ! Success
 
@@ -222,9 +223,10 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
         case User.SpawnServices =>
             services.foreach {
-                service =>
-                    log.debug("Launching Service through SpawnServices: %s".format(service))
-                    context.watch(service)
+                serviceName =>
+                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), serviceName)
+                    log.debug("Launching Service through SpawnServices: %s".format(serv))
+                    context.watch(serv)
             }
 
         case User.GetAccount =>
@@ -332,6 +334,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                 log.error(err)
                 notificationsManager ! Notify.Message(err)
             }
+
+        case x =>
+            log.warn("Some unrecognized message catched in SAM: %s".format(x))
 
     }
 
