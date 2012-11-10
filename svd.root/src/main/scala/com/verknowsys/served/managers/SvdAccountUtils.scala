@@ -98,6 +98,7 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
             performChecks()
             log.debug("Writing account data of uid: %d", uid)
             db << SvdAccount(userName = name, uid = uid, accountManagerPort = userManagerPort)
+            log.debug("Account Registered Successfully.")
         } else {
             val userAccount = SvdAccounts(db).filter{_.uid == uid}.head
             val userManagerPort = userAccount.accountManagerPort

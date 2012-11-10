@@ -70,7 +70,7 @@ trait SvdExceptionHandler extends Actor with Logging with SvdUtils {
 
     def traceReceive(f: Receive): Receive = {
         case msg =>
-            log.trace("Got message: %s", msg)
+            // log.trace("Got message: %s", msg)
             f(msg)
     }
 

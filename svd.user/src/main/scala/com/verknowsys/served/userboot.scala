@@ -66,7 +66,7 @@ object userboot extends SvdAkkaSupport with Logging {
 
         } onFailure {
             case x =>
-                log.info("Couldn't connect to SvdROOT with UID: %s".format(userUID))
+                log.debug("Couldn't connect to SvdROOT with UID: %s".format(userUID))
 
                 log.info("Launching headless mode for UID: %d".format(userUID))
                 val account = SvdAccount(uid = userUID, userName = "headless %s".format(userUID))
