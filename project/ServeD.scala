@@ -156,7 +156,7 @@ object ServeD extends Build {
     lazy val user = Project("user", file("svd.user"),
         settings = coreBuildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
-            libraryDependencies ++= Seq(jline, jgit)
+            libraryDependencies ++= Seq(jline, jgit, webbit)
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, common, utils, web, testing % "test")
 

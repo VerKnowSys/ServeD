@@ -84,7 +84,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
                 }
         }
         log.info("All done.")
-        postStop
+        // postStop
     }
 
 

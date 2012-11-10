@@ -1,6 +1,6 @@
 package com.verknowsys.served.managers
 
-import com.verknowsys.served.SvdConfig
+import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.api.accountkeys._
 import com.verknowsys.served.api.git._
@@ -66,13 +66,13 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
         if (headless) {
             // headless mode
-            val headlessPort = account.uid + 1024 // choose one above 0:1024 range
-            val dbPort = account.uid + 1025
+            val headlessPort = account.uid + 1025 // choose one above 0:1024 range
+            val dbPort = account.uid + 1030
+            val websocketsPort = account.uid + 1035
             log.info("Headless mode assumes that machine services ports remains static for given user.")
             log.info("Headless port for this user is: %d. Database port: %d".format(headlessPort, dbPort))
             val dbServer = new DBServer(dbPort, userHomeDir / "%s.db".format(account.uid))
             val db = dbServer.openClient
-
 
             // NON DRY NON DRY NON DRY:
             val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")))
@@ -83,10 +83,10 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             context.watch(gitManager)
             context.watch(webManager)
 
-            val nginx = context.actorOf(Props(new SvdService("Nginx", account, notificationsManager, self)), "Nginx")
-            val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager, self)), "Redis")
+            val nginx = context.actorOf(Props(new SvdService("Nginx", account)), "Nginx")
+            val redis = context.actorOf(Props(new SvdService("Redis", account)), "Redis")
             // val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)), "Postgresql")
-            val memcached = context.actorOf(Props(new SvdService("Memcached", account, notificationsManager, self)), "Memcached")
+            val memcached = context.actorOf(Props(new SvdService("Memcached", account)), "Memcached")
 
             log.debug("Registering file events for 'watchfile'")
             registerFileEventFor(userHomeDir / "watchfile", Modified, uid = account.uid)
@@ -101,6 +101,15 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
             log.debug("Becaming headless with started")
             context.become(started(db, dbServer, gitManager, notificationsManager, webManager, services))
+
+            // import org.webbitserver._
+            // import org.webbitserver.handler._
+            // log.info("Spawning Webbit WebSockets Server")
+            // val websocketsServer = WebServers.createWebServer(websocketsPort)
+            //   .add("/livemonitor", new SvdWebSocketsHandler)
+            //   // .add(new StaticFileHandler("/web"))
+            //   .start.get
+            // log.info("WebSockets Server running at " + websocketsServer.getUri)
 
             self ! User.SpawnServices // spawn userside services
 
@@ -129,10 +138,10 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     context.watch(webManager)
 
                     // user services start from this point:
-                    val nginx = context.actorOf(Props(new SvdService("Nginx", account, notificationsManager, self)), "Nginx")
-                    val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager, self)), "Redis")
+                    val nginx = context.actorOf(Props(new SvdService("Nginx", account)), "Nginx")
+                    val redis = context.actorOf(Props(new SvdService("Redis", account)), "Redis")
                     // val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)), "Postgresql")
-                    val memcached = context.actorOf(Props(new SvdService("Memcached", account, notificationsManager, self)), "Memcached")
+                    val memcached = context.actorOf(Props(new SvdService("Memcached", account)), "Memcached")
 
                     // Start the real work
                     log.info("(NYI) Checking installed services")
@@ -172,10 +181,14 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         case Terminated(ref) => // XXX: it seems to be super fucked up way to maintain actors. Use supervision Luke!
             log.debug("Terminated service actor: %s".format(ref))
             context.unwatch(ref)
-            context.stop(ref)
+            // context.stop(ref)
+
+        case msg: Notify.Base =>
+            log.trace("Forwarding notification to Notification Center")
+            notificationsManager forward msg
 
         case x =>
-            val m = "SvdAccountManager is in turned off stage but still receives message: %s".format(x)
+            val m = "SvdAccountManager already become zombie stage but received message: %s".format(x)
             log.warn("%s".format(m))
             // sender ! Error(m)
 
@@ -265,7 +278,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             log.debug("Received Success")
 
         // redirect user notification messages directly to notification center
-        case msg: Notify.Message =>
+        case msg: Notify.Base =>
             log.trace("Forwarding notification to Notification Center")
             notificationsManager forward msg
 
@@ -275,6 +288,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     log.trace("Forwarding Git message to Git Manager")
                     gitManager forward x
 
+                case x =>
+                    log.error("Ambigous message: %s".format(x))
             }
 
         case msg: Git.Base =>
@@ -332,6 +347,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         log.warn("Forcing POST Stop in Account Manager")
         if (!headless)
             accountsManager ! Admin.Dead(account)
+
         postStop
     }
 
@@ -340,17 +356,19 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         // log.debug("Stopping database server and client")
         // db.close
         // dbServer.close
+
         log.info("Stopping services")
         (self ? User.TerminateServices) onSuccess {
             case _ =>
-                log.debug("Terminated successfully")
-                context.unbecome
-                super.postStop
-
+                log.info("All Services Terminated")
         } onFailure {
             case x =>
                 log.error("TerminateServices fail: %s".format(x))
         }
+        log.debug("Unbecoming AccountManager")
+        context.unbecome
+        log.debug("Terminated successfully")
+        super.postStop
     }
 
 

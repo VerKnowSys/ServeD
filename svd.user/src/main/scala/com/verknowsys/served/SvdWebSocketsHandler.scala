@@ -1,7 +1,7 @@
 // © Copyright 2009 Daniel Dettlaff, Tymon Tobolski. ® All Rights Reserved.
 // This Software is a close code project. You may not redistribute this code without permission of author.
 
-package com.verknowsys.served.systemmanager
+package com.verknowsys.served
 
 
 import com.verknowsys.served._

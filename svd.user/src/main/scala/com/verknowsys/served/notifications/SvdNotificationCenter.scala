@@ -43,7 +43,7 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler wit
 
     addShutdownHook {
         val thirtyPercentLessTimeout = SvdConfig.shutdownTimeout - SvdConfig.shutdownTimeout/3
-        log.warn("Notification Center shutdown hook invoked. Waiting %s seconds before stopping".format(thirtyPercentLessTimeout))
+        log.warn("Notification Center shutdown hook invoked. Waiting %s seconds for some late messangers before stopping".format(thirtyPercentLessTimeout))
         Thread.sleep(thirtyPercentLessTimeout)
         postStop
     }

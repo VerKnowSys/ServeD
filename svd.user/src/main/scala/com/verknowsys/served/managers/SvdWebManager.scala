@@ -43,7 +43,7 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
 
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
     val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
-    val accountManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountManager".format(SvdConfig.served, account.accountManagerPort))
+    val accountManager = context.actorFor("/user/SvdAccountManager")
 
 
     addShutdownHook {
@@ -112,7 +112,7 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
             .filter(panel)
             .start // spawn embeded version of server
 
-        self ! Notify.Message(formatMessage("I:Your panel has been started for user: %s at: http://%s:%d".format(account.userName, currentHost.getHostAddress, port))) // XXX : hardcoded host.
+        accountManager forward Notify.Message(formatMessage("I:Your panel has been started for user: %s at: http://%s:%d".format(account.userName, currentHost.getHostAddress, port))) // XXX : hardcoded host.
 
         addShutdownHook {
             log.warn("Shutdown hook in Web Manager invoked")

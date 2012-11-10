@@ -109,7 +109,9 @@ class SvdServiceConfigLoader(name: String) extends Logging {
 }
 
 
-class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsManager: ActorRef, accountManager: ActorRef) extends SvdExceptionHandler with SvdUtils {
+class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExceptionHandler with SvdUtils {
+
+    val accountManager = context.actorFor("/user/SvdAccountManager")
 
     val installIndicator = new File(
         if (account.uid == 0)
@@ -220,7 +222,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
                 val msg = formatMessage("I:Performing %s of service: %s".format(hookName, config.name))
                 log.trace(msg)
                 if (config.reportAllInfos)
-                    notificationsManager ! Notify.Message(msg)
+                    accountManager ! Notify.Message(msg)
 
             } catch {
                 case x: expectj.TimeoutException =>
@@ -232,16 +234,16 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
                     val msg = formatMessage("E:Hook %s of service: %s failed to pass expectations: CMD: '%s', OUT: '%s', ERR: '%s'.".format(hookName, config.name, hk.commands.mkString(" "), hk.expectStdOut, hk.expectStdErr))
                     log.error(msg)
                     if (config.reportAllErrors)
-                        notificationsManager ! Notify.Message(msg)
+                        accountManager ! Notify.Message(msg)
 
                 case x: Exception =>
                     val msg = formatMessage("F:Thrown exception in hook: %s of service: %s an exception content below:\n%s".format(hookName, config.name, x.getMessage + " " + x.getStackTrace))
                     log.error(msg)
                     if (config.reportAllErrors)
-                        notificationsManager ! Notify.Message(msg)
+                        accountManager ! Notify.Message(msg)
             }
         } else {
-            log.trace("Command list empty in hook: %s".format(config.name))
+            log.trace("Command list empty in hook: %s of service %s".format(hookName, config.name))
         }
     }
 
@@ -303,6 +305,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
 
     addShutdownHook {
         log.warn("SvdService: %s shutdown hook invoked".format(config.name))
+        // postStop
     }
 
     override def postStop {
