@@ -11,13 +11,16 @@ import akka.actor.Actor
 
 class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler with SvdUtils with Logging {
 
+    val accountManager = context.actorFor("/user/SvdAccountManager")
+
     val gates: List[Gate] =
         new SvdXMPPGate(
             host = SvdConfig.notificationXmppHost,
             port = SvdConfig.notificationXmppPort,
             login = SvdConfig.notificationXmppLogin,
             password = SvdConfig.notificationXmppPassword,
-            resource = SvdConfig.notificationXmppResource
+            resource = SvdConfig.notificationXmppResource,
+            accountManager = accountManager
         ) :: Nil // new SvdMailGate :: Nil
 
 
@@ -62,8 +65,8 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler wit
             sender ! Success
 
         case x =>
-            log.debug("Unknown message: %s", x)
-            sender ! Success
+            log.debug("Unknown message for notification center: %s", x)
+        //     accountManager forward x
 
     }
 

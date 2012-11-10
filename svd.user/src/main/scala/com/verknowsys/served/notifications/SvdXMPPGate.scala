@@ -2,6 +2,10 @@ package com.verknowsys.served.notifications
 
 
 import com.verknowsys.served._
+import com.verknowsys.served.api._
+import com.verknowsys.served.api.accountkeys._
+import com.verknowsys.served.api.git._
+import com.verknowsys.served.services._
 import com.verknowsys.served.utils._
 
 import scala.collection.mutable.ListBuffer
@@ -9,8 +13,17 @@ import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
 
+import akka.actor._
+import akka.dispatch._
+import akka.pattern.ask
+import akka.remote._
+import akka.util.Duration
+import akka.util.Timeout
+import akka.util.duration._
+import akka.actor._
 
-class SvdXMPPGate(host: String, port: Int, login: String, password: String, resource: String) extends Gate with MessageListener with Logging with SvdUtils {
+
+class SvdXMPPGate(host: String, port: Int, login: String, password: String, resource: String, accountManager: ActorRef) extends Gate with MessageListener with Logging with SvdUtils {
 
     val config = new ConnectionConfiguration(host, port)
     config.setCompressionEnabled(SvdConfig.notificationXmppCompression)
@@ -74,7 +87,63 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
 
 
     def processMessage(chat: Chat, message: org.jivesoftware.smack.packet.Message) {
-        log.trace("Received message: (\"" + message.getBody + "\")")
+        val msg = message.getBody
+        log.debug("Received command message: (%s)".format(msg))
+
+        val commands = Map(
+            "help" -> "This console provides remote control over your account",
+            "log" -> "Shows log of service given as param",
+            "install" -> "Installs software given as param",
+            "show" -> "Shows installed software",
+            "register" -> "Registering"
+            )
+
+        msg.split(" ").toList match {
+
+            case "help" :: Nil =>
+                send("Available commands: %s".format(commands.mkString(", ")))
+
+            case "help" :: command :: Nil =>
+                send("Detailed information about command: %s\n%s".format(command, commands(command)))
+
+            case "log" :: app :: Nil =>
+                send("Last 10 lines of log of app: %s".format(app))
+                accountManager ! "Dupa"
+
+            case "install" :: app :: Nil =>
+                send("Installing %s".format(app))
+
+            case "register" :: "domain" :: domain :: _ :: Nil =>
+                send("Registering domain: %s".format(domain))
+                accountManager ! System.RegisterDomain(domain)
+
+            case "show" :: Nil =>
+                (accountManager ? User.GetServices) onSuccess {
+                    case x =>
+                        send("Showing installed software:\n%s".format(x))
+
+                }
+
+            case "terminate" :: "all" :: Nil =>
+                send("Terminating all running services")
+                (accountManager ? User.TerminateServices) onSuccess {
+                    case x =>
+                        send("Terminated")
+                }
+
+            case "launch" :: "all" :: Nil =>
+                send("Launching all installed services")
+                (accountManager ? User.SpawnServices) onSuccess {
+                    case x =>
+                        send("Terminated")
+                }
+
+
+            case anything =>
+                send("Bad command: %s".format(anything.mkString(" ")))
+
+        }
+
         // send(message.getBody)
         // if (message.getFrom.contains("verknowsys.com")) {
         //     trace("Message contains verknowsys: " + message.getFrom)
