@@ -49,64 +49,20 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     class DBServerInitializationException extends Exception
 
 
-    val homeDir = SvdConfig.userHomeDir / account.uid.toString
+    val userHomeDir = SvdConfig.userHomeDir / "%s".format(account.uid)
+
+    val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
+    val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-single-dispatcher"), "SvdFileEventsManagerUser") // XXX: hardcode
+
     val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
     val systemManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSystemManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
-    val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-core-dispatcher"), "SvdFileEventsManagerUser") // XXX: hardcode
-    val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
     val sshd = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
-    val userHomePath = SvdConfig.userHomeDir / "%s".format(account.uid)
 
-    // Only for closing in postStop
-    // private var _dbServer: Option[DBServer] = None // XXX: Refactor
-    // private var _dbClient: Option[DBClient] = None // XXX: Refactor
-
-    // lazy val _passenger = new SvdService(
-    //     SvdUserServices.rackWebAppConfig(
-    //         account,
-    //         domain = SvdUserDomain("delda") // NOTE: it's also tells about app root dir set to /Users/501/WebApps/delda
-    //     ),
-    //     account
-    // )
-
-    // lazy val _postgres = new SvdService(
-    //     SvdUserServices.postgresDatabaseConfig(
-    //         account
-    //     ),
-    //     account
-    // )
-
-    // val _apps =
-    //     try {
-    //         // actorFor("/user/app/passenger")
-    //     } catch {
-    //         case e: Throwable =>
-    //             log.error("EXCPT in %s".format(e))
-    //             // 2011-09-09 21:12:09 - dmilith - TODO: FIXME: PENDING: make notifications about eceptions to user
-    //             // Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
-    //     }
-
-    // val _dbs =
-    //     try {
-    //         // actorOf(_postgres)
-    //     } catch {
-    //         case e: Throwable =>
-    //             log.error("EXCPT in %s".format(e))
-    //             // 2011-09-09 21:12:09 - dmilith - TODO: FIXME: PENDING: make notifications about eceptions to user
-    //             // Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
-    //     }
 
     override def preStart = {
         super.preStart
-        context.watch(fem)
 
         log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
-
-        log.debug("Registering file events for 'watchfile'")
-        registerFileEventFor(userHomePath / "watchfile", All, uid = account.uid)
-
-        log.debug("Registering file events for 'restart'")
-        registerFileEventFor(userHomePath / "restart", All, uid = account.uid)
 
         if (headless) {
             // headless mode
@@ -114,14 +70,15 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             val dbPort = account.uid + 1025
             log.info("Headless mode assumes that machine services ports remains static for given user.")
             log.info("Headless port for this user is: %d. Database port: %d".format(headlessPort, dbPort))
-            val dbServer = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
+            val dbServer = new DBServer(dbPort, userHomeDir / "%s.db".format(account.uid))
             val db = dbServer.openClient
 
 
             // NON DRY NON DRY NON DRY:
-            val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
+            val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")))
             val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"))
 
+            context.watch(fem)
             context.watch(notificationsManager)
             context.watch(gitManager)
             context.watch(webManager)
@@ -130,6 +87,12 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             val redis = context.actorOf(Props(new SvdService("Redis", account, notificationsManager, self)), "Redis")
             // val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)), "Postgresql")
             val memcached = context.actorOf(Props(new SvdService("Memcached", account, notificationsManager, self)), "Memcached")
+
+            log.debug("Registering file events for 'watchfile'")
+            registerFileEventFor(userHomeDir / "watchfile", Modified, uid = account.uid)
+
+            log.debug("Registering file events for 'restart'")
+            registerFileEventFor(userHomeDir / "restart", AttributesChanged, uid = account.uid)
 
             // Start the real work
             log.info("(NYI) Checking installed services")
@@ -153,13 +116,14 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     log.debug("Got database port %d", dbPort)
 
                     // Start database server
-                    val dbServer = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
+                    val dbServer = new DBServer(dbPort, userHomeDir / "%s.db".format(account.uid))
                     val db = dbServer.openClient
 
                     // start managers
-                    val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
+                    val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")))
                     val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"))
 
+                    context.watch(fem)
                     context.watch(notificationsManager)
                     context.watch(gitManager)
                     context.watch(webManager)
@@ -303,6 +267,14 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         case msg: Notify.Message =>
             log.trace("Forwarding notification to Notification Center")
             notificationsManager forward msg
+
+        case Some(x) =>
+            x match {
+                case repo: Repository =>
+                    log.trace("Forwarding Git message to Git Manager")
+                    gitManager forward x
+
+            }
 
         case msg: Git.Base =>
             log.trace("Forwarding Git message to Git Manager")
