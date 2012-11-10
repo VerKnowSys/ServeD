@@ -1,16 +1,26 @@
 #!/bin/sh
 
+unset DYLD_LIBRARY_PATH
+unset LD_LIBRARY_PATH
+
 pwd=$(pwd)
-version="$(cat VERSION)"
-JAR="${pwd}/svd.user/target/user-assembly-${version}.jar"
-UID="$(id -u)"
+VERSION="$(cat VERSION)"
+BUILD="$(cat svd.common/src/main/resources/BUILD)"
+JAR="${pwd}/svd.user/target/user-assembly-${VERSION}-b${BUILD}.jar"
+userUID="$(id -u)"
+JAVA_PATH="/Software/Openjdk6-i386/exports/java"
+
 if [ "$1" != "" ]; then
-  export UID="$1"
+  export userUID="$1"
 fi
 
-if [ -e "${jar}" ]; then
-  echo "Executing: ${jar}"
-  java -d32 -XX:MaxPermSize=64M -XX:+UseParallelGC -Xms8m -Xmx128m -Dfile.encoding=UTF-8 -noverify -client -Djna.library.path=$(pwd)/lib -jar "${JAR}" "${UID}" "$@"
+if [ "$(uname)" = "Darwin" ]; then
+  export JAVA_PATH="/usr/bin/java"
+fi
+
+if [ -e "${JAR}" ]; then
+  echo "Executing: ${JAR}"
+  "${JAVA_PATH}" -d32 -XX:MaxPermSize=64M -XX:+UseParallelGC -Xms8m -Xmx128m -Dfile.encoding=UTF-8 -noverify -client -Djna.library.path=$(pwd)/lib -jar "${JAR}" "${userUID}" "$@"
 else
   echo "Assembly not found. Use build script!"
 fi
