@@ -216,7 +216,8 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
                 shell.exec(
                     hook.copy(commands = execCommands)
                 )
-                val msg = "--- INFO ---\nPerforming %s of service: %s\n------------\n".format(hookName, config.name)
+                // INFO -- @deldagorin/192.168.0.3 -- Performing start of service: Nginx
+                val msg = formatMessage("I:Performing %s of service: %s".format(hookName, config.name))
                 log.trace(msg)
                 if (config.reportAllInfos)
                     notificationsManager ! Notify.Message(msg)
@@ -228,13 +229,13 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
                          .replaceAll("SERVICE_PORT", "*(masked-random-user-port)*")
                          .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
                     })
-                    val msg = "=== ERROR ===\nHook %s of service: %s failed to pass expectations: CMD: '%s', OUT: '%s', ERR: '%s'.\n=============\n".format(hookName, config.name, hk.commands.mkString(" "), hk.expectStdOut, hk.expectStdErr)
+                    val msg = formatMessage("E:Hook %s of service: %s failed to pass expectations: CMD: '%s', OUT: '%s', ERR: '%s'.".format(hookName, config.name, hk.commands.mkString(" "), hk.expectStdOut, hk.expectStdErr))
                     log.error(msg)
                     if (config.reportAllErrors)
                         notificationsManager ! Notify.Message(msg)
 
                 case x: Exception =>
-                    val msg = "### FATAL ###\nThrown exception in hook: %s of service: %s an exception content below:\n%s\n#############\n".format(hookName, config.name, x.getMessage + " " + x.getStackTrace)
+                    val msg = formatMessage("F:Thrown exception in hook: %s of service: %s an exception content below:\n%s".format(hookName, config.name, x.getMessage + " " + x.getStackTrace))
                     log.error(msg)
                     if (config.reportAllErrors)
                         notificationsManager ! Notify.Message(msg)

@@ -105,7 +105,7 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
             .filter(panel)
             .start // spawn embeded version of server
 
-        self ! Notify.Message("Your panel has been started for user: %s at: http://%s:%d".format(account.userName, "127.0.0.1", port)) // XXX : hardcoded host.
+        self ! Notify.Message(formatMessage("I:Your panel has been started for user: %s at: http://%s:%d".format(account.userName, currentHost.getHostAddress, port))) // XXX : hardcoded host.
     }
 
 

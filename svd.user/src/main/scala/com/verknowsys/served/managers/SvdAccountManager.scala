@@ -243,7 +243,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             flags match {
                 case Modified =>
                     log.trace("File event type: Modified")
-                    notificationsManager ! Notify.Message("File event notification: Modified on path: %s on host: %s".format(path, currentHost.getHostName))
+                    // "INFO -- %s -- Performing %s of service: %s".format(currentHost, hookName, config.name)
+                    notificationsManager ! Notify.Message(formatMessage("I:File event notification: Modified on path: %s.".format(path)))
                     gitManager ! Git.CreateRepository("somerepository")
                 case Deleted =>
                     log.trace("File event type: Deleted")
@@ -298,7 +299,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                         sender ! Math.abs(randomPort)
 
                     case _ =>
-                        val err = "Forwarding to Accounts Manager can't work in headless mode."
+                        val err = formatMessage("E:Forwarding to Accounts Manager can't work in headless mode.")
                         log.error(err)
                         notificationsManager ! Notify.Message(err)
                 }
@@ -312,7 +313,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                 log.debug("Forwarding message: %s to System Manager", x)
                 systemManager forward x
             } else {
-                val err = "Forwarding to System Manager can't work in headless mode."
+                val err = formatMessage("E:Forwarding to System Manager can't work in headless mode.")
                 log.error(err)
                 notificationsManager ! Notify.Message(err)
             }
