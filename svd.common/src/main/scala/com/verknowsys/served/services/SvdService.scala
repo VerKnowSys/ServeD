@@ -241,7 +241,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount, notificationsMan
                         notificationsManager ! Notify.Message(msg)
             }
         } else {
-            log.trace("Command list empty.")
+            log.trace("Command list empty in hook: %s".format(config.name))
         }
     }
 

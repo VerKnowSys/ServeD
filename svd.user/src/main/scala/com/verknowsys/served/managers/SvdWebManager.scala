@@ -62,11 +62,18 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
         log.info("Starting Web Manager for uid: %s".format(account.uid))
 
         log.debug("Getting web panel port from AccountsManager")
+        implicit val timeout = Timeout(5 seconds)
         (accountsManager ? Admin.GetPort) onSuccess {
             case webPort: Int =>
                 log.trace("Got web panel port %d", webPort)
 
                 log.debug("Launching Web Panel for UID: %d", account.uid)
+                spawnServer(webPort)
+        } onFailure {
+            case _ =>
+                val webPort = account.uid + 1027
+                log.debug("Assumming headless mode")
+                log.debug("Launching Web Panel for UID: %d on port: %d".format(account.uid, webPort))
                 spawnServer(webPort)
         }
     }
@@ -98,7 +105,7 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
         val http = Http(port)
         val panel = new SvdAccountPanel(self, account, port)
 
-        http
+        val server = http
             .context("/assets") {
                 _.resources(base)
             }
@@ -106,6 +113,11 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
             .start // spawn embeded version of server
 
         self ! Notify.Message(formatMessage("I:Your panel has been started for user: %s at: http://%s:%d".format(account.userName, currentHost.getHostAddress, port))) // XXX : hardcoded host.
+
+        addShutdownHook {
+            log.warn("Shutdown hook in Web Manager invoked")
+            server.stop
+        }
     }
 
 

@@ -25,14 +25,15 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
         // XMPPConnection.DEBUG_ENABLED = SvdConfig.notificationXmppDebug
 
         connection.connect
+        log.trace("SvdXMPPGate connected to server")
 
         try {
             connection.login(login, password, resource)
             log.trace("XMPP server: %s:%d, login: %s, resource: %s", host, port, login, resource)
         } catch {
             case x: Throwable =>
-                log.error("Error while connecting to Xmpp server. Please check login / password.")
-                log.debug( x.printStackTrace.toString )
+                log.error("Error while connecting to Xmpp server. Please check login / password. Exc: %s".format(x))
+                // log.debug( x.printStackTrace.toString )
         }
 
         val chatmanager = connection.getChatManager

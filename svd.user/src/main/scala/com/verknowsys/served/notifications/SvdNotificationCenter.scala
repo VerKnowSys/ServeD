@@ -52,12 +52,12 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler wit
     def receive = {
 
         case Notify.Status(status) =>
-            log.debug("Setting status %s", status)
+            log.trace("Setting status %s", status)
             gates.foreach(_ setStatus status)
             sender ! Success
 
         case Notify.Message(msg) =>
-            log.debug("Sending message %s", msg)
+            log.trace("Sending message %s", msg)
             gates.foreach(_ send msg)
             sender ! Success
 
