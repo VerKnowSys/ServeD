@@ -83,11 +83,6 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             context.watch(gitManager)
             context.watch(webManager)
 
-            // val nginx = context.actorOf(Props(new SvdService("Nginx", account)), "Nginx")
-            // val redis = context.actorOf(Props(new SvdService("Redis", account)), "Redis")
-            // val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)), "Postgresql")
-            // val memcached = context.actorOf(Props(new SvdService("Memcached", account)), "Memcached")
-
             log.debug("Registering file events for 'watchfile'")
             registerFileEventFor(userHomeDir / "watchfile", Modified, uid = account.uid)
 
@@ -137,12 +132,6 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     context.watch(gitManager)
                     context.watch(webManager)
 
-                    // user services start from this point:
-                    // val nginx = context.actorOf(Props(new SvdService("Nginx", account)), "Nginx")
-                    // val redis = context.actorOf(Props(new SvdService("Redis", account)), "Redis")
-                    // val postgres = context.actorOf(Props(new SvdService("Postgresql", account, notificationsManager, self)), "Postgresql")
-                    // val memcached = context.actorOf(Props(new SvdService("Memcached", account)), "Memcached")
-
                     // Start the real work
                     log.info("(NYI) Checking installed services")
                     // TODO: Checking installed services
@@ -177,10 +166,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         case Success =>
             log.debug("Got success")
 
-        case Terminated(ref) => // XXX: it seems to be super fucked up way to maintain actors. Use supervision Luke!
+        case Terminated(ref) =>
             log.debug("Terminated service actor: %s".format(ref))
             context.unwatch(ref)
-            // context.stop(ref)
 
         case msg: Notify.Base =>
             log.trace("Forwarding notification to Notification Center")
@@ -211,37 +199,78 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         case User.SpawnServices =>
             services.foreach {
                 serviceName =>
-                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), serviceName)
-                    log.debug("Launching Service through SpawnServices: %s".format(serv))
-                    context.watch(serv)
+                    // look for old services already started, and stop it:
+                    def joinContext(withServices: List[String]) { // launch new service:
+                        val serv = context.actorOf(Props(new SvdService(serviceName, account)), serviceName)
+                        log.debug("Launching Service through SpawnServices: %s".format(serv))
+                        context.watch(serv)
+                        context.unbecome
+                        log.debug("Currently maintained services: %s".format(withServices))
+                        context.become(started(db, dbServer, gitManager, notificationsManager, webManager, withServices))
+                    }
+                    val currServ = context.actorFor("/user/SvdAccountManager/%s".format(serviceName))
+                    (currServ ? Ping) onComplete {
+                        case Right(Pong) =>
+                            val msg = "Service already running: %s. Restarting".format(serviceName)
+                            log.warn(msg)
+                            notificationsManager ! Notify.Message(formatMessage("W:%s".format(msg)))
+                            context.unwatch(currServ)
+                            context.stop(currServ)
+                            log.debug("Waiting for service shutdown hooks…")
+                            Thread.sleep(SvdConfig.serviceRestartPause)
+                            joinContext(services.filterNot(_ == serviceName))
+
+                        case Left(exc) =>
+                            log.debug("No alive actors found: %s".format(exc.getMessage))
+                            joinContext(services)
+                    }
             }
-            context.unbecome
-            log.debug("Currently maintained services: %s".format(services))
-            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, services))
 
         case User.TerminateServices =>
             services.foreach {
                 serviceName =>
                     log.debug("Terminating Service: %s".format(serviceName))
+                    val servicesLeft = services.filterNot(_ == serviceName)
                     val serv = context.actorFor("/user/SvdAccountManager/%s".format(serviceName))
                     context.unwatch(serv)
                     context.stop(serv)
+                    context.unbecome
+                    log.debug("Currently maintained services: %s".format(servicesLeft))
+                    context.become(started(db, dbServer, gitManager, notificationsManager, webManager, servicesLeft))
             }
-            context.unbecome
-            log.debug("Currently maintained services: %s".format(services))
-            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, services))
+
 
         case User.GetServices =>
             sender ! services
 
-        case User.SpawnService(name) =>
-            log.debug("Spawning service: %s".format(name))
-            val serv = context.actorOf(Props(new SvdService(name, account)), name)
-            context.watch(serv)
-            val svces = name :: services
-            context.unbecome
-            log.debug("Currently maintained services: %s".format(svces))
-            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, svces))
+        case User.SpawnService(serviceName) =>
+            log.debug("Spawning service: %s".format(serviceName))
+            // look for old services already started, and stop it:
+            def joinContext(withServices: List[String]) {
+                // spawn new service with that name:
+                val serv = context.actorOf(Props(new SvdService(serviceName, account)), serviceName)
+                context.watch(serv)
+                context.unbecome
+                log.debug("Currently maintained services: %s".format(withServices))
+                context.become(started(db, dbServer, gitManager, notificationsManager, webManager, withServices))
+            }
+            val currServ = context.actorFor("/user/SvdAccountManager/%s".format(serviceName))
+            (currServ ? Ping) onComplete {
+                case Right(Pong) =>
+                    val msg = "Service already running: %s. Restarting".format(serviceName)
+                    log.warn(msg)
+                    notificationsManager ! Notify.Message(formatMessage("W:%s".format(msg)))
+                    context.unwatch(currServ)
+                    context.stop(currServ)
+                    log.debug("Waiting for service shutdown hooks…")
+                    Thread.sleep(SvdConfig.serviceRestartPause)
+                    joinContext(services.filterNot(_ == serviceName))
+
+                case Left(exc) =>
+                    log.debug("No alive service found: %s".format(exc.getMessage))
+                    joinContext(serviceName :: services)
+            }
+
 
         case User.TerminateService(name) =>
             log.debug("Stopping service: %s".format(name))
@@ -302,6 +331,10 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
         case Success =>
             log.debug("Received Success")
+
+        case Terminated(ref) =>
+            log.debug("Terminated service actor: %s".format(ref))
+            context.unwatch(ref)
 
         // redirect user notification messages directly to notification center
         case msg: Notify.Base =>

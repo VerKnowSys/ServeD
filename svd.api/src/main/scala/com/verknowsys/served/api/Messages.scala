@@ -9,6 +9,9 @@ import akka.actor.ActorRef
 
 // ServeD -> Client messages
 // common responses
+case object Ping extends ApiMessage
+case object Pong extends ApiMessage
+
 case object Success extends ApiResponse
 case object Shutdown extends ApiResponse
 case class Error(val message: String) extends ApiResponse

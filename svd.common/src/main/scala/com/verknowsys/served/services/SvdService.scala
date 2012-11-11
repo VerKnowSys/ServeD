@@ -270,6 +270,9 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
 
     def receive = {
 
+        case Ping =>
+            sender ! Pong
+
         /**
          *  @author dmilith
          *
