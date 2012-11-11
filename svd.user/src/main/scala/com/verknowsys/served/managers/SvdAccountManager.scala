@@ -92,10 +92,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             // Start the real work
             log.info("(NYI) Checking installed services")
             // TODO: Checking installed services
-            val services = ("Nginx" :: "Redis" :: "Memcached" :: Nil) // :: postgres
 
             log.debug("Becaming headless with started")
-            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, services))
+            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, Nil))
 
             // import org.webbitserver._
             // import org.webbitserver.handler._
@@ -133,13 +132,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     context.watch(webManager)
 
                     // Start the real work
-                    log.info("(NYI) Checking installed services")
-                    // TODO: Checking installed services
-                    val services = ("Nginx" :: "Redis" :: "Memcached" :: Nil) // :: postgres
-
                     log.debug("Becaming started")
                     context.become(
-                        started(db, dbServer, gitManager, notificationsManager, webManager, services))
+                        started(db, dbServer, gitManager, notificationsManager, webManager, Nil))
 
                     accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
                     self ! User.SpawnServices // spawn userside services
@@ -197,6 +192,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, services: List[String] = Nil): Receive = traceReceive {
 
         case User.SpawnServices =>
+
             services.foreach {
                 serviceName =>
                     // look for old services already started, and stop it:
@@ -234,11 +230,12 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     val serv = context.actorFor("/user/SvdAccountManager/%s".format(serviceName))
                     context.unwatch(serv)
                     context.stop(serv)
-                    context.unbecome
-                    log.debug("Currently maintained services: %s".format(servicesLeft))
-                    context.become(started(db, dbServer, gitManager, notificationsManager, webManager, servicesLeft))
             }
-
+            log.debug("Waiting for service shutdown hooks…")
+            Thread.sleep(SvdConfig.serviceRestartPause)
+            context.unbecome
+            log.debug("Currently maintained services: %s".format(Nil))
+            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, Nil))
 
         case User.GetServices =>
             sender ! services
@@ -248,11 +245,18 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             // look for old services already started, and stop it:
             def joinContext(withServices: List[String]) {
                 // spawn new service with that name:
-                val serv = context.actorOf(Props(new SvdService(serviceName, account)), serviceName)
-                context.watch(serv)
-                context.unbecome
-                log.debug("Currently maintained services: %s".format(withServices))
-                context.become(started(db, dbServer, gitManager, notificationsManager, webManager, withServices))
+                try { // XXX: TODO: make sure it's safe
+                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), serviceName)
+                    context.watch(serv)
+                    context.unbecome
+                    log.debug("Currently maintained services: %s".format(withServices))
+                    context.become(started(db, dbServer, gitManager, notificationsManager, webManager, withServices))
+                } catch {
+                    case x: InvalidActorNameException =>
+                        val msg = formatMessage("E:Invalid name exception (duplicate same service): %s".format(x.getMessage))
+                        log.warn(msg)
+                        notificationsManager ! Notify.Message(msg)
+                }
             }
             val currServ = context.actorFor("/user/SvdAccountManager/%s".format(serviceName))
             (currServ ? Ping) onComplete {
