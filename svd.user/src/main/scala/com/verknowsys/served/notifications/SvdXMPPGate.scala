@@ -120,6 +120,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
             // "whoami" -> "Shows current user name"
             )
 
+        send("Remote message: '%s' from %s".format(msg, from))
         msgList match {
 
             case "help" :: Nil =>
@@ -138,7 +139,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                 }
 
             case "whoami" :: Nil =>
-                send("You're authorized as %s. Writing from: %s".format(account.userName, message.getFrom))
+                send("You're authorized as %s. Writing from: %s".format(account.userName, from))
 
             case "logs" :: command :: argument :: Nil =>
                 command.toLowerCase match {
