@@ -30,6 +30,8 @@ save 60 10000
 appendonly no
 appendfsync everysec
 activerehashing yes
+loglevel notice
+logfile SERVICE_PREFIX/service.log
 ' > SERVICE_PREFIX/service.conf"]
     }
 }

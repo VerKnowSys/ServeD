@@ -41,6 +41,9 @@ temp_buffers = 32MB
 work_mem = 16MB
 max_stack_depth = 16MB
 
+logging_collector = true
+log_directory = SERVICE_PREFIX
+log_filename = service.log
 ' > SERVICE_PREFIX/database/postgresql.conf"]
     }
 }
