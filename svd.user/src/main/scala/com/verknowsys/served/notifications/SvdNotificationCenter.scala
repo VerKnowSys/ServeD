@@ -20,6 +20,7 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler wit
             login = SvdConfig.notificationXmppLogin,
             password = SvdConfig.notificationXmppPassword,
             resource = SvdConfig.notificationXmppResource,
+            account = account,
             accountManager = accountManager
         ) :: Nil // new SvdMailGate :: Nil
 

@@ -23,7 +23,7 @@ import akka.util.duration._
 import akka.actor._
 
 
-class SvdXMPPGate(host: String, port: Int, login: String, password: String, resource: String, accountManager: ActorRef) extends Gate with MessageListener with Logging with SvdUtils {
+class SvdXMPPGate(host: String, port: Int, login: String, password: String, resource: String, account: SvdAccount, accountManager: ActorRef) extends Gate with MessageListener with Logging with SvdUtils {
 
     val config = new ConnectionConfiguration(host, port)
     config.setCompressionEnabled(SvdConfig.notificationXmppCompression)
@@ -88,56 +88,126 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
 
     def processMessage(chat: Chat, message: org.jivesoftware.smack.packet.Message) {
         val msg = message.getBody
+        val from = message.getFrom
+        val msgList = msg.toLowerCase.split(" ").toList
         log.debug("Received command message: (%s)".format(msg))
 
         val commands = Map(
-            "help" -> "This console provides remote control over your account",
-            "log" -> "Shows log of service given as param",
-            "install" -> "Installs software given as param",
-            "show" -> "Shows installed software",
-            "register" -> "Registering"
+            // "help" -> "This console provides remote control over your account",
+            "service" -> Map(
+                "remove" -> "Removes service",
+                "start" -> "Starts service (will also install service on demand if not already built)",
+                "stop" -> "Stops service",
+                "status" -> "Shows service details"
+                ),
+            "logs" -> Map(
+                "show" -> "Shows logs from service given as a param"
+                ),
+            "register" -> Map(
+                "domain" -> "Registers domain",
+                "user" -> "Registers user"
+                ),
+            "unregister" -> Map(
+                "domain" -> "Unregisters domain"
+                // "user" -> "Unregisters domain"
+                )
+            // "whoami" -> "Shows current user name"
             )
 
-        msg.split(" ").toList match {
+        msgList match {
 
             case "help" :: Nil =>
-                send("Available commands: %s".format(commands.mkString(", ")))
+                send("help -> %s".format(commands.keys.mkString(", ")))
 
-            case "help" :: command :: Nil =>
-                send("Detailed information about command: %s\n%s".format(command, commands(command)))
-
-            case "log" :: app :: Nil =>
-                send("Last 10 lines of log of app: %s".format(app))
-                accountManager ! "Dupa"
-
-            case "install" :: app :: Nil =>
-                send("Installing %s".format(app))
-
-            case "register" :: "domain" :: domain :: _ :: Nil =>
-                send("Registering domain: %s".format(domain))
-                accountManager ! System.RegisterDomain(domain)
-
-            case "show" :: Nil =>
-                (accountManager ? User.GetServices) onSuccess {
-                    case x =>
-                        send("Showing installed software:\n%s".format(x))
-
+            case "help" :: patt :: Nil =>
+                patt.toLowerCase match {
+                    case key: String =>
+                        send("%s -> %s".format(patt, commands(key).keys.mkString(", ")))
                 }
 
-            case "terminate" :: "all" :: Nil =>
-                send("Terminating all running services")
-                (accountManager ? User.TerminateServices) onSuccess {
-                    case x =>
-                        send("Terminated")
+            case "help" :: patt :: inner :: Nil =>
+                patt.toLowerCase match {
+                    case key: String =>
+                        send(commands(key)(inner))
                 }
 
-            case "launch" :: "all" :: Nil =>
-                send("Launching all installed services")
-                (accountManager ? User.SpawnServices) onSuccess {
-                    case x =>
-                        send("Terminated")
+            case "whoami" :: Nil =>
+                send("You're authorized as %s. Writing from: %s".format(account.userName, message.getFrom))
+
+            case "logs" :: command :: argument :: Nil =>
+                command.toLowerCase match {
+                    case "show" =>
+                        send("NYI") // TODO: implement log parser
                 }
 
+            case "register" :: command :: argument :: _ =>
+                val domain = argument.toLowerCase
+                command.toLowerCase match {
+                    case "domain" =>
+                        accountManager ! System.RegisterDomain(domain)
+
+                    // case "user" =>
+                    //     accountManager ! User.TerminateServices
+                }
+
+            case "service" :: argument :: command :: Nil =>
+                val arg = argument.capitalize
+                arg match {
+                    case "All" =>
+                        command.toLowerCase match {
+                            case "start" =>
+                                accountManager ! User.SpawnServices
+
+                            case "stop" =>
+                                accountManager ! User.TerminateServices
+
+                            case "status" =>
+                                (accountManager ? User.GetServices) onSuccess {
+                                    case list =>
+                                        send("Services:\n%s".format(list))
+                                }
+                        }
+                    case _ =>
+                        command.toLowerCase match {
+                            case "start" =>
+                                accountManager ! User.SpawnService(arg)
+
+                            case "stop" =>
+                                accountManager ! User.TerminateService(arg)
+
+                            case "status" =>
+                                (accountManager ? User.GetServices) onSuccess {
+                                    case list =>
+                                        send("Services:\n%s".format(list))
+                                }
+                        }
+                }
+
+
+            // USER SIDE REMOTE API
+            //
+            //
+            // Services API
+            //
+            // service status all
+            // service status Redis
+            // service stop Redis
+            // service stop all
+            // service start Redis
+            // service start all
+            //
+            // Logs API
+            // logs show all
+            // logs show Redis
+            //
+            // Register/ UnRegister API
+            // register domain domain.some.com
+            // register user user name
+            //
+            // Auth API
+            // TODO: auth API
+            //
+            //
 
             case anything =>
                 send("Bad command: %s".format(anything.mkString(" ")))
