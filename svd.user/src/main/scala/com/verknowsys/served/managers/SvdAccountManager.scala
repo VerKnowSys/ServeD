@@ -208,6 +208,17 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
     private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, services: List[String] = Nil): Receive = traceReceive {
 
+        case User.SpawnServices =>
+            services.foreach {
+                serviceName =>
+                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), serviceName)
+                    log.debug("Launching Service through SpawnServices: %s".format(serv))
+                    context.watch(serv)
+            }
+            context.unbecome
+            log.debug("Currently maintained services: %s".format(services))
+            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, services))
+
         case User.TerminateServices =>
             services.foreach {
                 serviceName =>
@@ -216,18 +227,31 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     context.unwatch(serv)
                     context.stop(serv)
             }
-            sender ! Success
+            context.unbecome
+            log.debug("Currently maintained services: %s".format(services))
+            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, services))
 
         case User.GetServices =>
             sender ! services
 
-        case User.SpawnServices =>
-            services.foreach {
-                serviceName =>
-                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), serviceName)
-                    log.debug("Launching Service through SpawnServices: %s".format(serv))
-                    context.watch(serv)
-            }
+        case User.SpawnService(name) =>
+            log.debug("Spawning service: %s".format(name))
+            val serv = context.actorOf(Props(new SvdService(name, account)), name)
+            context.watch(serv)
+            val svces = name :: services
+            context.unbecome
+            log.debug("Currently maintained services: %s".format(svces))
+            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, svces))
+
+        case User.TerminateService(name) =>
+            log.debug("Stopping service: %s".format(name))
+            val serv = context.actorFor("/user/SvdAccountManager/%s".format(name))
+            context.unwatch(serv)
+            context.stop(serv)
+            val svces = services.filterNot{_.name == name}
+            context.unbecome
+            log.debug("Currently maintained services: %s".format(svces))
+            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, svces))
 
         case User.GetAccount =>
             sender ! account
