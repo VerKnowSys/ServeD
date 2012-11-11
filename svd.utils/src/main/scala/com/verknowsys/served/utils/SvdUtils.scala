@@ -143,7 +143,7 @@ trait SvdUtils extends Logging {
             case 'I' | 'i' =>
                 "INFO -- %s -- %s".format(currentHost, msg.substring(2))
             case 'W' | 'w' =>
-                "WARNING %% %s %% %s".format(currentHost, msg.substring(2))
+                "WARN -- %s -- %s".format(currentHost, msg.substring(2))
             case 'E' | 'e' =>
                 "ERROR == %s == %s".format(currentHost, msg.substring(2))
             case 'F' | 'f' =>
