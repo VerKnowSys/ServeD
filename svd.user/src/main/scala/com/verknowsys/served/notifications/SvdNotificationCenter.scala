@@ -9,7 +9,7 @@ import com.verknowsys.served.utils.Logging
 import akka.actor.Actor
 
 
-class SvdNotificationCenter(account: SvdAccount) extends SvdExceptionHandler with SvdUtils with Logging {
+class SvdNotificationCenter(account: SvdAccount) extends SvdActor with SvdUtils with Logging {
 
     val accountManager = context.actorFor("/user/SvdAccountManager")
 

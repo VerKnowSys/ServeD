@@ -6,7 +6,7 @@ import com.verknowsys.served.utils._
 import akka.actor._
 
 
-class CI extends SvdExceptionHandler {
+class CI extends SvdActor {
 
     def receive = {
         case Build =>

@@ -26,7 +26,7 @@ import org.apache.sshd.server.shell._
 import com.typesafe.config.ConfigFactory
 
 
-sealed class SSHD(port: Int) extends SvdExceptionHandler {
+sealed class SSHD(port: Int) extends SvdActor {
 
     def this() = this(SvdConfig.sshPort)
 

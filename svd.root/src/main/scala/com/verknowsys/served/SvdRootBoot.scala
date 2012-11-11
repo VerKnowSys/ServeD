@@ -22,7 +22,7 @@ import akka.util.duration._
 import akka.actor._
 
 
-class SvdRootBoot extends Logging with SvdExceptionHandler {
+class SvdRootBoot extends Logging with SvdActor {
 
     import akka.actor.OneForOneStrategy
     import akka.actor.SupervisorStrategy._

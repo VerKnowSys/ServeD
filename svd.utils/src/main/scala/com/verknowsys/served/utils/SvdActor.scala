@@ -1,5 +1,6 @@
 package com.verknowsys.served.utils
 
+
 import akka.actor.Actor
 import org.apache.commons.io.FileUtils
 import java.io._
@@ -13,8 +14,10 @@ import com.verknowsys.served.utils._
  *
  *   This trait should be used by all ServeD actors
  */
-trait SvdExceptionHandler extends Actor with Logging with SvdUtils {
+trait SvdActor extends Actor with Logging with SvdUtils {
 
+    val ancestor = this.getClass.getName
+    val predecestor = super.getClass.getName
     // 2011-01-30 01:36:28 - dmilith - NOTE: txmt protocol example: txmt://open/?url=file://~/.bash_profile&line=11&column=2
 
 //     /**
@@ -67,6 +70,7 @@ trait SvdExceptionHandler extends Actor with Logging with SvdUtils {
         super.unhandled(msg)
         log.warn("Message sent to %s was not recognized: %s", this.getClass, msg)
     }
+
 
     def traceReceive(f: Receive): Receive = {
         case msg =>

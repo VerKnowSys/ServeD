@@ -4,11 +4,11 @@
 // // import akka.serialization.RemoteActorSerialization.toRemoteActorRefProtocol
 
 // import com.verknowsys.served.utils.Logging
-// import com.verknowsys.served.utils.SvdExceptionHandler
+// import com.verknowsys.served.utils.SvdActor
 // import com.verknowsys.served.api._
 
 
-// class SvdApiConnection extends Actor with SvdExceptionHandler {
+// class SvdApiConnection extends Actor with SvdActor {
 //     log.info("Starting new API connection")
 
 //     def receive = {

@@ -71,7 +71,7 @@ object Events {
  * @author dmilith
  *
  */
-trait SvdFileEventsReactor extends SvdExceptionHandler with Logging with SvdUtils {
+trait SvdFileEventsReactor extends SvdActor with Logging with SvdUtils {
 
     def registerFileEventFor(path: String, flags: Int, ref: ActorRef = self, uid: Int = 0) {
         def bindEvent {
@@ -130,7 +130,7 @@ trait SvdFileEventsReactor extends SvdExceptionHandler with Logging with SvdUtil
  *
  * @author teamon
  */
-class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler with SvdUtils {
+class SvdFileEventsManager extends Actor with Logging with SvdActor with SvdUtils {
     import CLibrary._
     import Events._
 

@@ -16,7 +16,7 @@ import akka.actor._
  *
  *  @author teamon
  */
-class SvdSystemInfo extends SvdExceptionHandler {
+class SvdSystemInfo extends SvdActor {
 
     log.info("Starting SvdSystemInfo")
 

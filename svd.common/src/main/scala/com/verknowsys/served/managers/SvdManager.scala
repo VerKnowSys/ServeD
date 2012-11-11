@@ -10,4 +10,4 @@ import akka.actor.Actor
  *
  * @author teamon
  */
-abstract trait SvdManager extends Actor with SvdExceptionHandler with Logging with SvdUtils
+abstract trait SvdManager extends Actor with SvdActor with Logging with SvdUtils

@@ -109,7 +109,7 @@ class SvdServiceConfigLoader(name: String) extends Logging {
 }
 
 
-class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExceptionHandler with SvdUtils {
+class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor with SvdUtils {
 
     val accountManager = context.actorFor("/user/SvdAccountManager")
 
@@ -218,8 +218,8 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
                 shell.exec(
                     hook.copy(commands = execCommands)
                 )
-                // INFO -- @deldagorin/192.168.0.3 -- Performing start of service: Nginx
-                val msg = formatMessage("I:Performing %s of service: %s".format(hookName, config.name))
+                // INFO -- @deldagorin/192.168.0.3 -- Done start of service: Nginx
+                val msg = formatMessage("I:Done %s of service: %s".format(hookName, config.name))
                 log.trace(msg)
                 if (config.reportAllInfos)
                     accountManager ! Notify.Message(msg)
@@ -324,6 +324,6 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdExcep
 
 }
 
-// class SvdSystemService extends SvdExceptionHandler
+// class SvdSystemService extends SvdActor
 
-// class SvdUserService extends SvdExceptionHandler
+// class SvdUserService extends SvdActor
