@@ -94,6 +94,12 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
 
         val commands = Map(
             // "help" -> "This console provides remote control over your account",
+            "services" -> Map(
+                "remove" -> "Remove services",
+                "start" -> "Start services (will also install services on demand if not already built)",
+                "stop" -> "Stop services",
+                "status" -> "Show services details"
+                ),
             "service" -> Map(
                 "remove" -> "Removes service",
                 "start" -> "Starts service (will also install service on demand if not already built)",
@@ -150,23 +156,24 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                     //     accountManager ! User.TerminateServices
                 }
 
+            case "services" :: command :: Nil =>
+                command.toLowerCase match {
+                    case "start" =>
+                        accountManager ! User.SpawnServices
+
+                    case "stop" =>
+                        accountManager ! User.TerminateServices
+
+                    case "status" =>
+                        (accountManager ? User.GetServices) onSuccess {
+                            case list =>
+                                send("Services:\n%s".format(list))
+                        }
+                }
+
             case "service" :: argument :: command :: Nil =>
                 val arg = argument.capitalize
                 arg match {
-                    case "All" =>
-                        command.toLowerCase match {
-                            case "start" =>
-                                accountManager ! User.SpawnServices
-
-                            case "stop" =>
-                                accountManager ! User.TerminateServices
-
-                            case "status" =>
-                                (accountManager ? User.GetServices) onSuccess {
-                                    case list =>
-                                        send("Services:\n%s".format(list))
-                                }
-                        }
                     case _ =>
                         command.toLowerCase match {
                             case "start" =>
