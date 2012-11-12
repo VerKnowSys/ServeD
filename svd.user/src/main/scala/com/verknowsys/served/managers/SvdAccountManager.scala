@@ -50,6 +50,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
 
     val userHomeDir = SvdConfig.userHomeDir / "%s".format(account.uid)
+    val preloadedServicesFile = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / SvdConfig.defaultServicesFile
     // val preloadedServices = Source.fromFile(userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / SvdConfig.defaultServicesFile).mkString.split(" ")
 
     val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
@@ -75,7 +76,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             val dbServer = new DBServer(dbPort, userHomeDir / "%s.db".format(account.uid))
             val db = dbServer.openClient
 
-            // NON DRY NON DRY NON DRY:
+            // preload saved services (stored using "services store")
+            val servicesPreloadList = loadList(preloadedServicesFile)
+
             val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")))
             val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"))
 
@@ -95,7 +98,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             // TODO: Checking installed services
 
             log.debug("Becaming headless with started")
-            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, Nil))
+            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, servicesPreloadList))
 
             // import org.webbitserver._
             // import org.webbitserver.handler._
@@ -123,6 +126,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     val dbServer = new DBServer(dbPort, userHomeDir / "%s.db".format(account.uid))
                     val db = dbServer.openClient
 
+                    // preload saved services (stored using "services store")
+                    val servicesPreloadList = loadList(preloadedServicesFile)
+
                     // start managers
                     val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")))
                     val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"))
@@ -135,7 +141,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     // Start the real work
                     log.debug("Becaming started")
                     context.become(
-                        started(db, dbServer, gitManager, notificationsManager, webManager, Nil))
+                        started(db, dbServer, gitManager, notificationsManager, webManager, servicesPreloadList))
 
                     accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
                     self ! User.SpawnServices // spawn userside services
@@ -281,6 +287,18 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
         case User.GetServices =>
             sender ! services
+
+        case User.StoreServices =>
+            log.debug("Requested storing current state of running services as default service list for user: %s".format(services))
+            try {
+                val servList = services.mkString(" ")
+                log.trace("Services list to be stored: %s".format(servList))
+                writeToFile(preloadedServicesFile, servList)
+                notificationsManager ! Notify.Message(formatMessage("I:Services were stored successfully: %s".format(servList)))
+            } catch {
+                case e: Exception =>
+                    notificationsManager ! Notify.Message(formatMessage("E:Failed to store services cause of: %s".format(e)))
+            }
 
         case User.GetRunningServices =>
             notificationsManager ! Notify.Message("Running Services: " + services.mkString(", "))

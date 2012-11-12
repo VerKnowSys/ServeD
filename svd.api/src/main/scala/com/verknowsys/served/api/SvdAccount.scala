@@ -15,6 +15,7 @@ object User {
     case object TerminateServices
     case object GetServices // returns List
     case object GetRunningServices // returns nothing, just notifies
+    case object StoreServices
     case object ShowAvailableServices
 
     case class ReadLogFile(serviceName: String, pattern: Option[String])

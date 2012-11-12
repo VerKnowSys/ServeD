@@ -564,5 +564,25 @@ trait SvdUtils extends Logging {
     }
 
 
+    def loadList(file: String) = {
+        try {
+            Some(fileToString(file).split(" ").toList).getOrElse(Nil)
+        } catch {
+            case e: FileNotFoundException =>
+                log.debug("No file found: %s".format(file))
+                Nil
+        }
+    }
+
+
+    def using[A <: { def close(): Unit }, B](param: A)(f: A => B): B =
+        try { f(param) } finally { param.close() }
+
+
+    def writeToFile(fileName: String, data: String) =
+        using (new FileWriter(fileName)) {
+            fileWriter => fileWriter.write(data)
+    }
+
 }
 

@@ -168,6 +168,9 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
 
             case "services" :: command :: Nil =>
                 command.toLowerCase match {
+                    case "store" | "save" =>
+                        accountManager ! User.StoreServices
+
                     case "start" =>
                         accountManager ! User.SpawnServices
 

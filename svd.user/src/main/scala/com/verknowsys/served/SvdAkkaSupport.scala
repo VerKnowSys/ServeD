@@ -24,13 +24,6 @@ trait SvdAkkaSupport extends SvdUtils with Logging {
         if (!new File(configFile).exists) {
             log.info("Akka config: %s not found. Generating default one", configFile)
 
-            def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
-                try { f(param) } finally { param.close() }
-
-            def writeToFile(fileName: String, data: String) =
-                using (new FileWriter(fileName)) {
-                    fileWriter => fileWriter.write(data)
-            }
             val defaultConfig = Source.fromURL(
                 getClass.getResource(
                     SvdConfig.defaultUserAkkaConf
