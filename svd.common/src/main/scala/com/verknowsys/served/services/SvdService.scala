@@ -207,6 +207,8 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             try {
                 val execCommands = hook.commands.map {
                     _.replaceAll("SERVICE_PREFIX", servicePrefix)
+                     .replaceAll("SERVICE_ADDRESS", SvdConfig.defaultHost)
+                     .replaceAll("SERVICE_DOMAIN", SvdConfig.defaultDomain)
                      .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
                      .replaceAll("SERVICE_VERSION", try {
                             Source.fromFile(installIndicator).mkString
