@@ -190,7 +190,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     }
 
 
-    protected def readLogFile(serviceName: String, pattern: Option[String] = None) {
+    protected def readLogFile(serviceName: String, pattern: Option[String] = None) { // , amount: Option[Int] = None
         import java.io._
 
         val arg = serviceName.capitalize
@@ -204,14 +204,16 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                 case Some(patt) =>
                     val content = fileToString(access).split("\n").reverse.filter{
                         _.contains(patt)
-                    }.take(20).reverse.mkString("\n")
-                    notificationsManager ! Notify.Message(formatMessage("I:Last 20 lines of log: \n%s\n\nFull log here: http://verknowsys.com".format(content)))
+                    }.take(20).reverse.mkString("\n") // XXX: hardcode
+
+                    // TODO: upload log to private gist or something
+
+                    notificationsManager ! Notify.Message(formatMessage("I:Last 20 lines of log: \n%s\n\nFull log here: http://paster.verknowsys.com/SOME-SHA".format(content)))
 
                 case None =>
-                    val content = fileToString(access).split("\n").reverse.take(20).reverse.mkString("\n")
+                    val content = fileToString(access).split("\n").reverse.take(20).reverse.mkString("\n") // XXX: hardcode
                     notificationsManager ! Notify.Message(formatMessage("I:Last 20 lines of log: \n%s\n\nFull log here: http://verknowsys.com".format(content)))
             }
-
             log.trace("Forcing GC after log show")
             Runtime.getRuntime.gc
 
@@ -280,6 +282,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         case User.GetServices =>
             sender ! services
 
+        case User.GetRunningServices =>
+            notificationsManager ! Notify.Message("Running Services: " + services.mkString(", "))
+
         case User.SpawnService(serviceName) =>
             log.debug("Spawning service: %s".format(serviceName))
             // look for old services already started, and stop it:
@@ -324,6 +329,11 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             log.debug("Currently maintained services: %s".format(svces))
             context.unbecome
             context.become(started(db, dbServer, gitManager, notificationsManager, webManager, svces))
+
+        case User.ShowAvailableServices =>
+            log.debug("Showing available services definitions")
+            notificationsManager ! Notify.Message("Available Services: " +
+                listFiles(SvdConfig.defaultSoftwareTemplatesDir).filter{_.getName.endsWith(".json")}.map{_.getName.split("/").last}.mkString(", ").replaceAll(".json", "")) // XXX: replace with some good regexp
 
         case User.ReadLogFile(serviceName, pattern) =>
             log.debug("Reading log file for service: %s".format(serviceName))

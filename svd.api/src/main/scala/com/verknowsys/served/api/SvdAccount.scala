@@ -13,7 +13,9 @@ object User {
 
     case object SpawnServices
     case object TerminateServices
-    case object GetServices
+    case object GetServices // returns List
+    case object GetRunningServices // returns nothing, just notifies
+    case object ShowAvailableServices
 
     case class ReadLogFile(serviceName: String, pattern: Option[String])
     case class SpawnService(name: String)
