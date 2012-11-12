@@ -542,6 +542,27 @@ trait SvdUtils extends Logging {
         }
 
 
+    // XXX: TODO: FIXME: this javaish implementation sucks. We'll need good efficient solution, probably C lib
+    def fileToString(file: File, encoding: String = "UTF-8") = {
+        val inStream = new FileInputStream(file)
+        val outStream = new ByteArrayOutputStream
+        try {
+            var reading = true
+            while (reading) {
+                inStream.read match {
+                    case -1 =>
+                        reading = false
+                    case c =>
+                        outStream.write(c)
+                    }
+            }
+            outStream.flush
+        } finally {
+            inStream.close
+        }
+        new String(outStream.toByteArray, encoding)
+    }
+
 
 }
 
