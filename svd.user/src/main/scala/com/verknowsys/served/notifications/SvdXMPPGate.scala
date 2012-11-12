@@ -175,16 +175,11 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                         accountManager ! User.TerminateServices
 
                     case "status" | "list" | "all" | "show" =>
-                        (accountManager ? User.GetServices) onSuccess {
-                            case list: List[_] =>
-                                send("Services: %s".format(list.mkString(", ")))
-                        }
+                        accountManager ! User.GetRunningServices
 
                     case "avail" | "available" =>
-                        // (accountManager ? User.GetServices) onSuccess { // TODO: it should call for FS check
-                            // case list: List[_] =>
-                                // send("Service available:\n%s".format(list.mkString(", ")))
-                        // }
+                        accountManager ! User.ShowAvailableServices
+
                 }
 
             case "service" :: argument :: command :: Nil =>
