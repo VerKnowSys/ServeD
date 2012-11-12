@@ -30,7 +30,7 @@ datadir     = SERVICE_PREFIX/database
 tmpdir      = SERVICE_PREFIX/tmp
 # language    = /usr/share/mysql/english
 skip-external-locking
-bind-address        = 0.0.0.0
+bind-address        = SERVICE_DOMAIN
 key_buffer      = 16M
 max_allowed_packet  = 16M
 thread_stack        = 128K
