@@ -38,6 +38,8 @@ object SvdConfig {
     def webApplicationsDir              = "WebApps/"
     def webConfigDir                    = "WebConfig/"
     def softwareDataDir                 = "SoftwareData/"
+    def defaultServicesFile             = "services.defined"
+    def defaultServiceLogFile           = "service.log"
     def installed                       = "installed"
     def defaultShell                    = "/bin/sh"
     def defaultEncoding                 = "UTF-8"

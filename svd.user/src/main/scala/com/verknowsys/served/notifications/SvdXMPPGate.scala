@@ -106,8 +106,9 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                 "stop" -> "Stops service",
                 "status" -> "Shows service details"
                 ),
-            "logs" -> Map(
-                "show" -> "Shows logs from service given as a param"
+            "show" -> Map(
+                "logs" -> "Shows logs from service given as a param",
+                "whoami" -> "Shows current user name"
                 ),
             "register" -> Map(
                 "domain" -> "Registers domain",
@@ -117,10 +118,9 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                 "domain" -> "Unregisters domain"
                 // "user" -> "Unregisters domain"
                 )
-            // "whoami" -> "Shows current user name"
             )
 
-        send("Remote message: '%s' from %s".format(msg, from))
+        send(formatMessage("I:> '%s' from %s".format(msg, from)))
         msgList match {
 
             case "help" :: Nil =>
@@ -138,13 +138,22 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                         send(commands(key)(inner))
                 }
 
-            case "whoami" :: Nil =>
-                send("You're authorized as %s. Writing from: %s".format(account.userName, from))
-
-            case "logs" :: command :: argument :: Nil =>
+            case "show" :: command :: Nil =>
                 command.toLowerCase match {
-                    case "show" =>
-                        send("NYI") // TODO: implement log parser
+                    case "whoami" =>
+                        send("You're authorized as %s. Writing from: %s".format(account.userName, from))
+                }
+
+            case "show" :: command :: argument :: Nil =>
+                command.toLowerCase match {
+                    case "log" =>
+                        accountManager ! User.ReadLogFile(argument, None)
+                }
+
+            case "show" :: command :: argument :: pattern :: Nil =>
+                command.toLowerCase match {
+                    case "log" =>
+                        accountManager ! User.ReadLogFile(argument, Some(pattern))
                 }
 
             case "register" :: command :: argument :: _ =>
@@ -165,11 +174,17 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                     case "stop" =>
                         accountManager ! User.TerminateServices
 
-                    case "status" =>
+                    case "status" | "list" | "all" | "show" =>
                         (accountManager ? User.GetServices) onSuccess {
-                            case list =>
-                                send("Services:\n%s".format(list))
+                            case list: List[_] =>
+                                send("Services: %s".format(list.mkString(", ")))
                         }
+
+                    case "avail" | "available" =>
+                        // (accountManager ? User.GetServices) onSuccess { // TODO: it should call for FS check
+                            // case list: List[_] =>
+                                // send("Service available:\n%s".format(list.mkString(", ")))
+                        // }
                 }
 
             case "service" :: argument :: command :: Nil =>
@@ -183,7 +198,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                             case "stop" =>
                                 accountManager ! User.TerminateService(arg)
 
-                            case "status" =>
+                            case "status" | "list" | "all" | "show" =>
                                 (accountManager ? User.GetServices) onSuccess {
                                     case list =>
                                         send("Services:\n%s".format(list))
@@ -218,7 +233,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
             //
 
             case anything =>
-                send("Bad command: %s".format(anything.mkString(" ")))
+                send(formatMessage("E:Try 'help'. No such command: %s".format(anything.mkString(" "))))
 
         }
 

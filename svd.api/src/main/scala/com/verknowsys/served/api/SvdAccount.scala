@@ -14,6 +14,8 @@ object User {
     case object SpawnServices
     case object TerminateServices
     case object GetServices
+
+    case class ReadLogFile(serviceName: String, pattern: Option[String])
     case class SpawnService(name: String)
     case class TerminateService(name: String)
 

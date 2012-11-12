@@ -50,6 +50,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
 
     val userHomeDir = SvdConfig.userHomeDir / "%s".format(account.uid)
+    // val preloadedServices = Source.fromFile(userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / SvdConfig.defaultServicesFile).mkString.split(" ")
 
     val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
     val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-single-dispatcher"), "SvdFileEventsManagerUser") // XXX: hardcode
@@ -189,6 +190,45 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     }
 
 
+    protected def readLogFile(serviceName: String, pattern: Option[String] = None) {
+        import java.io._
+
+        val arg = serviceName.capitalize
+        val logPath = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / arg / SvdConfig.defaultServiceLogFile
+
+        try {
+            val access = new File(logPath)
+            val logFileSize = access.length.toInt
+            log.debug("Reading tail of log file: %s with %d bytes.", logPath, logFileSize)
+            pattern match {
+                case Some(patt) =>
+                    val content = fileToString(access).split("\n").reverse.filter{
+                        _.contains(patt)
+                    }.take(20).reverse.mkString("\n")
+                    notificationsManager ! Notify.Message(formatMessage("I:Last 20 lines of log: \n%s\n\nFull log here: http://verknowsys.com".format(content)))
+
+                case None =>
+                    val content = fileToString(access).split("\n").reverse.take(20).reverse.mkString("\n")
+                    notificationsManager ! Notify.Message(formatMessage("I:Last 20 lines of log: \n%s\n\nFull log here: http://verknowsys.com".format(content)))
+            }
+
+            log.trace("Forcing GC after log show")
+            Runtime.getRuntime.gc
+
+        } catch {
+            case e: FileNotFoundException =>
+                val msg = formatMessage("E:Log file not available: %s".format(e))
+                log.error(msg)
+                notificationsManager ! Notify.Message(msg)
+
+            case x: Exception =>
+                val msg = formatMessage("E:Exception happened: %s".format(x))
+                log.error(msg)
+                notificationsManager ! Notify.Message(msg)
+        }
+    }
+
+
     private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, services: List[String] = Nil): Receive = traceReceive {
 
         case User.SpawnServices =>
@@ -275,16 +315,19 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     joinContext(serviceName :: services)
             }
 
-
         case User.TerminateService(name) =>
             log.debug("Stopping service: %s".format(name))
             val serv = context.actorFor("/user/SvdAccountManager/%s".format(name))
             context.unwatch(serv)
             context.stop(serv)
             val svces = services.filterNot{_.name == name}
-            context.unbecome
             log.debug("Currently maintained services: %s".format(svces))
+            context.unbecome
             context.become(started(db, dbServer, gitManager, notificationsManager, webManager, svces))
+
+        case User.ReadLogFile(serviceName, pattern) =>
+            log.debug("Reading log file for service: %s".format(serviceName))
+            readLogFile(serviceName, pattern)
 
         case User.GetAccount =>
             sender ! account
