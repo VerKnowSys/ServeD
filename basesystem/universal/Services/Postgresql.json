@@ -6,14 +6,15 @@
     },
     "configure": {
         "commands": [
-            "test ! -d SERVICE_PREFIX/database/base && SERVICE_ROOT/exports/initdb -D SERVICE_PREFIX/database && rm -f SERVICE_PREFIX/database/pg_hba.conf && rm -f SERVICE_PREFIX/database/postgresql.conf",
+            "test ! -d SERVICE_PREFIX/database/base && SERVICE_ROOT/exports/initdb -D SERVICE_PREFIX/database && rm -f SERVICE_PREFIX/database/pg_hba.conf && rm -f SERVICE_PREFIX/database/postgresql.conf"
         ]
     },
     "start": {
         "commands": [
-            "SERVICE_ROOT/exports/pg_ctl -D SERVICE_PREFIX/database start"
+            "SERVICE_ROOT/exports/pg_ctl -D SERVICE_PREFIX/database -l SERVICE_PREFIX/service.log start"
         ],
-        "expectStdOut": ["database system is ready to accept connections"],
+        "expectStdOut": ["server starting"],
+        "expectOutputTimeout": 25
     },
     "stop": {
         "commands": [
@@ -22,6 +23,7 @@
     },
     "validate": {
         "commands": [
+            "test ! -d SERVICE_PREFIX/database/base && SERVICE_ROOT/exports/initdb -D SERVICE_PREFIX/database && rm -f SERVICE_PREFIX/database/pg_hba.conf && rm -f SERVICE_PREFIX/database/postgresql.conf",
             "test ! -f SERVICE_PREFIX/database/pg_hba.conf && printf '
 # Default Postgresql service configuration
 local all all trust
@@ -42,8 +44,7 @@ work_mem = 16MB
 max_stack_depth = 16MB
 
 logging_collector = true
-log_directory = SERVICE_PREFIX
-log_filename = service.log
 ' > SERVICE_PREFIX/database/postgresql.conf"]
+
     }
 }
