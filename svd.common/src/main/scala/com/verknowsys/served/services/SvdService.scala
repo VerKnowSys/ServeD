@@ -259,12 +259,13 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             hookShot(installHook, "install")
             hookShot(configureHook, "configure")
         } else {
-            log.info("Service software already installed and configured: %s".format(config.name))
+            log.info("Service software already installed: %s".format(config.name))
         }
         hookShot(validateHook, "validate")
 
-        log.debug("Waiting after validate hook")
-        Thread.sleep(SvdConfig.serviceRestartPause)
+        val pause = SvdConfig.serviceRestartPause / 2
+        log.debug("Waiting after validate hook for: %ss".format(pause/1000))
+        Thread.sleep(pause)
 
         if (config.autoStart) {
             log.info("Starting service: %s", config.name)
