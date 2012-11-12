@@ -140,14 +140,16 @@ trait SvdUtils extends Logging {
      */
     def formatMessage(msg: String) = {
         msg(0) match { // first char of message
-            case 'I' | 'i' =>
-                "INFO -- %s -- %s".format(currentHost, msg.substring(2))
             case 'W' | 'w' =>
                 "WARN -- %s -- %s".format(currentHost, msg.substring(2))
             case 'E' | 'e' =>
                 "ERROR == %s == %s".format(currentHost, msg.substring(2))
             case 'F' | 'f' =>
                 "FATAL ## %s ## %s".format(currentHost, msg.substring(2))
+            case 'I' | 'i' =>
+                "INFO -- %s -- %s".format(currentHost, msg.substring(2))
+            case _ =>
+                "INFO -- %s -- %s".format(currentHost, msg.substring(2))
         }
     }
 
