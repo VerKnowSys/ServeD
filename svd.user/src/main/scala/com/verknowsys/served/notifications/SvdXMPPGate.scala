@@ -98,7 +98,9 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                 "remove" -> "Remove services",
                 "start" -> "Start services (will also install services on demand if not already built)",
                 "stop" -> "Stop services",
-                "status" -> "Show services details"
+                "status" -> "Show services details",
+                "store" -> "Store service state",
+                "stored" -> "Show stored services"
                 ),
             "service" -> Map(
                 "remove" -> "Removes service",
@@ -170,6 +172,9 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                 command.toLowerCase match {
                     case "store" | "save" =>
                         accountManager ! User.StoreServices
+
+                    case "stored" | "saved" =>
+                        accountManager ! User.GetStoredServices
 
                     case "start" =>
                         accountManager ! User.SpawnServices

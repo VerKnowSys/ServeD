@@ -18,6 +18,10 @@ object User {
     case object StoreServices
     case object ShowAvailableServices
 
+    case object ServiceStatus // used to get information about Service state
+    case object ServiceAutostart
+    case object GetStoredServices
+
     case class ReadLogFile(serviceName: String, pattern: Option[String])
     case class SpawnService(name: String)
     case class TerminateService(name: String)

@@ -50,8 +50,6 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
 
     val userHomeDir = SvdConfig.userHomeDir / "%s".format(account.uid)
-    val preloadedServicesFile = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / SvdConfig.defaultServicesFile
-    // val preloadedServices = Source.fromFile(userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / SvdConfig.defaultServicesFile).mkString.split(" ")
 
     val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
     val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-single-dispatcher"), "SvdFileEventsManagerUser") // XXX: hardcode
@@ -76,11 +74,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             val dbServer = new DBServer(dbPort, userHomeDir / "%s.db".format(account.uid))
             val db = dbServer.openClient
 
-            // preload saved services (stored using "services store")
-            val servicesPreloadList = loadList(preloadedServicesFile)
-
-            val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")))
-            val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"))
+            val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")), "SvdGitManager")
+            val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"), "SvdWebManager")
 
             context.watch(fem)
             context.watch(notificationsManager)
@@ -98,7 +93,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             // TODO: Checking installed services
 
             log.debug("Becaming headless with started")
-            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, servicesPreloadList))
+            context.become(started(db, dbServer, gitManager, notificationsManager, webManager))
 
             // import org.webbitserver._
             // import org.webbitserver.handler._
@@ -126,12 +121,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     val dbServer = new DBServer(dbPort, userHomeDir / "%s.db".format(account.uid))
                     val db = dbServer.openClient
 
-                    // preload saved services (stored using "services store")
-                    val servicesPreloadList = loadList(preloadedServicesFile)
-
                     // start managers
-                    val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")))
-                    val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"))
+                    val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")), "SvdGitManager")
+                    val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"), "SvdWebManager")
 
                     context.watch(fem)
                     context.watch(notificationsManager)
@@ -141,7 +133,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     // Start the real work
                     log.debug("Becaming started")
                     context.become(
-                        started(db, dbServer, gitManager, notificationsManager, webManager, servicesPreloadList))
+                        started(db, dbServer, gitManager, notificationsManager, webManager))
 
                     accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
                     self ! User.SpawnServices // spawn userside services
@@ -237,22 +229,50 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     }
 
 
-    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, services: List[String] = Nil): Receive = traceReceive {
+    def cleanServicesAutostart {
+        val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir
+        listDirectories(servicesLocationDir).map {
+            dir =>
+                val file = new java.io.File(dir.toString / ".autostart_service")
+                if (file.exists) {
+                    log.debug("Removing autostart file: %s", file)
+                    rm_r(file.toString)
+                }
+        }
+    }
+
+
+    def loadServicesList = {
+        val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir
+        log.debug("Found services dir: %s".format(servicesLocationDir))
+        listDirectories(servicesLocationDir).map {
+            dir =>
+                if (new java.io.File(dir.toString / ".autostart_service").exists) { // XXX: hardcode
+                    log.debug("Found autostart for %s".format(dir))
+                    dir.toString.split("/").last
+                } else {
+                    log.debug("No autostart for %s".format(dir))
+                    ""
+                }
+        }.filterNot(_.isEmpty)
+    }
+
+
+    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef): Receive = traceReceive {
 
         case User.SpawnServices =>
 
-            services.foreach {
+            val listOfServices = loadServicesList
+            log.debug("List of all services stored: %s".format(listOfServices.mkString(", ")))
+            listOfServices.foreach {
                 serviceName =>
                     // look for old services already started, and stop it:
-                    def joinContext(withServices: List[String]) { // launch new service:
-                        val serv = context.actorOf(Props(new SvdService(serviceName, account)), serviceName)
+                    def joinContext {
+                        val serv = context.actorOf(Props(new SvdService(serviceName, account)), "Service-%s".format(serviceName))
                         log.debug("Launching Service through SpawnServices: %s".format(serv))
                         context.watch(serv)
-                        context.unbecome
-                        log.debug("Currently maintained services: %s".format(withServices))
-                        context.become(started(db, dbServer, gitManager, notificationsManager, webManager, withServices))
                     }
-                    val currServ = context.actorFor("/user/SvdAccountManager/%s".format(serviceName))
+                    val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
                     (currServ ? Ping) onComplete {
                         case Right(Pong) =>
                             val msg = "Service already running: %s. Restarting".format(serviceName)
@@ -262,66 +282,55 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                             context.stop(currServ)
                             log.debug("Waiting for service shutdown hooks…")
                             Thread.sleep(SvdConfig.serviceRestartPause)
-                            joinContext(services.filterNot(_ == serviceName))
+                            joinContext //(services.filterNot(_ == serviceName))
 
                         case Left(exc) =>
                             log.debug("No alive actors found: %s".format(exc.getMessage))
-                            joinContext(services)
+                            joinContext //(services)
                     }
             }
 
         case User.TerminateServices =>
-            services.foreach {
-                serviceName =>
-                    log.debug("Terminating Service: %s".format(serviceName))
-                    val servicesLeft = services.filterNot(_ == serviceName)
-                    val serv = context.actorFor("/user/SvdAccountManager/%s".format(serviceName))
-                    context.unwatch(serv)
-                    context.stop(serv)
-            }
-            log.debug("Waiting for service shutdown hooks…")
-            Thread.sleep(SvdConfig.serviceRestartPause)
-            context.unbecome
-            log.debug("Currently maintained services: %s".format(Nil))
-            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, Nil))
+            log.info("Terminating all services…")
+            context.actorSelection("../SvdAccountManager/Service-*") ! Quit
 
         case User.GetServices =>
-            sender ! services
+            val listOfServices = loadServicesList
+            log.debug("List of all services stored: %s".format(listOfServices.mkString(", ")))
+            sender ! listOfServices
+
+        case User.GetStoredServices =>
+            val listOfServices = loadServicesList
+            notificationsManager ! Notify.Message(formatMessage("I:%s".format(listOfServices.mkString(", "))))
 
         case User.StoreServices =>
-            log.debug("Requested storing current state of running services as default service list for user: %s".format(services))
-            try {
-                val servList = services.mkString(" ")
-                log.trace("Services list to be stored: %s".format(servList))
-                writeToFile(preloadedServicesFile, servList)
-                notificationsManager ! Notify.Message(formatMessage("I:Services were stored successfully: %s".format(servList)))
-            } catch {
-                case e: Exception =>
-                    notificationsManager ! Notify.Message(formatMessage("E:Failed to store services cause of: %s".format(e)))
-            }
+            cleanServicesAutostart
+            context.actorSelection("../SvdAccountManager/Service-*") ! User.ServiceAutostart
 
         case User.GetRunningServices =>
-            notificationsManager ! Notify.Message("Running Services: " + services.mkString(", "))
+            context.actorSelection("../SvdAccountManager/Service-*") ! User.ServiceStatus
 
         case User.SpawnService(serviceName) =>
             log.debug("Spawning service: %s".format(serviceName))
             // look for old services already started, and stop it:
-            def joinContext(withServices: List[String]) {
+            def joinContext {
                 // spawn new service with that name:
                 try { // XXX: TODO: make sure it's safe
-                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), serviceName)
+                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), "Service-%s".format(serviceName))
                     context.watch(serv)
-                    context.unbecome
-                    log.debug("Currently maintained services: %s".format(withServices))
-                    context.become(started(db, dbServer, gitManager, notificationsManager, webManager, withServices))
                 } catch {
                     case x: InvalidActorNameException =>
-                        val msg = formatMessage("E:Invalid name exception (duplicate same service): %s".format(x.getMessage))
+                        val msg = formatMessage("E:Invalid name exception (duplicate same service): %s. Causing Restart of Service.".format(x.getMessage))
+                        log.warn(msg)
+                        notificationsManager ! Notify.Message(msg)
+
+                    case x: Exception =>
+                        val msg = formatMessage("E:Something nasty happened with service: %s".format(x.getMessage))
                         log.warn(msg)
                         notificationsManager ! Notify.Message(msg)
                 }
             }
-            val currServ = context.actorFor("/user/SvdAccountManager/%s".format(serviceName))
+            val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
             (currServ ? Ping) onComplete {
                 case Right(Pong) =>
                     val msg = "Service already running: %s. Restarting".format(serviceName)
@@ -331,22 +340,18 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     context.stop(currServ)
                     log.debug("Waiting for service shutdown hooks…")
                     Thread.sleep(SvdConfig.serviceRestartPause)
-                    joinContext(services.filterNot(_ == serviceName))
+                    joinContext
 
                 case Left(exc) =>
                     log.debug("No alive service found: %s".format(exc.getMessage))
-                    joinContext(serviceName :: services)
+                    joinContext
             }
 
         case User.TerminateService(name) =>
             log.debug("Stopping service: %s".format(name))
-            val serv = context.actorFor("/user/SvdAccountManager/%s".format(name))
+            val serv = context.actorFor("/user/SvdAccountManager/Service-%s".format(name))
             context.unwatch(serv)
             context.stop(serv)
-            val svces = services.filterNot{_.name == name}
-            log.debug("Currently maintained services: %s".format(svces))
-            context.unbecome
-            context.become(started(db, dbServer, gitManager, notificationsManager, webManager, svces))
 
         case User.ShowAvailableServices =>
             log.debug("Showing available services definitions")
@@ -439,8 +444,6 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                 x match {
                     case Admin.GetPort => // allow getting static port for headless account manager
                         import java.lang._
-
-                        val numServices = services.length + 1
 
                         Thread.sleep(Math.abs(new scala.util.Random().nextInt % 100))
                         val randomPort = ((1024 + account.uid) + java.lang.System.currentTimeMillis % 10000).toInt// XXX: almost random in range of max 10000 service ports

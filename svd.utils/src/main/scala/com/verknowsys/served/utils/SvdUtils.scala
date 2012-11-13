@@ -566,7 +566,9 @@ trait SvdUtils extends Logging {
 
     def loadList(file: String) = {
         try {
-            Some(fileToString(file).split(" ").toList.filterNot(_.isEmpty)).getOrElse(Nil)
+            Some(
+                fileToString(file).split(" ").toList.filterNot(_.isEmpty)
+            ).getOrElse(Nil)
         } catch {
             case e: FileNotFoundException =>
                 log.debug("No file found: %s".format(file))
@@ -582,6 +584,14 @@ trait SvdUtils extends Logging {
     def writeToFile(fileName: String, data: String) =
         using (new FileWriter(fileName)) {
             fileWriter => fileWriter.write(data)
+    }
+
+    def fssecure(path: String)(f: String => Unit) {
+        f(path)
+    }
+
+    def touch(path: String) = fssecure(path) {
+        p => FileUtils touch p
     }
 
 }
