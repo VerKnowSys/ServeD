@@ -177,7 +177,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                     case "stop" =>
                         accountManager ! User.TerminateServices
 
-                    case "status" | "list" | "all" | "show" =>
+                    case "status" | "list" | "all" | "show" | "running" | "run" | "spawned" =>
                         accountManager ! User.GetRunningServices
 
                     case "avail" | "available" =>
