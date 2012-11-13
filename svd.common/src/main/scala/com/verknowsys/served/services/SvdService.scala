@@ -23,6 +23,7 @@ import akka.remote._
 import akka.util.Duration
 import akka.util.Timeout
 import akka.util.duration._
+import java.lang.System
 
 
 /**
@@ -39,7 +40,6 @@ class SvdServiceConfigLoader(name: String) extends Logging {
     log.trace("SvdServiceConfigLoader: %s".format(name))
 
     val fullName = SvdConfig.defaultSoftwareTemplatesDir / name + SvdConfig.defaultSoftwareTemplateExt
-
     val defaultTemplate = parse(Source.fromFile(SvdConfig.defaultSoftwareTemplate + SvdConfig.defaultSoftwareTemplateExt).mkString) //.extract[SvdServiceConfig]
     val appSpecificTemplate = parse(Source.fromFile(fullName).mkString)
     val appTemplateMerged = defaultTemplate merge appSpecificTemplate
@@ -48,7 +48,7 @@ class SvdServiceConfigLoader(name: String) extends Logging {
     log.debug("Extracted SvdServiceConfig from igniter: %s.".format(name))
     // log.trace("Default template: %s".format(defaultTemplate))
     // log.trace("App template: %s".format(appSpecificTemplate))
-    log.trace("Merged template: %s".format(compact(render(appTemplateMerged))))
+    // log.trace("Merged template: %s".format(compact(render(appTemplateMerged))))
 
     val config = SvdServiceConfig( // OPTIMIZE: this should be done automatically
         name = (appTemplateMerged \ "name").extract[String],
@@ -111,7 +111,10 @@ class SvdServiceConfigLoader(name: String) extends Logging {
 
 class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor with SvdUtils {
 
+
+    val uptime = System.currentTimeMillis // Service uptime measure point
     val accountManager = context.actorFor("/user/SvdAccountManager")
+    val autostartFileLocation = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name / ".autostart_service"
 
     val installIndicator = new File(
         if (account.uid == 0)
@@ -277,7 +280,19 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
     def receive = {
 
+        case User.ServiceAutostart =>
+            touch(autostartFileLocation)
+            val msg = formatMessage("I:Turned on autostart of: %s".format(this))
+            log.debug(msg)
+            accountManager ! Notify.Message(msg)
+
+        case User.ServiceStatus =>
+            val msg = formatMessage("I:%s".format(this))
+            log.debug(msg)
+            accountManager ! Notify.Message(msg)
+
         case Ping =>
+            log.debug("%s".format(this))
             sender ! Pong
 
         /**
@@ -305,9 +320,10 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
          *   Quit should be sent when we want to stop this service
          */
         case Quit =>
+            log.info("Got Quit in %s".format(this))
             hookShot(stopHook, "stop")
             hookShot(afterStopHook, "afterStop")
-            sender ! Success
+            context.stop(self)
 
         case Success =>
             log.trace("Success in SvdService from %s".format(sender.getClass.getName))
@@ -327,7 +343,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
     }
 
 
-    override def toString = "SvdService name: %s with config: %s".format(config.name, config)
+    override def toString = "SvdService name: %s. Uptime: %s".format(config.name, secondsToHMS((System.currentTimeMillis - uptime).toInt / 1000))
 
 }
 
