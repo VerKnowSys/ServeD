@@ -566,7 +566,7 @@ trait SvdUtils extends Logging {
 
     def loadList(file: String) = {
         try {
-            Some(fileToString(file).split(" ").toList).getOrElse(Nil)
+            Some(fileToString(file).split(" ").toList.filterNot(_.isEmpty)).getOrElse(Nil)
         } catch {
             case e: FileNotFoundException =>
                 log.debug("No file found: %s".format(file))
