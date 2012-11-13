@@ -74,6 +74,7 @@ object SvdConfig {
     def gatherTimeout                   = 1000
     def serviceRestartPause             = 6000
     def headlessTimeout                 = 6000 // 6 seconds
+    def serviceAutostartFile            = ".autostart_service"
     def defaultUserAkkaConf             = "/defaultUserAkkaConf.conf"
     def defaultAkkaConfName             = ".akka.conf"
     def standardShellEnvironment        = ". /etc/profile\nulimit -u 120\n"

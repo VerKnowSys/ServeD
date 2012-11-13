@@ -114,7 +114,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
     val uptime = System.currentTimeMillis // Service uptime measure point
     val accountManager = context.actorFor("/user/SvdAccountManager")
-    val autostartFileLocation = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name / ".autostart_service"
+    val autostartFileLocation = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name / SvdConfig.serviceAutostartFile
 
     val installIndicator = new File(
         if (account.uid == 0)

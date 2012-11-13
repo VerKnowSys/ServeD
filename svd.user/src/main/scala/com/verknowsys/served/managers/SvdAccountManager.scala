@@ -25,7 +25,7 @@ case class AccountKeys(keys: Set[AccessKey] = Set.empty, uuid: UUID = randomUUID
 object AccountKeysDB extends DB[AccountKeys]
 
 /**
- * Account Manager - owner of all managers
+ * Account Manager - User Side Manager, which has purpose to watch over all user side mechanisms and APIs
  *
  * @author dmilith
  * @author teamon
@@ -147,15 +147,11 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     throwException[DBServerInitializationException]("DB initialization error. Got param: %s".format(x))
             }
         }
-
     }
 
     // TODO: gather list of configurations from user config
 
     def receive = traceReceive {
-
-        // case AuthorizeWithKey(key: PublicKey) =>
-        //     log.debug("WTF? Not started manager!")
 
         case Success =>
             log.debug("Got success")
@@ -229,11 +225,17 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     }
 
 
+    /**
+     *  @author dmilith
+     *
+     *  Cleans autostart mark from services software data dir.
+     *
+     */
     def cleanServicesAutostart {
         val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir
         listDirectories(servicesLocationDir).map {
             dir =>
-                val file = new java.io.File(dir.toString / ".autostart_service")
+                val file = new java.io.File(dir.toString / SvdConfig.serviceAutostartFile)
                 if (file.exists) {
                     log.debug("Removing autostart file: %s", file)
                     rm_r(file.toString)
@@ -242,6 +244,12 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     }
 
 
+    /**
+     *  @author dmilith
+     *
+     *  Load autostart marks from services software data dir.
+     *
+     */
     def loadServicesList = {
         val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir
         log.debug("Found services dir: %s".format(servicesLocationDir))
@@ -282,11 +290,11 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                             context.stop(currServ)
                             log.debug("Waiting for service shutdown hooks…")
                             Thread.sleep(SvdConfig.serviceRestartPause)
-                            joinContext //(services.filterNot(_ == serviceName))
+                            joinContext
 
                         case Left(exc) =>
                             log.debug("No alive actors found: %s".format(exc.getMessage))
-                            joinContext //(services)
+                            joinContext
                     }
             }
 
