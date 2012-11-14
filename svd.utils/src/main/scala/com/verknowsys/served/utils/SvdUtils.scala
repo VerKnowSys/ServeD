@@ -146,6 +146,8 @@ trait SvdUtils extends Logging {
                 "ERROR == %s == %s".format(currentHost, msg.substring(2))
             case 'F' | 'f' =>
                 "FATAL ## %s ## %s".format(currentHost, msg.substring(2))
+            case 'D' | 'd' =>
+                "DEBUG -- %s -- %s".format(currentHost, msg.substring(2))
             case 'I' | 'i' =>
                 "INFO -- %s -- %s".format(currentHost, msg.substring(2))
             case _ =>

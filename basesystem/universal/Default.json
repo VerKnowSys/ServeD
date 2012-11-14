@@ -3,6 +3,7 @@
     "autoRestart": true,
     "reportAllErrors": true,
     "reportAllInfos": true,
+    "reportAllDebugs": true,
 
     "name": "service-name",
     "version": "no-version",
@@ -37,7 +38,7 @@
         "expectOutputTimeout": 60
     },
     "afterStop":  {
-        "commands": [],
+        "commands": ["rm -f SERVICE_PREFIX/service.pid"],
         "expectStdOut": [],
         "expectStdErr": [],
         "expectOutputTimeout": 60

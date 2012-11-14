@@ -29,7 +29,8 @@ case class SvdServiceConfig(
         autoStart: Boolean = true,
         autoRestart: Boolean = true, // TODO: Not yet Implemented
         reportAllErrors: Boolean = true,
-        reportAllInfos: Boolean = false,
+        reportAllInfos: Boolean = true,
+        reportAllDebugs: Boolean = true,
         uuid: UUID = randomUUID
     ) extends Persistent
 

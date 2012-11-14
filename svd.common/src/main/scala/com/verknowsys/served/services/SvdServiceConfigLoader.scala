@@ -46,6 +46,7 @@ class SvdServiceConfigLoader(name: String) extends Logging {
         autoStart = (appTemplateMerged \ "autoStart").extract[Boolean],
         reportAllErrors = (appTemplateMerged \ "reportAllErrors").extract[Boolean],
         reportAllInfos = (appTemplateMerged \ "reportAllInfos").extract[Boolean],
+        reportAllDebugs = (appTemplateMerged \ "reportAllDebugs").extract[Boolean],
         install = SvdShellOperations(
                 commands = (appTemplateMerged \ "install" \ "commands").extract[List[String]],
                 expectStdOut = (appTemplateMerged \ "install" \ "expectStdOut").extract[List[String]],

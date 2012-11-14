@@ -34,16 +34,16 @@ import java.lang.System
  */
 class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor with SvdUtils {
 
-    import akka.actor.OneForOneStrategy
-    import akka.actor.SupervisorStrategy._
+    // import akka.actor.OneForOneStrategy
+    // import akka.actor.SupervisorStrategy._
 
-    override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 10 seconds) {
-        // case _: Terminated               => Restart
-        case _: ArithmeticException      => Restart
-        case _: NullPointerException     => Restart
-        case _: IllegalArgumentException => Restart
-        case _: Exception                => Restart
-    }
+    // override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 10 seconds) {
+    //     // case _: Terminated               => Restart
+    //     case _: ArithmeticException      => Restart
+    //     case _: NullPointerException     => Restart
+    //     case _: IllegalArgumentException => Restart
+    //     case _: Exception                => Restart
+    // }
 
 
     val uptime = System.currentTimeMillis // Service uptime measure point
@@ -159,15 +159,28 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
                     hook.copy(commands = execCommands)
                 )
                 // INFO -- @deldagorin/192.168.0.3 -- Done start of service: Nginx
-                val msg = formatMessage("I:Done %s of service: %s".format(hookName, config.name))
-                log.trace(msg)
-                if (config.reportAllInfos)
-                    accountManager ! Notify.Message(msg)
+                val matcher = """after.*""".r
+                hookName match {
+                    case matcher() =>
+                        log.trace("MATCHED: %s".format(hookName))
+                        if (config.reportAllDebugs)
+                            accountManager ! Notify.Message(formatMessage("D:Done %s of service: %s".format(hookName, config.name)))
+
+                    case "validate" =>
+                        if (config.reportAllDebugs)
+                            accountManager ! Notify.Message(formatMessage("D:Done %s of service: %s".format(hookName, config.name)))
+
+                    case _ =>
+                        if (config.reportAllInfos)
+                            accountManager ! Notify.Message(formatMessage("I:Done %s of service: %s".format(hookName, config.name)))
+                }
 
             } catch {
                 case x: expectj.TimeoutException =>
                     val hk = hook.copy( commands = hook.commands.map { // map values for better message
                         _.replaceAll("SERVICE_PREFIX", servicePrefix)
+                         .replaceAll("SERVICE_ADDRESS", SvdConfig.defaultHost)
+                         .replaceAll("SERVICE_DOMAIN", SvdConfig.defaultDomain)
                          .replaceAll("SERVICE_PORT", "*(masked-random-user-port)*")
                          .replaceAll("SERVICE_ROOT", serviceRootPrefix)
                     })
@@ -263,10 +276,10 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             log.trace("Success in SvdService from %s".format(sender.getClass.getName))
     }
 
-    addShutdownHook {
-        log.warn("SvdService: %s shutdown hook invoked".format(config.name))
-        // postStop
-    }
+    // addShutdownHook {
+    //     log.warn("SvdService: %s shutdown hook invoked".format(config.name))
+    //     // postStop
+    // }
 
     override def postStop {
         log.info("PostStop in SvdService: %s".format(config.name))
