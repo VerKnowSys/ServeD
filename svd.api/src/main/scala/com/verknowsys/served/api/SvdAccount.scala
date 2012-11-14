@@ -22,6 +22,7 @@ object User {
     case object ServiceAutostart
     case object GetStoredServices
 
+    case class GetServiceStatus(name: String)
     case class ReadLogFile(serviceName: String, pattern: Option[String])
     case class SpawnService(name: String)
     case class TerminateService(name: String)

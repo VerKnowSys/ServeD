@@ -47,16 +47,17 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
 
     val uptime = System.currentTimeMillis // Service uptime measure point
+    val serviceRootPrefix = SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name
+    val servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
     val accountManager = context.actorFor("/user/SvdAccountManager")
-    val autostartFileLocation = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name / SvdConfig.serviceAutostartFile
+    val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
 
     val installIndicator = new File(
         if (account.uid == 0)
             SvdConfig.systemHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / config.name.toLowerCase + "." + SvdConfig.installed
         else
-            SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / config.name.toLowerCase + "." + SvdConfig.installed
+            serviceRootPrefix / config.name.toLowerCase + "." + SvdConfig.installed
     )
-    val servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
     checkOrCreateDir(servicePrefix)
 
     implicit val timeout = Timeout(60 seconds) // XXX: hardcode
@@ -146,7 +147,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
                     _.replaceAll("SERVICE_PREFIX", servicePrefix)
                      .replaceAll("SERVICE_ADDRESS", SvdConfig.defaultHost)
                      .replaceAll("SERVICE_DOMAIN", SvdConfig.defaultDomain)
-                     .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
+                     .replaceAll("SERVICE_ROOT", serviceRootPrefix)
                      .replaceAll("SERVICE_VERSION", try {
                             Source.fromFile(installIndicator).mkString
                         } catch {
@@ -168,7 +169,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
                     val hk = hook.copy( commands = hook.commands.map { // map values for better message
                         _.replaceAll("SERVICE_PREFIX", servicePrefix)
                          .replaceAll("SERVICE_PORT", "*(masked-random-user-port)*")
-                         .replaceAll("SERVICE_ROOT", SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.applicationsDir / config.name)
+                         .replaceAll("SERVICE_ROOT", serviceRootPrefix)
                     })
                     val msg = formatMessage("E:Hook %s of service: %s failed to pass expectations: CMD: '%s', OUT: '%s', ERR: '%s'.".format(hookName, config.name, hk.commands.mkString(" "), hk.expectStdOut, hk.expectStdErr))
                     log.error(msg)
@@ -199,9 +200,9 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
         }
         hookShot(validateHook, "validate")
 
-        val pause = SvdConfig.serviceRestartPause / 2
-        log.debug("Waiting after validate hook for: %ss".format(pause/1000))
-        Thread.sleep(pause)
+        // val pause = SvdConfig.serviceRestartPause / 2
+        // log.debug("Waiting after validate hook for: %ss".format(pause/1000))
+        // Thread.sleep(pause)
 
         if (config.autoStart) {
             log.info("Starting service: %s", config.name)

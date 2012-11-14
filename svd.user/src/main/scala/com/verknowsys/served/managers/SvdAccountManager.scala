@@ -318,6 +318,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         case User.GetRunningServices =>
             context.actorSelection("../SvdAccountManager/Service-*") ! User.ServiceStatus
 
+        case User.GetServiceStatus(name) =>
+            context.actorFor("/user/SvdAccountManager/Service-%s".format(name)) ! User.ServiceStatus
+
         case User.SpawnService(serviceName) =>
             log.debug("Spawning service: %s".format(serviceName))
             // look for old services already started, and stop it:

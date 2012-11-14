@@ -113,8 +113,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                 "whoami" -> "Shows current user name"
                 ),
             "register" -> Map(
-                "domain" -> "Registers domain",
-                "user" -> "Registers user"
+                "domain" -> "Registers domain"
                 ),
             "unregister" -> Map(
                 "domain" -> "Unregisters domain"
@@ -191,21 +190,18 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                 }
 
             case "service" :: argument :: command :: Nil =>
-                val arg = argument.capitalize
-                arg match {
+                val serviceName = argument.capitalize
+                serviceName match {
                     case _ =>
                         command.toLowerCase match {
                             case "start" =>
-                                accountManager ! User.SpawnService(arg)
+                                accountManager ! User.SpawnService(serviceName)
 
                             case "stop" =>
-                                accountManager ! User.TerminateService(arg)
+                                accountManager ! User.TerminateService(serviceName)
 
                             case "status" | "list" | "all" | "show" =>
-                                (accountManager ? User.GetServices) onSuccess {
-                                    case list =>
-                                        send("Services:\n%s".format(list))
-                                }
+                                accountManager ! User.GetServiceStatus(serviceName)
                         }
                 }
 
