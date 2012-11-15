@@ -234,29 +234,37 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             hookShot(afterStartHook, "afterStart")
         }
 
-        // define scheduler job
+        // defining scheduler job
         if (!config.schedulerActions.shellCommands.isEmpty) {
             log.debug("Config scheduler actions for service %s aren't empty.".format(config.name))
-            val cronEntry = CronScheduleBuilder.cronSchedule(config.schedulerActions.cronEntry)
-            val shellOperations = SvdShellOperations(commands = config.schedulerActions.shellCommands.map {
-                    elem => replaceAllSpecialValues(elem)
-                })
+            try {
+                val cronEntry = CronScheduleBuilder.cronSchedule(config.schedulerActions.cronEntry)
+                val shellOperations = SvdShellOperations(commands = config.schedulerActions.shellCommands.map {
+                        elem => replaceAllSpecialValues(elem)
+                    })
+                val name = config.name
+                val jobInstance = new ShellJob
+                val job = JobBuilder.newJob(jobInstance.getClass)
+                    .withIdentity("%s".format(name), "%s".format(name))
+                    .build
+                // setting job data values:
+                job.getJobDataMap.put("shellOperations", shellOperations)
+                job.getJobDataMap.put("account", account)
+                val trigger = TriggerBuilder.newTrigger
+                    .withIdentity("%s".format(name), "%s".format(name))
+                    .startNow
+                    .withSchedule(cronEntry)
+                    .build
 
-            val name = config.name
-            val jobInstance = new ShellJob
-            val job = JobBuilder.newJob(jobInstance.getClass)
-                .withIdentity("%s".format(name), "%s".format(name))
-                .build
-            job.getJobDataMap.put("shellOperations", shellOperations)
-            job.getJobDataMap.put("account", account)
+                accountManager ! SvdScheduler.StartJob(name, job, trigger)
 
-            val trigger = TriggerBuilder.newTrigger
-                .withIdentity("%s".format(name), "%s".format(name))
-                .startNow
-                .withSchedule(cronEntry)
-                .build
+            } catch {
+                case e: java.text.ParseException =>
+                    accountManager ! Notify.Message(formatMessage("E:%s".format(e)))
 
-            accountManager ! SvdScheduler.StartJob(name, job, trigger)
+                case e: Throwable =>
+                    accountManager ! Notify.Message(formatMessage("F:%s".format(e)))
+            }
         }
 
     }
