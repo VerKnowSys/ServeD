@@ -110,6 +110,7 @@ object Dependencies {
     val scalateUtil = "org.fusesource.scalate" % "scalate-util" % "1.5.3" % "test"
     val liftJson = "net.liftweb" % "lift-json_2.9.1" % "2.4" % "compile->default"
     val liftUtil = "net.liftweb" % "lift-util_2.9.1" % "2.4" % "compile->default"
+    val quartz = "org.quartz-scheduler" % "quartz" % "2.1.6"
 
     // val javax = "javax.media" % "jai-core" % "1.1.3"
     // val javaxjmf = "javax.media" % "jmf" % "2.1.1b"
@@ -185,7 +186,7 @@ object ServeD extends Build {
     lazy val utils = Project("utils", file("svd.utils"),
         settings = buildSettings ++ Seq(
             compileOrder        := CompileOrder.Mixed,
-            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd, liftUtil, slf4japi)
+            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd, liftUtil, slf4japi, quartz)
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, testing % "test")
 
