@@ -2,6 +2,7 @@ package com.verknowsys.served.managers
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
+import com.verknowsys.served.api.scheduler._
 import com.verknowsys.served.api.accountkeys._
 import com.verknowsys.served.api.git._
 import com.verknowsys.served.services._
@@ -20,9 +21,16 @@ import akka.util.Timeout
 import akka.util.duration._
 import akka.actor._
 
+import org.quartz._
+import org.quartz.impl._
+import org.quartz.JobKey._
+import java.io.File
+
 
 case class AccountKeys(keys: Set[AccessKey] = Set.empty, uuid: UUID = randomUUID) extends Persistent
 object AccountKeysDB extends DB[AccountKeys]
+class DBServerInitializationException extends Exception
+
 
 /**
  * Account Manager - User Side Manager, which has purpose to watch over all user side mechanisms and APIs
@@ -46,9 +54,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
     import com.verknowsys.served.utils.Events._
 
-    class DBServerInitializationException extends Exception
 
-
+    val scheduler = StdSchedulerFactory.getDefaultScheduler
     val userHomeDir = SvdConfig.userHomeDir / "%s".format(account.uid)
 
     val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
@@ -62,7 +69,11 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     override def preStart = {
         super.preStart
 
+        log.info("Starting Quartz Scheduler")
+        scheduler.start
+
         log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
+
 
         if (headless) {
             // headless mode
@@ -267,6 +278,14 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
 
     private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef): Receive = traceReceive {
+
+        case SvdScheduler.StartJob(name, job, trigger) =>
+            log.debug("Starting schedule job named: %s from: %s".format(name, sender))
+            scheduler.scheduleJob(job, trigger)
+
+        case SvdScheduler.StopJob(name) =>
+            log.debug("Stopping scheduled job named: %s from: %s".format(name, sender))
+            scheduler.deleteJob(jobKey(name, name))
 
         case User.SpawnServices =>
 
@@ -507,6 +526,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         // log.debug("Stopping database server and client")
         // db.close
         // dbServer.close
+        log.info("Stopping scheduler")
+        scheduler.shutdown
 
         log.info("Stopping services")
         (self ? User.TerminateServices) onSuccess {

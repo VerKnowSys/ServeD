@@ -2,6 +2,8 @@ package com.verknowsys.served.services
 
 
 import com.verknowsys.served._
+import com.verknowsys.served.api._
+import com.verknowsys.served.api.scheduler._
 import com.verknowsys.served.db._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.systemmanager.native._
@@ -9,12 +11,13 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.Events._
 import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.services._
-import com.verknowsys.served.api._
 import com.verknowsys.served.api.accountkeys._
 import com.verknowsys.served.api.pools._
+import com.verknowsys.served.scheduler._
 
 import net.liftweb.json._
 import scala.io._
+import scala.util._
 import java.io.File
 import akka.actor._
 import akka.dispatch._
@@ -24,6 +27,9 @@ import akka.util.Duration
 import akka.util.Timeout
 import akka.util.duration._
 import java.lang.System
+
+import org.quartz._
+import org.quartz.impl._
 
 
 /**
@@ -64,6 +70,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
     val future = accountManager ? Admin.GetPort
     val servicePort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
     log.trace("Expected port from Account Manager arrived: %d".format(servicePort))
+
 
     def shell = new SvdShell(account)
 
@@ -135,6 +142,20 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
     def validateHook = config.validate
 
 
+    def replaceAllSpecialValues(hook: String) =
+        hook
+        .replaceAll("SERVICE_PREFIX", servicePrefix)
+        .replaceAll("SERVICE_ADDRESS", SvdConfig.defaultHost)
+        .replaceAll("SERVICE_DOMAIN", SvdConfig.defaultDomain)
+        .replaceAll("SERVICE_ROOT", serviceRootPrefix)
+        .replaceAll("SERVICE_VERSION", try {
+            Source.fromFile(installIndicator).mkString
+        } catch {
+            case _: Exception => "no-version"
+        })
+        .replaceAll("SERVICE_PORT", "%d".format(servicePort))
+
+
     /**
      *  @author dmilith
      *
@@ -144,16 +165,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
         if (!hook.commands.isEmpty) { // don't report empty / undefined hooks
             try {
                 val execCommands = hook.commands.map {
-                    _.replaceAll("SERVICE_PREFIX", servicePrefix)
-                     .replaceAll("SERVICE_ADDRESS", SvdConfig.defaultHost)
-                     .replaceAll("SERVICE_DOMAIN", SvdConfig.defaultDomain)
-                     .replaceAll("SERVICE_ROOT", serviceRootPrefix)
-                     .replaceAll("SERVICE_VERSION", try {
-                            Source.fromFile(installIndicator).mkString
-                        } catch {
-                            case _: Exception => "no-version"
-                        })
-                    .replaceAll("SERVICE_PORT", "%d".format(servicePort))
+                    replaceAllSpecialValues _
                 }
                 shell.exec(
                     hook.copy(commands = execCommands)
@@ -178,11 +190,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             } catch {
                 case x: expectj.TimeoutException =>
                     val hk = hook.copy( commands = hook.commands.map { // map values for better message
-                        _.replaceAll("SERVICE_PREFIX", servicePrefix)
-                         .replaceAll("SERVICE_ADDRESS", SvdConfig.defaultHost)
-                         .replaceAll("SERVICE_DOMAIN", SvdConfig.defaultDomain)
-                         .replaceAll("SERVICE_PORT", "*(masked-random-user-port)*")
-                         .replaceAll("SERVICE_ROOT", serviceRootPrefix)
+                        replaceAllSpecialValues _
                     })
                     val msg = formatMessage("E:Hook %s of service: %s failed to pass expectations: CMD: '%s', OUT: '%s', ERR: '%s'.".format(hookName, config.name, hk.commands.mkString(" "), hk.expectStdOut, hk.expectStdErr))
                     log.error(msg)
@@ -205,11 +213,14 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
         /* check for previous installation */
         log.info("Looking for %s file to check software installation status".format(installIndicator))
-        if (!installIndicator.exists) {
-            hookShot(installHook, "install")
-            hookShot(configureHook, "configure")
-        } else {
-            log.info("Service software already installed: %s".format(config.name))
+        installIndicator.exists match {
+            case true =>
+                log.info("Service already installed: %s".format(config.name))
+
+            case false =>
+                log.info("Installing service: %s".format(config.name))
+                hookShot(installHook, "install")
+                hookShot(configureHook, "configure")
         }
         hookShot(validateHook, "validate")
 
@@ -222,6 +233,32 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
         }
+
+        // define scheduler job
+        if (!config.schedulerActions.shellCommands.isEmpty) {
+            log.debug("Config scheduler actions for service %s aren't empty.".format(config.name))
+            val cronEntry = CronScheduleBuilder.cronSchedule(config.schedulerActions.cronEntry)
+            val shellOperations = SvdShellOperations(commands = config.schedulerActions.shellCommands.map {
+                    elem => replaceAllSpecialValues(elem)
+                })
+
+            val name = config.name
+            val jobInstance = new ShellJob
+            val job = JobBuilder.newJob(jobInstance.getClass)
+                .withIdentity("%s".format(name), "%s".format(name))
+                .build
+            job.getJobDataMap.put("shellOperations", shellOperations)
+            job.getJobDataMap.put("account", account)
+
+            val trigger = TriggerBuilder.newTrigger
+                .withIdentity("%s".format(name), "%s".format(name))
+                .startNow
+                .withSchedule(cronEntry)
+                .build
+
+            accountManager ! SvdScheduler.StartJob(name, job, trigger)
+        }
+
     }
 
 
@@ -283,6 +320,9 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
     override def postStop {
         log.info("PostStop in SvdService: %s".format(config.name))
+        log.debug("Stopping scheduler for service.")
+        accountManager ! SvdScheduler.StopJob(config.name)
+
         hookShot(stopHook, "stop")
         hookShot(afterStopHook, "afterStop")
         log.info("Stopped SvdService: %s".format(config.name))
