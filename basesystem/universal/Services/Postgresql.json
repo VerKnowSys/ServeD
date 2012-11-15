@@ -33,7 +33,7 @@ max_stack_depth = 16MB
 
 logging_collector = true
 ' > SERVICE_PREFIX/database/postgresql.conf && echo listen_addresses=\\'SERVICE_DOMAIN\\' >> SERVICE_PREFIX/database/postgresql.conf",
-            "SERVICE_ROOT/exports/pg_ctl -D SERVICE_PREFIX/database -l SERVICE_PREFIX/service.log start"
+            "SERVICE_ROOT/exports/pg_ctl -D SERVICE_PREFIX/database -l SERVICE_PREFIX/service.log -o \"-k SERVICE_PREFIX\" start"
         ],
         "expectStdOut": ["server starting"],
         "expectOutputTimeout": 25
