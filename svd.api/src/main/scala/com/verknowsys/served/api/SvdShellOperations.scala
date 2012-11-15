@@ -18,6 +18,7 @@ package com.verknowsys.served.api
  */
 case class SvdServiceConfig(
         name: String,
+        schedulerActions: SvdSchedulerActions,
         install: SvdShellOperations,
         configure: SvdShellOperations,
         start: SvdShellOperations,
@@ -51,3 +52,11 @@ case class SvdShellOperations(
     override def toString = "Commands: %s, Expecting OUT: '%s', Expecting ERR: '%s', Expected in: %d seconds".format(commands.mkString("' or '"), expectStdOut.mkString("' or '"), expectStdErr.mkString(", "), expectOutputTimeout)
 
 }
+
+
+case class SvdSchedulerActions(
+        cronEntry: String = "* * * * * ?",
+        shellCommands: List[String] = Nil,
+        jvmCommands: List[String] = Nil,
+        uuid: UUID = randomUUID
+    ) extends Persistent
