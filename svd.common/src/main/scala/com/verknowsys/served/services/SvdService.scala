@@ -51,13 +51,14 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
     val future = accountManager ? Admin.GetPort
     val servicePort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
     log.trace("Expected port from Account Manager arrived: %d".format(servicePort))
+    val shell = new SvdShell(account)
 
 
     /**
      *  @author dmilith
      *
      *  Returns file of install indication from Sofin.
-     *      For example "redis.installed" will imply installed Redis software.
+     *      For example "redis.installed" implies installed Redis software.
      *
      */
     def installIndicator = new File(
@@ -66,9 +67,6 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
         else
             serviceRootPrefix / config.name.toLowerCase + "." + SvdConfig.installed
     )
-
-
-    val shell = new SvdShell(account)
 
 
     /**
