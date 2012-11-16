@@ -1,0 +1,36 @@
+#!/bin/sh
+
+MATCHER="\(memcached\|mysqld\|redis\|nginx\|postgres\|mongod\)"
+
+open_files_on_start="$(lsof | grep java | wc -l)"
+
+for i in $(seq 1 10000); do
+  clear
+  result="$(pstree 2>/dev/null | grep -e "${MATCHER}" | grep -v grep 2>/dev/null)"
+  if [ "${result}" = "" ]; then
+    export result="Not found"
+  fi
+
+  printf "Processes:\n$result\n"
+  printf "Open files on start:\n${open_files_on_start}\n"
+  if [ "${open_files}" != "" ]; then
+    printf "Open files now:\n$open_files\n"
+  fi
+
+  mod5="$(echo ${i} % 3 | bc)"
+  if [ "$mod5" = "0" ]; then
+    export open_files="$(lsof | grep java | wc -l)"
+  else
+    sleep 2
+  fi
+done
+
+# default_igniters_dir="/Users/Common/Igniters"
+
+# if [ ! -d "${default_igniters_dir}" ]; then
+#     mkdir -p "${default_igniters_dir}"
+#     echo "Installing SvdService Igniters to ${default_igniters_dir}"
+#     cp -r $(pwd)/basesystem/universal/* ${default_igniters_dir}/
+# else
+#     echo "Igniters already installed."
+# fi
