@@ -41,7 +41,7 @@ object SvdConfig {
     def defaultServicesFile             = "services.defined"
     def defaultServiceLogFile           = "service.log"
     def installed                       = "installed"
-    def defaultShell                    = "/bin/sh"
+    def defaultShell                    = "/Software/Zsh/exports/zsh"
     def defaultEncoding                 = "UTF-8"
     def publicHttpDir                   = "/Public/"
     def defaultBackupDir                = "/Backup/"
