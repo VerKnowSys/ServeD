@@ -2,7 +2,11 @@
 
 MATCHER="\(memcached\|mysqld\|redis\|nginx\|postgres\|mongod\)"
 
-open_files_on_start="$(lsof | grep java | wc -l)"
+if [ "$(uname)" = "Darwin" ]; then
+  export open_files_on_start="$(lsof | grep java | wc -l)"
+else
+  export open_files_on_start="$(fstat | grep java | wc -l)"
+fi
 
 for i in $(seq 1 10000); do
   clear
