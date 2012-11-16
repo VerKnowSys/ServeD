@@ -68,12 +68,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
     )
 
 
-    /**
-     *  @author dmilith
-     *
-     *   Shell hook to spawn each command in separate private user shell.
-     */
-    def shell = new SvdShell(account)
+    val shell = new SvdShell(account)
 
 
     /**
@@ -210,6 +205,12 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
     }
 
 
+    def stopScheduler {
+        log.debug("Stopping scheduler for service.")
+        accountManager ! SvdScheduler.StopJob(config.name)
+    }
+
+
     override def preStart = {
 
         /* check for previous installation */
@@ -323,26 +324,25 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
          */
         case Quit =>
             log.info("Got Quit in %s".format(this))
-            hookShot(stopHook, "stop")
-            hookShot(afterStopHook, "afterStop")
+            context.unwatch(self)
             context.stop(self)
 
         case Success =>
             log.trace("Success in SvdService from %s".format(sender.getClass.getName))
     }
 
-    // addShutdownHook {
-    //     log.warn("SvdService: %s shutdown hook invoked".format(config.name))
-    //     // postStop
-    // }
 
     override def postStop {
         log.info("PostStop in SvdService: %s".format(config.name))
-        log.debug("Stopping scheduler for service.")
-        accountManager ! SvdScheduler.StopJob(config.name)
-
         hookShot(stopHook, "stop")
         hookShot(afterStopHook, "afterStop")
+
+        stopScheduler
+        val pause = SvdConfig.serviceRestartPause / 2
+        log.debug("Waiting for scheduler stop for %s seconds".format(pause /1000))
+        Thread.sleep(pause)
+
+        shell.close
         log.info("Stopped SvdService: %s".format(config.name))
         super.postStop
     }
