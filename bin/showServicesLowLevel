@@ -3,20 +3,22 @@
 MATCHER="\(memcached\|mysqld\|redis\|nginx\|postgres\|mongod\)"
 
 if [ "$(uname)" = "Darwin" ]; then
-  export open_files_on_start="$(lsof | grep java | wc -l)"
+  export OPEN_FILES_ON_START="$(lsof | grep java | wc -l)"
+  export PS_TOOL="pstree"
 else
-  export open_files_on_start="$(fstat | grep java | wc -l)"
+  export OPEN_FILES_ON_START="$(fstat | grep java | wc -l)"
+  export PS_TOOL="ps"
 fi
 
 for i in $(seq 1 10000); do
   clear
-  result="$(pstree 2>/dev/null | grep -e "${MATCHER}" | grep -v grep 2>/dev/null)"
+  result="$(${PS_TOOL} 2>/dev/null | grep -e "${MATCHER}" | grep -v grep 2>/dev/null)"
   if [ "${result}" = "" ]; then
     export result="Not found"
   fi
 
   printf "Processes:\n$result\n"
-  printf "Open files on start:\n${open_files_on_start}\n"
+  printf "Open files on start:\n${OPEN_FILES_ON_START}\n"
   if [ "${open_files}" != "" ]; then
     printf "Open files now:\n$open_files\n"
   fi
@@ -28,13 +30,3 @@ for i in $(seq 1 10000); do
     sleep 2
   fi
 done
-
-# default_igniters_dir="/Users/Common/Igniters"
-
-# if [ ! -d "${default_igniters_dir}" ]; then
-#     mkdir -p "${default_igniters_dir}"
-#     echo "Installing SvdService Igniters to ${default_igniters_dir}"
-#     cp -r $(pwd)/basesystem/universal/* ${default_igniters_dir}/
-# else
-#     echo "Igniters already installed."
-# fi
