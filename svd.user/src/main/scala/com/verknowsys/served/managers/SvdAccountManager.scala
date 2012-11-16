@@ -527,8 +527,6 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         // log.debug("Stopping database server and client")
         // db.close
         // dbServer.close
-        log.info("Stopping scheduler")
-        scheduler.shutdown
 
         log.info("Stopping services")
         (self ? User.TerminateServices) onSuccess {
@@ -540,6 +538,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         }
         log.debug("Unbecoming AccountManager")
         context.unbecome
+        log.info("Stopping scheduler")
+        scheduler.shutdown
         log.debug("Terminated successfully")
         super.postStop
     }
