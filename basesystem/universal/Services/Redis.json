@@ -1,11 +1,19 @@
 {
     "name": "Redis",
-    "schedulerActions": {
-        "cronEntry": "* 0 * * * ?",
-        "shellCommands": [
-            "cp SERVICE_PREFIX/database/database.rdf SERVICE_PREFIX/database/database.rdf.backup"
-        ]
-    },
+    "schedulerActions": [
+        {
+            "cronEntry": "0 0/1 * * * ?",
+            "shellCommands": [
+                "cp SERVICE_PREFIX/database/database.rdf SERVICE_PREFIX/database/database.rdf.backup && echo 'Backup ok'"
+            ]
+        },
+        {
+            "cronEntry": "0 0/2 * * * ?",
+            "shellCommands": [
+                "echo 'Pam pam pam'"
+            ]
+        }
+    ],
     "install": {
         "commands": ["sofin get redis"],
         "expectStdOut": ["Preparing application: Redis", "All done."]

@@ -8,12 +8,8 @@
     "name": "service-name",
     "version": "no-version",
 
-    "schedulerActions": {
-        "cronEntry": "",
-        "shellCommands": [],
-        "jvmCommands": []
-    },
-
+    "schedulerActions": [
+    ],
     "install": {
         "commands": [],
         "expectStdOut": [],
