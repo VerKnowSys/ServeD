@@ -301,16 +301,16 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                         context.watch(serv)
                     }
                     val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
+                    log.trace("Pinging service: %s".format(currServ))
                     (currServ ? Ping) onComplete {
                         case Right(Pong) =>
-                            val msg = "Service already running: %s. Restarting".format(serviceName)
+                            val msg = "Service already running: %s.".format(serviceName)
                             log.warn(msg)
                             notificationsManager ! Notify.Message(formatMessage("W:%s".format(msg)))
-                            context.unwatch(currServ)
-                            context.stop(currServ)
-                            log.debug("Waiting for service shutdown hooks…")
-                            Thread.sleep(SvdConfig.serviceRestartPause)
-                            joinContext
+                            // currServ ! Quit
+                            // log.debug("Waiting for service shutdown hooks…")
+                            // Thread.sleep(SvdConfig.serviceRestartPause)
+                            // joinContext
 
                         case Left(exc) =>
                             log.debug("No alive actors found: %s".format(exc.getMessage))
@@ -538,7 +538,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         }
         log.debug("Unbecoming AccountManager")
         context.unbecome
-        log.info("Stopping scheduler")
+        log.info("Shutting down Scheduler")
         scheduler.shutdown
         log.debug("Terminated successfully")
         super.postStop
