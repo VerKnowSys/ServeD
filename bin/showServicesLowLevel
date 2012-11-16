@@ -25,7 +25,11 @@ for i in $(seq 1 10000); do
 
   mod5="$(echo ${i} % 3 | bc)"
   if [ "$mod5" = "0" ]; then
-    export open_files="$(lsof | grep java | wc -l)"
+    if [ "$(uname)" = "Darwin" ]; then
+      export open_files="$(lsof | grep java | wc -l)"
+    else
+      export open_files="$(fstat | grep java | wc -l)"
+    fi
   else
     sleep 2
   fi
