@@ -10,7 +10,7 @@
         {
             "cronEntry": "0 0/2 * * * ?",
             "shellCommands": [
-                "echo 'Pam pam pam'"
+                "echo 'Redis pam pam pam'"
             ]
         }
     ],

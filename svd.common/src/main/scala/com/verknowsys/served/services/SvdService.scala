@@ -40,30 +40,11 @@ import org.quartz.impl._
  */
 class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor with SvdUtils {
 
-    // import akka.actor.OneForOneStrategy
-    // import akka.actor.SupervisorStrategy._
-
-    // override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 10 seconds) {
-    //     // case _: Terminated               => Restart
-    //     case _: ArithmeticException      => Restart
-    //     case _: NullPointerException     => Restart
-    //     case _: IllegalArgumentException => Restart
-    //     case _: Exception                => Restart
-    // }
-
-
     val uptime = System.currentTimeMillis // Service uptime measure point
     val serviceRootPrefix = SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name
     val servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
     val accountManager = context.actorFor("/user/SvdAccountManager")
     val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
-
-    val installIndicator = new File(
-        if (account.uid == 0)
-            SvdConfig.systemHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / config.name.toLowerCase + "." + SvdConfig.installed
-        else
-            serviceRootPrefix / config.name.toLowerCase + "." + SvdConfig.installed
-    )
     checkOrCreateDir(servicePrefix)
 
     implicit val timeout = Timeout(60 seconds) // XXX: hardcode
@@ -72,6 +53,26 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
     log.trace("Expected port from Account Manager arrived: %d".format(servicePort))
 
 
+    /**
+     *  @author dmilith
+     *
+     *  Returns file of install indication from Sofin.
+     *      For example "redis.installed" will imply installed Redis software.
+     *
+     */
+    def installIndicator = new File(
+        if (account.uid == 0)
+            SvdConfig.systemHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / config.name.toLowerCase + "." + SvdConfig.installed
+        else
+            serviceRootPrefix / config.name.toLowerCase + "." + SvdConfig.installed
+    )
+
+
+    /**
+     *  @author dmilith
+     *
+     *   Shell hook to spawn each command in separate private user shell.
+     */
     def shell = new SvdShell(account)
 
 

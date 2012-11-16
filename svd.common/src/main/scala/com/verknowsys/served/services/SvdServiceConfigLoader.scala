@@ -40,7 +40,7 @@ class SvdServiceConfigLoader(name: String) extends Logging {
     // log.trace("App template: %s".format(appSpecificTemplate))
     log.trace("Merged template: %s".format(compact(render(appTemplateMerged))))
 
-    val config = SvdServiceConfig( // OPTIMIZE: this should be done automatically
+    def config = SvdServiceConfig( // OPTIMIZE: this should be done automatically
         name = (appTemplateMerged \ "name").extract[String],
         autoRestart = (appTemplateMerged \ "autoRestart").extract[Boolean],
         autoStart = (appTemplateMerged \ "autoStart").extract[Boolean],

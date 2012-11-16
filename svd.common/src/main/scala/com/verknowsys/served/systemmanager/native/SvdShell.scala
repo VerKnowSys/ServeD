@@ -63,9 +63,10 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
 
     def close {
         try {
-            log.trace("Stopping shell %s. Shell is closed?: %s".format(shell, shell.isClosed))
+            log.trace("Stopping shell. Closed: %s".format(shell.isClosed))
             shell.send("\nexit\n")
             shell.stop
+            log.debug("Shell stopped. Closed: %s".format(shell.isClosed))
         } catch {
             case e: Exception =>
                 log.warn("%s on exit from shell.".format(e))
