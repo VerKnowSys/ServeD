@@ -7,7 +7,7 @@ if [ "$(uname)" = "Darwin" ]; then
   export PS_TOOL="pstree"
 else
   export OPEN_FILES_ON_START="$(fstat | grep java | wc -l)"
-  export PS_TOOL="ps"
+  export PS_TOOL="ps -A"
 fi
 
 for i in $(seq 1 10000); do
