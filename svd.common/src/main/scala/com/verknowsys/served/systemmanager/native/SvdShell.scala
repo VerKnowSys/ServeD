@@ -18,18 +18,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
             else
                 new ExpectJ
 
-    // loadSettings // XXX: UNUSED still
     var shell = expectinator.spawn(SvdConfig.defaultShell)
-
-
-    def loadSettings =
-        "export HOME=%s\n".format(SvdConfig.userHomeDir / "%s".format(account.uid)) ::
-        "export USER=%s\n".format(account.uid) ::
-        "export USERNAME=%s\n".format(account.uid) ::
-        "export EDITOR=true\n" ::
-        // "%s\n".format("") ::
-        "cd %s%s\n".format(SvdConfig.userHomeDir, account.uid) ::
-        SvdConfig.standardShellEnvironment :: Nil
 
 
     def dead = shell.isClosed
