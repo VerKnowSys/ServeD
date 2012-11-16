@@ -1,0 +1,15 @@
+{
+    "name": "Coreginx",
+    "reportAllInfos": true,
+    "install": {
+        "commands": ["sofin get nginx"],
+        "expectStdOut": ["Preparing application: Nginx", "All done."],
+        "expectOutputTimeout": 256
+    },
+    "start": {
+        "commands": ["memcached -p SERVICE_PORT -P SERVICE_PREFIX/service.pid -d"]
+    },
+    "stop": {
+        "commands": ["kill $(cat SERVICE_PREFIX/service.pid)"]
+    }
+}

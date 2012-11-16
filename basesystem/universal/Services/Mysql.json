@@ -1,5 +1,13 @@
 {
     "name": "Mysql",
+    "schedulerActions": [
+        {
+            "cronEntry": "0 0/3 * * * ?",
+            "shellCommands": [
+                "echo 'Mysql what? Misa nie rozumić mysql crap.'"
+            ]
+        }
+    ],
     "install": {
         "commands": ["sofin get mysql"],
         "expectStdOut": ["Preparing application: Mysql", "All done."]

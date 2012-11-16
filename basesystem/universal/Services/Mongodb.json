@@ -4,6 +4,14 @@
         "commands": ["sofin get mongodb"],
         "expectStdOut": ["Preparing application: Mongodb", "All done."]
     },
+    "schedulerActions": [
+        {
+            "cronEntry": "0 0/1 * * * ?",
+            "shellCommands": [
+                "echo 'Mongo pom pom'"
+            ]
+        }
+    ],
     "start": {
         "commands": [
             "test ! -f SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database && chmod 700 SERVICE_PREFIX/database",

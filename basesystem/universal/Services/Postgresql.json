@@ -1,5 +1,13 @@
 {
     "name": "Postgresql",
+    "schedulerActions": [
+        {
+            "cronEntry": "0 0/3 * * * ?",
+            "shellCommands": [
+                "echo 'Postgres myk myk'"
+            ]
+        }
+    ],
     "install": {
         "commands": ["sofin get postgresql"],
         "expectStdOut": ["Preparing application: Postgresql", "All done."]
