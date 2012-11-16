@@ -24,6 +24,7 @@ import akka.actor._
 import org.quartz._
 import org.quartz.impl._
 import org.quartz.JobKey._
+import org.quartz.impl.matchers._
 import java.io.File
 
 
@@ -73,7 +74,6 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         scheduler.start
 
         log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
-
 
         if (headless) {
             // headless mode
@@ -280,15 +280,16 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef): Receive = traceReceive {
 
         case SvdScheduler.StartJob(name, job, trigger) =>
-            log.debug("Starting schedule job named: %s from: %s".format(name, sender))
+            log.debug("Starting schedule job named: %s for service: %s".format(name, sender))
             scheduler.scheduleJob(job, trigger)
 
         case SvdScheduler.StopJob(name) =>
-            log.debug("Stopping scheduled job named: %s from: %s".format(name, sender))
-            scheduler.deleteJob(jobKey(name, name))
+            log.debug("Stopping scheduled jobs named: %s for service: %s".format(name, sender))
+            for (index <- 0 to SvdConfig.maxSchedulerDefinitions) { // XXX: hacky.. it's better to figure out how to get list of defined jobs from scheduler..
+                scheduler.deleteJob(jobKey("%s-%d".format(name, index)))
+            }
 
         case User.SpawnServices =>
-
             val listOfServices = loadServicesList
             log.debug("List of all services stored: %s".format(listOfServices.mkString(", ")))
             listOfServices.foreach {

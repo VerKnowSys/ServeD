@@ -38,7 +38,7 @@ class SvdServiceConfigLoader(name: String) extends Logging {
     log.debug("Extracted SvdServiceConfig from igniter: %s.".format(name))
     // log.trace("Default template: %s".format(defaultTemplate))
     // log.trace("App template: %s".format(appSpecificTemplate))
-    // log.trace("Merged template: %s".format(compact(render(appTemplateMerged))))
+    log.trace("Merged template: %s".format(compact(render(appTemplateMerged))))
 
     val config = SvdServiceConfig( // OPTIMIZE: this should be done automatically
         name = (appTemplateMerged \ "name").extract[String],
@@ -47,11 +47,15 @@ class SvdServiceConfigLoader(name: String) extends Logging {
         reportAllErrors = (appTemplateMerged \ "reportAllErrors").extract[Boolean],
         reportAllInfos = (appTemplateMerged \ "reportAllInfos").extract[Boolean],
         reportAllDebugs = (appTemplateMerged \ "reportAllDebugs").extract[Boolean],
-        schedulerActions = SvdSchedulerActions(
-                cronEntry = (appTemplateMerged \ "schedulerActions" \ "cronEntry").extract[String],
-                shellCommands = (appTemplateMerged \ "schedulerActions" \ "shellCommands").extract[List[String]],
-                jvmCommands = (appTemplateMerged \ "schedulerActions" \ "jvmCommands").extract[List[String]]
-            ),
+        schedulerActions = (appTemplateMerged \ "schedulerActions").children.map {
+            children =>
+                SvdSchedulerActions(
+                    cronEntry = (children \ "cronEntry").extract[String],
+                    shellCommands = (children \ "shellCommands").extract[List[String]],
+                    jvmCommands = (children \ "jvmCommands").extract[List[String]]
+                )
+            },
+
         install = SvdShellOperations(
                 commands = (appTemplateMerged \ "install" \ "commands").extract[List[String]],
                 expectStdOut = (appTemplateMerged \ "install" \ "expectStdOut").extract[List[String]],

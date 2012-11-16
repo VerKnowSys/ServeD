@@ -18,7 +18,7 @@ package com.verknowsys.served.api
  */
 case class SvdServiceConfig(
         name: String,
-        schedulerActions: SvdSchedulerActions,
+        schedulerActions: List[SvdSchedulerActions],
         install: SvdShellOperations,
         configure: SvdShellOperations,
         start: SvdShellOperations,
