@@ -21,23 +21,23 @@
     "validate": {
         "commands": [
             "test ! -f SERVICE_PREFIX/service.conf && printf '
-worker_processes  2;
+worker_processes 2;
 events {
-    worker_connections  1024;
+    worker_connections 1024;
 }
 
 http {
-    include       SERVICE_ROOT/conf/mime.types;
-    default_type  application/octet-stream;
-    sendfile        on;
-    keepalive_timeout  270;
+    include SERVICE_ROOT/conf/mime.types;
+    default_type application/octet-stream;
+    sendfile on;
+    keepalive_timeout 270;
     error_log SERVICE_PREFIX/service.log;
     server {
-        listen       SERVICE_PORT;
-        server_name  localhost;
+        listen SERVICE_PORT;
+        server_name SERVICE_DOMAIN;
         location / {
-            root   SERVICE_ROOT/html;
-            index  index.html index.htm;
+            root SERVICE_PREFIX/html;
+            index index.html index.htm;
         }
     }
 }
