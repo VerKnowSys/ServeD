@@ -1,0 +1,50 @@
+#!/bin/sh
+
+
+# Ocaml build
+system="$(uname)"
+DEVEL="true"
+FLAGS=""
+STRIP="strip"
+CLANG="/usr/bin/clang"
+OCAMLBUILD="$(which ocamlbuild)"
+if [ "${OCAMLBUILD}" = "" ]; then
+    echo "OCaml not found."
+    echo "Try: sofin get ocaml first."
+    exit 1
+fi
+if [ "${DEVEL}" = "true" ]; then
+    export FLAGS="${FLAGS} -verbose -g -i"
+fi
+
+
+echo "System: $system"
+echo "Compiler: $OCAMLBUILD"
+echo "Linker: $CC"
+echo "Flags: $FLAGS"
+echo "Devel: $DEVEL"
+echo
+
+check() {
+    if [ "$1" = "0" ]; then
+        echo "* $2 => Compiled Sucessfully"
+        if [ "$DEVEL" != "true" ]; then
+            if [ "$3" != "" ]; then
+                echo "  Stripping $3"
+                $STRIP $3
+            fi
+        fi
+    else
+        echo "* $2 => Failure"
+        exit 1
+    fi
+}
+
+
+# build torture-machine binary
+cd lib/torture-machine/
+${OCAMLBUILD} -libs unix -no-log -build-dir ../../lib/ -install-bin-dir ../../ main.native
+check "$?" "Building Ocaml binaries"
+cd ../..
+mv lib/main.native torture-machine
+${STRIP} torture-machine
