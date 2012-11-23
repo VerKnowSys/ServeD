@@ -14,6 +14,10 @@ import com.verknowsys.served.api.accountkeys._
 import com.verknowsys.served.api.pools._
 
 import scala.io._
+import org.json4s._
+import org.json4s.native._
+import org.json4s.JsonDSL._
+import org.json4s.native.JsonMethods._
 
 
 /**
@@ -22,8 +26,6 @@ import scala.io._
  * it uses package object with implicit conversion from string to service configuration
  */
 class SvdServiceConfigLoader(name: String) extends Logging {
-
-    import net.liftweb.json._
 
     implicit val formats = DefaultFormats // Brings in default date formats etc.
 

@@ -8,7 +8,8 @@ import unfiltered.kit._
 import unfiltered.filter._
 import unfiltered.scalate.Scalate
 import org.fusesource.scalate.TemplateEngine
-import net.liftweb.json._
+import org.json4s._
+import org.json4s.native._
 import java.util.UUID
 import org.fusesource.scalate.{TemplateEngine, Binding}
 
@@ -22,7 +23,6 @@ import com.verknowsys.served.db.{DBServer, DBClient, DB}
 import unfiltered.jetty.Http
 import java.net.URL
 import unfiltered.filter.Plan
-import net.liftweb.json._
 import akka.actor._
 import akka.dispatch._
 import akka.util.Timeout
@@ -40,8 +40,9 @@ import akka.pattern.ask
 class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Plan with Logging with SvdUtils {
 
     import QParams._
-    import net.liftweb.json.JsonAST._
-    import net.liftweb.json.JsonDSL._
+    import org.json4s._
+    import org.json4s.native._
+    import org.json4s.JsonDSL._
     import webImplicits._
     import com.verknowsys.served.db._
     import com.verknowsys.served.web.merch._

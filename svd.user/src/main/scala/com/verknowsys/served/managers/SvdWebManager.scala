@@ -31,7 +31,8 @@ import unfiltered.kit._
 import unfiltered.jetty.Http
 import java.net.URL
 import unfiltered.filter.Plan
-import net.liftweb.json._
+import org.json4s._
+import org.json4s.native._
 
 
 /**

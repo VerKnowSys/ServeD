@@ -15,7 +15,8 @@ import com.verknowsys.served.api.accountkeys._
 import com.verknowsys.served.api.pools._
 import com.verknowsys.served.scheduler._
 
-import net.liftweb.json._
+import org.json4s._
+import org.json4s.native._
 import scala.io._
 import scala.util._
 import java.io.File
