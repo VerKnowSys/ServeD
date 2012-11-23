@@ -92,44 +92,40 @@ object Resolvers {
 object Dependencies {
     val akkaVersion = "2.0.3"
 
+    // Scala
     val akkaActor = "com.typesafe.akka" % "akka-actor" % akkaVersion
     val akkaRemote = "com.typesafe.akka" % "akka-remote" % akkaVersion
-    val akkaTestkit = "com.typesafe.akka" % "akka-testkit" % akkaVersion
-
-    val messadmin = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
-    val jna = "net.java.dev.jna" % "jna" % "3.2.7"
+    val akkaTestkit = "com.typesafe.akka" % "akka-testkit" % akkaVersion % "test"
     val jline = "jline" % "jline" % "0.9.9"
-    val scalatest = "org.scalatest" %% "scalatest" % "1.8"
-    val expect4j = "net.sourceforge.expectj" % "expectj" % "2.0.1"
-    val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "2.1.0.201209190230-r" // "1.0.0.201106090707-r"
-    val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
+    val scalatest = "org.scalatest" %% "scalatest" % "1.8" % "test"
     val unfilteredFilter = "net.databinder" %% "unfiltered-filter" % "0.6.4"
     val unfilteredJetty = "net.databinder" %% "unfiltered-jetty" % "0.6.4"
     val unfilteredSpec = "net.databinder" %% "unfiltered-spec" % "0.6.4" % "test"
     val scalate = "org.fusesource.scalate" % "scalate-core" % "1.5.3"
     val scalateUtil = "org.fusesource.scalate" % "scalate-util" % "1.5.3" % "test"
-    val liftJson = "net.liftweb" % "lift-json_2.9.1" % "2.4" % "compile->default"
-    val liftUtil = "net.liftweb" % "lift-util_2.9.1" % "2.4" % "compile->default"
-    val quartz = "org.quartz-scheduler" % "quartz" % "2.1.6"
+    val json = "org.json4s" %% "json4s-native" % "3.0.0"
 
+    // Java
+    val bouncycastle = "org.bouncycastle" % "bcprov-jdk16" % "1.46"
+    val messadmin = "net.sourceforge.messadmin" % "MessAdmin-Core" % "4.0"
+    val sshd = "org.apache.sshd" % "sshd-core" % "0.7.0"
+    val jna = "net.java.dev.jna" % "jna" % "3.2.7"
+    val jnaerator = "com.nativelibs4java" % "jnaerator-runtime" % "0.11-SNAPSHOT" % "compile"
+    val expect4j = "net.sourceforge.expectj" % "expectj" % "2.0.1"
+    val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "2.1.0.201209190230-r" // "1.0.0.201106090707-r"
+    val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
+    val javaMail = "javax.mail" % "mail" % "1.4.5"
+    val quartz = "org.quartz-scheduler" % "quartz" % "2.1.6"
+    val slf4japi = "org.slf4j" % "slf4j-api" % "1.6.6"
+    val commonsio = "commons-io" % "commons-io" % "1.3.2"
+    val webbit = "org.webbitserver" % "webbit" % "0.4.14"
+    val tzip = "de.schlichtherle" % "truezip" % "6.8.4"
     // val javax = "javax.media" % "jai-core" % "1.1.3"
     // val javaxjmf = "javax.media" % "jmf" % "2.1.1b"
     // val smack = "jivesoftware" % "smack" % "3.0.4"
     // val smackx = "jivesoftware" % "smackx" % "3.0.4"
-    // val jetty = "org.mortbay.jetty" % "jetty" % "6.1.22" % "container"
-    // val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.4.1.v20110513"
-    val sshd = "org.apache.sshd" % "sshd-core" % "0.7.0"
-    val slf4japi = "org.slf4j" % "slf4j-api" % "1.6.6"
-    val commonsio = "commons-io" % "commons-io" % "1.3.2"
-    val webbit = "org.webbitserver" % "webbit" % "0.4.14"
     // val scalaz = "org.scalaz" % "scalaz-core_2.9.2" % "7.0.0-M3"
 
-    val tzip = "de.schlichtherle" % "truezip" % "6.8.4"
-    val bouncycastle = "org.bouncycastle" % "bcprov-jdk16" % "1.46"
-
-
-    // val servlet = "javax.servlet" % "servlet-api" % "2.5"
-    // val scalate = "org.fusesource.scalate" % "scalate-core" % "1.5.0"
 }
 
 object ServeD extends Build {
@@ -164,7 +160,7 @@ object ServeD extends Build {
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle)
+            libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle, json, javaMail)
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test")
 
@@ -186,7 +182,7 @@ object ServeD extends Build {
     lazy val utils = Project("utils", file("svd.utils"),
         settings = buildSettings ++ Seq(
             compileOrder        := CompileOrder.Mixed,
-            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd, liftUtil, slf4japi, quartz)
+            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd, slf4japi, quartz) // liftUtil,
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, testing % "test")
 
@@ -196,7 +192,7 @@ object ServeD extends Build {
                 (resourceManaged in (Compile, CoffeeKeys.coffee)) <<= (crossTarget in Compile)(_ / "classes" / "public" / "js"),
                 (resourceManaged in (Compile, LessKeys.less)) <<= (crossTarget in Compile)(_ / "classes" / "public" / "css"),
                 libraryDependencies ++= Seq(
-                    unfilteredFilter, unfilteredJetty, scalate, scalateUtil, liftJson
+                    unfilteredFilter, unfilteredJetty, scalate, scalateUtil, json
                 )
             )
         ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, common, utils, testing % "test")
