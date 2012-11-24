@@ -96,6 +96,9 @@ if [ "$system" = "Darwin" ]; then
     $CXX $FLAGS -shared lib/kickstart/usage_sys.cc -o lib/libusagesys.dylib lib/utils.o
     check $? "UsageSysLib"
 
+    $CXX $FLAGS -arch x86_64 lib/kickstart/usage_gather.cc -o usage_gather lib/libusagesys.dylib lib/utils.o -lutil
+    check $? "UsageGather" "usage_gather"
+
     $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/stat.cc -o lib/libstat.dylib
     check $? "StatLib"
 

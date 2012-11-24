@@ -37,6 +37,12 @@
     #include <mach/clock_priv.h>
     #include <mach/clock_types.h>
     #include <sys/fcntl.h>
+    #include <assert.h>
+    #include <errno.h>
+    #include <stdbool.h>
+    #include <stdlib.h>
+    #include <stdio.h>
+    #include <sys/sysctl.h>
 #endif
 
 #ifdef __linux__
@@ -53,7 +59,7 @@
 
     /* global constants */
 
-    #define APP_VERSION "0.2.14"
+    #define APP_VERSION "0.2.15"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 

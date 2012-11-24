@@ -105,3 +105,4 @@ ctrlcli
 /lib/*.ml
 /lib/*.mli
 /torture-machine
+/usage_gather

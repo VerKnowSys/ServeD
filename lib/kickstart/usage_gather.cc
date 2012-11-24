@@ -12,8 +12,10 @@ extern vector<string> split(const string& s, const string& delim, const bool kee
 int main(int argc, char const *argv[]) {
 
 #ifdef __APPLE__
-    cout << "Apple systems unsupported yet." << endl;
-    return 1;
+
+    cout << processDataToLearn(-1) << endl;
+
+    return 0;
 #else
     int SVDWRITER = 0;
     int argument = 0;
