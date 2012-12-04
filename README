@@ -1,8 +1,10 @@
 /**
-*   ServeD - README
-*
 *   © Copyright 2008-2012 Daniel Dettlaff. ® All Rights Reserved.
 *   This Software is a close code project. You may not redistribute this code without permission of author.
+*
+*
+*   ServeD is designed on top of FreeBSD 9.x system source code, and uses BSD technologies (libprocstat, kvm, kqueue).
+*   Later support of *NIX/ POSIX compliant systems is plausible.
 *
 *
 *   Credits for:
@@ -23,10 +25,10 @@
         >= 0.11.3
 
     0.3 - Scala (will be downloaded by sbt automatically)
-        >= 2.9.1
+        >= 2.9.2
 
     0.4 - ZSH Shell (for SvdSystemManager)
-        >= 4.3.10
+        >= 5.0.0
 
     0.5 - Smack library (for XMPP Notifications)
         >= 3.0.4
@@ -35,7 +37,7 @@
         >= 1.4.2
 
     0.7 - Any of currently supported platforms:
-        Mac OSX (100% features, development),
+        Mac OSX (75% features, development),
         Free BSD (100% features, production)
 
     0.8 - JRebel (http://zeroturnaround.com/software/jrebel/) for Scala is required for development mode. It's not required in production.
