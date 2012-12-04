@@ -81,8 +81,8 @@ object SvdConfig {
     def standardShellEnvironment        = ". /etc/profile\nulimit -u 120\n"
     def notificationMailUser            = "notifications"
     def notificationMailPassword        = "mkonjibhu"
-    def notificationMailRecipients      = "dmilith@verknowsys.com" :: "michal.lipski@gmail.com" :: Nil
-    def notificationXmppRecipients      = "dmilith@verknowsys.com" :: "michal.lipski@gmail.com" :: Nil
+    def notificationMailRecipients      = "dmilith@verknowsys.com" :: Nil
+    def notificationXmppRecipients      = "dmilith@verknowsys.com" :: "michal.lipski@gmail.com" :: "wick3d@verknowsys.com" :: Nil
     def notificationXmppHost            = "verknowsys.com"
     def notificationXmppLogin           = "notifications"
     def notificationXmppPassword        = "mkonjibhu"
