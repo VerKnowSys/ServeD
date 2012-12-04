@@ -19,8 +19,8 @@ class SvdMailGate extends Gate with Logging with SvdUtils {
     }
 
     def send(message: String) {
-        log.debug("Sending eMail")
-        SvdNotifyMailer(message, SvdConfig.notificationMailRecipients)
+        log.debug("NYI! Sending eMail")
+        // SvdNotifyMailer(message, SvdConfig.notificationMailRecipients)
     }
 
 
