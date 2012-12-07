@@ -94,8 +94,9 @@ void defaultSignalHandler(int sig) {
     	case SIGINT:
     	case SIGTERM:
     		cerr << "SIGTERM/INT (terminate) signal catched. Quitting" << endl;
-    		string rmCmd = "/bin/rm " + string(LOCK_FILE);
-    		system(rmCmd.c_str());
+    		// string rmCmd = "/bin/rm " + string(LOCK_FILE);
+    		// system(rmCmd.c_str());
+            unlink(LOCK_FILE);
     		exit(0);
     		break;
 
