@@ -93,7 +93,7 @@ extern "C" {
     const char* processDataToLearn(int uid) {
 
         string output;
-        const int pagesize = getpagesize();
+        // const int pagesize = getpagesize();
         size_t count = 0;
         kinfo_proc *result = NULL;
         kinfo_proc *procs = NULL;
