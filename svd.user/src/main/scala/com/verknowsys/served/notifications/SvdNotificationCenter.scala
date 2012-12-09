@@ -22,7 +22,7 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with SvdUtils 
             resource = SvdConfig.notificationXmppResource,
             account = account,
             accountManager = accountManager
-        ) :: new SvdIRCGate() :: Nil // new SvdMailGate :: Nil
+        ) :: new SvdIRCGate(account) :: Nil // new SvdMailGate :: Nil
 
 
     override def preStart {

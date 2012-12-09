@@ -11,7 +11,7 @@ import com.verknowsys.served.utils._
 import org.jibble.pircbot._
 
 
-class SvdIRCGate extends PircBot with Logging with SvdUtils with Gate {
+class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils with Gate {
 
 
     def settings = {
