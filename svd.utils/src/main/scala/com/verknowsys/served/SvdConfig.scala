@@ -2,6 +2,7 @@ package com.verknowsys.served
 
 import scala.io.Source
 
+import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.SvdProperties
 
@@ -21,7 +22,7 @@ object SvdConfig {
     def operatingSystem                 = System.getProperty("os.name")
     def binaryArchitecture              = "64"
     def systemVersion                   = System.getProperty("os.version")
-    def binarySoftwareRepository        = "http://software.verknowsys.com/binary/" + operatingSystem + "/" + binaryArchitecture + "/" + systemVersion
+    def binarySoftwareRepository        = "http://software.verknowsys.com/binary" / operatingSystem / binaryArchitecture / systemVersion
     def kickApp                         = "svdkick"
     def servedShell                     = "svdshell"
     def rootPidFile                     = "0.pid"
@@ -55,8 +56,8 @@ object SvdConfig {
     def defaultUserName                 = "guest"
     def defaultUserUID                  = 501
     def defaultSoftwareTemplateExt      = ".json"
-    def defaultSoftwareTemplate         = userHomeDir + "Common/Igniters/Default"
-    def defaultSoftwareTemplatesDir     = userHomeDir + "Common/Igniters/Services/"
+    def defaultSoftwareTemplate         = userHomeDir / "Common/Igniters/Default"
+    def defaultSoftwareTemplatesDir     = userHomeDir / "Common/Igniters/Services/"
     def remoteApiServerHost             = "127.0.0.1" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
     def sshPort                         = 22
     def remoteApiServerPort             = 10
