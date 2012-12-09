@@ -31,6 +31,9 @@ class SvdIRCGate extends PircBot with Logging with SvdUtils with Gate {
     override def onMessage(channel: String, sender: String, login: String, hostname: String, message: String) {
         if (message.startsWith("!")) {
             message.split(" ").toList match {
+                case "!ping" :: Nil =>
+                    log.debug("Received ping request from: %s", sender)
+                    sendMessage(channel, "%s: pong".format(sender))
                 case "!tasks" :: nickname :: Nil =>
                     if (allowedUserNames.contains(nickname)) {
                         log.debug("Found allowed nickname: %s", nickname)
