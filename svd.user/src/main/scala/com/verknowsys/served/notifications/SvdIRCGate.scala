@@ -40,6 +40,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
                         sendMessage(channel, "%s: No tasks sire.".format(nickname))
                     } else
                         log.trace("Not allowed nickname: %s sending command: '%s'", nickname, message)
+                case _ =>
             }
         }
     }
