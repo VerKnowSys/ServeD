@@ -16,7 +16,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
 
     def settings = {
         setVerbose(false)
-        setName("tasks-servant")
+        setName("tasks-robo")
         setAutoNickChange(true)
         setVersion("0.1.0")
         setEncoding("UTF-8")
