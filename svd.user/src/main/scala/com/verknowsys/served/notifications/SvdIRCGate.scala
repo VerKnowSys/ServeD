@@ -29,12 +29,12 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
 
 
     override def onMessage(channel: String, sender: String, login: String, hostname: String, message: String) {
-        if (message.startsWith("!")) {
+        if (message.startsWith(".")) {
             message.split(" ").toList match {
-                case "!ping" :: Nil =>
+                case ".ping" :: Nil =>
                     log.debug("Received ping request from: %s", sender)
                     sendMessage(channel, "%s: pong".format(sender))
-                case "!tasks" :: nickname :: Nil =>
+                case ".tasks" :: nickname :: Nil =>
                     if (allowedUserNames.contains(nickname)) {
                         log.debug("Found allowed nickname: %s", nickname)
                         sendMessage(channel, "%s: No tasks sire.".format(nickname))
