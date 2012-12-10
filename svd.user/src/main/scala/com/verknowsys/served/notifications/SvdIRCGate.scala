@@ -242,7 +242,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
 
 
         def wipeTasksCmd(nickname: String) {
-            if (allowedUserNames.contains(nickname)) {
+            if (allowedUserNames.contains(nickname))
                 writeTasksToFile(nickname, Tasks(list = Nil, nextId = 1)) match {
                     case true =>
                         val append = if (sender != nickname) " for %s.".format(nickname) else "."
@@ -252,7 +252,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
                     case false =>
                         sendMessage(channel, "%s: Unfortunately, I can't wipe tasks. Please try again later.".format(sender))
                 }
-            } else
+            else
                 log.trace("Not allowed nickname: %s sending command: '%s'", nickname, message)
         }
 
