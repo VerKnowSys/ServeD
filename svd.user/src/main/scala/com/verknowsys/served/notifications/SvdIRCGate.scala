@@ -113,12 +113,12 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
         }
 
 
-
     def getAllTasks(nickname: String) = getTasks(nickname, "all")
     def getFinishedTasks(nickname: String) = getTasks(nickname, "finished")
     def getOpenTasks(nickname: String) = getTasks(nickname, "open")
 
-    def timeStamp: Long = java.lang.System.currentTimeMillis / 1000
+
+    def timeStamp = java.lang.System.currentTimeMillis / 1000L
 
 
     def writeTasksToFile(nickname: String, tasks: Tasks) = {
