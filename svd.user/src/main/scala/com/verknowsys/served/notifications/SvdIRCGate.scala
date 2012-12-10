@@ -40,6 +40,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
 
 
     def allowedUserNames = "dmilith" :: "tallica" :: "wick3d" :: Nil
+    def tasksPerPage = 5
 
 
     def tasksFile(nickname: String) = {
@@ -144,10 +145,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
                 val tasks = getTasks(nickname, tasksType)
 
                 if (tasks.list.length > 0) {
-                    val count = "(%d of %d)".format(math.min(tasks.list.length, 5), tasks.list.length)
+                    val count = "(%d of %d)".format(math.min(tasks.list.length, tasksPerPage), tasks.list.length)
                     val forWhom = if (sender != nickname) "for %s ".format(nickname) else ""
                     sendMessage(channel, "%s: Listing %s tasks %s%s.".format(sender, tasksType, forWhom, count))
-                    tasks.list.reverse.take(5).reverse.map {
+                    tasks.list.reverse.take(tasksPerPage).reverse.map {
                         task =>
                             sendMessage(channel, "%s: #%d → %s".format(sender, task.id, task.content))
                     }
