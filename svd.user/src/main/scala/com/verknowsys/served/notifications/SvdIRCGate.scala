@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat
 
 
 /**
-    @author dmilith, tallica
+    @author tallica, dmilith
  */
 
 class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils with Gate {
