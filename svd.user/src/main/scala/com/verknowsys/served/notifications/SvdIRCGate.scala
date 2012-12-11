@@ -51,9 +51,9 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
 
 
     abstract class TaskState
-    case object Open extends TaskState
-    case object Finished extends TaskState
-    case object All extends TaskState
+    case object open extends TaskState
+    case object finished extends TaskState
+    case object all extends TaskState
 
 
     case class Task(id: Int, content: String, date: Long, done: Boolean)
@@ -106,9 +106,9 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
         try {
             val json = parse(Source.fromFile(tasksFile(nickname)).mkString)
             state match {
-                case Finished =>
+                case `finished` =>
                     parseTasks(json, true)
-                case Open =>
+                case `open` =>
                     parseTasks(json, false)
                 case _ =>
                     parseTasks(json)
@@ -120,9 +120,9 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
         }
 
 
-    def getAllTasks(nickname: String) = getTasks(nickname, All)
-    def getFinishedTasks(nickname: String) = getTasks(nickname, Finished)
-    def getOpenTasks(nickname: String) = getTasks(nickname, Open)
+    def getallTasks(nickname: String) = getTasks(nickname, all)
+    def getfinishedTasks(nickname: String) = getTasks(nickname, finished)
+    def getopenTasks(nickname: String) = getTasks(nickname, open)
 
 
     def timeStamp = java.lang.System.currentTimeMillis / 1000L
@@ -153,14 +153,14 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
                 if (tasks.list.length > 0) {
                     val count = "(%d of %d)".format(math.min(tasks.list.length, tasksPerPage), tasks.list.length)
                     val forWhom = if (sender != nickname) "for %s ".format(nickname) else ""
-                    sendMessage(channel, "%s: Listing %s tasks %s%s.".format(sender, state.toString.toLowerCase, forWhom, count))
+                    sendMessage(channel, "%s: Listing %s tasks %s%s.".format(sender, state, forWhom, count))
                     tasks.list.takeRight(tasksPerPage).map {
                         task =>
                             sendMessage(channel, "%s: #%d → %s".format(sender, task.id, task.content))
                     }
                 } else {
                     val forWhom = if (sender != nickname) "for %s".format(nickname) else "sire"
-                    sendMessage(channel, "%s: No %s tasks %s.".format(sender, state.toString.toLowerCase, forWhom))
+                    sendMessage(channel, "%s: No %s tasks %s.".format(sender, state, forWhom))
                 }
             } else
                 log.trace("Not allowed nickname: %s sending command: '%s'", nickname, message)
@@ -171,7 +171,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
             if (allowedUserNames.contains(nickname)) {
                 log.debug("Found allowed nickname: %s", nickname)
                 if (content.length > 0) {
-                    val tasks = getAllTasks(nickname)
+                    val tasks = getallTasks(nickname)
                     val newTask = Task(tasks.nextId, content.mkString(" "), timeStamp, false)
                     val tasksUpdated = Tasks(tasks.list ::: List(newTask), tasks.nextId + 1)
 
@@ -194,7 +194,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
             if (allowedUserNames.contains(nickname)) {
                 log.debug("Found allowed nickname: %s", nickname)
                 if (ids.length > 0) {
-                    val tasks = getAllTasks(nickname)
+                    val tasks = getallTasks(nickname)
                     val tasksIds = ids.map { _.toInt }
                     val tasksList = tasks.list.map {
                         task =>
@@ -225,7 +225,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
             if (allowedUserNames.contains(nickname)) {
                 log.debug("Found allowed nickname: %s", nickname)
                 if (ids.length > 0) {
-                    val tasks = getAllTasks(nickname)
+                    val tasks = getallTasks(nickname)
                     val tasksIds = ids.map { _.toInt }
                     val tasksList = tasks.list.filterNot {
                         task => tasksIds.contains(task.id)
@@ -279,10 +279,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
                     doneTasksCmd(sender, ids)
 
                 case ".finished" :: Nil =>
-                    listTasksCmd(sender, Finished)
+                    listTasksCmd(sender, finished)
 
                 case ".finished" :: nickname :: Nil =>
-                    listTasksCmd(nickname, Finished)
+                    listTasksCmd(nickname, finished)
 
                 case ".remove" :: ids =>
                     removeTasksCmd(sender, ids)
@@ -291,10 +291,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
                     addTaskCmd(nickname, content)
 
                 case ".tasks" :: Nil =>
-                    listTasksCmd(sender, Open)
+                    listTasksCmd(sender, open)
 
                 case ".tasks" :: nickname :: Nil =>
-                    listTasksCmd(nickname, Open)
+                    listTasksCmd(nickname, open)
 
                 case ".wipe" :: Nil =>
                     wipeTasksCmd(sender)
