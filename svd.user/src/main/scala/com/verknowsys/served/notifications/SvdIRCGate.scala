@@ -50,6 +50,12 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
     }
 
 
+    abstract class TaskState
+    case object Open extends TaskState
+    case object Finished extends TaskState
+    case object All extends TaskState
+
+
     case class Task(id: Int, content: String, date: Long, done: Boolean)
     case class Tasks(list: List[Task], nextId: Int)
 
@@ -96,13 +102,13 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
         )
 
 
-    def getTasks(nickname: String, tasksType: String) =
+    def getTasks(nickname: String, state: TaskState) =
         try {
             val json = parse(Source.fromFile(tasksFile(nickname)).mkString)
-            tasksType match {
-                case "finished" =>
+            state match {
+                case Finished =>
                     parseTasks(json, true)
-                case "open" =>
+                case Open =>
                     parseTasks(json, false)
                 case _ =>
                     parseTasks(json)
@@ -114,9 +120,9 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
         }
 
 
-    def getAllTasks(nickname: String) = getTasks(nickname, "all")
-    def getFinishedTasks(nickname: String) = getTasks(nickname, "finished")
-    def getOpenTasks(nickname: String) = getTasks(nickname, "open")
+    def getAllTasks(nickname: String) = getTasks(nickname, All)
+    def getFinishedTasks(nickname: String) = getTasks(nickname, Finished)
+    def getOpenTasks(nickname: String) = getTasks(nickname, Open)
 
 
     def timeStamp = java.lang.System.currentTimeMillis / 1000L
@@ -139,22 +145,22 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
     override def onMessage(channel: String, sender: String, login: String, hostname: String, message: String) {
 
 
-        def listTasksCmd(nickname: String, tasksType: String) {
+        def listTasksCmd(nickname: String, state: TaskState) {
             if (allowedUserNames.contains(nickname)) {
                 log.debug("Found allowed nickname: %s", nickname)
-                val tasks = getTasks(nickname, tasksType)
+                val tasks = getTasks(nickname, state)
 
                 if (tasks.list.length > 0) {
                     val count = "(%d of %d)".format(math.min(tasks.list.length, tasksPerPage), tasks.list.length)
                     val forWhom = if (sender != nickname) "for %s ".format(nickname) else ""
-                    sendMessage(channel, "%s: Listing %s tasks %s%s.".format(sender, tasksType, forWhom, count))
+                    sendMessage(channel, "%s: Listing %s tasks %s%s.".format(sender, state.toString.toLowerCase, forWhom, count))
                     tasks.list.takeRight(tasksPerPage).map {
                         task =>
                             sendMessage(channel, "%s: #%d → %s".format(sender, task.id, task.content))
                     }
                 } else {
                     val forWhom = if (sender != nickname) "for %s".format(nickname) else "sire"
-                    sendMessage(channel, "%s: No %s tasks %s.".format(sender, tasksType, forWhom))
+                    sendMessage(channel, "%s: No %s tasks %s.".format(sender, state.toString.toLowerCase, forWhom))
                 }
             } else
                 log.trace("Not allowed nickname: %s sending command: '%s'", nickname, message)
@@ -273,10 +279,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
                     doneTasksCmd(sender, ids)
 
                 case ".finished" :: Nil =>
-                    listTasksCmd(sender, "finished")
+                    listTasksCmd(sender, Finished)
 
                 case ".finished" :: nickname :: Nil =>
-                    listTasksCmd(nickname, "finished")
+                    listTasksCmd(nickname, Finished)
 
                 case ".remove" :: ids =>
                     removeTasksCmd(sender, ids)
@@ -285,10 +291,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
                     addTaskCmd(nickname, content)
 
                 case ".tasks" :: Nil =>
-                    listTasksCmd(sender, "open")
+                    listTasksCmd(sender, Open)
 
                 case ".tasks" :: nickname :: Nil =>
-                    listTasksCmd(nickname, "open")
+                    listTasksCmd(nickname, Open)
 
                 case ".wipe" :: Nil =>
                     wipeTasksCmd(sender)
