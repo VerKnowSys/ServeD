@@ -148,7 +148,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
                     val count = "(%d of %d)".format(math.min(tasks.list.length, tasksPerPage), tasks.list.length)
                     val forWhom = if (sender != nickname) "for %s ".format(nickname) else ""
                     sendMessage(channel, "%s: Listing %s tasks %s%s.".format(sender, tasksType, forWhom, count))
-                    tasks.list.reverse.take(tasksPerPage).reverse.map {
+                    tasks.list.takeRight(tasksPerPage).map {
                         task =>
                             sendMessage(channel, "%s: #%d → %s".format(sender, task.id, task.content))
                     }
