@@ -17,7 +17,8 @@ object SvdLowLevelSystemAccess extends Logging {
 
     def usagesys(uid: Int) = {
         import CUsageSys._
-        CUsageSys.instance.getProcessUsage(uid, false)
+
+        CUsageSys.instance.processDataToLearn(uid)
     }
 
 
