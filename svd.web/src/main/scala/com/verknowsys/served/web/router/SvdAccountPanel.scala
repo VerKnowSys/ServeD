@@ -59,31 +59,13 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
 
         case req @ POST(Path(Seg("GetUserProcesses" :: Nil))) =>
             log.debug("POST on GetUserProcesses")
-            implicit val timeout = Timeout(5 seconds)
-            val res = (webManager ? System.GetUserProcesses(account.uid)) onSuccess {
-                case x: String =>
-                    log.trace("Got usage data: %s", x)
-                    x
-            }
-            val result = Await.result(res, timeout.duration).asInstanceOf[String]
-            JsonContent ~> ResponseString(result)
+            SvdWebAPI.apiRespond(webManager ? System.GetUserProcesses(account.uid))
 
 
         case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil))) =>
             log.debug("POST /RegisterDomain by path")
             log.info("Given domain to be registered: %s", domain)
-            (webManager ? System.RegisterDomain(domain)) onSuccess {
-                case _ =>
-                    log.info("Registered user domain: %s", domain)
-                    JsonContent ~> ResponseString("{\"message\": \"Domain registered by path.\"}")
-
-            } onFailure {
-                case x =>
-                    log.error("Failure happened: %s", x)
-                    JsonContent ~> ResponseString("{\"message\": \"Failure registering domain.\"}")
-            }
-            JsonContent ~> ResponseString("{\"message\": \"Finished\"}")
-
+            SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain))
 
 
         case req @ POST(Path(Seg("RegisterDomain" :: Nil)) & Params(params)) =>
@@ -101,9 +83,7 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
             }
 
 
-
         case req @ _ =>
-
             log.debug("GET /")
             Ok ~> Scalate(req, "/templates/index.jade")
 

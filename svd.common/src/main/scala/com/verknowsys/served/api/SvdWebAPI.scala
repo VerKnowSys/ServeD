@@ -31,6 +31,10 @@ object SvdWebAPI extends SvdUtils {
                 case Success =>
                     JsonContent ~> ResponseString("{\"message\": \"API request completed successfully.\"}")
 
+                case jsonContent: String =>
+                    log.trace("Passing json content: %s".format(jsonContent))
+                    JsonContent ~> ResponseString("%s".format(jsonContent))
+
                 case Error(x) =>
                     JsonContent ~> ResponseString("{\"message\": \"Error occured while processing API request: %s\"}".format(x))
             }

@@ -497,7 +497,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             }
 
         case x: System.Base =>
-            if (headless) {
+            if (!headless) {
                 log.debug("Forwarding message: %s to System Manager", x)
                 systemManager forward x
             } else {

@@ -51,7 +51,7 @@ class SvdSystemManager extends SvdManager with Logging {
 
         case System.GetUserProcesses(uid: Int) =>
             log.debug("Gathering user processes of %s".format(uid))
-            sender ! SvdLowLevelSystemAccess.usagesys(uid)
+            sender ! SvdLowLevelSystemAccess.usagesys(uid).toString
 
 
         case System.GetNetstat =>
