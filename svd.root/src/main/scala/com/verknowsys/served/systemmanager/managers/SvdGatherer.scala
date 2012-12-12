@@ -29,7 +29,7 @@ class SvdGatherer(account: SvdAccount) extends SvdManager {
     lazy val usagesys = CUsageSys.instance
     // String getProcessUsage(int uid, boolean consoleOutput);
 
-    def gather(uid: Int) = usagesys.getProcessUsage(uid, false)
+    def gather(uid: Int) = usagesys.processDataToLearn(uid)
 
     // private def gather = loopThread {
     //     log.trace("Time elapsed on gather(): %d".format(
