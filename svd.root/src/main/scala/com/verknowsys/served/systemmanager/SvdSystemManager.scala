@@ -29,11 +29,13 @@ import org.webbitserver.handler._
 */
 class SvdSystemManager extends SvdManager with Logging {
 
+    SvdLowLevelSystemAccess
+
 
     override def preStart = {
         super.preStart
         log.info("SvdSystemManager is loading")
-        log.warn("SYSUSAGE: " + SvdLowLevelSystemAccess.usagesys(0))
+        // log.warn("SYSUSAGE: " + SvdLowLevelSystemAccess.usagesys(0))
 
         log.debug("Updating system time")
         SvdNtpSync
@@ -49,9 +51,9 @@ class SvdSystemManager extends SvdManager with Logging {
 
     def receive = {
 
-        case System.GetUserProcesses(uid: Int) =>
+        case System.GetUserProcesses(uid) =>
             log.debug("Gathering user processes of %s".format(uid))
-            sender ! SvdLowLevelSystemAccess.usagesys(uid).toString
+            sender ! SvdLowLevelSystemAccess.usagesys(uid)
 
 
         case System.GetNetstat =>
