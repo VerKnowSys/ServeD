@@ -596,5 +596,16 @@ trait SvdUtils extends Logging {
         p => FileUtils touch p
     }
 
+
+    def validateDomain(domain: String) = {
+        log.warn("NYI")
+        domain match {
+            case "" =>
+                Some("Domain cannot be empty!")
+            case _ =>
+                None // XXX: hardcoded none means "no errors"
+        }
+    }
+
 }
 
