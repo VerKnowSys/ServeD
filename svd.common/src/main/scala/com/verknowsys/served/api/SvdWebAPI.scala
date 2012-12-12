@@ -25,8 +25,8 @@ object SvdWebAPI extends SvdUtils {
 
 
     def apiRespond[T](future: Future[T]) = {
-        implicit val timeout = Timeout(SvdConfig.defaultAPITimeout / 1000)
         try {
+            implicit val timeout = Timeout(SvdConfig.defaultAPITimeout / 1000 seconds)
             Await.result(future, timeout.duration) match {
                 case Success =>
                     JsonContent ~> ResponseString("{\"message\": \"API request completed successfully.\"}")
