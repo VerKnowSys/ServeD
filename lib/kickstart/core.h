@@ -76,7 +76,7 @@
         #define DEFAULT_JAVA64_BIN (DEFAULT_JAVA64_BIN + "exports/java")
     #else
         #define DEFAULT_JAVA_BIN (DEFAULT_JAVA7_PATH + "exports/java")
-        #define DEFAULT_JAVA64_BIN (DEFAULT_JAVA764_PATH "exports/java")
+        #define DEFAULT_JAVA64_BIN (DEFAULT_JAVA764_PATH + "exports/java")
     #endif
 
     // Darwin case:
