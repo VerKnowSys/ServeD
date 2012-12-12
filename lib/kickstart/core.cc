@@ -79,12 +79,12 @@ const static string coreDir = currentDir();
 
     void load_svd(execParams params) {
         string jnalp = "-Djava.library.path=" + string(LIBRARIES32_DIR);
-        string javaNative = string(DEFAULT_JAVA_PATH);
+        string javaNative = DEFAULT_JAVA_PATH;
         #ifdef JDK7
-            javaNative = string(DEFAULT_JAVA7_PATH);
+            javaNative = DEFAULT_JAVA7_PATH;
         #endif
 
-        string libPath = "LD_LIBRARY_PATH=" + javaNative + "lib:" + javaNative + "openjdk6/jre/lib/i386:/lib32";
+        string libPath = "LD_LIBRARY_PATH=" + javaNative + "lib:" + javaNative + "openjdk6/jre/lib/i386:" + javaNative + "openjdk6/jre/lib/i386/client" + ":/lib32";
         #ifdef DEVEL
             int count = 15;
         #endif
