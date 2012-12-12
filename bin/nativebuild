@@ -3,11 +3,14 @@
 
 unset JDK7
 
-system="$(uname)"
 CC="gcc"
 CXX="g++"
 STRIP="strip"
 FLAGS="-Os -fPIC"
+UNAME="/usr/bin/uname"
+
+SYSTEM="$(uname)"
+ARCH="$(uname -p)"
 DEVEL="false"
 
 if [ "$1" = "devel" ]; then
@@ -32,7 +35,7 @@ if [ -e "/usr/bin/clang++" ]; then
     CC="clang"
 fi
 
-echo "System: $system"
+echo "System: $SYSTEM"
 echo "C compiler: $CC"
 echo "C++ compiler: $CXX"
 echo "Flags: $FLAGS"
@@ -75,24 +78,26 @@ check $? "UserDaemon" "daemon"
 $CXX $FLAGS lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
 check $? "KickStart" "kick"
 
-if [ "$system" = "FreeBSD" ]; then
-    $CXX $FLAGS -shared lib/kickstart/usage_sys.cc -o lib/libusagesys.so lib/utils.o -lutil -lprocstat -lkvm
-    check $? "UsageSysLib" "lib/libusagesys.so"
-
-    $CXX $FLAGS lib/kickstart/usage_gather.cc -o usage_gather lib/libusagesys.so lib/utils.o -lutil -lprocstat -lkvm
-    check $? "UsageGather" "usage_gather"
-
-    $CXX $FLAGS -shared lib/kickstart/stat.cc -o lib/libstat.so
-    check $? "StatLib" "lib/libstat.so"
-
-    $CXX $FLAGS -shared lib/kickstart/system_time.cc -o lib/libsystemtime.so -lrt
-    check $? "SystemTimeLib" "lib/libsystemtime.so"
-
-    $CXX $FLAGS -shared lib/kickstart/symlink.cc -o lib/libsymlink.so
-    check $? "SymlinkLib" "lib/libsymlink.so"
+if [ "$SYSTEM" = "FreeBSD" ]; then
+    fbsd_process () {
+        postfix="${1}"
+        $CXX $FLAGS -shared lib/kickstart/usage_sys.cc -o lib/libusagesys${postfix}.so lib/utils.o -lutil -lprocstat -lkvm
+        check $? "UsageSysLib" "lib/libusagesys${postfix}.so"
+        $CXX $FLAGS lib/kickstart/usage_gather.cc -o usage_gather lib/libusagesys${postfix}.so lib/utils.o -lutil -lprocstat -lkvm
+        check $? "UsageGather" "usage_gather"
+        $CXX $FLAGS -shared lib/kickstart/stat.cc -o lib/libstat${postfix}.so
+        check $? "StatLib" "lib/libstat${postfix}.so"
+        $CXX $FLAGS -shared lib/kickstart/system_time.cc -o lib/libsystemtime${postfix}.so -lrt
+        check $? "SystemTimeLib" "lib/libsystemtime${postfix}.so"
+    }
+    if [ "${ARCH}" = "i386" ]; then
+        fbsd_process "32"
+    else # x86_64
+        fbsd_process
+    fi
 fi
 
-if [ "$system" = "Darwin" ]; then
+if [ "$SYSTEM" = "Darwin" ]; then
     $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/usage_sys.cc -o lib/libusagesys.dylib lib/utils.o
     check $? "UsageSysLib"
 
@@ -105,16 +110,11 @@ if [ "$system" = "Darwin" ]; then
     $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/system_time.cc -o lib/libsystemtime.dylib
     check $? "SystemTimeLib"
 
-    $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/symlink.cc -o lib/libsymlink.dylib
-    check $? "SymlinkLib"
 fi
 
-if [ "$system" = "Linux" ]; then
+if [ "$SYSTEM" = "Linux" ]; then
     $CXX $FLAGS -shared lib/kickstart/system_time.cc -o lib/libsystemtime.so -lrt
     check $? "SystemTimeLib" "lib/libsystemtime.so"
-
-    $CXX $FLAGS -shared lib/kickstart/symlink.cc -o lib/libsymlink.so
-    check $? "SymlinkLib" "lib/libsymlink.so"
 fi
 
 
@@ -139,7 +139,7 @@ check $? "FANN float"
 $CC $FLAGS $FANN_FLAGS -c lib/fann/fann.c -o lib/fann.o
 check $? "FANN main"
 
-if [ "$system" = "Darwin" ]; then
+if [ "$SYSTEM" = "Darwin" ]; then
     $CC $FLAGS $FANN_FLAGS -arch x86_64 -shared -o lib/libfann.dylib lib/fann.o lib/fann_train_data.o lib/fann_train.o lib/fann_io.o lib/fann_error.o lib/fann_cascade.o
     check $? "FANN library"
 
