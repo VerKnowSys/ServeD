@@ -72,7 +72,7 @@
     #ifdef __FreeBSD__
         #ifndef JDK7
             const string DEFAULT_JAVA_BIN = DEFAULT_JAVA_PATH + "exports/java";
-            const string DEFAULT_JAVA64_BIN = DEFAULT_JAVA64_BIN + "exports/java";
+            const string DEFAULT_JAVA64_BIN = DEFAULT_JAVA64_PATH + "exports/java";
         #else
             const string DEFAULT_JAVA_BIN = DEFAULT_JAVA7_PATH + "exports/java";
             const string DEFAULT_JAVA64_BIN = DEFAULT_JAVA764_PATH + "exports/java";
