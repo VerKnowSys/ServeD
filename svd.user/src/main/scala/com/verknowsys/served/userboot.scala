@@ -18,6 +18,7 @@ import akka.util.duration._
 import akka.actor._
 import scala.io.Source
 import java.io.File
+import java.lang.{System => JSystem}
 
 
 object userboot extends SvdAkkaSupport with Logging {
@@ -87,7 +88,7 @@ object userboot extends SvdAkkaSupport with Logging {
 
     def main(args: Array[String]) {
         // set runtime properties
-        System.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
+        JSystem.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
 
         // handle signals
         handleSignal("ABRT") { getAllLiveThreads }
