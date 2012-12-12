@@ -3,12 +3,22 @@
 unset DYLD_LIBRARY_PATH
 unset LD_LIBRARY_PATH
 
+userUID="$(id -u)"
 pwd=$(pwd)
 VERSION="$(cat VERSION)"
 BUILD="$(cat svd.common/src/main/resources/BUILD)"
 JAR="${pwd}/svd.user/target/user-assembly-${VERSION}-b${BUILD}.jar"
-userUID="$(id -u)"
+
+# read sofin configuration
+. "/etc/profile_sofin"
+
+# read user configuration
+. "/Users/${userUID}/.profile"
+. "/Users/${userUID}/.profile_java"
+
+
 JAVA_PATH="/Software/Openjdk6-i386/exports/java"
+
 
 if [ "$1" != "" ]; then
   export userUID="$1"
