@@ -52,6 +52,7 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
             Binding(name = "account", className = "com.verknowsys.served.api.SvdAccount") :: Nil
 
     implicit val additionalAttributes = ("account", account) :: Nil
+    implicit val timeout = Timeout(10 seconds) // XXX: hardcode
 
 
     def intent = {
@@ -61,7 +62,7 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
             implicit val timeout = Timeout(5 seconds)
             val res = (webManager ? System.GetUserProcesses(account.uid)) onSuccess {
                 case x: String =>
-                    log.info("Got usage data: %s", x)
+                    log.trace("Got usage data: %s", x)
                     x
             }
             val result = Await.result(res, timeout.duration).asInstanceOf[String]
@@ -93,15 +94,18 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
             param("RegisterDomain") match {
                 case domain: String =>
                     log.debug("Given domain: %s", domain)
-                    (webManager ? System.RegisterDomain(domain)) onSuccess {
-                        case _ =>
-                            log.info("Succesfully answered api request for domain: %s", domain)
-                    } onFailure {
+                    val future = webManager ? System.RegisterDomain(domain)
+                    Await.result(future, timeout.duration) match {
+                        case Success =>
+                            JsonContent ~> ResponseString("{\"message\": \"Domain registered successfully.\"}")
                         case x =>
-                            log.error("A problem occured: %s", x)
+                            JsonContent ~> ResponseString("{\"message\": \"Error occured while processing API request: %s\"}".format(x))
                     }
+
+                case _ =>
+                    JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\"}")
             }
-            JsonContent ~> ResponseString("{\"message\": \"Domain registered from params.\"}")
+
 
 
         case req @ _ =>

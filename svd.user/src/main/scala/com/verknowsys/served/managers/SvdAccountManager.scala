@@ -414,8 +414,13 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
         case System.RegisterDomain(domain) =>
             log.info("Registering domain: %s", domain)
-            log.warn("NYI")
-            sender ! Success
+            validateDomain(domain) match {
+                case None => // no errors detected
+                    sender ! Success
+
+                case Some(x) =>
+                    sender ! Error("Domain registration failures: %s".format(x))
+            }
 
         case SvdFileEvent(path, flags) =>
             log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))
