@@ -59,7 +59,7 @@
 
     /* global constants */
 
-    #define APP_VERSION "0.2.15"
+    #define APP_VERSION "0.2.16"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -154,6 +154,7 @@
     extern "C" {
 
         int getOwner(char* path);
+        int isSymlink(const char *path);
         const char* getProcessUsage(int uid, bool consoleOutput = false);
         const char* processDataToLearn(int uid);
 
