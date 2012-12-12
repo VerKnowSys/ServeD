@@ -31,7 +31,7 @@ object SvdWebAPI extends SvdUtils {
                 case Success =>
                     JsonContent ~> ResponseString("{\"message\": \"API request completed successfully.\"}")
 
-                case x =>
+                case Error(x) =>
                     JsonContent ~> ResponseString("{\"message\": \"Error occured while processing API request: %s\"}".format(x))
             }
         } catch {
