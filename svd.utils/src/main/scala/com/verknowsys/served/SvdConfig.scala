@@ -59,6 +59,7 @@ object SvdConfig {
     def defaultSoftwareTemplate         = userHomeDir / "Common/Igniters/Default"
     def defaultSoftwareTemplatesDir     = userHomeDir / "Common/Igniters/Services/"
     def remoteApiServerHost             = "127.0.0.1" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
+    def defaultAPITimeout               = 10000 // 10 seconds
     def sshPort                         = 22
     def remoteApiServerPort             = 10
     def remoteAccountServerPort         = 12

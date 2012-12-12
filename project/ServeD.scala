@@ -160,7 +160,7 @@ object ServeD extends Build {
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle, json, javaMail)
+            libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle, json, javaMail, unfilteredFilter)
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test")
 

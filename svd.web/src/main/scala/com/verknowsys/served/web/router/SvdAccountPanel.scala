@@ -94,13 +94,7 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
             param("RegisterDomain") match {
                 case domain: String =>
                     log.debug("Given domain: %s", domain)
-                    val future = webManager ? System.RegisterDomain(domain)
-                    Await.result(future, timeout.duration) match {
-                        case Success =>
-                            JsonContent ~> ResponseString("{\"message\": \"Domain registered successfully.\"}")
-                        case x =>
-                            JsonContent ~> ResponseString("{\"message\": \"Error occured while processing API request: %s\"}".format(x))
-                    }
+                    SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain))
 
                 case _ =>
                     JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\"}")
