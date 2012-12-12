@@ -39,7 +39,7 @@ const static string coreDir = currentDir();
             int count = 13;
         #endif
         char *args[] = {
-            (char*)DEFAULT_JAVA64_BIN,
+            (char*)DEFAULT_JAVA64_BIN.c_str(),
             (char*)"-d64",
             (char*)"-Xmn4m",
             (char*)"-Xms16m",
@@ -90,7 +90,7 @@ const static string coreDir = currentDir();
         #endif
         char *args[] = {
             (char*)libPath.c_str(),
-            (char*)DEFAULT_JAVA_BIN,
+            (char*)DEFAULT_JAVA_BIN.c_str(),
             (char*)"-d32",
             (char*)"-client",
             (char*)"-Xmn1m",
