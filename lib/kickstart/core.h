@@ -59,19 +59,24 @@
 
     /* global constants */
 
-    #define APP_VERSION "0.2.17"
+    #define APP_VERSION "0.2.18"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
 
     // default BSD case:
     #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh"
+    #define DEFAULT_JAVA_PATH "/Software/Openjdk6-i386/"
+    #define DEFAULT_JAVA64_PATH "/Software/Openjdk6-amd64/"
+    #define DEFAULT_JAVA7_PATH "/Software/Openjdk7-i386/"
+    #define DEFAULT_JAVA764_PATH "/Software/Openjdk7-amd64/"
+
     #ifndef JDK7
-        #define DEFAULT_JAVA_BIN "/Software/Openjdk6-i386/exports/java"
-        #define DEFAULT_JAVA64_BIN "/Software/Openjdk6-amd64/exports/java"
+        #define DEFAULT_JAVA_BIN  (DEFAULT_JAVA_PATH + "exports/java")
+        #define DEFAULT_JAVA64_BIN (DEFAULT_JAVA64_BIN + "exports/java")
     #else
-        #define DEFAULT_JAVA_BIN "/Software/Openjdk7-i386/exports/java"
-        #define DEFAULT_JAVA64_BIN "/Software/Openjdk7-amd64/exports/java"
+        #define DEFAULT_JAVA_BIN (DEFAULT_JAVA7_PATH + "exports/java")
+        #define DEFAULT_JAVA64_BIN (DEFAULT_JAVA764_PATH "exports/java")
     #endif
 
     // Darwin case:
