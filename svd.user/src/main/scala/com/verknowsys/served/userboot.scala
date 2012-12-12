@@ -86,6 +86,9 @@ object userboot extends SvdAkkaSupport with Logging {
 
 
     def main(args: Array[String]) {
+        // set runtime properties
+        System.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
+
         // handle signals
         handleSignal("ABRT") { getAllLiveThreads }
         handleSignal("USR2") { log.warn("TODO: implement USR2 handling (show svd config values)") }
