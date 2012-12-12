@@ -10,9 +10,11 @@ import com.sun.jna.*;
  */
 
 public interface CUsageSys extends Library {
+    String arch = System.getProperty("os.arch");
     public static final CUsageSys instance = (CUsageSys) Native.loadLibrary("usagesys", CUsageSys.class);
 
     String getProcessUsage(int uid, boolean consoleOutput);
+    String processDataToLearn(int uid);
 
 }
 
