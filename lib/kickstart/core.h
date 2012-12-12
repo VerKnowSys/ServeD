@@ -59,7 +59,7 @@
 
     /* global constants */
 
-    #define APP_VERSION "0.2.16"
+    #define APP_VERSION "0.2.17"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -98,6 +98,7 @@
     #define CORE_HOMEDIR "/SystemUsers/"
     #define USERS_HOME_DIR "/Users/"
     #define LIBRARIES_DIR "/lib/"
+    #define LIBRARIES32_DIR "/lib32/"
     #define DEFAULT_BEHAVIORS_DIR "basesystem/behaviors"
     #define DEFAULT_BEHAVIORS_RAW "/output_raw_processes.raw.input"
 

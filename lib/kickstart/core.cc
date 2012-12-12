@@ -78,9 +78,9 @@ const static string coreDir = currentDir();
 
 
     void load_svd(execParams params) {
-        // string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
+        string jnalp = "-Djava.library.path=" + string(LIBRARIES32_DIR);
         #ifdef DEVEL
-            int count = 13;
+            int count = 14;
         #endif
         char *args[] = {
             (char*)DEFAULT_JAVA_BIN,
@@ -91,7 +91,7 @@ const static string coreDir = currentDir();
             (char*)"-Xms16m",
             (char*)"-Xmx96m",
             (char*)"-Dfile.encoding=UTF-8",
-            // (char*)jnalp.c_str(),
+            (char*)jnalp.c_str(),
             #ifndef DEVEL
                 /* when not devel, use classes from assembly jar */
                 (char*)"-jar",
