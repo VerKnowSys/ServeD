@@ -120,9 +120,9 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
         }
 
 
-    def getallTasks(nickname: String) = getTasks(nickname, all)
-    def getfinishedTasks(nickname: String) = getTasks(nickname, finished)
-    def getopenTasks(nickname: String) = getTasks(nickname, open)
+    def getAllTasks(nickname: String) = getTasks(nickname, all)
+    def getFinishedTasks(nickname: String) = getTasks(nickname, finished)
+    def getOpenTasks(nickname: String) = getTasks(nickname, open)
 
 
     def timeStamp = java.lang.System.currentTimeMillis / 1000L
@@ -171,7 +171,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
             if (allowedUserNames.contains(nickname)) {
                 log.debug("Found allowed nickname: %s", nickname)
                 if (content.length > 0) {
-                    val tasks = getallTasks(nickname)
+                    val tasks = getAllTasks(nickname)
                     val newTask = Task(tasks.nextId, content.mkString(" "), timeStamp, false)
                     val tasksUpdated = Tasks(tasks.list ::: List(newTask), tasks.nextId + 1)
 
@@ -194,7 +194,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
             if (allowedUserNames.contains(nickname)) {
                 log.debug("Found allowed nickname: %s", nickname)
                 if (ids.length > 0) {
-                    val tasks = getallTasks(nickname)
+                    val tasks = getAllTasks(nickname)
                     val tasksIds = ids.map { _.toInt }
                     val tasksList = tasks.list.map {
                         task =>
@@ -225,7 +225,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
             if (allowedUserNames.contains(nickname)) {
                 log.debug("Found allowed nickname: %s", nickname)
                 if (ids.length > 0) {
-                    val tasks = getallTasks(nickname)
+                    val tasks = getAllTasks(nickname)
                     val tasksIds = ids.map { _.toInt }
                     val tasksList = tasks.list.filterNot {
                         task => tasksIds.contains(task.id)
