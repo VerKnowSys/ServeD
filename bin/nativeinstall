@@ -5,7 +5,8 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
-system="$(uname)"
+SYSTEM="$(uname)"
+ARCH="$(uname -p)"
 
 if [ -e "kick" ]; then
     echo "* Installing svdkick to /sbin"
@@ -24,16 +25,22 @@ fi
 echo "* Installing native libraries"
 if [ ! -d "/lib" ]; then
     mkdir /lib
-    if [ "$system" = "Darwin" ]; then
+    if [ "$SYSTEM" = "Darwin" ]; then
         echo "Making /lib hidden"
         chflags hidden /lib
     fi
 fi
 # NOTE: TODO: maybe use case in case of support for more systems:
-if [ "$system" = "FreeBSD" ]; then
+if [ "$SYSTEM" = "FreeBSD" ]; then
     cp -fv lib/*.so /lib
+    if [ "${ARCH}" = "amd64" ]; then
+        mkdir -p /lib32
+        echo "* Installing 32bit precompiled libraries for headless mode."
+        cp -fv lib32/*.so /lib32
+    fi
+
 fi
-if [ "$system" = "Darwin" ]; then
+if [ "$SYSTEM" = "Darwin" ]; then
     cp -fv lib/*.dylib /lib
     chmod 0755 /lib
     # chmod 0644 /lib/*

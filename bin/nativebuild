@@ -35,7 +35,7 @@ if [ -e "/usr/bin/clang++" ]; then
     CC="clang"
 fi
 
-echo "System: $SYSTEM"
+echo "System: $SYSTEM, Arch: ${ARCH}"
 echo "C compiler: $CC"
 echo "C++ compiler: $CXX"
 echo "Flags: $FLAGS"
