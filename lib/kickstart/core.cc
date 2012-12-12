@@ -86,7 +86,7 @@ const static string coreDir = currentDir();
 
         string libPath = "LD_LIBRARY_PATH=" + javaNative + "lib:" + javaNative + "openjdk6/jre/lib/i386:" + javaNative + "openjdk6/jre/lib/i386/client" + ":/lib32";
         #ifdef DEVEL
-            int count = 15;
+            int count = 16;
         #endif
         char *args[] = {
             (char*)libPath.c_str(),
@@ -98,6 +98,7 @@ const static string coreDir = currentDir();
             (char*)"-Xms16m",
             (char*)"-Xmx96m",
             (char*)"-Dfile.encoding=UTF-8",
+            (char*)"-Dorg.terracotta.quartz.skipUpdateCheck=true",
             (char*)jnalp.c_str(),
             #ifndef DEVEL
                 /* when not devel, use classes from assembly jar */
