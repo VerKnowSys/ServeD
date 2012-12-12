@@ -15,6 +15,7 @@ public interface CUsageSys extends Library {
 
     String getProcessUsage(int uid, boolean consoleOutput);
     String processDataToLearn(int uid);
+    boolean isSymlink(String path);
 
 }
 
