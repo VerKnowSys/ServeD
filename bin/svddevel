@@ -4,8 +4,9 @@ unset DYLD_LIBRARY_PATH
 unset LD_LIBRARY_PATH
 
 SYSTEM_NAME="$(uname -s)"
+userUID="$(id -u)"
 DEFAULT_COMMON_PATH="/Users/Common"
-DEFAULT_USER_UID="501"
+DEFAULT_USER_UID="${userUID}"
 JAVA_PATH="/Software/Openjdk6-i386/exports/java"
 
 # read sofin configuration
