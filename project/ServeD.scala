@@ -120,6 +120,7 @@ object Dependencies {
     val commonsio = "commons-io" % "commons-io" % "1.3.2"
     val webbit = "org.webbitserver" % "webbit" % "0.4.14"
     val tzip = "de.schlichtherle" % "truezip" % "6.8.4"
+    val jedis = "redis.clients" % "jedis" % "2.1.0"
     // val javax = "javax.media" % "jai-core" % "1.1.3"
     // val javaxjmf = "javax.media" % "jmf" % "2.1.1b"
     // val smack = "jivesoftware" % "smack" % "3.0.4"
@@ -160,7 +161,7 @@ object ServeD extends Build {
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle, json, javaMail, unfilteredFilter)
+            libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle, json, javaMail, unfilteredFilter, jedis)
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test")
 
