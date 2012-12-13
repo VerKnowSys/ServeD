@@ -14,7 +14,6 @@ import com.verknowsys.served.services._
 
 import scala.io.Source
 import akka.actor._
-import akka.actor._
 import akka.dispatch._
 import akka.pattern.ask
 import akka.remote._

@@ -63,7 +63,15 @@ object userboot extends SvdAkkaSupport with Logging {
                 log.info("Spawned UserBoot for UID: %d", userUID)
 
             case None =>
-                log.error("No account with uid %d".format(userUID))
+                // log.error("No account with uid %d".format(userUID))
+
+                // XXX: "let anybody in"
+                val account = SvdAccount(userName = "anybody", uid = userUID)
+                val am = system.actorOf(Props(new SvdAccountManager(account)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
+                // val loggingManager = system.actorOf(Props(new LoggingManager(GlobalLogger)))
+                log.info("Spawned UserBoot for UID: %d", userUID)
+
+
 
         } onFailure {
             case x =>

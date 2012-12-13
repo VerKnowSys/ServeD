@@ -66,8 +66,8 @@ class SvdRootBoot extends Logging with SvdActor {
         context.watch(ssm)
         context.watch(sshd)
         context.watch(sam)
-        (sam ? Admin.RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
-            case _ =>
+        // (sam ? Admin.RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
+        //     case _ =>
                 // log.trace("Spawning Account Manager for each user.")
                 // sam ! RegisterAccount("stefan") // XXX: hardcoded
                 // sam ! RegisterAccount("waldek") // XXX: hardcoded
@@ -79,7 +79,7 @@ class SvdRootBoot extends Logging with SvdActor {
                 //         log.error("Failure spawning accounts: %s", x)
                 //         sys.exit(1)
                 // }
-        }
+        // }
 
     }
 
