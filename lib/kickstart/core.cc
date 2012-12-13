@@ -103,7 +103,7 @@ const static string coreDir = currentDir();
             (char*)"-Xmn1m",
             (char*)"-XX:NewRatio=1",
             (char*)"-Xms16m",
-            (char*)"-Xmx96m",
+            (char*)"-Xmx256m",
             (char*)"-Dfile.encoding=UTF-8",
             (char*)jnalp.c_str(),
             #ifndef DEVEL
