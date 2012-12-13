@@ -46,7 +46,7 @@ case "${SYSTEM_NAME}" in
     bin/ignitersuninstall && bin/ignitersinstall
     chown ${DEFAULT_USER_UID} /Users/${DEFAULT_USER_UID}/.akka.conf
     sleep 3
-    "${JAVA_PATH}" -d32 -client -Xmn1m -XX:NewRatio=1 -Xms16m -Xmx64m -Dfile.encoding=UTF-8 -cp "$(cat tmp/user.classpath)" com.verknowsys.served.userboot ${DEFAULT_USER_UID}
+    "${JAVA_PATH}" -d32 -client -Xmn1m -XX:NewRatio=1 -Xms32m -Xmx256m -Dfile.encoding=UTF-8 -cp "$(cat tmp/user.classpath)" com.verknowsys.served.userboot ${DEFAULT_USER_UID}
     ;;
 
 esac
