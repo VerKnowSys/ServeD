@@ -67,11 +67,16 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     val sshd = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
 
 
+
     override def preStart = {
         super.preStart
 
         log.info("Starting Quartz Scheduler")
         scheduler.start
+
+        log.debug("Account Manager base folder checks in progress")
+        checkOrCreateDir(userHomeDir / SvdConfig.softwareDataDir)
+        checkOrCreateDir(userHomeDir / SvdConfig.webConfigDir)
 
         log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
 
