@@ -35,10 +35,17 @@ const static string coreDir = currentDir();
 
     void load_svd64(execParams params) {
         string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
+        string javaNative = DEFAULT_JAVA_PATH;
+        #ifdef JDK7
+            javaNative = DEFAULT_JAVA7_PATH;
+        #endif
+
+        string libPath = "LD_LIBRARY_PATH=" + javaNative + "lib:" + javaNative + "openjdk6/jre/lib/amd64:" + javaNative + "openjdk6/jre/lib/amd64/client" + ":/lib";
         #ifdef DEVEL
-            int count = 13;
+            int count = 14;
         #endif
         char *args[] = {
+            (char*)libPath.c_str(),
             (char*)DEFAULT_JAVA64_BIN.c_str(),
             (char*)"-d64",
             (char*)"-Xmn4m",
