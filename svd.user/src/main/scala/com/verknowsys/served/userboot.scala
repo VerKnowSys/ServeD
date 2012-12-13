@@ -50,7 +50,7 @@ object userboot extends SvdAkkaSupport with Logging {
         val akkaConfigContent = Source.fromFile(configFile).getLines.mkString("\n")
         log.trace("Read akka configuration for account: %s", akkaConfigContent)
         val system = ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDremote"))
-        val accountsManager = system.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
+        val accountsManager = system.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
 
         implicit val timeout = Timeout(SvdConfig.headlessTimeout / 1000 seconds) // cause of standard of milisecond value in SvdConfig
         (accountsManager ? User.GetAccount(userUID)) onSuccess {
@@ -70,7 +70,6 @@ object userboot extends SvdAkkaSupport with Logging {
                 val am = system.actorOf(Props(new SvdAccountManager(account)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
                 // val loggingManager = system.actorOf(Props(new LoggingManager(GlobalLogger)))
                 log.info("Spawned UserBoot for UID: %d", userUID)
-
 
 
         } onFailure {

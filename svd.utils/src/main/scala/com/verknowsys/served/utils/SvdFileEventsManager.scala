@@ -101,7 +101,7 @@ trait SvdFileEventsReactor extends SvdActor with Logging with SvdUtils {
     }
 
     def unregisterFileEvents(ref: ActorRef = self) {
-        val fem = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
+        val fem = context.actorFor("akka://%s@%s:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
         fem ! SvdUnregisterFileEvent(ref)
         log.debug("Unregistering events for Account Manager: %s", ref)
     }

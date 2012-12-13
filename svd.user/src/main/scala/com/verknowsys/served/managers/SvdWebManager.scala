@@ -43,7 +43,7 @@ import org.json4s.native._
 class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsReactor with SvdUtils with Logging {
 
     val homeDir = SvdConfig.userHomeDir / account.uid.toString
-    val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
+    val accountsManager = context.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
     val accountManager = context.actorFor("/user/SvdAccountManager")
 
 

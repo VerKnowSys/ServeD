@@ -31,7 +31,7 @@ sealed class SSHD(port: Int) extends SvdActor {
     def this() = this(SvdConfig.sshPort)
 
     val sshd = SshServer.setUpDefaultServer()
-    val ssm = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
+    val ssm = context.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
 
 
     override def preStart = {

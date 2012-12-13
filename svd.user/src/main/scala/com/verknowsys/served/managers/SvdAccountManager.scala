@@ -60,11 +60,11 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     val userHomeDir = SvdConfig.userHomeDir / "%s".format(account.uid)
 
     val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
-    val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-single-dispatcher"), "SvdFileEventsManagerUser") // XXX: hardcode
+    val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-single-dispatcher"), "SvdFileEventsManagerUser")
 
-    val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
-    val systemManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSystemManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
-    val sshd = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
+    val accountsManager = context.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
+    val systemManager = context.actorFor("akka://%s@%s:%d/user/SvdSystemManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
+    val sshd = context.actorFor("akka://%s@%s:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
 
 
 
