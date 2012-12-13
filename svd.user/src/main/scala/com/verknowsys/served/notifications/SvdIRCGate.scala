@@ -9,13 +9,13 @@ import com.verknowsys.served.services._
 import com.verknowsys.served.utils._
 
 import org.jibble.pircbot._
-import scala.io._
 import org.json4s._
 import org.json4s.native._
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import java.util.Calendar
 import java.text.SimpleDateFormat
+import redis.clients.jedis._
 
 
 /**
@@ -41,13 +41,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
 
     def allowedUserNames = "dmilith" :: "tallica" :: "wick3d" :: Nil
     def tasksPerPage = 5
+    def redisHost = SvdConfig.remoteApiServerHost
+    def redisKey(nickname: String) = nickname + ".tasks"
 
-
-    def tasksFile(nickname: String) = {
-        val path = SvdConfig.userHomeDir / "%d/%s.tasks".format(account.uid, nickname)
-        log.debug("Looking for tasks file at: %s".format(path))
-        path
-    }
+    lazy val jedis = new Jedis(redisHost)
 
 
     abstract class TaskState
@@ -58,6 +55,26 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
 
     case class Task(id: Int, content: String, date: Long, done: Boolean)
     case class Tasks(list: List[Task], nextId: Int)
+
+
+    def connectToRedis = {
+        log.info("Connecting to Redis server")
+        try {
+            // jedis.auth("password")
+            jedis.connect
+            true
+        } catch {
+            case e: Exception =>
+                log.error(e.toString)
+                false
+        }
+    }
+
+
+    def disconnectFromRedis {
+        log.info("Disconnecting from Redis server")
+        jedis.disconnect
+    }
 
 
     def renderTasks(tasks: Tasks) = (
@@ -104,7 +121,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
 
     def getTasks(nickname: String, state: TaskState) =
         try {
-            val json = parse(Source.fromFile(tasksFile(nickname)).mkString)
+            val json = parse(jedis.get(redisKey(nickname)))
             state match {
                 case `finished` =>
                     parseTasks(json, true)
@@ -128,11 +145,11 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
     def timeStamp = java.lang.System.currentTimeMillis / 1000L
 
 
-    def writeTasksToFile(nickname: String, tasks: Tasks) = {
+    def setTasks(nickname: String, tasks: Tasks) = {
         val json = compact(render(renderTasks(tasks)))
 
         try {
-            writeToFile(tasksFile(nickname), json)
+            jedis.set(redisKey(nickname), json)
             true
         } catch {
             case e: Exception =>
@@ -175,7 +192,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
                     val newTask = Task(tasks.nextId, content.mkString(" "), timeStamp, false)
                     val tasksUpdated = Tasks(tasks.list ::: List(newTask), tasks.nextId + 1)
 
-                    writeTasksToFile(nickname, tasksUpdated) match {
+                    setTasks(nickname, tasksUpdated) match {
                         case true =>
                             val append = if (sender != nickname) " for %s.".format(nickname) else "."
                             sendMessage(channel, "%s: Added a new task #%d%s".format(sender, tasks.nextId, append))
@@ -205,7 +222,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
                     }
                     val tasksUpdated = Tasks(tasksList, tasks.nextId)
 
-                    writeTasksToFile(nickname, tasksUpdated) match {
+                    setTasks(nickname, tasksUpdated) match {
                         case true =>
                             val append = if (sender != nickname) " for %s.".format(nickname) else "."
                             val plural = if (tasksIds.length > 1) "s" else ""
@@ -232,7 +249,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
                     }
                     val tasksUpdated = Tasks(tasksList, tasks.nextId)
 
-                    writeTasksToFile(nickname, tasksUpdated) match {
+                    setTasks(nickname, tasksUpdated) match {
                         case true =>
                             val append = if (sender != nickname) " for %s.".format(nickname) else "."
                             sendMessage(channel, "%s: Tasks (%s) removed%s".format(sender, tasksIds.map("#" + _).mkString(", "), append))
@@ -249,7 +266,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
 
         def wipeTasksCmd(nickname: String) {
             if (allowedUserNames.contains(nickname))
-                writeTasksToFile(nickname, Tasks(list = Nil, nextId = 1)) match {
+                setTasks(nickname, Tasks(list = Nil, nextId = 1)) match {
                     case true =>
                         val append = if (sender != nickname) " for %s.".format(nickname) else "."
                         sendMessage(channel, "%s: Tasks wiped%s".format(sender, append))
@@ -307,7 +324,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
 
     def connect {
         log.info("Initiating SvdIRCGate")
-        settings
+        if (connectToRedis)
+            settings
+        else
+            log.warn("Aborting startup duo to connection problems to Redis server")
     }
 
 
@@ -318,6 +338,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
     def send(message: String) {
 
         // SvdNotifyMailer(message, SvdConfig.notificationMailRecipients)
+    }
+
+    override def onDisconnect {
+        disconnectFromRedis
     }
 
 
