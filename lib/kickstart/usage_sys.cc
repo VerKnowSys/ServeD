@@ -381,7 +381,7 @@ extern "C" {
         }
 
         kvm_close(kd);
-        output += "]}"
+        output += "]}";
         return output.c_str();
     }
 
