@@ -362,7 +362,7 @@ extern "C" {
             return (char*)"{message: 'NOPCS'}";
         }
 
-        output += "{message: \"Ok\", content: ["
+        output += "{message: \"Ok\", content: [";
         for (int i = 0; i < count; ++i) {
             stringstream out;
             args = kvm_getargv(kd, procs, 0);
