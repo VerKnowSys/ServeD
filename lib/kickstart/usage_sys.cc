@@ -354,15 +354,15 @@ extern "C" {
 
         kvm_t* kd = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL);
         if (kd == 0) {
-            return (char*)"{message: 'KDERR'}";
+            return (char*)"{\"message\": \"KDERR\", \"status\":-1}";
         }
 
         kinfo_proc* procs = kvm_getprocs(kd, KERN_PROC_UID, uid, &count); // get processes directly from BSD kernel
         if (count <= 0) {
-            return (char*)"{\"message\": \"NOPCS\"}";
+            return (char*)"{\"message\": \"NOPCS\", \"status\":-2}";
         }
 
-        output += "{\"message\": \"Ok\", \"content\": [";
+        output += "{\"message\": \"Ok\", \"status\":0, \"content\": [";
         for (int i = 0; i < count; ++i) {
             stringstream out;
             args = kvm_getargv(kd, procs, 0);

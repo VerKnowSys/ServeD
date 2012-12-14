@@ -57,16 +57,18 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
 
     def intent = {
 
+
+        /** API call #001  */
         case req @ POST(Path(Seg("GetUserProcesses" :: Nil))) =>
             log.debug("POST on GetUserProcesses")
             SvdWebAPI.apiRespond(webManager ? System.GetUserProcesses(account.uid))
 
 
+        /** API call #002  */
         case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil))) =>
             log.debug("POST /RegisterDomain by path")
             log.info("Given domain to be registered: %s", domain)
             SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain))
-
 
         case req @ POST(Path(Seg("RegisterDomain" :: Nil)) & Params(params)) =>
             log.debug("POST /RegisterDomain from form params")
@@ -79,7 +81,7 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
                     SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain))
 
                 case _ =>
-                    JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\"}")
+                    JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\", \"status\":3}")
             }
 
 
