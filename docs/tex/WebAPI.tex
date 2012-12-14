@@ -10,6 +10,7 @@
 \usepackage{xcolor}
 \usepackage{xcolor, listings}
 \usepackage{caption}
+\usepackage{minted}
 
 % NOTE: declarations and definitions document wide:
 \DeclareCaptionFont{white}{\color{white}}
@@ -28,6 +29,23 @@
 \author{\href{mailto:dmilith@verknowsys.com}{Daniel (dmilith) Dettlaff}}
 \date{2012-12-14}
 
+\lstloadlanguages{Ruby}
+\lstset{
+  language=Ruby,
+  morecomment=[s][\color{blue}]{\:}{\ },
+  morecomment=[s][\color{magenta}]{\=\>}{\ },
+  basicstyle=\tiny,
+  tabsize=4,
+  breaklines=true,
+  breakatwhitespace=true,
+  numberstyle=\tiny,
+  firstnumber=1,
+  basicstyle=\ttfamily\color{black},
+  commentstyle=\ttfamily\color{gray},
+  keywordstyle=\ttfamily\color{red},
+  stringstyle=\color{green2},
+  numberstyle=\ttfamily\color{magenta}
+}
 
 % NOTE: document content:
 \begin{document}
@@ -75,6 +93,26 @@
       \end{description}
 
   \end{itemize}
+
+
+\section{Scala code usage examples}\label{sec:scalausage}
+  Scala code examples to be used in own code.
+
+  \begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=2,
+               frame=lines,
+               framesep=2mm]{scala}
+  /** API call #001  */
+    case req @ POST(Path(Seg("GetUserProcesses" :: Nil))) =>
+      SvdWebAPI.apiRespond(webManager ? System.GetUserProcesses(account.uid))
+
+  /** API call #002  */
+    case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil))) =>
+      SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain))
+
+  \end{minted}
 
 
 \end{document}
