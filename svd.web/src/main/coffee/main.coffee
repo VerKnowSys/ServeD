@@ -1,14 +1,18 @@
 $ ->
 
   console.log("Running main code.")
-  $('div.target').unbind().bind 'click', ->
-    $.ajax
-      url: "/GetUserProcesses"
-      type: "POST"
-      cache: false
-      dataType: "html" # jsonp
-      success: (data) ->
-        console.log("Clicked target div, data is #{data}")
-        $('div.target2').text(data)
-      done:
-        console.log("Done")
+
+  $.ajax
+    url: "/GetUserProcesses"
+    type: "post"
+    contentType: "application/json"
+    dataType: "json"
+    cache: false
+    processData: false
+    success: (data) =>
+      destData = JSON.parse(JSON.stringify(data))
+      console.log("Clicked target div, data is #{destData} -> #{destData.message}")
+      $('div.target2').text(destData.message)
+
+    done:
+      console.log("Done")
