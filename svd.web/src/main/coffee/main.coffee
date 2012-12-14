@@ -20,7 +20,7 @@ $ ->
     type: "get"
     contentType: "text/html"
     dataType: "html"
-    cache: true
+    cache: false
     processData: false
     success: (data) =>
       $('section.header').html(data)
@@ -33,7 +33,7 @@ $ ->
     type: "get"
     contentType: "text/html"
     dataType: "html"
-    cache: true
+    cache: false
     processData: false
     success: (data) =>
       $('section.pslist').html(data)
