@@ -372,8 +372,8 @@ extern "C" {
                 << "\"runt\":" << (procs->ki_runtime / 1000) << ","
                 << "\"ioin\":" << (procs->ki_rusage.ru_inblock) << ","
                 << "\"ioout\":" << (procs->ki_rusage.ru_oublock) << ","
-                << "\"rss\":" << (procs->ki_rssize * pagesize) << "},";
-
+                << "\"rss\":" << (procs->ki_rssize * pagesize) << "}";
+            if (i + 1 != count) out << "," // if last element not detected add a comma
             args = NULL;
             output += out.str();
             procs++;
