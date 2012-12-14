@@ -16,3 +16,16 @@ $ ->
 
     done:
       console.log("Done")
+
+  $.ajax
+    url: "/Header"
+    type: "get"
+    contentType: "text/html"
+    dataType: "html"
+    cache: false
+    processData: false
+    success: (data) =>
+      $('section.header').html(data)
+
+    done:
+      console.log("Done")
