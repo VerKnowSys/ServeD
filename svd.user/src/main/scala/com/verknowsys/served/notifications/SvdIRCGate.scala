@@ -16,6 +16,7 @@ import org.json4s.native.JsonMethods._
 import java.util.Calendar
 import java.text.SimpleDateFormat
 import redis.clients.jedis._
+import scala.collection.JavaConverters._
 
 
 /**
@@ -288,6 +289,40 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
             else
                 log.trace("Not allowed nickname: %s sending command: '%s'", nickname, message)
         }
+
+
+        def termKey(term: String) = "term." + term.toLowerCase
+
+
+        if (message.startsWith("\\"))
+            message.substring(1).split(" ", 2).toList match {
+                case term :: content :: Nil =>
+                    jedis.rpush(termKey(term), content)
+                    sendMessage(channel, "%s: Added a new item to term %s.".format(sender, term))
+
+                case _ =>
+                    sendMessage(channel, "%s: Wrong argument number.".format(sender))
+            }
+
+
+        if (message.startsWith("?"))
+            message.substring(1).split(" ").toList match {
+                case term :: Nil =>
+                    val len = jedis.llen(termKey(term))
+
+                    if (len > 0) {
+                        val terms = jedis.lrange(termKey(term), 0, len)
+                        terms.asScala.map {
+                            content => sendMessage(channel, "%s: %s".format(sender, content))
+                        }
+                    }
+                    else
+                        sendMessage(channel, "%s: Term %s not found.".format(sender, term))
+
+                case _ =>
+                    sendMessage(channel, "%s: Wrong argument number.".format(sender))
+
+            }
 
 
         if (message.startsWith(".")) {
