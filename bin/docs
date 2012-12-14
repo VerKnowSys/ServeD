@@ -162,7 +162,29 @@
 # end
 
 
-cd docs/tex
-mkdir -p tmp
-pdflatex -shell-escape -output-directory=tmp *.tex
-mv tmp/*.pdf ../
+PDFLATEX_BIN="$(which pdflatex)"
+if [ "${PDFLATEX_BIN}" != "" ]; then
+
+  PYGMENTIZE_BIN="$(which pygmentize)"
+  if [ "${PYGMENTIZE_BIN}" != "" ]; then # PYGMENTIZE is required for minted module.
+
+    cd docs/tex/
+    for i in *.tex; do
+      echo "Compiling $i with ${PDFLATEX_BIN}"
+      ${PDFLATEX_BIN} -shell-escape $i #>/dev/null
+      if [ "$?" != "0" ]; then
+        echo "Failure"
+        exit 1
+      fi
+    done
+    echo "Moving pdf to docs/"
+    mv *.pdf ../
+    echo "Done"
+
+  else
+    echo "pygmentize not found. Install it with: easy_install Pygments and gem install pygmentize"
+    echo "If you're using Sofin, remember to do sofin export pygmentize ruby after installation to make it available in PATH."
+  fi
+else
+  echo "pdflatex not found. Cannot build documentation withouth TexLive"
+fi
