@@ -359,20 +359,20 @@ extern "C" {
 
         kinfo_proc* procs = kvm_getprocs(kd, KERN_PROC_UID, uid, &count); // get processes directly from BSD kernel
         if (count <= 0) {
-            return (char*)"{message: 'NOPCS'}";
+            return (char*)"{\"message\": \"NOPCS\"}";
         }
 
-        output += "{message: \"Ok\", content: [";
+        output += "{\"message\": \"Ok\", \"content\": [";
         for (int i = 0; i < count; ++i) {
             stringstream out;
             args = kvm_getargv(kd, procs, 0);
-            out << "{cmd:\"" << (procs->ki_comm) << "\","
-                << "pid:" << (procs->ki_pid) << ","
-                << "ppid:" << (procs->ki_ppid) << ","
-                << "runt:" << (procs->ki_runtime / 1000) << ","
-                << "ioin:" << (procs->ki_rusage.ru_inblock) << ","
-                << "ioout:" << (procs->ki_rusage.ru_oublock) << ","
-                << "rss:" << (procs->ki_rssize * pagesize) << "},"
+            out << "{\"cmd\":\"" << (procs->ki_comm) << "\","
+                << "\"pid\":" << (procs->ki_pid) << ","
+                << "\"ppid\":" << (procs->ki_ppid) << ","
+                << "\"runt\":" << (procs->ki_runtime / 1000) << ","
+                << "\"ioin\":" << (procs->ki_rusage.ru_inblock) << ","
+                << "\"ioout\":" << (procs->ki_rusage.ru_oublock) << ","
+                << "\"rss\":" << (procs->ki_rssize * pagesize) << "},"
                 << endl;
 
             args = NULL;
