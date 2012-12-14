@@ -84,6 +84,9 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
                     JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\", \"status\":3}")
             }
 
+        case req @ POST(_) =>
+            JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\", \"status\":3}")
+
 
         case req @ _ =>
             log.debug("GET /")
