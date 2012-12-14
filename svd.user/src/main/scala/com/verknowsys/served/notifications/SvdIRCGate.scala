@@ -31,11 +31,20 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
     def settings = {
         setVerbose(false)
         setName("tasks-robo")
-        setAutoNickChange(true)
+        setAutoNickChange(false)
         setVersion("0.1.0")
         setEncoding("UTF-8")
-        connect("irc.freenode.net")
-        joinChannel("#verknowsys")
+        try {
+            connect("irc.freenode.net")
+            joinChannel("#verknowsys")
+        } catch {
+            case e: NickAlreadyInUseException =>
+                log.error("Can't connect to IRC. Nickname is already in use.")
+
+            case e: Exception =>
+                log.error("%s".format(e))
+        } finally
+            disconnect
     }
 
 
