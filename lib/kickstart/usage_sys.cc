@@ -372,7 +372,7 @@ extern "C" {
                 << "\"runt\":" << (procs->ki_runtime / 1000) << ","
                 << "\"ioin\":" << (procs->ki_rusage.ru_inblock) << ","
                 << "\"ioout\":" << (procs->ki_rusage.ru_oublock) << ","
-                << "\"rss\":" << (procs->ki_rssize * pagesize) << "},"
+                << "\"rss\":" << (procs->ki_rssize * pagesize) << "},";
 
             args = NULL;
             output += out.str();
