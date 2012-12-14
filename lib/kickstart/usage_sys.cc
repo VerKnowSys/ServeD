@@ -373,7 +373,6 @@ extern "C" {
                 << "\"ioin\":" << (procs->ki_rusage.ru_inblock) << ","
                 << "\"ioout\":" << (procs->ki_rusage.ru_oublock) << ","
                 << "\"rss\":" << (procs->ki_rssize * pagesize) << "},"
-                << endl;
 
             args = NULL;
             output += out.str();
