@@ -58,23 +58,25 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
     def intent = {
 
 
-        /** API call #001  */
+        /** API POST call #001  */
         case req @ POST(Path(Seg("GetUserProcesses" :: Nil))) =>
             log.debug("POST on GetUserProcesses")
             SvdWebAPI.apiRespond(webManager ? System.GetUserProcesses(account.uid))
 
 
-        /** API call #002  */
+        /** API POST call #002  */
         case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil))) =>
             log.debug("POST /RegisterDomain by path")
             log.info("Given domain to be registered: %s", domain)
             SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain))
 
         case req @ POST(Path(Seg("RegisterDomain" :: Nil)) & Params(params)) =>
-            log.debug("POST /RegisterDomain from form params")
-
+            /**
+             *  Helper to access html body param value
+             */
             def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
 
+            log.debug("POST /RegisterDomain from form params")
             param("RegisterDomain") match {
                 case domain: String =>
                     log.debug("Given domain: %s", domain)
@@ -84,10 +86,20 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
                     JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\", \"status\":3}")
             }
 
+        /** API POST call #DEFAULT  */
         case req @ POST(_) =>
             JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\", \"status\":3}")
 
 
+        /** API GET call #001  */
+        case req @ GET(Path(Seg("Header" :: Nil))) =>
+            Ok ~> Scalate(req, "/templates/header.jade")
+
+        /** API GET call #002  */
+        case req @ GET(Path(Seg("ProcList" :: Nil))) =>
+            Ok ~> Scalate(req, "/templates/proclist.jade")
+
+        /** API GET call #DEFAULT  */
         case req @ _ =>
             log.debug("GET /")
             Ok ~> Scalate(req, "/templates/index.jade")
