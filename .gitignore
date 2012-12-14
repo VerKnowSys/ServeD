@@ -111,3 +111,4 @@ ctrlcli
 *.fls
 *.out
 *.synctex.gz
+/docs/tex/tmp/
