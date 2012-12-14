@@ -106,3 +106,8 @@ ctrlcli
 /lib/*.mli
 /torture-machine
 /usage_gather
+*.aux
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
