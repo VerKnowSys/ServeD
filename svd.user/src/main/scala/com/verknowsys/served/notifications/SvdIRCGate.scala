@@ -43,8 +43,9 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
 
             case e: Exception =>
                 log.error("%s".format(e))
-        } finally
+
             disconnect
+        }
     }
 
 
