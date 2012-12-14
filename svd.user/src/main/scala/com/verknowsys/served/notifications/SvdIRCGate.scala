@@ -40,7 +40,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
             joinChannel("#verknowsys")
         } catch {
             case e: NickAlreadyInUseException =>
-                log.error("Can't connect to IRC. Nickname is already in use.")
+                log.warn("Can't connect to IRC. Nickname is already in use.")
 
             case e: Exception =>
                 log.error("%s".format(e))
