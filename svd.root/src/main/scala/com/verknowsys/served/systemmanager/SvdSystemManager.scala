@@ -51,6 +51,18 @@ class SvdSystemManager extends SvdManager with Logging {
 
     def receive = {
 
+        case System.RegisterDomain(domain) =>
+            log.info("Registering domain: %s", domain)
+
+            validateDomain(domain) match {
+                case None => // no errors detected
+                    sender ! Success
+
+                case Some(x) =>
+                    sender ! Error("Domain registration failures: %s".format(x))
+            }
+
+
         case System.GetUserProcesses(uid) =>
             log.debug("Gathering user processes of %s".format(uid))
             sender ! SvdLowLevelSystemAccess.usagesys(uid)

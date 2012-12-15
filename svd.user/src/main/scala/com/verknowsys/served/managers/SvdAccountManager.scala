@@ -417,16 +417,6 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             val ak = accountKeys(db)
             db << ak.copy(keys = ak.keys - key)
 
-        case System.RegisterDomain(domain) =>
-            log.info("Registering domain: %s", domain)
-            validateDomain(domain) match {
-                case None => // no errors detected
-                    sender ! Success
-
-                case Some(x) =>
-                    sender ! Error("Domain registration failures: %s".format(x))
-            }
-
         case SvdFileEvent(path, flags) =>
             log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))
             flags match {
