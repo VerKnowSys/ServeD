@@ -1,5 +1,5 @@
 
-pollInterval := 800
+pollInterval := 300
 
 useGpg := true
 
