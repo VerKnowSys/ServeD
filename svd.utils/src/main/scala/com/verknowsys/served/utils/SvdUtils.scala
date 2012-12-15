@@ -24,6 +24,7 @@ import java.util.ArrayList
 import java.util.regex.Pattern
 import sun.misc.SignalHandler
 import sun.misc.Signal
+import java.net.NetworkInterface
 
 
 /**
@@ -597,13 +598,68 @@ trait SvdUtils extends Logging {
     }
 
 
+
+    /**
+     * @author: Daniel (dmilith) Dettlaff
+     *
+     *  Returns true if given ip matches with any of server IPs.
+     *
+     */
+    def isIPBoundToCurrentServer(ip: String): Boolean = {
+        log.trace("Checking ip: %s", ip)
+        val ifcs = NetworkInterface.getNetworkInterfaces
+        while (ifcs.hasMoreElements) {
+            val ifc = ifcs.nextElement
+            log.debug("IPs of interface: %s", ifc.getDisplayName)
+            val adresses = ifc.getInetAddresses
+            while (adresses.hasMoreElements) {
+                val element = adresses.nextElement.getHostAddress
+                log.trace("IP address: %s vs %s", element, ip)
+                if (element == ip)
+                    return true
+            }
+        }
+        false
+    }
+
+
+    /**
+     * @author: Daniel (dmilith) Dettlaff
+     *
+     *  Code to validate given domain.
+     *  It will result:
+     *      None => when no problems occured. Everything's fine, domain is bindable under one of current server IPs.
+     *      Some => with some problem
+     *
+     */
     def validateDomain(domain: String) = {
-        log.warn("NYI")
-        domain match {
-            case "" =>
-                Some("Domain cannot be empty!")
-            case _ =>
-                None // XXX: hardcoded none means "no errors"
+        try {
+            domain match {
+                case "" =>
+                    Some("Domain cannot be empty!")
+
+                case _ =>
+                    if (domain.matches(SvdConfig.matcherFQDN)) { // domain must be fully qualified
+                        val domainAddress = InetAddress.getByName(domain).getHostAddress
+                        if (isIPBoundToCurrentServer(domainAddress)) // domain must be bound to this server
+                            None //NOTE: No errors. Domain's fine.
+                        else
+                            Some("Domain is incorrectly bound or DNS not yet propagated.")
+                    } else {
+                        Some("Domain must be fully qualified, registered domain name.")
+                    }
+            }
+
+        } catch {
+            case e: UnknownHostException =>
+                Some("Unknown host: %s!".format(domain))
+
+            case e: java.lang.AbstractMethodError =>
+                Some("Domain is bound to unknown or wrong server.")
+
+            case e: Throwable =>
+                Some("Exception %s for: %s!".format(e, domain))
+
         }
     }
 

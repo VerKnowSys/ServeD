@@ -94,5 +94,6 @@ object SvdConfig {
     def notificationXmppUseSasl         = false
 
     def defaultNtpHost                  = "ntp.task.gda.pl"
+    def matcherFQDN                     = """(?=^.{1,254}$)(^(?:(?!\d+\.)[a-zA-Z0-9_\-]{1,63}\.?)+(?:[a-zA-Z]{2,})$)"""
 
 }
