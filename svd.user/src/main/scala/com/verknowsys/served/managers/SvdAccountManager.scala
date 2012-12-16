@@ -376,7 +376,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
         case User.RegisteredDomains =>
             log.debug("Displaying registerd domains.")
-            log.info("RegisteredDomains: %s", SvdUserDomains(db).mkString(", "))
+            val domains = SvdUserDomains(db).mkString(", ")
+            log.info("RegisteredDomains: %s", domains)
+            sender ! """{"message": "Domain list", "content": [%s]}""".format(domains)
 
         case AuthorizeWithKey(key) =>
             log.debug("Trying to find key in account: %s", account)
