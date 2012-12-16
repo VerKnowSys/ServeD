@@ -319,8 +319,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             context.actorSelection("../SvdAccountManager/Service-*") ! User.ServiceStatus
 
 
-        case User.GetServiceStatus(name) =>
-            context.actorFor("/user/SvdAccountManager/Service-%s".format(name)) ! User.ServiceStatus
+        // case User.GetServiceStatus(name) =>
+        //     context.actorFor("/user/SvdAccountManager/Service-%s".format(name)) ! User.ServiceStatus
 
 
         case User.SpawnService(serviceName) => // #7
@@ -380,9 +380,6 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             log.debug("Reading log file for service: %s".format(serviceName))
             readLogFile(serviceName, pattern)
 
-        // case User.GetAccount =>
-        //     sender ! account
-
 
         case User.StoreUserDomain(domain) =>
             log.info("Storing user domain: %s", domain)
@@ -395,6 +392,17 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             log.info("RegisteredDomains: %s", domains)
             sender ! """{"message": "Domain list", "content": [%s]}""".format(domains)
 
+
+        case User.GetServiceStatus(serviceName) => // #11
+            val s = sender
+            val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
+            (currServ ? Ping) onComplete {
+                case Right(Pong) =>
+                    s ! Success
+
+                case Left(x) =>
+                    s ! Error("No response from service: %s".format(serviceName))
+            }
 
         case AuthorizeWithKey(key) =>
             log.debug("Trying to find key in account: %s", account)

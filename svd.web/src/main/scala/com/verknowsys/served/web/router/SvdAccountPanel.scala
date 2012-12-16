@@ -119,6 +119,9 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
         case req @ POST(Path(Seg("SpawnServices" :: Nil))) =>
             SvdWebAPI.apiRespond(webManager ? User.SpawnServices)
 
+        /** API POST call #011  */
+        case req @ POST(Path(Seg("GetServiceStatus" :: name :: Nil))) =>
+            SvdWebAPI.apiRespond(webManager ? User.GetServiceStatus(name))
 
 
 
