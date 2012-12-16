@@ -10,7 +10,7 @@ import com.verknowsys.served.api.pools._
 object User {
     abstract class Base
 
-    case object AccountNotFound
+    // case object AccountNotFound
 
     case object SpawnServices
     case object TerminateServices
@@ -23,13 +23,13 @@ object User {
     case object ServiceAutostart
     case object GetStoredServices
 
-    case class GetServiceStatus(name: String)
-    case class ReadLogFile(serviceName: String, pattern: Option[String])
-    case class SpawnService(name: String)
-    case class TerminateService(name: String)
+    case class GetServiceStatus(name: String) extends Base
+    case class ReadLogFile(serviceName: String, pattern: Option[String]) extends Base
+    case class SpawnService(name: String) extends Base
+    case class TerminateService(name: String) extends Base
 
-    case class GetAccount(uid: Int)
-    case class GetAccountByName(name: String)
+    // case class GetAccount(uid: Int)
+    // case class GetAccountByName(name: String)
 
     /**
      * @author Daniel (dmilith) Dettlaff
