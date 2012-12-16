@@ -253,9 +253,11 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
     private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, utils: SvdAccountUtils): Receive = traceReceive {
 
+
         case SvdScheduler.StartJob(name, job, trigger) =>
             log.debug("Starting schedule job named: %s for service: %s".format(name, sender))
             scheduler.scheduleJob(job, trigger)
+
 
         case SvdScheduler.StopJob(name) =>
             log.debug("Stopping scheduled jobs named: %s for service: %s".format(name, sender))
@@ -263,7 +265,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                 scheduler.deleteJob(jobKey("%s-%d".format(name, index)))
             }
 
-        case User.SpawnServices =>
+
+        case User.SpawnServices => // #10
             val listOfServices = loadServicesList
             log.debug("List of all services stored: %s".format(listOfServices.mkString(", ")))
             listOfServices.foreach {
@@ -291,37 +294,41 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                             joinContext
                     }
             }
+            sender ! Success
 
-        case User.TerminateServices =>
-            log.info("Terminating all services…")
-            context.actorSelection("../SvdAccountManager/Service-*") ! Quit
 
-        case User.GetServices =>
-            val listOfServices = loadServicesList
-            log.debug("List of all services stored: %s".format(listOfServices.mkString(", ")))
-            sender ! listOfServices
-
-        case User.GetStoredServices =>
+        case User.GetStoredServices => // #4
             val listOfServices = loadServicesList
             notificationsManager ! Notify.Message(formatMessage("I:%s".format(listOfServices.mkString(", "))))
+            sender ! """{"message": "Stored services", "content": [%s]}""".format(listOfServices.map{ c => "\"" +c+ "\"" }.mkString(", "))
 
-        case User.StoreServices =>
+
+        case User.TerminateServices => // #5
+            log.info("Terminating all services…")
+            context.actorSelection("../SvdAccountManager/Service-*") ! Quit
+            sender ! Success
+
+
+        case User.StoreServices => // #6
             cleanServicesAutostart
             context.actorSelection("../SvdAccountManager/Service-*") ! User.ServiceAutostart
+            sender ! Success
+
 
         case User.GetRunningServices =>
             context.actorSelection("../SvdAccountManager/Service-*") ! User.ServiceStatus
 
+
         case User.GetServiceStatus(name) =>
             context.actorFor("/user/SvdAccountManager/Service-%s".format(name)) ! User.ServiceStatus
 
-        case User.SpawnService(serviceName) =>
+
+        case User.SpawnService(serviceName) => // #7
             log.debug("Spawning service: %s".format(serviceName))
-            // look for old services already started, and stop it:
-            def joinContext {
-                // spawn new service with that name:
+
+            def joinContext { // look for old services already started, and stop it:
                 try { // XXX: TODO: make sure it's safe
-                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), "Service-%s".format(serviceName))
+                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), "Service-%s".format(serviceName)) // spawn new service with that name:
                     context.watch(serv)
                 } catch {
                     case x: InvalidActorNameException =>
@@ -351,17 +358,23 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     log.debug("No alive service found: %s".format(exc.getMessage))
                     joinContext
             }
+            sender ! Success
 
-        case User.TerminateService(name) =>
+
+        case User.TerminateService(name) => // #8
             log.debug("Stopping service: %s".format(name))
             val serv = context.actorFor("/user/SvdAccountManager/Service-%s".format(name))
             context.unwatch(serv)
             context.stop(serv)
+            sender ! Success
 
-        case User.ShowAvailableServices =>
+
+        case User.ShowAvailableServices => // #9
             log.debug("Showing available services definitions")
-            notificationsManager ! Notify.Message("Available Services: " +
-                listFiles(SvdConfig.defaultSoftwareTemplatesDir).filter{_.getName.endsWith(".json")}.map{_.getName.split("/").last}.mkString(", ").replaceAll(".json", "")) // XXX: replace with some good regexp
+            val availableSvces = listFiles(SvdConfig.defaultSoftwareTemplatesDir).filter{_.getName.endsWith(".json")}.map{_.getName.split("/").last}.mkString(",").replaceAll(".json", "") // XXX: replace with some good regexp
+            notificationsManager ! Notify.Message("Available Services: " + availableSvces)
+            sender ! """{"message": "Available services", "content": [%s]}""".format(availableSvces.split(",").map{ c => "\"" +c+ "\"" }.mkString(", "))
+
 
         case User.ReadLogFile(serviceName, pattern) =>
             log.debug("Reading log file for service: %s".format(serviceName))
@@ -370,15 +383,18 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         // case User.GetAccount =>
         //     sender ! account
 
+
         case User.StoreUserDomain(domain) =>
             log.info("Storing user domain: %s", domain)
             utils.registerUserDomain(domain)
 
-        case User.RegisteredDomains =>
+
+        case User.RegisteredDomains => // #3
             log.debug("Displaying registerd domains.")
             val domains = SvdUserDomains(db).mkString(", ")
             log.info("RegisteredDomains: %s", domains)
             sender ! """{"message": "Domain list", "content": [%s]}""".format(domains)
+
 
         case AuthorizeWithKey(key) =>
             log.debug("Trying to find key in account: %s", account)

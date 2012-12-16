@@ -243,7 +243,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
                 log.trace("Proceeding with index: %d", index)
                 val action = config.schedulerActions(index)
 
-                log.debug("Config scheduler actions for service %s aren't empty.".format(config.name))
+                log.debug("Config scheduler actions for service %s isn't empty.".format(config.name))
                 try {
                     val name = config.name
                     val jobInstance = new ShellJob

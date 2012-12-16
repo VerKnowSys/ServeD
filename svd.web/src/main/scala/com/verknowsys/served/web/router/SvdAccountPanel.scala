@@ -52,7 +52,7 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
             Binding(name = "account", className = "com.verknowsys.served.api.SvdAccount") :: Nil
 
     implicit val additionalAttributes = ("account", account) :: Nil
-    implicit val timeout = Timeout(10 seconds) // XXX: hardcode
+    implicit val timeout = Timeout(SvdConfig.defaultAPITimeout/1000 seconds)
 
 
     def intent = {
@@ -86,9 +86,42 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
                     JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\", \"status\":3}")
             }
 
+
         /** API POST call #003  */
         case req @ POST(Path(Seg("RegisteredDomains" :: Nil))) =>
             SvdWebAPI.apiRespond(webManager ? User.RegisteredDomains)
+
+        /** API POST call #004  */
+        case req @ POST(Path(Seg("GetStoredServices" :: Nil))) =>
+            SvdWebAPI.apiRespond(webManager ? User.GetStoredServices)
+
+        /** API POST call #005  */
+        case req @ POST(Path(Seg("TerminateServices" :: Nil))) =>
+            SvdWebAPI.apiRespond(webManager ? User.TerminateServices)
+
+        /** API POST call #006  */
+        case req @ POST(Path(Seg("StoreServices" :: Nil))) =>
+            SvdWebAPI.apiRespond(webManager ? User.StoreServices)
+
+        /** API POST call #007  */
+        case req @ POST(Path(Seg("SpawnService" :: serviceName :: Nil))) =>
+            SvdWebAPI.apiRespond(webManager ? User.SpawnService(serviceName))
+
+        /** API POST call #008  */
+        case req @ POST(Path(Seg("TerminateService" :: serviceName :: Nil))) =>
+            SvdWebAPI.apiRespond(webManager ? User.TerminateService(serviceName))
+
+        /** API POST call #009  */
+        case req @ POST(Path(Seg("ShowAvailableServices" :: Nil))) =>
+            SvdWebAPI.apiRespond(webManager ? User.ShowAvailableServices)
+
+        /** API POST call #010  */
+        case req @ POST(Path(Seg("SpawnServices" :: Nil))) =>
+            SvdWebAPI.apiRespond(webManager ? User.SpawnServices)
+
+
+
+
 
 
         /** API POST call #DEFAULT  */
