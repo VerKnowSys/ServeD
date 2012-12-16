@@ -600,7 +600,7 @@ trait SvdUtils extends Logging {
 
 
     /**
-     * @author: Daniel (dmilith) Dettlaff
+     * @author Daniel (dmilith) Dettlaff
      *
      *  Returns true if given ip matches with any of server IPs.
      *
@@ -624,7 +624,7 @@ trait SvdUtils extends Logging {
 
 
     /**
-     * @author: Daniel (dmilith) Dettlaff
+     * @author Daniel (dmilith) Dettlaff
      *
      *  Code to validate given domain.
      *  It will result:
