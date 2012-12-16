@@ -2,7 +2,7 @@
     "name": "Mongodb",
     "install": {
         "commands": ["sofin get mongodb"],
-        "expectStdOut": ["Preparing application: Mongodb", "All done."]
+        "expectStdOut": ["Installing", "All done."]
     },
     "schedulerActions": [
         {

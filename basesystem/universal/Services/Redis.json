@@ -16,7 +16,7 @@
     ],
     "install": {
         "commands": ["sofin get redis"],
-        "expectStdOut": ["Preparing application: Redis", "All done."]
+        "expectStdOut": ["Installing", "All done."]
     },
     "configure": {
         "commands": [

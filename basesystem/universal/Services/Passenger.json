@@ -2,7 +2,7 @@
     "name": "Passenger",
     "install": {
         "commands": ["sofin get passenger"],
-        "expectStdOut": ["Preparing application: Passenger", "All done."]
+        "expectStdOut": ["Installing", "All done."]
     },
     "start": {
         "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf"]

@@ -3,7 +3,7 @@
     "reportAllInfos": true,
     "install": {
         "commands": ["sofin get nginx"],
-        "expectStdOut": ["Preparing application: Nginx", "All done."],
+        "expectStdOut": ["Installing", "All done."],
         "expectOutputTimeout": 256
     },
     "start": {
