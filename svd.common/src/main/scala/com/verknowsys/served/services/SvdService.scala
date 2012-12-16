@@ -27,7 +27,7 @@ import akka.remote._
 import akka.util.Duration
 import akka.util.Timeout
 import akka.util.duration._
-import java.lang.System
+import java.lang.{System => JSystem}
 
 import org.quartz._
 import org.quartz.impl._
@@ -41,7 +41,7 @@ import org.quartz.impl._
  */
 class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor with SvdUtils {
 
-    val uptime = System.currentTimeMillis // Service uptime measure point
+    val uptime = JSystem.currentTimeMillis // Service uptime measure point
     val serviceRootPrefix = SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name
     val servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
     val accountManager = context.actorFor("/user/SvdAccountManager")
@@ -49,7 +49,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
     checkOrCreateDir(servicePrefix)
 
     implicit val timeout = Timeout(60 seconds) // XXX: hardcode
-    val future = accountManager ? Admin.GetPort
+    val future = accountManager ? System.GetPort
     val servicePort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
     log.trace("Expected port from Account Manager arrived: %d".format(servicePort))
     val shell = new SvdShell(account)
@@ -347,6 +347,6 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
     }
 
 
-    override def toString = "SvdService name: %s. Uptime: %s".format(config.name, secondsToHMS((System.currentTimeMillis - uptime).toInt / 1000))
+    override def toString = "SvdService name: %s. Uptime: %s".format(config.name, secondsToHMS((JSystem.currentTimeMillis - uptime).toInt / 1000))
 
 }

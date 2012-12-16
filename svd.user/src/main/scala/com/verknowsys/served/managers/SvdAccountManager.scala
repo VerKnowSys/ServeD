@@ -21,16 +21,26 @@ import akka.util.Timeout
 import akka.util.duration._
 import akka.actor._
 
+import scala.math._
+import scala.util._
 import org.quartz._
 import org.quartz.impl._
 import org.quartz.JobKey._
 import org.quartz.impl.matchers._
 import java.io.File
+import java.lang.{System => JSystem}
 
 
 case class AccountKeys(keys: Set[AccessKey] = Set.empty, uuid: UUID = randomUUID) extends Persistent
 object AccountKeysDB extends DB[AccountKeys]
+
 class DBServerInitializationException extends Exception
+
+case object SvdAccounts extends DB[SvdAccount]
+case object SvdUserPorts extends DB[SvdUserPort]
+case object SvdSystemPorts extends DB[SvdSystemPort]
+case object SvdUserUIDs extends DB[SvdUserUID]
+case object SvdUserDomains extends DB[SvdUserDomain]
 
 
 /**
@@ -53,8 +63,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     // }
 
 
-    import com.verknowsys.served.utils.Events._
-
+    import Events._
 
     val scheduler = StdSchedulerFactory.getDefaultScheduler
     val userHomeDir = SvdConfig.userHomeDir / "%s".format(account.uid)
@@ -67,6 +76,14 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     val sshd = context.actorFor("akka://%s@%s:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
 
 
+    def displayAdditionalInformation(db: DBClient) {
+        log.debug("User accounts registered in Account database: %s".format(SvdAccounts(db).mkString(", ")))
+        log.debug("User ports registered in Account database: %s".format(SvdUserPorts(db).mkString(", ")))
+        log.debug("System ports registered in Account database: %s".format(SvdSystemPorts(db).mkString(", ")))
+        log.debug("User uids registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
+        log.debug("User domains registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
+    }
+
 
     override def preStart = {
         super.preStart
@@ -78,92 +95,44 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         checkOrCreateDir(userHomeDir / SvdConfig.softwareDataDir)
         checkOrCreateDir(userHomeDir / SvdConfig.webConfigDir)
 
+
         log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
 
-        if (headless) {
-            // headless mode
-            val headlessPort = account.uid + 1025 // choose one above 0:1024 range
-            val dbPort = account.uid + 1030
-            val websocketsPort = account.uid + 1035
-            log.info("Headless mode assumes that machine services ports remains static for given user.")
-            log.info("Headless port for this user is: %d. Database port: %d".format(headlessPort, dbPort))
-            val dbServer = new DBServer(dbPort, userHomeDir / "%s.db".format(account.uid))
-            val db = dbServer.openClient
+        val port = SvdAccountUtils.randomFreePort
+        log.debug("Got database port %d", port)
 
-            val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")), "SvdGitManager")
-            val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"), "SvdWebManager")
+        // Start database server
+        val dbServer = new DBServer(port, userHomeDir / "%s.db".format(account.uid))
+        val db = dbServer.openClient
+        val utils = new SvdAccountUtils(db)
 
-            context.watch(fem)
-            context.watch(notificationsManager)
-            context.watch(gitManager)
-            context.watch(webManager)
+        // start managers
+        val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")), "SvdGitManager")
+        val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"), "SvdWebManager")
 
-            log.debug("Registering file events for 'watchfile'")
-            registerFileEventFor(userHomeDir / "watchfile", Modified, uid = account.uid)
+        context.watch(fem)
+        context.watch(notificationsManager)
+        context.watch(gitManager)
+        context.watch(webManager)
 
-            log.debug("Registering file events for 'restart'")
-            registerFileEventFor(userHomeDir / "restart", AttributesChanged, uid = account.uid)
+        // Start the real work
 
-            // Start the real work
-            log.info("(NYI) Checking installed services")
-            // TODO: Checking installed services
+        displayAdditionalInformation(db)
 
-            log.debug("Becaming headless with started")
-            context.become(started(db, dbServer, gitManager, notificationsManager, webManager))
+        log.debug("Becaming started")
+        context.become(
+            started(db, dbServer, gitManager, notificationsManager, webManager, utils))
 
-            // import org.webbitserver._
-            // import org.webbitserver.handler._
-            // log.info("Spawning Webbit WebSockets Server")
-            // val websocketsServer = WebServers.createWebServer(websocketsPort)
-            //   .add("/livemonitor", new SvdWebSocketsHandler)
-            //   // .add(new StaticFileHandler("/web"))
-            //   .start.get
-            // log.info("WebSockets Server running at " + websocketsServer.getUri)
+        if (!headless)
+            accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
 
-            self ! User.SpawnServices // spawn userside services automatically
+        self ! User.SpawnServices // spawn userside services
 
-            // send availability of user to sshd manager
-            // addDefaultAccessKey(db)
-            // sshd ! InitSSHChannelForUID(account.uid)
-
-        } else  {
-            // normal mode
-            log.debug("Getting database port from AccountsManager")
-            (accountsManager ? Admin.GetPort) onSuccess {
-                case dbPort: Int =>
-                    log.debug("Got database port %d", dbPort)
-
-                    // Start database server
-                    val dbServer = new DBServer(dbPort, userHomeDir / "%s.db".format(account.uid))
-                    val db = dbServer.openClient
-
-                    // start managers
-                    val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")), "SvdGitManager")
-                    val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"), "SvdWebManager")
-
-                    context.watch(fem)
-                    context.watch(notificationsManager)
-                    context.watch(gitManager)
-                    context.watch(webManager)
-
-                    // Start the real work
-                    log.debug("Becaming started")
-                    context.become(
-                        started(db, dbServer, gitManager, notificationsManager, webManager))
-
-                    accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
-                    self ! User.SpawnServices // spawn userside services
-
-                    // send availability of user to sshd manager
-                    addDefaultAccessKey(db)
-                    sshd ! InitSSHChannelForUID(account.uid)
-
-                case x =>
-                    // sender ! Error("DB initialization error. Got param: %s".format(x))
-                    throwException[DBServerInitializationException]("DB initialization error. Got param: %s".format(x))
-            }
-        }
+        // send availability of user to sshd manager
+        addDefaultAccessKey(db)
+        sshd ! InitSSHChannelForUID(account.uid)
     }
+
 
     // TODO: gather list of configurations from user config
 
@@ -282,7 +251,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     }
 
 
-    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef): Receive = traceReceive {
+    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, utils: SvdAccountUtils): Receive = traceReceive {
 
         case SvdScheduler.StartJob(name, job, trigger) =>
             log.debug("Starting schedule job named: %s for service: %s".format(name, sender))
@@ -401,6 +370,10 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         case User.GetAccount =>
             sender ! account
 
+        case User.StoreUserDomain(domain) =>
+            log.info("Storing user domain: %s", domain)
+            utils.registerUserDomain(domain)
+
         case AuthorizeWithKey(key) =>
             log.debug("Trying to find key in account: %s", account)
             sender ! accountKeys(db).keys.find(_.key == key).isDefined
@@ -471,25 +444,38 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             fem forward x
 
         case x: Admin.Base =>
+            // if (headless) {
+            //     x match {
+            //         case System.GetPort => // allow getting static port for headless account manager
+            //             import java.lang._
+
+            //             Thread.sleep(Math.abs(new scala.util.Random().nextInt % 100))
+            //             val randomPort = ((1024 + account.uid) + java.lang.System.currentTimeMillis % 10000).toInt// XXX: almost random in range of max 10000 service ports
+
+            //             sender ! Math.abs(randomPort)
+
+            //         case _ =>
+            //             val err = formatMessage("E:Forwarding to Accounts Manager can't work in headless mode.")
+            //             log.error(err)
+            //             notificationsManager ! Notify.Message(err)
+            //     }
+            // } else {
+            log.debug("Forwarding message: %s to Accounts Manager", x)
+            accountsManager forward x
+            // }
+
+
+        case System.GetPort => // allow getting static port for headless account manager
             if (headless) {
-                x match {
-                    case Admin.GetPort => // allow getting static port for headless account manager
-                        import java.lang._
-
-                        Thread.sleep(Math.abs(new scala.util.Random().nextInt % 100))
-                        val randomPort = ((1024 + account.uid) + java.lang.System.currentTimeMillis % 10000).toInt// XXX: almost random in range of max 10000 service ports
-
-                        sender ! Math.abs(randomPort)
-
-                    case _ =>
-                        val err = formatMessage("E:Forwarding to Accounts Manager can't work in headless mode.")
-                        log.error(err)
-                        notificationsManager ! Notify.Message(err)
-                }
+                Thread.sleep(abs(new Random().nextInt % 100))
+                val randomPort = ((1024 + account.uid) + JSystem.currentTimeMillis % 10000).toInt// XXX: almost random in range of max 10000 service ports
+                sender ! abs(randomPort)
             } else {
-                log.debug("Forwarding message: %s to Accounts Manager", x)
-                accountsManager forward x
+                val port = utils.randomUserPort
+                utils.registerUserPort(port)
+                sender ! port
             }
+
 
         case x: System.Base =>
             if (!headless) {
@@ -503,6 +489,21 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
         case x =>
             log.warn("Some unrecognized message catched in SAM: %s".format(x))
+
+        // TODO: do user registration
+        // case Admin.RegisterAccount(name) =>
+        //     log.trace("Registering default account if not present")
+        //     if (name == SvdConfig.defaultUserName) {
+        //         if (!userUIDRegistered(SvdConfig.defaultUserUID)) {
+        //             registerUserAccount(SvdConfig.defaultUserName, SvdConfig.defaultUserUID) // XXX: hardcoded
+        //         }
+        //         sender ! Success
+        //     } else {
+        //         val userUID = randomUserUid
+        //         log.debug("Registering account with name: %s and uid: %d".format(name, userUID))
+        //         registerUserAccount(name, userUID)
+        //         sender ! Success
+        //     }
 
     }
 

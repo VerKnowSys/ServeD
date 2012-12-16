@@ -49,7 +49,12 @@ object userboot extends SvdAkkaSupport with Logging {
 
         val akkaConfigContent = Source.fromFile(configFile).getLines.mkString("\n")
         log.trace("Read akka configuration for account: %s", akkaConfigContent)
-        val system = ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDremote"))
+        val system = try {
+            ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDremote"))
+        } catch {
+            case _ =>
+                ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDheadless"))
+        }
         val accountsManager = system.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
 
         implicit val timeout = Timeout(SvdConfig.headlessTimeout / 1000 seconds) // cause of standard of milisecond value in SvdConfig
