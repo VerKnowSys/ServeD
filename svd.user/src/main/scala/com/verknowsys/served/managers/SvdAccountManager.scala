@@ -388,9 +388,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
         case User.RegisteredDomains => // #3
             log.debug("Displaying registerd domains.")
-            val domains = SvdUserDomains(db).mkString(", ")
-            log.info("RegisteredDomains: %s", domains)
-            sender ! """{"message": "Domain list", "content": [%s]}""".format(domains)
+            val domains = SvdUserDomains(db)
+            log.info("RegisteredDomains: %s", domains.mkString(", "))
+            sender ! """{"message": "Domain list", "content": [%s]}""".format(domains.map{c => "\"" +c.name+ "\"" }.mkString(", "))
 
 
         case User.GetServiceStatus(serviceName) => // #11
