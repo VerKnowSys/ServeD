@@ -7,8 +7,7 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.Events._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.signals.SvdPOSIX._
-import com.verknowsys.served.systemmanager.managers._
-import com.verknowsys.served.api.{SvdUserPort, SvdUserUID, SvdAccount, SvdSystemPort}
+import com.verknowsys.served.api.{SvdUserPort, SvdUserUID, SvdAccount, SvdSystemPort, SvdUserDomain}
 import com.verknowsys.served.api.pools._
 import com.verknowsys.served.services._
 
@@ -17,17 +16,32 @@ import java.io._
 import scala.util._
 
 
-class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
-
-    /**
+object SvdAccountUtils extends SvdUtils {
+        /**
      *  @author dmilith
      *
      *   randomUserPort is a helper function to be used with SvdUserPort in API
      */
-    def randomUserPort: Int = {
+    def randomFreePort: Int = {
         val rnd = new Random(System.currentTimeMillis)
         val port = SvdPools.userPortPool.start + rnd.nextInt(SvdPools.userPortPool.end - SvdPools.userPortPool.start)
-        if (portAvailable(port) && !userPortRegistered(port)) {
+        if (portAvailable(port)) {
+            port
+        } else
+            randomFreePort
+    }
+
+}
+
+
+class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
+
+    import SvdAccountUtils._
+
+
+    def randomUserPort: Int = {
+        val port = randomFreePort
+        if (!userPortRegistered(port)) {
             port
         } else
             randomUserPort
@@ -76,11 +90,11 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
         def performChecks(managerPort: Int = userManagerPort) {
             log.trace("Performing user registration checks and making missing directories")
             checkOrCreateDir(userHomeDir)
-            ("Backup" :: "SoftwareData" :: "WebApps" :: Nil).map { // XXX: HARDCODE
-                sub =>
-                    log.trace("Chowning %s", userHomeDir / sub)
-                    chown(userHomeDir / sub, uid)
-            }
+            // ("Backup" :: "SoftwareData" :: "WebApps" :: Nil).map { // XXX: HARDCODE
+            //     sub =>
+            //         log.trace("Chowning %s", userHomeDir / sub)
+            //         chown(userHomeDir / sub, uid)
+            // }
             log.debug("Creating Akka configuration…")
             createAkkaUserConfIfNotExistant(uid, managerPort)
         }
@@ -169,6 +183,35 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
             false
         else
             true
+
+
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  Checks if given domain is already registered for user
+     *
+     */
+    def userDomainRegistered(domain: String) = {
+        if (SvdUserDomains(db)(_.name == domain).isEmpty)
+            false
+        else
+            true
+    }
+
+
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  Registers user domain
+     *
+     */
+    def registerUserDomain(domain: String) = {
+        if (!userDomainRegistered(domain)) {
+            db << SvdUserDomain(name = domain)
+        } else {
+            log.trace("Domain already registered: %s", domain)
+        }
+    }
 
 
 }
