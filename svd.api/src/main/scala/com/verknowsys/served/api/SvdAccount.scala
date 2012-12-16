@@ -8,20 +8,20 @@ import com.verknowsys.served.api.pools._
  *  API object for user messages:
  */
 object User {
-    abstract class Base
+    abstract class Base extends ApiResponse
 
     // case object AccountNotFound
 
-    case object SpawnServices
-    case object TerminateServices
-    case object GetServices // returns List
-    case object GetRunningServices // returns nothing, just notifies
-    case object StoreServices
-    case object ShowAvailableServices
+    case object SpawnServices extends Base
+    case object TerminateServices extends Base
+    case object GetServices extends Base // returns List
+    case object GetRunningServices extends Base // returns nothing, just notifies
+    case object StoreServices extends Base
+    case object ShowAvailableServices extends Base
 
-    case object ServiceStatus // used to get information about Service state
-    case object ServiceAutostart
-    case object GetStoredServices
+    case object ServiceStatus extends Base // used to get information about Service state
+    case object ServiceAutostart extends Base
+    case object GetStoredServices extends Base
 
     case class GetServiceStatus(name: String) extends Base
     case class ReadLogFile(serviceName: String, pattern: Option[String]) extends Base
