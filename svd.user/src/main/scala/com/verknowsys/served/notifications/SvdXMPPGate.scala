@@ -36,34 +36,32 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
     def connect {
         log.info("Initiating SvdXMPPGate")
         // XMPPConnection.DEBUG_ENABLED = SvdConfig.notificationXmppDebug
-
-        connection.connect
-        log.trace("SvdXMPPGate connected to server")
-
         try {
+            connection.connect
+            log.trace("SvdXMPPGate connected to server")
             connection.login(login, password, resource)
             log.trace("XMPP server: %s:%d, login: %s, resource: %s", host, port, login, resource)
+            val chatmanager = connection.getChatManager
+
+            SvdConfig.notificationXmppRecipients.foreach { user =>
+                try {
+                    chats += chatmanager.createChat(user, this)
+                } catch {
+                    case x: Throwable =>
+                        log.error("Error: " + x )
+                }
+            }
+
+            log.debug("Number of users bound to be notified with repository changes: %s".format(chats.length))
+            presence.setStatus("ServeD® XMPP Notification Plugin")
+            presence.setMode(Presence.Mode.available)
+            connection.sendPacket(presence)
+
         } catch {
             case x: Throwable =>
-                log.error("Error while connecting to Xmpp server. Please check login / password. Exc: %s".format(x))
-                // log.debug( x.printStackTrace.toString )
+                log.error("Error in XMPP Gate Exc: %s".format(x))
+                log.warn("XMPP Gate initialization aborted for this session.")
         }
-
-        val chatmanager = connection.getChatManager
-
-        SvdConfig.notificationXmppRecipients.foreach { user =>
-            try {
-                chats += chatmanager.createChat(user, this)
-            } catch {
-                case x: Throwable =>
-                    log.error("Error: " + x )
-            }
-        }
-
-        log.debug("Number of users bound to be notified with repository changes: %s".format(chats.length))
-        presence.setStatus("ServeD® XMPP Notification Plugin")
-        presence.setMode(Presence.Mode.available)
-        connection.sendPacket(presence)
     }
 
     def disconnect { connection.disconnect() }
@@ -110,7 +108,8 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                 ),
             "show" -> Map(
                 "logs" -> "Shows logs from service given as a param",
-                "whoami" -> "Shows current user name"
+                "whoami" -> "Shows current user name",
+                "scheduler" -> "Shows info about scheduled tasks"
                 ),
             "register" -> Map(
                 "domain" -> "Registers domain"
@@ -143,6 +142,8 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                 command.toLowerCase match {
                     case "whoami" =>
                         send("You're authorized as %s. Writing from: %s".format(account.userName, from))
+                    case "scheduler" =>
+                        send("%s".format("dsd"))
                 }
 
             case "show" :: command :: argument :: Nil =>
@@ -161,7 +162,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                 val domain = argument.toLowerCase
                 command.toLowerCase match {
                     case "domain" =>
-                        accountManager ! System.RegisterDomain(domain)
+                        accountManager ! System.RegisterDomain(domain, accountManager)
 
                     // case "user" =>
                     //     accountManager ! User.TerminateServices
