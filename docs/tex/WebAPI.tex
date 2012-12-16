@@ -26,27 +26,27 @@
 \definecolor{green2}{HTML}{347235}
 
 \title{ServeD WebAPI}
-\subtitle{version 0.1.3}
+\subtitle{version 0.2.0}
 \author{\href{mailto:dmilith@verknowsys.com}{Daniel (dmilith) Dettlaff}}
 \date{2012-12-14}
 
-\lstloadlanguages{Ruby}
-\lstset{
-  language=Ruby,
-  morecomment=[s][\color{blue}]{\:}{\ },
-  morecomment=[s][\color{magenta}]{\=\>}{\ },
-  basicstyle=\tiny,
-  tabsize=4,
-  breaklines=true,
-  breakatwhitespace=true,
-  numberstyle=\tiny,
-  firstnumber=1,
-  basicstyle=\ttfamily\color{black},
-  commentstyle=\ttfamily\color{gray},
-  keywordstyle=\ttfamily\color{red},
-  stringstyle=\color{green2},
-  numberstyle=\ttfamily\color{magenta}
-}
+% \lstloadlanguages{Ruby}
+% \lstset{
+%   language=Ruby,
+%   morecomment=[s][\color{blue}]{\:}{\ },
+%   morecomment=[s][\color{magenta}]{\=\>}{\ },
+%   basicstyle=\tiny,
+%   tabsize=4,
+%   breaklines=true,
+%   breakatwhitespace=true,
+%   numberstyle=\tiny,
+%   firstnumber=1,
+%   basicstyle=\ttfamily\color{black},
+%   commentstyle=\ttfamily\color{gray},
+%   keywordstyle=\ttfamily\color{red},
+%   stringstyle=\color{green2},
+%   numberstyle=\ttfamily\color{magenta}
+% }
 
 % NOTE: document content:
 \begin{document}
@@ -59,27 +59,134 @@
 
   \begin{itemize}
 
-    \item \#001 - /GetUserProcesses - Gets process information from all services and applications running by user (owner of web panel).
-      \begin{itemize}
-        \item params: no additional params.
-        \item return type: JSON.
-        \item errors: \{message: "information"\} where MESSAGE is one of error codes: KDERR, NOPCS.
-        \item format: \{message: "information", content: [\{properties, …\}, …]\}
-      \end{itemize}
+    \item \#001:
+      \begin{minted}{bash}
+    /GetUserProcesses
+      \end{minted}
+      \begin{minted}{scala}
+      @description gets process information from all services and
+        applications running by user (owner of web panel).
+      @returns nothing or one of error codes: KDERR, NOPCS as
+        message in case of critical failure.
+      @params no additional params.
+      @format json: {message: information_string}
+      \end{minted}
 
-    \item \#002 - /RegisterDomain - Registers user domain.
-      \begin{itemize}
-        \item params: Accepts additional http param as domain, or takes \"RegisterDomain\" key from http body data array (when no additional http param is provided).
-        \item return type: JSON
-        \item format: \{message: "information", content: [\{properties, …\}, …]\}
-      \end{itemize}
+    \item \#002:
+      \begin{minted}{bash}
+    /RegisterDomain
+      \end{minted}
+      \begin{minted}{scala}
+      @description registers user domain.
+      @returns nothing
+      @params accepts additional http param as domain, or takes
+        RegisterDomain key from http body data array (when no
+        additional http param is provided).
+      @format json: {message: information_string}
+      \end{minted}
 
-    \item \#003 - /RegisteredDomains - Lists domains registered by user.
-      \begin{itemize}
-        \item params: no additional params.
-        \item return type: JSON
-        \item format: \{message: "information", content: [domain1, domain2, …]\}
-      \end{itemize}
+    \item \#003:
+      \begin{minted}{bash}
+    /RegisteredDomains
+      \end{minted}
+      \begin{minted}{scala}
+      @description lists domains registered by user.
+      @returns list of domains as content.
+      @params no additional params.
+      @format json: {message: information_string, content: [domain1, ...]}
+      \end{minted}
+
+    \item \#004:
+      \begin{minted}{bash}
+    /GetStoredServices
+      \end{minted}
+      \begin{minted}{scala}
+      @description lists services stored by user.
+      @returns list of stored services as content.
+      @params no additional params.
+      @format json: {message: information_string, content: [Svc1, ...]}
+      \end{minted}
+
+    \item \#005:
+      \begin{minted}{bash}
+    /TerminateServices
+      \end{minted}
+      \begin{minted}{scala}
+      @description terminates all user spawned services.
+      @returns nothing.
+      @params no additional params.
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#006:
+      \begin{minted}{bash}
+    /StoreServices
+      \end{minted}
+      \begin{minted}{scala}
+      @description stores user spawned services. it will cause
+        autostart of those services on each WebPanel start.
+      @returns nothing.
+      @params no additional params.
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#007:
+      \begin{minted}{bash}
+    /SpawnService
+      \end{minted}
+      \begin{minted}{scala}
+      @description spawns given service.
+      @returns nothing.
+      @params capitalized service name.
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#008:
+      \begin{minted}{bash}
+    /TerminateService
+      \end{minted}
+      \begin{minted}{scala}
+      @description terminates service given as a param.
+      @returns nothing.
+      @params capitalized service name.
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#009:
+      \begin{minted}{bash}
+    /ShowAvailableServices
+      \end{minted}
+      \begin{minted}{scala}
+      @description shows all available services defined
+        to be used by user.
+      @returns list of available services as content array.
+      @params no additional params.
+      @format json: {message: information_string, content:[Svc1, ...] }
+      \end{minted}
+
+    \item \#010:
+      \begin{minted}{bash}
+    /SpawnServices
+      \end{minted}
+      \begin{minted}{scala}
+      @description spawns all stored services at once.
+      @returns status code 0 when service is started,
+        error otherwise.
+      @params no additional params.
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#011:
+      \begin{minted}{bash}
+    /GetServiceStatus
+      \end{minted}
+      \begin{minted}{scala}
+      @description checks service status.
+      @returns status code 0 when service is started,
+        error otherwise.
+      @params capitalized service name.
+      @format json: {message: information_string}
+      \end{minted}
 
   \end{itemize}
 
