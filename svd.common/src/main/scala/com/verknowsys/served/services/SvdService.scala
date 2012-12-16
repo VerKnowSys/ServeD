@@ -46,12 +46,20 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
     val servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
     val accountManager = context.actorFor("/user/SvdAccountManager")
     val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
+    val portsFile = servicePrefix / ".service_ports"
     checkOrCreateDir(servicePrefix)
 
     implicit val timeout = Timeout(60 seconds) // XXX: hardcode
     val future = accountManager ? System.GetPort
-    val servicePort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
+    val sPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
     log.trace("Expected port from Account Manager arrived: %d".format(servicePort))
+    val servicePort = try {
+        Source.fromFile(portsFile).mkString.toInt
+    } catch {
+        case _ =>
+            writeToFile(portsFile, "%d".format(sPort))
+            sPort
+    }
     val shell = new SvdShell(account)
 
 
