@@ -84,7 +84,6 @@ object System {
     case class Chmod(what: String, mode: Int, recursive: Boolean) extends Base
     case class Chown(what: String, userId: Int, recursive: Boolean) extends Base
 
-    case class RegisterDomain(domain: String) extends Base
-    case object RegisteredDomains extends Base
+    case class RegisterDomain(domain: String, proxyActor: ActorRef) extends Base
     case object GetPort extends Base
 }

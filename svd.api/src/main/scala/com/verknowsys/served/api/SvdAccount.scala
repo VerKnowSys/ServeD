@@ -8,6 +8,7 @@ import com.verknowsys.served.api.pools._
  *  API object for user messages:
  */
 object User {
+    abstract class Base
 
     case object AccountNotFound
 
@@ -36,7 +37,16 @@ object User {
      *  Call to store domain record for user.
      *
      */
-    case class StoreUserDomain(domain: String)
+    case class StoreUserDomain(domain: String) extends Base
+
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  Call to retrieve stored domain records for user.
+     *
+     */
+    case object RegisteredDomains extends Base
+
 
 }
 

@@ -17,7 +17,8 @@ import scala.util._
 
 
 object SvdAccountUtils extends SvdUtils {
-        /**
+
+    /**
      *  @author dmilith
      *
      *   randomUserPort is a helper function to be used with SvdUserPort in API

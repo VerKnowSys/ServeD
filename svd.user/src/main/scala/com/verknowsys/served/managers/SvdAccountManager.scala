@@ -374,6 +374,10 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             log.info("Storing user domain: %s", domain)
             utils.registerUserDomain(domain)
 
+        case User.RegisteredDomains =>
+            log.debug("Displaying registerd domains.")
+            log.info("RegisteredDomains: %s", SvdUserDomains(db).mkString(", "))
+
         case AuthorizeWithKey(key) =>
             log.debug("Trying to find key in account: %s", account)
             sender ! accountKeys(db).keys.find(_.key == key).isDefined

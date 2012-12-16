@@ -58,37 +58,26 @@ object userboot extends SvdAkkaSupport with Logging {
         val accountsManager = system.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
 
         implicit val timeout = Timeout(SvdConfig.headlessTimeout / 1000 seconds) // cause of standard of milisecond value in SvdConfig
-        (accountsManager ? User.GetAccount(userUID)) onSuccess {
 
-            case Some(account: SvdAccount) =>
 
-                log.debug("Got account, starting AccountManager for %s on account manager port: %d", account, account.accountManagerPort)
-                val am = system.actorOf(Props(new SvdAccountManager(account)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
-                // val loggingManager = system.actorOf(Props(new LoggingManager(GlobalLogger)))
-                log.info("Spawned UserBoot for UID: %d", userUID)
+        (accountsManager ? System.GetPort) onSuccess {
 
-            case None =>
-                // log.error("No account with uid %d".format(userUID))
-
-                // XXX: "let anybody in"
+            case anyPort: Int =>
                 val account = SvdAccount(userName = "anybody", uid = userUID)
                 val am = system.actorOf(Props(new SvdAccountManager(account)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
-                // val loggingManager = system.actorOf(Props(new LoggingManager(GlobalLogger)))
                 log.info("Spawned UserBoot for UID: %d", userUID)
 
-
         } onFailure {
+
             case x =>
-                log.debug("Couldn't connect to SvdROOT with UID: %s".format(userUID))
-
-                log.info("Launching headless mode for UID: %d".format(userUID))
-                val account = SvdAccount(uid = userUID, userName = "headless %s".format(userUID))
-
                 // launching headless mode
+                log.info("Launching svduser headless mode for UID: %d".format(userUID))
+                val account = SvdAccount(uid = userUID, userName = "anUser %s".format(userUID))
                 val am = system.actorOf(Props(new SvdAccountManager(account, headless = true)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager")
-                log.info("Spawned Headless UserBoot for UID: %d", userUID)
+                log.info("Spawned UserBoot for UID: %d", userUID)
 
         }
+
 
         addShutdownHook {
             log.warn("userboot Shutdown Hook invoked")

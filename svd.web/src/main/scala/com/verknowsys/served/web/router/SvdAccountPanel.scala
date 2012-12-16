@@ -68,7 +68,7 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
         case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil))) =>
             log.debug("POST /RegisterDomain by path")
             log.info("Given domain to be registered: %s", domain)
-            SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain))
+            SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain, webManager))
 
         case req @ POST(Path(Seg("RegisterDomain" :: Nil)) & Params(params)) =>
             /**
@@ -80,11 +80,16 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
             param("RegisterDomain") match {
                 case domain: String =>
                     log.debug("Given domain: %s", domain)
-                    SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain))
+                    SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain, webManager))
 
                 case _ =>
                     JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\", \"status\":3}")
             }
+
+        /** API POST call #003  */
+        case req @ POST(Path(Seg("RegisteredDomains" :: Nil))) =>
+            SvdWebAPI.apiRespond(webManager ? User.RegisteredDomains)
+
 
         /** API POST call #DEFAULT  */
         case req @ POST(_) =>

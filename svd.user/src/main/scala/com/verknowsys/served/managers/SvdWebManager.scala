@@ -92,6 +92,9 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
         // case System.GetUserProcesses(x) => // it doesn't require any additional priviledges
         //     sender ! SvdLowLevelSystemAccess.usagesys(account.uid).toString // take list of user processes
 
+        case x: User.Base =>
+            accountManager forward x
+
         case x: System.Base =>
             log.debug("Web Panel got a message: %s. Forwarding to Account Manager", x)
             accountManager forward x

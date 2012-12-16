@@ -76,11 +76,15 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
 
     def awareOfUserManagers(accountsAlive: List[SvdAccount]): Receive = {
 
-
-         case System.GetPort =>
-            val utils = new SvdAccountUtils(null)
-            val port = utils.randomUserPort
-            sender ! port
+        /**
+         * @author Daniel (dmilith) Dettlaff
+         * @since 0.4
+         *
+         *  Gets first free port available from server.
+         *
+         */
+        case System.GetPort =>
+            sender ! SvdAccountUtils.randomFreePort
 
 
         /**
