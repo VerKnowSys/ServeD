@@ -16,7 +16,7 @@ let arguments = List.tl (to_list Sys.argv);;
 (* let arguments = List.filter rejection prep_args;; *)
 
 let version = "0.1.0" in
-let head = "Torture Tool  v" ^ version in
+let head = "Torture Tool - v" ^ version in
 print_endline head;;
 
 
@@ -44,11 +44,10 @@ print_endline (string_of_bool e);;
 let e = Signals.pidValid (-123) in
 print_endline (string_of_bool e);;
  *)
+
 let pid = int_of_string (List.nth arguments 0) in
 Signals.deathWatchPid pid;;
 
-
 (* print_endline (Signals.attackPid -123);; *)
 (* print_endline mapped_result;; *)
-
 (* read_line ();; *)
