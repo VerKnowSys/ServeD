@@ -367,8 +367,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             log.debug("Reading log file for service: %s".format(serviceName))
             readLogFile(serviceName, pattern)
 
-        case User.GetAccount =>
-            sender ! account
+        // case User.GetAccount =>
+        //     sender ! account
 
         case User.StoreUserDomain(domain) =>
             log.info("Storing user domain: %s", domain)
