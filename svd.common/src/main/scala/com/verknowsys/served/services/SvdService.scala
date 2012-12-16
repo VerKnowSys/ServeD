@@ -293,6 +293,10 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             log.debug(msg)
             accountManager ! Notify.Message(msg)
 
+        case User.GetServicePort =>
+            log.debug("Getting port of service: %s:%d".format(config.name, servicePort))
+            sender ! servicePort
+
         case Ping =>
             log.debug("%s".format(this))
             sender ! Pong

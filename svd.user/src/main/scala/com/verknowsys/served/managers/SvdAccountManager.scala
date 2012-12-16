@@ -393,6 +393,17 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             sender ! """{"message": "Domain list", "content": [%s]}""".format(domains.map{c => "\"" +c.name+ "\"" }.mkString(", "))
 
 
+        case User.GetServicePort(serviceName) =>
+            log.debug("Asking service %s for port it's using.".format(serviceName))
+            val s = sender
+            val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
+            (currServ ? User.GetServicePort) onComplete {
+                case Right(port) =>
+                    s ! """{"message": "Port gathered successfully.", "content": [%d]}""".format(port)
+                case Left(exc) =>
+                    s ! Error("Service port unavailable!")
+            }
+
         case User.GetServiceStatus(serviceName) => // #11
             val s = sender
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))

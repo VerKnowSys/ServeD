@@ -188,6 +188,17 @@
       @format json: {message: information_string}
       \end{minted}
 
+    \item \#012:
+      \begin{minted}{bash}
+    /GetServicePort
+      \end{minted}
+      \begin{minted}{scala}
+      @description retrieves service port on which given service is listening at.
+      @returns port list as content
+      @params capitalized service name.
+      @format json: {message: information_string, content: [1025, 1026, ...]}
+      \end{minted}
+
   \end{itemize}
 
 

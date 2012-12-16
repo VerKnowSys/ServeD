@@ -23,6 +23,8 @@ object User {
     case object ServiceAutostart extends Base
     case object GetStoredServices extends Base
 
+    case object GetServicePort
+    case class GetServicePort(name: String) extends Base
     case class GetServiceStatus(name: String) extends Base
     case class ReadLogFile(serviceName: String, pattern: Option[String]) extends Base
     case class SpawnService(name: String) extends Base
