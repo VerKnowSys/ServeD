@@ -51,7 +51,6 @@ object Admin {
     case class RegisterAccount(name: String) extends Base
     case class GetAccountManager(userUid: Int) extends Base
 
-    case object GetPort extends Base
     case class GetSysUsage(userUid: Int) extends Base
     case class Alive(account: SvdAccount) extends Base
     case class Dead(account: SvdAccount) extends Base
@@ -86,4 +85,6 @@ object System {
     case class Chown(what: String, userId: Int, recursive: Boolean) extends Base
 
     case class RegisterDomain(domain: String) extends Base
+    case object RegisteredDomains extends Base
+    case object GetPort extends Base
 }

@@ -64,7 +64,7 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
 
         log.debug("Getting web panel port from AccountsManager")
         implicit val timeout = Timeout(5 seconds)
-        (accountsManager ? Admin.GetPort) onSuccess {
+        (accountsManager ? System.GetPort) onSuccess {
             case webPort: Int =>
                 log.trace("Got web panel port %d", webPort)
 

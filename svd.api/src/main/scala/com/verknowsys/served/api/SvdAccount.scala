@@ -30,6 +30,14 @@ object User {
     case class GetAccount(uid: Int)
     case class GetAccountByName(name: String)
 
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  Call to store domain record for user.
+     *
+     */
+    case class StoreUserDomain(domain: String)
+
 }
 
 
