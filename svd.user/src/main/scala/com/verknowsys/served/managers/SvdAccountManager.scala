@@ -381,7 +381,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             readLogFile(serviceName, pattern)
 
 
-        case User.StoreUserDomain(domain) =>
+        case User.StoreUserDomain(domain) => // internal call
             log.info("Storing user domain: %s", domain)
             utils.registerUserDomain(domain)
 
@@ -393,7 +393,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             sender ! """{"message": "Domain list", "content": [%s]}""".format(domains.map{c => "\"" +c.name+ "\"" }.mkString(", "))
 
 
-        case User.GetServicePort(serviceName) =>
+        case User.GetServicePort(serviceName) => // #12
             log.debug("Asking service %s for port it's using.".format(serviceName))
             val s = sender
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
@@ -485,25 +485,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             fem forward x
 
         case x: Admin.Base =>
-            // if (headless) {
-            //     x match {
-            //         case System.GetPort => // allow getting static port for headless account manager
-            //             import java.lang._
-
-            //             Thread.sleep(Math.abs(new scala.util.Random().nextInt % 100))
-            //             val randomPort = ((1024 + account.uid) + java.lang.System.currentTimeMillis % 10000).toInt// XXX: almost random in range of max 10000 service ports
-
-            //             sender ! Math.abs(randomPort)
-
-            //         case _ =>
-            //             val err = formatMessage("E:Forwarding to Accounts Manager can't work in headless mode.")
-            //             log.error(err)
-            //             notificationsManager ! Notify.Message(err)
-            //     }
-            // } else {
             log.debug("Forwarding message: %s to Accounts Manager", x)
             accountsManager forward x
-            // }
 
 
         case System.GetPort => // allow getting static port for headless account manager
