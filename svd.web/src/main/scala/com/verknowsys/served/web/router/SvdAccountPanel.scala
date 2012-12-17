@@ -162,7 +162,7 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
 
         /** API GET call #002  */
         case req @ GET(Path(Seg("ProcList" :: Nil))) =>
-            Ok ~> layout(
+            Ok ~> Html(
                 <script type="text/javascript" src="/assets/js/raphael-min.js"/>
                 <script type="text/javascript" src="/assets/js/g.graphael.js"/>
                 <script type="text/javascript" src="/assets/js/g.dot.js"/>
