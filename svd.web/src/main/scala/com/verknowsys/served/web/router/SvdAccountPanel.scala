@@ -6,12 +6,12 @@ import unfiltered.request._
 import unfiltered.response._
 import unfiltered.kit._
 import unfiltered.filter._
-import unfiltered.scalate.Scalate
-import org.fusesource.scalate.TemplateEngine
+// import unfiltered.scalate.Scalate
+// import org.fusesource.scalate.TemplateEngine
 import org.json4s._
 import org.json4s.native._
 import java.util.UUID
-import org.fusesource.scalate.{TemplateEngine, Binding}
+// import org.fusesource.scalate.{TemplateEngine, Binding}
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
@@ -28,7 +28,6 @@ import akka.dispatch._
 import akka.util.Timeout
 import akka.util.duration._
 import akka.pattern.ask
-
 
 /**
  *  @author dmilith
@@ -48,11 +47,29 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
     import com.verknowsys.served.web.merch._
 
 
-    implicit val bindings: List[Binding] =
-            Binding(name = "account", className = "com.verknowsys.served.api.SvdAccount") :: Nil
+    // implicit val bindings: List[Binding] =
+            // Binding(name = "account", className = "com.verknowsys.served.api.SvdAccount") :: Nil
 
-    implicit val additionalAttributes = ("account", account) :: Nil
+    // implicit val additionalAttributes = ("account", account) :: Nil
     implicit val timeout = Timeout(SvdConfig.defaultAPITimeout/1000 seconds)
+
+
+    def layout(content: scala.xml.NodeBuffer) = Html(
+        <html>
+            <head>
+                <title>ServeD</title>
+                <meta http_equiv="Content-Type" content="text/html; charset=utf-8"/>
+                <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css"/>
+                <link rel="stylesheet" type="text/css" href="/assets/css/main.css"/>
+            </head>
+            <body>
+                <script type="text/javascript" src="/assets/js/jquery-1.8.3.min.js"/>
+                <script type="text/javascript" src="/assets/js/bootstrap.min.js"/>
+                <script type="text/javascript" src="/assets/js/main.js"/>
+                { content }
+            </body>
+        </html>
+    )
 
 
     def intent = {
@@ -137,16 +154,36 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
 
         /** API GET call #001  */
         case req @ GET(Path(Seg("Header" :: Nil))) =>
-            Ok ~> Scalate(req, "/templates/header.jade")
+            Ok ~> Html(
+                <h1>{ Dict("User Panel") }</h1>
+                <p>{ Dict("Welcome") + " " + account.userName }</p>
+                <p>{ Dict("Details") + ": " + account }</p>)
+
 
         /** API GET call #002  */
         case req @ GET(Path(Seg("ProcList" :: Nil))) =>
-            Ok ~> Scalate(req, "/templates/proclist.jade")
+            Ok ~> layout(
+                <script type="text/javascript" src="/assets/js/raphael-min.js"/>
+                <script type="text/javascript" src="/assets/js/g.graphael.js"/>
+                <script type="text/javascript" src="/assets/js/g.dot.js"/>
+                <script type="text/javascript" src="/assets/js/proclist.js"/>
+                <article>
+                  <header>ProcList</header>
+                  <div id="holder">Cos</div>
+                </article>
+            )
 
         /** API GET call #DEFAULT  */
         case req @ _ =>
             log.debug("GET /")
-            Ok ~> Scalate(req, "/templates/index.jade")
+            Ok ~> layout(
+                <section class="header"></section>
+                <section class="content">
+                    <div class="target">Coś sensownego</div>
+                    <div class="target2">Cel</div>
+                    <section class="pslist"></section>
+                </section>
+            )
 
         //     log.debug("GET /productlist")
 
