@@ -77,7 +77,6 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
 
     def displayAdditionalInformation(db: DBClient) {
-        log.debug("User accounts registered in Account database: %s".format(SvdAccounts(db).mkString(", ")))
         log.debug("User ports registered in Account database: %s".format(SvdUserPorts(db).mkString(", ")))
         log.debug("System ports registered in Account database: %s".format(SvdSystemPorts(db).mkString(", ")))
         log.debug("User uids registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
