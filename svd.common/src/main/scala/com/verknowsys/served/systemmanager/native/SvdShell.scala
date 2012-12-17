@@ -47,16 +47,18 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     }
 
 
-    def output = (shell.getCurrentStandardOutContents, shell.getCurrentStandardErrContents)
+    // def output = synchronized {
+    //     (shell.getCurrentStandardOutContents, shell.getCurrentStandardErrContents)
+    // }
 
 
     def close {
         try {
-            log.trace("Stopping shell. Closed: %s".format(shell.isClosed))
+            log.trace("Closing shell. Is it closed? %s".format(shell.isClosed))
             shell.send("\nexit\n")
             shell.stop
             shell.expectClose
-            log.debug("Shell stopped. Closed: %s".format(shell.isClosed))
+            log.debug("Shell closed. Is it really closed? %s".format(shell.isClosed))
         } catch {
             case e: Exception =>
                 log.warn("%s on exit from shell.".format(e))

@@ -206,6 +206,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
                     if (config.reportAllErrors)
                         accountManager ! Notify.Message(msg)
             }
+            // log.trace("after hookShot output: %s", shell.output)
         } else {
             log.trace("Command list empty in hook: %s of service %s".format(hookName, config.name))
         }
