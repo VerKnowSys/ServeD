@@ -101,8 +101,8 @@ object Dependencies {
     val unfilteredFilter = "net.databinder" %% "unfiltered-filter" % "0.6.4"
     val unfilteredJetty = "net.databinder" %% "unfiltered-jetty" % "0.6.4"
     val unfilteredSpec = "net.databinder" %% "unfiltered-spec" % "0.6.4" % "test"
-    val scalate = "org.fusesource.scalate" % "scalate-core" % "1.5.3"
-    val scalateUtil = "org.fusesource.scalate" % "scalate-util" % "1.5.3" % "test"
+    // val scalate = "org.fusesource.scalate" % "scalate-core" % "1.5.3"
+    // val scalateUtil = "org.fusesource.scalate" % "scalate-util" % "1.5.3" % "test"
     val json = "org.json4s" %% "json4s-native" % "3.0.0"
 
     // Java
@@ -193,7 +193,7 @@ object ServeD extends Build {
                 (resourceManaged in (Compile, CoffeeKeys.coffee)) <<= (crossTarget in Compile)(_ / "classes" / "public" / "js"),
                 (resourceManaged in (Compile, LessKeys.less)) <<= (crossTarget in Compile)(_ / "classes" / "public" / "css"),
                 libraryDependencies ++= Seq(
-                    unfilteredFilter, unfilteredJetty, scalate, scalateUtil, json
+                    unfilteredFilter, unfilteredJetty, json // scalate, scalateUtil,
                 )
             )
         ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, common, utils, testing % "test")
