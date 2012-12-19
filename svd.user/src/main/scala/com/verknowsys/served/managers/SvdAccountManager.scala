@@ -16,6 +16,7 @@ import java.security.PublicKey
 import akka.actor._
 import akka.dispatch._
 import akka.pattern.ask
+import akka.pattern.AskTimeoutException
 import akka.remote._
 import akka.util.Duration
 import akka.util.Timeout
@@ -435,7 +436,13 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     s ! """{"message": "Service: %s. %s", "status": 0}""".format(serviceName, content)
 
                 case Left(x) =>
-                    s ! Error("No response from service: %s".format(serviceName))
+                    x match {
+                        case x: AskTimeoutException =>
+                            s ! Error("Service refused to answer. Installation is in progress or service's not started.")
+                        case x: Exception =>
+                            s ! Error("Critical error: %s".format(x))
+
+                    }
             }
 
         case AuthorizeWithKey(key) =>
