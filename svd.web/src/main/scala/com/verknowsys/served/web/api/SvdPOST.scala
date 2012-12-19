@@ -49,13 +49,13 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
     def intent = {
 
         /** API POST call #000  */
-        case req @ POST(Path(Seg("Authorize" :: key :: Nil))) =>
+        case req @ POST(Path(Seg("Authorize" :: key :: Nil)) & Cookies(cookies)) =>
             log.debug("POST on Authorize")
             log.trace("XXX: for dmilith: %s".format(sha1("dmilith"))) // XXX
             log.trace("XXX: for tallica: %s".format(sha1("tallica"))) // XXX
             log.trace("XXX: given: %s".format(key)) // XXX
             if ((key == sha1("dmilith")) || (key == sha1("tallica"))) // FIXME: XXX: TODO: hardcode auth key
-                SetCookies(Cookie("svdauth", key)) ~>
+                SetCookies(Cookie("svdauth", key, maxAge = Some(3600*24))) ~>
                     ResponseString("""{"message": "Authorized successfully.", "status": 0}""")
             else
                 Unauthorized ~>
@@ -63,28 +63,34 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
 
 
         /** API POST call #001  */
-        case req @ POST(Path(Seg("GetUserProcesses" :: Nil))) =>
-            log.debug("POST on GetUserProcesses")
-            SvdWebAPI.apiRespond(webManager ? System.GetUserProcesses(account.uid))
+        case req @ POST(Path(Seg("GetUserProcesses" :: Nil)) & Cookies(cookies)) =>
+            checkAuth(cookies) {
+                log.debug("POST on GetUserProcesses")
+                SvdWebAPI.apiRespond(webManager ? System.GetUserProcesses(account.uid))
+            }
 
 
         /** API POST call #002  */
-        case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil))) =>
-            log.debug("POST /RegisterDomain by path")
-            log.info("Given domain to be registered: %s", domain)
-            SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain, webManager))
+        case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil)) & Cookies(cookies)) =>
+            checkAuth(cookies) {
+                log.debug("POST /RegisterDomain by path")
+                log.info("Given domain to be registered: %s", domain)
+                SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain, webManager))
+            }
 
-        case req @ POST(Path(Seg("RegisterDomain" :: Nil)) & Params(params)) =>
-            def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
+        case req @ POST(Path(Seg("RegisterDomain" :: Nil)) & Params(params) & Cookies(cookies)) =>
+            checkAuth(cookies) {
+                def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
 
-            log.debug("POST /RegisterDomain from form params")
-            param("RegisterDomain") match {
-                case domain: String =>
-                    log.debug("Given domain: %s", domain)
-                    SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain, webManager))
+                log.debug("POST /RegisterDomain from form params")
+                param("RegisterDomain") match {
+                    case domain: String =>
+                        log.debug("Given domain: %s", domain)
+                        SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain, webManager))
 
-                case _ =>
-                    JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\", \"status\":3}")
+                    case _ =>
+                        JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\", \"status\":3}")
+                }
             }
 
 

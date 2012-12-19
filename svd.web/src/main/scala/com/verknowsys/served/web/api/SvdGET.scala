@@ -88,14 +88,31 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                 </article>
             )
 
+
+        /** API GET call #003  */
+        case req @ GET(Path(Seg("AdminPanel" :: Nil))) =>
+            Ok ~> Html(
+                <div class="services_result">Result should be shown here</div>
+                <div class="services_data">Data should be shown here</div>
+
+                <article class="services">
+                    <div class="authorize">Authorize as dmilith</div>
+                    <div class="get_user_processes">GetUserProcesses</div>
+                    <div class="get_stored_services">GetStoredServices</div>
+                </article>
+            )
+
+
+
         /** API GET call #DEFAULT  */
         case req @ _ =>
             log.debug("GET /")
             Ok ~> layout(
                 <section class="header"></section>
                 <section class="content">
-                    <div class="target">Coś sensownego</div>
-                    <div class="target2">Cel</div>
+                    <div class="target">Connection not estabilished yet.</div>
+                    <div class="messages">No data yet.</div>
+                    <section class="admin"></section>
                     <section class="pslist"></section>
                 </section>
             )
