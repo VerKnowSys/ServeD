@@ -394,7 +394,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             log.debug("Showing available services definitions")
             val availableSvces = (
                 listFiles(SvdConfig.defaultSoftwareTemplatesDir) ++ listFiles(userHomeDir / SvdConfig.defaultUserIgnitersDir))
-                .filter{_.getName.endsWith(".json")}.map{_.getName.split("/").last}.mkString(",").replaceAll(".json", "") // XXX: replace with some good regexp
+                .filter{_.getName.endsWith(SvdConfig.defaultSoftwareTemplateExt)}.map{_.getName.split("/").last}.mkString(",").replaceAll(SvdConfig.defaultSoftwareTemplateExt, "") // XXX: replace with some good regexp
             notificationsManager ! Notify.Message("Available Services: " + availableSvces)
             sender ! """{"message": "Available services", "content": [%s]}""".format(availableSvces.split(",").map{ c => "\"" +c+ "\"" }.mkString(", "))
 
