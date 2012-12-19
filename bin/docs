@@ -163,11 +163,16 @@
 
 
 PDFLATEX_BIN="$(which pdflatex)"
+PYGMENTIZE_BIN="$(which pygmentize)"
+if [ "${PYGMENTIZE_BIN}" = "" ]; then
+  sofin get ruby
+  gem install pygmentize
+  sofin exportapp pygmentize ruby
+  export PYGMENTIZE_BIN="$(which pygmentize)"
+fi
+
 if [ "${PDFLATEX_BIN}" != "" ]; then
-
-  PYGMENTIZE_BIN="$(which pygmentize)"
   if [ "${PYGMENTIZE_BIN}" != "" ]; then # PYGMENTIZE is required for minted module.
-
     cd docs/tex/
     for i in *.tex; do
       echo "Compiling $i with ${PDFLATEX_BIN}"
@@ -182,8 +187,14 @@ if [ "${PDFLATEX_BIN}" != "" ]; then
     echo "Done"
 
   else
-    echo "pygmentize not found. Install it with: easy_install Pygments and gem install pygmentize"
-    echo "If you're using Sofin, remember to do sofin export pygmentize ruby after installation to make it available in PATH."
+    echo "pygmentize not found. Install it with: gem install pygmentize"
+    echo
+    echo "If you're using Sofin try doing:"
+    echo "  sofin get ruby"
+    echo "  gem install pygmentize"
+    echo "  sofin exportapp pygmentize ruby"
+    echo
+    echo "and retry ${0} script"
   fi
 else
   echo "pdflatex not found. Cannot build documentation withouth TexLive"
