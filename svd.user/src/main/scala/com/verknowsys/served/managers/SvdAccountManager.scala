@@ -287,6 +287,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             }
 
 
+        case Admin.RegisterAccount(userName) => // #14
+            sender ! Error("Not yet implemented.")
+
 
         case User.SpawnServices => // #10
             val listOfServices = loadServicesList

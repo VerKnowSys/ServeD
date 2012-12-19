@@ -1,4 +1,4 @@
-package com.verknowsys.served.web.router
+package com.verknowsys.served.web.api
 
 
 import unfiltered.Cookie
@@ -6,18 +6,15 @@ import unfiltered.request._
 import unfiltered.response._
 import unfiltered.kit._
 import unfiltered.filter._
-// import unfiltered.scalate.Scalate
-// import org.fusesource.scalate.TemplateEngine
 import org.json4s._
 import org.json4s.native._
 import java.util.UUID
-// import org.fusesource.scalate.{TemplateEngine, Binding}
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.web._
-import com.verknowsys.served.web.router._
+import com.verknowsys.served.web.api._
 import com.verknowsys.served.db.{DBServer, DBClient, DB}
 
 import javax.servlet.http.HttpServletResponse
@@ -36,63 +33,17 @@ import unfiltered.Cookie._
 /**
  *  @author dmilith
  *
- *  Web API is used to perform communication with web manager
+ *  Web POST API is used to perform communication with web manager
  */
+class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends SvdWebAPI(webManager) {
 
-
-class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Plan with Logging with SvdUtils {
-
-    import QParams._
     import org.json4s._
     import org.json4s.native._
     import org.json4s.JsonDSL._
     import webImplicits._
-    import com.verknowsys.served.db._
-    import com.verknowsys.served.web.merch._
 
 
-    // implicit val bindings: List[Binding] =
-            // Binding(name = "account", className = "com.verknowsys.served.api.SvdAccount") :: Nil
-
-    // implicit val additionalAttributes = ("account", account) :: Nil
     implicit val timeout = Timeout(SvdConfig.defaultAPITimeout/1000 seconds)
-
-
-    def layout(content: scala.xml.NodeBuffer) = Html(
-        <html>
-            <head>
-                <title>ServeD</title>
-                <meta http_equiv="Content-Type" content="text/html; charset=utf-8"/>
-                <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css"/>
-                <link rel="stylesheet" type="text/css" href="/assets/css/main.css"/>
-            </head>
-            <body>
-                <script type="text/javascript" src="/assets/js/jquery-1.8.3.min.js"/>
-                <script type="text/javascript" src="/assets/js/bootstrap.min.js"/>
-                <script type="text/javascript" src="/assets/js/main.js"/>
-                { content }
-            </body>
-        </html>
-    )
-
-
-    /**
-     * @author Daniel (dmilith) Dettlaff
-     *
-     *  Cookies auth method simple implementation.
-     *
-     */
-    def checkAuth(cookies: Map[String, Option[Cookie]])(block: => ResponseFunction[Any]) = {
-        cookies("svdauth") match {
-            case Some(Cookie(_, pref, _, _, _, _, _, _)) =>
-                log.debug("Auth cookie found.")
-                block
-
-            case _ =>
-                log.debug("No svd auth cookie.")
-                SvdWebAPI.apiRespond(webManager ? Error("Unauthorized. Use /Authorize/key first."))
-        }
-    }
 
 
     def intent = {
@@ -204,45 +155,14 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
                 SvdWebAPI.apiRespond(webManager ? User.CloneIgniterForUser(igniterName, Some(userIgniterName)))
             }
 
+        /** API POST call #014  */
+        case req @ POST(Path(Seg("RegisterAccount" :: accountName :: Nil)) & Cookies(cookies)) =>
+            SvdWebAPI.apiRespond(webManager ? Admin.RegisterAccount(accountName))
 
 
         /** API POST call #DEFAULT  */
         case req @ POST(_) =>
             JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\", \"status\":3}")
-
-
-        /** API GET call #001  */
-        case req @ GET(Path(Seg("Header" :: Nil))) =>
-            Ok ~> Html(
-                <h1>{ Dict("User Panel") }</h1>
-                <p>{ Dict("Welcome") + " " + account.userName }</p>
-                <p>{ Dict("Details") + ": " + account }</p>)
-
-
-        /** API GET call #002  */
-        case req @ GET(Path(Seg("ProcList" :: Nil))) =>
-            Ok ~> Html(
-                <script type="text/javascript" src="/assets/js/raphael-min.js"/>
-                <script type="text/javascript" src="/assets/js/g.graphael.js"/>
-                <script type="text/javascript" src="/assets/js/g.dot.js"/>
-                <script type="text/javascript" src="/assets/js/proclist.js"/>
-                <article>
-                  <header>ProcList</header>
-                  <div id="holder">Cos</div>
-                </article>
-            )
-
-        /** API GET call #DEFAULT  */
-        case req @ _ =>
-            log.debug("GET /")
-            Ok ~> layout(
-                <section class="header"></section>
-                <section class="content">
-                    <div class="target">Coś sensownego</div>
-                    <div class="target2">Cel</div>
-                    <section class="pslist"></section>
-                </section>
-            )
 
     }
 

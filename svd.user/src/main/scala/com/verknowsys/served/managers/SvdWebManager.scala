@@ -2,14 +2,13 @@ package com.verknowsys.served.managers
 
 import com.verknowsys.served._
 import com.verknowsys.served.services._
-// import com.verknowsys.served.LocalAccountsManager
 import com.verknowsys.served.api._
 import com.verknowsys.served.api.accountkeys._
 import com.verknowsys.served.api.git._
 import com.verknowsys.served.db.{DBServer, DBClient, DB}
 import com.verknowsys.served.utils._
 import com.verknowsys.served.web._
-import com.verknowsys.served.web.router._
+import com.verknowsys.served.web.api._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.notifications._
 
@@ -98,6 +97,9 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
         case x: User.Base =>
             accountManager forward x
 
+        case x: Admin.Base =>
+            accountManager forward x
+
         case x: System.Base =>
             log.debug("Web Panel got a message: %s. Forwarding to Account Manager", x)
             accountManager forward x
@@ -113,13 +115,16 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
     def spawnServer(port: Int) = {
         val base = new URL(getClass.getResource("/public/"), ".")
         val http = Http(port)
-        val panel = new SvdAccountPanel(self, account, port)
+
+        lazy val postAPI = new SvdPOST(self, account, port)
+        lazy val getAPI = new SvdGET(self, account, port)
 
         val server = http
             .context("/assets") {
                 _.resources(base)
             }
-            .filter(panel)
+            .filter(postAPI)
+            .filter(getAPI)
             .start // spawn embeded version of server
 
         accountManager forward Notify.Message(formatMessage("I:Your panel has been started for user: %s at: http://%s:%d".format(account.userName, currentHost.getHostAddress, port))) // XXX : hardcoded host.
