@@ -26,27 +26,10 @@
 \definecolor{green2}{HTML}{347235}
 
 \title{ServeD WebAPI}
-\subtitle{version 0.2.2}
 \author{\href{mailto:dmilith@verknowsys.com}{Daniel (dmilith) Dettlaff}}
+\subtitle{version 0.2.3}
 \date{2012-12-14}
 
-% \lstloadlanguages{Ruby}
-% \lstset{
-%   language=Ruby,
-%   morecomment=[s][\color{blue}]{\:}{\ },
-%   morecomment=[s][\color{magenta}]{\=\>}{\ },
-%   basicstyle=\tiny,
-%   tabsize=4,
-%   breaklines=true,
-%   breakatwhitespace=true,
-%   numberstyle=\tiny,
-%   firstnumber=1,
-%   basicstyle=\ttfamily\color{black},
-%   commentstyle=\ttfamily\color{gray},
-%   keywordstyle=\ttfamily\color{red},
-%   stringstyle=\color{green2},
-%   numberstyle=\ttfamily\color{magenta}
-% }
 
 % NOTE: document content:
 \begin{document}
@@ -58,6 +41,17 @@
   An invalid request will return "status" code "1" error.
 
   \begin{itemize}
+
+    \item \#000:
+      \begin{minted}{bash}
+    /Authorize
+      \end{minted}
+      \begin{minted}{scala}
+      @description checks user key and creates svdauth cookie.
+      @returns nothing.
+      @params user key.
+      @format json: {message: information_string}
+      \end{minted}
 
     \item \#001:
       \begin{minted}{bash}
@@ -227,6 +221,7 @@
         \item{2} - Error executing API Request.
         \item{3} - API Request Timeout.
         \item{4} - API Request Crashed.
+        \item{5} - API Access Denied.
         \item{-2} - Native error: NOPCS.
         \item{-1} - Native error: KDERR.
       \end{description}

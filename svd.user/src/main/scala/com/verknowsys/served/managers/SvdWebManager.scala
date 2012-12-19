@@ -85,6 +85,9 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
         case Success =>
             log.debug("Success in WebManager")
 
+        case Error(x) =>
+            log.warn("Error occured: %s", x)
+
         case x: Notify.Base => // forward Notify messages from web panel
             log.debug("Web Panel got a message: %s. Forwarding to Account Manager", x)
             accountManager forward x
