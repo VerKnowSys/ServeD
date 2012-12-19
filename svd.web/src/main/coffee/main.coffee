@@ -55,7 +55,8 @@ $ ->
         data:
           params
         success: (data) =>
-          $('div.services_result').text(data.message)
+          $('div.services_result').text(data?.message)
+          $('div.services_data').text(data?.content)
 
 
 
