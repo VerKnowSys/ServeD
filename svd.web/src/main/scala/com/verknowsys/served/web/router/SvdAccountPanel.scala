@@ -100,27 +100,15 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
         /** API POST call #000  */
         case req @ POST(Path(Seg("Authorize" :: key :: Nil))) =>
             log.debug("POST on Authorize")
-            if (key == "12345") // FIXME: XXX: TODO: hardcode auth key
+            log.trace("XXX: for dmilith: %s".format(sha1("dmilith"))) // XXX
+            log.trace("XXX: for tallica: %s".format(sha1("tallica"))) // XXX
+            log.trace("XXX: given: %s".format(key)) // XXX
+            if ((key == sha1("dmilith")) || (key == sha1("tallica"))) // FIXME: XXX: TODO: hardcode auth key
                 SetCookies(Cookie("svdauth", key)) ~>
                     ResponseString("""{"message": "Authorized successfully.", "status": 0}""")
             else
                 Unauthorized ~>
                     ResponseString("""{"message": "Authorization failed.", "status": 5}""")
-
-        case req @ POST(Path(Seg("Authorize" :: Nil)) & Params(params)) =>
-            def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
-            param("Authorize") match {
-                case key: String =>
-                    if (key == "12345") // FIXME: XXX: TODO: hardcode auth key
-                        SetCookies(Cookie("svdauth", key)) ~>
-                            ResponseString("""{"message": "Authorized successfully.", "status": 0}""")
-                    else
-                        Unauthorized ~>
-                            ResponseString("""{"message": "Authorization failed.", "status": 5}""")
-                case _ =>
-                    Unauthorized ~>
-                        ResponseString("""{"message": "Authorization failed.", "status": 5}""")
-            }
 
 
         /** API POST call #001  */
