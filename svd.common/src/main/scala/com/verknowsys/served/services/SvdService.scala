@@ -49,7 +49,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
     val portsFile = servicePrefix / ".service_ports"
     checkOrCreateDir(servicePrefix)
 
-    implicit val timeout = Timeout(60 seconds) // XXX: hardcode
+    implicit val timeout = Timeout(SvdConfig.defaultAPITimeout / 1000 seconds)
     val future = accountManager ? System.GetPort
     val sPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
     log.trace("Expected port from Account Manager arrived: %d".format(servicePort))
