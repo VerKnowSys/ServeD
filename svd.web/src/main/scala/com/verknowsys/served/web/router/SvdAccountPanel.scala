@@ -94,8 +94,8 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
         }
     }
 
-    def intent = {
 
+    def intent = {
 
         /** API POST call #000  */
         case req @ POST(Path(Seg("Authorize" :: key :: Nil))) =>
@@ -256,124 +256,6 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
                 </section>
             )
 
-        //     log.debug("GET /productlist")
-
-        //     val clothings = Clothings(db)
-        //     val letters = SpatialLetters(db)
-        //     val stickers = Stickers(db)
-
-
-        //         Binding(name = "letters", className = "List[com.verknowsys.served.web.merch.SpatialLetter]") ::
-        //         Binding(name = "stickers", className = "List[com.verknowsys.served.web.merch.Sticker]") :: Nil
-        //     implicit val additionalAttributes =
-        //         ("clothings", clothings.toList) ::
-        //         ("letters", letters.toList) ::
-        //         ("stickers", stickers.toList) :: Nil
-        //     log.warn("Current resource: %s", System.getProperty("user.dir"))
-        //     Ok ~> Scalate(req, "/templates/productlist.jade")
-
-
-
-        // // adding new product
-        // case req @ GET(Path(Seg("product" :: Nil))) =>
-        //     log.debug("GET /product")
-        //     implicit val bindings = productBindings
-        //     implicit val additionalAttributes = productDefaultAttributes
-        //     Ok ~> Scalate(req, "/templates/product.jade")
-
-
-        // case req @ POST(Path(Seg("product" :: Nil)) & Params(params)) =>
-        //     log.debug("POST /product with params %s".format(params.mkString(", ")))
-
-        //     def param(k: String) = params.get(k).flatMap { _.headOption } getOrElse("")
-
-        //     implicit val bindings = productBindings
-        //     val expected = for {
-
-        //         description <- lookup("product_description") is
-        //             trimmed is
-        //             nonempty(Dict("Product description cannot be empty"))
-
-        //     } yield {
-        //         // creating new product
-        //         log.info("Creating new product based on params: %s".format(params.mkString(", ")))
-        //         param("product_class") match {
-        //             case "Clothing" =>
-        //                 db << Clothing(
-        //                     category = ClothingCategory(param("product_category")),
-        //                     color = Color(param("product_color")),
-        //                     printSize = PrintSize(param("product_print_size")),
-        //                     printPlacement = TshirtPrintPlacement(param("product_print_placement")),
-        //                     project = ProjectType(param("product_project")),
-        //                     size = Size(param("product_size")),
-        //                     description = param("product_description")
-        //                     )
-
-        //             case "SpatialLetter" =>
-        //                 db << SpatialLetter(
-        //                     color = Color(param("product_color")),
-        //                     project = ProjectType(param("product_project")),
-        //                     description = param("product_description")
-        //                     )
-
-        //             case "Sticker" =>
-        //                 db << Sticker(
-        //                     color = Color(param("product_color")),
-        //                     project = ProjectType(param("product_project")),
-        //                     stickerType = StickerType(param("product_sticker_type")),
-        //                     description = param("product_description")
-        //                     )
-
-        //             case any =>
-        //                 log.error("Couldn't create object for product category: %s".format(any))
-        //         }
-
-        //         Ok ~> Redirect("/productlist")
-        //     }
-
-
-        //     expected(params) orFail {
-        //         fails =>
-        //             val failures =
-        //                 fails.map {
-        //                     fail =>
-        //                         log.error("Validation error: %s".format(fail.error))
-        //                         fail.error
-        //                 }
-
-        //             implicit val additionalAttributes =
-        //                 ("productClass", param("product_class")) ::
-        //                 ("productCategory", ClothingCategory(param("product_category"))) ::
-        //                 ("productColor", Color(param("product_color"))) ::
-        //                 ("productPrintSize", PrintSize(param("product_print_size"))) ::
-        //                 ("productPrintPlacement", TshirtPrintPlacement(param("product_print_placement"))) ::
-        //                 ("productProject", ProjectType(param("product_project"))) ::
-        //                 ("productSize", Size(param("product_size"))) ::
-        //                 ("productStickerType", StickerType(param("product_sticker_type"))) ::
-        //                 ("productDescription", param("product_description")) ::
-        //                 ("messages", failures.mkString(", ")) :: Nil
-
-        //             Ok ~> Scalate(req, "/templates/product.jade")
-        //     }
-
-
-
-
-
-
-        // case POST(Path(Seg(
-        //     "generatesomeproducts" :: Nil))) =>
-        //         defineSomeRandomProducts
-        //         JsonContent ~> ResponseString(
-        //             message("Products defined."))
-
-
-        // case POST(Path(Seg(
-        //     "getfulllistofproducts" :: Nil))) =>
-        //         JsonContent ~> ResponseString(
-        //             message("Products defined: %s".format(gatherAllProductsAvailable.mkString(", "))))
-
     }
-
 
 }
