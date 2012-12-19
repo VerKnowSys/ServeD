@@ -51,7 +51,7 @@ trait SvdUtils extends Logging {
         val mDigest = MessageDigest.getInstance("SHA1")
         val result = mDigest.digest(input.getBytes)
         val sb = new StringBuffer
-        for (i <- 0 to result.length) {
+        for (i <- 0 to result.length - 1) {
             sb.append(Integer.toString((result(i) & 0xff) + 0x100, 16).substring(1))
         }
         sb.toString
