@@ -111,6 +111,8 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="get_service_status">GetServiceStatus</div>
                     <div class="clone_igniter_for_user">CloneIgniterForUser</div>
                     <div class="register_account">RegisterAccount</div>
+                    <div class="get_service_port">GetServicePort</div>
+
                 </article>
             )
 
