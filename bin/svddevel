@@ -1,5 +1,6 @@
 #!/bin/sh
 
+clear
 unset DYLD_LIBRARY_PATH
 unset LD_LIBRARY_PATH
 
@@ -35,7 +36,7 @@ case "${SYSTEM_NAME}" in
   Darwin)
     sudo mkdir -p "${DEFAULT_COMMON_PATH}"
     sudo chown ${DEFAULT_USER_UID} "${DEFAULT_COMMON_PATH}"
-    sudo bin/ignitersuninstall && sudo bin/ignitersinstall
+    sudo bin/ignitersinstall
     sudo chown ${DEFAULT_USER_UID} /Users/${DEFAULT_USER_UID}/.akka.conf
     sleep 3
     "${JAVA_PATH}" -d32 -client -Xmn1m -XX:NewRatio=1 -Xms32m -Xmx64m -Dfile.encoding=UTF-8 -javaagent:/lib/jrebel/jrebel.jar -cp "$(cat tmp/user.classpath)" com.verknowsys.served.userboot ${DEFAULT_USER_UID}
@@ -43,7 +44,7 @@ case "${SYSTEM_NAME}" in
 
   *)
     chown ${DEFAULT_USER_UID} "${DEFAULT_COMMON_PATH}"
-    bin/ignitersuninstall && bin/ignitersinstall
+    bin/ignitersinstall
     chown ${DEFAULT_USER_UID} /Users/${DEFAULT_USER_UID}/.akka.conf
     sleep 3
     "${JAVA_PATH}" -d32 -client -Xmn1m -XX:NewRatio=1 -Xms32m -Xmx64m -Dfile.encoding=UTF-8 -cp "$(cat tmp/user.classpath)" com.verknowsys.served.userboot ${DEFAULT_USER_UID}
