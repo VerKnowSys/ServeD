@@ -5,8 +5,9 @@
     "reportAllInfos": true,
     "reportAllDebugs": true,
 
-    "name": "service-name",
-    "version": "no-version",
+    "name": "NO_SERVICE_NAME!",
+    "version": "0.2",
+    "softwareName": "NO_SOFTWARE_NAME!",
 
     "schedulerActions": [
     ],

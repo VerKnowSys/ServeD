@@ -1,5 +1,5 @@
 {
-    "name": "Mongodb",
+    "softwareName": "Mongodb",
     "install": {
         "commands": ["sofin get mongodb"],
         "expectStdOut": ["Installing", "All done."]

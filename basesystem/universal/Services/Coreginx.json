@@ -1,5 +1,5 @@
 {
-    "name": "Coreginx",
+    "softwareName": "Nginx",
     "reportAllInfos": true,
     "install": {
         "commands": ["sofin get nginx"],

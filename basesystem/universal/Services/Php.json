@@ -1,5 +1,5 @@
 {
-    "name": "Php",
+    "softwareName": "Php",
     "install": {
         "commands": ["sofin get php"],
         "expectStdOut": ["Installing", "All done."]

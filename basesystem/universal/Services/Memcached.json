@@ -1,5 +1,5 @@
 {
-    "name": "Memcached",
+    "softwareName": "Memcached",
     "install": {
         "commands": ["sofin get memcached"],
         "expectStdOut": ["Installing", "All done."]

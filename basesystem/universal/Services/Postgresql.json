@@ -1,5 +1,5 @@
 {
-    "name": "Postgresql",
+    "softwareName": "Postgresql",
     "schedulerActions": [
         {
             "cronEntry": "0 0/3 * * * ?",

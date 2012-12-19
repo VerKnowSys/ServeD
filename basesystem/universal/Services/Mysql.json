@@ -1,5 +1,5 @@
 {
-    "name": "Mysql",
+    "softwareName": "Mysql",
     "schedulerActions": [
         {
             "cronEntry": "0 0/3 * * * ?",

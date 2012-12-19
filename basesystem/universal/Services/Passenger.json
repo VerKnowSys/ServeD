@@ -1,5 +1,5 @@
 {
-    "name": "Passenger",
+    "softwareName": "Passenger",
     "install": {
         "commands": ["sofin get passenger"],
         "expectStdOut": ["Installing", "All done."]

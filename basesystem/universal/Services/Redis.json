@@ -1,5 +1,5 @@
 {
-    "name": "Redis",
+    "softwareName": "Redis",
     "schedulerActions": [
         {
             "cronEntry": "0 0/1 * * * ?",
