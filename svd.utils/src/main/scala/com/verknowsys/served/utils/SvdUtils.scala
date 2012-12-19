@@ -7,6 +7,8 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served._
 import SvdPOSIX._
 
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import org.apache.commons.io.FileUtils
 import clime.messadmin.providers.sizeof.ObjectProfiler
 import scala.collection.JavaConversions._
@@ -37,6 +39,24 @@ trait SvdUtils extends Logging {
 
     import CLibrary._
     lazy val clib = CLibrary.instance
+
+
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  Simple helper function to generate SHA1 hash from String.
+     *
+     */
+    def sha1(input: String) = {
+        val mDigest = MessageDigest.getInstance("SHA1")
+        val result = mDigest.digest(input.getBytes)
+        val sb = new StringBuffer
+        for (i <- 0 to result.length) {
+            sb.append(Integer.toString((result(i) & 0xff) + 0x100, 16).substring(1))
+        }
+        sb.toString
+    }
+
 
     /**
       * A way to get default shell path depended on currently running operating system
