@@ -18,53 +18,50 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
             else
                 new ExpectJ
 
-    // loadSettings // XXX: UNUSED still
     var shell = expectinator.spawn(SvdConfig.defaultShell)
-
-
-    def loadSettings =
-        "export HOME=%s\n".format(SvdConfig.userHomeDir / "%s".format(account.uid)) ::
-        "export USER=%s\n".format(account.userName) ::
-        "export USERNAME=%s\n".format(account.userName) ::
-        "export EDITOR=true\n" ::
-        "%s\n".format("") ::
-        "cd %s%s\n".format(SvdConfig.userHomeDir, account.uid) ::
-        SvdConfig.standardShellEnvironment :: Nil
 
 
     def dead = shell.isClosed
 
 
-    def exec(operation: SvdShellOperation) {
+    def exec(operations: SvdShellOperations) {
         if (dead) { // if shell is dead, respawn it! It MUST live no matter what
-            log.trace("Found dead shell: %s".format(shell))
+            log.debug("Found dead shell: %s".format(shell))
             shell = expectinator.spawn(SvdConfig.defaultShell)
             if (dead)
                 throwException[SvdShellException]("Found dead shell where it should be alive!")
         }
-        shell.send(operation.commands + "\n")
-        if (operation.expectStdOut.size != 0) operation.expectStdOut.foreach {
-            expect =>
-                shell.expect(expect, operation.waitForOutputFor)
+        operations.commands.foreach {
+            cmd =>
+                shell.send(cmd + "\n") // send commands one by one to shell
         }
-        if (operation.expectStdErr.size != 0) operation.expectStdErr.foreach {
+
+        if (operations.expectStdOut.size != 0) operations.expectStdOut.foreach {
             expect =>
-                shell.expectErr(expect, operation.waitForOutputFor)
+                shell.expect(expect, operations.expectOutputTimeout)
+        }
+        if (operations.expectStdErr.size != 0) operations.expectStdErr.foreach {
+            expect =>
+                shell.expectErr(expect, operations.expectOutputTimeout)
         }
     }
 
 
-    def output = (shell.getCurrentStandardOutContents, shell.getCurrentStandardErrContents)
+    // def output = synchronized {
+    //     (shell.getCurrentStandardOutContents, shell.getCurrentStandardErrContents)
+    // }
 
 
     def close {
         try {
-            log.trace("Stopping shell %s. Shell is closed?: %s".format(shell, shell.isClosed))
-            shell.send("exit\n")
+            log.trace("Closing shell. Is it closed? %s".format(shell.isClosed))
+            shell.send("\nexit\n")
             shell.stop
+            shell.expectClose
+            log.debug("Shell closed. Is it really closed? %s".format(shell.isClosed))
         } catch {
             case e: Exception =>
-                log.error(e.getMessage + " on exit")
+                log.warn("%s on exit from shell.".format(e))
         }
     }
 

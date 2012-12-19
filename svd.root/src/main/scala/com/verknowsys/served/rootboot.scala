@@ -4,7 +4,7 @@ package com.verknowsys.served
 import com.verknowsys.served.utils._
 import com.verknowsys.served.managers.LoggingManager
 import com.verknowsys.served.maintainer.SvdSystemInfo
-import com.verknowsys.served.maintainer.SvdApiConnection
+// import com.verknowsys.served.maintainer.SvdApiConnection
 import com.verknowsys.served.managers.SvdAccountsManager
 import com.verknowsys.served.systemmanager.SvdSystemManager
 // import com.verknowsys.served.notifications.SvdNotificationCenter
@@ -43,17 +43,17 @@ object rootboot extends Logging with SvdUtils with App {
         println("===   ServeD - core   ===")
         println("=========================")
         println()
+        println()
+        log.info(SvdConfig.servedFull)
+        log.info(SvdConfig.copyright)
 
         val rb = system.actorOf(Props(new SvdRootBoot).withDispatcher("svd-core-dispatcher"))
         addShutdownHook {
-            rb ! Shutdown
+            log.warn("rootboot shutdown hook")
+            system.shutdown
         }
 
     }
-
-
-    log.info(SvdConfig.servedFull)
-    log.info(SvdConfig.copyright)
 
     // handle signals
     handleSignal("ABRT") { getAllLiveThreads }

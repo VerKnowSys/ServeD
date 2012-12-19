@@ -12,15 +12,19 @@ check_result () {
 
 
 cd /usr/src
+echo "Merging master"
 ${MERGEMASTER_BIN} -pF
 check_result $?
 
+echo "Installing world"
 ${BSDMAKE_BIN} installworld
 check_result $?
 
+echo "Final merge"
 ${MERGEMASTER_BIN} -F
 check_result $?
 
+echo "Deleting old files"
 ${BSDMAKE_BIN} -DBATCH_DELETE_OLD_FILES delete-old delete-old-libs
 check_result $?
 

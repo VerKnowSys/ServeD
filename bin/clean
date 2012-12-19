@@ -17,7 +17,7 @@ if [ "$1" = "sysonly" ]; then
     rm -vf /Users/$i/$i.db*
     rm -vf /Users/$i/$i-svd*
     rm -vf /Users/$i/$i.pid
-    rm -vf /Users/$i/akka.conf
+    rm -vf /Users/$i/.akka.conf
   done
   rm -vf /SystemUsers/accounts.db_*
   rm -vf /SystemUsers/0.pid

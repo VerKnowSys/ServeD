@@ -9,8 +9,9 @@ import akka.actor.ActorRef
 
 // ServeD -> Client messages
 // common responses
-case object RespawnAccounts extends ApiResponse
-case class RegisterAccount(name: String) extends ApiResponse
+case object Ping extends ApiMessage
+case object Pong extends ApiMessage
+
 case object Success extends ApiResponse
 case object Shutdown extends ApiResponse
 case class Error(val message: String) extends ApiResponse
@@ -25,6 +26,7 @@ object Notify {
     case class Message(content: String) extends Base
     case class Status(content: String) extends Base
 }
+
 
 object General {
     sealed abstract class Base extends ApiMessage
@@ -41,8 +43,18 @@ object General {
     }
 }
 
+
 object Admin {
     sealed abstract class Base extends ApiMessage
+
+    case object RespawnAccounts extends Base
+    case class RegisterAccount(name: String) extends Base
+    case class GetAccountManager(userUid: Int) extends Base
+
+    case class GetSysUsage(userUid: Int) extends Base
+    case class Alive(account: SvdAccount) extends Base
+    case class Dead(account: SvdAccount) extends Base
+    case object AliveAccounts extends Base
 
     // Request
     case object ListTreeActors extends Base
@@ -59,9 +71,19 @@ object Admin {
     )
 }
 
-// XXX: Temporary place for those messages
-case class GetAccountManager(userUid: Int)
-case class SetAccountManager(userUid: Int)
-case object GetPort
-case class GetSysUsage(userUid: Int)
-case class Alive(userUid: Int)
+
+object System {
+    sealed abstract class Base extends ApiMessage
+
+    case object GetRunningProcesses extends Base
+    case object GetNetstat extends Base
+
+    case class GetUserProcesses(uid: Int) extends Base
+    case class SpawnProcess(cmd: String) extends Base
+    case class KillProcess(what: Int, signal: Any) extends Base
+    case class Chmod(what: String, mode: Int, recursive: Boolean) extends Base
+    case class Chown(what: String, userId: Int, recursive: Boolean) extends Base
+
+    case class RegisterDomain(domain: String, proxyActor: ActorRef) extends Base
+    case object GetPort extends Base
+}

@@ -130,15 +130,15 @@ class LoggingEventHandler extends Actor with Logging {
         case AkkaLogging.Error(cause, "Error", instance, message) =>
             log.log(Error, message.toString, resolveClassName(instance))
             log.log(Error, cause.toString, resolveClassName(instance))
-            cause.printStackTrace(System.out)
+            cause.printStackTrace(java.lang.System.out)
 
         case AkkaLogging.Warning("Warning", instance, message) =>
             log.log(Warn, message.toString, resolveClassName(instance.getClass.getName))
 
-        case AkkaLogging.Info("Warning", instance, message) =>
+        case AkkaLogging.Info("Info", instance, message) =>
             log.log(Info, message.toString, resolveClassName(instance.getClass.getName))
 
-        case AkkaLogging.Debug("Warning", instance, message) =>
+        case AkkaLogging.Debug("Debug", instance, message) =>
             log.log(Debug, message.toString, resolveClassName(instance.getClass.getName))
 
         case event =>

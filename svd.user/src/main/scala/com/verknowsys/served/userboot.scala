@@ -17,18 +17,14 @@ import akka.util.Timeout
 import akka.util.duration._
 import akka.actor._
 import scala.io.Source
+import java.io.File
+import java.lang.{System => JSystem}
 
 
-// object LocalAccountsManager //extends GlobalActorRef(
-//     remote.actorFor("service:accounts-manager", SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort)
-// )
-
-object userboot extends Logging with SvdUtils {
+object userboot extends SvdAkkaSupport with Logging {
 
 
     def run(userUID: Int){
-        log.info("ServeD v" + SvdConfig.version)
-        log.info(SvdConfig.copyright)
 
         println()
         println()
@@ -37,51 +33,64 @@ object userboot extends Logging with SvdUtils {
         println("=========================")
         println()
         println()
+        log.info("ServeD v" + SvdConfig.version)
+        log.info(SvdConfig.copyright)
 
         // Get account form remote service
         log.debug("Getting account for uid %d", userUID)
-        val configFile = SvdConfig.userHomeDir / "%d".format(userUID) / "akka.conf"
-        val akkaConfigContent = Source.fromFile(configFile).getLines.mkString("\n")
-        log.trace("Read akka configuration for account: %s", akkaConfigContent)
 
-        val system = ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDremote"))
-        val accountsManager = system.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
+        val configFile = SvdConfig.userHomeDir / "%d".format(userUID) / SvdConfig.defaultAkkaConfName
 
-        (accountsManager ? GetAccount(userUID)) onSuccess {
-
-            case Some(account: SvdAccount) =>
-
-                log.debug("Got account, starting AccountManager for %s on account manager port: %d", account, account.accountManagerPort)
-                val am = system.actorOf(Props(new SvdAccountManager(account)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
-                val loggingManager = system.actorOf(Props(new LoggingManager(GlobalLogger)))
-                log.info("Spawned UserBoot for UID: %d", userUID)
-
-            case None =>
-                log.error("No account with uid %d".format(userUID))
-
-        } onFailure {
-            case x =>
-                log.error("Error occured in userboot with: %s".format(x))
-                throwException[RuntimeException]("Cannot spawn user boot for UID: %s!".format(userUID))
+        if (!new File(configFile).exists) {
+            log.info("Spawning headless".format(userUID))
+            val account = SvdAccount(uid = userUID, userName = "headless %s".format(userUID))
+            createAkkaUserConfIfNotExistant(userUID, userUID + 1026)
         }
 
-        // val portOpt = (accountsManager ? GetPort) onSuccess {
-        //     case i: Int => i
-        // }
+        val akkaConfigContent = Source.fromFile(configFile).getLines.mkString("\n")
+        log.trace("Read akka configuration for account: %s", akkaConfigContent)
+        val system = try {
+            ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDremote"))
+        } catch {
+            case _ =>
+                ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDheadless"))
+        }
+        val accountsManager = system.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
 
-        // for {
-        //     account <- accountOpt
-        //     port <- portOpt
-        // } yield {
-        // }
-        // }) getOrElse {
-        //     log.error("Account for uid %d does not exist", userUID)
-        //     sys.exit(1)
-        // }
+        implicit val timeout = Timeout(SvdConfig.headlessTimeout / 1000 seconds) // cause of standard of milisecond value in SvdConfig
+
+
+        (accountsManager ? System.GetPort) onSuccess {
+
+            case anyPort: Int =>
+                val account = SvdAccount(userName = "anybody", uid = userUID)
+                val am = system.actorOf(Props(new SvdAccountManager(account)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
+                log.info("Spawned UserBoot for UID: %d", userUID)
+
+        } onFailure {
+
+            case x =>
+                // launching headless mode
+                log.info("Launching svduser headless mode for UID: %d".format(userUID))
+                val account = SvdAccount(uid = userUID, userName = "anUser %s".format(userUID))
+                val am = system.actorOf(Props(new SvdAccountManager(account, headless = true)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager")
+                log.info("Spawned UserBoot for UID: %d", userUID)
+
+        }
+
+
+        addShutdownHook {
+            log.warn("userboot Shutdown Hook invoked")
+            Thread.sleep(SvdConfig.shutdownTimeout)
+            system.shutdown // shutting down main account actor manager
+        }
     }
 
 
     def main(args: Array[String]) {
+        // set runtime properties
+        JSystem.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
+
         // handle signals
         handleSignal("ABRT") { getAllLiveThreads }
         handleSignal("USR2") { log.warn("TODO: implement USR2 handling (show svd config values)") }

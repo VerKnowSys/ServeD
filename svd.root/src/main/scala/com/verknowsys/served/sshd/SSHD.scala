@@ -26,12 +26,12 @@ import org.apache.sshd.server.shell._
 import com.typesafe.config.ConfigFactory
 
 
-sealed class SSHD(port: Int) extends SvdExceptionHandler {
+sealed class SSHD(port: Int) extends SvdActor {
 
     def this() = this(SvdConfig.sshPort)
 
     val sshd = SshServer.setUpDefaultServer()
-    val ssm = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
+    val ssm = context.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
 
 
     override def preStart = {
@@ -50,20 +50,6 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
 
     def started(listOfKeys: Set[AccessKey], account: SvdAccount): Receive = {
 
-        case Init =>
-            sshd.setPublickeyAuthenticator(new PublicKeyAuth(listOfKeys, account))
-            sshd.setShellFactory(new SvdShellFactory(
-                Array(
-                    SvdConfig.servedShell,
-                    "%d".format(account.uid),
-                    defaultShell,
-                    "-i",
-                    "-s"
-                )
-            ))
-            log.debug("Become available for uid %d", account.uid)
-            sshd.start
-
         case Shutdown =>
             context.unbecome
             sshd.stop
@@ -77,31 +63,43 @@ sealed class SSHD(port: Int) extends SvdExceptionHandler {
     def receive = {
 
         case InitSSHChannelForUID(forUID: Int) =>
-            log.debug("Got shell base for uid: %d", forUID)
-            (sender ? ListKeys) onSuccess {
-                case set: Set[_] =>
-                    log.trace("Listing user SSH keys: %s", set)
+            // log.debug("Got shell base for uid: %d", forUID)
+            // (sender ? ListKeys) onSuccess {
+            //     case set: Set[_] =>
+            //         log.trace("Listing user SSH keys: %s", set)
 
-                    (ssm ? GetAccount(forUID)) onSuccess {
-                        case Some(account: SvdAccount) =>
-                            context.become(started(set.asInstanceOf[Set[AccessKey]], account))
-                            self ! Init // hit message after it became listening state
+            //         (ssm ? GetAccount(forUID)) onSuccess {
+            //             case Some(account: SvdAccount) =>
+            //                 val list = set.asInstanceOf[Set[AccessKey]]
+            //                 log.debug("Become available for uid %d", account.uid)
+            //                 context.become(started(list, account))
+            //                 sshd.setPublickeyAuthenticator(new PublicKeyAuth(list, account))
+            //                 sshd.setShellFactory(new SvdShellFactory(
+            //                     Array(
+            //                         SvdConfig.servedShell,
+            //                         "%d".format(account.uid),
+            //                         defaultShell,
+            //                         "-i",
+            //                         "-s"
+            //                     )
+            //                 ))
+            //                 sshd.start
 
-                        case x =>
-                            sender ! Error("We don't like this: %s".format(x))
+            //             case x =>
+            //                 sender ! Error("We don't like this: %s".format(x))
 
-                    } onFailure {
-                        case x =>
-                            sender ! Error("I'm trying, but, come on. Wtf?: %s".format(x))
-                    }
+            //         } onFailure {
+            //             case x =>
+            //                 sender ! Error("I'm trying, but, come on. Wtf?: %s".format(x))
+            //         }
 
-                case x =>
-                    sender ! Error("Got something weird for uid %d - %s".format(forUID, x))
+            //     case x =>
+            //         sender ! Error("Got something weird for uid %d - %s".format(forUID, x))
 
-            } onFailure {
-                case x =>
-                    sender ! Error("Failed to ask for user SSHD keys with error: %s".format(x))
-            }
+            // } onFailure {
+            //     case x =>
+            //         sender ! Error("Failed to ask for user SSHD keys with error: %s".format(x))
+            // }
 
 
         case Shutdown =>

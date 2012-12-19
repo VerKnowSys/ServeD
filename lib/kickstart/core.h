@@ -37,6 +37,12 @@
     #include <mach/clock_priv.h>
     #include <mach/clock_types.h>
     #include <sys/fcntl.h>
+    #include <assert.h>
+    #include <errno.h>
+    #include <stdbool.h>
+    #include <stdlib.h>
+    #include <stdio.h>
+    #include <sys/sysctl.h>
 #endif
 
 #ifdef __linux__
@@ -52,32 +58,48 @@
     using namespace std;
 
     /* global constants */
-
-    #define DEVEL
-    #define APP_VERSION "0.2.6"
+    #define APP_VERSION "0.2.21"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
+    /* default BSD case: */
+    const string DEFAULT_SHELL_COMMAND = "/Software/Zsh/exports/zsh";
+    const string DEFAULT_JAVA_PATH = "/Software/Openjdk6-i386/";
+    const string DEFAULT_JAVA64_PATH = "/Software/Openjdk6-amd64/";
+    const string DEFAULT_JAVA7_PATH = "/Software/Openjdk7-i386/";
+    const string DEFAULT_JAVA764_PATH = "/Software/Openjdk7-amd64/";
+
     #ifdef __FreeBSD__
-        #define DEFAULT_SHELL_COMMAND "/Software/Zsh/bin/zsh"
-        #define DEFAULT_JAVA_BIN "/Software/Openjdk/bin/java"
-        #define DEFAULT_JAVA64_BIN "/Software/Openjdk64/bin/java"
-    #elif __APPLE__
-        #define CLOCK_REALTIME REALTIME_CLOCK
-        #define DEFAULT_SHELL_COMMAND "/usr/local/bin/zsh"
-        #define DEFAULT_JAVA_BIN "/usr/bin/java"
-        #define DEFAULT_JAVA64_BIN "/usr/bin/java"
-    #elif __linux__
-        #define DEFAULT_SHELL_COMMAND "/bin/zsh"
-        #define DEFAULT_JAVA_BIN "/usr/bin/java"
-        #define DEFAULT_JAVA64_BIN "/usr/bin/java"
-    #else
-        #error No supported OS found!
+        #ifndef JDK7
+            const string DEFAULT_JAVA_BIN = DEFAULT_JAVA_PATH + "exports/java";
+            const string DEFAULT_JAVA64_BIN = DEFAULT_JAVA64_PATH + "exports/java";
+        #else
+            const string DEFAULT_JAVA_BIN = DEFAULT_JAVA7_PATH + "exports/java";
+            const string DEFAULT_JAVA64_BIN = DEFAULT_JAVA764_PATH + "exports/java";
+        #endif
     #endif
+
+    // Darwin case:
+    #ifdef __APPLE__
+        #define CLOCK_REALTIME REALTIME_CLOCK
+        // NOTE: Darwin uses same zsh path as BSD
+        const string DEFAULT_JAVA_BIN = "/usr/bin/java";
+        const string DEFAULT_JAVA64_BIN = "/usr/bin/java";
+    #endif
+
+    // Linux case:
+    #ifdef __linux__
+        #undef DEFAULT_SHELL_COMMAND
+        #define DEFAULT_SHELL_COMMAND "/bin/zsh"
+        const string DEFAULT_JAVA_BIN = "/usr/bin/java";
+        const string DEFAULT_JAVA64_BIN = "/usr/bin/java";
+    #endif
+
 
     #define CORE_HOMEDIR "/SystemUsers/"
     #define USERS_HOME_DIR "/Users/"
     #define LIBRARIES_DIR "/lib/"
+    #define LIBRARIES32_DIR "/lib32/"
     #define DEFAULT_BEHAVIORS_DIR "basesystem/behaviors"
     #define DEFAULT_BEHAVIORS_RAW "/output_raw_processes.raw.input"
 
@@ -89,7 +111,7 @@
     #define ROOT_JAR_FILE "/sbin/root.core"
     #define USER_JAR_FILE "/bin/user.core"
 
-    #define DEFAULT_USER_UID 500
+    #define DEFAULT_USER_UID 501
     #define DEFAULT_GATHERING_PAUSE_MICROSECONDS 500000 // half a second
     #define DEFAULT_COUNT_OF_ROUNDS_OF_GATHERING 7200 // waiting half a second, hence 7200 is 60 minutes of gathering
     #define DEFAULT_USER_GROUP 0
@@ -134,6 +156,7 @@
     extern "C" {
 
         int getOwner(char* path);
+        int isSymlink(const char *path);
         const char* getProcessUsage(int uid, bool consoleOutput = false);
         const char* processDataToLearn(int uid);
 

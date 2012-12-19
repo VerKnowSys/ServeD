@@ -31,12 +31,17 @@ requirementscheck
 bin/current
 bin/sbt compile
 if [ "$?" = "0" ]; then
-    bin/sbt assembly && \
-    if [ $system = "Darwin" ]; then
-        sudo bin/install
+    bin/sbt assembly
+    if [ "$?" = "0" ]; then
+        if [ $system = "Darwin" ]; then
+            sudo bin/install
+        else
+            rootcheck && \
+            bin/install
+        fi
     else
-        rootcheck && \
-        bin/install
+        "Done. Failure!"
+        exit
     fi
     bin/nativebuild && \
     if [ $system = "Darwin" ]; then
@@ -45,7 +50,15 @@ if [ "$?" = "0" ]; then
         rootcheck && \
         bin/nativeinstall
     fi
+    if [ $system = "Darwin" ]; then
+        sudo bin/ignitersinstall
+        sudo mkdir -p /Software/.cache
+    else
+        bin/ignitersinstall
+        mkdir -p /Software/.cache
+    fi
     echo "Done. Success!"
 else
     echo "Done. Failure!"
+    exit
 fi

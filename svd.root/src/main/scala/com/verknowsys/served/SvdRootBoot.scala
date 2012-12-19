@@ -4,12 +4,13 @@ package com.verknowsys.served
 import com.verknowsys.served.utils._
 import com.verknowsys.served.managers.LoggingManager
 import com.verknowsys.served.maintainer.SvdSystemInfo
-import com.verknowsys.served.maintainer.SvdApiConnection
+// import com.verknowsys.served.maintainer.SvdApiConnection
 import com.verknowsys.served.managers.SvdAccountsManager
 import com.verknowsys.served.systemmanager.SvdSystemManager
 // import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.sshd.SSHD
 import com.verknowsys.served.api._
+import com.verknowsys.served.api.Admin._
 
 import com.typesafe.config.ConfigFactory
 import akka.dispatch._
@@ -21,8 +22,18 @@ import akka.util.duration._
 import akka.actor._
 
 
-class SvdRootBoot extends Logging with SvdExceptionHandler {
+class SvdRootBoot extends Logging with SvdActor {
 
+    import akka.actor.OneForOneStrategy
+    import akka.actor.SupervisorStrategy._
+
+
+    override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 1 minute) {
+        case _: ArithmeticException      => Resume
+        case _: NullPointerException     => Restart
+        case _: IllegalArgumentException => Stop
+        case _: Exception                => Escalate
+    }
 
     val system = ActorSystem(SvdConfig.served, ConfigFactory.load.getConfig(SvdConfig.served))
     // core svd actors:
@@ -52,21 +63,24 @@ class SvdRootBoot extends Logging with SvdExceptionHandler {
     override def preStart = {
         super.preStart
         context.watch(fem)
+        context.watch(ssm)
         context.watch(sshd)
         context.watch(sam)
-        context.watch(ssm)
-        (sam ? RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
-            case _ =>
-                log.trace("Spawning Account Manager for each user.")
-                (sam ? RespawnAccounts) onSuccess {
-                    case _ =>
-                        log.info("Account Manager initialized and accounts should be spawned.")
-                } onFailure {
-                    case x =>
-                        log.error("Failure spawning accounts: %s", x)
-                        sys.exit(1)
-                }
-        }
+        // (sam ? Admin.RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
+        //     case _ =>
+                // log.trace("Spawning Account Manager for each user.")
+                // sam ! RegisterAccount("stefan") // XXX: hardcoded
+                // sam ! RegisterAccount("waldek") // XXX: hardcoded
+                // (sam ? Admin.RespawnAccounts) onSuccess {
+                //     case _ =>
+                //         log.info("Account Manager initialized and accounts should be spawned.")
+                // } onFailure {
+                //     case x =>
+                //         log.error("Failure spawning accounts: %s", x)
+                //         sys.exit(1)
+                // }
+        // }
+
     }
 
 
@@ -75,10 +89,9 @@ class SvdRootBoot extends Logging with SvdExceptionHandler {
         case Success =>
             log.debug("RootBoot success")
 
-        case Shutdown =>
-            sshd ! Shutdown
-            system.shutdown
-            log.debug("Got shutdown")
-
+        // case Shutdown =>
+        //     sshd ! Shutdown
+        //     log.warn("Got shutdown. Told whole system to stop itself.")
+            // Thread.sleep(SvdConfig.shutdownTimeout)
     }
 }

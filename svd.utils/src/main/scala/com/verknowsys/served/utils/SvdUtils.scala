@@ -7,6 +7,8 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served._
 import SvdPOSIX._
 
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import org.apache.commons.io.FileUtils
 import clime.messadmin.providers.sizeof.ObjectProfiler
 import scala.collection.JavaConversions._
@@ -24,6 +26,7 @@ import java.util.ArrayList
 import java.util.regex.Pattern
 import sun.misc.SignalHandler
 import sun.misc.Signal
+import java.net.NetworkInterface
 
 
 /**
@@ -33,6 +36,26 @@ import sun.misc.Signal
  *
  */
 trait SvdUtils extends Logging {
+
+    import CLibrary._
+    lazy val clib = CLibrary.instance
+
+
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  Simple helper function to generate SHA1 hash from String.
+     *
+     */
+    def sha1(input: String) = {
+        val mDigest = MessageDigest.getInstance("SHA1")
+        val result = mDigest.digest(input.getBytes)
+        val sb = new StringBuffer
+        for (i <- 0 to result.length - 1) {
+            sb.append(Integer.toString((result(i) & 0xff) + 0x100, 16).substring(1))
+        }
+        sb.toString
+    }
 
 
     /**
@@ -67,6 +90,7 @@ trait SvdUtils extends Logging {
     def kill(pid: Long, signal: SvdPOSIX.Value = SIGINT) = {
         import CLibrary._
         val clib = CLibrary.instance
+        log.trace("Sending %d signal to pid %d".format(signal.id, pid))
         if (clib.kill(pid, signal.id) == 0)
             true
         else
@@ -81,18 +105,19 @@ trait SvdUtils extends Logging {
      */
     def chown(path: String, user: Int, group: Int = SvdConfig.defaultUserGroup, recursive: Boolean = true) =
         if (!(new File(path)).exists) {
-            log.warn("Chown: File/ path doesn't exists! Cannot chown non existant file/ directory! IGNORING!")
+            log.warn("Chown: File/ path doesn't exists! Cannot chown non existant file/ directory! Ignoring!")
             false
         } else {
-            import CLibrary._
-            val clib = CLibrary.instance
-            val files = if (recursive) recursiveListFilesFromPath(new File(path)) else List(new File(path))
-            log.trace("chown(path: %s, user: %d, group: %d, recursion: %s): File list: %s. Amount of files: %s".format(path, user, group, recursive, files.mkString(", "), files.length))
 
-            for (file <- files) {
-                log.trace("chowning: %s".format(file.getAbsolutePath))
-                if (clib.chown(file.getAbsolutePath, user, group) != 0)
-                    throwException[Exception]("Error occured while chowning: %s".format(file))
+            val files =
+                if (recursive) recursiveListFilesFromPath(new File(path))
+                    else List(
+                        new File(path))
+
+            files.par.map {
+                file =>
+                    if (clib.chown(file.getAbsolutePath, user, group) != 0)
+                        log.warn("Chown failed on file: %s. Ignoring", file)
             }
             true
         }
@@ -131,13 +156,34 @@ trait SvdUtils extends Logging {
 
 
     /**
+     *  @author dmilith
+     *  Formats message for Notification System
+     */
+    def formatMessage(msg: String) = {
+        msg(0) match { // first char of message
+            case 'W' | 'w' =>
+                "WARN -- %s -- %s".format(currentHost, msg.substring(2))
+            case 'E' | 'e' =>
+                "ERROR == %s == %s".format(currentHost, msg.substring(2))
+            case 'F' | 'f' =>
+                "FATAL ## %s ## %s".format(currentHost, msg.substring(2))
+            case 'D' | 'd' =>
+                "DEBUG -- %s -- %s".format(currentHost, msg.substring(2))
+            case 'I' | 'i' =>
+                "INFO -- %s -- %s".format(currentHost, msg.substring(2))
+            case _ =>
+                "INFO -- %s -- %s".format(currentHost, msg.substring(2))
+        }
+    }
+
+    /**
         @author dmilith
         Unified & DRY method of throwing exceptions
     */
     def throwException[T <: Throwable : Manifest](message: String) {
         val exception = implicitly[Manifest[T]].erasure.getConstructor(classOf[String]).newInstance(message).asInstanceOf[T]
         // log.error("Error occured in %s.\nException: %s\n\n%s".format(this.getClass.getName, exception, exception.getStackTrace.mkString("\n")))
-        // throw exception
+        throw exception
     }
 
 
@@ -458,7 +504,7 @@ trait SvdUtils extends Logging {
             if (file.isDirectory)
                 Option(file.listFiles).map(
                     e =>
-                        e.toList.flatMap(recursiveListFilesFromPath)
+                        e.par.toList.flatMap(recursiveListFilesFromPath)
                 ) getOrElse Nil
             else Nil)
     }
@@ -519,6 +565,123 @@ trait SvdUtils extends Logging {
         }
 
 
+    // XXX: TODO: FIXME: this javaish implementation sucks. We'll need good efficient solution, probably C lib
+    def fileToString(file: File, encoding: String = "UTF-8") = {
+        val inStream = new FileInputStream(file)
+        val outStream = new ByteArrayOutputStream
+        try {
+            var reading = true
+            while (reading) {
+                inStream.read match {
+                    case -1 =>
+                        reading = false
+                    case c =>
+                        outStream.write(c)
+                    }
+            }
+            outStream.flush
+        } finally {
+            inStream.close
+        }
+        new String(outStream.toByteArray, encoding)
+    }
+
+
+    def loadList(file: String) = {
+        try {
+            Some(
+                fileToString(file).split(" ").toList.filterNot(_.isEmpty)
+            ).getOrElse(Nil)
+        } catch {
+            case e: FileNotFoundException =>
+                log.debug("No file found: %s".format(file))
+                Nil
+        }
+    }
+
+
+    def using[A <: { def close(): Unit }, B](param: A)(f: A => B): B =
+        try { f(param) } finally { param.close() }
+
+
+    def writeToFile(fileName: String, data: String) =
+        using (new FileWriter(fileName)) {
+            fileWriter => fileWriter.write(data)
+    }
+
+    def fssecure(path: String)(f: String => Unit) {
+        f(path)
+    }
+
+    def touch(path: String) = fssecure(path) {
+        p => FileUtils touch p
+    }
+
+
+
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  Returns true if given ip matches with any of server IPs.
+     *
+     */
+    def isIPBoundToCurrentServer(ip: String): Boolean = {
+        log.trace("Checking ip: %s", ip)
+        val ifcs = NetworkInterface.getNetworkInterfaces
+        while (ifcs.hasMoreElements) {
+            val ifc = ifcs.nextElement
+            log.debug("IPs of interface: %s", ifc.getDisplayName)
+            val adresses = ifc.getInetAddresses
+            while (adresses.hasMoreElements) {
+                val element = adresses.nextElement.getHostAddress
+                log.trace("IP address: %s vs %s", element, ip)
+                if (element == ip)
+                    return true
+            }
+        }
+        false
+    }
+
+
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  Code to validate given domain.
+     *  It will result:
+     *      None => when no problems occured. Everything's fine, domain is bindable under one of current server IPs.
+     *      Some => with some problem
+     *
+     */
+    def validateDomain(domain: String) = {
+        try {
+            domain match {
+                case "" =>
+                    Some("Domain cannot be empty!")
+
+                case _ =>
+                    if (domain.matches(SvdConfig.matcherFQDN)) { // domain must be fully qualified
+                        val domainAddress = InetAddress.getByName(domain).getHostAddress
+                        if (isIPBoundToCurrentServer(domainAddress)) // domain must be bound to this server
+                            None //NOTE: No errors. Domain's fine.
+                        else
+                            Some("Domain is incorrectly bound or DNS not yet propagated.")
+                    } else {
+                        Some("Domain must be fully qualified, registered domain name.")
+                    }
+            }
+
+        } catch {
+            case e: UnknownHostException =>
+                Some("Unknown host: %s!".format(domain))
+
+            case e: java.lang.AbstractMethodError =>
+                Some("Domain is bound to unknown or wrong server.")
+
+            case e: Throwable =>
+                Some("Exception %s for: %s!".format(e, domain))
+
+        }
+    }
 
 }
 

@@ -1,144 +1,160 @@
 package com.verknowsys.served.managers
 
-import com.verknowsys.served.services._
-// import com.verknowsys.served.LocalAccountsManager
-import com.verknowsys.served.SvdConfig
+import com.verknowsys.served._
+import com.verknowsys.served.api._
+import com.verknowsys.served.api.scheduler._
 import com.verknowsys.served.api.accountkeys._
 import com.verknowsys.served.api.git._
-import com.verknowsys.served.api._
+import com.verknowsys.served.services._
 import com.verknowsys.served.db.{DBServer, DBClient, DB}
 import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.notifications._
 
+import org.apache.commons.io.FileUtils
 import java.security.PublicKey
 import akka.actor._
 import akka.dispatch._
 import akka.pattern.ask
+import akka.pattern.AskTimeoutException
 import akka.remote._
 import akka.util.Duration
 import akka.util.Timeout
 import akka.util.duration._
 import akka.actor._
 
+import scala.math._
+import scala.util._
+import org.quartz._
+import org.quartz.impl._
+import org.quartz.JobKey._
+import org.quartz.impl.matchers._
+import java.io.File
+import java.lang.{System => JSystem}
+
 
 case class AccountKeys(keys: Set[AccessKey] = Set.empty, uuid: UUID = randomUUID) extends Persistent
 object AccountKeysDB extends DB[AccountKeys]
 
+class DBServerInitializationException extends Exception
+
+case object SvdAccounts extends DB[SvdAccount]
+case object SvdUserPorts extends DB[SvdUserPort]
+case object SvdSystemPorts extends DB[SvdSystemPort]
+case object SvdUserUIDs extends DB[SvdUserUID]
+case object SvdUserDomains extends DB[SvdUserDomain]
+
+
 /**
- * Account Manager - owner of all managers
+ * Account Manager - User Side Manager, which has purpose to watch over all user side mechanisms and APIs
  *
  * @author dmilith
  * @author teamon
  */
-class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler with SvdFileEventsReactor with SvdUtils {
+class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) extends SvdManager with SvdFileEventsReactor with Logging {
 
-    import com.verknowsys.served.utils.events._
+    // import akka.actor.OneForOneStrategy
+    // import akka.actor.SupervisorStrategy._
 
-    class DBServerInitializationException extends Exception
+    // override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 1 minute) {
+    //     // case _: Terminated               => Escalate
+    //     case _: ArithmeticException      => Resume
+    //     case _: NullPointerException     => Restart
+    //     case _: IllegalArgumentException => Stop
+    //     case _: Exception                => Escalate
+    // }
 
-    log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
 
-    val homeDir = SvdConfig.userHomeDir / account.uid.toString
-    val sh = new SvdShell(account)
-    val accountsManager = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
-    val sshd = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerPort)) // XXX: hardcode
-    val userHomePath = SvdConfig.userHomeDir / "%s".format(account.uid)
+    import Events._
 
-    // Only for closing in postStop
-    // private var _dbServer: Option[DBServer] = None // XXX: Refactor
-    // private var _dbClient: Option[DBClient] = None // XXX: Refactor
+    val scheduler = StdSchedulerFactory.getDefaultScheduler
+    val userHomeDir = SvdConfig.userHomeDir / "%s".format(account.uid)
 
-    // lazy val _passenger = new SvdService(
-    //     SvdUserServices.rackWebAppConfig(
-    //         account,
-    //         domain = SvdUserDomain("delda") // NOTE: it's also tells about app root dir set to /Users/501/WebApps/delda
-    //     ),
-    //     account
-    // )
+    val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
+    val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-single-dispatcher"), "SvdFileEventsManagerUser")
 
-    // lazy val _postgres = new SvdService(
-    //     SvdUserServices.postgresDatabaseConfig(
-    //         account
-    //     ),
-    //     account
-    // )
+    val accountsManager = context.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
+    val systemManager = context.actorFor("akka://%s@%s:%d/user/SvdSystemManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
+    val sshd = context.actorFor("akka://%s@%s:%d/user/SvdSSHD".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
 
-    // val _apps =
-    //     try {
-    //         // actorFor("/user/app/passenger")
-    //     } catch {
-    //         case e: Throwable =>
-    //             log.error("EXCPT in %s".format(e))
-    //             // 2011-09-09 21:12:09 - dmilith - TODO: FIXME: PENDING: make notifications about eceptions to user
-    //             // Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
-    //     }
 
-    // val _dbs =
-    //     try {
-    //         // actorOf(_postgres)
-    //     } catch {
-    //         case e: Throwable =>
-    //             log.error("EXCPT in %s".format(e))
-    //             // 2011-09-09 21:12:09 - dmilith - TODO: FIXME: PENDING: make notifications about eceptions to user
-    //             // Actor.actorOf(new SvdService(new SvdServiceConfig("Noop"), account)) // 2011-09-09 20:27:13 - dmilith - HACK: empty actor
-    //     }
+    def displayAdditionalInformation(db: DBClient) {
+        log.debug("User ports registered in Account database: %s".format(SvdUserPorts(db).mkString(", ")))
+        log.debug("System ports registered in Account database: %s".format(SvdSystemPorts(db).mkString(", ")))
+        log.debug("User uids registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
+        log.debug("User domains registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
+    }
+
 
     override def preStart = {
         super.preStart
-        log.info("SvdAccountManager is loading.")
-        log.debug("Registering file events for 'watchfile'")
-        registerFileEventFor(userHomePath / "watchfile", All, uid = account.uid)
 
-        log.debug("Getting database port from AccountsManager")
-        (accountsManager ? GetPort) onSuccess {
-            case dbPort: Int =>
-                log.debug("Got database port %d", dbPort)
-                // Start database server
-                val dbServer = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
-                val db = dbServer.openClient
+        log.info("Starting Quartz Scheduler")
+        scheduler.start
 
-                // log.info(SvdUserServices.newPhpWebAppEntry("Php", SvdUserDomain("deldaphp", false), account))
+        log.debug("Account Manager base folder checks in progress")
+        checkOrCreateDir(userHomeDir / SvdConfig.softwareDataDir)
+        checkOrCreateDir(userHomeDir / SvdConfig.webConfigDir)
+        checkOrCreateDir(userHomeDir / SvdConfig.defaultUserIgnitersDir)
 
-                // log.info("Spawning user app: %s".format(_apps))
-                // _apps.start
-                // _apps !! Run /* temporary call due to lack of web interface */
-                // _apps !! Reload /* temporary call due to lack of web interface */
-                // self startLink _apps
 
-                val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)))
-                val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
-                val webManager = context.actorOf(Props(new SvdWebManager(account)))
+        log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
 
-                // Start the real work
-                log.debug("Becaming started")
-                accountsManager ! Alive(account.uid)
-                context.become(started(db, dbServer, gitManager, notificationsManager, webManager))
-                log.trace("Sending Init once again")
-                self ! Init
+        val port = SvdAccountUtils.randomFreePort
+        log.debug("Got database port %d", port)
 
-            case x =>
-                sender ! Error("DB initialization error. Got param: %s".format(x))
-                throwException[DBServerInitializationException]("DB initialization error. Got param: %s".format(x))
-        }
+        // Start database server
+        val dbServer = new DBServer(port, userHomeDir / "%s.db".format(account.uid))
+        val db = dbServer.openClient
+        val utils = new SvdAccountUtils(db)
 
+        // start managers
+        val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")), "SvdGitManager")
+        val webManager = context.actorOf(Props(new SvdWebManager(account)).withDispatcher("svd-single-dispatcher"), "SvdWebManager")
+
+        context.watch(fem)
+        context.watch(notificationsManager)
+        context.watch(gitManager)
+        context.watch(webManager)
+
+        // Start the real work
+
+        displayAdditionalInformation(db)
+
+        log.debug("Becaming started")
+        context.become(
+            started(db, dbServer, gitManager, notificationsManager, webManager, utils))
+
+        if (!headless)
+            accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
+
+        self ! User.SpawnServices // spawn userside services
+
+        // send availability of user to sshd manager
+        addDefaultAccessKey(db)
+        sshd ! InitSSHChannelForUID(account.uid)
     }
+
 
     // TODO: gather list of configurations from user config
 
     def receive = traceReceive {
 
-        // case AuthorizeWithKey(key: PublicKey) =>
-        //     log.debug("WTF? Not started manager!")
-
         case Success =>
             log.debug("Got success")
 
+        case Terminated(ref) =>
+            log.debug("Terminated service actor: %s".format(ref))
+            context.unwatch(ref)
+
+        case msg: Notify.Base =>
+            log.trace("Forwarding notification to Notification Center")
+            notificationsManager forward msg
 
         case x =>
-            val m = "Unknown SvdAccountManager message: %s".format(x)
+            val m = "SvdAccountManager already become zombie stage but received message: %s".format(x)
             log.warn("%s".format(m))
-            sender ! Error(m)
+            // sender ! Error(m)
 
     }
 
@@ -155,30 +171,282 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
     }
 
 
-    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef): Receive = traceReceive {
-        // case GetUserProcessList =>
-        //     val psAll = SvdLowLevelSystemAccess.processList(false)
-        //     log.debug("All user process IDs: %s".format(psAll.mkString(", ")))
-        case Init =>
-            log.debug("Sending init to SSHD manager with uid: %d", account.uid)
-            // send availability of user to sshd manager
-            addDefaultAccessKey(db)
+    protected def readLogFile(serviceName: String, pattern: Option[String] = None) { // , amount: Option[Int] = None
+        import java.io._
 
-            sshd ! InitSSHChannelForUID(account.uid)
+        val arg = serviceName.capitalize
+        val logPath = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / arg / SvdConfig.defaultServiceLogFile
 
-            // adding default key:
+        try {
+            val access = new File(logPath)
+            val logFileSize = access.length.toInt
+            log.debug("Reading tail of log file: %s with %d bytes.", logPath, logFileSize)
+            pattern match {
+                case Some(patt) =>
+                    val content = fileToString(access).split("\n").reverse.filter{
+                        _.contains(patt)
+                    }.take(20).reverse.mkString("\n") // XXX: hardcode
 
+                    // TODO: upload log to private gist or something
+
+                    notificationsManager ! Notify.Message(formatMessage("I:Last 20 lines of log: \n%s\n\nFull log here: http://paster.verknowsys.com/SOME-SHA".format(content)))
+
+                case None =>
+                    val content = fileToString(access).split("\n").reverse.take(20).reverse.mkString("\n") // XXX: hardcode
+                    notificationsManager ! Notify.Message(formatMessage("I:Last 20 lines of log: \n%s\n\nFull log here: http://verknowsys.com".format(content)))
+            }
+            log.trace("Forcing GC after log show")
+            Runtime.getRuntime.gc
+
+        } catch {
+            case e: FileNotFoundException =>
+                val msg = formatMessage("E:Log file not available: %s".format(e))
+                log.error(msg)
+                notificationsManager ! Notify.Message(msg)
+
+            case x: Exception =>
+                val msg = formatMessage("E:Exception happened: %s".format(x))
+                log.error(msg)
+                notificationsManager ! Notify.Message(msg)
+        }
+    }
+
+
+    /**
+     *  @author dmilith
+     *
+     *  Cleans autostart mark from services software data dir.
+     *
+     */
+    def cleanServicesAutostart {
+        val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir
+        listDirectories(servicesLocationDir).map {
+            dir =>
+                val file = new java.io.File(dir.toString / SvdConfig.serviceAutostartFile)
+                if (file.exists) {
+                    log.debug("Removing autostart file: %s", file)
+                    rm_r(file.toString)
+                }
+        }
+    }
+
+
+    /**
+     *  @author dmilith
+     *
+     *  Load autostart marks from services software data dir.
+     *
+     */
+    def loadServicesList = {
+        val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir
+        log.debug("Found services dir: %s".format(servicesLocationDir))
+        listDirectories(servicesLocationDir).map {
+            dir =>
+                if (new java.io.File(dir.toString / ".autostart_service").exists) { // XXX: hardcode
+                    log.debug("Found autostart for %s".format(dir))
+                    dir.toString.split("/").last
+                } else {
+                    log.debug("No autostart for %s".format(dir))
+                    ""
+                }
+        }.filterNot(_.isEmpty)
+    }
+
+
+    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, utils: SvdAccountUtils): Receive = traceReceive {
+
+
+        case SvdScheduler.StartJob(name, job, trigger) =>
+            log.debug("Starting schedule job named: %s for service: %s".format(name, sender))
+            scheduler.scheduleJob(job, trigger)
+
+
+        case SvdScheduler.StopJob(name) =>
+            log.debug("Stopping scheduled jobs named: %s for service: %s".format(name, sender))
+            for (index <- 0 to SvdConfig.maxSchedulerDefinitions) { // XXX: hacky.. it's better to figure out how to get list of defined jobs from scheduler..
+                scheduler.deleteJob(jobKey("%s-%d".format(name, index)))
+            }
+
+
+        case User.CloneIgniterForUser(igniterName, userIgniterNewName) => // #13
+            try {
+                val igniterFile = new File(SvdConfig.defaultSoftwareTemplatesDir / igniterName + SvdConfig.defaultSoftwareTemplateExt)
+                val userIgniterName = new File(userHomeDir / SvdConfig.defaultUserIgnitersDir / (
+                    userIgniterNewName match {
+                        case Some(nameSet) =>
+                            nameSet
+                        case None =>
+                            igniterName
+                    }
+                ))
+                FileUtils.copyFile(igniterFile, userIgniterName + SvdConfig.defaultSoftwareTemplateExt, false) // NOTE: false => don't copy attributes
+                sender ! Success
+            } catch {
+                case e: Exception =>
+                    sender ! Error("Exception occured: %s".format(e))
+            }
+
+
+        case Admin.RegisterAccount(userName) => // #14
+            sender ! Error("Not yet implemented.")
+
+
+        case User.SpawnServices => // #10
+            val listOfServices = loadServicesList
+            log.debug("List of all services stored: %s".format(listOfServices.mkString(", ")))
+            listOfServices.foreach {
+                serviceName =>
+                    // look for old services already started, and stop it:
+                    def joinContext {
+                        val serv = context.actorOf(Props(new SvdService(serviceName, account)), "Service-%s".format(serviceName))
+                        log.debug("Launching Service through SpawnServices: %s".format(serv))
+                        context.watch(serv)
+                    }
+                    val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
+                    log.trace("Pinging service: %s".format(currServ))
+                    (currServ ? Ping) onComplete {
+                        case Right(Pong) =>
+                            val msg = "Service already running: %s.".format(serviceName)
+                            log.warn(msg)
+                            notificationsManager ! Notify.Message(formatMessage("W:%s".format(msg)))
+                            // currServ ! Quit
+                            // log.debug("Waiting for service shutdown hooks…")
+                            // Thread.sleep(SvdConfig.serviceRestartPause)
+                            // joinContext
+
+                        case Left(exc) =>
+                            log.debug("No alive actors found: %s".format(exc.getMessage))
+                            joinContext
+                    }
+            }
             sender ! Success
 
-                //) onSuccess {
-            //     case Taken(x) =>
-            //         log.trace("SSHD taken by x: %s", x)
-            //         sshd ! Shutdown
-            //         sshd ! InitSSHChannelForUID(account.uid)
-            // }
 
-        case GetAccount =>
-            sender ! account
+        case User.GetStoredServices => // #4
+            val listOfServices = loadServicesList
+            notificationsManager ! Notify.Message(formatMessage("I:%s".format(listOfServices.mkString(", "))))
+            sender ! """{"message": "Stored services", "content": [%s]}""".format(listOfServices.map{ c => "\"" +c+ "\"" }.mkString(", "))
+
+
+        case User.TerminateServices => // #5
+            log.info("Terminating all services…")
+            context.actorSelection("../SvdAccountManager/Service-*") ! Quit
+            sender ! Success
+
+
+        case User.StoreServices => // #6
+            cleanServicesAutostart
+            context.actorSelection("../SvdAccountManager/Service-*") ! User.ServiceAutostart
+            sender ! Success
+
+
+        case User.GetRunningServices =>
+            context.actorSelection("../SvdAccountManager/Service-*") ! User.ServiceStatus
+
+
+        // case User.GetServiceStatus(name) =>
+        //     context.actorFor("/user/SvdAccountManager/Service-%s".format(name)) ! User.ServiceStatus
+
+
+        case User.SpawnService(serviceName) => // #7
+            log.debug("Spawning service: %s".format(serviceName))
+
+            def joinContext { // look for old services already started, and stop it:
+                try { // XXX: TODO: make sure it's safe
+                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), "Service-%s".format(serviceName)) // spawn new service with that name:
+                    context.watch(serv)
+                } catch {
+                    case x: InvalidActorNameException =>
+                        val msg = formatMessage("E:Invalid name exception (duplicate same service): %s. Causing Restart of Service.".format(x.getMessage))
+                        log.warn(msg)
+                        notificationsManager ! Notify.Message(msg)
+
+                    case x: Exception =>
+                        val msg = formatMessage("E:Something nasty happened with service: %s".format(x.getMessage))
+                        log.warn(msg)
+                        notificationsManager ! Notify.Message(msg)
+                }
+            }
+            val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
+            (currServ ? Ping) onComplete {
+                case Right(Pong) =>
+                    val msg = "Service already running: %s. Restarting".format(serviceName)
+                    log.warn(msg)
+                    notificationsManager ! Notify.Message(formatMessage("W:%s".format(msg)))
+                    context.unwatch(currServ)
+                    context.stop(currServ)
+                    log.debug("Waiting for service shutdown hooks…")
+                    Thread.sleep(SvdConfig.serviceRestartPause)
+                    joinContext
+
+                case Left(exc) =>
+                    log.debug("No alive service found: %s".format(exc.getMessage))
+                    joinContext
+            }
+            sender ! Success
+
+
+        case User.TerminateService(name) => // #8
+            log.debug("Stopping service: %s".format(name))
+            val serv = context.actorFor("/user/SvdAccountManager/Service-%s".format(name))
+            context.unwatch(serv)
+            context.stop(serv)
+            sender ! Success
+
+
+        case User.ShowAvailableServices => // #9
+            log.debug("Showing available services definitions")
+            val availableSvces = (
+                listFiles(SvdConfig.defaultSoftwareTemplatesDir) ++ listFiles(userHomeDir / SvdConfig.defaultUserIgnitersDir))
+                .filter{_.getName.endsWith(SvdConfig.defaultSoftwareTemplateExt)}.map{_.getName.split("/").last}.mkString(",").replaceAll(SvdConfig.defaultSoftwareTemplateExt, "") // XXX: replace with some good regexp
+            notificationsManager ! Notify.Message("Available Services: " + availableSvces)
+            sender ! """{"message": "Available services", "content": [%s]}""".format(availableSvces.split(",").map{ c => "\"" +c+ "\"" }.mkString(", "))
+
+
+        case User.ReadLogFile(serviceName, pattern) =>
+            log.debug("Reading log file for service: %s".format(serviceName))
+            readLogFile(serviceName, pattern)
+
+
+        case User.StoreUserDomain(domain) => // internal call
+            log.info("Storing user domain: %s", domain)
+            utils.registerUserDomain(domain)
+
+
+        case User.RegisteredDomains => // #3
+            log.debug("Displaying registerd domains.")
+            val domains = SvdUserDomains(db)
+            log.info("RegisteredDomains: %s", domains.mkString(", "))
+            sender ! """{"message": "Domain list", "content": [%s]}""".format(domains.map{c => "\"" +c.name+ "\"" }.mkString(", "))
+
+
+        case User.GetServicePort(serviceName) => // #12
+            log.debug("Asking service %s for port it's using.".format(serviceName))
+            val s = sender
+            val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
+            (currServ ? User.GetServicePort) onComplete {
+                case Right(port) =>
+                    s ! """{"message": "Port gathered successfully.", "content": [%d]}""".format(port)
+                case Left(exc) =>
+                    s ! Error("Service port unavailable!")
+            }
+
+        case User.GetServiceStatus(serviceName) => // #11
+            val s = sender
+            val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
+            (currServ ? User.ServiceStatus) onComplete {
+                case Right(content) =>
+                    s ! """{"message": "Service: %s. %s", "status": 0}""".format(serviceName, content)
+
+                case Left(x) =>
+                    x match {
+                        case x: AskTimeoutException =>
+                            s ! Error("Service refused to answer. Installation is in progress or service's not started.")
+                        case x: Exception =>
+                            s ! Error("Critical error: %s".format(x))
+
+                    }
+            }
 
         case AuthorizeWithKey(key) =>
             log.debug("Trying to find key in account: %s", account)
@@ -196,21 +464,19 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
             val ak = accountKeys(db)
             db << ak.copy(keys = ak.keys - key)
 
-        case Success =>
-            log.debug("Received Success")
-
         case SvdFileEvent(path, flags) =>
             log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))
             flags match {
                 case Modified =>
                     log.trace("File event type: Modified")
-                    notificationsManager ! Notify.Message("File event notification: Modified on path: %s on host: %s".format(path, currentHost.getHostName))
-                    gitManager ! CreateRepository("somerepository")
+                    // "INFO -- %s -- Performing %s of service: %s".format(currentHost, hookName, config.name)
+                    notificationsManager ! Notify.Message(formatMessage("I:File event notification: Modified on path: %s.".format(path)))
+                    gitManager ! Git.CreateRepository("somerepository")
                 case Deleted =>
                     log.trace("File event type: Deleted")
                 case Renamed =>
                     log.trace("File event type: Renamed")
-                    gitManager ! Shutdown
+                    // gitManager ! Shutdown
                 case AttributesChanged =>
                     log.trace("File event type: AttributesChanged")
                     // gitManager ! RemoveRepository("somerepository")
@@ -218,41 +484,84 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
                     log.trace("File event type: Revoked")
                 case x =>
                     log.trace("Got event: %s", x)
+
             }
 
-        case Terminated(ref) => // XXX: it seems to be super fucked up way to maintain actors. Use supervision Luke!
+        case Success =>
+            log.debug("Received Success")
+
+        case Terminated(ref) =>
+            log.debug("Terminated service actor: %s".format(ref))
             context.unwatch(ref)
-            context.stop(ref)
-            (accountsManager ? GetPort) onSuccess {
-                case dbPort: Int =>
-                    log.debug("Actor restart pending")
-                    // val server = new DBServer(dbPort, userHomePath / "%s.db".format(account.uid))
-                    val db = dbServer.openClient
-                    val gm = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
-
-                case x =>
-                    log.error("Wtf?: %s", x)
-
-            } onFailure {
-                case x =>
-                    log.debug("Failure after Terminated signal")
-            }
-            // context.stop(ref)
-            // val gitManager = context.actorOf(Props(new SvdGitManager(account, db, homeDir / "git")))
-            // (gitManager ? Init) onSuccess {
-            //     case _ =>
-            //         log.debug("Setting log watch on git manager.")
-            //         context.watch(gitManager)
-            // }
-
 
         // redirect user notification messages directly to notification center
-        case msg: Notify.Message =>
+        case msg: Notify.Base =>
             log.trace("Forwarding notification to Notification Center")
             notificationsManager forward msg
 
-        case msg: git.Base =>
+        case Some(x) =>
+            x match {
+                case repo: Repository =>
+                    log.trace("Forwarding Git message to Git Manager")
+                    gitManager forward x
+
+                case x =>
+                    log.error("Ambigous message: %s".format(x))
+            }
+
+        case msg: Git.Base =>
+            log.trace("Forwarding Git message to Git Manager")
             gitManager forward msg
+
+        case x: Events.Base =>
+            log.trace("Forwarding Events message to File Event Manager")
+            fem forward x
+
+        case x: Admin.Base =>
+            log.debug("Forwarding message: %s to Accounts Manager", x)
+            accountsManager forward x
+
+
+        case System.GetPort => // allow getting static port for headless account manager
+            if (headless) {
+                Thread.sleep(abs(new Random().nextInt % 100))
+                val randomPort = ((1024 + account.uid) + JSystem.currentTimeMillis % 10000).toInt// XXX: almost random in range of max 10000 service ports
+                sender ! abs(randomPort)
+            } else {
+                val port = utils.randomUserPort
+                utils.registerUserPort(port)
+                sender ! port
+            }
+
+
+        case x: System.Base =>
+            if (!headless) {
+                log.debug("Forwarding message: %s to System Manager", x)
+                systemManager forward x
+            } else {
+                val err = formatMessage("E:Forwarding to System Manager can't work in headless mode.")
+                log.error(err)
+                notificationsManager ! Notify.Message(err)
+            }
+
+        case x =>
+            log.warn("Some unrecognized message catched in SAM: %s".format(x))
+
+        // TODO: do user registration
+        // case Admin.RegisterAccount(name) =>
+        //     log.trace("Registering default account if not present")
+        //     if (name == SvdConfig.defaultUserName) {
+        //         if (!userUIDRegistered(SvdConfig.defaultUserUID)) {
+        //             registerUserAccount(SvdConfig.defaultUserName, SvdConfig.defaultUserUID) // XXX: hardcoded
+        //         }
+        //         sender ! Success
+        //     } else {
+        //         val userUID = randomUserUid
+        //         log.debug("Registering account with name: %s and uid: %d".format(name, userUID))
+        //         registerUserAccount(name, userUID)
+        //         sender ! Success
+        //     }
+
     }
 
 
@@ -263,22 +572,41 @@ class SvdAccountManager(val account: SvdAccount) extends SvdExceptionHandler wit
     }
 
 
+    addShutdownHook {
+        log.warn("Forcing POST Stop in Account Manager")
+        if (!headless)
+            accountsManager ! Admin.Dead(account)
+
+        postStop
+    }
+
+
     override def postStop {
-        log.debug("Executing postStop for user svd UID: %s".format(account.uid))
-        // _apps.stop
-        // _dbs.stop
-        sh.close
-        // _dbClient.foreach(_.close)
-        // _dbServer.foreach(_.close)
+        // log.debug("Stopping database server and client")
+        // db.close
+        // dbServer.close
+
+        log.info("Stopping services")
+        (self ? User.TerminateServices) onSuccess {
+            case _ =>
+                log.info("All Services Terminated")
+        } onFailure {
+            case x =>
+                log.error("TerminateServices fail: %s".format(x))
+        }
+        log.debug("Unbecoming AccountManager")
+        context.unbecome
+        log.info("Shutting down Scheduler")
+        scheduler.shutdown
+        log.debug("Terminated successfully")
         super.postStop
     }
 
 
-    addShutdownHook {
-        log.warn("Got termination signal")
-        log.info("Shutting down Account Manager")
-        unregisterFileEvents(self)
-        system.shutdown // shutting down main account actor manager
+    override def preRestart(reason: Throwable, message: Option[Any]) = {
+        log.warn("preRestart caused by reason: %s and message: %s", reason, message)
+        super.preRestart(reason, message)
     }
+
 
 }

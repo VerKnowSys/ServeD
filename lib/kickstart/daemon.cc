@@ -1,7 +1,7 @@
 /**
  *  @author dmilith
  *
- *   Shell wrapper with UID given as argument to main.
+ *   Daemon wrapper with UID given as argument to main.
  *   This helper is used by SSHD side of ServeD
  *   © 2011-2012 - VerKnowSys
  *

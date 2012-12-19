@@ -1,0 +1,36 @@
+#!/bin/sh
+
+MATCHER="\(memcached\|mysqld\|redis\|nginx\|postgres\|mongod\|php\)"
+
+if [ "$(uname)" = "Darwin" ]; then
+  export OPEN_FILES_ON_START="$(lsof | grep java | wc -l)"
+  export PS_TOOL="pstree"
+else
+  export OPEN_FILES_ON_START="$(fstat | grep java | wc -l)"
+  export PS_TOOL="ps -A"
+fi
+
+for i in $(seq 1 10000); do
+  clear
+  result="$(${PS_TOOL} 2>/dev/null | grep -e "${MATCHER}" | grep -v grep 2>/dev/null)"
+  if [ "${result}" = "" ]; then
+    export result="Not found"
+  fi
+
+  printf "Processes:\n$result\n"
+  printf "Open files on start:\n${OPEN_FILES_ON_START}\n"
+  if [ "${open_files}" != "" ]; then
+    printf "Open files now:\n$open_files\n"
+  fi
+
+  mod5="$(echo ${i} % 25 | bc)"
+  if [ "$mod5" = "0" ]; then
+    if [ "$(uname)" = "Darwin" ]; then
+      export open_files="$(lsof | grep java | wc -l)"
+    else
+      export open_files="$(fstat | grep java | wc -l)"
+    fi
+  else
+    sleep 2
+  fi
+done

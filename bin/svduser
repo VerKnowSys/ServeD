@@ -1,12 +1,36 @@
 #!/bin/sh
 
-pwd=$(pwd)
-version="$(cat VERSION)"
-jar="${pwd}/svd.user/target/user-assembly-${version}.jar"
+unset DYLD_LIBRARY_PATH
+unset LD_LIBRARY_PATH
 
-if [ -e "${jar}" ]; then
-    echo "Executing: ${jar}"
-    java -d32 -XX:MaxPermSize=64M -XX:+UseParallelGC -Xms8m -Xmx128m -Dfile.encoding=UTF-8 -noverify -client -Djna.library.path=$(pwd)/lib -jar "${jar}" $(id -u) "$@"
+userUID="$(id -u)"
+pwd=$(pwd)
+VERSION="$(cat VERSION)"
+BUILD="$(cat svd.common/src/main/resources/BUILD)"
+JAR="${pwd}/svd.user/target/user-assembly-${VERSION}-b${BUILD}.jar"
+
+# read sofin configuration
+. "/etc/profile_sofin"
+
+# read user configuration
+. "/Users/${userUID}/.profile"
+. "/Users/${userUID}/.profile_java"
+
+
+JAVA_PATH="/Software/Openjdk6-i386/exports/java"
+
+
+if [ "$1" != "" ]; then
+  export userUID="$1"
+fi
+
+if [ "$(uname)" = "Darwin" ]; then
+  export JAVA_PATH="/usr/bin/java"
+fi
+
+if [ -e "${JAR}" ]; then
+  echo "Executing: ${JAR}"
+  "${JAVA_PATH}" -d32 -XX:MaxPermSize=64M -XX:+UseParallelGC -Xms8m -Xmx128m -Dfile.encoding=UTF-8 -noverify -client -Djna.library.path=$(pwd)/lib -jar "${JAR}" "${userUID}" "$@"
 else
-    echo "Assembly not found. Use build script!"
+  echo "Assembly not found. Use build script!"
 fi

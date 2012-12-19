@@ -9,7 +9,127 @@
 extern std::string escapeJsonString(const std::string& input);
 
 
-#ifndef __APPLE__
+#ifdef __APPLE__
+
+
+typedef struct kinfo_proc kinfo_proc;
+
+
+int GetBSDProcessList(kinfo_proc **procList, size_t *procCount) {
+    int                 err;
+    kinfo_proc *        result;
+    bool                done;
+    static const int    name[] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0 };
+    // Declaring name as const requires us to cast it when passing it to
+    // sysctl because the prototype doesn't include the const modifier.
+    size_t              length;
+
+    assert( procList != NULL);
+    // assert(*procList == NULL);
+    assert(procCount != NULL);
+
+    *procCount = 0;
+    result = NULL;
+    done = false;
+    do {
+        assert(result == NULL);
+
+        // Call sysctl with a NULL buffer.
+
+        length = 0;
+        err = sysctl( (int *) name, (sizeof(name) / sizeof(*name)) - 1,
+                      NULL, &length,
+                      NULL, 0);
+        if (err == -1) {
+            err = errno;
+        }
+
+        // Allocate an appropriately sized buffer based on the results
+        // from the previous call.
+        if (err == 0) {
+            result = (kinfo_proc*) malloc(length);
+            if (result == NULL) {
+                err = ENOMEM;
+            }
+        }
+
+        // Call sysctl again with the new buffer.  If we get an ENOMEM
+        // error, toss away our buffer and start again.
+        if (err == 0) {
+            err = sysctl( (int *) name, (sizeof(name) / sizeof(*name)) - 1,
+                          result, &length,
+                          NULL, 0);
+            if (err == -1) {
+                err = errno;
+            }
+            if (err == 0) {
+                done = true;
+            } else if (err == ENOMEM) {
+                assert(result != NULL);
+                free(result);
+                result = NULL;
+                err = 0;
+            }
+        }
+    } while (err == 0 && ! done);
+
+    // Clean up and establish post conditions.
+    if (err != 0 && result != NULL) {
+        free(result);
+        result = NULL;
+    }
+    *procList = result;
+    if (err == 0) {
+        *procCount = length / sizeof(kinfo_proc);
+    }
+    assert( (err == 0) == (*procList != NULL) );
+    return err;
+}
+
+
+extern "C" {
+
+
+    const char* processDataToLearn(int uid) {
+
+        string output;
+        // const int pagesize = getpagesize();
+        size_t count = 0;
+        kinfo_proc *result = NULL;
+        kinfo_proc *procs = NULL;
+        result = (kinfo_proc*)malloc(sizeof(kinfo_proc));
+
+        if (GetBSDProcessList(&result, &count) == 0) {
+            for (int i = 0; i < count; ++i) {
+
+                procs = &result[i];
+
+                stringstream out;
+                out << (procs->kp_proc.p_comm) << " "
+                    << (procs->kp_proc.p_pid) << " "
+                    << (procs->kp_proc.p_rtime.tv_sec) << " "
+                    << (procs->kp_proc.p_cpticks) << " "
+                    << count << " "
+                    << endl;
+
+                output += out.str();
+            }
+        }
+        free(result);
+        return output.c_str();
+    }
+
+
+    const char* getProcessUsage(int uid, bool consoleOutput) {
+        stringstream out;
+        mach_timespec_t ts;
+        clock_get_time(REALTIME_CLOCK, &ts);
+        out << "{\"time\": \"" << ts.tv_sec << "\"}";
+        return out.str().c_str();
+    }
+}
+#else
+
 extern "C" {
 
     #define ord(c) ((int)(unsigned char)(c))
@@ -234,33 +354,33 @@ extern "C" {
 
         kvm_t* kd = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL);
         if (kd == 0) {
-            return (char*)"KDERR";
+            return (char*)"{\"message\": \"KDERR\", \"status\":-1}";
         }
 
         kinfo_proc* procs = kvm_getprocs(kd, KERN_PROC_UID, uid, &count); // get processes directly from BSD kernel
         if (count <= 0) {
-            return (char*)"NOPCS";
+            return (char*)"{\"message\": \"NOPCS\", \"status\":-2}";
         }
 
+        output += "{\"message\": \"Ok\", \"status\":0, \"content\": [";
         for (int i = 0; i < count; ++i) {
             stringstream out;
             args = kvm_getargv(kd, procs, 0);
-            out << (procs->ki_comm) << " "
-                << (procs->ki_pid) << "#"
-                << (procs->ki_runtime / 1000) << " "
-                << (procs->ki_rusage.ru_inblock) << " "
-                << (procs->ki_rusage.ru_oublock) << " "
-                << (procs->ki_rssize * pagesize) << " "
-                << count << " "
-                << totalMem
-                << endl;
-
+            out << "{\"cmd\":\"" << (procs->ki_comm) << "\","
+                << "\"pid\":" << (procs->ki_pid) << ","
+                << "\"ppid\":" << (procs->ki_ppid) << ","
+                << "\"runt\":" << (procs->ki_runtime / 1000) << ","
+                << "\"ioin\":" << (procs->ki_rusage.ru_inblock) << ","
+                << "\"ioout\":" << (procs->ki_rusage.ru_oublock) << ","
+                << "\"rss\":" << (procs->ki_rssize * pagesize) << "}";
+            if (i + 1 != count) out << ","; // if last element not detected add a comma
             args = NULL;
             output += out.str();
             procs++;
         }
 
         kvm_close(kd);
+        output += "]}";
         return output.c_str();
     }
 

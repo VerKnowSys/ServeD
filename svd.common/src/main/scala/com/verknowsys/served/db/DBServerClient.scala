@@ -17,7 +17,7 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
      * Otherwise variant value will not be calculated. Since all UUIDs generated with java.util.UUID
      * class have variant 2, and UUID retrieved from NeoDatis database has variant 0 the same
      * object savend and then retrieved from NeoDatis is different in terms of `equals` method.
-     * To solve this issue we need to force storing of transient `variant` field into database 
+     * To solve this issue we need to force storing of transient `variant` field into database
      * and that is exactly what those two lines do.
      *
      * @author teamon
@@ -26,10 +26,10 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
      */
     currentODB.getClassRepresentation(classOf[UUID].getName(), false).persistAttribute("variant")
     historyODB.getClassRepresentation(classOf[UUID].getName(), false).persistAttribute("variant")
-    
+
     /**
      * Save object in database
-     * 
+     *
      * If object with the same uuid already exists in database it will be moved to history
      * database and replaced in current database with current one.
      *
@@ -44,10 +44,10 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
                 currentODB.store(newObj)
                 currentODB.delete(oldObj)
                 currentODB.commit
-            
+
             case Some(oldObj) =>
                 // TODO: Update timestamp
-            
+
             case None =>
                 currentODB.store(newObj)
                 currentODB.commit
@@ -55,14 +55,14 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
                 historyODB.commit
         }
     }
-    
+
     /**
      * Remove object from database
      *
      * @author teamon
      */
     def ~[T <: Persistent : ClassManifest](obj: T) { this ~ obj.uuid }
-    
+
     /**
      * Remove object with given uuid from database
      *
@@ -79,12 +79,12 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
         currentODB.delete(obj)
         currentODB.commit
     }
-    
+
     protected[db] def find[T <: Persistent : ClassManifest](uuid: UUID) = {
         val col = new TopLevelCollection[T](this)
         col(uuid)
     }
-    
+
     /**
      * Close database connection
      *
@@ -97,7 +97,7 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
         } catch {
             case ex: ODBRuntimeException =>
                 log.warn("ODBRuntimeException: %s", ex.toString)// XXX: Should we do something with it?
-            case ex: NeoDatisError => 
+            case ex: NeoDatisError =>
                 log.warn("NeoDatisError: %s", ex.toString)// XXX: Should we do something with it?
         }
     }
@@ -105,7 +105,7 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
 
 /**
  * Server instance.
- * 
+ *
  * It requires port and path to database directory.
  * When given path = "/db/mybase" it will create two databases:
  *  - "/db/mybase_current.neodatis" for the most up-to-date objects
@@ -115,35 +115,37 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
  */
 class DBServer(port: Int, path: String){
     OdbConfiguration.setLogServerStartupAndShutdown(false)
-    OdbConfiguration.setDatabaseCharacterEncoding("UTF-8");
-    
+    OdbConfiguration.setDatabaseCharacterEncoding("UTF-8")
+    OdbConfiguration.useMultiThread(true, 8)
+
+
     protected val server = ODBFactory.openServer(port)
-    
-    ("current" :: "history" :: Nil) foreach { suffix => 
+
+    ("current" :: "history" :: Nil) foreach { suffix =>
         server.addBase(dbpath(suffix), dbpath(suffix) + ".neodatis")
     }
-    
+
     server.startServer(true)
-    
+
     /**
      * Returns new client instance for this server
      *
      * @author teamon
      */
     def openClient = new DBClient(currentClient, historyClient)
-    
+
     /**
      * Shutdown server
      *
      * @author teamon
      */
-    
+
     def close = server.close
-    
+
     protected def currentClient = server.openClient(dbpath("current"))
-    
+
     protected def historyClient = server.openClient(dbpath("history"))
-    
+
     protected def dbpath(suffix: String) = path + "_" + suffix
 }
 

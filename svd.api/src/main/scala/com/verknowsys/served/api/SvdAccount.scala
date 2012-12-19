@@ -5,6 +5,63 @@ import com.verknowsys.served.api.pools._
 
 
 /**
+ *  API object for user messages:
+ */
+object User {
+    abstract class Base extends ApiResponse
+
+    // case object AccountNotFound
+
+    case object SpawnServices extends Base
+    case object TerminateServices extends Base
+    case object GetServices extends Base // returns List
+    case object GetRunningServices extends Base // returns nothing, just notifies
+    case object StoreServices extends Base
+    case object ShowAvailableServices extends Base
+
+    case object ServiceStatus extends Base // used to get information about Service state
+    case object ServiceAutostart extends Base
+    case object GetStoredServices extends Base
+
+    case object GetServicePort
+    case class GetServicePort(name: String) extends Base
+    case class GetServiceStatus(name: String) extends Base
+    case class ReadLogFile(serviceName: String, pattern: Option[String]) extends Base
+    case class SpawnService(name: String) extends Base
+    case class TerminateService(name: String) extends Base
+
+    // case class GetAccount(uid: Int)
+    // case class GetAccountByName(name: String)
+
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  Call to store domain record for user.
+     *
+     */
+    case class StoreUserDomain(domain: String) extends Base
+
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  Call to retrieve stored domain records for user.
+     *
+     */
+    case object RegisteredDomains extends Base
+
+
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  Call to perform user side, writable copy of already defined Igniter.
+     *
+     */
+    case class CloneIgniterForUser(igniterName: String, userIgniterName: Option[String] = None) extends Base
+
+}
+
+
+/**
  * SvdAccount describes one virtual svd User
  *
  * @author dmilith
@@ -25,10 +82,6 @@ case class SvdAccount (
 
 }
 
-case object AccountNotFound
-
-case class GetAccount(uid: Int)
-case class GetAccountByName(name: String)
 
 /**
  *  @author dmilith

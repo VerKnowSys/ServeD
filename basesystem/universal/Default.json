@@ -1,0 +1,62 @@
+{
+    "autoStart": true,
+    "autoRestart": true,
+    "reportAllErrors": true,
+    "reportAllInfos": true,
+    "reportAllDebugs": true,
+
+    "name": "NO_SERVICE_NAME!",
+    "version": "0.2",
+    "softwareName": "NO_SOFTWARE_NAME!",
+
+    "schedulerActions": [
+    ],
+    "install": {
+        "commands": [],
+        "expectStdOut": [],
+        "expectStdErr": [],
+        "expectOutputTimeout": 0
+    },
+    "configure":  {
+        "commands": [],
+        "expectStdOut": [],
+        "expectStdErr": [],
+        "expectOutputTimeout": 60
+    },
+    "start":  {
+        "commands": [],
+        "expectStdOut": [],
+        "expectStdErr": [],
+        "expectOutputTimeout": 60
+    },
+    "afterStart":  {
+        "commands": [],
+        "expectStdOut": [],
+        "expectStdErr": [],
+        "expectOutputTimeout": 60
+    },
+    "stop":  {
+        "commands": [],
+        "expectStdOut": [],
+        "expectStdErr": [],
+        "expectOutputTimeout": 60
+    },
+    "afterStop":  {
+        "commands": ["rm -f SERVICE_PREFIX/service.pid"],
+        "expectStdOut": [],
+        "expectStdErr": [],
+        "expectOutputTimeout": 60
+    },
+    "reload":  {
+        "commands": [],
+        "expectStdOut": [],
+        "expectStdErr": [],
+        "expectOutputTimeout": 60
+    },
+    "validate": {
+        "commands": [],
+        "expectStdOut": [],
+        "expectStdErr": [],
+        "expectOutputTimeout": 60
+    }
+}

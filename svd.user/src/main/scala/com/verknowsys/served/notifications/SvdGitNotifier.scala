@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat
 import akka.actor.Actor
 
 
-class SvdGitNotifier(repo: GitRepository) extends Actor with Logging with SvdExceptionHandler {
+class SvdGitNotifier(repo: GitRepository) extends Actor with Logging with SvdActor {
 
     var oldHEAD = repo.head // XXX: var :(
 

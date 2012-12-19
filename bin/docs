@@ -1,163 +1,201 @@
-#!/usr/bin/env ruby
+#!/bin/sh
 
 # Usage: pass --color argument to colorize code with pygmentize
 
-require "rubygems"
-require "haml"
-require "fileutils"
+# require "rubygems"
+# require "haml"
+# require "fileutils"
 
-class CodeFilter
-  def render(text)
-    colorize(text.strip)
-  end
-  
-  def colorize(code)
-    if $colorize
-      print "."
-      code_html = nil
-      open("|pygmentize -l scala -O encoding=utf-8 -f html", 'r+') do |fd|
-        pid =
-          fork {
-            fd.close_read
-            fd.write code
-            fd.close_write
-            exit!
-          }
-        fd.close_write
-        code_html = fd.read
-        fd.close_read
-        Process.wait(pid)
-      end
+# class CodeFilter
+#   def render(text)
+#     colorize(text.strip)
+#   end
 
-      code_html
-    else
-      %Q{
-        <div class="highlight">
-          <pre>#{code}</pre>
-        </div>
-      }
-    end
-  end
-end
+#   def colorize(code)
+#     if $colorize
+#       print "."
+#       code_html = nil
+#       open("|pygmentize -l scala -O encoding=utf-8 -f html", 'r+') do |fd|
+#         pid =
+#           fork {
+#             fd.close_read
+#             fd.write code
+#             fd.close_write
+#             exit!
+#           }
+#         fd.close_write
+#         code_html = fd.read
+#         fd.close_read
+#         Process.wait(pid)
+#       end
 
-class SideCodeFilter < CodeFilter
-  def initialize(header)
-    @header = header
-  end
-  
-  def render(text)
-    %Q{
-      <div class="side">
-        <h4>#@header</h4>
-        #{colorize(text.strip)}
-      </div>
-    }
-  end
-end
+#       code_html
+#     else
+#       %Q{
+#         <div class="highlight">
+#           <pre>#{code}</pre>
+#         </div>
+#       }
+#     end
+#   end
+# end
 
-module Haml::Filters::Code
-  include Haml::Filters::Base
+# class SideCodeFilter < CodeFilter
+#   def initialize(header)
+#     @header = header
+#   end
 
-  def render(text)
-    CodeFilter.new.render(text)
-  end
-end
+#   def render(text)
+#     %Q{
+#       <div class="side">
+#         <h4>#@header</h4>
+#         #{colorize(text.strip)}
+#       </div>
+#     }
+#   end
+# end
 
-module Haml::Filters::Request
-  include Haml::Filters::Base
+# module Haml::Filters::Code
+#   include Haml::Filters::Base
 
-  def render(text)
-    SideCodeFilter.new("Request").render(text)
-  end
-end
+#   def render(text)
+#     CodeFilter.new.render(text)
+#   end
+# end
 
-module Haml::Filters::Response
-  include Haml::Filters::Base
+# module Haml::Filters::Request
+#   include Haml::Filters::Base
 
-  def render(text)
-    SideCodeFilter.new("Response").render(text)
-  end
-end
+#   def render(text)
+#     SideCodeFilter.new("Request").render(text)
+#   end
+# end
+
+# module Haml::Filters::Response
+#   include Haml::Filters::Base
+
+#   def render(text)
+#     SideCodeFilter.new("Response").render(text)
+#   end
+# end
 
 
-class Renderer
-  attr_accessor :content, :toc, :title
-end
+# class Renderer
+#   attr_accessor :content, :toc, :title
+# end
 
-@target_dir = "target/site"
-@src_dir = "docs/site"
-@chapters = []
+# @target_dir = "target/site"
+# @src_dir = "docs/site"
+# @chapters = []
 
-def generate(src_path, target_path, title = "")
-  print "Processing #{target_path}"
-  
-  FileUtils.mkdir_p(File.dirname(File.join(@target_dir, target_path)))
-  
-  src = File.read(File.join(@src_dir, src_path))
-  
-  renderer = Renderer.new
-  renderer.toc = @toc
-  renderer.title = title
-  
-  # render content
-  Haml::Engine.new(src).def_method(renderer, :render)
-  renderer.content = renderer.render
+# def generate(src_path, target_path, title = "")
+#   print "Processing #{target_path}"
 
-  # render layout
-  Haml::Engine.new(File.read(File.join(@src_dir, "layout.haml"))).def_method(renderer, :render)
-  content = renderer.render
-  
-  File.open(File.join(@target_dir, target_path.sub("/chapters/", "").sub(".haml", ".html").gsub("/", "-")), "w") do |f|
-    f.write content
-  end
-  puts
-end
+#   FileUtils.mkdir_p(File.dirname(File.join(@target_dir, target_path)))
 
-def generate_all(root, prefix = "")
-  root.each do |data|
-    if data[:sub]
-      generate_all(data[:sub])
-    else
-      generate(data[:file], prefix + data[:file], data[:title])
-    end
-  end
-end
+#   src = File.read(File.join(@src_dir, src_path))
 
-def title(filename)
-  File.basename(filename).split(".").first.split("-", 2)[1].gsub("-", " ")
-end
+#   renderer = Renderer.new
+#   renderer.toc = @toc
+#   renderer.title = title
 
-def tree(dir)
-  Dir[File.join(dir, "*")].map do |file|
-    data = { 
-      :title => title(file),
-      :file => file.sub(@src_dir, "")
-    }
-    data[:sub] = tree(file) if File.directory?(file)
-    data
-  end
-end
+#   # render content
+#   Haml::Engine.new(src).def_method(renderer, :render)
+#   renderer.content = renderer.render
 
-def list(root)
-  return "" if !root || root.empty?
-  "<ul>" + 
-  root.map do |e|
-    href = e[:file].index(".haml") ? e[:file].sub("/chapters/", "").sub(".haml", ".html").gsub("/", "-") : ""
-    
-    "<li><a href='#{href}'>#{e[:title]}</a>" + list(e[:sub]) + "</li>"
-  end.join("\n") +
-  "</ul>"
-end
+#   # render layout
+#   Haml::Engine.new(File.read(File.join(@src_dir, "layout.haml"))).def_method(renderer, :render)
+#   content = renderer.render
 
-$colorize = ARGV.include?("--color")
+#   File.open(File.join(@target_dir, target_path.sub("/chapters/", "").sub(".haml", ".html").gsub("/", "-")), "w") do |f|
+#     f.write content
+#   end
+#   puts
+# end
 
-chapters = tree(File.join(@src_dir, "chapters"))
-@toc = list(chapters)
+# def generate_all(root, prefix = "")
+#   root.each do |data|
+#     if data[:sub]
+#       generate_all(data[:sub])
+#     else
+#       generate(data[:file], prefix + data[:file], data[:title])
+#     end
+#   end
+# end
 
-generate("index.haml", "index.html")
-generate_all(chapters)
+# def title(filename)
+#   File.basename(filename).split(".").first.split("-", 2)[1].gsub("-", " ")
+# end
 
-["images", "stylesheets"].each do |e|
-  FileUtils.cp_r(File.join(@src_dir, e), @target_dir)
-end
+# def tree(dir)
+#   Dir[File.join(dir, "*")].map do |file|
+#     data = {
+#       :title => title(file),
+#       :file => file.sub(@src_dir, "")
+#     }
+#     data[:sub] = tree(file) if File.directory?(file)
+#     data
+#   end
+# end
 
+# def list(root)
+#   return "" if !root || root.empty?
+#   "<ul>" +
+#   root.map do |e|
+#     href = e[:file].index(".haml") ? e[:file].sub("/chapters/", "").sub(".haml", ".html").gsub("/", "-") : ""
+
+#     "<li><a href='#{href}'>#{e[:title]}</a>" + list(e[:sub]) + "</li>"
+#   end.join("\n") +
+#   "</ul>"
+# end
+
+# $colorize = ARGV.include?("--color")
+
+# chapters = tree(File.join(@src_dir, "chapters"))
+# @toc = list(chapters)
+
+# generate("index.haml", "index.html")
+# generate_all(chapters)
+
+# ["images", "stylesheets"].each do |e|
+#   FileUtils.cp_r(File.join(@src_dir, e), @target_dir)
+# end
+
+
+PDFLATEX_BIN="$(which pdflatex)"
+PYGMENTIZE_BIN="$(which pygmentize)"
+if [ "${PYGMENTIZE_BIN}" = "" ]; then
+  sofin get ruby
+  gem install pygmentize
+  sofin exportapp pygmentize ruby
+  export PYGMENTIZE_BIN="$(which pygmentize)"
+fi
+
+if [ "${PDFLATEX_BIN}" != "" ]; then
+  if [ "${PYGMENTIZE_BIN}" != "" ]; then # PYGMENTIZE is required for minted module.
+    cd docs/tex/
+    for i in *.tex; do
+      echo "Compiling $i with ${PDFLATEX_BIN}"
+      ${PDFLATEX_BIN} -shell-escape $i #>/dev/null
+      if [ "$?" != "0" ]; then
+        echo "Failure"
+        exit 1
+      fi
+    done
+    echo "Moving pdf to docs/"
+    mv *.pdf ../
+    echo "Done"
+
+  else
+    echo "pygmentize not found. Install it with: gem install pygmentize"
+    echo
+    echo "If you're using Sofin try doing:"
+    echo "  sofin get ruby"
+    echo "  gem install pygmentize"
+    echo "  sofin exportapp pygmentize ruby"
+    echo
+    echo "and retry ${0} script"
+  fi
+else
+  echo "pdflatex not found. Cannot build documentation withouth TexLive"
+fi

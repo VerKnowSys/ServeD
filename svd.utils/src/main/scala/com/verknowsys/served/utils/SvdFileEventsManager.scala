@@ -8,16 +8,11 @@ import akka.remote._
 import akka.util.Duration
 import akka.util.Timeout
 import akka.util.duration._
-import akka.actor._
-import com.sun.jna.NativeLong
-import com.sun.jna.{Native, Library}
-import events._
-
-import events._
-import com.verknowsys.served.utils.events._
+import com.sun.jna.{Native, Library, NativeLong}
+import com.verknowsys.served.utils.Events._
 import java.io._
 import org.apache.commons.io.FileUtils
-import events._
+import Events._
 import akka.actor._
 import akka.actor.Actor._
 import com.verknowsys.served.api._
@@ -25,11 +20,12 @@ import com.verknowsys.served.api.git._
 import com.verknowsys.served._
 
 
-object events {
-    case class SvdKqueueFileEvent(ident: Int, flags: Int)
-    case class SvdFileEvent(path: String, flags: Int)
-    case class SvdRegisterFileEvent(path: String, flags: Int, ref: ActorRef)
-    case class SvdUnregisterFileEvent(ref: ActorRef)
+object Events {
+    abstract class Base extends ApiMessage
+    case class SvdKqueueFileEvent(ident: Int, flags: Int) extends Base
+    case class SvdFileEvent(path: String, flags: Int) extends Base
+    case class SvdRegisterFileEvent(path: String, flags: Int, ref: ActorRef) extends Base
+    case class SvdUnregisterFileEvent(ref: ActorRef) extends Base
 
     class SvdKqueueException extends Exception
     class SvdKeventException extends Exception
@@ -75,12 +71,11 @@ object events {
  * @author dmilith
  *
  */
-trait SvdFileEventsReactor extends SvdExceptionHandler with Logging with SvdUtils {
+trait SvdFileEventsReactor extends SvdActor with Logging with SvdUtils {
 
     def registerFileEventFor(path: String, flags: Int, ref: ActorRef = self, uid: Int = 0) {
         def bindEvent {
-            val fem = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
-            fem ! SvdRegisterFileEvent(path, flags, ref)
+            self ! SvdRegisterFileEvent(path, flags, ref)
         }
 
         val file = new java.io.File(path)
@@ -106,21 +101,24 @@ trait SvdFileEventsReactor extends SvdExceptionHandler with Logging with SvdUtil
     }
 
     def unregisterFileEvents(ref: ActorRef = self) {
-        val fem = context.actorFor("akka://%s@127.0.0.1:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerPort))
+        val fem = context.actorFor("akka://%s@%s:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
         fem ! SvdUnregisterFileEvent(ref)
         log.debug("Unregistering events for Account Manager: %s", ref)
-        // ) onSuccess {
-        //     case _ =>
-        //         log.debug("Unregistered event.")
-        // } onFailure {
-        //     case x =>
-        //         log.error("Failure: %s", x)
-        // }
-        super.postStop // 2011-01-30 01:06:54 - dmilith - NOTE: execute SvdExceptionHandler's code
     }
 
-    override def preRestart(reason: Throwable) = unregisterFileEvents()
-    override def postStop = unregisterFileEvents()
+
+    override def preRestart(reason: Throwable, message: Option[Any]) {
+        log.warn("preRestart caused by reason: %s with message: %s", reason, message)
+        unregisterFileEvents()
+        super.preRestart(reason, message)
+    }
+
+
+    override def postStop {
+        log.debug("Post Stop in SvdFileEventsManager")
+        unregisterFileEvents()
+        super.postStop
+    }
 }
 
 
@@ -132,12 +130,12 @@ trait SvdFileEventsReactor extends SvdExceptionHandler with Logging with SvdUtil
  *
  * @author teamon
  */
-class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler with SvdUtils {
+class SvdFileEventsManager extends Actor with Logging with SvdActor with SvdUtils {
     import CLibrary._
+    import Events._
 
     log.info("SvdFileEventsManager is loading")
 
-    protected val clib = CLibrary.instance
     protected lazy val kq = {
         val k = clib.kqueue() // NOTE: C call
         if(k == -1) throwException[SvdKqueueException]("kQueue system call failed!") // check kqueue
@@ -178,11 +176,12 @@ class SvdFileEventsManager extends Actor with Logging with SvdExceptionHandler w
         log.info("SvdFileEventsManager initialized")
     }
 
-    override def preRestart(reason: Throwable) {
+    override def preRestart(reason: Throwable, message: Option[Any]) {
         readerThread.kill
     }
 
     override def postStop {
+        log.debug("PostStop in FileEventsManager")
         readerThread.kill
     }
 

@@ -1,0 +1,259 @@
+\documentclass[11pt,a4paper]{scrartcl}
+
+% NOTE: packages used
+\usepackage[utf8x]{inputenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{epstopdf}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{xcolor, listings}
+\usepackage{caption}
+\usepackage{minted}
+
+% NOTE: declarations and definitions document wide:
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\setlength{\parskip}{1.2ex}
+\setlength{\parindent}{2em}
+
+% dark green:
+\definecolor{green2}{HTML}{347235}
+
+\title{ServeD WebAPI}
+\author{\href{mailto:dmilith@verknowsys.com}{Daniel (dmilith) Dettlaff}}
+\subtitle{version 0.2.4}
+\date{2012-12-14}
+
+
+% NOTE: document content:
+\begin{document}
+
+\maketitle
+
+\section{HTTP JSON API Calls}\label{sec:apicalls}
+  All calls are by default using HTTP POST method.
+  An invalid request will return "status" code "1" error.
+
+  \begin{itemize}
+
+    \item \#000:
+      \begin{minted}{bash}
+    /Authorize
+      \end{minted}
+      \begin{minted}{scala}
+      @description checks user key and creates svdauth cookie.
+      @returns nothing.
+      @params Authorize=userAuthorizationKey
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#001:
+      \begin{minted}{bash}
+    /GetUserProcesses
+      \end{minted}
+      \begin{minted}{scala}
+      @description gets process information from all services and
+        applications running by user (owner of web panel).
+      @returns nothing or one of error codes: KDERR, NOPCS as
+        message in case of critical failure.
+      @params no additional params.
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#002:
+      \begin{minted}{bash}
+    /RegisterDomain
+      \end{minted}
+      \begin{minted}{scala}
+      @description registers user domain.
+      @returns nothing
+      @params RegisterDomain=domainNameBoundToServer
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#003:
+      \begin{minted}{bash}
+    /RegisteredDomains
+      \end{minted}
+      \begin{minted}{scala}
+      @description lists domains registered by user.
+      @returns list of domains as content.
+      @params no additional params.
+      @format json: {message: information_string, content: [domain1, ...]}
+      \end{minted}
+
+    \item \#004:
+      \begin{minted}{bash}
+    /GetStoredServices
+      \end{minted}
+      \begin{minted}{scala}
+      @description lists services stored by user.
+      @returns list of stored services as content.
+      @params no additional params.
+      @format json: {message: information_string, content: [Svc1, ...]}
+      \end{minted}
+
+    \item \#005:
+      \begin{minted}{bash}
+    /TerminateServices
+      \end{minted}
+      \begin{minted}{scala}
+      @description terminates all user spawned services.
+      @returns nothing.
+      @params no additional params.
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#006:
+      \begin{minted}{bash}
+    /StoreServices
+      \end{minted}
+      \begin{minted}{scala}
+      @description stores user spawned services. it will cause
+        autostart of those services on each WebPanel start.
+      @returns nothing.
+      @params no additional params.
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#007:
+      \begin{minted}{bash}
+    /SpawnService
+      \end{minted}
+      \begin{minted}{scala}
+      @description spawns given service.
+      @returns nothing.
+      @params SpawnService=ServiceName
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#008:
+      \begin{minted}{bash}
+    /TerminateService
+      \end{minted}
+      \begin{minted}{scala}
+      @description terminates service given as a param.
+      @returns nothing.
+      @params TerminateService=ServiceName
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#009:
+      \begin{minted}{bash}
+    /ShowAvailableServices
+      \end{minted}
+      \begin{minted}{scala}
+      @description shows all available services defined
+        to be used by user.
+      @returns list of available services as content array.
+      @params no additional params.
+      @format json: {message: information_string, content:[Svc1, ...] }
+      \end{minted}
+
+    \item \#010:
+      \begin{minted}{bash}
+    /SpawnServices
+      \end{minted}
+      \begin{minted}{scala}
+      @description spawns all stored services at once.
+      @returns status code 0 when service is started,
+        error otherwise.
+      @params no additional params.
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#011:
+      \begin{minted}{bash}
+    /GetServiceStatus
+      \end{minted}
+      \begin{minted}{scala}
+      @description checks service status.
+      @returns status code 0 when service is started with additional service uptime information,
+        error otherwise.
+      @params GetServiceStatus=ServiceName
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#012:
+      \begin{minted}{bash}
+    /GetServicePort
+      \end{minted}
+      \begin{minted}{scala}
+      @description retrieves service port on which given service is listening at.
+      @returns port list as content
+      @params GetServicePort=ServiceName
+      @format json: {message: information_string, content: [1025, 1026, ...]}
+      \end{minted}
+
+    \item \#013:
+      \begin{minted}{bash}
+    /CloneIgniterForUser
+      \end{minted}
+      \begin{minted}{scala}
+      @description creates a copy of existing service igniter for user.
+      @returns nothing.
+      @params IgniterName=originalServiceIgniter, UserIgniterName=userServiceName
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#014:
+      \begin{minted}{bash}
+    /RegisterAccount
+      \end{minted}
+      \begin{minted}{scala}
+      @description registers unique user name to prevent using it by others.
+      @returns nothing.
+      @params RegisterAccount=nameOfAccount
+      @format json: {message: information_string}
+      \end{minted}
+
+
+  \end{itemize}
+
+
+\section{HTTP JSON API Errors}\label{sec:apierrors}
+  All errors should have only two fields with JSON object respond: "status" and "message".
+
+  \begin{itemize}
+    \item "message" contains detailed information about error.
+    \item "status" codes:
+      \begin{description}
+        \item{0} - API Request executed successfully.
+        \item{1} - Invalid API Request.
+        \item{2} - Error executing API Request.
+        \item{3} - API Request Timeout.
+        \item{4} - API Request Crashed.
+        \item{5} - API Access Denied.
+        \item{-2} - Native error: NOPCS.
+        \item{-1} - Native error: KDERR.
+      \end{description}
+
+  \end{itemize}
+
+
+\section{Scala code usage examples}\label{sec:scalausage}
+  Scala code examples to be used in own code.
+
+  \begin{minted}[linenos,
+               numbersep=4pt,
+               gobble=2,
+               frame=lines,
+               framesep=2mm]{scala}
+  /** API call #001  */
+    case req @ POST(Path(Seg("GetUserProcesses" :: Nil))) =>
+      SvdWebAPI.apiRespond(webManager ? System.GetUserProcesses(account.uid))
+
+  /** API call #002  */
+    case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil))) =>
+      SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain))
+
+  \end{minted}
+
+
+\end{document}

@@ -1,6 +1,11 @@
 package com.verknowsys.served.utils
 
+
 import java.io.File
+
+import com.verknowsys.served._
+import com.verknowsys.served.utils._
+
 
 /**
     @author tallica
@@ -19,7 +24,10 @@ object SvdSymlink {
     }
 
 
-    def isSymlink(path: File) = CSymlink.instance.isSymlink(path)
+    def isSymlink(path: File) = {
+        import CUsageSys._
+        CUsageSys.instance.isSymlink(path)
+    }
 
 
     def getSymlinkDestination(path: File) = {

@@ -8,11 +8,8 @@ import com.verknowsys.served.api._
  * This module is related to operations on git repositories
  *
  * @author teamon
+ * @author dmilith
  */
-sealed abstract class Base extends ApiMessage
-
-
-// data
 
 case class Repository(
     name: String,                       // the name of repository
@@ -21,29 +18,34 @@ case class Repository(
 ) extends Persistent
 
 
-// messages
+object Git {
 
-case class GetRepositoryByName(name: String) extends Base
-case class GetRepositoryByUUID(uuid: UUID) extends Base
+    sealed abstract class Base extends ApiMessage
 
+    // messages
 
-case class CreateRepository(name: String) extends Base
-    // Repository
-case object RepositoryExistsError extends Base
-
-
-case class UpdateRepositoryConfiguration(repository: Repository) extends Base
-    // Success
+    case class GetRepositoryByName(name: String) extends Base
+    case class GetRepositoryByUUID(uuid: UUID) extends Base
 
 
-case class RemoveRepository(uuid: UUID) extends Base
-    // Success
-case object RepositoryDoesNotExistError extends Base
+    case class CreateRepository(name: String) extends Base
+        // Repository
+    case object RepositoryExistsError extends Base
 
 
-case object ListRepositories extends Base
-case class Repositories(repositories: List[Repository]) extends Base
+    case class UpdateRepositoryConfiguration(repository: Repository) extends Base
+        // Success
 
-case class AddAuthorizedKey(uuid: UUID, key: AccessKey) extends Base
-case class RemoveAuthorizedKey(uuid: UUID, key: AccessKey) extends Base
 
+    case class RemoveRepository(uuid: UUID) extends Base
+        // Success
+    case object RepositoryDoesNotExistError extends Base
+
+
+    case object ListRepositories extends Base
+    case class Repositories(repositories: List[Repository]) extends Base
+
+    case class AddAuthorizedKey(uuid: UUID, key: AccessKey) extends Base
+    case class RemoveAuthorizedKey(uuid: UUID, key: AccessKey) extends Base
+
+}

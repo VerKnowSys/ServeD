@@ -1,0 +1,65 @@
+\documentclass[11pt,a4paper]{scrartcl}
+
+% NOTE: packages used
+\usepackage[utf8x]{inputenc}
+\usepackage{polski}
+% \usepackage[polish]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{epstopdf}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{xcolor, listings}
+\usepackage{caption}
+
+% NOTE: declarations and definitions document wide:
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\setlength{\parskip}{1.2ex}
+\setlength{\parindent}{2em}
+
+% dark green:
+\definecolor{green2}{HTML}{347235}
+
+\title{Ankieta dla klienta: Strona WWW}
+\subtitle{wersja 0.2}
+\author{\href{mailto:dmilith@verknowsys.com}{Daniel (dmilith) Dettlaff}}
+\date{2012-12-14}
+
+
+% NOTE: document content:
+\begin{document}
+\renewcommand\thesection{\arabic{section}.}
+\renewcommand\thesubsection{\arabic{section}.\arabic{subsection}.}
+\renewcommand\thesubsubsection{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}.}
+
+\maketitle
+
+\section{Informacje ogólne.}\label{sec:ogolne}
+  \begin{enumerate}
+    \item Czy są przewidziane częste aktualizacje treści (teksty, obrazy) strony. Tak/ Nie.
+    \item Czy strona ma posiadać możliwość bezpłatnej aktualizacji treści przez użytkownika. Tak/ Nie.
+    \item Przewidywana ilość działów (podstron) na stronie: ?.
+    \item Czy użytkownik ma zarejestrowaną domenę pod którą ma znaleźć się strona. Tak/ Nie.
+    \item Przewidywany charakter strony: Zwykła informacyjna/ Serwis dynamiczny (np. sklep, serwis informacyjny, portal społecznościowy itp.).
+    \item Posiadane materiały na stronę. Informacje o kolorystyce, proponowanych elementach itp. ?.
+    \item Notatki, materiały, źródła, dodatkowe informacje i uwagi odnośnie strony: ?
+  \end{enumerate}
+
+
+\section{Informacje techniczne (opcjonalne).}\label{sec:techniczne}
+  \begin{enumerate}
+    \item Zdefiniowane wymagania technologii wykonania strony. Tak/ Nie. (domyślnie: zależnie od rodzaju serwisu. Jeśli "Nie", to do wyboru: Scala, Node, Rails, Php)
+    \item Wymagana zgodność strony z przeglądarkami Internet Explorer w wersji mniejszej niż "9". Tak/ Nie. (domyślnie Nie)
+    \item Wymagane stworzenie API użytkownika dla zewnętrznych użytkowników serwisu. Tak/ Nie. (domyślnie: Nie)
+    \item Wymagane dodatkowe bazy danych. Tak/ Nie. (domyślnie: Nie)
+    \item Wymagane wsparcie dla określonych technologii. Tak/ Nie. (domyślnie: Nie)
+    \item Wymagana obecność specjalizowanego środowiska testowego dla serwisu. Tak/ Nie. (domyślnie: Nie)
+  \end{enumerate}
+
+\end{document}
