@@ -457,7 +457,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             log.debug("Creating file watch on file: %s. Creating full path: %s", fileName, path)
             SvdFileEventBindings(db).find{_.absoluteFilePath == path} match {
                 case Some(x) =>
-                    log.info("Already registered File Event for file/ directory: %s. Ignoring trigger registering event.", fileName)
+                    log.trace("x contains: %s", x)
+                    log.info("Already registered File Event for file (or directory): %s. Ignoring trigger registering.", path)
 
                 case None =>
                     registerFileEventFor(path, flags)
@@ -471,7 +472,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             val path = userHomeDir / fileName
             log.debug("Destroying file watch on file: %s.", path)
 
-            SvdFileEventBindings(db).filter{_.absoluteFilePath == path}.map {
+            SvdFileEventBindings(db).find{_.absoluteFilePath == path}.map {
                 binding =>
                     log.info("Destroying file watch and binding for: %s", path)
                     val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(binding.serviceName))
@@ -483,12 +484,13 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                             context.stop(currServ)
 
                         case Left(xc) =>
-                            log.trace("Not (yet) started. Exception? %s", xc)
+                            log.trace("FEM Triggered Service Not (yet) started.")
+                            db ~ binding
                     }
             }
             log.debug("Unregistering File Events for path: %s", path)
             log.trace("Currently registered and stored bindings: %s", SvdFileEventBindings(db).mkString(", "))
-            // unregisterFileEvents() // unregister event watch
+            fem ! SvdUnregisterFileEvent(self) // unregister event watch
             sender ! Success
 
 
