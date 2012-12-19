@@ -86,6 +86,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         log.debug("System ports registered in Account database: %s".format(SvdSystemPorts(db).mkString(", ")))
         log.debug("User uids registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
         log.debug("User domains registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
+        log.warn("File Events Flags and numerical values: Modified: %d, Deleted: %d, Renamed: %d, AttributesChanged: %d, Revoked: %d, Linked: %d, All: %d", Modified, Deleted, Renamed, AttributesChanged, Revoked, Linked, All)
     }
 
 
