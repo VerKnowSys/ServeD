@@ -13,6 +13,7 @@ import com.verknowsys.served.api._
 import com.verknowsys.served.api.accountkeys._
 import com.verknowsys.served.api.pools._
 
+import java.io.FileNotFoundException
 import scala.io._
 import org.json4s._
 import org.json4s.native._
@@ -25,7 +26,7 @@ import org.json4s.native.JsonMethods._
  * class to automatically load default configs of given software
  * it uses package object with implicit conversion from string to service configuration
  */
-class SvdServiceConfigLoader(name: String) extends Logging {
+class SvdServiceConfigLoader(name: String) extends Logging with SvdUtils {
 
     implicit val formats = DefaultFormats // Brings in default date formats etc.
 
@@ -33,7 +34,19 @@ class SvdServiceConfigLoader(name: String) extends Logging {
 
     val fullName = SvdConfig.defaultSoftwareTemplatesDir / name + SvdConfig.defaultSoftwareTemplateExt
     val defaultTemplate = parse(Source.fromFile(SvdConfig.defaultSoftwareTemplate + SvdConfig.defaultSoftwareTemplateExt).mkString) //.extract[SvdServiceConfig]
-    val appSpecificTemplate = parse(Source.fromFile(fullName).mkString)
+    val appSpecificTemplate = parse(
+        try {
+            Source.fromFile(fullName).mkString
+        } catch {
+            case x: FileNotFoundException => // template not exists in common igniter location, try at user space
+                val userSideIgniter = SvdConfig.userHomeDir / "%d".format(getUserUid) / SvdConfig.defaultUserIgnitersDir / name + SvdConfig.defaultSoftwareTemplateExt
+                log.debug("Common igniter not found: %s. Trying again with: %s", fullName, userSideIgniter)
+                Source.fromFile(userSideIgniter).mkString
+
+            // case x: Exception => // template not exists
+                // log.error("SvdServiceConfigLoader Failure with igniter: %s", name)
+        }
+    )
     val appTemplateMerged = defaultTemplate merge appSpecificTemplate
 
     // val svcName = (appSpecificTemplate \\ "name").extract[String]

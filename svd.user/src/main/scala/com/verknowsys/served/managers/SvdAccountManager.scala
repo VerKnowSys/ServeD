@@ -269,7 +269,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
         case User.CloneIgniterForUser(igniterName, userIgniterNewName) => // #13
             try {
-                val igniterFile = new File(SvdConfig.defaultSoftwareTemplatesDir / igniterName + ".json")
+                val igniterFile = new File(SvdConfig.defaultSoftwareTemplatesDir / igniterName + SvdConfig.defaultSoftwareTemplateExt)
                 val userIgniterName = new File(userHomeDir / SvdConfig.defaultUserIgnitersDir / (
                     userIgniterNewName match {
                         case Some(nameSet) =>
@@ -278,7 +278,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                             igniterName
                     }
                 ))
-                FileUtils.copyFile(igniterFile, userIgniterName + ".json", false) // NOTE: false => don't copy attributes
+                FileUtils.copyFile(igniterFile, userIgniterName + SvdConfig.defaultSoftwareTemplateExt, false) // NOTE: false => don't copy attributes
                 sender ! Success
             } catch {
                 case e: Exception =>
@@ -392,7 +392,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
         case User.ShowAvailableServices => // #9
             log.debug("Showing available services definitions")
-            val availableSvces = listFiles(SvdConfig.defaultSoftwareTemplatesDir).filter{_.getName.endsWith(".json")}.map{_.getName.split("/").last}.mkString(",").replaceAll(".json", "") // XXX: replace with some good regexp
+            val availableSvces = (
+                listFiles(SvdConfig.defaultSoftwareTemplatesDir) ++ listFiles(userHomeDir / SvdConfig.defaultUserIgnitersDir))
+                .filter{_.getName.endsWith(".json")}.map{_.getName.split("/").last}.mkString(",").replaceAll(".json", "") // XXX: replace with some good regexp
             notificationsManager ! Notify.Message("Available Services: " + availableSvces)
             sender ! """{"message": "Available services", "content": [%s]}""".format(availableSvces.split(",").map{ c => "\"" +c+ "\"" }.mkString(", "))
 
