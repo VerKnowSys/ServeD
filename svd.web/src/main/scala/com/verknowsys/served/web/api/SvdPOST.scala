@@ -49,7 +49,7 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
     def intent = {
 
         /** API POST call #000  */
-        case req @ POST(Path(Seg("Authorize" :: Nil)) & Params(params)) =>
+        case req @ POST(Path("/Authorize") & Params(params)) =>
             log.debug("POST on Authorize")
             log.trace("XXX: for dmilith: %s".format(sha1("dmilith"))) // XXX
             log.trace("XXX: for tallica: %s".format(sha1("tallica"))) // XXX
@@ -68,7 +68,7 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
 
 
         /** API POST call #001  */
-        case req @ POST(Path(Seg("GetUserProcesses" :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path("/GetUserProcesses") & Cookies(cookies)) =>
             checkAuth(cookies) {
                 log.debug("POST on GetUserProcesses")
                 SvdWebAPI.apiRespond(webManager ? System.GetUserProcesses(account.uid))
@@ -76,7 +76,7 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
 
 
         /** API POST call #002  */
-        case req @ POST(Path(Seg("RegisterDomain" :: Nil)) & Params(params) & Cookies(cookies)) =>
+        case req @ POST(Path("/RegisterDomain") & Params(params) & Cookies(cookies)) =>
             checkAuth(cookies) {
                 def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
 
@@ -93,72 +93,72 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
 
 
         /** API POST call #003  */
-        case req @ POST(Path(Seg("RegisteredDomains" :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path("/RegisteredDomains") & Cookies(cookies)) =>
             checkAuth(cookies) {
                 SvdWebAPI.apiRespond(webManager ? User.RegisteredDomains)
             }
 
 
         /** API POST call #004  */
-        case req @ POST(Path(Seg("GetStoredServices" :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path("/GetStoredServices") & Cookies(cookies)) =>
             checkAuth(cookies) {
                 SvdWebAPI.apiRespond(webManager ? User.GetStoredServices)
             }
 
         /** API POST call #005  */
-        case req @ POST(Path(Seg("TerminateServices" :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path("/TerminateServices") & Cookies(cookies)) =>
             checkAuth(cookies) {
                 SvdWebAPI.apiRespond(webManager ? User.TerminateServices)
             }
 
         /** API POST call #006  */
-        case req @ POST(Path(Seg("StoreServices" :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path("/StoreServices") & Cookies(cookies)) =>
             checkAuth(cookies) {
                 SvdWebAPI.apiRespond(webManager ? User.StoreServices)
             }
 
         /** API POST call #007  */
-        case req @ POST(Path(Seg("SpawnService" :: Nil)) & Params(params) & Cookies(cookies)) =>
+        case req @ POST(Path("/SpawnService") & Params(params) & Cookies(cookies)) =>
             checkAuth(cookies) {
                 def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
                 SvdWebAPI.apiRespond(webManager ? User.SpawnService(param("SpawnService")))
             }
 
         /** API POST call #008  */
-        case req @ POST(Path(Seg("TerminateService" :: Nil)) & Params(params) & Cookies(cookies)) =>
+        case req @ POST(Path("/TerminateService") & Params(params) & Cookies(cookies)) =>
             checkAuth(cookies) {
                 def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
                 SvdWebAPI.apiRespond(webManager ? User.TerminateService(param("TerminateService")))
             }
 
         /** API POST call #009  */
-        case req @ POST(Path(Seg("ShowAvailableServices" :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path("/ShowAvailableServices") & Cookies(cookies)) =>
             checkAuth(cookies) {
                 SvdWebAPI.apiRespond(webManager ? User.ShowAvailableServices)
             }
 
         /** API POST call #010  */
-        case req @ POST(Path(Seg("SpawnServices" :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path("/SpawnServices") & Cookies(cookies)) =>
             checkAuth(cookies) {
                 SvdWebAPI.apiRespond(webManager ? User.SpawnServices)
             }
 
         /** API POST call #011  */
-        case req @ POST(Path(Seg("GetServiceStatus" :: Nil)) & Params(params) & Cookies(cookies)) =>
+        case req @ POST(Path("/GetServiceStatus") & Params(params) & Cookies(cookies)) =>
             checkAuth(cookies) {
                 def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
                 SvdWebAPI.apiRespond(webManager ? User.GetServiceStatus(param("GetServiceStatus")))
             }
 
         /** API POST call #012  */
-        case req @ POST(Path(Seg("GetServicePort" :: Nil)) & Params(params) & Cookies(cookies)) =>
+        case req @ POST(Path("/GetServicePort") & Params(params) & Cookies(cookies)) =>
             checkAuth(cookies) {
                 def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
                 SvdWebAPI.apiRespond(webManager ? User.GetServicePort(param("GetServicePort")))
             }
 
         /** API POST call #013  */
-        case req @ POST(Path(Seg("CloneIgniterForUser" :: Nil)) & Params(params) & Cookies(cookies)) =>
+        case req @ POST(Path("/CloneIgniterForUser") & Params(params) & Cookies(cookies)) =>
             checkAuth(cookies) {
                 def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
                 SvdWebAPI.apiRespond(webManager ? User.CloneIgniterForUser(
@@ -166,7 +166,7 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
             }
 
         /** API POST call #014  */
-        case req @ POST(Path(Seg("RegisterAccount" :: Nil)) & Params(params) & Cookies(cookies)) =>
+        case req @ POST(Path("/RegisterAccount") & Params(params) & Cookies(cookies)) =>
             def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
             SvdWebAPI.apiRespond(webManager ? Admin.RegisterAccount(param("RegisterAccount")))
 
