@@ -27,7 +27,7 @@
 
 \title{ServeD WebAPI}
 \author{\href{mailto:dmilith@verknowsys.com}{Daniel (dmilith) Dettlaff}}
-\subtitle{version 0.2.3}
+\subtitle{version 0.2.4}
 \date{2012-12-14}
 
 
@@ -49,7 +49,7 @@
       \begin{minted}{scala}
       @description checks user key and creates svdauth cookie.
       @returns nothing.
-      @params user key.
+      @params Authorize=userAuthorizationKey
       @format json: {message: information_string}
       \end{minted}
 
@@ -73,9 +73,7 @@
       \begin{minted}{scala}
       @description registers user domain.
       @returns nothing
-      @params accepts additional http param as domain, or takes
-        RegisterDomain key from http body data array (when no
-        additional http param is provided).
+      @params RegisterDomain=domainNameBoundToServer
       @format json: {message: information_string}
       \end{minted}
 
@@ -131,7 +129,7 @@
       \begin{minted}{scala}
       @description spawns given service.
       @returns nothing.
-      @params capitalized service name.
+      @params SpawnService=ServiceName
       @format json: {message: information_string}
       \end{minted}
 
@@ -142,7 +140,7 @@
       \begin{minted}{scala}
       @description terminates service given as a param.
       @returns nothing.
-      @params capitalized service name.
+      @params TerminateService=ServiceName
       @format json: {message: information_string}
       \end{minted}
 
@@ -178,7 +176,7 @@
       @description checks service status.
       @returns status code 0 when service is started with additional service uptime information,
         error otherwise.
-      @params capitalized service name.
+      @params GetServiceStatus=ServiceName
       @format json: {message: information_string}
       \end{minted}
 
@@ -189,7 +187,7 @@
       \begin{minted}{scala}
       @description retrieves service port on which given service is listening at.
       @returns port list as content
-      @params capitalized service name.
+      @params GetServicePort=ServiceName
       @format json: {message: information_string, content: [1025, 1026, ...]}
       \end{minted}
 
@@ -200,7 +198,7 @@
       \begin{minted}{scala}
       @description creates a copy of existing service igniter for user.
       @returns nothing.
-      @params existing igniter name, target name of user igniter.
+      @params IgniterName=originalServiceIgniter, UserIgniterName=userServiceName
       @format json: {message: information_string}
       \end{minted}
 
@@ -211,7 +209,7 @@
       \begin{minted}{scala}
       @description registers unique user name to prevent using it by others.
       @returns nothing.
-      @params account name.
+      @params RegisterAccount=nameOfAccount
       @format json: {message: information_string}
       \end{minted}
 

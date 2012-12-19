@@ -58,6 +58,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
             <body>
                 <script type="text/javascript" src="/assets/js/jquery-1.8.3.min.js"/>
                 <script type="text/javascript" src="/assets/js/bootstrap.min.js"/>
+                <script type="text/javascript" src="/assets/js/dough.min.js"/>
                 <script type="text/javascript" src="/assets/js/main.js"/>
                 { content }
             </body>
@@ -99,6 +100,17 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="authorize">Authorize as dmilith</div>
                     <div class="get_user_processes">GetUserProcesses</div>
                     <div class="get_stored_services">GetStoredServices</div>
+                    <div class="register_domain">RegisterDomain</div>
+                    <div class="registered_domains">RegisteredDomains</div>
+                    <div class="terminate_services">TerminateServices</div>
+                    <div class="store_services">StoreServices</div>
+                    <div class="spawn_service">SpawnService</div>
+                    <div class="terminate_service">TerminateService</div>
+                    <div class="show_available_services">ShowAvailableServices</div>
+                    <div class="spawn_services">SpawnServices</div>
+                    <div class="get_service_status">GetServiceStatus</div>
+                    <div class="clone_igniter_for_user">CloneIgniterForUser</div>
+                    <div class="register_account">RegisterAccount</div>
                 </article>
             )
 

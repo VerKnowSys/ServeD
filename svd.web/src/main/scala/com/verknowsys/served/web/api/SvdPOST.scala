@@ -49,16 +49,21 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
     def intent = {
 
         /** API POST call #000  */
-        case req @ POST(Path(Seg("Authorize" :: key :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path(Seg("Authorize" :: Nil)) & Params(params)) =>
             log.debug("POST on Authorize")
             log.trace("XXX: for dmilith: %s".format(sha1("dmilith"))) // XXX
             log.trace("XXX: for tallica: %s".format(sha1("tallica"))) // XXX
+            log.debug("PARAMS: %s".format(params.mkString))
+
+            def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
+            val key = param("Authorize")
             log.trace("XXX: given: %s".format(key)) // XXX
+
             if ((key == sha1("dmilith")) || (key == sha1("tallica"))) // FIXME: XXX: TODO: hardcode auth key
-                SetCookies(Cookie("svdauth", key, maxAge = Some(3600*24))) ~>
+                JsonContent ~> SetCookies(Cookie("svdauth", key, maxAge = Some(3600*24))) ~>
                     ResponseString("""{"message": "Authorized successfully.", "status": 0}""")
             else
-                Unauthorized ~>
+                JsonContent ~> Unauthorized ~>
                     ResponseString("""{"message": "Authorization failed.", "status": 5}""")
 
 
@@ -71,13 +76,6 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
 
 
         /** API POST call #002  */
-        case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil)) & Cookies(cookies)) =>
-            checkAuth(cookies) {
-                log.debug("POST /RegisterDomain by path")
-                log.info("Given domain to be registered: %s", domain)
-                SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain, webManager))
-            }
-
         case req @ POST(Path(Seg("RegisterDomain" :: Nil)) & Params(params) & Cookies(cookies)) =>
             checkAuth(cookies) {
                 def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
@@ -120,15 +118,17 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
             }
 
         /** API POST call #007  */
-        case req @ POST(Path(Seg("SpawnService" :: serviceName :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path(Seg("SpawnService" :: Nil)) & Params(params) & Cookies(cookies)) =>
             checkAuth(cookies) {
-                SvdWebAPI.apiRespond(webManager ? User.SpawnService(serviceName))
+                def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
+                SvdWebAPI.apiRespond(webManager ? User.SpawnService(param("SpawnService")))
             }
 
         /** API POST call #008  */
-        case req @ POST(Path(Seg("TerminateService" :: serviceName :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path(Seg("TerminateService" :: Nil)) & Params(params) & Cookies(cookies)) =>
             checkAuth(cookies) {
-                SvdWebAPI.apiRespond(webManager ? User.TerminateService(serviceName))
+                def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
+                SvdWebAPI.apiRespond(webManager ? User.TerminateService(param("TerminateService")))
             }
 
         /** API POST call #009  */
@@ -144,26 +144,31 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
             }
 
         /** API POST call #011  */
-        case req @ POST(Path(Seg("GetServiceStatus" :: name :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path(Seg("GetServiceStatus" :: Nil)) & Params(params) & Cookies(cookies)) =>
             checkAuth(cookies) {
-                SvdWebAPI.apiRespond(webManager ? User.GetServiceStatus(name))
+                def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
+                SvdWebAPI.apiRespond(webManager ? User.GetServiceStatus(param("GetServiceStatus")))
             }
 
         /** API POST call #012  */
-        case req @ POST(Path(Seg("GetServicePort" :: number :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path(Seg("GetServicePort" :: Nil)) & Params(params) & Cookies(cookies)) =>
             checkAuth(cookies) {
-                SvdWebAPI.apiRespond(webManager ? User.GetServicePort(number))
+                def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
+                SvdWebAPI.apiRespond(webManager ? User.GetServicePort(param("GetServicePort")))
             }
 
         /** API POST call #013  */
-        case req @ POST(Path(Seg("CloneIgniterForUser" :: igniterName :: userIgniterName :: Nil)) & Cookies(cookies)) =>
+        case req @ POST(Path(Seg("CloneIgniterForUser" :: Nil)) & Params(params) & Cookies(cookies)) =>
             checkAuth(cookies) {
-                SvdWebAPI.apiRespond(webManager ? User.CloneIgniterForUser(igniterName, Some(userIgniterName)))
+                def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
+                SvdWebAPI.apiRespond(webManager ? User.CloneIgniterForUser(
+                    param("IgniterName"), Some(param("UserIgniterName"))))
             }
 
         /** API POST call #014  */
-        case req @ POST(Path(Seg("RegisterAccount" :: accountName :: Nil)) & Cookies(cookies)) =>
-            SvdWebAPI.apiRespond(webManager ? Admin.RegisterAccount(accountName))
+        case req @ POST(Path(Seg("RegisterAccount" :: Nil)) & Params(params) & Cookies(cookies)) =>
+            def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
+            SvdWebAPI.apiRespond(webManager ? Admin.RegisterAccount(param("RegisterAccount")))
 
 
         /** API POST call #DEFAULT  */
