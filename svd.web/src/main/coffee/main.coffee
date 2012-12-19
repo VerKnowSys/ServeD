@@ -39,7 +39,8 @@ $ ->
     {link: "GetServiceStatus", element: "div.get_service_status", params: "GetServiceStatus=Redis" },
     {link: "GetServicePort", element: "div.get_service_port", params: "GetServicePort=Redis" },
     {link: "CloneIgniterForUser", element: "div.clone_igniter_for_user", params: "IgniterName=Redis&UserIgniterName=RedisDrugi" },
-    {link: "RegisterAccount", element: "div.register_account", params: "RegisterAccount=zbyszek1337" }
+    {link: "RegisterAccount", element: "div.register_account", params: "RegisterAccount=zbyszek1337" },
+    {link: "CreateFileWatch", element: "div.create_file_watch", params: "CreateFileWatch=Src/index.html2&Flags=3&ServiceName=Memcached" }
   ]
 
 

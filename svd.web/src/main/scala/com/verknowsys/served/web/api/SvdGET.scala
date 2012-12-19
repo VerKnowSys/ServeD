@@ -112,7 +112,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="clone_igniter_for_user">CloneIgniterForUser</div>
                     <div class="register_account">RegisterAccount</div>
                     <div class="get_service_port">GetServicePort</div>
-
+                    <div class="create_file_watch">CreateFileWatch</div>
                 </article>
             )
 

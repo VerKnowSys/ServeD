@@ -3,6 +3,7 @@ package com.verknowsys.served.api
 
 import com.verknowsys.served._
 import com.verknowsys.served.utils._
+import com.verknowsys.served.services._
 
 import unfiltered.request._
 import unfiltered.response._

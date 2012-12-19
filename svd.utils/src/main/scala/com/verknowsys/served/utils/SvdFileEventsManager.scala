@@ -74,31 +74,22 @@ object Events {
 trait SvdFileEventsReactor extends SvdActor with Logging with SvdUtils {
 
     def registerFileEventFor(path: String, flags: Int, ref: ActorRef = self, uid: Int = 0) {
-        def bindEvent {
-            self ! SvdRegisterFileEvent(path, flags, ref)
-        }
+        import java.io.File
 
-        val file = new java.io.File(path)
+        def bindEvent = self ! SvdRegisterFileEvent(path, flags, ref)
+
+        val file = new File(path)
         if (file.exists) {
-            log.debug("File to watch exists: %s.", path)
+            log.debug("Creating watch on existing file: %s.", path)
             bindEvent
         } else {
-            log.debug("File to watch doesn't exists. Will be created and watch set: %s", path)
-            file.createNewFile // XXX: only for root? how about some chmod and other event owners?
-            if (uid > 0) {
-                log.debug("Chowning file for uid: %d", uid)
-                chown(path, uid)
-            }
+            log.debug("File to watch doesn't exists. Assumming that we want to monitor a folder: %s", file)
+            file.mkdirs
+            log.info("Creating and starting monitoring of new folder: %s", file)
             bindEvent
         }
-
-        // val res = Await.result(future, timeout.duration).asInstanceOf[ActorRef]
-        // XXX: CHECKME
-        // res match {
-        //     case Some(fem) => fem ! SvdRegisterFileEvent(path, flags, this.self)
-        //     case None => log.warn("Could not register file event. FileEventsManager worker not found.")
-        // }
     }
+
 
     def unregisterFileEvents(ref: ActorRef = self) {
         val fem = context.actorFor("akka://%s@%s:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))

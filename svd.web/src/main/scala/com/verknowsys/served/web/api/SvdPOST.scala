@@ -170,6 +170,12 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
             def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
             SvdWebAPI.apiRespond(webManager ? Admin.RegisterAccount(param("RegisterAccount")))
 
+        /** API POST call #015  */
+        case req @ POST(Path("/CreateFileWatch") & Params(params) & Cookies(cookies)) =>
+            checkAuth(cookies) {
+                def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
+                SvdWebAPI.apiRespond(webManager ? User.CreateFileWatch(param("CreateFileWatch"), param("Flags").toInt, param("ServiceName")))
+            }
 
         /** API POST call #DEFAULT  */
         case req @ POST(_) =>

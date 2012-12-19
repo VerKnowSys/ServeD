@@ -33,6 +33,7 @@ import java.io.File
 import java.lang.{System => JSystem}
 
 
+
 case class AccountKeys(keys: Set[AccessKey] = Set.empty, uuid: UUID = randomUUID) extends Persistent
 object AccountKeysDB extends DB[AccountKeys]
 
@@ -43,6 +44,7 @@ case object SvdUserPorts extends DB[SvdUserPort]
 case object SvdSystemPorts extends DB[SvdSystemPort]
 case object SvdUserUIDs extends DB[SvdUserUID]
 case object SvdUserDomains extends DB[SvdUserDomain]
+case object SvdFileEventBindings extends DB[SvdFileEventBinding]
 
 
 /**
@@ -79,6 +81,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
 
     def displayAdditionalInformation(db: DBClient) {
+        log.debug("User File Event Bindings registered in Account database: %s", SvdFileEventBindings(db).mkString(", "))
         log.debug("User ports registered in Account database: %s".format(SvdUserPorts(db).mkString(", ")))
         log.debug("System ports registered in Account database: %s".format(SvdSystemPorts(db).mkString(", ")))
         log.debug("User uids registered in Account database: %s".format(SvdUserUIDs(db).mkString(", ")))
@@ -448,44 +451,84 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     }
             }
 
+
+        case User.CreateFileWatch(fileName, flags, serviceName) => // #15
+            val path = userHomeDir / fileName
+            log.debug("Creating file watch on file: %s. Creating full path: %s", fileName, path)
+
+            registerFileEventFor(path, flags)
+            db << SvdFileEventBinding(path, serviceName, flags)
+
+            log.info("Created file watch on file %s", path)
+            sender ! Success
+
+
         case AuthorizeWithKey(key) =>
             log.debug("Trying to find key in account: %s", account)
             sender ! accountKeys(db).keys.find(_.key == key).isDefined
 
+
         case ListKeys =>
             sender ! accountKeys(db).keys
+
 
         case AddKey(key) =>
             val ak = accountKeys(db)
             // log.debug("Adding key to user database: %s".format(ak))
             db << ak.copy(keys = ak.keys + key)
 
+
         case RemoveKey(key) =>
             val ak = accountKeys(db)
             db << ak.copy(keys = ak.keys - key)
 
-        case SvdFileEvent(path, flags) =>
-            log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))
-            flags match {
-                case Modified =>
-                    log.trace("File event type: Modified")
-                    // "INFO -- %s -- Performing %s of service: %s".format(currentHost, hookName, config.name)
-                    notificationsManager ! Notify.Message(formatMessage("I:File event notification: Modified on path: %s.".format(path)))
-                    gitManager ! Git.CreateRepository("somerepository")
-                case Deleted =>
-                    log.trace("File event type: Deleted")
-                case Renamed =>
-                    log.trace("File event type: Renamed")
-                    // gitManager ! Shutdown
-                case AttributesChanged =>
-                    log.trace("File event type: AttributesChanged")
-                    // gitManager ! RemoveRepository("somerepository")
-                case Revoked =>
-                    log.trace("File event type: Revoked")
-                case x =>
-                    log.trace("Got event: %s", x)
 
+        case SvdFileEvent(path, flags) =>
+            // at this point we know that trigger was shot and we need to match file to name of service and we're done
+            synchronized {
+                log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))
+                SvdFileEventBindings(db).toList.map {
+                    binding =>
+                        log.debug("Iterating through File Event Bindings. Currently: %s", binding)
+                        log.trace("%s vs %s,  %s vs %s,  svc: %s", path, binding.absoluteFilePath, flags, binding.flags, binding.serviceName)
+                        if ((path == binding.absoluteFilePath) &&  // this must be exactly same path
+                            (flags < binding.flags)) { // FIXME: XXX: NOT SURE it's ok, but flags must be at least same right?
+                            log.info("Launching trigger service for file: %s (if not already started)", path)
+                            val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(binding.serviceName))
+                            (currServ ? Ping) onComplete {
+                                case Right(Pong) => // it seems that service is already started
+                                    log.info("Triggered Service already running")
+
+                                case Left(ex) => // timeout probably?
+                                    log.trace("CurrServ exception: %s", ex)
+                                    val service = context.actorOf(Props(new SvdService(binding.serviceName, account)), "Service-%s".format(binding.serviceName))
+                                    context.watch(service)
+                            }
+                        }
+                }
+
+                // flags match {
+                //     case Modified =>
+                //         log.trace("File event type: Modified")
+                //         // "INFO -- %s -- Performing %s of service: %s".format(currentHost, hookName, config.name)
+                //         notificationsManager ! Notify.Message(formatMessage("I:File event notification: Modified on path: %s.".format(path)))
+                //         gitManager ! Git.CreateRepository("somerepository")
+                //     case Deleted =>
+                //         log.trace("File event type: Deleted")
+                //     case Renamed =>
+                //         log.trace("File event type: Renamed")
+                //         // gitManager ! Shutdown
+                //     case AttributesChanged =>
+                //         log.trace("File event type: AttributesChanged")
+                //         // gitManager ! RemoveRepository("somerepository")
+                //     case Revoked =>
+                //         log.trace("File event type: Revoked")
+                //     case x =>
+                //         log.trace("Got event: %s", x)
+
+                // }
             }
+
 
         case Success =>
             log.debug("Received Success")

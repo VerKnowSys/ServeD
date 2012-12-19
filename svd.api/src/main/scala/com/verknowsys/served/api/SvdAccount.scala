@@ -30,8 +30,16 @@ object User {
     case class SpawnService(name: String) extends Base
     case class TerminateService(name: String) extends Base
 
-    // case class GetAccount(uid: Int)
-    // case class GetAccountByName(name: String)
+
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  This message is used in communication between user core and WebAPI. It allows to set a file event on a file and perform actions defined in SvdService on a trigger. Flags constants are defined in SvdFileEventsManager.
+     *
+     * @warning fileToWatch parammeter will be prepended by default user's home directory, because it's the only place where user can create his file watches.
+     */
+    case class CreateFileWatch(fileToWatch: String, flags: Int, serviceName: String) extends Base
+
 
     /**
      * @author Daniel (dmilith) Dettlaff
@@ -136,3 +144,20 @@ case class SvdUserDomain(
     ) extends Persistent {
         override def toString = "SvdUserDomain(%s)[wldcrd: %s]".format(name, wildcard)
     }
+
+
+/**
+ * @author Daniel (dmilith) Dettlaff
+ *
+ *  This class contains path -> service name binding used in FEM triggers.
+ *
+ */
+case class SvdFileEventBinding(
+        absoluteFilePath: String,
+        serviceName: String,
+        flags: Int,
+        uuid: UUID = randomUUID
+    ) extends Persistent {
+        override def toString = "SvdFileEventBinding(%s triggers service: %s)".format(absoluteFilePath, serviceName)
+    }
+
