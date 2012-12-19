@@ -113,6 +113,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="register_account">RegisterAccount</div>
                     <div class="get_service_port">GetServicePort</div>
                     <div class="create_file_watch">CreateFileWatch</div>
+                    <div class="destroy_file_watch">DestroyFileWatch</div>
                 </article>
             )
 

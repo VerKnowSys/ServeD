@@ -44,6 +44,15 @@ object User {
     /**
      * @author Daniel (dmilith) Dettlaff
      *
+     *  This message will destroy all file watches on given file (of course if owned by user)
+     *
+     */
+    case class DestroyFileWatch(fileToUnwatch: String) extends Base
+
+
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
      *  Call to store domain record for user.
      *
      */

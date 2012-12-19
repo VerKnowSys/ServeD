@@ -455,11 +455,40 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         case User.CreateFileWatch(fileName, flags, serviceName) => // #15
             val path = userHomeDir / fileName
             log.debug("Creating file watch on file: %s. Creating full path: %s", fileName, path)
+            SvdFileEventBindings(db).find{_.absoluteFilePath == path} match {
+                case Some(x) =>
+                    log.info("Already registered File Event for file/ directory: %s. Ignoring trigger registering event.", fileName)
 
-            registerFileEventFor(path, flags)
-            db << SvdFileEventBinding(path, serviceName, flags)
+                case None =>
+                    registerFileEventFor(path, flags)
+                    db << SvdFileEventBinding(path, serviceName, flags)
+                    log.info("Created file watch on file %s", path)
+                    sender ! Success
+            }
 
-            log.info("Created file watch on file %s", path)
+
+        case User.DestroyFileWatch(fileName) => // #16
+            val path = userHomeDir / fileName
+            log.debug("Destroying file watch on file: %s.", path)
+
+            SvdFileEventBindings(db).filter{_.absoluteFilePath == path}.map {
+                binding =>
+                    log.info("Destroying file watch and binding for: %s", path)
+                    val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(binding.serviceName))
+                    (currServ ? User.ServiceStatus) onComplete {
+                        case Right(content) =>
+                            log.debug("Found FEM Triggered Service: %s", binding.serviceName)
+                            db ~ binding // remove record from user account db
+                            log.info("Removed binding for file %s", path)
+                            context.stop(currServ)
+
+                        case Left(xc) =>
+                            log.trace("Not (yet) started. Exception? %s", xc)
+                    }
+            }
+            log.debug("Unregistering File Events for path: %s", path)
+            log.trace("Currently registered and stored bindings: %s", SvdFileEventBindings(db).mkString(", "))
+            // unregisterFileEvents() // unregister event watch
             sender ! Success
 
 

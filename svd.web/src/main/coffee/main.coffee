@@ -40,7 +40,8 @@ $ ->
     {link: "GetServicePort", element: "div.get_service_port", params: "GetServicePort=Redis" },
     {link: "CloneIgniterForUser", element: "div.clone_igniter_for_user", params: "IgniterName=Redis&UserIgniterName=RedisDrugi" },
     {link: "RegisterAccount", element: "div.register_account", params: "RegisterAccount=zbyszek1337" },
-    {link: "CreateFileWatch", element: "div.create_file_watch", params: "CreateFileWatch=Src/index.html2&Flags=3&ServiceName=Memcached" }
+    {link: "CreateFileWatch", element: "div.create_file_watch", params: "CreateFileWatch=Src/index.html2&Flags=3&ServiceName=Memcached" },
+    {link: "DestroyFileWatch", element: "div.destroy_file_watch", params: "DestroyFileWatch=Src/index.html2" }
   ]
 
 

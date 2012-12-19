@@ -27,7 +27,7 @@
 
 \title{ServeD WebAPI}
 \author{\href{mailto:dmilith@verknowsys.com}{Daniel (dmilith) Dettlaff}}
-\subtitle{version 0.2.5}
+\subtitle{version 0.2.6}
 \date{2012-12-14}
 
 
@@ -219,9 +219,20 @@
       \end{minted}
       \begin{minted}{scala}
       @description registers file event monitor on file or directory. service is starting in case of sufficient flag trigger.
-      @params CreateFileWatch=absoluteFilPath&ServiceName=nameOfService&Flags=3
+      @params CreateFileWatch=absoluteFilePath&ServiceName=nameOfService&Flags=3
       @format json: {message: information_string}
       \end{minted}
+
+    \item \#016:
+      \begin{minted}{bash}
+    /DestroyFileWatch
+      \end{minted}
+      \begin{minted}{scala}
+      @description destroys file watches on given file (all!)
+      @params DestroyFileWatch=absoluteFilePath
+      @format json: {message: information_string}
+      \end{minted}
+
 
   \end{itemize}
 

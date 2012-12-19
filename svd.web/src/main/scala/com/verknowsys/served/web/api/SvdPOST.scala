@@ -177,6 +177,14 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
                 SvdWebAPI.apiRespond(webManager ? User.CreateFileWatch(param("CreateFileWatch"), param("Flags").toInt, param("ServiceName")))
             }
 
+        /** API POST call #016  */
+        case req @ POST(Path("/DestroyFileWatch") & Params(params) & Cookies(cookies)) =>
+            checkAuth(cookies) {
+                def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
+                SvdWebAPI.apiRespond(webManager ? User.DestroyFileWatch(param("DestroyFileWatch")))
+            }
+
+
         /** API POST call #DEFAULT  */
         case req @ POST(_) =>
             JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\", \"status\":3}")
