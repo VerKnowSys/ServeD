@@ -112,3 +112,6 @@ ctrlcli
 *.out
 *.synctex.gz
 /docs/tex/tmp/
+*.pdf
+*.pyg
+*?patch
