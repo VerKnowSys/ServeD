@@ -51,11 +51,9 @@ if [ "$?" = "0" ]; then
         bin/nativeinstall
     fi
     if [ $system = "Darwin" ]; then
-        sudo bin/ignitersuninstall
         sudo bin/ignitersinstall
         sudo mkdir -p /Software/.cache
     else
-        bin/ignitersuninstall
         bin/ignitersinstall
         mkdir -p /Software/.cache
     fi
