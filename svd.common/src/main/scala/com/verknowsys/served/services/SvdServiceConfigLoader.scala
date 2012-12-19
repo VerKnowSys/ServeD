@@ -56,7 +56,8 @@ class SvdServiceConfigLoader(name: String) extends Logging with SvdUtils {
     log.trace("Merged template: %s".format(compact(render(appTemplateMerged))))
 
     def config = SvdServiceConfig( // OPTIMIZE: this should be done automatically
-        name = (appTemplateMerged \ "name").extract[String],
+        name = name,
+        softwareName = (appTemplateMerged \ "softwareName").extract[String],
         autoRestart = (appTemplateMerged \ "autoRestart").extract[Boolean],
         autoStart = (appTemplateMerged \ "autoStart").extract[Boolean],
         reportAllErrors = (appTemplateMerged \ "reportAllErrors").extract[Boolean],

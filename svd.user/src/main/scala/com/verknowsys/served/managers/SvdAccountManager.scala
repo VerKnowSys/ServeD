@@ -430,9 +430,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         case User.GetServiceStatus(serviceName) => // #11
             val s = sender
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
-            (currServ ? Ping) onComplete {
-                case Right(Pong) =>
-                    s ! Success
+            (currServ ? User.ServiceStatus) onComplete {
+                case Right(content) =>
+                    s ! """{"message": "Service: %s. %s", "status": 0}""".format(serviceName, content)
 
                 case Left(x) =>
                     s ! Error("No response from service: %s".format(serviceName))
