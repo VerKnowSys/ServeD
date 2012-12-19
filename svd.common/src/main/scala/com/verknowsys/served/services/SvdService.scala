@@ -42,8 +42,9 @@ import org.quartz.impl._
 class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor with SvdUtils {
 
     val uptime = JSystem.currentTimeMillis // Service uptime measure point
-    val serviceRootPrefix = SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name
+    val serviceRootPrefix = SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.softwareName
     val servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
+
     val accountManager = context.actorFor("/user/SvdAccountManager")
     val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
     val portsFile = servicePrefix / ".service_ports"
@@ -70,12 +71,20 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
      *      For example "redis.installed" implies installed Redis software.
      *
      */
-    def installIndicator = new File(
-        if (account.uid == 0)
-            SvdConfig.systemHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.name / config.name.toLowerCase + "." + SvdConfig.installed
+    def installIndicator = {
+        // both cases: user side app (default) or root side (if no user service installed)
+        val userServiceLocation = new File(
+            SvdConfig.systemHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.softwareName / config.softwareName.toLowerCase + "." + SvdConfig.installed)
+        val rootServiceLocation = new File(
+            serviceRootPrefix / config.softwareName.toLowerCase + "." + SvdConfig.installed)
+
+        if (userServiceLocation.exists) // OPTIMIZE: do it better, but remember that userServiceLocation is default
+            userServiceLocation
+        else if (rootServiceLocation.exists)
+            rootServiceLocation
         else
-            serviceRootPrefix / config.name.toLowerCase + "." + SvdConfig.installed
-    )
+            userServiceLocation
+    }
 
 
     /**
@@ -301,6 +310,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             val msg = formatMessage("I:%s".format(this))
             log.debug(msg)
             accountManager ! Notify.Message(msg)
+            sender ! "%s".format(this)
 
         case User.GetServicePort =>
             log.debug("Getting port of service: %s:%d".format(config.name, servicePort))
