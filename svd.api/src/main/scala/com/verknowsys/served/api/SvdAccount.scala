@@ -50,6 +50,14 @@ object User {
     case object RegisteredDomains extends Base
 
 
+    /**
+     * @author Daniel (dmilith) Dettlaff
+     *
+     *  Call to perform user side, writable copy of already defined Igniter.
+     *
+     */
+    case class CloneIgniterForUser(igniterName: String, userIgniterName: Option[String] = None) extends Base
+
 }
 
 

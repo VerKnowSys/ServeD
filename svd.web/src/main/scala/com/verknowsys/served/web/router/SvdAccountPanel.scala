@@ -144,7 +144,9 @@ class SvdAccountPanel(webManager: ActorRef, account: SvdAccount, webPort: Int) e
         case req @ POST(Path(Seg("GetServicePort" :: number :: Nil))) =>
             SvdWebAPI.apiRespond(webManager ? User.GetServicePort(number))
 
-
+        /** API POST call #013  */
+        case req @ POST(Path(Seg("CloneIgniterForUser" :: igniterName :: userIgniterName :: Nil))) =>
+            SvdWebAPI.apiRespond(webManager ? User.CloneIgniterForUser(igniterName, Some(userIgniterName)))
 
 
         /** API POST call #DEFAULT  */

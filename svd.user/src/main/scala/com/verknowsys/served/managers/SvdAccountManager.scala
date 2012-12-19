@@ -11,6 +11,7 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.notifications._
 
+import org.apache.commons.io.FileUtils
 import java.security.PublicKey
 import akka.actor._
 import akka.dispatch._
@@ -93,6 +94,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         log.debug("Account Manager base folder checks in progress")
         checkOrCreateDir(userHomeDir / SvdConfig.softwareDataDir)
         checkOrCreateDir(userHomeDir / SvdConfig.webConfigDir)
+        checkOrCreateDir(userHomeDir / SvdConfig.defaultUserIgnitersDir)
 
 
         log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
@@ -263,6 +265,26 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             for (index <- 0 to SvdConfig.maxSchedulerDefinitions) { // XXX: hacky.. it's better to figure out how to get list of defined jobs from scheduler..
                 scheduler.deleteJob(jobKey("%s-%d".format(name, index)))
             }
+
+
+        case User.CloneIgniterForUser(igniterName, userIgniterNewName) => // #13
+            try {
+                val igniterFile = new File(SvdConfig.defaultSoftwareTemplatesDir / igniterName + ".json")
+                val userIgniterName = new File(userHomeDir / SvdConfig.defaultUserIgnitersDir / (
+                    userIgniterNewName match {
+                        case Some(nameSet) =>
+                            nameSet
+                        case None =>
+                            igniterName
+                    }
+                ))
+                FileUtils.copyFile(igniterFile, userIgniterName + ".json", false) // NOTE: false => don't copy attributes
+                sender ! Success
+            } catch {
+                case e: Exception =>
+                    sender ! Error("Exception occured: %s".format(e))
+            }
+
 
 
         case User.SpawnServices => // #10
