@@ -3,17 +3,13 @@
 
 package org.xmlpull.v1.builder;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 import org.xmlpull.v1.builder.impl.XmlInfosetBuilderImpl;
+
+import java.io.*;
 
 
 //     private XmlInfosetBuilder builder = XmlInfosetBuilder.newInstance(); // (XmlPullParser)

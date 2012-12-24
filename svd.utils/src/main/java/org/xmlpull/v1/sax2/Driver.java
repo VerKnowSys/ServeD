@@ -3,36 +3,18 @@
 
 package org.xmlpull.v1.sax2;
 
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.Reader;
-
-// not J2ME classes -- remove if you want to run in MIDP devices
-import java.net.URL;
-import java.net.MalformedURLException;
-
-
-// not J2ME classes
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.DTDHandler;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
-import org.xml.sax.XMLReader;
+import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
+
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+// not J2ME classes -- remove if you want to run in MIDP devices
+// not J2ME classes
 
 /**
  * SAX2 Driver that pulls events from XmlPullParser

@@ -1,13 +1,10 @@
 package com.verknowsys.served
 
 
-import com.verknowsys.served._
-import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
 
 import scala.io.Source
 import java.io._
-import scala.util._
 
 
 trait SvdAkkaSupport extends SvdUtils with Logging {

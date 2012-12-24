@@ -9,8 +9,9 @@
 
 package org.xmlpull.mxp1;
 
-import java.io.Reader;
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.Reader;
 
 /**
  * Extend MXP parser to use string cache of char[] to interned String

@@ -1,8 +1,8 @@
 package org.jivesoftware.smack.debugger;
 
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.util.*;
 

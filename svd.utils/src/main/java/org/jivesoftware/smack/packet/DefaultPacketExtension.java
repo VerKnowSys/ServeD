@@ -20,7 +20,10 @@
 
 package org.jivesoftware.smack.packet;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Default implementation of the PacketExtension interface. Unless a PacketExtensionProvider

@@ -1,10 +1,7 @@
 package com.verknowsys.served.utils
 
 
-import com.verknowsys.served._
 import com.verknowsys.served.testing._
-import com.verknowsys.served.utils._
-
 
 
 class SvdPropertiesTest extends DefaultTest with Logging with SvdUtils {

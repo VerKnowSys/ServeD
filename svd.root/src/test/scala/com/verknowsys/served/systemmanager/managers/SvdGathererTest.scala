@@ -1,28 +1,14 @@
 package com.verknowsys.served.systemmanager.managers
 
 
-import com.verknowsys.served.systemmanager.native._
-import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.api._
 import com.verknowsys.served.api.Admin._
-import com.verknowsys.served.db._
-import com.verknowsys.served._
 
-import java.io._
 import java.util.{Calendar, GregorianCalendar}
-import akka.actor._
-import akka.testkit.TestKit
-import akka.testkit.TestActorRef
-import com.typesafe.config.ConfigFactory
-import akka.dispatch._
 import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
-import akka.util.Timeout
 import akka.testkit.TestKit
-import akka.util.duration._
-import akka.actor.{ActorSystem, Props, ActorRef}
+import akka.actor.{ActorSystem, Props}
 import com.verknowsys.served.testing._
 
 

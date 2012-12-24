@@ -2,21 +2,10 @@ package com.verknowsys.served.utils
 
 
 import scala.collection.mutable.{HashMap => MutableMap, ListBuffer}
-import akka.dispatch._
-import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
-import akka.util.Timeout
-import akka.util.duration._
-import com.sun.jna.{Native, Library, NativeLong}
-import com.verknowsys.served.utils.Events._
-import java.io._
-import org.apache.commons.io.FileUtils
+import com.sun.jna.NativeLong
 import Events._
 import akka.actor._
-import akka.actor.Actor._
 import com.verknowsys.served.api._
-import com.verknowsys.served.api.git._
 import com.verknowsys.served._
 
 

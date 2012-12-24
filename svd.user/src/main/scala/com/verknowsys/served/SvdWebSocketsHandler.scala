@@ -4,10 +4,8 @@
 package com.verknowsys.served
 
 
-import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import org.webbitserver._
-import org.webbitserver.handler._
 
 
 trait DQueue[T] {

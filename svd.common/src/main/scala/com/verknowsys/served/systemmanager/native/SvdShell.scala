@@ -4,8 +4,7 @@ package com.verknowsys.served.systemmanager.native
 import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.utils._
-import scala.collection.mutable._
-import expectj._
+import expectj.ExpectJ
 
 
 class SvdShellException(reason: String) extends Exception(reason)

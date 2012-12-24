@@ -2,9 +2,7 @@ package com.verknowsys.served
 
 import scala.io.Source
 
-import com.verknowsys.served._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.SvdProperties
 
 
 object SvdConfig {

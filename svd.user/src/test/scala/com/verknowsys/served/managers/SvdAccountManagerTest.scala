@@ -1,20 +1,11 @@
 package com.verknowsys.served.managers
 
 
-import akka.testkit.TestActorRef
-import com.typesafe.config.ConfigFactory
-import akka.dispatch._
 import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
-import akka.util.Timeout
 import akka.testkit.TestKit
-import akka.util.duration._
 import akka.actor.{ActorSystem, Props}
 
-import com.verknowsys.served._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.SvdFileEventsManager
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.api._
@@ -34,7 +25,6 @@ class SvdAccountManagerTest(_system: ActorSystem) extends TestKit(_system) with 
 
     def waitForKqueue = waitFor(SvdConfig.kqueueWaitInterval)
 
-    import CLibrary._
     val clib = CLibrary.instance
     val account = currentAccount.copy(uid = clib.getuid)
     val am = system.actorOf(Props(new SvdAccountManager(account)))

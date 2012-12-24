@@ -20,6 +20,8 @@
 
 package com.verknowsys.served.utils;
 
+import org.apache.commons.codec.binary.Base64;
+
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -27,8 +29,6 @@ import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
-
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * The class is a utility class to read OpenSSH or SECSH encoded public key

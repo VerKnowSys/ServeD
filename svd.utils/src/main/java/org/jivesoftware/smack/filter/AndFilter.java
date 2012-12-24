@@ -22,8 +22,8 @@ package org.jivesoftware.smack.filter;
 
 import org.jivesoftware.smack.packet.Packet;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implements the logical AND operation over two or more packet filters.

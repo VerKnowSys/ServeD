@@ -3,11 +3,12 @@
 
 package org.xmlpull.v1.parser_pool;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // add aging so parser used more than X times is not resused ...
 

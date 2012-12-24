@@ -1,5 +1,8 @@
 package org.jivesoftware.smack.proxy;
 
+import org.jivesoftware.smack.util.Base64;
+
+import javax.net.SocketFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,8 +11,6 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import javax.net.SocketFactory;
-import org.jivesoftware.smack.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

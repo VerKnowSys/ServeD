@@ -4,8 +4,7 @@ package com.verknowsys.served
 import java.io.File
 import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.api.{SvdAccount, SvdShellOperations}
-import com.verknowsys.served.systemmanager.native.SvdShell
+import com.verknowsys.served.api.SvdAccount
 import com.verknowsys.served.utils.SvdUtils
 
 import org.apache.commons.io.FileUtils

@@ -1,8 +1,6 @@
 package com.verknowsys.served.api.scheduler
 
-
-import org.quartz._
-import org.quartz.impl._
+import org.quartz.{Trigger, JobDetail}
 
 
 object SvdScheduler {

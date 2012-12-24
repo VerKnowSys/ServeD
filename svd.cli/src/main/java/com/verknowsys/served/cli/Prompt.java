@@ -1,8 +1,10 @@
 package com.verknowsys.served.cli;
 
-import jline.*;
-import java.io.*;
-import java.util.*;
+import jline.ConsoleReader;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /** 
  * Small JLine wrapper. Using JLine in scala caused NullPointerExceptions.

@@ -4,6 +4,7 @@
 package org.xmlpull.v1.wrapper.classic;
 
 import org.xmlpull.v1.XmlSerializer;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;

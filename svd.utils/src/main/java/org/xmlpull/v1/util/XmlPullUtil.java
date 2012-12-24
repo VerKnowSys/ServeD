@@ -3,10 +3,11 @@
 
 package org.xmlpull.v1.util;
 
-import java.io.IOException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
+
+import java.io.IOException;
 
 /**
  * Handy functions that combines XmlPull API into higher level functionality.

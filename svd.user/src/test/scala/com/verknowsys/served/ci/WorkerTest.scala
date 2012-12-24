@@ -1,12 +1,7 @@
 package com.verknowsys.served.ci
 
 
-import akka.testkit.TestActorRef
-import com.typesafe.config.ConfigFactory
-import akka.dispatch._
 import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
 import akka.util.Timeout
 import akka.testkit.TestKit
 import akka.util.duration._
@@ -14,10 +9,6 @@ import akka.actor.ActorSystem
 import akka.actor.Props
 
 
-import com.verknowsys.served._
-import com.verknowsys.served.utils._
-import com.verknowsys.served.api.Logger
-import com.verknowsys.served.managers.LoggingManager
 import com.verknowsys.served.testing._
 
 

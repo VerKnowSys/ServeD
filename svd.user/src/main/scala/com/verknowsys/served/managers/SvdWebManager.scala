@@ -1,37 +1,17 @@
 package com.verknowsys.served.managers
 
 import com.verknowsys.served._
-import com.verknowsys.served.services._
 import com.verknowsys.served.api._
-import com.verknowsys.served.api.accountkeys._
-import com.verknowsys.served.api.git._
-import com.verknowsys.served.db.{DBServer, DBClient, DB}
 import com.verknowsys.served.utils._
-import com.verknowsys.served.web._
 import com.verknowsys.served.web.api._
-import com.verknowsys.served.systemmanager.native._
-import com.verknowsys.served.notifications._
 
-import java.security.PublicKey
-import akka.actor._
-import akka.dispatch._
 import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
 import akka.util.Timeout
 import akka.util.duration._
 import akka.actor._
 
-import unfiltered.util._
-import unfiltered.Cookie
-import unfiltered.request._
-import unfiltered.response._
-import unfiltered.kit._
 import unfiltered.jetty.Http
 import java.net.URL
-import unfiltered.filter.Plan
-import org.json4s._
-import org.json4s.native._
 
 
 /**

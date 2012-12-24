@@ -3,9 +3,6 @@ package com.verknowsys.served.utils
 
 import java.io.File
 
-import com.verknowsys.served._
-import com.verknowsys.served.utils._
-
 
 /**
     @author tallica
@@ -25,7 +22,6 @@ object SvdSymlink {
 
 
     def isSymlink(path: File) = {
-        import CUsageSys._
         CUsageSys.instance.isSymlink(path)
     }
 

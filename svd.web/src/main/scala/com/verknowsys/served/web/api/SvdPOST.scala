@@ -1,33 +1,17 @@
 package com.verknowsys.served.web.api
 
 
-import unfiltered.Cookie
 import unfiltered.request._
 import unfiltered.response._
-import unfiltered.kit._
-import unfiltered.filter._
-import org.json4s._
-import org.json4s.native._
-import java.util.UUID
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
-import com.verknowsys.served.utils._
-import com.verknowsys.served.web._
-import com.verknowsys.served.web.api._
-import com.verknowsys.served.db.{DBServer, DBClient, DB}
 
-import javax.servlet.http.HttpServletResponse
-import unfiltered.jetty.Http
-import java.net.URL
-import unfiltered.filter.Plan
 import akka.actor._
-import akka.dispatch._
 import akka.util.Timeout
 import akka.util.duration._
 import akka.pattern.ask
 import unfiltered.Cookie
-import unfiltered.Cookie._
 
 
 /**
@@ -36,11 +20,6 @@ import unfiltered.Cookie._
  *  Web POST API is used to perform communication with web manager
  */
 class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends SvdWebAPI(webManager) {
-
-    import org.json4s._
-    import org.json4s.native._
-    import org.json4s.JsonDSL._
-    import webImplicits._
 
 
     implicit val timeout = Timeout(SvdConfig.defaultAPITimeout/1000 seconds)

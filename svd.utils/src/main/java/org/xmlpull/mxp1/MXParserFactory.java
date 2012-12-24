@@ -9,14 +9,13 @@
 
 package org.xmlpull.mxp1;
 
-import java.util.Enumeration;
-
+import org.xmlpull.mxp1_serializer.MXSerializer;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
-import org.xmlpull.mxp1_serializer.MXSerializer;
+import java.util.Enumeration;
 
 /**
  * Simple facotry to speed up creation process.

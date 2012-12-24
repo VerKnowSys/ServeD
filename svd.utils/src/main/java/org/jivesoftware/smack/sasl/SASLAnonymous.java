@@ -21,8 +21,8 @@ package org.jivesoftware.smack.sasl;
 
 import org.jivesoftware.smack.SASLAuthentication;
 
-import java.io.IOException;
 import javax.security.auth.callback.CallbackHandler;
+import java.io.IOException;
 
 /**
  * Implementation of the SASL ANONYMOUS mechanism

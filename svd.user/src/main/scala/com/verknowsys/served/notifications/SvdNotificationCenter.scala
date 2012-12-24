@@ -3,10 +3,7 @@ package com.verknowsys.served.notifications
 import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.Logging
-
-import akka.actor.Actor
 
 
 class SvdNotificationCenter(account: SvdAccount) extends SvdActor with SvdUtils with Logging {

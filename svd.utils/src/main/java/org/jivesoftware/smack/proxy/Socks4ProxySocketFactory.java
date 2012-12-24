@@ -1,12 +1,12 @@
 package org.jivesoftware.smack.proxy;
 
+import javax.net.SocketFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import javax.net.SocketFactory;
 
 /**
  * Socket factory for socks4 proxy 

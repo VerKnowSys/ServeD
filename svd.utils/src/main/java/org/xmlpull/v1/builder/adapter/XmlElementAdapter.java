@@ -1,14 +1,11 @@
 package org.xmlpull.v1.builder.adapter;
 
 //import java.util.IdentityHashMap;
-import java.util.Iterator;
+
 import org.xmlpull.v1.builder.Iterable;
-import org.xmlpull.v1.builder.XmlAttribute;
-import org.xmlpull.v1.builder.XmlBuilderException;
-import org.xmlpull.v1.builder.XmlContainer;
-import org.xmlpull.v1.builder.XmlDocument;
-import org.xmlpull.v1.builder.XmlElement;
-import org.xmlpull.v1.builder.XmlNamespace;
+import org.xmlpull.v1.builder.*;
+
+import java.util.Iterator;
 
 /**
  */

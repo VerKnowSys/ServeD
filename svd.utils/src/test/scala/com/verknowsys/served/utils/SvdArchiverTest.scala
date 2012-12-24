@@ -1,17 +1,12 @@
 package com.verknowsys.served.utils
 
 
-import de.schlichtherle.io._
-import de.schlichtherle.key._
-import de.schlichtherle.crypto.io.raes._
-import java.io.{File, FileNotFoundException, DataOutputStream}
-import de.schlichtherle.io.{File => TFile, FileOutputStream}
-import scala.io.Source
+import java.io.File
+import de.schlichtherle.io.{File => TFile}
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.testing._
-import com.verknowsys.served.utils._
 
 
 /**

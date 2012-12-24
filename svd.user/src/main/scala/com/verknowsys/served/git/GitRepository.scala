@@ -3,9 +3,9 @@ package com.verknowsys.served.git
 import com.verknowsys.served.utils._
 import scala.collection.JavaConversions._
 import org.eclipse.jgit.api.{Git => JGit}
-import org.eclipse.jgit.lib.{AnyObjectId, Constants, Ref, PersonIdent}
+import org.eclipse.jgit.lib.{AnyObjectId, Constants, PersonIdent}
 import org.eclipse.jgit.storage.file.FileRepository
-import org.eclipse.jgit.revwalk.{RevCommit}
+import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.transport.{RemoteConfig, RefSpec}
 import java.io.File
 

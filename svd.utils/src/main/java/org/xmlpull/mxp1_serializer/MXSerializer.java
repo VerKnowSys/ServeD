@@ -1,11 +1,11 @@
 package org.xmlpull.mxp1_serializer;
 
+import org.xmlpull.v1.XmlSerializer;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-
-import org.xmlpull.v1.XmlSerializer;
 
 /**
  * Implementation of XmlSerializer interface from XmlPull V1 API.

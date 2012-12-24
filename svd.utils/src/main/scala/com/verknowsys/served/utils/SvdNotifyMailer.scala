@@ -5,9 +5,6 @@ package com.verknowsys.served.utils
 // import net.liftweb.util.Props
 // import javax.mail.{Authenticator,PasswordAuthentication}
 
-import com.verknowsys.served._
-import com.verknowsys.served.utils._
-
 
 /**
  *  @author dmilith

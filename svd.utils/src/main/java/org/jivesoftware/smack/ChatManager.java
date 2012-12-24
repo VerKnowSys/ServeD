@@ -20,13 +20,6 @@
 
 package org.jivesoftware.smack;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
-
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.FromContainsFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -35,6 +28,9 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smack.util.collections.ReferenceMap;
+
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * The chat manager keeps track of references to all current chats. It will not hold any references

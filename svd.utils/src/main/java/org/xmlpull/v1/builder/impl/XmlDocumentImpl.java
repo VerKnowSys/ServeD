@@ -3,18 +3,12 @@
 
 package org.xmlpull.v1.builder.impl;
 
+import org.xmlpull.v1.builder.Iterable;
+import org.xmlpull.v1.builder.*;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.xmlpull.v1.builder.Iterable;
-import org.xmlpull.v1.builder.XmlBuilderException;
-import org.xmlpull.v1.builder.XmlComment;
-import org.xmlpull.v1.builder.XmlDoctype;
-import org.xmlpull.v1.builder.XmlDocument;
-import org.xmlpull.v1.builder.XmlElement;
-import org.xmlpull.v1.builder.XmlNamespace;
-import org.xmlpull.v1.builder.XmlNotation;
-import org.xmlpull.v1.builder.XmlProcessingInstruction;
 
 public class XmlDocumentImpl implements XmlDocument
 {

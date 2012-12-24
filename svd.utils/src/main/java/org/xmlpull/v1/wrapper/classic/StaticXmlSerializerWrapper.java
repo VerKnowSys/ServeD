@@ -3,14 +3,15 @@
 
 package org.xmlpull.v1.wrapper.classic;
 
-import java.io.IOException;
-import java.io.StringReader;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 import org.xmlpull.v1.wrapper.XmlPullParserWrapper;
 import org.xmlpull.v1.wrapper.XmlPullWrapperFactory;
 import org.xmlpull.v1.wrapper.XmlSerializerWrapper;
+
+import java.io.IOException;
+import java.io.StringReader;
 
 /**
  * This class seemlesly extends exisiting serialzier implementation by adding new methods

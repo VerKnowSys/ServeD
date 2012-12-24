@@ -19,14 +19,13 @@
 
 package org.jivesoftware.smack.util;
 
-import java.util.Hashtable;
-import java.util.Map;
-
 import javax.naming.NamingEnumeration;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Utilty class to perform DNS lookups for XMPP services.

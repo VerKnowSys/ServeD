@@ -1,9 +1,10 @@
 package org.xmlpull.v1.builder.adapter;
 
 //import java.util.IdentityHashMap;
+
 import org.xmlpull.v1.builder.XmlAttribute;
-import org.xmlpull.v1.builder.XmlNamespace;
 import org.xmlpull.v1.builder.XmlElement;
+import org.xmlpull.v1.builder.XmlNamespace;
 
 /**
  * Wraps XML attribute - allows overriding and other nice things.

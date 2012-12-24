@@ -4,11 +4,8 @@ package com.verknowsys.served.scheduler
 import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.services._
 import com.verknowsys.served.systemmanager.native._
-
-import org.quartz._
-import org.quartz.impl._
+import org.quartz.{JobExecutionContext, Job}
 
 
 class TimeSynchronizeJob extends Job with Logging {

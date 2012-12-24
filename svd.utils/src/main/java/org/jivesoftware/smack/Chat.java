@@ -22,9 +22,9 @@ package org.jivesoftware.smack;
 
 import org.jivesoftware.smack.packet.Message;
 
-import java.util.Set;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**

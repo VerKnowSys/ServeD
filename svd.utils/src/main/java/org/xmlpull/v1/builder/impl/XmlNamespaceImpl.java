@@ -1,7 +1,7 @@
 package org.xmlpull.v1.builder.impl;
 
-import org.xmlpull.v1.builder.XmlNamespace;
 import org.xmlpull.v1.builder.XmlBuilderException;
+import org.xmlpull.v1.builder.XmlNamespace;
 
 /**
  * Simple implementation.

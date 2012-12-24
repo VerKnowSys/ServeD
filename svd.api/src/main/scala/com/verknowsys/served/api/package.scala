@@ -1,9 +1,6 @@
 package com.verknowsys.served
 
-import akka.dispatch._
 import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
 import akka.util.Timeout
 import akka.util.duration._
 import akka.actor._

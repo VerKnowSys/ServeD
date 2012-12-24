@@ -1,6 +1,8 @@
 package com.verknowsys.served.utils;
 
-import com.sun.jna.*;
+import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
 
 /**
  * C struct kevent * mapping

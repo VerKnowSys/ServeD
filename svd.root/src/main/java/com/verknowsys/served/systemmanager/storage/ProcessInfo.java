@@ -1,7 +1,7 @@
 package com.verknowsys.served.systemmanager.storage;
 
-import java.util.Date;
 import java.sql.Timestamp;
+import java.util.Date;
 
 public class ProcessInfo {
     public int pid;

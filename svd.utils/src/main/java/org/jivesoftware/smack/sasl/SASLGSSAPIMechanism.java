@@ -22,12 +22,11 @@ package org.jivesoftware.smack.sasl;
 import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPException;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.HashMap;
-import javax.security.sasl.Sasl;
-import javax.security.sasl.SaslClient;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.sasl.Sasl;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of the SASL GSSAPI mechanism

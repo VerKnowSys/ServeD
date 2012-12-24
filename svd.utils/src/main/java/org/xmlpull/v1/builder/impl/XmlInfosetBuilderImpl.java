@@ -1,23 +1,15 @@
 package org.xmlpull.v1.builder.impl;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlSerializer;
+import org.xmlpull.v1.builder.*;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlSerializer;
-import org.xmlpull.v1.builder.XmlAttribute;
-import org.xmlpull.v1.builder.XmlBuilderException;
-import org.xmlpull.v1.builder.XmlComment;
-import org.xmlpull.v1.builder.XmlContainer;
-import org.xmlpull.v1.builder.XmlDocument;
-import org.xmlpull.v1.builder.XmlElement;
-import org.xmlpull.v1.builder.XmlNamespace;
-import org.xmlpull.v1.builder.XmlInfosetBuilder;
-import org.xmlpull.v1.builder.XmlSerializable;
-import org.xmlpull.v1.builder.XmlCharacters;
 
 //TODO: add equals() and hashcode()
 //TODO: think about how to do gernali XmlSerialziable (to simplify serialzie()

@@ -1,7 +1,6 @@
 package com.verknowsys.served.cli
 
-import akka.actor.{Actor, ActorRef}
-import com.verknowsys.served.api.{Success, Error, General, RemoteSession}
+import com.verknowsys.served.api.RemoteSession
 
 
 /**

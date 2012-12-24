@@ -1,13 +1,6 @@
 package com.verknowsys.served.db
 
 
-import org.scalatest._
-import org.scalatest.matchers._
-
-import com.verknowsys.served._
-import com.verknowsys.served.utils._
-import com.verknowsys.served.api.Logger
-import com.verknowsys.served.managers.LoggingManager
 import com.verknowsys.served.testing._
 
 

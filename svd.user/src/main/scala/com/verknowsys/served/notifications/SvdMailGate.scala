@@ -1,7 +1,6 @@
 package com.verknowsys.served.notifications
 
 
-import com.verknowsys.served._
 import com.verknowsys.served.utils._
 
 

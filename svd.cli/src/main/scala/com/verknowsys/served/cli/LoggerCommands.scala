@@ -1,6 +1,6 @@
 package com.verknowsys.served.cli
 
-import com.verknowsys.served.api.{Success, Logger}
+import com.verknowsys.served.api.Logger
 
 object LoggerCommands extends Commands {
     def commands(implicit svd: Svd): PartialFunction[Args, Unit] = {

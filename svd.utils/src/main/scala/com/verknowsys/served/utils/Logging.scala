@@ -3,11 +3,7 @@ package com.verknowsys.served.utils
 import akka.actor.{Actor, ActorRef}
 // import akka.event.EventHandler
 import akka.event.{Logging => AkkaLogging}
-import java.io.FileWriter
-import akka.event.Logging.InitializeLogger
-import akka.event.Logging.LoggerInitialized
 
-import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.api._
 
 

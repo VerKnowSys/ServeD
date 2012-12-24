@@ -3,7 +3,6 @@ package com.verknowsys.served
 
 import com.verknowsys.served.utils._
 import com.verknowsys.served.testing._
-import com.verknowsys.served.api.Logger
 // import scalaz._
 
 

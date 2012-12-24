@@ -9,8 +9,9 @@
 
 package org.xmlpull.mxp1;
 
-import java.io.IOException;
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 
 /**
  * Extend MXP parser to be full non validating XML 1.0 parser

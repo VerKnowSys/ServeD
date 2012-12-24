@@ -22,8 +22,8 @@ package org.jivesoftware.smack;
 
 import javax.net.ssl.X509TrustManager;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;

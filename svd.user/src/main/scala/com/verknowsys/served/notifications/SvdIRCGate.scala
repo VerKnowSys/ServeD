@@ -3,18 +3,12 @@ package com.verknowsys.served.notifications
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
-import com.verknowsys.served.api.accountkeys._
-import com.verknowsys.served.api.git._
-import com.verknowsys.served.services._
 import com.verknowsys.served.utils._
 
 import org.jibble.pircbot._
 import org.json4s._
-import org.json4s.native._
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
-import java.util.Calendar
-import java.text.SimpleDateFormat
 import redis.clients.jedis._
 import scala.collection.JavaConverters._
 

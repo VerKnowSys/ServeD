@@ -7,13 +7,9 @@ package com.verknowsys.served
 import org.scalatest._
 import org.scalatest.matchers._
 // import akka.testkit.TestKit
-import akka.testkit.TestActorRef
 import java.io.File
 import scala.io.Source
 import org.apache.commons.io.FileUtils
-import com.typesafe.config.ConfigFactory
-import org.apache.commons.io.FileUtils
-import akka.actor.ActorRef
 import com.verknowsys.served.api.SvdAccount
 
 

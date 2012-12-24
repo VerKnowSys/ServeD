@@ -11,15 +11,8 @@ import com.verknowsys.served.api._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.Logging
 
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.RandomAccessFile
 import akka.actor._
-import com.sun.jna.{Native, Library}
-import scala.collection.mutable.ListBuffer
-import scala.collection.JavaConversions._
 import org.webbitserver._
-import org.webbitserver.handler._
 
 
 /**

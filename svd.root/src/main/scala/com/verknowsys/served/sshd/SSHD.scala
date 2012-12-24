@@ -1,19 +1,9 @@
 package com.verknowsys.served.sshd
 
-import com.verknowsys.served._
-import com.verknowsys.served.sshd._
-import com.verknowsys.served.managers.SvdAccountsManager
 import com.verknowsys.served.utils._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.api._
-import com.verknowsys.served.api.accountkeys._
 import akka.actor._
-import akka.dispatch._
-import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
-import akka.util.Timeout
-import akka.util.duration._
 
 import java.security.PublicKey
 import org.apache.sshd._
@@ -23,7 +13,6 @@ import org.apache.sshd.server.session._
 import org.apache.sshd.server.command._
 import org.apache.sshd.server.keyprovider._
 import org.apache.sshd.server.shell._
-import com.typesafe.config.ConfigFactory
 
 
 sealed class SSHD(port: Int) extends SvdActor {

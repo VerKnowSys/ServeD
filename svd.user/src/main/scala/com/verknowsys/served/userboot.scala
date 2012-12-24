@@ -1,19 +1,13 @@
 package com.verknowsys.served
 
 
-import com.verknowsys.served._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.managers.LoggingManager
 import com.verknowsys.served.managers.SvdAccountManager
 import com.verknowsys.served.api._
 
-import com.typesafe.config.ConfigFactory
-import akka.actor._
-import akka.dispatch._
 import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
 import akka.util.duration._
 import akka.actor._
 import scala.io.Source

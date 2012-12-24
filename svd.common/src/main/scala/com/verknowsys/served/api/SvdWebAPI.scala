@@ -3,15 +3,8 @@ package com.verknowsys.served.api
 
 import com.verknowsys.served._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.services._
 
-import unfiltered.request._
 import unfiltered.response._
-import java.net.URL
-import unfiltered.filter.Plan
-import org.json4s._
-import org.json4s.native._
-import akka.actor._
 import akka.dispatch._
 import akka.util.Timeout
 import akka.util.duration._

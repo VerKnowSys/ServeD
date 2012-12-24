@@ -1,8 +1,5 @@
 package com.verknowsys.served.api
 
-import com.verknowsys.served.api._
-import com.verknowsys.served.api.pools._
-
 
 /**
  *  API object for user messages:

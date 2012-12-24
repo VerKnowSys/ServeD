@@ -1,14 +1,7 @@
 package org.xmlpull.v1.builder.adapter;
 
 import org.xmlpull.v1.builder.Iterable;
-import org.xmlpull.v1.builder.XmlContainer;
-import org.xmlpull.v1.builder.XmlDocument;
-import org.xmlpull.v1.builder.XmlElement;
-import org.xmlpull.v1.builder.XmlNamespace;
-import org.xmlpull.v1.builder.XmlNotation;
-import org.xmlpull.v1.builder.XmlComment;
-import org.xmlpull.v1.builder.XmlProcessingInstruction;
-import org.xmlpull.v1.builder.XmlDoctype;
+import org.xmlpull.v1.builder.*;
 
 /**
  */

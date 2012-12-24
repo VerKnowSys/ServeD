@@ -3,15 +3,9 @@ package com.verknowsys.served.systemmanager.managers
 
 import com.verknowsys.served.managers.SvdManager
 
-import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils._
-import com.verknowsys.served.systemmanager.native._
-import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.api._
-import com.verknowsys.served.db._
-import com.verknowsys.served.utils.Logging
 
-import org.apache.commons.io.FileUtils
 import akka.actor._
 
 
@@ -25,7 +19,6 @@ import akka.actor._
 class SvdGatherer(account: SvdAccount) extends SvdManager {
     log.info("Starting Gatherer for account: " + account)
 
-    import com.verknowsys.served.utils.CUsageSys._
     lazy val usagesys = CUsageSys.instance
     // String getProcessUsage(int uid, boolean consoleOutput);
 

@@ -1,6 +1,5 @@
 package com.verknowsys.served.utils
 
-import scala.collection.mutable.ListBuffer
 
 /**
  * Simple benchmark utility

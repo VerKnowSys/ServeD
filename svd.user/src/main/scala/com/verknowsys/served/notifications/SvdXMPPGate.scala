@@ -3,24 +3,15 @@ package com.verknowsys.served.notifications
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
-import com.verknowsys.served.api.accountkeys._
-import com.verknowsys.served.api.git._
-import com.verknowsys.served.services._
 import com.verknowsys.served.utils._
 
 import scala.collection.mutable.ListBuffer
+
+import akka.actor._
+import org.jivesoftware.smack._
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
-
-import akka.actor._
-import akka.dispatch._
-import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
-import akka.util.Timeout
-import akka.util.duration._
-import akka.actor._
 
 
 class SvdXMPPGate(host: String, port: Int, login: String, password: String, resource: String, account: SvdAccount, accountManager: ActorRef) extends Gate with MessageListener with Logging with SvdUtils {

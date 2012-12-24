@@ -8,7 +8,6 @@ import com.verknowsys.served.api.SvdAccount
 
 import de.schlichtherle.io._
 import de.schlichtherle.key._
-import de.schlichtherle.crypto.io.raes._
 import java.io.{File, FileNotFoundException, DataOutputStream}
 import de.schlichtherle.io.{File => TFile, FileOutputStream}
 import scala.io.Source

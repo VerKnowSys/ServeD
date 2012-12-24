@@ -4,15 +4,9 @@ package com.verknowsys.served.managers
 import com.verknowsys.served._
 import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.Events._
-import com.verknowsys.served.systemmanager.native._
-import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.api.{SvdUserPort, SvdUserUID, SvdAccount, SvdSystemPort, SvdUserDomain}
 import com.verknowsys.served.api.pools._
-import com.verknowsys.served.services._
 
-import scala.io.Source
-import java.io._
 import scala.util._
 
 

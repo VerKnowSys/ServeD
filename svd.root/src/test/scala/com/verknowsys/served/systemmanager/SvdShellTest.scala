@@ -2,16 +2,10 @@ package com.verknowsys.served.systemmanager
 
 
 import com.verknowsys.served.testing._
-import com.verknowsys.served._
 import com.verknowsys.served.api._
-import com.verknowsys.served.systemmanager._
-import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
 
-import org.apache.commons.io.FileUtils
 import java.lang._
-import java.io._
 
 
 class SvdShellTest extends DefaultTest {
@@ -36,7 +30,6 @@ class SvdShellTest extends DefaultTest {
 
 
     it should "get proper output from shell" in {
-        import expectj.TimeoutException
 
         val sh = new SvdShell(
             new SvdAccount(

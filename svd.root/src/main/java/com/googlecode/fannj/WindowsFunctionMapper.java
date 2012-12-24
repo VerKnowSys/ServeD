@@ -2,6 +2,7 @@ package com.googlecode.fannj;
 
 import com.sun.jna.FunctionMapper;
 import com.sun.jna.NativeLibrary;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

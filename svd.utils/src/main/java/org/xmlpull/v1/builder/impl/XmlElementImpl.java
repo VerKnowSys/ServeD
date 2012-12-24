@@ -4,11 +4,11 @@
 package org.xmlpull.v1.builder.impl;
 
 import org.xmlpull.v1.builder.*;
+import org.xmlpull.v1.builder.Iterable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.xmlpull.v1.builder.Iterable;
 //import org.xmlpull.v1.builder.SimpleIterator;
 
 /**

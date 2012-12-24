@@ -1,6 +1,7 @@
 package org.jivesoftware.smack;
 
 import org.jivesoftware.smack.packet.StreamError;
+
 import java.util.Random;
 /**
  * Handles the automatic reconnection process. Every time a connection is dropped without

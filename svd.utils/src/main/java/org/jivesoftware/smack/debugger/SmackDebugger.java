@@ -20,9 +20,10 @@
 
 package org.jivesoftware.smack.debugger;
 
-import java.io.*;
-
 import org.jivesoftware.smack.*;
+
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * Interface that allows for implementing classes to debug XML traffic. That is a GUI window that 

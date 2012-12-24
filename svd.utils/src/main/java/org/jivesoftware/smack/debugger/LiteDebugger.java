@@ -20,16 +20,17 @@
 
 package org.jivesoftware.smack.debugger;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.event.*;
-import java.io.*;
-
-import javax.swing.*;
-
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.packet.*;
 import org.jivesoftware.smack.util.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.*;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * The LiteDebugger is a very simple debugger that allows to debug sent, received and 

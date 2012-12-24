@@ -1,18 +1,10 @@
 package com.verknowsys.served.managers
 
 
-import akka.testkit.TestActorRef
-import com.typesafe.config.ConfigFactory
-import akka.dispatch._
 import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
-import akka.util.Timeout
 import akka.testkit.TestKit
-import akka.util.duration._
 import akka.actor.{ActorSystem, Props}
 
-import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.git._
 import com.verknowsys.served.db._

@@ -1,36 +1,23 @@
 package com.verknowsys.served.services
 
 
-import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.api.scheduler._
 import com.verknowsys.served.db._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.Events._
-import com.verknowsys.served.utils.signals.SvdPOSIX._
-import com.verknowsys.served.services._
-import com.verknowsys.served.api.accountkeys._
-import com.verknowsys.served.api.pools._
 import com.verknowsys.served.scheduler._
 
-import org.json4s._
-import org.json4s.native._
 import scala.io._
-import scala.util._
 import java.io.File
 import akka.actor._
 import akka.dispatch._
 import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
 import akka.util.Timeout
 import akka.util.duration._
 import java.lang.{System => JSystem}
-
-import org.quartz._
-import org.quartz.impl._
+import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
 
 
 /**

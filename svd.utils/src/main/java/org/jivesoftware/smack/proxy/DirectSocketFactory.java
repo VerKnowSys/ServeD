@@ -1,12 +1,8 @@
 package org.jivesoftware.smack.proxy;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import javax.net.SocketFactory;
+import java.io.IOException;
+import java.net.*;
 
 /**
  * SocketFactory for direct connection

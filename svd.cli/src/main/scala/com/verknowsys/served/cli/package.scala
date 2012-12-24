@@ -1,17 +1,6 @@
 package com.verknowsys.served
 
 
-import com.verknowsys.served._
-import com.verknowsys.served.api.ApiMessage
-import akka.dispatch._
-import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
-import akka.util.Timeout
-import akka.util.duration._
-import akka.actor._
-
-
 package object cli {
 
     type Args = Iterable[String]

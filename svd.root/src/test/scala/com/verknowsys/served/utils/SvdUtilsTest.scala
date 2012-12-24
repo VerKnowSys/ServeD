@@ -4,7 +4,6 @@ package com.verknowsys.served.utils
 import com.verknowsys.served.testing._
 import com.verknowsys.served._
 
-import scala.util._
 import org.apache.commons.io.FileUtils
 import java.io.File
 

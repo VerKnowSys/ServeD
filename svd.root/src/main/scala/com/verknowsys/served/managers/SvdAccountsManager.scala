@@ -2,25 +2,24 @@ package com.verknowsys.served.managers
 
 
 import com.verknowsys.served._
-import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
+import com.verknowsys.served.api._
 import com.verknowsys.served.utils.Events._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.systemmanager.managers._
-import com.verknowsys.served.api._
+
 import com.verknowsys.served.api.pools._
 import com.verknowsys.served.services._
-
-import scala.io.Source
 import akka.actor._
+import scala.io.Source
+
 import akka.dispatch._
 import akka.pattern.ask
 import akka.remote._
 import akka.util.Duration
 import akka.util.Timeout
 import akka.util.duration._
-
 
 /**
  *  @author dmilith

@@ -1,20 +1,14 @@
 package com.verknowsys.served.utils
 
 
-import com.verknowsys.served._
 import com.verknowsys.served.utils.signals._
-import com.verknowsys.served.utils._
 import com.verknowsys.served._
 import SvdPOSIX._
 
 import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import org.apache.commons.io.FileUtils
 import clime.messadmin.providers.sizeof.ObjectProfiler
 import scala.collection.JavaConversions._
-import scala.util.matching.Regex
-import scala.io._
-import com.sun.jna.Native
 import java.io._
 import java.net._
 import java.util.UUID
@@ -22,8 +16,6 @@ import java.util.{Calendar, GregorianCalendar}
 import java.util.zip.DataFormatException
 import java.util.zip.Deflater
 import java.util.zip.Inflater
-import java.util.ArrayList
-import java.util.regex.Pattern
 import sun.misc.SignalHandler
 import sun.misc.Signal
 import java.net.NetworkInterface
@@ -37,7 +29,6 @@ import java.net.NetworkInterface
  */
 trait SvdUtils extends Logging {
 
-    import CLibrary._
     lazy val clib = CLibrary.instance
 
 
@@ -88,7 +79,6 @@ trait SvdUtils extends Logging {
       *
       */
     def kill(pid: Long, signal: SvdPOSIX.Value = SIGINT) = {
-        import CLibrary._
         val clib = CLibrary.instance
         log.trace("Sending %d signal to pid %d".format(signal.id, pid))
         if (clib.kill(pid, signal.id) == 0)
@@ -133,7 +123,6 @@ trait SvdUtils extends Logging {
             log.warn("Chmod: File or directory doesn't exists! Cannot chmod non existant file: '%s'! IGNORING!".format(path))
             false
         } else {
-            import CLibrary._
             val clib = CLibrary.instance
             val files = if (recursive) recursiveListFilesFromPath(new File(path))else List(new File(path))
             log.trace("chmod(path: %s, mode: %d, recursion: %s)".format(path, mode, recursive))
@@ -241,7 +230,6 @@ trait SvdUtils extends Logging {
      *   Returns uid owner of given file/dir
      */
      def getOwner(path: String) = {
-        import CStat._
         CStat.instance.getOwner(path)
      }
 
@@ -416,7 +404,6 @@ trait SvdUtils extends Logging {
      *   Returns uid of current logged in user
      */
     def getUserUid = {
-        import CLibrary._
         CLibrary.instance.getuid
     }
 

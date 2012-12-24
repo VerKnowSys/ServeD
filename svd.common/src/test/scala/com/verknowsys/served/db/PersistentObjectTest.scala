@@ -1,12 +1,9 @@
 package com.verknowsys.served.db
 
 
-import com.verknowsys.served.api.git._
-import akka.testkit.TestKit
 import com.verknowsys.served.testing._
 // import org.scalatest.FlatSpec
 // import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.matchers.ShouldMatchers._
 
 
 class PersistentObjectTest extends DatabaseTest with DefaultTest {

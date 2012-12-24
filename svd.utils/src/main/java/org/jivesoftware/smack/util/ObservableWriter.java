@@ -20,8 +20,10 @@
 
 package org.jivesoftware.smack.util;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An ObservableWriter is a wrapper on a Writer that notifies to its listeners when

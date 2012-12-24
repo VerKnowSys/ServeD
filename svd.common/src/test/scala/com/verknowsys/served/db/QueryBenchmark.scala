@@ -3,7 +3,6 @@ package com.verknowsys.served.db
 import com.verknowsys.served.testing._
 import com.verknowsys.served.utils.Benchmark._
 import com.verknowsys.served.utils._
-import com.verknowsys.served._
 
 import org.neodatis.odb._
 import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery

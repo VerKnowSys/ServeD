@@ -20,6 +20,11 @@
 
 package org.jivesoftware.smack;
 
+import org.jivesoftware.smack.debugger.SmackDebugger;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.Presence;
+
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
@@ -32,11 +37,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.jivesoftware.smack.debugger.SmackDebugger;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.Presence;
 
 /**
  * The abstract Connection class provides an interface for connections to a
