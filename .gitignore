@@ -22,7 +22,6 @@ target
 target-eclipse
 # build
 .idea/
-*.iml
 *.iws
 *.ipr
 *.tmproj
