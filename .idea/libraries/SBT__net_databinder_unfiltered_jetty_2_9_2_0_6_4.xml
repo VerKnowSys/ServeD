@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="SBT: net.databinder:unfiltered-jetty_2.9.2:0.6.4">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/net.databinder/unfiltered-jetty_2.9.2/jars/unfiltered-jetty_2.9.2-0.6.4.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.ivy2/cache/net.databinder/unfiltered-jetty_2.9.2/docs/unfiltered-jetty_2.9.2-0.6.4-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/net.databinder/unfiltered-jetty_2.9.2/srcs/unfiltered-jetty_2.9.2-0.6.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
