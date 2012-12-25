@@ -8,6 +8,7 @@ package com.verknowsys.served
 import scala.io.Source
 
 import com.verknowsys.served.utils._
+import java.util.UUID
 
 
 object SvdConfig {
@@ -21,19 +22,19 @@ object SvdConfig {
      */
 
     def version                         = Source.fromURL(getClass.getResource("/FULLVERSION")).getLines.mkString + "-b" + Source.fromURL(getClass.getResource("/BUILD")).getLines.mkString
-    def copyright                       = "Copyright © 2oo8-2o13 VerKnowSys.com - All " +
-      "Rights Reserved."
+    def copyright                       = "Copyright © 2oo8-2o13 VerKnowSys.com - All Rights Reserved."
     def operatingSystem                 = System.getProperty("os.name")
     def binaryArchitecture              = "64"
     def systemVersion                   = System.getProperty("os.version")
-    def binarySoftwareRepository        = "http://software.verknowsys.com/binary" / operatingSystem / binaryArchitecture / systemVersion
+    def binarySoftwareRepository        = "http://software.verknowsys.com" / "binary" /
+      operatingSystem / binaryArchitecture / systemVersion
     def kickApp                         = "svdkick"
     def servedShell                     = "svdshell"
     def rootPidFile                     = "0.pid"
     def coreSvdDatabaseName             = "svd.db"
     def coreSvdAccountsDatabaseName     = "accounts.db"
     def served                          = "ServeD"
-    def servedFull                      = "%s v%s".format(served, version)
+    def servedFull                      = served / version
     def systemConfDir                   = "/etc/"
     def temporaryDir                    = "/tmp/"
     def systemHomeDir                   = "/SystemUsers/"
@@ -60,9 +61,11 @@ object SvdConfig {
     def defaultUserName                 = "guest"
     def defaultUserUID                  = 501
     def defaultSoftwareTemplateExt      = ".json"
-    def defaultSoftwareTemplate         = userHomeDir / "Common/Igniters/Default"
-    def defaultSoftwareTemplatesDir     = userHomeDir / "Common/Igniters/Services/"
-    def defaultUserIgnitersDir          = "Igniters/Services/"
+    def defaultSoftwareTemplate         = userHomeDir / "Common" / "Igniters" /
+      "Default"
+    def defaultSoftwareTemplatesDir     = userHomeDir / "Common" / "Igniters" /
+      "Services/"
+    def defaultUserIgnitersDir          = "Igniters" / "Services/"
     def remoteApiServerHost             = "10.10.0.1" // 2011-06-09 00:15:00 - dmilith - TODO: XXX: switch to automatic ip detection (one with default route set)
     def defaultAPITimeout               = 15000 // 15 seconds
     def sshPort                         = 22
@@ -93,7 +96,7 @@ object SvdConfig {
     def notificationXmppHost            = "verknowsys.com"
     def notificationXmppLogin           = "notifications"
     def notificationXmppPassword        = "mkonjibhu"
-    def notificationXmppResource        = "svd-" + java.util.UUID.randomUUID
+    def notificationXmppResource        = "svd-" + UUID.randomUUID
     def notificationXmppPort            = 65222
     def notificationXmppCompression     = false
     def notificationXmppUseSasl         = false

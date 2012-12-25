@@ -20,7 +20,7 @@ trait SvdAkkaSupport extends SvdUtils with Logging {
      *   Creates akka configuration file for given user.
      *   It might be used to create akka configuration for headless svduser
      */
-    def createAkkaUserConfIfNotExistant(uid: Int, userManagerPort: Int) = {
+    def createAkkaUserConfIfNotExistant(uid: Int, userManagerPort: Int) {
         val configFile = SvdConfig.userHomeDir / "%d".format(uid) / SvdConfig.defaultAkkaConfName
 
         if (!new File(configFile).exists) {
