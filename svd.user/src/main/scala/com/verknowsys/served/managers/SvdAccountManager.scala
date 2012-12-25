@@ -1,3 +1,8 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.managers
 
 import com.verknowsys.served._
@@ -31,7 +36,6 @@ import org.quartz.JobKey._
 import org.quartz.impl.matchers._
 import java.io.File
 import java.lang.{System => JSystem}
-
 
 
 case class AccountKeys(keys: Set[AccessKey] = Set.empty, uuid: UUID = randomUUID) extends Persistent

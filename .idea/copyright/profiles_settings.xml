@@ -1,5 +1,6 @@
 <component name="CopyrightManager">
-  <settings default="">
+  <settings default="ServeD">
     <module2copyright />
+    <LanguageOptions name="Scala" />
   </settings>
 </component>

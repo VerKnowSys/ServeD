@@ -4,7 +4,8 @@
     <option name="SCALAC_BEFORE" value="false" />
     <option name="COMPILER_LIBRARY_NAME" value="scala-compiler" />
     <option name="COMPILER_LIBRARY_LEVEL" value="Project" />
-    <option name="VM_PARAMETERS" value="-Xss1m -client" />
+    <option name="MAXIMUM_HEAP_SIZE" value="768" />
+    <option name="VM_PARAMETERS" value="-Xss1m -server -XX:PermSize=512m" />
   </component>
 </project>
 

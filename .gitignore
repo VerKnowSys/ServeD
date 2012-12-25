@@ -112,3 +112,4 @@ ctrlcli
 *.pdf
 *.pyg
 *?patch
+/.idea/workspace.xml
