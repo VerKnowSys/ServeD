@@ -23,7 +23,6 @@ import java.util.zip.Deflater
 import java.util.zip.Inflater
 import sun.misc.SignalHandler
 import sun.misc.Signal
-import java.net.NetworkInterface
 
 
 /**
@@ -34,7 +33,8 @@ import java.net.NetworkInterface
  */
 trait SvdUtils extends Logging {
 
-    lazy val clib = CLibrary.instance
+    final lazy val clib = CLibrary.instance
+    final lazy val cstat = CStat.instance
 
 
     /**
@@ -62,11 +62,8 @@ trait SvdUtils extends Logging {
       */
     def defaultShell = {
         System.getProperty("os.name") match {
-            case "FreeBSD" =>
+            case "FreeBSD" | "Mac OS X" =>
                 "/Software/Zsh/exports/zsh"
-
-            case "Mac OS X" =>
-                "/usr/local/bin/zsh"
 
             case _ =>
                 "/usr/bin/zsh"
@@ -84,7 +81,6 @@ trait SvdUtils extends Logging {
       *
       */
     def kill(pid: Long, signal: SvdPOSIX.Value = SIGINT) = {
-        val clib = CLibrary.instance
         log.trace("Sending %d signal to pid %d".format(signal.id, pid))
         if (clib.kill(pid, signal.id) == 0)
             true
@@ -128,7 +124,6 @@ trait SvdUtils extends Logging {
             log.warn("Chmod: File or directory doesn't exists! Cannot chmod non existant file: '%s'! IGNORING!".format(path))
             false
         } else {
-            val clib = CLibrary.instance
             val files = if (recursive) recursiveListFilesFromPath(new File(path))else List(new File(path))
             log.trace("chmod(path: %s, mode: %d, recursion: %s)".format(path, mode, recursive))
 
@@ -146,7 +141,7 @@ trait SvdUtils extends Logging {
      *  @author dmilith
      *  Returns real host name (not "localhost")
      */
-    def currentHost = java.net.InetAddress.getLocalHost
+    def currentHost = InetAddress.getLocalHost
 
 
     /**
@@ -235,7 +230,7 @@ trait SvdUtils extends Logging {
      *   Returns uid owner of given file/dir
      */
      def getOwner(path: String) = {
-        CStat.instance.getOwner(path)
+        cstat.getOwner(path)
      }
 
 
@@ -307,13 +302,14 @@ trait SvdUtils extends Logging {
                 bos.write(buf, 0, count)
             } catch {
                 case e: DataFormatException =>
+                    log.error("Data Format Exception: %s", e)
             }
         }
         try {
             bos.close
         } catch {
             case e: Exception =>
-                log.trace("Exception in decompress: " + e)
+                log.error("Exception in decompress: " + e)
         }
         val decompressedByte = bos.toByteArray
         val decompressedString = new String(decompressedByte)
@@ -344,7 +340,7 @@ trait SvdUtils extends Logging {
      *
      */
     def getAllLiveThreads = log.trace("Live threads list:\n%s".format(
-        Thread.getAllStackTraces.toList.map{
+        Thread.getAllStackTraces.map{
             th =>
                 "%s - %s\n".format(
                     th._1,
@@ -409,7 +405,7 @@ trait SvdUtils extends Logging {
      *   Returns uid of current logged in user
      */
     def getUserUid = {
-        CLibrary.instance.getuid
+        clib.getuid
     }
 
 
