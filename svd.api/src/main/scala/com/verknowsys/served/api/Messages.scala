@@ -43,8 +43,9 @@ object General {
 
     case object GetStatus extends Base
 
-    object Status extends Enumeration {
-        val Connected, Disconnected = Value
+    object Status {
+        case object Connected
+        case object Disconnected
     }
 }
 
