@@ -21,7 +21,9 @@ object SvdConfig {
      *
      */
 
-    def version                         = Source.fromURL(getClass.getResource("/FULLVERSION")).getLines.mkString + "-b" + Source.fromURL(getClass.getResource("/BUILD")).getLines.mkString
+    def fullVersion                     = Source.fromURL(getClass.getResource("/FULLVERSION")).getLines.mkString.trim
+    def buildNum                        = Source.fromURL(getClass.getResource("/BUILD")).getLines.mkString.trim
+    def version                         = fullVersion + "-b" + buildNum
     def copyright                       = "Copyright © 2oo8-2o13 VerKnowSys.com - All Rights Reserved."
     def operatingSystem                 = System.getProperty("os.name")
     def binaryArchitecture              = "64"
