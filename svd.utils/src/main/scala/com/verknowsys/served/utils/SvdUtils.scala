@@ -541,7 +541,7 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @autor dmilith
+     *  @author dmilith
      *
      *  Get list of fields of case class using reflection
      */

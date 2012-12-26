@@ -37,8 +37,8 @@ object User {
      * @author Daniel (dmilith) Dettlaff
      *
      *  This message is used in communication between user core and WebAPI. It allows to set a file event on a file and perform actions defined in SvdService on a trigger. Flags constants are defined in SvdFileEventsManager.
+     *  fileToWatch parammeter will be prepended by default user's home directory, because it's the only place where user can create his file watches.
      *
-     * @warning fileToWatch parammeter will be prepended by default user's home directory, because it's the only place where user can create his file watches.
      */
     case class CreateFileWatch(fileToWatch: String, flags: Int, serviceName: String) extends Base
 

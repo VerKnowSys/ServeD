@@ -13,9 +13,8 @@ import com.verknowsys.served.utils._
 
 import akka.actor._
 import akka.pattern.ask
-import unfiltered._
 import unfiltered.filter.Plan
-import unfiltered.Cookie
+import unfiltered._
 
 
 /**

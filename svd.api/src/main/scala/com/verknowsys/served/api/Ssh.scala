@@ -30,7 +30,6 @@ case class AccessKey(name: String, key: PublicKey){
 /**
  * Generic command for public key access control
  *
- * @response Boolean
  */
 case class AuthorizeWithKey(key: PublicKey)
 
