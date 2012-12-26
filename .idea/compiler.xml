@@ -14,12 +14,23 @@
       <entry name="?*.dtd" />
       <entry name="?*.tld" />
       <entry name="?*.ftl" />
+      <entry name="BUILD" />
+      <entry name="FULLVERSION" />
+      <entry name="VERSION" />
+      <entry name="?*.conf" />
+      <entry name="?*.css" />
+      <entry name="?*.js" />
+      <entry name="?*.pub" />
     </wildcardResourcePatterns>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="false">
         <processorPath useClasspath="true" />
       </profile>
     </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="DEBUGGING_INFO" value="false" />
+    <option name="GENERATE_NO_WARNINGS" value="true" />
   </component>
   <component name="SbtSettings">
     <option name="sbtLauncherJarPath" value="$USER_HOME$/Projects/ServeD/vendor/sbt-launch.jar" />
