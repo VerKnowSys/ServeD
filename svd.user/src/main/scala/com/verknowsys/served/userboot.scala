@@ -97,12 +97,12 @@ object userboot extends SvdAkkaSupport with Logging {
 
         args.toList match {
             case userid :: xs =>
-                log.info("Spawning user (%d)", userid.toInt)
-                run(userid.toInt) //, accountsManager, system)
+                log.info("Spawning user with uid: %d", userid.toInt)
+                run(userid.toInt)
 
             case _ =>
                 log.error("Invalid arguments.")
-                log.error("Usage: [jar] [userid]   - ServeD user")
+                log.error("Usage: [jar] [userid]   - ServeD user UID")
                 sys.exit(1)
         }
     }
