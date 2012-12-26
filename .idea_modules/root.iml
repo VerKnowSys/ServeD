@@ -6,7 +6,6 @@
         <option name="compilerLibraryLevel" value="Project" />
         <option name="compilerLibraryName" value="SBT: scala:2.9.2" />
         <option name="compilerOptions" value="-Ywarn-dead-code -Xresident -g:source -explaintypes -unchecked -deprecation" />
-        <option name="continuations" value="true" />
         <option name="deprecationWarnings" value="true" />
         <option name="explainTypeErrors" value="true" />
         <option name="fsc" value="true" />
