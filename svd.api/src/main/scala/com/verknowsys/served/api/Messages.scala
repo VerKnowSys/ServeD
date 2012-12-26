@@ -14,8 +14,6 @@ import akka.actor.ActorRef
 
 // ServeD -> Client messages
 // common responses
-case object Ping extends ApiMessage
-case object Pong extends ApiMessage
 
 case object Success extends ApiResponse
 case object Shutdown extends ApiResponse
@@ -27,6 +25,9 @@ case object NotImplementedError
 object Notify {
     // generic notification center messages:
     sealed abstract class Base extends ApiMessage
+
+    case object Ping extends Base
+    case object Pong extends Base
 
     case class Message(content: String) extends Base
     case class Status(content: String) extends Base

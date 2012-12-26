@@ -310,8 +310,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                     }
                     val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
                     log.trace("Pinging service: %s".format(currServ))
-                    (currServ ? Ping) onComplete {
-                        case Right(Pong) =>
+                    (currServ ? Notify.Ping) onComplete {
+                        case Right(Notify.Pong) =>
                             val msg = "Service already running: %s.".format(serviceName)
                             log.warn(msg)
                             notificationsManager ! Notify.Message(formatMessage("W:%s".format(msg)))
@@ -374,8 +374,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                 }
             }
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
-            (currServ ? Ping) onComplete {
-                case Right(Pong) =>
+            (currServ ? Notify.Ping) onComplete {
+                case Right(Notify.Pong) =>
                     val msg = "Service already running: %s. Restarting".format(serviceName)
                     log.warn(msg)
                     notificationsManager ! Notify.Message(formatMessage("W:%s".format(msg)))
@@ -529,8 +529,8 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
                             (flags < binding.flags)) { // FIXME: XXX: NOT SURE it's ok, but flags must be at least same right?
                             log.info("Launching trigger service for file: %s (if not already started)", path)
                             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(binding.serviceName))
-                            (currServ ? Ping) onComplete {
-                                case Right(Pong) => // it seems that service is already started
+                            (currServ ? Notify.Ping) onComplete {
+                                case Right(Notify.Pong) => // it seems that service is already started
                                     log.info("Triggered Service already running")
 
                                 case Left(ex) => // timeout probably?

@@ -308,9 +308,9 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             log.debug("Getting port of service: %s:%d".format(config.name, servicePort))
             sender ! servicePort
 
-        case Ping =>
+        case Notify.Ping =>
             log.debug("%s".format(this))
-            sender ! Pong
+            sender ! Notify.Pong
 
         /**
          *  @author dmilith
