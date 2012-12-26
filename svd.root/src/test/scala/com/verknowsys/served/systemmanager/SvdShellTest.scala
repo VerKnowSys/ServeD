@@ -10,19 +10,20 @@ import com.verknowsys.served.testing._
 import com.verknowsys.served.api._
 import com.verknowsys.served.systemmanager.native._
 
-import java.lang._
+import java.lang.{System => JSystem}
+import java.util.concurrent.TimeoutException
 
 
 class SvdShellTest extends DefaultTest {
 
 
-    def shr(op: String, env: String = "", expectStdOut: List[String] = Nil, expectStdErr: List[String] = Nil, waitForOutputFor: Int = 5) = SvdShellOperation(op, env, expectStdOut, expectStdErr, waitForOutputFor)
+    def shr(op: String, env: String = "", expectStdOut: List[String] = Nil, expectStdErr: List[String] = Nil, waitForOutputFor: Int = 5) = SvdShellOperations(List(op), expectStdOut, expectStdErr, waitForOutputFor)
 
 
     it should "spawn command properly and know when it's dead and throw proper exception when shell is dead" in {
         val sh = new SvdShell(
             new SvdAccount(
-                userName = System.getProperty("user.name"),
+                userName = JSystem.getProperty("user.name"),
                 uid = randomPort
             )
         )
@@ -38,7 +39,7 @@ class SvdShellTest extends DefaultTest {
 
         val sh = new SvdShell(
             new SvdAccount(
-                userName = System.getProperty("user.name"),
+                userName = JSystem.getProperty("user.name"),
                 uid = randomPort
             )
         )
@@ -60,7 +61,7 @@ class SvdShellTest extends DefaultTest {
     it should "be able to get return code from ran processes" in {
         val sh = new SvdShell(
             new SvdAccount(
-                userName = System.getProperty("user.name"),
+                userName = JSystem.getProperty("user.name"),
                 uid = randomPort
             )
         )
@@ -70,10 +71,6 @@ class SvdShellTest extends DefaultTest {
         sh.exec(shr("echo $?", expectStdOut = List("1"))) // NOTE: 1 - error thrown from ls command
         sh.exec(shr("ls"))
         sh.exec(shr("echo $?", expectStdOut = List("0")))
-        sh.output._2 should include("command not found")
-        sh.output._1 should include("0")
-        sh.output._1 should include("1")
-        sh.output._1 should include("127") // NOTE: beware! output contains output from EVERYTHING ran in particular shell!
         sh.close
     }
 

@@ -19,7 +19,7 @@ class GitStatsTest extends DefaultTest {
     }
 
     it should "make few commits" in {
-        val repo = Git.init(path / "repo_for_stats")
+        val repo = GitCore.init(path / "repo_for_stats")
         val me = new Author("T. Tobolski", "teamon@example.com")
         val him = new Author("D. Dettlaff", "dmilith@example.com")
 
