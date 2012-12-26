@@ -434,7 +434,7 @@ trait SvdUtils extends Logging {
      *
      * @author teamon
      */
-    def fileExists(path: String) = (new java.io.File(path)).exists
+    def fileExists(path: String) = (new File(path)).exists
 
 
     /**

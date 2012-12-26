@@ -250,7 +250,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         log.debug("Found services dir: %s".format(servicesLocationDir))
         listDirectories(servicesLocationDir).map {
             dir =>
-                if (new java.io.File(dir.toString / ".autostart_service").exists) { // XXX: hardcode
+                if (new File(dir.toString / ".autostart_service").exists) { // XXX: hardcode
                     log.debug("Found autostart for %s".format(dir))
                     dir.toString.split("/").last
                 } else {
