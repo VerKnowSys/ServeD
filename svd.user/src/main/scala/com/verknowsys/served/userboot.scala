@@ -41,8 +41,7 @@ object userboot extends SvdAkkaSupport with Logging {
         val configFile = SvdConfig.userHomeDir / "%d".format(userUID) / SvdConfig.defaultAkkaConfName
 
         if (!new File(configFile).exists) {
-            log.info("Spawning headless".format(userUID))
-            val account = SvdAccount(uid = userUID, userName = "headless %s".format(userUID))
+            log.info("Spawning headless for uid: %d".format(userUID))
             createAkkaUserConfIfNotExistant(userUID, userUID + 1026)
         }
 
@@ -88,7 +87,7 @@ object userboot extends SvdAkkaSupport with Logging {
 
     def main(args: Array[String]) {
         // set runtime properties
-        JSystem.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
+        JSystem.setProperty("org.terracotta.quartz.skipUpdateCheck", "true")
 
         // handle signals
         handleSignal("ABRT") { getAllLiveThreads }

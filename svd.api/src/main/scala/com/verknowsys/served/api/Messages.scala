@@ -19,7 +19,7 @@ case object Pong extends ApiMessage
 
 case object Success extends ApiResponse
 case object Shutdown extends ApiResponse
-case class Error(val message: String) extends ApiResponse
+case class Error(message: String) extends ApiResponse
 
 // General errors
 case object NotImplementedError

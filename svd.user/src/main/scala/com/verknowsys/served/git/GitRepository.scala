@@ -205,7 +205,7 @@ class GitRepository(dir: String) extends Logging {
 
         val remoteConfig = new RemoteConfig(config, name)
         remoteConfig.addURI(uri)
-        remoteConfig.addFetchRefSpec(new RefSpec("+refs/heads/*:refs/remotes/origin/*"));
+        remoteConfig.addFetchRefSpec(new RefSpec("+refs/heads/*:refs/remotes/origin/*"))
         remoteConfig.update(config)
         config.save
     }

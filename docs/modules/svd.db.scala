@@ -19,7 +19,7 @@ import com.verknowsys.served.db._
 
 
 // Create case class that extends `DBObject`
-case class User(val name: String, id: UUID = randomUUID) extends DBObject(id)
+case class User(name: String, id: UUID = randomUUID) extends DBObject(id)
 
 // Create collection object
 object Users extends DB[User]

@@ -8,6 +8,7 @@ package com.verknowsys.served
 
 import com.verknowsys.served.utils._
 import org.webbitserver._
+import scala.collection.mutable
 
 
 trait DQueue[T] {
@@ -63,9 +64,9 @@ trait DQueue[T] {
 //
 
 case class SvdProcessUsage(
-    val pid: Int,
-    val name: String,
-    val rss: Int
+    pid: Int,
+    name: String,
+    rss: Int
     )
 
 
