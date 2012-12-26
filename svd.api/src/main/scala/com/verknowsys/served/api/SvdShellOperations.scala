@@ -6,16 +6,6 @@
 package com.verknowsys.served.api
 
 
-// /**
-//  *  @author dmilith
-//  *
-//  *   Defines software requirement to be downloaded from binary repository for actual OS, set by SvdConfig.binarySoftwareRepository
-//  */
-// case class SvdSoftwareRequirement(
-//         name: String
-//     )
-
-
 /**
  *  @author dmilith
  *

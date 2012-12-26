@@ -34,7 +34,7 @@ import org.quartz._
 import org.quartz.impl._
 import org.quartz.JobKey._
 import org.quartz.impl.matchers._
-import java.io.File
+import java.io.{File, FileNotFoundException}
 import java.lang.{System => JSystem}
 
 
@@ -180,8 +180,6 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
 
     protected def readLogFile(serviceName: String, pattern: Option[String] = None) { // , amount: Option[Int] = None
-        import java.io._
-
         val arg = serviceName.capitalize
         val logPath = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / arg / SvdConfig.defaultServiceLogFile
 

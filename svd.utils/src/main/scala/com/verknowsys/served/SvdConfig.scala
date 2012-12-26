@@ -9,6 +9,7 @@ import scala.io.Source
 
 import com.verknowsys.served.utils._
 import java.util.UUID
+import java.lang.{System => JSystem}
 
 
 object SvdConfig {
@@ -25,9 +26,9 @@ object SvdConfig {
     def buildNum                        = Source.fromURL(getClass.getResource("/BUILD")).getLines.mkString.trim
     def version                         = fullVersion + "-b" + buildNum
     def copyright                       = "Copyright © 2oo8-2o13 VerKnowSys.com - All Rights Reserved."
-    def operatingSystem                 = System.getProperty("os.name")
+    def operatingSystem                 = JSystem.getProperty("os.name")
     def binaryArchitecture              = "64"
-    def systemVersion                   = System.getProperty("os.version")
+    def systemVersion                   = JSystem.getProperty("os.version")
     def binarySoftwareRepository        = "http://software.verknowsys.com" / "binary" /
       operatingSystem / binaryArchitecture / systemVersion
     def kickApp                         = "svdkick"

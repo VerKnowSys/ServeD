@@ -8,10 +8,10 @@ package com.verknowsys.served.api
 
 import com.verknowsys.served._
 import com.verknowsys.served.utils._
-
+import java.util.concurrent.TimeoutException
 import unfiltered.response._
 import akka.dispatch._
-import akka.util.Timeout
+import akka.util._
 import akka.util.duration._
 
 
@@ -38,7 +38,7 @@ object SvdWebAPI extends SvdUtils {
                     JsonContent ~> ResponseString("{\"message\": \"Error occured while processing API request: %s\", \"status\":2}".format(x))
             }
         } catch {
-            case e: java.util.concurrent.TimeoutException =>
+            case e: TimeoutException =>
                 log.warn("Timout occured while processing API Request.")
                 JsonContent ~> ResponseString("{\"message\": \"API request timed out.\", \"status\":3}")
 
