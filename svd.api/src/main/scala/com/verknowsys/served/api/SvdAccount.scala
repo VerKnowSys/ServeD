@@ -143,7 +143,6 @@ case class SvdUserUID(
     }
 
 
-// 2011-06-25 23:13:38 - dmilith - PENDING: user domain issues
 /**
  *  @author dmilith
  *
