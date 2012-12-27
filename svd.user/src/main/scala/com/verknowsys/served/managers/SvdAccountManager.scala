@@ -569,6 +569,10 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
             log.debug("Terminated service actor: %s".format(ref))
             context.unwatch(ref)
 
+        case msg: Security.Base =>
+            log.trace("Forwarding Security message to System Manager")
+            systemManager forward msg
+
         // redirect user notification messages directly to notification center
         case msg: Notify.Base =>
             log.trace("Forwarding notification to Notification Center")

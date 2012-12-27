@@ -33,18 +33,11 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
     def intent = {
 
         /** API POST call #000  */
-        case req @ POST(Path("/Authorize") & Params(params)) =>
+        case req @ POST(Path("/Authorize")) =>
             log.debug("POST on Authorize")
-            log.trace("XXX: for dmilith: %s".format(sha1("dmilith"))) // XXX
-            log.trace("XXX: for tallica: %s".format(sha1("tallica"))) // XXX
-            log.debug("PARAMS: %s".format(params.mkString))
 
-            def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
-            val key = param("Authorize")
-            log.trace("XXX: given: %s".format(key)) // XXX
-
-            if ((key == sha1("dmilith")) || (key == sha1("tallica"))) // FIXME: XXX: TODO: hardcode auth key
-                JsonContent ~> SetCookies(Cookie("svdauth", key, maxAge = Some(3600*24))) ~>
+            if (true) // rotfl
+                JsonContent ~> SetCookies(Cookie("svdauth", "kluczo!", maxAge = Some(3600*24))) ~>
                     ResponseString("""{"message": "Authorized successfully.", "status": 0}""")
             else
                 JsonContent ~> Unauthorized ~>
@@ -167,6 +160,13 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
                 def param(key: String) = params.get(key).flatMap { _.headOption } getOrElse("")
                 SvdWebAPI.apiRespond(webManager ? User.DestroyFileWatch(param("DestroyFileWatch")))
             }
+
+        /** API POST call #017  */
+        case req @ POST(Path("/GetAccountPriviledges") & Cookies(cookies)) =>
+            checkAuth(cookies) {
+                SvdWebAPI.apiRespond(webManager ? Security.GetAccountPriviledges(account))
+            }
+
 
 
         /** API POST call #DEFAULT  */

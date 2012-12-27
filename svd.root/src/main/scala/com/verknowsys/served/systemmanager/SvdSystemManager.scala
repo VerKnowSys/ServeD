@@ -46,6 +46,15 @@ class SvdSystemManager extends SvdManager with Logging {
 
     def receive = {
 
+        case Security.GetAccountPriviledges(account) =>
+            new SvdAccountSecurityCheck(account).load match {
+                case Some(content) =>
+                    log.trace("Access granted")
+                    sender ! """{"message": "Security check finished.", "status": 0, "content": "[%s]"}""".format(content)
+
+                case None =>
+                    sender ! Error("Security Pass Failed")
+            }
 
         case System.RegisterDomain(domain, actorProxy) =>
             log.info("Registering domain: %s", domain)

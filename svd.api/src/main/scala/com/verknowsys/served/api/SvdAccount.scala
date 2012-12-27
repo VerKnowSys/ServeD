@@ -172,3 +172,22 @@ case class SvdFileEventBinding(
         override def toString = "SvdFileEventBinding(%s triggers service: %s)".format(absoluteFilePath, serviceName)
     }
 
+
+/**
+ *  Security messages collection, related to SvdAccount.
+ *
+ * @author Daniel (dmilith) Dettlaff
+ */
+case object Security {
+
+    sealed abstract class Base extends ApiMessage
+
+    /**
+     *  Basic message to authorize as registered account on remote SvdRoot
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    case class GetAccountPriviledges(account: SvdAccount) extends Base
+
+}
+

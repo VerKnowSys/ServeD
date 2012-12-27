@@ -48,7 +48,8 @@ $ ->
     {link: "DestroyFileWatch", element: "div.destroy_file_watch", params: "DestroyFileWatch=Src/index" },
     {link: "DestroyFileWatch", element: "div.destroy_file_watch1", params: "DestroyFileWatch=Src/some2" },
     {link: "DestroyFileWatch", element: "div.destroy_file_watch2", params: "DestroyFileWatch=Src/jakieśtakieśzótęłów" },
-    {link: "DestroyFileWatch", element: "div.destroy_file_watch3", params: "DestroyFileWatch=Src/zdzibrub" }
+    {link: "DestroyFileWatch", element: "div.destroy_file_watch3", params: "DestroyFileWatch=Src/zdzibrub" },
+    {link: "GetAccountPriviledges", element: "div.account_security_pass", params: ""}
   ]
 
 

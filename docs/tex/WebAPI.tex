@@ -27,7 +27,7 @@
 
 \title{ServeD WebAPI}
 \author{\href{mailto:dmilith@verknowsys.com}{Daniel (dmilith) Dettlaff}}
-\subtitle{version 0.2.6}
+\subtitle{version 0.2.7}
 \date{2012-12-14}
 
 
@@ -231,6 +231,16 @@
       @description destroys file watches on given file (all!)
       @params DestroyFileWatch=absoluteFilePath
       @format json: {message: information_string}
+      \end{minted}
+
+    \item \#017:
+      \begin{minted}{bash}
+    /GetAccountPriviledges
+      \end{minted}
+      \begin{minted}{scala}
+      @description send query to system manager for user priviledges info.
+      @params nothing.
+      @format json: {message: information_string, content: [priviledges_objects]}
       \end{minted}
 
 
