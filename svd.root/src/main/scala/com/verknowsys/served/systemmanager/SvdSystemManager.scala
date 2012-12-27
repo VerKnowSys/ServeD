@@ -50,7 +50,7 @@ class SvdSystemManager extends SvdManager with Logging {
             new SvdAccountSecurityCheck(account).load match {
                 case Some(content) =>
                     log.trace("Access granted")
-                    sender ! """{"message": "Security check finished.", "status": 0, "content": "[%s]"}""".format(content)
+                    sender ! """{"message": "Security check passed.", "status": 0, "content": [%s]}""".format(content)
 
                 case None =>
                     sender ! Error("Security Pass Failed")
