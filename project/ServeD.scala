@@ -106,8 +106,6 @@ object Dependencies {
     val unfilteredFilter = "net.databinder" %% "unfiltered-filter" % "0.6.4"
     val unfilteredJetty = "net.databinder" %% "unfiltered-jetty" % "0.6.4"
     val unfilteredSpec = "net.databinder" %% "unfiltered-spec" % "0.6.4" % "test"
-    // val scalate = "org.fusesource.scalate" % "scalate-core" % "1.5.3"
-    // val scalateUtil = "org.fusesource.scalate" % "scalate-util" % "1.5.3" % "test"
     val json = "org.json4s" %% "json4s-native" % "3.0.0"
 
     // Java
