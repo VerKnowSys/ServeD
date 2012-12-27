@@ -26,10 +26,9 @@ import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
 
 
 /**
- *
- *  @author dmilith
  *  Service actor. All Svd services are started using this actor wrapper.
  *
+ *  @author dmilith
  */
 class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor with SvdUtils {
 
@@ -57,11 +56,10 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
 
     /**
-     *  @author dmilith
-     *
      *  Returns file of install indication from Sofin.
-     *      For example "redis.installed" implies installed Redis software.
      *
+     *  @example "redis.installed" implies installed Redis software.
+     *  @author dmilith
      */
     def installIndicator = {
         // both cases: user side app (default) or root side (if no user service installed)
@@ -80,68 +78,68 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
 
     /**
-     *  @author dmilith
-     *
      *   configureHook - will be executed before starting service actor
+     *
+     *  @author dmilith
      */
     def configureHook = config.configure
 
 
     /**
-     *  @author dmilith
-     *
      *   afterStartHook - will be executed after starting of service
+     *
+     *  @author dmilith
      */
     def afterStartHook = config.afterStart
 
 
     /**
-     *  @author dmilith
-     *
      *   startHook - hook executed on service start
+     *
+     *  @author dmilith
      */
     def startHook = config.start
 
 
     /**
-     *  @author dmilith
-     *
      *   stopHook - stop hook executed on stop
+     *
+     *  @author dmilith
      */
     def stopHook = config.stop
 
 
     /**
-     *  @author dmilith
-     *
      *   afterStopHook - will be executed after service stop
+     *
+     *  @author dmilith
      */
     def afterStopHook = config.afterStop
 
 
     /**
-     *  @author dmilith
-     *
      *   installHook - Software prepare / install hook.
      *   Will be executed only on demand, by sending Install signal to SvdService
+     *
+     *  @author dmilith
      */
     def installHook = config.install
 
 
     /**
-     *  @author dmilith
-     *
      *   reloadHook - Service reloading command
      *   Will be executed only on demand, by sending Reload signal to SvdService
+     *
+     *  @author dmilith
      */
     def reloadHook = config.reload
 
 
     /**
-     *  @author dmilith
-     *
      *   validateHook - Performed right after configure on each application run
      *   Will throw exception when validation process wont pass
+     *
+     *  @author dmilith
      */
     def validateHook = config.validate
 
@@ -161,9 +159,9 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
 
     /**
-     *  @author dmilith
-     *
      *   hookShot is a safe way to launch service hooks
+     *
+     *  @author dmilith
      */
     def hookShot(hook: SvdShellOperations, hookName: String) { // XXX: this should be done better. String should be replaced
         if (!hook.commands.isEmpty) { // don't report empty / undefined hooks
@@ -313,18 +311,18 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             sender ! Notify.Pong
 
         /**
-         *  @author dmilith
-         *
          *   Reload by default should be SIGHUP signal sent to process pid
+         *
+         *  @author dmilith
          */
         case Reload =>
             hookShot(validateHook, "validate")
             hookShot(reloadHook, "reload")
 
         /**
-         *  @author dmilith
-         *
          *   Explicit method to launch service
+         *
+         *  @author dmilith
          */
         case Run =>
             hookShot(startHook, "start")
@@ -332,9 +330,9 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             sender ! Success
 
         /**
-         *  @author dmilith
-         *
          *   Quit should be sent when we want to stop this service
+         *
+         *  @author dmilith
          */
         case Quit =>
             log.info("Got Quit in %s".format(this))

@@ -18,9 +18,9 @@ import org.webbitserver._
 
 
 /**
-*   @author dmilith
-*
 *   SvdSystemManager - responsible for System managment and monitoring
+*
+*   @author dmilith
 */
 class SvdSystemManager extends SvdManager with Logging {
 

@@ -18,9 +18,9 @@ import scala.util._
 object SvdAccountUtils extends SvdUtils {
 
     /**
-     *  @author dmilith
-     *
      *   randomUserPort is a helper function to be used with SvdUserPort in API
+     *
+     *  @author dmilith
      */
     def randomFreePort: Int = {
         val rnd = new Random(System.currentTimeMillis)
@@ -49,9 +49,9 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   randomSystemPort is a helper function to be used with SvdSystemPort in API
+     *
+     *  @author dmilith
      */
     def randomSystemPort: Int = {
         val rnd = new Random(System.currentTimeMillis)
@@ -64,9 +64,9 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   randomUserUid is a helper function to be used with SvdUserUID in API
+     *
+     *  @author dmilith
      */
     def randomUserUid: Int = {
         val rnd = new Random(System.currentTimeMillis)
@@ -79,9 +79,9 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   registers user with given name and uid number in svd database
+     *
+     *  @author dmilith
      */
     def registerUserAccount(name: String, uid: Int): Unit = {
         val userManagerPort = randomUserPort
@@ -123,36 +123,36 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   registers user UID with given number and name in svd database
+     *
+     *  @author dmilith
      */
     def registerUserUID(num: Int) =
         db << SvdUserUID(number = num)
 
 
     /**
-     *  @author dmilith
-     *
      *   registers user port with given number in svd database
+     *
+     *  @author dmilith
      */
     def registerUserPort(num: Int) =
         db << SvdUserPort(number = num)
 
 
     /**
-     *  @author dmilith
-     *
      *   registers system port with given number in svd database
+     *
+     *  @author dmilith
      */
     def registerSystemPort(num: Int) =
         db << SvdSystemPort(number = num)
 
 
     /**
-     *  @author dmilith
-     *
      *   returns true if user port is registered in svd database
+     *
+     *  @author dmilith
      */
     def userPortRegistered(num: Int) =
         if (SvdUserPorts(db)(_.number == num).isEmpty)
@@ -162,9 +162,9 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   returns true if system port is registered in svd database
+     *
+     *  @author dmilith
      */
     def systemPortRegistered(num: Int) =
         if (SvdSystemPorts(db)(_.number == num).isEmpty)
@@ -174,9 +174,9 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
 
 
     /**s
-     *  @author dmilith
-     *
      *   returns true if system uid is registered in svd database
+     *
+     *  @author dmilith
      */
     def userUIDRegistered(num: Int) =
         if (SvdUserUIDs(db)(_.number == num).isEmpty)
@@ -186,10 +186,9 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
 
 
     /**
-     * @author Daniel (dmilith) Dettlaff
-     *
      *  Checks if given domain is already registered for user
      *
+     * @author Daniel (dmilith) Dettlaff
      */
     def userDomainRegistered(domain: String) = {
         if (SvdUserDomains(db)(_.name == domain).isEmpty)
@@ -200,10 +199,9 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
 
 
     /**
-     * @author Daniel (dmilith) Dettlaff
-     *
      *  Registers user domain
      *
+     * @author Daniel (dmilith) Dettlaff
      */
     def registerUserDomain(domain: String) = {
         if (!userDomainRegistered(domain)) {

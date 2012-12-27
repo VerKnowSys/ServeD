@@ -14,10 +14,10 @@
 
 
 // /**
-//  *  @author dmilith
-//  *
 //  *   Definitions of "built in" SvdService configurations, parametrized by SvdAccountManager's account.
 //  *   NOTE: "name" is additionally name of service root folder.
+//  *
+//  *  @author dmilith
 //  */
 
 // object SvdUserServices {

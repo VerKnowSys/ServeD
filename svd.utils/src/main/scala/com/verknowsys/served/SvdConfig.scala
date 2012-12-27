@@ -12,15 +12,13 @@ import java.util.UUID
 import java.lang.{System => JSystem}
 
 
+/**
+ * A very low level settings hardcoded into application
+ * These configuration settings can be overriden by configuration stored in ServeD database
+ *
+ * @author dmilith, teamon
+ */
 object SvdConfig {
-
-    /**
-     * @author dmilith, teamon
-     *
-     * A very low level settings hardcoded into application
-     * These configuration settings can be overriden by configuration stored in ServeD database
-     *
-     */
 
     def fullVersion                     = Source.fromURL(getClass.getResource("/FULLVERSION")).getLines.mkString.trim
     def buildNum                        = Source.fromURL(getClass.getResource("/BUILD")).getLines.mkString.trim
@@ -86,7 +84,7 @@ object SvdConfig {
     def kqueueWaitInterval              = 200
     def sleepDefaultPause               = 1000
     def gatherTimeout                   = 1000
-    def serviceRestartPause             = 6000
+    def serviceRestartPause             = 4000
     def headlessTimeout                 = 6000 // 6 seconds
     def serviceAutostartFile            = ".autostart_service"
     def defaultUserAkkaConf             = "/defaultUserAkkaConf.conf"

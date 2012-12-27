@@ -10,9 +10,9 @@ import akka.actor.Actor
 
 
 /**
- *  @author dmilith
- *
  *   This trait should be used by all ServeD actors
+ *
+ *  @author dmilith
  */
 trait SvdActor extends Actor with Logging with SvdUtils {
 

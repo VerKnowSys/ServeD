@@ -219,10 +219,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
 
     /**
-     *  @author dmilith
-     *
      *  Cleans autostart mark from services software data dir.
      *
+     *  @author dmilith
      */
     def cleanServicesAutostart {
         val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir
@@ -238,10 +237,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
 
     /**
-     *  @author dmilith
-     *
      *  Load autostart marks from services software data dir.
      *
+     *  @author dmilith
      */
     def loadServicesList = {
         val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir

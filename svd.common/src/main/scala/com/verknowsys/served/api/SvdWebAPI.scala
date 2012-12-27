@@ -16,9 +16,9 @@ import akka.util.duration._
 
 
 /**
- *  @author dmilith
- *      This object is a container of functions used in Web API
+ *  This object is a container of functions used in Web API
  *
+ *  @author dmilith
  */
 object SvdWebAPI extends SvdUtils {
 

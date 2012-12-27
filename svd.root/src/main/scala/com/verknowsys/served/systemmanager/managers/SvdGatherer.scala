@@ -15,11 +15,10 @@ import akka.actor._
 
 
 /**
- *  @author dmilith
- *
  *   Gatherer will be spawned for each user account by SvdAccountManager.
  *   The main goal for SvdGatherer is to gather user usage stats and write them to file.
  *
+ *  @author dmilith
  */
 class SvdGatherer(account: SvdAccount) extends SvdManager {
     log.info("Starting Gatherer for account: " + account)

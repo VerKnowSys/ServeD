@@ -12,8 +12,8 @@ package com.verknowsys.served.utils
 
 
 /**
- *  @author dmilith
  *  Fast implementation of Mailer to be used with notification system.
+ *  @author dmilith
  */
 object SvdNotifyMailer extends Logging {
 

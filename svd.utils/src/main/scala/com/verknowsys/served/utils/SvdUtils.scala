@@ -38,10 +38,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-     * @author Daniel (dmilith) Dettlaff
-     *
      *  Simple helper function to generate SHA1 hash from String.
      *
+     * @author Daniel (dmilith) Dettlaff
      */
     def sha1(input: String) = {
         val mDigest = MessageDigest.getInstance("SHA1")
@@ -138,15 +137,15 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
      *  Returns real host name (not "localhost")
+     *  @author dmilith
      */
     def currentHost = InetAddress.getLocalHost
 
 
     /**
-     *  @author dmilith
      *  Formats message for Notification System
+     *  @author dmilith
      */
     def formatMessage(msg: String) = {
         msg(0) match { // first char of message
@@ -166,8 +165,8 @@ trait SvdUtils extends Logging {
     }
 
     /**
-        @author dmilith
         Unified & DRY method of throwing exceptions
+        @author dmilith
     */
     def throwException[T <: Throwable : Manifest](message: String) {
         val exception = implicitly[Manifest[T]].erasure.getConstructor(classOf[String]).newInstance(message).asInstanceOf[T]
@@ -177,10 +176,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-    *   @author dmilith
-    *
     *   check and inform when current user isn't superuser (root)
     *
+    *   @author dmilith
     */
     def rootCheck {
         System.getProperty("user.name") match {
@@ -193,41 +191,41 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   returns true if running system matches BSD
+     *
+     *  @author dmilith
      */
     def isBSD = System.getProperty("os.name").contains("BSD")
 
 
     /**
-     *  @author dmilith
-     *
      *   returns true if running system matches Darwin
+     *
+     *  @author dmilith
      */
     def isOSX = System.getProperty("os.name").contains("Darwin")
 
 
     /**
-     *  @author dmilith
-     *
      *   returns true if running system matches Linux
+     *
+     *  @author dmilith
      */
     def isLinux = System.getProperty("os.name").contains("Linux")
 
 
     /**
-     *  @author dmilith
-     *
      *   Generate unique identifier
+     *
+     *  @author dmilith
      */
     def newUuid = UUID.randomUUID
 
 
     /**
-     *  @author dmilith
-     *
      *   Returns uid owner of given file/dir
+     *
+     *  @author dmilith
      */
      def getOwner(path: String) = {
         cstat.getOwner(path)
@@ -235,10 +233,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *  Checks and creates (if missing) given directory name
      *
+     *  @author dmilith
      */
     def checkOrCreateDir(dir: String) = {
         if (new File(dir).exists) {
@@ -252,9 +249,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   simple String compression (zip inflate/deflate)
+     *
+     *  @author dmilith
      */
     def compress(input: String) = {
         // 2011-03-13 20:48:01 - dmilith - TODO: implement check for too short string to compress (<40 chars)
@@ -284,9 +281,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   simple String decompression (zip inflate/deflate)
+     *
+     *  @author dmilith
      */
     def decompress(input: String) = {
         // Decompress the data
@@ -319,9 +316,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   converts seconds to friendly format: hh-mm-ss
+     *
+     *  @author dmilith
      */
     def secondsToHMS(seconds: Int) = {
         val calendar = new GregorianCalendar(0,0,0,0,0,0)
@@ -334,10 +331,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *  Get all live threads of ServeD. Useful only when debugging.
      *
+     *  @author dmilith
      */
     def getAllLiveThreads = log.trace("Live threads list:\n%s".format(
         Thread.getAllStackTraces.map{
@@ -358,28 +354,19 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *  Returns size (in bytes) of given object in JVM memory
      *
-     *  @example
-     *  println(sizeof(new Date))
-     *
+     *  @example println(sizeof(new Date))
+     *  @author dmilith
      */
     def sizeof(any: Any) = ObjectProfiler.sizeof(any)
 
 
     /**
-     *  @author dmilith
-     *
      *  Adds a hook for SIGINT/ SIGTERM signals to gracefully close the app
      *
-     *  @example
-     *  addShutdownHook {
-     *     closeMySockets
-     *     info("Dying!")
-     *  }
-     *
+     *  @example addShutdownHook { closeMyDatabase; info("Dying!") }
+     *  @author dmilith
      */
     def addShutdownHook(block: => Unit) =
         Runtime.getRuntime.addShutdownHook(
@@ -400,9 +387,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   Returns uid of current logged in user
+     *
+     *  @author dmilith
      */
     def getUserUid = {
         clib.getuid
@@ -410,9 +397,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   counts time spent on operation in given block
+     *
+     *  @author dmilith
      */
     def bench(block: => Unit) = {
         val start = System.currentTimeMillis
@@ -447,9 +434,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   Find file in given directory. Named params available: name, root, extensions and recursive
+     *
+     *  @author dmilith
      */
     def findFileInDir(
         name: String,
@@ -483,9 +470,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith, teamon
-     *
      *   Recursive list files in given path
+     *
+     *  @author dmilith, teamon
      */
     def recursiveListFilesFromPath(file: File): List[File] = {
         file :: (
@@ -499,27 +486,27 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *   List of directories from given location
+     *
+     *  @author dmilith
      */
     def listDirectories(location: String) =
         (new File(location)).listFiles.filter(_.isDirectory)
 
 
     /**
-     *  @author dmilith
-     *
      *   List of files from given location
+     *
+     *  @author dmilith
      */
     def listFiles(location: String) =
         (new File(location)).listFiles.filterNot(_.isDirectory)
 
 
     /**
-    * @author dmilith
-    *
     *   Checks if a specific port is available for user
+    *
+    * @author dmilith
     */
     def portAvailable(port: Int): Boolean = {
         try {
@@ -541,9 +528,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  @author dmilith
-     *
      *  Get list of fields of case class using reflection
+     *
+     *  @author dmilith
      */
     def caseClassFields(cc: AnyRef) =
         (Map[String, String]() /: cc.getClass.getDeclaredFields) {
@@ -608,10 +595,9 @@ trait SvdUtils extends Logging {
 
 
     /**
-     * @author Daniel (dmilith) Dettlaff
-     *
      *  Returns true if given ip matches with any of server IPs.
      *
+     * @author Daniel (dmilith) Dettlaff
      */
     def isIPBoundToCurrentServer(ip: String): Boolean = {
         log.trace("Checking ip: %s", ip)
@@ -632,13 +618,12 @@ trait SvdUtils extends Logging {
 
 
     /**
-     * @author Daniel (dmilith) Dettlaff
-     *
      *  Code to validate given domain.
      *  It will result:
      *      None => when no problems occured. Everything's fine, domain is bindable under one of current server IPs.
      *      Some => with some problem
      *
+     * @author Daniel (dmilith) Dettlaff
      */
     def validateDomain(domain: String) = {
         try {

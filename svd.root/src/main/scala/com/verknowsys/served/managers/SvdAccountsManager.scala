@@ -27,10 +27,9 @@ import akka.util.Timeout
 import akka.util.duration._
 
 /**
- *  @author dmilith
- *
  *  ServeD Accounts Manager
  *
+ *  @author dmilith
  */
 class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Logging {
 

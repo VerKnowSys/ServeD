@@ -104,9 +104,9 @@ case class SvdAccount (
 
 
 /**
- *  @author dmilith
- *
  *   SvdUserPort describes one of port from user pool (defined in SvdPools)
+ *
+ *  @author dmilith
  */
 case class SvdUserPort(
         number: Int,
@@ -117,9 +117,9 @@ case class SvdUserPort(
 
 
 /**
- *  @author dmilith
- *
  *   SvdSystemPort describes one of port from system pool (defined in SvdPools)
+ *
+ *  @author dmilith
  */
 case class SvdSystemPort(
         number: Int,
@@ -130,9 +130,9 @@ case class SvdSystemPort(
 
 
 /**
- *  @author dmilith
- *
  *   SvdUID stores system uid and human readable name related to it
+ *
+ *  @author dmilith
  */
 case class SvdUserUID(
         number: Int,
@@ -144,9 +144,9 @@ case class SvdUserUID(
 
 
 /**
- *  @author dmilith
- *
  *   SvdUserDomain describes user domain registered by user
+ *
+ *  @author dmilith
  */
 case class SvdUserDomain(
         name: String,

@@ -16,9 +16,9 @@ import org.apache.commons.io.FileUtils
 
 
 /**
- *  @author dmilith
- *
  *   This util will read all /home folder contents and iterate through elements, then create user accounts database
+ *
+ *  @author dmilith
  */
 
 case object SvdAccounts extends DB[SvdAccount]

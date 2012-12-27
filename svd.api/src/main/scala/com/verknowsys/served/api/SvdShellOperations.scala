@@ -7,9 +7,9 @@ package com.verknowsys.served.api
 
 
 /**
- *  @author dmilith
- *
  *   Defines config of hooks passed to SvdService
+ *
+ *  @author dmilith
  */
 case class SvdServiceConfig(
         name: String,
@@ -33,9 +33,9 @@ case class SvdServiceConfig(
 
 
 /**
- *  @author dmilith
- *
  *   Defines shell operation required by SvdShell
+ *
+ *  @author dmilith
  */
 case class SvdShellOperations(
         commands: List[String],
