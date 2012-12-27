@@ -30,9 +30,9 @@ class SvdArchiveUnsupportedActionException(message: String) extends Exception(me
 */
 class SvdAESKeyProvider extends AesKeyProvider with Logging with SvdUtils {
 
-    def getCreateKey = SvdConfig.backupKey.toCharArray
+    def getCreateKey = SvdConfig.defaultSecurityBaseKey.toCharArray
 
-    def getOpenKey = SvdConfig.backupKey.toCharArray
+    def getOpenKey = SvdConfig.defaultSecurityBaseKey.toCharArray
 
     def invalidOpenKey = {
         // This method is called whenever a key for an existing protected resource is invalid.

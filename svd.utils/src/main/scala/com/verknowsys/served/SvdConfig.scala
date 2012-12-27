@@ -13,8 +13,7 @@ import java.lang.{System => JSystem}
 
 
 /**
- * A very low level settings hardcoded into application
- * These configuration settings can be overriden by configuration stored in ServeD database
+ * A very low level settings hardcoded into application.
  *
  * @author dmilith, teamon
  */
@@ -53,7 +52,7 @@ object SvdConfig {
     def defaultEncoding                 = "UTF-8"
     def publicHttpDir                   = "/Public/"
     def defaultBackupDir                = "/Backup/"
-    def backupKey                       = "30E4A7AF-0624-4288-8CD6-31CC217725CF"
+    def defaultSecurityBaseKey          = "30E4A7AF-0624-4288-8CD6-31CC217725CF"
     def defaultBackupKeyManager         = "com.verknowsys.served.utils.SvdArchiverKeyManager"
     def defaultBackupFileExtension      = "zip.raes"
     def defaultBackupFileMatcher        = """(.*)\.zip\.raes$"""
