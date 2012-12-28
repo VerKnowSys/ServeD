@@ -178,7 +178,7 @@ case class SvdFileEventBinding(
  *
  * @author Daniel (dmilith) Dettlaff
  */
-case object Security {
+object Security {
 
     sealed abstract class Base extends ApiMessage
 
