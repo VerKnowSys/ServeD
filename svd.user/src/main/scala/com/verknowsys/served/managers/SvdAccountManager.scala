@@ -57,7 +57,7 @@ case object SvdFileEventBindings extends DB[SvdFileEventBinding]
  * @author dmilith
  * @author teamon
  */
-class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) extends SvdManager with SvdFileEventsReactor with Logging {
+class SvdAccountManager(val bootAccount: SvdAccount, val headless: Boolean = false) extends SvdManager with SvdFileEventsReactor with Logging {
 
     // import akka.actor.OneForOneStrategy
     // import akka.actor.SupervisorStrategy._
@@ -74,9 +74,9 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     import Events._
 
     val scheduler = StdSchedulerFactory.getDefaultScheduler
-    val userHomeDir = SvdConfig.userHomeDir / "%s".format(account.uid)
+    val userHomeDir = SvdConfig.userHomeDir / "%s".format(bootAccount.uid)
 
-    val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(account)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
+    val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(bootAccount)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
     val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-single-dispatcher"), "SvdFileEventsManagerUser")
 
     val accountsManager = context.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
@@ -106,15 +106,22 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
         checkOrCreateDir(userHomeDir / SvdConfig.defaultUserIgnitersDir)
 
 
-        log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, account.uid))
+        log.info("Starting AccountManager (v%s) for uid: %s".format(SvdConfig.version, bootAccount.uid))
 
         val port = SvdAccountUtils.randomFreePort
         log.debug("Got database port %d", port)
 
         // Start database server
-        val dbServer = new DBServer(port, userHomeDir / "%s.db".format(account.uid))
+        val dbServer = new DBServer(port, userHomeDir / "%s.db".format(bootAccount.uid))
         val db = dbServer.openClient
         val utils = new SvdAccountUtils(db)
+
+        // load real account
+        val account = SvdAccounts(db).find{_.uid == bootAccount.uid}.getOrElse {
+            db << bootAccount.copy(userName = "Unnamed Local User")
+            bootAccount
+        } // load first account with given uid from local user database. Preveil same uuid on every boot.
+
 
         // start managers
         val gitManager = context.actorOf(Props(new SvdGitManager(account, db, userHomeDir / "git")), "SvdGitManager")
@@ -131,7 +138,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
         log.debug("Becaming started")
         context.become(
-            started(db, dbServer, gitManager, notificationsManager, webManager, utils))
+            started(account, db, dbServer, gitManager, notificationsManager, webManager, utils))
 
         if (!headless)
             accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
@@ -179,7 +186,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     }
 
 
-    protected def readLogFile(serviceName: String, pattern: Option[String] = None) { // , amount: Option[Int] = None
+    protected def readLogFile(account: SvdAccount, serviceName: String, pattern: Option[String] = None) { // , amount: Option[Int] = None
         val arg = serviceName.capitalize
         val logPath = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / arg / SvdConfig.defaultServiceLogFile
 
@@ -224,7 +231,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
      *  @author dmilith
      */
     def cleanServicesAutostart {
-        val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir
+        val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(bootAccount.uid) / SvdConfig.softwareDataDir
         listDirectories(servicesLocationDir).map {
             dir =>
                 val file = new java.io.File(dir.toString / SvdConfig.serviceAutostartFile)
@@ -242,7 +249,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
      *  @author dmilith
      */
     def loadServicesList = {
-        val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir
+        val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(bootAccount.uid) / SvdConfig.softwareDataDir
         log.debug("Found services dir: %s".format(servicesLocationDir))
         listDirectories(servicesLocationDir).map {
             dir =>
@@ -257,7 +264,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     }
 
 
-    private def started(db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, utils: SvdAccountUtils): Receive = traceReceive {
+    private def started(account: SvdAccount, db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, utils: SvdAccountUtils): Receive = traceReceive {
 
 
         case SvdScheduler.StartJob(name, job, trigger) =>
@@ -409,7 +416,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
 
         case User.ReadLogFile(serviceName, pattern) =>
             log.debug("Reading log file for service: %s".format(serviceName))
-            readLogFile(serviceName, pattern)
+            readLogFile(account, serviceName, pattern)
 
 
         case User.StoreUserDomain(domain) => // internal call
@@ -654,7 +661,7 @@ class SvdAccountManager(val account: SvdAccount, val headless: Boolean = false) 
     addShutdownHook {
         log.warn("Forcing POST Stop in Account Manager")
         if (!headless)
-            accountsManager ! Admin.Dead(account)
+            accountsManager ! Admin.Dead(bootAccount)
 
         postStop
     }

@@ -61,8 +61,8 @@ object userboot extends SvdAkkaSupport with Logging {
         (accountsManager ? System.GetPort) onSuccess {
 
             case anyPort: Int =>
-                val account = SvdAccount(userName = "anybody", uid = userUID)
-                val am = system.actorOf(Props(new SvdAccountManager(account)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
+                val bootAccount = SvdAccount(uid = userUID, userName = "a boot user %d".format(userUID))
+                val am = system.actorOf(Props(new SvdAccountManager(bootAccount)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
                 log.info("Spawned UserBoot for UID: %d", userUID)
 
         } onFailure {
@@ -70,8 +70,8 @@ object userboot extends SvdAkkaSupport with Logging {
             case x =>
                 // launching headless mode
                 log.info("Launching svduser headless mode for UID: %d".format(userUID))
-                val account = SvdAccount(uid = userUID, userName = "anUser %s".format(userUID))
-                val am = system.actorOf(Props(new SvdAccountManager(account, headless = true)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager")
+                val bootAccount = SvdAccount(uid = userUID, userName = "a headless user %s".format(userUID))
+                val am = system.actorOf(Props(new SvdAccountManager(bootAccount, headless = true)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager")
                 log.info("Spawned UserBoot for UID: %d", userUID)
 
         }
