@@ -49,16 +49,17 @@ class SvdAccountSecurityCheck(account: SvdAccount) extends SvdUtils {
 
         val systemAuthFileOfAccount = systemAuthAccountDir / securityKey + SvdConfig.defaultSoftwareTemplateExt
         try {
-            // NOTE: just read file. Don't even try to remove user authkey file!
+            // NOTE: just read file with hash of account uuid inside
             val auuid = sha1(account.uuid)
             val json = parse(Source.fromFile(systemAuthFileOfAccount).getLines.mkString)
             val userKey = (json \ "usha").extract[String]
             log.debug("File found for uuid: %s, loaded content: %s, securityKey: %s", auuid, userKey, securityKey)
             log.trace("SHA: %s VS: %s".format(auuid, userKey))
-            log.debug("Content UUID matches. Auth successfull.")
-            if (userKey == auuid)
+
+            if (userKey == auuid) {
+                log.debug("Content UUID matches. Auth successfull.")
                 Some(compact(render(json)))
-            else
+            } else
                 None
 
         } catch {
