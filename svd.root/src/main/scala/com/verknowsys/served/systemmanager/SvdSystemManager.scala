@@ -15,6 +15,7 @@ import com.verknowsys.served.utils.Logging
 
 import akka.actor._
 import org.webbitserver._
+import org.json4s.native.JsonMethods._
 
 
 /**
@@ -48,12 +49,15 @@ class SvdSystemManager extends SvdManager with Logging {
 
         case Security.GetAccountPriviledges(account) =>
             new SvdAccountSecurityCheck(account).load match {
-                case Some(content) =>
-                    log.trace("Access granted")
-                    sender ! """{"message": "Security check passed.", "status": 0, "content": [%s]}""".format(content)
+                case Some(container) =>
+                    val privs = (parse(container) \ "privdgs").children.map {
+                        child => compact(render(child))
+                    }
+                    log.info("Priviledges found for account: %s. Granting access for: %s", account.userName, privs)
+                    sender ! """{"message": "Security check passed.", "status": 0, "content": %s}""".format(container)
 
                 case None =>
-                    sender ! Error("Security Pass Failed")
+                    sender ! Error("Priviledges Check Failed")
             }
 
         case System.RegisterDomain(domain, actorProxy) =>
