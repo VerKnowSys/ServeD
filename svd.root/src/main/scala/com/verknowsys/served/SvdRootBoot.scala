@@ -7,17 +7,14 @@ package com.verknowsys.served
 
 
 import com.verknowsys.served.utils._
-// import com.verknowsys.served.maintainer.SvdApiConnection
 import com.verknowsys.served.managers.SvdAccountsManager
 import com.verknowsys.served.systemmanager.SvdSystemManager
-// import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.sshd.SSHD
 import com.verknowsys.served.api._
-
 import akka.util.duration._
 import akka.actor._
-
 import com.typesafe.config.ConfigFactory
+
 
 class SvdRootBoot extends Logging with SvdActor {
 
