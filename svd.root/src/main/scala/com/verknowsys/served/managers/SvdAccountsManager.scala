@@ -36,44 +36,9 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
     import Events._
 
 
-    log.info("SvdAccountsManager (v%s) is loading".format(SvdConfig.version))
-
-    // log.info("Registering Coreginx")
-    // val coreginx = actorOf(new SvdService(SvdRootServices.coreginxConfig(), rootAccount))
-
-    // private val accountManagers = scala.collection.mutable.Map[Int, ActorRef]() // UID => AccountManager ref
-
-    // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
-    addShutdownHook {
-        log.warn("Got termination signal. Unregistering file events")
-        unregisterFileEvents(self)
-
-        // log.info("Stopping spawned user workers")
-        // userAccounts.foreach{
-        //     account =>
-        //         val pidFile = SvdConfig.userHomeDir / "%d".format(account.uid) / "%d.pid".format(account.uid)
-        //         log.trace("PIDFile: %s".format(pidFile))
-        //         if (new java.io.File(pidFile).exists) {
-        //             val pid = Source.fromFile(pidFile).getLines.toList.head.trim.toInt
-        //             log.debug("Client VM PID to be killed: %d".format(pid))
-
-        //             // XXX: TODO: define death watch daemon:
-        //             kill(pid)
-
-        //             log.debug("Client VM PID file to be deleted: %s".format(pidFile))
-        //             rm_r(pidFile)
-        //         } else {
-        //             log.warn("File not found: %s".format(pidFile))
-        //         }
-        // }
-        log.info("All done.")
-        // postStop
-    }
-
-
     override def preStart = {
         super.preStart
-        log.debug("SvdAccountsManager is starting.")
+        log.info("SvdAccountsManager (v%s) is loading".format(SvdConfig.version))
     }
 
 
@@ -155,6 +120,13 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
     override def postStop = {
         log.debug("Accounts Manager postStop.")
         super.postStop
+    }
+
+
+    addShutdownHook {
+        log.warn("Got termination signal. Unregistering file events")
+        unregisterFileEvents(self)
+        log.info("All done.")
     }
 
 }
