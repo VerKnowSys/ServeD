@@ -186,7 +186,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
                     case _ =>
                         if (config.reportAllInfos)
-                            accountManager ! Notify.Message(formatMessage("I:Done %s of service: %s".format(hookName, config.name)))
+                            accountManager ! Notify.Message(formatMessage("D:Done %s of service: %s".format(hookName, config.name)))
                 }
 
             } catch {
