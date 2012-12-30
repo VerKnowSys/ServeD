@@ -49,7 +49,8 @@ $ ->
     {link: "DestroyFileWatch", element: "div.destroy_file_watch1", params: "DestroyFileWatch=Src/some2" },
     {link: "DestroyFileWatch", element: "div.destroy_file_watch2", params: "DestroyFileWatch=Src/jakieśtakieśzótęłów" },
     {link: "DestroyFileWatch", element: "div.destroy_file_watch3", params: "DestroyFileWatch=Src/zdzibrub" },
-    {link: "GetAccountPriviledges", element: "div.account_security_pass", params: ""}
+    {link: "GetAccountPriviledges", element: "div.account_security_pass", params: ""},
+    {link: "RestartAccountManager", element: "div.restart_account_manager", params: ""}
   ]
 
 
