@@ -158,19 +158,20 @@ trait SvdUtils extends Logging {
      *  @author dmilith
      */
     def formatMessage(msg: String) = {
+        val current = currentVPNHost
         msg(0) match { // first char of message
             case 'W' | 'w' =>
-                "WARN -- %s -- %s".format(currentHost, msg.substring(2))
+                "WARN -- %s -- %s".format(current, msg.substring(2))
             case 'E' | 'e' =>
-                "ERROR == %s == %s".format(currentHost, msg.substring(2))
+                "ERROR == %s == %s".format(current, msg.substring(2))
             case 'F' | 'f' =>
-                "FATAL ## %s ## %s".format(currentHost, msg.substring(2))
+                "FATAL ## %s ## %s".format(current, msg.substring(2))
             case 'D' | 'd' =>
-                "DEBUG -- %s -- %s".format(currentHost, msg.substring(2))
+                "DEBUG -- %s -- %s".format(current, msg.substring(2))
             case 'I' | 'i' =>
-                "INFO -- %s -- %s".format(currentHost, msg.substring(2))
+                "INFO -- %s -- %s".format(current, msg.substring(2))
             case _ =>
-                "INFO -- %s -- %s".format(currentHost, msg.substring(2))
+                "INFO -- %s -- %s".format(current, msg.substring(2))
         }
     }
 
