@@ -70,9 +70,9 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
 
 
         /** API POST call #003  */
-        case req @ POST(Path("/RegisteredDomains") & Cookies(cookies)) =>
+        case req @ POST(Path("/GetRegisteredDomains") & Cookies(cookies)) =>
             checkAuth(cookies) {
-                SvdWebAPI.apiRespond(webManager ? User.RegisteredDomains)
+                SvdWebAPI.apiRespond(webManager ? User.GetRegisteredDomains)
             }
 
 

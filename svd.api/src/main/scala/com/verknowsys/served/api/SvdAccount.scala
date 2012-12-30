@@ -75,7 +75,7 @@ object User {
      *
      * @author Daniel (dmilith) Dettlaff
      */
-    case object RegisteredDomains extends Base
+    case object GetRegisteredDomains extends Base
 
 
     /**

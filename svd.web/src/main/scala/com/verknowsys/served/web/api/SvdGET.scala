@@ -83,7 +83,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="get_user_processes">GetUserProcesses</div>
                     <div class="get_stored_services">GetStoredServices</div>
                     <div class="register_domain">RegisterDomain</div>
-                    <div class="registered_domains">RegisteredDomains</div>
+                    <div class="registered_domains">GetRegisteredDomains</div>
                     <div class="terminate_services">TerminateServices</div>
                     <div class="store_services">StoreServices</div>
                     <div class="spawn_service">SpawnService</div>

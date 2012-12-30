@@ -429,10 +429,10 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             utils.registerUserDomain(domain)
 
 
-        case User.RegisteredDomains => // #3
+        case User.GetRegisteredDomains => // #3
             log.debug("Displaying registerd domains.")
             val domains = SvdUserDomains(db)
-            log.info("RegisteredDomains: %s", domains.mkString(", "))
+            log.info("GetRegisteredDomains: %s", domains.mkString(", "))
             sender ! """{"message": "Domain list", "content": [%s]}""".format(domains.map{c => "\"" +c.name+ "\"" }.mkString(", "))
 
 
