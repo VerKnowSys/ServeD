@@ -11,8 +11,17 @@ import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.Logging
 import akka.actor.{Props, ActorRef}
 
+import akka.pattern.ask
+import akka.util
+import akka.util.duration._
+import akka.util.Timeout
+import akka.pattern.ask
+
 
 class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
+
+    implicit val timeout = Timeout(SvdConfig.defaultAPITimeout/1000 seconds)
+
 
     val accountManager = context.actorFor("/user/SvdAccountManager")
 
@@ -32,13 +41,24 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
         super.preStart
         log.info("SvdNotificationCenter is loading.")
         log.debug("Sending Notify.Connect signal to all registered Gates.")
-        gates.foreach(_ ! Notify.Connect)
+        gates.par.map {
+            gate =>
+                (gate ? Notify.Connect) onComplete {
+
+                    case Right(content) =>
+                        log.info("PreStart")
+
+                    case Left(exception) =>
+                        log.error("Exception: %s", exception)
+
+                }
+        }
     }
 
 
     override def postStop {
         log.debug("Shutting down Notification Center. Disconnecting all gates.")
-        gates.foreach(_ ! Notify.Disconnect)
+        gates.par.foreach(_ ! Notify.Disconnect)
         super.postStop
     }
 
@@ -61,13 +81,41 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
 
         case Notify.Status(status) =>
             log.trace("Setting status %s", status)
-            gates.foreach(_ ! Notify.Status(status))
-            sender ! Success
+            gates.par.map{
+                gate =>
+                    log.debug("Setting Status for gate: %s", gate)
+                    (gate ? Notify.Status(status)) onComplete {
+                        case Right(some) =>
+                            log.debug("Status set to %s", some)
+//                            sender ! Success
+
+                        case Left(exception) =>
+                            log.error("Exception: %s", exception)
+//                            sender ! Error("Exception: %s", exception)
+
+                    }
+            }
+
+
+
 
         case Notify.Message(msg) =>
             log.trace("Sending message %s", msg)
-            gates.foreach(_ ! Notify.Message(msg))
-            sender ! Success
+            gates.par.map{
+                gate =>
+                    log.debug("Setting Message for gate: %s", gate)
+                    (gate ? Notify.Message(msg)) onComplete {
+                        case Right(some) =>
+                            log.debug("Sending message :%s", some)
+//                            sender ! Success
+
+                        case Left(exception) =>
+                            log.error("Exception: %s", exception)
+//                            sender ! Error("Exception: %s", exception)
+
+                    }
+            }
+
 
         case x =>
             log.debug("Unknown message for notification center: %s", x)
