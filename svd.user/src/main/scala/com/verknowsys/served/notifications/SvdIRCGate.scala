@@ -16,38 +16,52 @@ import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import redis.clients.jedis._
 import scala.collection.JavaConverters._
+import akka.util.Timeout
+import akka.util
+import akka.pattern.ask
+import akka.util.Timeout
+import akka.util.duration._
+import akka.actor._
 
 
 /**
     @author tallica, dmilith
  */
 
-class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdActor {
+class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging {
 
 
+    implicit val timeout = Timeout(SvdConfig.defaultAPITimeout/1000 seconds)
     implicit val formats = DefaultFormats
 
 
-    def settings {
+    def settings = {
         setVerbose(false)
         setName("tasks-robo")
         setAutoNickChange(false)
-        setVersion("0.1.0")
-        setEncoding("UTF-8")
+        setVersion("0.2.0")
+        setEncoding(SvdConfig.defaultEncoding)
         try {
-            connect("irc.freenode.net")
-            joinChannel("#verknowsys")
+            log.debug("Attepting to connect to irc server: %s on channel %s", SvdConfig.defaultIRCServerName, SvdConfig.defaultIRCChannelName)
+            connect(SvdConfig.defaultIRCServerName)
+            joinChannel(SvdConfig.defaultIRCChannelName)
+
         } catch {
+
             case e: NickAlreadyInUseException =>
                 log.warn("Can't connect to IRC. Nickname is already in use.")
 
             case e: Exception =>
-                log.error("%s".format(e))
+                log.error("IRC Gate Exception: %s".format(e))
 
-            disconnect
         }
     }
 
+
+    override def preStart = {
+        log.debug("Prestarting IRC Gate")
+        // settings
+    }
 
     def allowedUserNames = "dmilith" :: "tallica" :: "wick3d" :: Nil
     def tasksPerPage = 5
@@ -369,37 +383,44 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdActor
     def receive = {
 
         case Notify.Connect =>
-            log.info("Connecting to IRC Gate")
-            connect
+            log.info("Initializing IRC Gate")
+            if (connectToRedis)
+                settings
+            else
+                log.warn("Aborting startup duo to connection problems to Redis server")
+            sender ! Success
 
 
         case Notify.Disconnect =>
-            log.info("Disconnecting to IRC Gate")
-            disconnect()
+            log.info("Disconnecting from IRC Gate")
+            disconnect
+            sender ! Success
 
 
         case Notify.Status(status) =>
-            log.debug("NYI")
-//            log.debug("Setting status: %s for XMPP Gate.", status)
-//            presence.setStatus(status)
+            log.debug("IRC Status: NYI!")
+            sender ! Success
 
 
         case Notify.Message(message) =>
-            log.debug("NYI")
+            Thread.sleep(10000)
+            sendMessage(SvdConfig.defaultIRCChannelName, message)
+            sender ! Success
 
     }
 
-
-    def connect {
-        log.info("Initiating SvdIRCGate")
-        if (connectToRedis)
-            settings
-        else
-            log.warn("Aborting startup duo to connection problems to Redis server")
-    }
+//
+//    def connect {
+//        log.info("Initializing IRC Gate")
+//        if (connectToRedis)
+//            settings
+//        else
+//            log.warn("Aborting startup duo to connection problems to Redis server")
+//    }
 
 
     override def onDisconnect {
+        log.debug("Disconnect in IRC Gate")
         disconnectFromRedis
     }
 
