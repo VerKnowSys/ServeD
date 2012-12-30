@@ -144,6 +144,16 @@ trait SvdUtils extends Logging {
 
 
     /**
+     *  Get ServeD VPN local IP address.
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    def currentVPNHost = InetAddress.getAllByName(currentHost.getHostName).map{_.getAddress.mkString(".")}.find{
+            _.matches(SvdConfig.defaultVPNNetworkPrefix)
+        } getOrElse currentHost
+
+
+    /**
      *  Formats message for Notification System
      *  @author dmilith
      */
