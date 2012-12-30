@@ -6,6 +6,20 @@
 package com.verknowsys.served.api
 
 
+
+object Maintenance {
+    abstract class Base extends ApiResponse
+
+    /**
+     *  Restart user Account Manager on demand
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    case object RestartAccountManager extends Base
+
+}
+
+
 /**
  *  API object for user messages:
  */
@@ -13,7 +27,6 @@ object User {
     abstract class Base extends ApiResponse
 
     // case object AccountNotFound
-
     case object SpawnServices extends Base
     case object TerminateServices extends Base
     case object GetServices extends Base // returns List
@@ -34,46 +47,41 @@ object User {
 
 
     /**
-     * @author Daniel (dmilith) Dettlaff
-     *
      *  This message is used in communication between user core and WebAPI. It allows to set a file event on a file and perform actions defined in SvdService on a trigger. Flags constants are defined in SvdFileEventsManager.
      *  fileToWatch parammeter will be prepended by default user's home directory, because it's the only place where user can create his file watches.
      *
+     * @author Daniel (dmilith) Dettlaff
      */
     case class CreateFileWatch(fileToWatch: String, flags: Int, serviceName: String) extends Base
 
 
     /**
-     * @author Daniel (dmilith) Dettlaff
-     *
      *  This message will destroy all file watches on given file (of course if owned by user)
      *
+     * @author Daniel (dmilith) Dettlaff
      */
     case class DestroyFileWatch(fileToUnwatch: String) extends Base
 
 
     /**
-     * @author Daniel (dmilith) Dettlaff
-     *
      *  Call to store domain record for user.
      *
+     * @author Daniel (dmilith) Dettlaff
      */
     case class StoreUserDomain(domain: String) extends Base
 
     /**
-     * @author Daniel (dmilith) Dettlaff
-     *
      *  Call to retrieve stored domain records for user.
      *
+     * @author Daniel (dmilith) Dettlaff
      */
     case object RegisteredDomains extends Base
 
 
     /**
-     * @author Daniel (dmilith) Dettlaff
-     *
      *  Call to perform user side, writable copy of already defined Igniter.
      *
+     * @author Daniel (dmilith) Dettlaff
      */
     case class CloneIgniterForUser(igniterName: String, userIgniterName: Option[String] = None) extends Base
 
@@ -97,8 +105,8 @@ case class SvdAccount (
         uuid: UUID = randomUUID
     ) extends Persistent {
 
-    override def toString = "SvdAccount(%s)[%d]{%d}".format(userName, uid,
-        accountManagerPort)
+    override def toString = "SvdAccount(%s)[%d]{%d}<%s>".format(userName, uid,
+        accountManagerPort, uuid)
 
 }
 
@@ -158,10 +166,9 @@ case class SvdUserDomain(
 
 
 /**
- * @author Daniel (dmilith) Dettlaff
- *
  *  This class contains path -> service name binding used in FEM triggers.
  *
+ * @author Daniel (dmilith) Dettlaff
  */
 case class SvdFileEventBinding(
         absoluteFilePath: String,

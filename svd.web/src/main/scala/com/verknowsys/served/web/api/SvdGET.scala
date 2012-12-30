@@ -103,6 +103,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="destroy_file_watch2">DestroyFileWatch2</div>
                     <div class="destroy_file_watch3">DestroyFileWatch3</div>
                     <div class="account_security_pass">GetAccountPriviledges</div>
+                    <div class="restart_account_manager">RestartAccountManager</div>
                 </article>
             )
 

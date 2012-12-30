@@ -48,7 +48,7 @@ object userboot extends SvdAkkaSupport with Logging {
 
                 // Get account form remote service
                 log.info("Dispatching Account Manager for uid %s", userUID)
-                val rb = system.actorOf(Props(new SvdUserBoot(userUID.toInt)).withDispatcher("svd-core-dispatcher"))
+                val rb = system.actorOf(Props(new SvdUserBoot(userUID.toInt)).withDispatcher("svd-core-dispatcher"), "SvdUserBoot")
 
                 addShutdownHook {
                     log.warn("userboot Shutdown Hook invoked")

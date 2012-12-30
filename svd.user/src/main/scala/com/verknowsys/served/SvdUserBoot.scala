@@ -56,7 +56,7 @@ class SvdUserBoot(userUID: Int) extends Logging with SvdActor with SvdAkkaSuppor
 
         case anyPort: Int =>
             val bootAccount = SvdAccount(uid = userUID, userName = "a boot user %d".format(userUID))
-            val am = system.actorOf(Props(new SvdAccountManager(bootAccount)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
+            val am = system.actorOf(Props(new SvdAccountManager(bootAccount, self)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
             log.info("UserBoot connected to remote SvdRoot at: %s for UID: %d", SvdConfig.remoteApiServerHost, userUID)
 
     } onFailure {
@@ -65,7 +65,7 @@ class SvdUserBoot(userUID: Int) extends Logging with SvdActor with SvdAkkaSuppor
             // launching headless mode
             log.info("Launching svduser headless mode for UID: %d".format(userUID))
             val bootAccount = SvdAccount(uid = userUID, userName = "a headless user %s".format(userUID))
-            val am = system.actorOf(Props(new SvdAccountManager(bootAccount, headless = true)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager")
+            val am = system.actorOf(Props(new SvdAccountManager(bootAccount, self, headless = true)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager")
             log.info("UserBoot spawned for UID: %d", userUID)
 
     }
@@ -91,9 +91,11 @@ class SvdUserBoot(userUID: Int) extends Logging with SvdActor with SvdAkkaSuppor
             log.debug("UserBoot success.")
 
 
-        case Restart =>
-            log.debug("UserBoot restart.")
-            self ! PoisonPill
+        case Maintenance.RestartAccountManager =>
+            log.debug("Killing Account Manager on demand of user: %s.", userUID)
+            sender ! Success
+            system.shutdown
+            sys.exit(0)
 
 
         case Terminated(ref) =>

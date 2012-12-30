@@ -57,7 +57,7 @@ case object SvdFileEventBindings extends DB[SvdFileEventBinding]
  * @author dmilith
  * @author teamon
  */
-class SvdAccountManager(val bootAccount: SvdAccount, val headless: Boolean = false) extends SvdManager with SvdFileEventsReactor with Logging {
+class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val headless: Boolean = false) extends SvdManager with SvdFileEventsReactor with Logging {
 
     // import akka.actor.OneForOneStrategy
     // import akka.actor.SupervisorStrategy._
@@ -277,6 +277,11 @@ class SvdAccountManager(val bootAccount: SvdAccount, val headless: Boolean = fal
             for (index <- 0 to SvdConfig.maxSchedulerDefinitions) { // XXX: hacky.. it's better to figure out how to get list of defined jobs from scheduler..
                 scheduler.deleteJob(jobKey("%s-%d".format(name, index)))
             }
+
+
+        case msg: Maintenance.Base =>
+            log.debug("Forwarding Maintenance message to UserBoot")
+            userBoot forward msg
 
 
         case User.CloneIgniterForUser(igniterName, userIgniterNewName) => // #13

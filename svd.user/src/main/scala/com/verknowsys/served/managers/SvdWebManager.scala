@@ -82,6 +82,9 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
         case x: Security.Base =>
             accountManager forward x
 
+        case x: Maintenance.Base =>
+            accountManager forward x
+
         case x: User.Base =>
             accountManager forward x
 

@@ -167,6 +167,11 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
                 SvdWebAPI.apiRespond(webManager ? Security.GetAccountPriviledges(account))
             }
 
+        /** API POST call #018  */
+        case req @ POST(Path("/RestartAccountManager") & Cookies(cookies)) =>
+            checkAuth(cookies) {
+                SvdWebAPI.apiRespond(webManager ? Maintenance.RestartAccountManager)
+            }
 
 
         /** API POST call #DEFAULT  */
