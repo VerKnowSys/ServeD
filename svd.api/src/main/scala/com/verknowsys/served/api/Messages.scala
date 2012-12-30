@@ -26,6 +26,9 @@ object Notify {
     // generic notification center messages:
     sealed abstract class Base extends ApiMessage
 
+    case object Connect extends Base
+    case object Disconnect extends Base
+
     case object Ping extends Base
     case object Pong extends Base
 

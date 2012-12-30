@@ -9,14 +9,15 @@ import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.utils.Logging
+import akka.actor.{Props, ActorRef}
 
 
-class SvdNotificationCenter(account: SvdAccount) extends SvdActor with SvdUtils with Logging {
+class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
 
     val accountManager = context.actorFor("/user/SvdAccountManager")
 
-    val gates: List[Gate] =
-        new SvdXMPPGate(
+
+    val gates: List[ActorRef] = context.actorOf(Props(new SvdXMPPGate(
             host = SvdConfig.notificationXmppHost,
             port = SvdConfig.notificationXmppPort,
             login = SvdConfig.notificationXmppLogin,
@@ -24,26 +25,27 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with SvdUtils 
             resource = SvdConfig.notificationXmppResource,
             account = account,
             accountManager = accountManager
-        ) :: new SvdIRCGate(account) :: Nil // new SvdMailGate :: Nil
+        ))) :: context.actorOf(Props(new SvdIRCGate(account))) :: Nil
 
 
     override def preStart {
         super.preStart
-        log.info("SvdNotificationCenter is loading")
-        gates.foreach(_.connect)
+        log.info("SvdNotificationCenter is loading.")
+        log.debug("Sending Notify.Connect signal to all registered Gates.")
+        gates.foreach(_ ! Notify.Connect)
+    }
+
+
+    override def postStop {
+        log.debug("Shutting down Notification Center. Disconnecting all gates.")
+        gates.foreach(_ ! Notify.Disconnect)
+        super.postStop
     }
 
 
     override def preRestart(reason: Throwable, message: Option[Any]) {
         log.debug("preRestart down Notification Center with reason: %s and message: %s", reason, message)
         super.preRestart(reason, message)
-    }
-
-
-    override def postStop {
-        log.debug("Shutting down Notification Center. Disconnecting all gates.")
-        gates.foreach(_.disconnect)
-        super.postStop
     }
 
 
@@ -59,12 +61,12 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with SvdUtils 
 
         case Notify.Status(status) =>
             log.trace("Setting status %s", status)
-            gates.foreach(_ setStatus status)
+            gates.foreach(_ ! Notify.Status(status))
             sender ! Success
 
         case Notify.Message(msg) =>
             log.trace("Sending message %s", msg)
-            gates.foreach(_ send msg)
+            gates.foreach(_ ! Notify.Message(msg))
             sender ! Success
 
         case x =>

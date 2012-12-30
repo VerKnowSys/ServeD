@@ -22,13 +22,13 @@ import scala.collection.JavaConverters._
     @author tallica, dmilith
  */
 
-class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils with Gate {
+class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdActor {
 
 
     implicit val formats = DefaultFormats
 
 
-    def settings = {
+    def settings {
         setVerbose(false)
         setName("tasks-robo")
         setAutoNickChange(false)
@@ -366,6 +366,30 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
     }
 
 
+    def receive = {
+
+        case Notify.Connect =>
+            log.info("Connecting to IRC Gate")
+            connect
+
+
+        case Notify.Disconnect =>
+            log.info("Disconnecting to IRC Gate")
+            disconnect()
+
+
+        case Notify.Status(status) =>
+            log.debug("NYI")
+//            log.debug("Setting status: %s for XMPP Gate.", status)
+//            presence.setStatus(status)
+
+
+        case Notify.Message(message) =>
+            log.debug("NYI")
+
+    }
+
+
     def connect {
         log.info("Initiating SvdIRCGate")
         if (connectToRedis)
@@ -374,15 +398,6 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
             log.warn("Aborting startup duo to connection problems to Redis server")
     }
 
-
-    def setStatus(st: String) {
-    }
-
-
-    def send(message: String) {
-
-        // SvdNotifyMailer(message, SvdConfig.notificationMailRecipients)
-    }
 
     override def onDisconnect {
         disconnectFromRedis
