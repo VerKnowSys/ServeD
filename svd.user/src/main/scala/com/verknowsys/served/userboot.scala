@@ -24,8 +24,6 @@ object userboot extends SvdAkkaSupport with Logging {
 
 
     def main(args: Array[String]) {
-        // set runtime properties
-        JSystem.setProperty("org.terracotta.quartz.skipUpdateCheck", "true")
 
         // handle signals
         handleSignal("ABRT") { getAllLiveThreads }
@@ -45,6 +43,11 @@ object userboot extends SvdAkkaSupport with Logging {
                 println()
                 log.info("ServeD v" + SvdConfig.version)
                 log.info(SvdConfig.copyright)
+
+                // set runtime properties
+                JSystem.setProperty("org.terracotta.quartz.skipUpdateCheck", "true")
+                JSystem.setProperty("user.name", userUID) // required for ServeD
+                JSystem.setProperty("user.home", SvdConfig.userHomeDir / userUID) // required for ServeD
 
                 // Get account form remote service
                 log.info("Dispatching Account Manager for uid %s", userUID)
