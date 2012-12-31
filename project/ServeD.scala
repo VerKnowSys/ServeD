@@ -69,6 +69,9 @@ object BuildSettings {
             case some @ x if some.endsWith(".coffee") =>
                 MergeStrategy.discard
 
+            case some @ x if some.endsWith(".less") =>
+                MergeStrategy.discard
+
             case "about.html" | "build.number" | "META-INF/MANIFEST.MF" | "META-INF/DEPENDENCIES" | "META-INF/INDEX.LIST" | "META-INF/BCKEY.DSA" | "META-INF/BCKEY.SF" =>
                 MergeStrategy.discard
 
