@@ -28,7 +28,7 @@ $ ->
       element: "div.register_domain"
       params: "RegisterDomain=dupa123.fibi.tallica.pl"
     ,
-    {link: "RegisteredDomains", element: "div.registered_domains", params: "" },
+    {link: "GetRegisteredDomains", element: "div.registered_domains", params: "" },
     {link: "GetStoredServices", element: "div.get_stored_services", params: "" },
     {link: "TerminateServices", element: "div.terminate_services", params: "" },
     {link: "StoreServices", element: "div.store_services", params: "" },
