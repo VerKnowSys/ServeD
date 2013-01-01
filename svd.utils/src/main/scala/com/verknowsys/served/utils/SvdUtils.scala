@@ -552,7 +552,11 @@ trait SvdUtils extends Logging {
         val res = compact(render(cc.getClass.getDeclaredFields.toList.map {
             field =>
                 field.setAccessible(true)
-                JString(field.getName) // -> JString(field.get(cc).toString)
+                JObject(
+                    List(
+                        (field.getName -> JString(field.get(cc).toString))
+                    )
+                )
         }))
 
         val result = compact(render(parse(res)))
