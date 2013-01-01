@@ -98,7 +98,7 @@ object Resolvers {
 }
 
 object Dependencies {
-    val akkaVersion = "2.0.3"
+    val akkaVersion = "2.0.4"
 
     // Scala
     val akkaActor = "com.typesafe.akka" % "akka-actor" % akkaVersion
