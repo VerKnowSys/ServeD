@@ -531,12 +531,13 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
 
         case User.RemoveAllUserPorts =>
-            log.debug("Removing All sser ports for account: %s", account)
+            log.debug("Removing All registered ports for account: %s", account)
             SvdUserPorts(db).map{
                 portRecord =>
                     log.trace("Removing port: %s from user account.", portRecord.number)
                     db ~ portRecord
             }
+            sender ! Success
 
 
         case AuthorizeWithKey(key) =>
