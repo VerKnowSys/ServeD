@@ -10,6 +10,9 @@ import com.verknowsys.served.utils.signals._
 import com.verknowsys.served._
 import SvdPOSIX._
 
+import org.json4s._
+import org.json4s.native.JsonMethods._
+
 import java.security.MessageDigest
 import org.apache.commons.io.FileUtils
 import clime.messadmin.providers.sizeof.ObjectProfiler
@@ -539,9 +542,30 @@ trait SvdUtils extends Logging {
 
 
     /**
-     *  Get list of fields of case class using reflection
+     *  Get JSON list of fields of case class using Java Reflection
      *
      *  @author dmilith
+     *  @return JSON array with fields
+     */
+    def caseClassFieldsJSON(cc: AnyRef) = {
+        import org.json4s.JsonDSL._
+        val res = compact(render(cc.getClass.getDeclaredFields.toList.map {
+            field =>
+                field.setAccessible(true)
+                JString(field.getName) // -> JString(field.get(cc).toString)
+        }))
+
+        val result = compact(render(parse(res)))
+        log.debug("RESULT CASE: %s", result)
+        result
+    }
+
+
+    /**
+     *  Get list of fields of case class using Java Reflection
+     *
+     *  @author dmilith
+     *  @return Map of Strings with key and values.
      */
     def caseClassFields(cc: AnyRef) =
         (Map[String, String]() /: cc.getClass.getDeclaredFields) {
