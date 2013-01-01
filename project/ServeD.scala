@@ -191,7 +191,7 @@ object ServeD extends Build {
     lazy val utils = Project("utils", file("svd.utils"),
         settings = buildSettings ++ Seq(
             compileOrder        := CompileOrder.Mixed,
-            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd, slf4japi, quartz) // liftUtil,
+            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd, slf4japi, quartz, json) // liftUtil,
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, testing % "test")
 
