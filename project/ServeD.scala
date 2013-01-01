@@ -98,18 +98,18 @@ object Resolvers {
 }
 
 object Dependencies {
-    val akkaVersion = "2.0.4"
+    val akkaVersion = "2.1.0"
 
     // Scala
     val akkaActor = "com.typesafe.akka" % "akka-actor" % akkaVersion
-    val akkaRemote = "com.typesafe.akka" % "akka-remote" % akkaVersion
-    val akkaTestkit = "com.typesafe.akka" % "akka-testkit" % akkaVersion % "test"
+    // val akkaRemote = "com.typesafe.akka" % "akka-remote" % akkaVersion
+    // val akkaTestkit = "com.typesafe.akka" % "akka-testkit" % akkaVersion % "test"
     val jline = "jline" % "jline" % "0.9.9"
-    val scalatest = "org.scalatest" %% "scalatest" % "1.8" % "test"
-    val unfilteredFilter = "net.databinder" %% "unfiltered-filter" % "0.6.4"
-    val unfilteredJetty = "net.databinder" %% "unfiltered-jetty" % "0.6.4"
-    val unfilteredSpec = "net.databinder" %% "unfiltered-spec" % "0.6.4" % "test"
-    val json = "org.json4s" %% "json4s-native" % "3.0.0"
+    val scalatest = "org.scalatest" % "scalatest_2.10.0-RC5" % "2.0.M5-B1"
+    val unfilteredFilter = "net.databinder" % "unfiltered-filter_2.9.2" % "0.6.4"
+    val unfilteredJetty = "net.databinder" % "unfiltered-jetty_2.9.2" % "0.6.4"
+    val unfilteredSpec = "net.databinder" % "unfiltered-spec_2.9.2" % "0.6.4" % "test"
+    val json = "org.json4s" %% "json4s-native" % "3.1.0"
 
     // Java
     val bouncycastle = "org.bouncycastle" % "bcprov-jdk16" % "1.46"
@@ -176,7 +176,7 @@ object ServeD extends Build {
 
     lazy val api = Project("api", file("svd.api"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(akkaRemote)
+            libraryDependencies ++= Seq() // akkaRemote
         )
     ).settings(graph.Plugin.graphSettings: _*)
 
@@ -209,7 +209,7 @@ object ServeD extends Build {
 
     lazy val testing = Project("testkit", file("svd.testing"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(scalatest, akkaTestkit, commonsio, bouncycastle)
+            libraryDependencies ++= Seq(scalatest, commonsio, bouncycastle) // akkaTestkit
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api)
 
