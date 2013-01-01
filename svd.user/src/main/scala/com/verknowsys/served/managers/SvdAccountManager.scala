@@ -29,7 +29,7 @@ import akka.util.duration._
 import akka.actor._
 
 import scala.math._
-import scala.util._
+import scala.util.Random
 import org.quartz._
 import org.quartz.impl._
 import org.quartz.JobKey._
