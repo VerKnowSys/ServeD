@@ -37,8 +37,11 @@ object User {
     case object ServiceStatus extends Base // used to get information about Service state
     case object ServiceAutostart extends Base
     case object GetStoredServices extends Base
+    case object RemoveAllUserPorts extends Base
+    case object GetUserPorts extends Base
+    case object GetServicePort extends Base
+    case object RegisterUserPort extends Base
 
-    case object GetServicePort
     case class GetServicePort(name: String) extends Base
     case class GetServiceStatus(name: String) extends Base
     case class ReadLogFile(serviceName: String, pattern: Option[String]) extends Base
@@ -120,7 +123,7 @@ case class SvdUserPort(
         number: Int,
         uuid: UUID = randomUUID
     ) extends Persistent {
-        override def toString = "SvdUSerPort(" + number + ")"
+        override def toString = "SvdUserPort(" + number + ")"
     }
 
 

@@ -360,10 +360,6 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             context.actorSelection("../SvdAccountManager/Service-*") ! User.ServiceStatus
 
 
-        // case User.GetServiceStatus(name) =>
-        //     context.actorFor("/user/SvdAccountManager/Service-%s".format(name)) ! User.ServiceStatus
-
-
         case User.SpawnService(serviceName) => // #7
             log.debug("Spawning service: %s".format(serviceName))
 
@@ -507,6 +503,42 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             sender ! Success
 
 
+        case User.GetUserPorts =>
+            log.debug("Getting User ports for account: %s", account)
+            val portsListFormatted = SvdUserPorts(db).map{_.number}.mkString(",")
+            sender ! """{"message": "Stored services", "content": [%s]}""".format(portsListFormatted)
+
+
+        case User.RegisterUserPort =>
+            if (headless) {
+                val newFreeLocalPort = SvdAccountUtils.randomFreePort
+                log.debug("Registering user port: %s", newFreeLocalPort)
+                db << SvdUserPort(number = newFreeLocalPort)
+            } else { // "Connected to SvdRoot mode"
+                log.trace("Got User.RegisterUserPort")
+
+                SvdUserPorts(db).find{_.number == 12345} getOrElse { // XXX: HACK
+                    if (portAvailable(12345)) {
+                        log.trace("Registering port: %s", 12345)
+                        db << SvdUserPort(number = 12345) // XXX: HACK
+                    }
+                }
+
+                systemManager forward User.RegisterUserPort // XXX: hack. It must be done on root side, but an utils is required to perform read and checks of all /SystemUsers/Security/*.json
+
+                sender ! """{"message": "Port registered: %s", "content": [%s]}""".format(12345, 12345)
+            }
+
+
+        case User.RemoveAllUserPorts =>
+            log.debug("Removing All sser ports for account: %s", account)
+            SvdUserPorts(db).map{
+                portRecord =>
+                    log.trace("Removing port: %s from user account.", portRecord.number)
+                    db ~ portRecord
+            }
+
+
         case AuthorizeWithKey(key) =>
             log.debug("Trying to find key in account: %s", account)
             sender ! accountKeys(db).keys.find(_.key == key).isDefined
@@ -550,27 +582,6 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                             }
                         }
                 }
-
-                // flags match {
-                //     case Modified =>
-                //         log.trace("File event type: Modified")
-                //         // "INFO -- %s -- Performing %s of service: %s".format(currentHost, hookName, config.name)
-                //         notificationsManager ! Notify.Message(formatMessage("I:File event notification: Modified on path: %s.".format(path)))
-                //         gitManager ! Git.CreateRepository("somerepository")
-                //     case Deleted =>
-                //         log.trace("File event type: Deleted")
-                //     case Renamed =>
-                //         log.trace("File event type: Renamed")
-                //         // gitManager ! Shutdown
-                //     case AttributesChanged =>
-                //         log.trace("File event type: AttributesChanged")
-                //         // gitManager ! RemoveRepository("somerepository")
-                //     case Revoked =>
-                //         log.trace("File event type: Revoked")
-                //     case x =>
-                //         log.trace("Got event: %s", x)
-
-                // }
             }
 
 

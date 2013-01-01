@@ -50,7 +50,10 @@ $ ->
     {link: "DestroyFileWatch", element: "div.destroy_file_watch2", params: "DestroyFileWatch=Src/jakieśtakieśzótęłów" },
     {link: "DestroyFileWatch", element: "div.destroy_file_watch3", params: "DestroyFileWatch=Src/zdzibrub" },
     {link: "GetAccountPriviledges", element: "div.account_security_pass", params: ""},
-    {link: "RestartAccountManager", element: "div.restart_account_manager", params: ""}
+    {link: "RestartAccountManager", element: "div.restart_account_manager", params: ""},
+    {link: "RemoveAllReservedPorts", element: "div.remove_all_reserved_ports", params: ""},
+    {link: "RegisterUserPort", element: "div.register_user_port", params: "RegisterUserPort=12344"},
+    {link: "GetUserPorts", element: "div.get_user_ports", params: ""}
   ]
 
 

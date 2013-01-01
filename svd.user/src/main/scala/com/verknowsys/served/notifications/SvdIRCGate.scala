@@ -403,7 +403,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
 
 
         case Notify.Message(message) =>
-            Thread.sleep(10000)
+            Thread.sleep(10000) // XXX: hardcode
             sendMessage(SvdConfig.defaultIRCChannelName, message)
             sender ! Success
 

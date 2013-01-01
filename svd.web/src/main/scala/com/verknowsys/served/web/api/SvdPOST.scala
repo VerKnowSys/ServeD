@@ -173,6 +173,23 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
                 SvdWebAPI.apiRespond(webManager ? Maintenance.RestartAccountManager)
             }
 
+        /** API POST call #019  */
+        case req @ POST(Path("/GetUserPorts") & Cookies(cookies)) =>
+            checkAuth(cookies) {
+                SvdWebAPI.apiRespond(webManager ? User.GetUserPorts)
+            }
+
+        /** API POST call #020  */
+        case req @ POST(Path("/RemoveAllReservedPorts") & Cookies(cookies)) =>
+            checkAuth(cookies) {
+                SvdWebAPI.apiRespond(webManager ? User.RemoveAllUserPorts)
+            }
+
+        /** API POST call #021  */
+        case req @ POST(Path("/RegisterUserPort") & Cookies(cookies)) =>
+            checkAuth(cookies) {
+                SvdWebAPI.apiRespond(webManager ? User.RegisterUserPort)
+            }
 
         /** API POST call #DEFAULT  */
         case req @ POST(_) =>
