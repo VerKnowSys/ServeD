@@ -554,14 +554,19 @@ trait SvdUtils extends Logging {
                 field.setAccessible(true)
                 JObject(
                     List(
-                        (field.getName -> JString(field.get(cc).toString))
+                        (field.getName -> (try { // by default try formatting int
+                            JInt(field.get(cc).toString.toInt) // NOTE: will throw exception on Double/Float and parse them as String.
+                        } catch {
+                            case x: Exception =>
+                                JString(field.get(cc).toString)
+                        }))
                     )
                 )
-        }))
+            }
+        ))
 
-        val result = compact(render(parse(res)))
-        log.debug("RESULT CASE: %s", result)
-        result
+        log.debug("RESULT CASE: %s", res)
+        res
     }
 
 
