@@ -24,25 +24,26 @@ import java.util.Map;
 
 /**
  * Trains an ANN. Currently only File based training is supported.
- * 
+ *
  * @author krenfro, drt24, brandstaetter
  */
+@SuppressWarnings("unchecked")
 public class Trainer {
-    
+
     static {
         NativeLibrary fann;
         if (Platform.isWindows()){
             fann = NativeLibrary.getInstance("fannfloat");
             Map options = fann.getOptions();
             options.put(Library.OPTION_CALLING_CONVENTION,  StdCallLibrary.STDCALL_CONVENTION);
-            options.put(Library.OPTION_FUNCTION_MAPPER, new WindowsFunctionMapper());            
+            options.put(Library.OPTION_FUNCTION_MAPPER, new WindowsFunctionMapper());
         }
         else{
             fann = NativeLibrary.getInstance("fann");
         }
         Native.register(fann);
     }
- 
+
     Fann fann;
 
     public Trainer(Fann fann) {
@@ -65,7 +66,7 @@ public class Trainer {
     }
 
     /**
-     * 
+     *
      * @param dataFile
      * @param maxNeurons
      * @param neuronsBetweenReports
@@ -86,7 +87,7 @@ public class Trainer {
     }
 
     /**
-     * 
+     *
      * @param testingFile
      * @return MSE for the Fann which has been tested
      */
@@ -117,14 +118,14 @@ public class Trainer {
 
     /**
      * Resets the mean square error from the network.
-     * 
+     *
      * @param ann
      */
     protected static native void fann_reset_MSE(Pointer ann);
 
     /**
      * Reads the mean square error from the network.
-     * 
+     *
      * @param ann
      * @return the mean square error of the network
      */
@@ -132,9 +133,9 @@ public class Trainer {
 
     /**
      * Test the network using data and return the MSE of the network.
-     * 
+     *
      * You might need to run {@link #fann_reset_MSE(Pointer)} first
-     * 
+     *
      * @param ann
      * @param data
      *            the data to test with
@@ -144,10 +145,10 @@ public class Trainer {
 
     /**
      * Read the training or testing data from a file
-     * 
+     *
      * You must call {@link #fann_destroy_train(Pointer)} on the {@link Pointer}
      * you get from this after you have finished with it
-     * 
+     *
      * @param filename
      *            the file name of the file to read the data from
      * @return pointer to the data which has been read for use with
@@ -157,7 +158,7 @@ public class Trainer {
 
     /**
      * Deallocate the data
-     * 
+     *
      * @param data
      *            the training/testing data to deallocate
      */
