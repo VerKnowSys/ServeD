@@ -54,7 +54,7 @@ object BuildSettings {
         // javacOptions     += "-encoding UTF-8",
         // javacOptions     += "-source 1.6",
         // javacOptions     += "-target 1.6",
-        // javacOptions     += "-Xlint:unchecked",
+        javacOptions    += "-Xlint:unchecked",
         javacOptions    += "-Xlint:deprecation"
 
     ) ++ Tasks.all
