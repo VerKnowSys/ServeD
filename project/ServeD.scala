@@ -35,25 +35,28 @@ object BuildSettings {
         1
     }
 
-    val buildSettings = Defaults.defaultSettings ++ Seq( // ++ GrowlingTests.growlSettings
-        organization    := "VerKnowSys",
+    val buildSettings = Defaults.defaultSettings ++ Seq(
+        organization    := "Versatile Knowledge Systems",
         version         := Source.fromFile("VERSION").mkString.trim + "-b%d".format(buildNumber),
         scalaVersion    := Source.fromFile("VERSION-SCALA").mkString.trim,
         resolvers       := Resolvers.all,
         logLevel        := Level.Info,
-        compileOrder    := CompileOrder.JavaThenScala,
+        compileOrder    := CompileOrder.Mixed,
+        parallelExecution := false,
 
-        scalacOptions   += "-Ywarn-dead-code",
         scalacOptions   += "-Xresident",
-        scalacOptions   += "-g:source",
-        scalacOptions   += "-explaintypes",
+        // scalacOptions   += "-Yinline",
+        // scalacOptions   += "-Ywarn-dead-code",
+        // scalacOptions   += "-Xcheck-null",
+        // scalacOptions   += "–Xshow-phases",
+        // scalacOptions   += "–Xexperimental",
+
+        scalacOptions   += "-g:none",
+        // scalacOptions   += "-explaintypes",
         scalacOptions   += "-unchecked",
         scalacOptions   += "-deprecation",
 
         javacOptions    += "-g:none",
-        // javacOptions     += "-encoding UTF-8",
-        // javacOptions     += "-source 1.6",
-        // javacOptions     += "-target 1.6",
         javacOptions    += "-Xlint:unchecked",
         javacOptions    += "-Xlint:deprecation"
 
