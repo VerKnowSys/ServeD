@@ -1,15 +1,29 @@
 #!/bin/sh
 
-unset DYLD_LIBRARY_PATH
+unset SBT_OPTS
+unset JAVA_OPTS
+
+export SBT_OPTS=" -d32 -Xms256m -Xmx1g -server -XX:+UseParNewGC -XX:+CMSClassUnloadingEnabled -XX:+AggressiveOpts"
+# -XX:ReservedCodeCacheSize=256m  -XX:MaxPermSize=512m
+
+#  -XX:+UseConcMarkSweepGC
+# -XX:ReservedCodeCacheSize=256m \
+# ${SBT_OPTS} \
+# -XX:+UseConcMarkSweepGC \
+# -XX:+CMSClassUnloadingEnabled \
+# -XX:+AggressiveOpts \
+# -XX:MaxPermSize=512m \
+# -Xms256m \
 
 exec java \
 -d32 \
--Djna.library.path=$(pwd)/lib \
+-XX:MaxPermSize=512m \
+-XX:+UseParNewGC \
+-XX:+CMSClassUnloadingEnabled \
 -XX:+AggressiveOpts \
--Dcom.sun.management.jmxremote=true \
--Dcom.sun.management.jmxremote.ssl=false \
--Dcom.sun.management.jmxremote.authenticate=false \
--Xms32m \
--Xmx512m \
-${SBT_OPTS} \
+-Djna.library.path=$(pwd)/lib \
+-Dfile.encoding=UTF-8 \
+-Xmx1g \
+-server \
+-javaagent:/lib/jrebel/jrebel.jar \
 -jar $(dirname $0)/../vendor/sbt-launch.jar "$@"
