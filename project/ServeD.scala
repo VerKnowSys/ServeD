@@ -42,7 +42,7 @@ object BuildSettings {
         resolvers       := Resolvers.all,
         logLevel        := Level.Info,
         compileOrder    := CompileOrder.JavaThenScala,
-        parallelExecution := true,
+        parallelExecution := false,
 
         scalacOptions   += "-Xresident",
         scalacOptions   += "-Yrepl-sync",
@@ -148,7 +148,9 @@ object ServeD extends Build {
     import Dependencies._
 
 
-    lazy val served = Project("served", file("."), settings = buildSettings).settings(graph.Plugin.graphSettings: _*) aggregate(
+    lazy val served = Project("served", file("."), settings = buildSettings ++ Seq(
+            // commands ++= Seq(warmup)
+        )).settings(graph.Plugin.graphSettings: _*) aggregate(
 
         api, cli, utils, testing, root, user, common, web
     )
@@ -216,6 +218,29 @@ object ServeD extends Build {
             libraryDependencies ++= Seq(scalatest, akkaTestkit, commonsio, bouncycastle)
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api)
+
+
+    // def warmupEval: State => State = (state: State) => {
+
+    //     Project.runTask(Keys.clean, state)
+
+    //     Project.runTask(Keys.compile, state)
+
+    //     state
+    // }
+
+
+    /**
+     *  Warmup function
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    // def warmup: Command = Command.command("warmup") {
+    //         // warmupEval(_)
+    //         // scope =>
+
+    // }
+
 
 
 }
