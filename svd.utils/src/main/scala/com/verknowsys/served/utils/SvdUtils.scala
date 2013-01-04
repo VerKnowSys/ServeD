@@ -178,6 +178,7 @@ trait SvdUtils extends Logging {
         }
     }
 
+
     /**
         Unified & DRY method of throwing exceptions
         @author dmilith
@@ -406,7 +407,9 @@ trait SvdUtils extends Logging {
      *  @author dmilith
      */
     def getUserUid = {
-        clib.getuid
+        val uid = clib.getuid
+        log.debug("Getting user uid: %d", uid)
+        uid
     }
 
 
