@@ -41,10 +41,11 @@ object BuildSettings {
         scalaVersion    := Source.fromFile("VERSION-SCALA").mkString.trim,
         resolvers       := Resolvers.all,
         logLevel        := Level.Info,
-        compileOrder    := CompileOrder.Mixed,
-        parallelExecution := false,
+        compileOrder    := CompileOrder.JavaThenScala,
+        parallelExecution := true,
 
         scalacOptions   += "-Xresident",
+        scalacOptions   += "-Yrepl-sync",
         // scalacOptions   += "-Yinline",
         // scalacOptions   += "-Ywarn-dead-code",
         // scalacOptions   += "-Xcheck-null",
