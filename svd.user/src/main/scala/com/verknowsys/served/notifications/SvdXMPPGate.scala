@@ -1,29 +1,26 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.notifications
 
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
-import com.verknowsys.served.api.accountkeys._
-import com.verknowsys.served.api.git._
-import com.verknowsys.served.services._
 import com.verknowsys.served.utils._
 
 import scala.collection.mutable.ListBuffer
+
+import akka.actor._
+import org.jivesoftware.smack._
 import org.jivesoftware.smack._
 import org.jivesoftware.smack.packet._
 import org.jivesoftware.smack.filter._
 
-import akka.actor._
-import akka.dispatch._
-import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
-import akka.util.Timeout
-import akka.util.duration._
-import akka.actor._
 
+class SvdXMPPGate(host: String, port: Int, login: String, password: String, resource: String, account: SvdAccount, accountManager: ActorRef) extends SvdActor with MessageListener {
 
-class SvdXMPPGate(host: String, port: Int, login: String, password: String, resource: String, account: SvdAccount, accountManager: ActorRef) extends Gate with MessageListener with Logging with SvdUtils {
 
     val config = new ConnectionConfiguration(host, port)
     config.setCompressionEnabled(SvdConfig.notificationXmppCompression)
@@ -33,42 +30,68 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
     val chats = ListBuffer[Chat]()
 
 
-    def connect {
-        log.info("Initiating SvdXMPPGate")
-        // XMPPConnection.DEBUG_ENABLED = SvdConfig.notificationXmppDebug
-        try {
-            connection.connect
-            log.trace("SvdXMPPGate connected to server")
-            connection.login(login, password, resource)
-            log.trace("XMPP server: %s:%d, login: %s, resource: %s", host, port, login, resource)
-            val chatmanager = connection.getChatManager
+    def receive = {
 
-            SvdConfig.notificationXmppRecipients.foreach { user =>
-                try {
-                    chats += chatmanager.createChat(user, this)
-                } catch {
-                    case x: Throwable =>
-                        log.error("Error: " + x )
+
+        case Notify.Connect =>
+            log.info("Connecting XMPP Gate to host: %s", host)
+            try {
+                connection.connect
+                log.trace("SvdXMPPGate connected to server")
+                connection.login(login, password, resource)
+                log.trace("XMPP server: %s:%d, login: %s, resource: %s", host, port, login, resource)
+                val chatmanager = connection.getChatManager
+
+                SvdConfig.notificationXmppRecipients.foreach { user =>
+                    try {
+                        chats += chatmanager.createChat(user, this)
+                    } catch {
+                        case x: Throwable =>
+                            log.error("Error: " + x )
+                    }
                 }
+
+                log.debug("Number of users bound to be notified with repository changes: %s".format(chats.length))
+                presence.setStatus("ServeD® XMPP Notification Plugin")
+                presence.setMode(Presence.Mode.available)
+                connection.sendPacket(presence)
+
+            } catch {
+                case x: Throwable =>
+                    log.error("Error in XMPP Gate Exc: %s".format(x))
+                    log.warn("XMPP Gate initialization aborted for this session.")
             }
 
-            log.debug("Number of users bound to be notified with repository changes: %s".format(chats.length))
-            presence.setStatus("ServeD® XMPP Notification Plugin")
-            presence.setMode(Presence.Mode.available)
-            connection.sendPacket(presence)
 
-        } catch {
-            case x: Throwable =>
-                log.error("Error in XMPP Gate Exc: %s".format(x))
-                log.warn("XMPP Gate initialization aborted for this session.")
-        }
+        case Notify.Disconnect =>
+            log.info("Disconnecting from XMPP server: %s", host)
+            connection.disconnect()
+
+
+        case Notify.Status(status) =>
+            log.debug("Setting status: %s for XMPP Gate.", status)
+            presence.setStatus(status)
+
+
+        case Notify.Message(message) =>
+            log.debug("Sending message: %s", message)
+            send(message)
+
+
     }
 
-    def disconnect { connection.disconnect() }
 
-    def setStatus(st: String) {
-        presence.setStatus(st)
+    override def preStart {
+        super.preStart
+        log.info("Initiating XMPP Gate")
     }
+
+
+    override def postStop {
+        log.info("Stopping XMPP Gate")
+        super.postStop
+    }
+
 
     def send(message: String) {
         chats.foreach { chatRecipient =>
@@ -207,51 +230,11 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                 }
 
 
-            // USER SIDE REMOTE API
-            //
-            //
-            // Services API
-            //
-            // service status all
-            // service status Redis
-            // service stop Redis
-            // service stop all
-            // service start Redis
-            // service start all
-            //
-            // Logs API
-            // logs show all
-            // logs show Redis
-            //
-            // Register/ UnRegister API
-            // register domain domain.some.com
-            // register user user name
-            //
-            // Auth API
-            // TODO: auth API
-            //
-            //
-
             case anything =>
                 send(formatMessage("E:Try 'help'. No such command: %s".format(anything.mkString(" "))))
 
         }
 
-        // send(message.getBody)
-        // if (message.getFrom.contains("verknowsys.com")) {
-        //     trace("Message contains verknowsys: " + message.getFrom)
-        //     message.getBody match {
-        //         case "last" =>
-        //             chat.sendMessage("Requested last commit.\nNYI")
-        //         case "last5" =>
-        //             chat.sendMessage("Requested last 5 commits.\nNYI")
-        //         case "last10" =>
-        //             chat.sendMessage("Requested last 10 commits.\nNYI")
-        //         case "help" =>
-        //             chat.sendMessage("No help for noobs")
-        //     }
-        // }
     }
-
 
 }

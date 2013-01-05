@@ -1,19 +1,21 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.sshd;
 
-import java.io.FilterInputStream;
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.EnumSet;
-import java.util.Map;
-
-import org.apache.sshd.server.shell.*;
 import org.apache.sshd.common.Factory;
 import org.apache.sshd.common.util.Buffer;
 import org.apache.sshd.server.Command;
+import org.apache.sshd.server.shell.InvertedShell;
+import org.apache.sshd.server.shell.InvertedShellWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.EnumSet;
+import java.util.Map;
 
 /**
  * A {@link Factory} of {@link Command} that will create a new process and bridge

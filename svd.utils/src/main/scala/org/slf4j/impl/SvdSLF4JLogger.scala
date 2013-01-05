@@ -2,8 +2,6 @@ package org.slf4j.impl
 
 import org.slf4j.Logger
 import org.slf4j.Marker
-import org.slf4j.helpers.MessageFormatter
-import org.slf4j.helpers.NamedLoggerBase
 
 import com.verknowsys.served.utils.Logging
 import com.verknowsys.served.api.Logger.Levels._

@@ -1,76 +1,43 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.managers
 
 
 import com.verknowsys.served._
-import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
+import com.verknowsys.served.api._
 import com.verknowsys.served.utils.Events._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.systemmanager.managers._
-import com.verknowsys.served.api._
+
 import com.verknowsys.served.api.pools._
 import com.verknowsys.served.services._
-
-import scala.io.Source
 import akka.actor._
-import akka.dispatch._
-import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
-import akka.util.Timeout
-import akka.util.duration._
+import scala.io.Source
 
+import scala.concurrent._
+import akka.pattern.ask
+import akka.util.Timeout
+import scala.concurrent.duration._
+import ExecutionContext.Implicits.global
 
 /**
- *  @author dmilith
- *
  *  ServeD Accounts Manager
  *
+ *  @author dmilith
  */
 class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Logging {
 
     import Events._
 
 
-    log.info("SvdAccountsManager (v%s) is loading".format(SvdConfig.version))
-
-    // log.info("Registering Coreginx")
-    // val coreginx = actorOf(new SvdService(SvdRootServices.coreginxConfig(), rootAccount))
-
-    // private val accountManagers = scala.collection.mutable.Map[Int, ActorRef]() // UID => AccountManager ref
-
-    // protected val systemPasswdFilePath = SvdConfig.systemPasswdFile // NOTE: This must be copied into value to use in pattern matching
-    addShutdownHook {
-        log.warn("Got termination signal. Unregistering file events")
-        unregisterFileEvents(self)
-
-        // log.info("Stopping spawned user workers")
-        // userAccounts.foreach{
-        //     account =>
-        //         val pidFile = SvdConfig.userHomeDir / "%d".format(account.uid) / "%d.pid".format(account.uid)
-        //         log.trace("PIDFile: %s".format(pidFile))
-        //         if (new java.io.File(pidFile).exists) {
-        //             val pid = Source.fromFile(pidFile).getLines.toList.head.trim.toInt
-        //             log.debug("Client VM PID to be killed: %d".format(pid))
-
-        //             // XXX: TODO: define death watch daemon:
-        //             kill(pid)
-
-        //             log.debug("Client VM PID file to be deleted: %s".format(pidFile))
-        //             rm_r(pidFile)
-        //         } else {
-        //             log.warn("File not found: %s".format(pidFile))
-        //         }
-        // }
-        log.info("All done.")
-        // postStop
-    }
-
-
     override def preStart = {
         super.preStart
-        log.debug("SvdAccountsManager is starting.")
+        log.info("SvdAccountsManager (v%s) is loading".format(SvdConfig.version))
     }
 
 
@@ -112,7 +79,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
             val accountsWithoutThisOne = accountsAlive.filterNot{_.uuid == account.uuid}
             context.become(
                 awareOfUserManagers(accountsWithoutThisOne))
-            sender ! Success
+            sender ! ApiSuccess
             log.info("Becoming aware of dead account: %s", account)
             log.debug("Alive accounts: %s".format(accountsWithoutThisOne))
 
@@ -135,7 +102,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
             }
 
 
-        case Success =>
+        case ApiSuccess =>
             log.debug("Got success")
 
 
@@ -152,6 +119,13 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
     override def postStop = {
         log.debug("Accounts Manager postStop.")
         super.postStop
+    }
+
+
+    addShutdownHook {
+        log.warn("Got termination signal. Unregistering file events")
+        unregisterFileEvents(self)
+        log.info("All done.")
     }
 
 }

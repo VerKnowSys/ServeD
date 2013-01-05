@@ -1,14 +1,17 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served
 
-import akka.dispatch._
-import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
-import akka.util.Timeout
-import akka.util.duration._
+
 import akka.actor._
-// import akka.serialization.RemoteActorSerialization.fromBinaryToRemoteActorRef
-// import akka.remote.protocol.RemoteProtocol.RemoteActorRefProtocol
+import akka.pattern.ask
+import scala.concurrent.duration._
+import scala.concurrent._
+import akka.util.Timeout
+import ExecutionContext.Implicits._
 
 
 package object api {

@@ -1,23 +1,18 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.services
 
 
-import com.verknowsys.served._
-import com.verknowsys.served.db._
 import com.verknowsys.served.SvdConfig
-import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.Events._
-import com.verknowsys.served.utils.signals.SvdPOSIX._
-import com.verknowsys.served.services._
 import com.verknowsys.served.api._
-import com.verknowsys.served.api.accountkeys._
-import com.verknowsys.served.api.pools._
 
 import java.io.FileNotFoundException
 import scala.io._
 import org.json4s._
-import org.json4s.native._
-import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 
 

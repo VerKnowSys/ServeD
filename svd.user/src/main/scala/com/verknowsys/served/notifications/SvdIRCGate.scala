@@ -1,31 +1,37 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.notifications
 
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
-import com.verknowsys.served.api.accountkeys._
-import com.verknowsys.served.api.git._
-import com.verknowsys.served.services._
 import com.verknowsys.served.utils._
 
 import org.jibble.pircbot._
 import org.json4s._
-import org.json4s.native._
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
-import java.util.Calendar
-import java.text.SimpleDateFormat
 import redis.clients.jedis._
 import scala.collection.JavaConverters._
+import akka.util.Timeout
+import akka.util
+import akka.pattern.ask
+import akka.util.Timeout
+import scala.concurrent.duration._
+import akka.actor._
 
 
 /**
     @author tallica, dmilith
  */
 
-class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils with Gate {
+class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging {
 
 
+    implicit val timeout = Timeout(SvdConfig.defaultAPITimeout/1000 seconds)
     implicit val formats = DefaultFormats
 
 
@@ -33,22 +39,29 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
         setVerbose(false)
         setName("tasks-robo")
         setAutoNickChange(false)
-        setVersion("0.1.0")
-        setEncoding("UTF-8")
+        setVersion("0.2.0")
+        setEncoding(SvdConfig.defaultEncoding)
         try {
-            connect("irc.freenode.net")
-            joinChannel("#verknowsys")
+            log.debug("Attepting to connect to irc server: %s on channel %s", SvdConfig.defaultIRCServerName, SvdConfig.defaultIRCChannelName)
+            connect(SvdConfig.defaultIRCServerName)
+            joinChannel(SvdConfig.defaultIRCChannelName)
+
         } catch {
+
             case e: NickAlreadyInUseException =>
                 log.warn("Can't connect to IRC. Nickname is already in use.")
 
             case e: Exception =>
-                log.error("%s".format(e))
+                log.error("IRC Gate Exception: %s".format(e))
 
-            disconnect
         }
     }
 
+
+    override def preStart = {
+        log.debug("Prestarting IRC Gate")
+        // settings
+    }
 
     def allowedUserNames = "dmilith" :: "tallica" :: "wick3d" :: Nil
     def tasksPerPage = 5
@@ -367,25 +380,47 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with Logging with SvdUtils
     }
 
 
-    def connect {
-        log.info("Initiating SvdIRCGate")
-        if (connectToRedis)
-            settings
-        else
-            log.warn("Aborting startup duo to connection problems to Redis server")
+    def receive = {
+
+        case Notify.Connect =>
+            log.info("Initializing IRC Gate")
+            if (connectToRedis)
+                settings
+            else
+                log.warn("Aborting startup duo to connection problems to Redis server")
+            sender ! ApiSuccess
+
+
+        case Notify.Disconnect =>
+            log.info("Disconnecting from IRC Gate")
+            disconnect
+            sender ! ApiSuccess
+
+
+        case Notify.Status(status) =>
+            log.debug("IRC Status: NYI!")
+            sender ! ApiSuccess
+
+
+        case Notify.Message(message) =>
+            Thread.sleep(10000) // XXX: hardcode
+            sendMessage(SvdConfig.defaultIRCChannelName, message)
+            sender ! ApiSuccess
+
     }
 
+//
+//    def connect {
+//        log.info("Initializing IRC Gate")
+//        if (connectToRedis)
+//            settings
+//        else
+//            log.warn("Aborting startup duo to connection problems to Redis server")
+//    }
 
-    def setStatus(st: String) {
-    }
-
-
-    def send(message: String) {
-
-        // SvdNotifyMailer(message, SvdConfig.notificationMailRecipients)
-    }
 
     override def onDisconnect {
+        log.debug("Disconnect in IRC Gate")
         disconnectFromRedis
     }
 

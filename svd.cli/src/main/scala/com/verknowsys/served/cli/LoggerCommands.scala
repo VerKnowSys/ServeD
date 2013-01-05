@@ -1,6 +1,11 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.cli
 
-import com.verknowsys.served.api.{Success, Logger}
+import com.verknowsys.served.api.Logger
 
 object LoggerCommands extends Commands {
     def commands(implicit svd: Svd): PartialFunction[Args, Unit] = {
@@ -12,14 +17,14 @@ object LoggerCommands extends Commands {
 
             case ("remove" | "rm") :: className :: Nil =>
                 // request(Logger.RemoveEntry(className)){
-                //     case Success => info("Entry removed")
+                //     case ApiSuccess => info("Entry removed")
                 // }
 
             case className :: level :: Nil =>
                 loggerLevels.get(level) match {
                     case Some(lvl) =>
                         // request(Logger.AddEntry(className, lvl)){
-                        //     case Success => info("Entry added")
+                        //     case ApiSuccess => info("Entry added")
                         // }
 
                     case None =>

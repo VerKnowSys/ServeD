@@ -1,43 +1,34 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.services
 
 
-import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.api.scheduler._
-import com.verknowsys.served.db._
+//import com.verknowsys.served.db._
 import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.Events._
-import com.verknowsys.served.utils.signals.SvdPOSIX._
-import com.verknowsys.served.services._
-import com.verknowsys.served.api.accountkeys._
-import com.verknowsys.served.api.pools._
 import com.verknowsys.served.scheduler._
 
-import org.json4s._
-import org.json4s.native._
 import scala.io._
-import scala.util._
 import java.io.File
 import akka.actor._
-import akka.dispatch._
+import scala.concurrent._
 import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
 import akka.util.Timeout
-import akka.util.duration._
+import scala.concurrent.duration._
 import java.lang.{System => JSystem}
-
-import org.quartz._
-import org.quartz.impl._
+import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
 
 
 /**
+ *  Service akka.actor. All Svd services are started using this actor wrapper.
  *
  *  @author dmilith
- *  Service actor. All Svd services are started using this actor wrapper.
- *
  */
 class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor with SvdUtils {
 
@@ -65,11 +56,10 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
 
     /**
-     *  @author dmilith
-     *
      *  Returns file of install indication from Sofin.
-     *      For example "redis.installed" implies installed Redis software.
      *
+     *  @example "redis.installed" implies installed Redis software.
+     *  @author dmilith
      */
     def installIndicator = {
         // both cases: user side app (default) or root side (if no user service installed)
@@ -88,68 +78,68 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
 
     /**
-     *  @author dmilith
-     *
      *   configureHook - will be executed before starting service actor
+     *
+     *  @author dmilith
      */
     def configureHook = config.configure
 
 
     /**
-     *  @author dmilith
-     *
      *   afterStartHook - will be executed after starting of service
+     *
+     *  @author dmilith
      */
     def afterStartHook = config.afterStart
 
 
     /**
-     *  @author dmilith
-     *
      *   startHook - hook executed on service start
+     *
+     *  @author dmilith
      */
     def startHook = config.start
 
 
     /**
-     *  @author dmilith
-     *
      *   stopHook - stop hook executed on stop
+     *
+     *  @author dmilith
      */
     def stopHook = config.stop
 
 
     /**
-     *  @author dmilith
-     *
      *   afterStopHook - will be executed after service stop
+     *
+     *  @author dmilith
      */
     def afterStopHook = config.afterStop
 
 
     /**
-     *  @author dmilith
-     *
      *   installHook - Software prepare / install hook.
      *   Will be executed only on demand, by sending Install signal to SvdService
+     *
+     *  @author dmilith
      */
     def installHook = config.install
 
 
     /**
-     *  @author dmilith
-     *
      *   reloadHook - Service reloading command
      *   Will be executed only on demand, by sending Reload signal to SvdService
+     *
+     *  @author dmilith
      */
     def reloadHook = config.reload
 
 
     /**
-     *  @author dmilith
-     *
      *   validateHook - Performed right after configure on each application run
      *   Will throw exception when validation process wont pass
+     *
+     *  @author dmilith
      */
     def validateHook = config.validate
 
@@ -169,9 +159,9 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
 
     /**
-     *  @author dmilith
-     *
      *   hookShot is a safe way to launch service hooks
+     *
+     *  @author dmilith
      */
     def hookShot(hook: SvdShellOperations, hookName: String) { // XXX: this should be done better. String should be replaced
         if (!hook.commands.isEmpty) { // don't report empty / undefined hooks
@@ -196,7 +186,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
                     case _ =>
                         if (config.reportAllInfos)
-                            accountManager ! Notify.Message(formatMessage("I:Done %s of service: %s".format(hookName, config.name)))
+                            accountManager ! Notify.Message(formatMessage("D:Done %s of service: %s".format(hookName, config.name)))
                 }
 
             } catch {
@@ -316,41 +306,41 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             log.debug("Getting port of service: %s:%d".format(config.name, servicePort))
             sender ! servicePort
 
-        case Ping =>
+        case Notify.Ping =>
             log.debug("%s".format(this))
-            sender ! Pong
+            sender ! Notify.Pong
 
         /**
-         *  @author dmilith
-         *
          *   Reload by default should be SIGHUP signal sent to process pid
+         *
+         *  @author dmilith
          */
         case Reload =>
             hookShot(validateHook, "validate")
             hookShot(reloadHook, "reload")
 
         /**
-         *  @author dmilith
-         *
          *   Explicit method to launch service
+         *
+         *  @author dmilith
          */
         case Run =>
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
-            sender ! Success
+            sender ! ApiSuccess
 
         /**
-         *  @author dmilith
-         *
          *   Quit should be sent when we want to stop this service
+         *
+         *  @author dmilith
          */
         case Quit =>
             log.info("Got Quit in %s".format(this))
             context.unwatch(self)
             context.stop(self)
 
-        case Success =>
-            log.trace("Success in SvdService from %s".format(sender.getClass.getName))
+        case ApiSuccess =>
+            log.trace("ApiSuccess in SvdService from %s".format(sender.getClass.getName))
     }
 
 

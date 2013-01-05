@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="SBT: net.sourceforge.expectj:expectj:2.0.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/net.sourceforge.expectj/expectj/jars/expectj-2.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.ivy2/cache/net.sourceforge.expectj/expectj/docs/expectj-2.0.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/net.sourceforge.expectj/expectj/srcs/expectj-2.0.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

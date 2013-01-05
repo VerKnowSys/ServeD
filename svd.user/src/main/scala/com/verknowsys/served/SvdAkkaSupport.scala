@@ -1,24 +1,26 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served
 
 
-import com.verknowsys.served._
-import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
 
 import scala.io.Source
 import java.io._
-import scala.util._
 
 
 trait SvdAkkaSupport extends SvdUtils with Logging {
 
     /**
-     *  @author dmilith
-     *
      *   Creates akka configuration file for given user.
      *   It might be used to create akka configuration for headless svduser
+     *
+     *  @author dmilith
      */
-    def createAkkaUserConfIfNotExistant(uid: Int, userManagerPort: Int) = {
+    def createAkkaUserConfIfNotExistant(uid: Int, userManagerPort: Int) {
         val configFile = SvdConfig.userHomeDir / "%d".format(uid) / SvdConfig.defaultAkkaConfName
 
         if (!new File(configFile).exists) {

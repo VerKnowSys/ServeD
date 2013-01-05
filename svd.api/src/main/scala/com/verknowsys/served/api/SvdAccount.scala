@@ -1,7 +1,23 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.api
 
-import com.verknowsys.served.api._
-import com.verknowsys.served.api.pools._
+
+
+object Maintenance {
+    abstract class Base extends ApiResponse
+
+    /**
+     *  Restart user Account Manager on demand
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    case object RestartAccountManager extends Base
+
+}
 
 
 /**
@@ -11,7 +27,6 @@ object User {
     abstract class Base extends ApiResponse
 
     // case object AccountNotFound
-
     case object SpawnServices extends Base
     case object TerminateServices extends Base
     case object GetServices extends Base // returns List
@@ -22,39 +37,54 @@ object User {
     case object ServiceStatus extends Base // used to get information about Service state
     case object ServiceAutostart extends Base
     case object GetStoredServices extends Base
+    case object RemoveAllUserPorts extends Base
+    case object GetUserPorts extends Base
+    case object GetServicePort extends Base
+    case object RegisterUserPort extends Base
 
-    case object GetServicePort
     case class GetServicePort(name: String) extends Base
     case class GetServiceStatus(name: String) extends Base
     case class ReadLogFile(serviceName: String, pattern: Option[String]) extends Base
     case class SpawnService(name: String) extends Base
     case class TerminateService(name: String) extends Base
 
-    // case class GetAccount(uid: Int)
-    // case class GetAccountByName(name: String)
 
     /**
-     * @author Daniel (dmilith) Dettlaff
+     *  This message is used in communication between user core and WebAPI. It allows to set a file event on a file and perform actions defined in SvdService on a trigger. Flags constants are defined in SvdFileEventsManager.
+     *  fileToWatch parammeter will be prepended by default user's home directory, because it's the only place where user can create his file watches.
      *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    case class CreateFileWatch(fileToWatch: String, flags: Int, serviceName: String) extends Base
+
+
+    /**
+     *  This message will destroy all file watches on given file (of course if owned by user)
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    case class DestroyFileWatch(fileToUnwatch: String) extends Base
+
+
+    /**
      *  Call to store domain record for user.
      *
+     * @author Daniel (dmilith) Dettlaff
      */
     case class StoreUserDomain(domain: String) extends Base
 
     /**
-     * @author Daniel (dmilith) Dettlaff
-     *
      *  Call to retrieve stored domain records for user.
      *
+     * @author Daniel (dmilith) Dettlaff
      */
-    case object RegisteredDomains extends Base
+    case object GetRegisteredDomains extends Base
 
 
     /**
-     * @author Daniel (dmilith) Dettlaff
-     *
      *  Call to perform user side, writable copy of already defined Igniter.
      *
+     * @author Daniel (dmilith) Dettlaff
      */
     case class CloneIgniterForUser(igniterName: String, userIgniterName: Option[String] = None) extends Base
 
@@ -78,28 +108,29 @@ case class SvdAccount (
         uuid: UUID = randomUUID
     ) extends Persistent {
 
-    override def toString = "SvdAccount(%s)[%s]{%s}".format(userName, uid, accountManagerPort)
+    override def toString = "SvdAccount(%s)[%d]{%d}<%s>".format(userName, uid,
+        accountManagerPort, uuid)
 
 }
 
 
 /**
- *  @author dmilith
- *
  *   SvdUserPort describes one of port from user pool (defined in SvdPools)
+ *
+ *  @author dmilith
  */
 case class SvdUserPort(
         number: Int,
         uuid: UUID = randomUUID
     ) extends Persistent {
-        override def toString = "SvdUSerPort(" + number + ")"
+        override def toString = "SvdUserPort(" + number + ")"
     }
 
 
 /**
- *  @author dmilith
- *
  *   SvdSystemPort describes one of port from system pool (defined in SvdPools)
+ *
+ *  @author dmilith
  */
 case class SvdSystemPort(
         number: Int,
@@ -110,9 +141,9 @@ case class SvdSystemPort(
 
 
 /**
- *  @author dmilith
- *
  *   SvdUID stores system uid and human readable name related to it
+ *
+ *  @author dmilith
  */
 case class SvdUserUID(
         number: Int,
@@ -123,11 +154,10 @@ case class SvdUserUID(
     }
 
 
-// 2011-06-25 23:13:38 - dmilith - PENDING: user domain issues
 /**
- *  @author dmilith
- *
  *   SvdUserDomain describes user domain registered by user
+ *
+ *  @author dmilith
  */
 case class SvdUserDomain(
         name: String,
@@ -136,3 +166,38 @@ case class SvdUserDomain(
     ) extends Persistent {
         override def toString = "SvdUserDomain(%s)[wldcrd: %s]".format(name, wildcard)
     }
+
+
+/**
+ *  This class contains path -> service name binding used in FEM triggers.
+ *
+ * @author Daniel (dmilith) Dettlaff
+ */
+case class SvdFileEventBinding(
+        absoluteFilePath: String,
+        serviceName: String,
+        flags: Int,
+        uuid: UUID = randomUUID
+    ) extends Persistent {
+        override def toString = "SvdFileEventBinding(%s triggers service: %s)".format(absoluteFilePath, serviceName)
+    }
+
+
+/**
+ *  Security messages collection, related to SvdAccount.
+ *
+ * @author Daniel (dmilith) Dettlaff
+ */
+object Security {
+
+    sealed abstract class Base extends ApiMessage
+
+    /**
+     *  Basic message to authorize as registered account on remote SvdRoot
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    case class GetAccountPriviledges(account: SvdAccount) extends Base
+
+}
+

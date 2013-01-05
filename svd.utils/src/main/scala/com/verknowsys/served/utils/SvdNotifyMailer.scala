@@ -1,3 +1,8 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.utils
 
 
@@ -5,13 +10,10 @@ package com.verknowsys.served.utils
 // import net.liftweb.util.Props
 // import javax.mail.{Authenticator,PasswordAuthentication}
 
-import com.verknowsys.served._
-import com.verknowsys.served.utils._
-
 
 /**
- *  @author dmilith
  *  Fast implementation of Mailer to be used with notification system.
+ *  @author dmilith
  */
 object SvdNotifyMailer extends Logging {
 

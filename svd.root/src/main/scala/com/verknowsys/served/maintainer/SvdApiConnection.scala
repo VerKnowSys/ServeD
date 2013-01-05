@@ -1,6 +1,11 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 // package com.verknowsys.served.maintainer
 
-// import akka.actor.Actor
+// import akka.actor Actor
 // // import akka.serialization.RemoteActorSerialization.toRemoteActorRefProtocol
 
 // import com.verknowsys.served.utils.Logging

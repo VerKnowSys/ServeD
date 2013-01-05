@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="SBT: com.typesafe.akka:akka-actor:2.0.3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.typesafe.akka/akka-actor/jars/akka-actor-2.0.3.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.typesafe.akka/akka-actor/docs/akka-actor-2.0.3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.typesafe.akka/akka-actor/srcs/akka-actor-2.0.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

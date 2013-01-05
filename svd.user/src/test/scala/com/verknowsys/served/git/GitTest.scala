@@ -1,3 +1,8 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.git
 
 
@@ -17,7 +22,7 @@ class GitTest extends DefaultTest {
     }
 
     "GitRepository" should "create new normal repository" in {
-        val repo = Git.init(path / "newrepo")
+        val repo = GitCore.init(path / "newrepo")
         repo.path should equal (path / "newrepo")
         repo.name should equal ("newrepo")
         repo should not be ('bare)
@@ -32,7 +37,7 @@ class GitTest extends DefaultTest {
     }
 
     it should "create new bare repository" in {
-        val repo = Git.init(path / "newbarerepo", bare = true)
+        val repo = GitCore.init(path / "newbarerepo", bare = true)
         repo.name should equal ("newbarerepo")
         repo should be ('bare)
 
@@ -45,24 +50,24 @@ class GitTest extends DefaultTest {
     }
 
     it should "clone remote repository" in {
-        val source = Git.init(path)
+        val source = GitCore.init(path)
         writeFile(source.path / "README", "Remote repo README")
         source.add("README")
         source.commit("initial for clone")
 
-        val target = Git.clone(randomPath, source.path)
+        val target = GitCore.clone(randomPath, source.path)
         target.history.size should equal (1)
         target.history.next.message should equal ("initial for clone")
     }
 
     it should "list repositories in directory" in {
-        Git.list(path) should have size (0)
+        GitCore.list(path) should have size (0)
 
-        Git.init(path / "one")
-        Git.init(path / "two")
-        Git.init(path / "three")
+        GitCore.init(path / "one")
+        GitCore.init(path / "two")
+        GitCore.init(path / "three")
 
-        val list = Git.list(path).map(_.name)
+        val list = GitCore.list(path).map(_.name)
         list should have size(3)
         list should contain ("one")
         list should contain ("two")
@@ -70,12 +75,12 @@ class GitTest extends DefaultTest {
     }
 
     "GitRepository commands" should "have null HEAD" in {
-        val repo = Git.init(randomPath)
+        val repo = GitCore.init(randomPath)
         repo.head.getObjectId should be (null)
     }
 
     it should "add new file and commit" in {
-        val repo = Git.init(path)
+        val repo = GitCore.init(path)
         writeFile(repo.path / "README", "Some readme text")
         repo.add("README")
         repo.commit("init")
@@ -94,7 +99,7 @@ class GitTest extends DefaultTest {
     }
 
     it should "make few commits" in {
-        val repo = Git.init(path)
+        val repo = GitCore.init(path)
         writeFile(repo.path / "README", "Some readme text")
         repo.add("README")
         repo.commit("init")
@@ -116,7 +121,7 @@ class GitTest extends DefaultTest {
     }
 
     it should "remote" in {
-        val repo = Git.init(path)
+        val repo = GitCore.init(path)
         repo.remotes should have size (0)
 
         repo.addRemote("origin", "/path/to/remote.git")
@@ -134,12 +139,12 @@ class GitTest extends DefaultTest {
     }
 
     it should "push" in {
-        val repo = Git.init(randomPath)
+        val repo = GitCore.init(randomPath)
         writeFile(repo.path / "README", "Some readme text")
         repo.add("README")
         repo.commit("init")
 
-        val remote = Git.init(randomPath)
+        val remote = GitCore.init(randomPath)
         evaluating { remote.history } should produce [NoHeadException]
 
         repo.addRemote("origin", remote.path)
@@ -149,12 +154,12 @@ class GitTest extends DefaultTest {
     }
 
     it should "pull" in {
-        val source = Git.init(randomPath)
+        val source = GitCore.init(randomPath)
         writeFile(source.path / "README", "Remote repo README")
         source.add("README")
         source.commit("initial")
 
-        val target = Git.init(randomPath)
+        val target = GitCore.init(randomPath)
         target.addRemote("origin", source.path)
         target.pull
 
@@ -162,7 +167,7 @@ class GitTest extends DefaultTest {
     }
 
     it should "branch" in {
-        val repo = Git.init(randomPath)
+        val repo = GitCore.init(randomPath)
         writeFile(repo.path / "README", "Some readme text")
         repo.add("README")
         repo.commit("init")
@@ -177,7 +182,7 @@ class GitTest extends DefaultTest {
     }
 
     it should "checkout" in {
-        val repo = Git.init(randomPath)
+        val repo = GitCore.init(randomPath)
         writeFile(repo.path / "README", "Some readme text")
         repo.add("README")
         repo.commit("init")
@@ -198,7 +203,7 @@ class GitTest extends DefaultTest {
     }
 
     it should "single commit" in {
-        val repo = Git.init(randomPath)
+        val repo = GitCore.init(randomPath)
         writeFile(repo.path / "README", "Some readme text")
         repo.add("README")
 

@@ -17,12 +17,9 @@
  */
 package com.googlecode.fannj;
 
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-import com.sun.jna.NativeLibrary;
-import com.sun.jna.Platform;
-import com.sun.jna.Pointer;
+import com.sun.jna.*;
 import com.sun.jna.win32.StdCallLibrary;
+
 import java.util.Map;
 
 /**

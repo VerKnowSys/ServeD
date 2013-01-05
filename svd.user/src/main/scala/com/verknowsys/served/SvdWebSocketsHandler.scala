@@ -1,13 +1,14 @@
-// © Copyright 2009 Daniel Dettlaff, Tymon Tobolski. ® All Rights Reserved.
-// This Software is a close code project. You may not redistribute this code without permission of author.
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
 
 package com.verknowsys.served
 
 
-import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import org.webbitserver._
-import org.webbitserver.handler._
+import scala.collection.mutable
 
 
 trait DQueue[T] {
@@ -63,9 +64,9 @@ trait DQueue[T] {
 //
 
 case class SvdProcessUsage(
-    val pid: Int,
-    val name: String,
-    val rss: Int
+    pid: Int,
+    name: String,
+    rss: Int
     )
 
 

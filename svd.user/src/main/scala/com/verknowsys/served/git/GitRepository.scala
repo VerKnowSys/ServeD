@@ -1,11 +1,16 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.git
 
 import com.verknowsys.served.utils._
 import scala.collection.JavaConversions._
 import org.eclipse.jgit.api.{Git => JGit}
-import org.eclipse.jgit.lib.{AnyObjectId, Constants, Ref, PersonIdent}
+import org.eclipse.jgit.lib.{AnyObjectId, Constants, PersonIdent}
 import org.eclipse.jgit.storage.file.FileRepository
-import org.eclipse.jgit.revwalk.{RevCommit}
+import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.transport.{RemoteConfig, RefSpec}
 import java.io.File
 
@@ -200,7 +205,7 @@ class GitRepository(dir: String) extends Logging {
 
         val remoteConfig = new RemoteConfig(config, name)
         remoteConfig.addURI(uri)
-        remoteConfig.addFetchRefSpec(new RefSpec("+refs/heads/*:refs/remotes/origin/*"));
+        remoteConfig.addFetchRefSpec(new RefSpec("+refs/heads/*:refs/remotes/origin/*"))
         remoteConfig.update(config)
         config.save
     }

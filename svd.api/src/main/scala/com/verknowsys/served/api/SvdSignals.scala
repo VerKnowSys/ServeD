@@ -1,5 +1,7 @@
-// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
-// This Software is a close code project. You may not redistribute this code without permission of author.
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
 
 package com.verknowsys.served.api
 
@@ -21,5 +23,5 @@ case object RevertBackup
 
 // Internal response
 // sealed abstract class InternalResponse
-// case object Success extends InternalResponse
+// case object ApiSuccess extends InternalResponse
 // case object Failure extends InternalResponse

@@ -1,31 +1,28 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.systemmanager.managers
 
 
 import com.verknowsys.served.managers.SvdManager
 
-import com.verknowsys.served.SvdConfig
 import com.verknowsys.served.utils._
-import com.verknowsys.served.systemmanager.native._
-import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.api._
-import com.verknowsys.served.db._
-import com.verknowsys.served.utils.Logging
 
-import org.apache.commons.io.FileUtils
 import akka.actor._
 
 
 /**
- *  @author dmilith
- *
  *   Gatherer will be spawned for each user account by SvdAccountManager.
  *   The main goal for SvdGatherer is to gather user usage stats and write them to file.
  *
+ *  @author dmilith
  */
 class SvdGatherer(account: SvdAccount) extends SvdManager {
     log.info("Starting Gatherer for account: " + account)
 
-    import com.verknowsys.served.utils.CUsageSys._
     lazy val usagesys = CUsageSys.instance
     // String getProcessUsage(int uid, boolean consoleOutput);
 

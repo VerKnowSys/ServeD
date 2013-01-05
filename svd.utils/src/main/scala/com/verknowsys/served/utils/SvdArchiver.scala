@@ -1,5 +1,7 @@
-// © Copyright 2009-2012 Daniel Dettlaff. ® All Rights Reserved.
-// This Software is a close code project. You may not redistribute this code without permission of author.
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
 
 package com.verknowsys.served.utils
 
@@ -8,14 +10,13 @@ import com.verknowsys.served.api.SvdAccount
 
 import de.schlichtherle.io._
 import de.schlichtherle.key._
-import de.schlichtherle.crypto.io.raes._
 import java.io.{File, FileNotFoundException, DataOutputStream}
 import de.schlichtherle.io.{File => TFile, FileOutputStream}
 import scala.io.Source
 
 /**
-    @author dmilith
     SvdArchive Exception classes
+    @author dmilith
 */
 class SvdArchiveInvalidRAESKeyException(message: String) extends Exception(message)
 class SvdArchiveNonExistantException(message: String) extends Exception(message)
@@ -24,14 +25,14 @@ class SvdArchiveUnsupportedActionException(message: String) extends Exception(me
 
 
 /**
-    @author dmilith
     AES Key provider
+    @author dmilith
 */
 class SvdAESKeyProvider extends AesKeyProvider with Logging with SvdUtils {
 
-    def getCreateKey = SvdConfig.backupKey.toCharArray
+    def getCreateKey = SvdConfig.defaultSecurityBaseKey.toCharArray
 
-    def getOpenKey = SvdConfig.backupKey.toCharArray
+    def getOpenKey = SvdConfig.defaultSecurityBaseKey.toCharArray
 
     def invalidOpenKey = {
         // This method is called whenever a key for an existing protected resource is invalid.
@@ -45,8 +46,8 @@ class SvdAESKeyProvider extends AesKeyProvider with Logging with SvdUtils {
 
 
 /**
-    @author dmilith
     AES Key manager
+    @author dmilith
 */
 class SvdArchiverKeyManager extends KeyManager {
     mapKeyProviderType(classOf[AesKeyProvider], classOf[SvdAESKeyProvider])
@@ -54,8 +55,8 @@ class SvdArchiverKeyManager extends KeyManager {
 
 
 /**
-    @author dmilith
     SvdArchiver object to compress and decompress AES encrypted ZIP files with ease.
+    @author dmilith
 */
 object SvdArchiver extends Logging with SvdUtils {
 
@@ -63,9 +64,9 @@ object SvdArchiver extends Logging with SvdUtils {
     TFile.setDefaultArchiveDetector(new DefaultArchiveDetector(SvdConfig.defaultBackupFileExtension))
 
     /**
-        @author dmilith
         Recursive method of gathering all directories of path in both folders and archives.
         @return Returns list of gathered files in whole directory tree.
+        @author dmilith
     */
     def gatherAllDirsRecursively(rootDir: List[File], gathered: List[File] = Nil): List[File] = {
         if (rootDir.isEmpty) // TODO: do pattern match instead of if
@@ -89,8 +90,8 @@ object SvdArchiver extends Logging with SvdUtils {
 
 
     /**
-        @author dmilith
         Unmount ZIP VFS to synchronize IO (for bigger files)
+        @author dmilith
     */
     def unmountVFS =
         try {
@@ -117,12 +118,12 @@ object SvdArchiver extends Logging with SvdUtils {
 
 
     /**
-        @author dmilith
         Perform update of changed/new files in archive.
         It updates only changed files.
         It will use disk IO _read_ only for reading archive file list and timestamp.
         This will use disk IO _write_ only if differences were found in existing files timestamps.
         WARNING: This function wont delete old files!
+        @author dmilith
     */
     def updateByTimeStampDiff(fileOrDirectoryPath: String, userAccount: Option[SvdAccount] = None) = {
 
@@ -246,9 +247,9 @@ object SvdArchiver extends Logging with SvdUtils {
 
 
     /**
-        @author dmilith
         This will use disk IO _read_, only for reading archive file list.
         This will use disk IO _write_, only for removing files from archive which were already deleted from file system.
+        @author dmilith
     */
     def compact(fileOrDirectoryPath: String, userAccount: Option[SvdAccount] = None) = {
         val trimmedFileName = fileOrDirectoryPath.split("/").last
@@ -323,8 +324,8 @@ object SvdArchiver extends Logging with SvdUtils {
 
 
     /**
-        @author dmilith
         Call it to compress or decompress AES-256 ZIP archive.
+        @author dmilith
     */
     def apply(fileOrDirectoryPath: String, destinationDir: Option[String] = None, exclude: List[String] = List(".lock", ".sock"), userAccount: Option[SvdAccount] = None) { // TODO: implement exclude list
 

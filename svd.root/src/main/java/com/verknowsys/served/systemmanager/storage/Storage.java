@@ -1,13 +1,16 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.systemmanager.storage;
 
+import java.io.File;
 import java.sql.*;
-import java.util.Queue;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Date;
-import java.sql.Timestamp;
-import java.io.File;
+import java.util.List;
+import java.util.Queue;
 
 // TODO: Add parent pid field to ProcessInfo
 

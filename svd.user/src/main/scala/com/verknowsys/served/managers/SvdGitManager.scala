@@ -1,3 +1,8 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.managers
 
 
@@ -83,7 +88,7 @@ class SvdGitManager(
                     log.trace("Removing repository: %s".format(repoLocation))
                     db ~ repo
                     rm_r(repoLocation)
-                    sender ! Success
+                    sender ! ApiSuccess
                 }
             }
 
@@ -91,13 +96,13 @@ class SvdGitManager(
             withRepo(uuid) { repo =>
                 db << repo.copy(authorizedKeys = repo.authorizedKeys + key)
             }
-            sender ! Success
+            sender ! ApiSuccess
 
         case Git.RemoveAuthorizedKey(uuid, key) =>
             withRepo(uuid) { repo =>
                 db << repo.copy(authorizedKeys = repo.authorizedKeys - key)
             }
-            sender ! Success
+            sender ! ApiSuccess
 
         case Repository(name, authorizedKeys, uuid) =>
             log.debug("Got new repository named: %s with keys: %s", name, authorizedKeys)
@@ -111,7 +116,7 @@ class SvdGitManager(
     def withRepo(uuid: java.util.UUID)(f: (Repository) => Unit) = sender ! (RepositoryDB(db)(uuid) match {
         case Some(repo) =>
             f(repo)
-            Success
+            ApiSuccess
         case None =>
             Git.RepositoryDoesNotExistError
     })

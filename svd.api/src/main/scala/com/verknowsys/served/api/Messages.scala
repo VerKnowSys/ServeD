@@ -1,3 +1,8 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.api
 
 
@@ -9,12 +14,10 @@ import akka.actor.ActorRef
 
 // ServeD -> Client messages
 // common responses
-case object Ping extends ApiMessage
-case object Pong extends ApiMessage
 
-case object Success extends ApiResponse
+case object ApiSuccess extends ApiResponse
 case object Shutdown extends ApiResponse
-case class Error(val message: String) extends ApiResponse
+case class Error(message: String) extends ApiResponse
 
 // General errors
 case object NotImplementedError
@@ -22,6 +25,12 @@ case object NotImplementedError
 object Notify {
     // generic notification center messages:
     sealed abstract class Base extends ApiMessage
+
+    case object Connect extends Base
+    case object Disconnect extends Base
+
+    case object Ping extends Base
+    case object Pong extends Base
 
     case class Message(content: String) extends Base
     case class Status(content: String) extends Base
@@ -38,8 +47,9 @@ object General {
 
     case object GetStatus extends Base
 
-    object Status extends Enumeration {
-        val Connected, Disconnected = Value
+    object Status {
+        case object Connected
+        case object Disconnected
     }
 }
 

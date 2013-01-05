@@ -1,33 +1,21 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.web.api
 
 
-import unfiltered.Cookie
 import unfiltered.request._
 import unfiltered.response._
-import unfiltered.kit._
-import unfiltered.filter._
-import org.json4s._
-import org.json4s.native._
-import java.util.UUID
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.web._
-import com.verknowsys.served.web.api._
-import com.verknowsys.served.db.{DBServer, DBClient, DB}
 
-import javax.servlet.http.HttpServletResponse
-import unfiltered.jetty.Http
-import java.net.URL
-import unfiltered.filter.Plan
 import akka.actor._
-import akka.dispatch._
 import akka.util.Timeout
-import akka.util.duration._
-import akka.pattern.ask
-import unfiltered.Cookie
-import unfiltered.Cookie._
+import scala.concurrent.duration._
 
 
 /**
@@ -36,12 +24,6 @@ import unfiltered.Cookie._
  *  Web GET API is used to perform communication with web manager
  */
 class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends SvdWebAPI(webManager) {
-
-    import QParams._
-    import org.json4s._
-    import org.json4s.native._
-    import org.json4s.JsonDSL._
-    import webImplicits._
 
 
     implicit val timeout = Timeout(SvdConfig.defaultAPITimeout/1000 seconds)
@@ -101,7 +83,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="get_user_processes">GetUserProcesses</div>
                     <div class="get_stored_services">GetStoredServices</div>
                     <div class="register_domain">RegisterDomain</div>
-                    <div class="registered_domains">RegisteredDomains</div>
+                    <div class="registered_domains">GetRegisteredDomains</div>
                     <div class="terminate_services">TerminateServices</div>
                     <div class="store_services">StoreServices</div>
                     <div class="spawn_service">SpawnService</div>
@@ -111,6 +93,20 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="get_service_status">GetServiceStatus</div>
                     <div class="clone_igniter_for_user">CloneIgniterForUser</div>
                     <div class="register_account">RegisterAccount</div>
+                    <div class="get_service_port">GetServicePort</div>
+                    <div class="create_file_watch">CreateFileWatch</div>
+                    <div class="create_file_watch1">CreateFileWatch1</div>
+                    <div class="create_file_watch2">CreateFileWatch2</div>
+                    <div class="create_file_watch3">CreateFileWatch3</div>
+                    <div class="destroy_file_watch">DestroyFileWatch</div>
+                    <div class="destroy_file_watch1">DestroyFileWatch1</div>
+                    <div class="destroy_file_watch2">DestroyFileWatch2</div>
+                    <div class="destroy_file_watch3">DestroyFileWatch3</div>
+                    <div class="account_security_pass">GetAccountPriviledges</div>
+                    <div class="restart_account_manager">RestartAccountManager</div>
+                    <div class="remove_all_reserved_ports">RemoveAllReservedPorts</div>
+                    <div class="register_user_port">RegisterUserPort</div>
+                    <div class="get_user_ports">GetUserPorts</div>
                 </article>
             )
 

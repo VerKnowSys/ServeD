@@ -2,8 +2,8 @@
     "autoStart": true,
     "autoRestart": true,
     "reportAllErrors": true,
-    "reportAllInfos": true,
-    "reportAllDebugs": true,
+    "reportAllInfos": false,
+    "reportAllDebugs": false,
 
     "name": "NO_SERVICE_NAME!",
     "version": "0.2",

@@ -1,20 +1,35 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.notifications
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.utils.signals._
 import com.verknowsys.served.utils.Logging
+import akka.actor.{Props, ActorRef}
 
-import akka.actor.Actor
+import akka.pattern.ask
+import akka.util
+import akka.util.Timeout
+import akka.pattern.ask
+import scala.util._
+import scala.concurrent._
+import scala.concurrent.duration._
+import ExecutionContext.Implicits.global
 
 
-class SvdNotificationCenter(account: SvdAccount) extends SvdActor with SvdUtils with Logging {
+class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
+
+    implicit val timeout = Timeout(SvdConfig.defaultAPITimeout/1000 seconds)
+
 
     val accountManager = context.actorFor("/user/SvdAccountManager")
 
-    val gates: List[Gate] =
-        new SvdXMPPGate(
+
+    val gates: List[ActorRef] = context.actorOf(Props(new SvdXMPPGate(
             host = SvdConfig.notificationXmppHost,
             port = SvdConfig.notificationXmppPort,
             login = SvdConfig.notificationXmppLogin,
@@ -22,26 +37,38 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with SvdUtils 
             resource = SvdConfig.notificationXmppResource,
             account = account,
             accountManager = accountManager
-        ) :: new SvdIRCGate(account) :: Nil // new SvdMailGate :: Nil
+        ))) :: context.actorOf(Props(new SvdIRCGate(account))) :: Nil
 
 
     override def preStart {
         super.preStart
-        log.info("SvdNotificationCenter is loading")
-        gates.foreach(_.connect)
+        log.info("SvdNotificationCenter is loading.")
+        log.debug("Sending Notify.Connect signal to all registered Gates.")
+        gates.par.map {
+            gate =>
+                (gate ? Notify.Connect) onComplete {
+
+                    case Success(content) =>
+                        log.info("PreStart")
+
+                    case Failure(exception) =>
+                        log.error("Exception: %s", exception)
+
+                }
+        }
+    }
+
+
+    override def postStop {
+        log.debug("Shutting down Notification Center. Disconnecting all gates.")
+        gates.par.foreach(_ ! Notify.Disconnect)
+        super.postStop
     }
 
 
     override def preRestart(reason: Throwable, message: Option[Any]) {
         log.debug("preRestart down Notification Center with reason: %s and message: %s", reason, message)
         super.preRestart(reason, message)
-    }
-
-
-    override def postStop {
-        log.debug("Shutting down Notification Center. Disconnecting all gates.")
-        gates.foreach(_.disconnect)
-        super.postStop
     }
 
 
@@ -57,13 +84,41 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with SvdUtils 
 
         case Notify.Status(status) =>
             log.trace("Setting status %s", status)
-            gates.foreach(_ setStatus status)
-            sender ! Success
+            gates.par.map{
+                gate =>
+                    log.debug("Setting Status for gate: %s", gate)
+                    (gate ? Notify.Status(status)) onComplete {
+                        case Success(some) =>
+                            log.debug("Status set to %s", some)
+//                            sender ! ApiSuccess
+
+                        case Failure(exception) =>
+                            log.error("Exception: %s", exception)
+//                            sender ! Error("Exception: %s", exception)
+
+                    }
+            }
+
+
+
 
         case Notify.Message(msg) =>
             log.trace("Sending message %s", msg)
-            gates.foreach(_ send msg)
-            sender ! Success
+            gates.par.map{
+                gate =>
+                    log.debug("Setting Message for gate: %s", gate)
+                    (gate ? Notify.Message(msg)) onComplete {
+                        case Success(some) =>
+                            log.debug("Sending message :%s", some)
+//                            sender ! ApiSuccess
+
+                        case Failure(exception) =>
+                            log.error("Exception: %s", exception)
+//                            sender ! Error("Exception: %s", exception)
+
+                    }
+            }
+
 
         case x =>
             log.debug("Unknown message for notification center: %s", x)

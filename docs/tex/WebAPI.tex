@@ -27,7 +27,7 @@
 
 \title{ServeD WebAPI}
 \author{\href{mailto:dmilith@verknowsys.com}{Daniel (dmilith) Dettlaff}}
-\subtitle{version 0.2.4}
+\subtitle{version 0.6.10}
 \date{2012-12-14}
 
 
@@ -79,7 +79,7 @@
 
     \item \#003:
       \begin{minted}{bash}
-    /RegisteredDomains
+    /GetRegisteredDomains
       \end{minted}
       \begin{minted}{scala}
       @description lists domains registered by user.
@@ -211,6 +211,77 @@
       @returns nothing.
       @params RegisterAccount=nameOfAccount
       @format json: {message: information_string}
+      \end{minted}
+
+    \item \#015:
+      \begin{minted}{bash}
+    /CreateFileWatch
+      \end{minted}
+      \begin{minted}{scala}
+      @description registers file event monitor on file or directory. service is starting in case of sufficient flag trigger.
+      @params CreateFileWatch=absoluteFilePath&ServiceName=nameOfService&Flags=3
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#016:
+      \begin{minted}{bash}
+    /DestroyFileWatch
+      \end{minted}
+      \begin{minted}{scala}
+      @description destroys file watches on given file (all!)
+      @params DestroyFileWatch=absoluteFilePath
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#017:
+      \begin{minted}{bash}
+    /GetAccountPriviledges
+      \end{minted}
+      \begin{minted}{scala}
+      @description send query to system manager for user priviledges info.
+      @params nothing.
+      @format json: {message: information_string, content: [priviledges_objects]}
+      \end{minted}
+
+
+    \item \#018:
+      \begin{minted}{bash}
+    /RestartAccountManager
+      \end{minted}
+      \begin{minted}{scala}
+      @description stops Account Manager.
+      @params nothing.
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#019:
+      \begin{minted}{bash}
+    /GetUserPorts
+      \end{minted}
+      \begin{minted}{scala}
+      @description returns list of ports registered by user..
+      @params nothing.
+      @format json: {message: information_string, content: [list_of_ports]}
+      \end{minted}
+
+    \item \#020:
+      \begin{minted}{bash}
+    /RemoveAllReservedPorts
+      \end{minted}
+      \begin{minted}{scala}
+      @description removes all ports registered by user.
+      @params nothing.
+      @format json: {message: information_string}
+      \end{minted}
+
+    \item \#021:
+      \begin{minted}{bash}
+    /RegisterUserPort
+      \end{minted}
+      \begin{minted}{scala}
+      @description registers random free user port.
+      @params nothing.
+      @format json: {message: information_string, contents: [port]}
       \end{minted}
 
 

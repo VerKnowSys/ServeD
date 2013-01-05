@@ -1,3 +1,8 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.utils
 
 import com.verknowsys.served._
@@ -19,7 +24,7 @@ object SvdNtpSync extends Logging {
                 false
             case e: java.net.SocketTimeoutException => log.error("%s\n".format(e))
                 false
-            case _ => log.error("Failed to get current offset time from `%s`.".format(host))
+            case e: Exception => log.error("Failed to get current offset time from `%s`.".format(host))
                 false
         }
     }

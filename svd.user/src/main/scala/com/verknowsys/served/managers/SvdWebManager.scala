@@ -1,37 +1,24 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.managers
 
 import com.verknowsys.served._
-import com.verknowsys.served.services._
 import com.verknowsys.served.api._
-import com.verknowsys.served.api.accountkeys._
-import com.verknowsys.served.api.git._
-import com.verknowsys.served.db.{DBServer, DBClient, DB}
 import com.verknowsys.served.utils._
-import com.verknowsys.served.web._
 import com.verknowsys.served.web.api._
-import com.verknowsys.served.systemmanager.native._
-import com.verknowsys.served.notifications._
 
-import java.security.PublicKey
 import akka.actor._
-import akka.dispatch._
 import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
 import akka.util.Timeout
-import akka.util.duration._
-import akka.actor._
+import scala.concurrent._
+import scala.concurrent.duration._
+import ExecutionContext.Implicits.global
 
-import unfiltered.util._
-import unfiltered.Cookie
-import unfiltered.request._
-import unfiltered.response._
-import unfiltered.kit._
 import unfiltered.jetty.Http
 import java.net.URL
-import unfiltered.filter.Plan
-import org.json4s._
-import org.json4s.native._
 
 
 /**
@@ -63,13 +50,15 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
 
         log.debug("Getting web panel port from AccountsManager")
         implicit val timeout = Timeout(5 seconds)
-        (accountsManager ? System.GetPort) onSuccess {
+        val sgp = (accountsManager ? System.GetPort)
+        sgp onSuccess {
             case webPort: Int =>
                 log.trace("Got web panel port %d", webPort)
 
                 log.debug("Launching Web Panel for UID: %d", account.uid)
                 spawnServer(webPort)
-        } onFailure {
+        }
+        sgp onFailure {
             case _ =>
                 val webPort = account.uid + 1027
                 log.debug("Assumming headless mode")
@@ -81,8 +70,8 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
 
     def receive = traceReceive {
 
-        case Success =>
-            log.debug("Success in WebManager")
+        case ApiSuccess =>
+            log.debug("ApiSuccess in WebManager")
 
         case Error(x) =>
             log.warn("Error occured: %s", x)
@@ -93,6 +82,12 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
 
         // case System.GetUserProcesses(x) => // it doesn't require any additional priviledges
         //     sender ! SvdLowLevelSystemAccess.usagesys(account.uid).toString // take list of user processes
+
+        case x: Security.Base =>
+            accountManager forward x
+
+        case x: Maintenance.Base =>
+            accountManager forward x
 
         case x: User.Base =>
             accountManager forward x
@@ -127,7 +122,9 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
             .filter(getAPI)
             .start // spawn embeded version of server
 
-        accountManager forward Notify.Message(formatMessage("I:Your panel has been started for user: %s at: http://%s:%d".format(account.userName, currentHost.getHostAddress, port))) // XXX : hardcoded host.
+        accountManager forward Notify.Message(
+            formatMessage("W:Your panel has been started for user: %s at: http://%s:%d".format(
+                account.userName, currentVPNHost, port))) // XXX : hardcoded host.
 
         addShutdownHook {
             log.warn("Shutdown hook in Web Manager invoked")

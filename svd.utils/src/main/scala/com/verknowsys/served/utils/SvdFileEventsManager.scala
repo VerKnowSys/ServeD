@@ -1,22 +1,16 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.utils
 
 
+import akka.actor.{Actor, ActorRef}
 import scala.collection.mutable.{HashMap => MutableMap, ListBuffer}
-import akka.dispatch._
-import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
-import akka.util.Timeout
-import akka.util.duration._
-import com.sun.jna.{Native, Library, NativeLong}
-import com.verknowsys.served.utils.Events._
-import java.io._
-import org.apache.commons.io.FileUtils
+import com.sun.jna.NativeLong
 import Events._
-import akka.actor._
-import akka.actor.Actor._
 import com.verknowsys.served.api._
-import com.verknowsys.served.api.git._
 import com.verknowsys.served._
 
 
@@ -74,31 +68,22 @@ object Events {
 trait SvdFileEventsReactor extends SvdActor with Logging with SvdUtils {
 
     def registerFileEventFor(path: String, flags: Int, ref: ActorRef = self, uid: Int = 0) {
-        def bindEvent {
-            self ! SvdRegisterFileEvent(path, flags, ref)
-        }
+        import java.io.File
 
-        val file = new java.io.File(path)
+        def bindEvent = self ! SvdRegisterFileEvent(path, flags, ref)
+
+        val file = new File(path)
         if (file.exists) {
-            log.debug("File to watch exists: %s.", path)
+            log.debug("Creating watch on existing file: %s.", path)
             bindEvent
         } else {
-            log.debug("File to watch doesn't exists. Will be created and watch set: %s", path)
-            file.createNewFile // XXX: only for root? how about some chmod and other event owners?
-            if (uid > 0) {
-                log.debug("Chowning file for uid: %d", uid)
-                chown(path, uid)
-            }
+            log.debug("File to watch doesn't exists. Assumming that we want to monitor a folder: %s", file)
+            file.mkdirs
+            log.info("Creating and starting monitoring of new folder: %s", file)
             bindEvent
         }
-
-        // val res = Await.result(future, timeout.duration).asInstanceOf[ActorRef]
-        // XXX: CHECKME
-        // res match {
-        //     case Some(fem) => fem ! SvdRegisterFileEvent(path, flags, this.self)
-        //     case None => log.warn("Could not register file event. FileEventsManager worker not found.")
-        // }
     }
+
 
     def unregisterFileEvents(ref: ActorRef = self) {
         val fem = context.actorFor("akka://%s@%s:%d/user/SvdFileEventsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
@@ -197,7 +182,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdActor with SvdUtil
 
             log.debug("Registered new file event: %s / %s for %s", path, flags, ref)
             log.debug("Registered file events: %s", idents)
-            sender ! Success
+            sender ! ApiSuccess
 
         case SvdUnregisterFileEvent(ref) =>
             idents.foreach { case ((ident, (path, list))) =>
@@ -209,7 +194,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdActor with SvdUtil
 
             log.debug("Unregistered file events for %s", ref)
             log.debug("Registered file events: %s", idents)
-            sender ! Success
+            sender ! ApiSuccess
 
         // Forward event sent by kqueue to file watchers
         case SvdKqueueFileEvent(ident, flags) =>
@@ -220,10 +205,10 @@ class SvdFileEventsManager extends Actor with Logging with SvdActor with SvdUtil
                     case ((fl, ref)) if (fl & flags) > 0 => ref ! SvdFileEvent(path, flags)
                 }
             }
-            sender ! Success
+            sender ! ApiSuccess
 
-        case Success =>
-            log.trace("Success in SEM")
+        case ApiSuccess =>
+            log.trace("ApiSuccess in SEM")
 
 
         // case SvdFileEvent(path, flags) =>

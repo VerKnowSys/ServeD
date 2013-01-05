@@ -1,7 +1,11 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.cli
 
-import akka.actor.{Actor, ActorRef}
-import com.verknowsys.served.api.{Success, Error, General, RemoteSession}
+import com.verknowsys.served.api.RemoteSession
 
 
 /**
@@ -21,7 +25,7 @@ class ApiClient(svd: Svd) {
 
     // Connect to ServeD
     // request(General.Connect(userUid)) {
-    //     case Success =>
+    //     case ApiSuccess =>
     //         info("ServeD interactive shell. Welcome %s", userUid)
     //         prompt(new Prompt)
     //     case Error(message) =>

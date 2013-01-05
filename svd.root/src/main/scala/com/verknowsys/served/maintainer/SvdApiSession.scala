@@ -1,11 +1,16 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 // package com.verknowsys.served.maintainer
 
-// import akka.dispatch._
+// import scala.concurrent._
 // import akka.pattern.ask
 // import akka.remote._
-// import akka.util.Duration
+// import scala.concurrent.Duration
 // import akka.util.Timeout
-// import akka.util.duration._
+// import scala.concurrent.duration._
 // import akka.actor._
 
 // import com.verknowsys.served._
@@ -31,7 +36,7 @@
 //                 case Some(x: SvdAccountsManager) =>
 //                     context.become(dispatch)
 //                     log.info("Remote client successfully connected with UID: %s", userUid)
-//                     sender ! Success
+//                     sender ! ApiSuccess
 
 //                 case None =>
 //                     sender ! Error("No remote client found")

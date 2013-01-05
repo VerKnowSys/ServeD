@@ -1,22 +1,25 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served
 
 
 import java.io.File
 import com.verknowsys.served.db._
 import com.verknowsys.served.utils._
-import com.verknowsys.served.api.{SvdAccount, SvdShellOperations}
-import com.verknowsys.served.systemmanager.native.SvdShell
+import com.verknowsys.served.api.SvdAccount
 import com.verknowsys.served.utils.SvdUtils
 
 import org.apache.commons.io.FileUtils
 
 
 /**
- *  @author dmilith
- *
  *   This util will read all /home folder contents and iterate through elements, then create user accounts database
+ *
+ *  @author dmilith
  */
-
 case object SvdAccounts extends DB[SvdAccount]
 
 

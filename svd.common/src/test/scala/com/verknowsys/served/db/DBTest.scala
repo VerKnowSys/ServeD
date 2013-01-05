@@ -1,10 +1,11 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.db
 
 
-import org.scalatest._
-import org.scalatest.matchers._
-
-import com.verknowsys.served._
 import com.verknowsys.served.testing._
 
 

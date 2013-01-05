@@ -1,3 +1,8 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served
 
 import java.io.File
@@ -69,7 +74,7 @@ package object utils {
     def catchException[T](f: => T): Option[T] = try {
         Some(f)
     } catch {
-        case _ => None
+        case x: Exception => None
     }
 
     // implicit def GlobalActorRef2ActorRef(global: GlobalActorRef) = global.actor

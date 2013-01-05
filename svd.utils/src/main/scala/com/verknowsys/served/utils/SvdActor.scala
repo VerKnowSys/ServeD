@@ -1,20 +1,20 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.utils
 
 
-import akka.actor.Actor
-import org.apache.commons.io.FileUtils
-import java.io._
-import java.util.Collection
-import java.util.Iterator
-import com.verknowsys.served.utils._
+import akka.actor.{Actor, ActorRef}
 
 
 /**
- *  @author dmilith
- *
  *   This trait should be used by all ServeD actors
+ *
+ *  @author dmilith
  */
-trait SvdActor extends Actor with Logging with SvdUtils {
+trait SvdActor extends  Actor with Logging with SvdUtils {
 
     val ancestor = this.getClass.getName
     val predecestor = super.getClass.getName

@@ -1,3 +1,8 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served
 
 // import com.verknowsys.served.utils.LoggerUtils
@@ -7,24 +12,20 @@ package com.verknowsys.served
 import org.scalatest._
 import org.scalatest.matchers._
 // import akka.testkit.TestKit
-import akka.testkit.TestActorRef
 import java.io.File
 import scala.io.Source
 import org.apache.commons.io.FileUtils
-import com.typesafe.config.ConfigFactory
-import org.apache.commons.io.FileUtils
-import akka.actor.ActorRef
 import com.verknowsys.served.api.SvdAccount
 
 
 package object testing {
 
 
-    // import akka.dispatch._
+    // import scala.concurrent._
     // import akka.pattern.ask
-    // import akka.util.Duration
+    // import scala.concurrent.Duration
     // import akka.util.Timeout
-    // import akka.util.duration._
+    // import scala.concurrent.duration._
     // import akka.actor._
 
 

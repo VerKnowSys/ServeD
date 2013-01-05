@@ -1,5 +1,7 @@
-// © Copyright 2009 Daniel Dettlaff. ® All Rights Reserved.
-// This Software is a close code project. You may not redistribute this code without permission of author.
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
 
 package com.verknowsys.served.systemmanager
 
@@ -11,21 +13,15 @@ import com.verknowsys.served.api._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.utils.Logging
 
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.RandomAccessFile
 import akka.actor._
-import com.sun.jna.{Native, Library}
-import scala.collection.mutable.ListBuffer
-import scala.collection.JavaConversions._
 import org.webbitserver._
-import org.webbitserver.handler._
+import org.json4s.native.JsonMethods._
 
 
 /**
-*   @author dmilith
-*
 *   SvdSystemManager - responsible for System managment and monitoring
+*
+*   @author dmilith
 */
 class SvdSystemManager extends SvdManager with Logging {
 
@@ -51,6 +47,18 @@ class SvdSystemManager extends SvdManager with Logging {
 
     def receive = {
 
+        case Security.GetAccountPriviledges(account) =>
+            new SvdAccountSecurityCheck(account).load match {
+                case Some(container) =>
+                    val privs = (parse(container) \ "privdgs").children.map {
+                        child => compact(render(child))
+                    }
+                    log.info("Priviledges found for account: %s. Granting access for: %s", account.userName, privs)
+                    sender ! """{"message": "Security check passed.", "status": 0, "content": %s}""".format(container)
+
+                case None =>
+                    sender ! Error("Priviledges Check Failed")
+            }
 
         case System.RegisterDomain(domain, actorProxy) =>
             log.info("Registering domain: %s", domain)
@@ -58,7 +66,7 @@ class SvdSystemManager extends SvdManager with Logging {
             validateDomain(domain) match {
                 case None => // no errors detected
                     actorProxy ! User.StoreUserDomain(domain)
-                    sender ! Success
+                    sender ! ApiSuccess
                     log.info("Domain registration succeeded")
 
                 case Some(x) =>
@@ -77,7 +85,7 @@ class SvdSystemManager extends SvdManager with Logging {
 
             // SvdLowLevelSystemAccess.netstat.stat(SvdLowLevelSystemAccess.core)
             // log.warn("Network usage (bytes): IN: %s, OUT: %s".format(SvdLowLevelSystemAccess.netstat.getTcpInboundTotal, SvdLowLevelSystemAccess.netstat.getTcpOutboundTotal))
-            // self reply Success
+            // self reply ApiSuccess
 
         // case Quit =>
         //     log.info("Quitting SvdSystemManager")
@@ -86,12 +94,12 @@ class SvdSystemManager extends SvdManager with Logging {
         case System.Chown(what, userId, recursive) =>
             log.debug("Chown called on location: '%s' with uid: %s, recursive: %s".format(what, userId, recursive))
             chown(what, userId, SvdConfig.defaultUserGroup, recursive)
-            sender ! Success
+            sender ! ApiSuccess
 
         case System.Chmod(what, mode, recursive) =>
             log.debug("Chmod called on location: '%s' with mode: %s (recursively: %s)".format(what, mode, recursive))
             chmod(what, mode, recursive)
-            sender ! Success
+            sender ! ApiSuccess
 
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))

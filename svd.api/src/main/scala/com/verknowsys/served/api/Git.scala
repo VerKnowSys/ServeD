@@ -1,3 +1,8 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.api.git
 
 
@@ -34,11 +39,11 @@ object Git {
 
 
     case class UpdateRepositoryConfiguration(repository: Repository) extends Base
-        // Success
+        // ApiSuccess
 
 
     case class RemoveRepository(uuid: UUID) extends Base
-        // Success
+        // ApiSuccess
     case object RepositoryDoesNotExistError extends Base
 
 

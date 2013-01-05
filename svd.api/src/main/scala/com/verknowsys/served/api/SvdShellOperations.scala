@@ -1,20 +1,15 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.api
 
 
-// /**
-//  *  @author dmilith
-//  *
-//  *   Defines software requirement to be downloaded from binary repository for actual OS, set by SvdConfig.binarySoftwareRepository
-//  */
-// case class SvdSoftwareRequirement(
-//         name: String
-//     )
-
-
 /**
- *  @author dmilith
- *
  *   Defines config of hooks passed to SvdService
+ *
+ *  @author dmilith
  */
 case class SvdServiceConfig(
         name: String,
@@ -38,9 +33,9 @@ case class SvdServiceConfig(
 
 
 /**
- *  @author dmilith
- *
  *   Defines shell operation required by SvdShell
+ *
+ *  @author dmilith
  */
 case class SvdShellOperations(
         commands: List[String],

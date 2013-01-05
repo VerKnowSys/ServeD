@@ -1,3 +1,8 @@
+/*
+ * © Copyright 2008-2013 Daniel (dmilith) Dettlaff. ® All Rights Reserved.
+ * This Software is a close code project. You may not redistribute this code without permission of author.
+ */
+
 package com.verknowsys.served.db
 
 import org.neodatis.odb._
@@ -99,6 +104,8 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
                 log.warn("ODBRuntimeException: %s", ex.toString)// XXX: Should we do something with it?
             case ex: NeoDatisError =>
                 log.warn("NeoDatisError: %s", ex.toString)// XXX: Should we do something with it?
+            case ex: Exception =>
+                log.error("Exception: %s", ex)
         }
     }
 }
