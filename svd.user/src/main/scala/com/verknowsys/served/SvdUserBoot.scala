@@ -10,7 +10,6 @@ import com.verknowsys.served._
 import com.verknowsys.served.managers._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.api._
-import akka.util.duration._
 import akka.util.Timeout
 import akka.actor._
 import akka.pattern.ask
@@ -18,6 +17,10 @@ import com.typesafe.config.ConfigFactory
 import scala.io._
 import java.io.File
 import java.lang.{System => JSystem}
+
+import scala.concurrent._
+import scala.concurrent.duration._
+import ExecutionContext.Implicits.global
 
 
 class SvdUserBoot(userUID: Int) extends Logging with SvdActor with SvdAkkaSupport {
@@ -46,20 +49,22 @@ class SvdUserBoot(userUID: Int) extends Logging with SvdActor with SvdAkkaSuppor
     val system = try {
         ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDremote"))
     } catch {
-        case _ =>
+        case x: Exception =>
             ActorSystem(SvdConfig.served, ConfigFactory.parseString(akkaConfigContent).getConfig("ServeDheadless"))
     }
     val accountsManager = system.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
 
 
-    (accountsManager ? System.GetPort) onSuccess {
+    val gp = (accountsManager ? System.GetPort)
+    gp.onSuccess {
 
         case anyPort: Int =>
             val bootAccount = SvdAccount(uid = userUID, userName = "a boot user %d".format(userUID))
             val am = system.actorOf(Props(new SvdAccountManager(bootAccount, self)).withDispatcher("svd-single-dispatcher"), "SvdAccountManager") // NOTE: actor name is significant for remote actors!!
             log.info("UserBoot connected to remote SvdRoot at: %s for UID: %d", SvdConfig.remoteApiServerHost, userUID)
 
-    } onFailure {
+    }
+    gp.onFailure {
 
         case x =>
             // launching headless mode
@@ -87,13 +92,13 @@ class SvdUserBoot(userUID: Int) extends Logging with SvdActor with SvdAkkaSuppor
     def receive = {
 
 
-        case Success =>
+        case ApiSuccess =>
             log.debug("UserBoot success.")
 
 
         case Maintenance.RestartAccountManager =>
             log.debug("Killing Account Manager on demand of user: %s.", userUID)
-            sender ! Success
+            sender ! ApiSuccess
             system.shutdown
             sys.exit(0)
 

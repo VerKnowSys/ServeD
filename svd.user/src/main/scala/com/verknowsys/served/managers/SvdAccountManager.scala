@@ -19,13 +19,13 @@ import com.verknowsys.served.notifications._
 import org.apache.commons.io.FileUtils
 import java.security.PublicKey
 import akka.actor._
-import akka.dispatch._
+import scala.concurrent._
 import akka.pattern.ask
 import akka.pattern.AskTimeoutException
-import akka.remote._
-import akka.util.Duration
+// import akka.remote._
 import akka.util.Timeout
-import akka.util.duration._
+import scala.concurrent.duration._
+import ExecutionContext.Implicits.global
 import akka.actor._
 
 import scala.math._
@@ -155,7 +155,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
     def receive = traceReceive {
 
-        case Success =>
+        case ApiSuccess =>
             log.debug("Got success")
 
         case Terminated(ref) =>
@@ -296,7 +296,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                     }
                 ))
                 FileUtils.copyFile(igniterFile, userIgniterName + SvdConfig.defaultSoftwareTemplateExt, false) // NOTE: false => don't copy attributes
-                sender ! Success
+                sender ! ApiSuccess
             } catch {
                 case e: Exception =>
                     sender ! Error("Exception occured: %s".format(e))
@@ -321,7 +321,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                     val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
                     log.trace("Pinging service: %s".format(currServ))
                     (currServ ? Notify.Ping) onComplete {
-                        case Right(Notify.Pong) =>
+                        case Success(Notify.Pong) =>
                             val msg = "Service already running: %s.".format(serviceName)
                             log.warn(msg)
                             notificationsManager ! Notify.Message(formatMessage("W:%s".format(msg)))
@@ -330,12 +330,12 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                             // Thread.sleep(SvdConfig.serviceRestartPause)
                             // joinContext
 
-                        case Left(exc) =>
+                        case Failure(exc) =>
                             log.debug("No alive actors found: %s".format(exc.getMessage))
                             joinContext
                     }
             }
-            sender ! Success
+            sender ! ApiSuccess
 
 
         case User.GetStoredServices => // #4
@@ -347,13 +347,13 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         case User.TerminateServices => // #5
             log.info("Terminating all services…")
             context.actorSelection("../SvdAccountManager/Service-*") ! Quit
-            sender ! Success
+            sender ! ApiSuccess
 
 
         case User.StoreServices => // #6
             cleanServicesAutostart
             context.actorSelection("../SvdAccountManager/Service-*") ! User.ServiceAutostart
-            sender ! Success
+            sender ! ApiSuccess
 
 
         case User.GetRunningServices =>
@@ -381,7 +381,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             }
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
             (currServ ? Notify.Ping) onComplete {
-                case Right(Notify.Pong) =>
+                case Success(Notify.Pong) =>
                     val msg = "Service already running: %s. Restarting".format(serviceName)
                     log.warn(msg)
                     notificationsManager ! Notify.Message(formatMessage("W:%s".format(msg)))
@@ -391,11 +391,11 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                     Thread.sleep(SvdConfig.serviceRestartPause)
                     joinContext
 
-                case Left(exc) =>
+                case Failure(exc) =>
                     log.debug("No alive service found: %s".format(exc.getMessage))
                     joinContext
             }
-            sender ! Success
+            sender ! ApiSuccess
 
 
         case User.TerminateService(name) => // #8
@@ -403,7 +403,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             val serv = context.actorFor("/user/SvdAccountManager/Service-%s".format(name))
             context.unwatch(serv)
             context.stop(serv)
-            sender ! Success
+            sender ! ApiSuccess
 
 
         case User.ShowAvailableServices => // #9
@@ -437,9 +437,9 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             val s = sender
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
             (currServ ? User.GetServicePort) onComplete {
-                case Right(port) =>
+                case Success(port) =>
                     s ! """{"message": "Port gathered successfully.", "content": [%d]}""".format(port)
-                case Left(exc) =>
+                case Failure(exc) =>
                     s ! Error("Service port unavailable!")
             }
 
@@ -447,10 +447,10 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             val s = sender
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
             (currServ ? User.ServiceStatus) onComplete {
-                case Right(content) =>
+                case Success(content) =>
                     s ! """{"message": "Service: %s. %s", "status": 0}""".format(serviceName, content)
 
-                case Left(x) =>
+                case Failure(x) =>
                     x match {
                         case x: AskTimeoutException =>
                             s ! Error("Service refused to answer. Installation is in progress or service's not started.")
@@ -473,7 +473,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                     registerFileEventFor(path, flags)
                     db << SvdFileEventBinding(path, serviceName, flags)
                     log.info("Created file watch on file %s", path)
-                    sender ! Success
+                    sender ! ApiSuccess
             }
 
 
@@ -486,13 +486,13 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                     log.info("Destroying file watch and binding for: %s", path)
                     val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(binding.serviceName))
                     (currServ ? User.ServiceStatus) onComplete {
-                        case Right(content) =>
+                        case Success(content) =>
                             log.debug("Found FEM Triggered Service: %s", binding.serviceName)
                             db ~ binding // remove record from user account db
                             log.info("Removed binding for file %s", path)
                             context.stop(currServ)
 
-                        case Left(xc) =>
+                        case Failure(xc) =>
                             log.trace("FEM Triggered Service Not (yet) started.")
                             db ~ binding
                     }
@@ -500,7 +500,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             log.debug("Unregistering File Events for path: %s", path)
             log.trace("Currently registered and stored bindings: %s", SvdFileEventBindings(db).mkString(", "))
             fem ! SvdUnregisterFileEvent(self) // unregister event watch
-            sender ! Success
+            sender ! ApiSuccess
 
 
         case User.GetUserPorts =>
@@ -537,7 +537,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                     log.trace("Removing port: %s from user account.", portRecord.number)
                     db ~ portRecord
             }
-            sender ! Success
+            sender ! ApiSuccess
 
 
         case AuthorizeWithKey(key) =>
@@ -573,10 +573,10 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                             log.info("Launching trigger service for file: %s (if not already started)", path)
                             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(binding.serviceName))
                             (currServ ? Notify.Ping) onComplete {
-                                case Right(Notify.Pong) => // it seems that service is already started
+                                case Success(Notify.Pong) => // it seems that service is already started
                                     log.info("Triggered Service already running")
 
-                                case Left(ex) => // timeout probably?
+                                case Failure(ex) => // timeout probably?
                                     log.trace("CurrServ exception: %s", ex)
                                     val service = context.actorOf(Props(new SvdService(binding.serviceName, account)), "Service-%s".format(binding.serviceName))
                                     context.watch(service)
@@ -586,8 +586,8 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             }
 
 
-        case Success =>
-            log.debug("Received Success")
+        case ApiSuccess =>
+            log.debug("Received ApiSuccess")
 
         case Terminated(ref) =>
             log.debug("Terminated service actor: %s".format(ref))
@@ -657,12 +657,12 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         //         if (!userUIDRegistered(SvdConfig.defaultUserUID)) {
         //             registerUserAccount(SvdConfig.defaultUserName, SvdConfig.defaultUserUID) // XXX: hardcoded
         //         }
-        //         sender ! Success
+        //         sender ! ApiSuccess
         //     } else {
         //         val userUID = randomUserUid
         //         log.debug("Registering account with name: %s and uid: %d".format(name, userUID))
         //         registerUserAccount(name, userUID)
-        //         sender ! Success
+        //         sender ! ApiSuccess
         //     }
 
     }
@@ -690,10 +690,12 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         // dbServer.close
 
         log.info("Stopping services")
-        (self ? User.TerminateServices) onSuccess {
+        val ts = (self ? User.TerminateServices)
+        ts onSuccess {
             case _ =>
                 log.info("All Services Terminated")
-        } onFailure {
+        }
+        ts onFailure {
             case x =>
                 log.error("TerminateServices fail: %s".format(x))
         }

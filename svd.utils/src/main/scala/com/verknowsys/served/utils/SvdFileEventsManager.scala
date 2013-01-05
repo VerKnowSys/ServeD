@@ -6,10 +6,10 @@
 package com.verknowsys.served.utils
 
 
+import akka.actor.{Actor, ActorRef}
 import scala.collection.mutable.{HashMap => MutableMap, ListBuffer}
 import com.sun.jna.NativeLong
 import Events._
-import akka.actor._
 import com.verknowsys.served.api._
 import com.verknowsys.served._
 
@@ -182,7 +182,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdActor with SvdUtil
 
             log.debug("Registered new file event: %s / %s for %s", path, flags, ref)
             log.debug("Registered file events: %s", idents)
-            sender ! Success
+            sender ! ApiSuccess
 
         case SvdUnregisterFileEvent(ref) =>
             idents.foreach { case ((ident, (path, list))) =>
@@ -194,7 +194,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdActor with SvdUtil
 
             log.debug("Unregistered file events for %s", ref)
             log.debug("Registered file events: %s", idents)
-            sender ! Success
+            sender ! ApiSuccess
 
         // Forward event sent by kqueue to file watchers
         case SvdKqueueFileEvent(ident, flags) =>
@@ -205,10 +205,10 @@ class SvdFileEventsManager extends Actor with Logging with SvdActor with SvdUtil
                     case ((fl, ref)) if (fl & flags) > 0 => ref ! SvdFileEvent(path, flags)
                 }
             }
-            sender ! Success
+            sender ! ApiSuccess
 
-        case Success =>
-            log.trace("Success in SEM")
+        case ApiSuccess =>
+            log.trace("ApiSuccess in SEM")
 
 
         // case SvdFileEvent(path, flags) =>

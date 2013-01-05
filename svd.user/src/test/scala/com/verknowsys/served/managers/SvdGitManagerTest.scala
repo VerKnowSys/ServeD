@@ -103,7 +103,7 @@ class SvdGitManagerTest(_system: ActorSystem) extends DefaultTest {
         (manager ? Git.CreateRepository("foo")) onSuccess {
             case repo: Repository =>
                 (manager ? Git.RemoveRepository(repo.uuid)) onSuccess {
-                    case Success =>
+                    case ApiSuccess =>
                         homeDir / "git" / "foo.git" should not (exist)
                         (manager ? Git.ListRepositories) onSuccess {
                             case Git.Repositories(Nil) =>
@@ -183,7 +183,7 @@ class SvdGitManagerTest(_system: ActorSystem) extends DefaultTest {
 
                 val key = AccessKey("default", KeyUtils.load(testPublicKey).get) // we are sure this is valid key
                 (manager ? Git.AddAuthorizedKey(repo.uuid, key)) onSuccess {
-                    case Success =>
+                    case ApiSuccess =>
                         (manager ? Git.GetRepositoryByUUID(repo.uuid)) onSuccess {
                             case Some(res: Repository) =>
                                 res.authorizedKeys should have size(1)
@@ -191,7 +191,7 @@ class SvdGitManagerTest(_system: ActorSystem) extends DefaultTest {
                                 res should equal (repo.copy(authorizedKeys = Set() + key))
 
 //                                manager ! Git.AddAuthorizedKey(repo.uuid, key)
-//                                expectMsg(Success)
+//                                expectMsg(ApiSuccess)
 
                                 (manager ? Git.GetRepositoryByUUID(repo.uuid)) onSuccess {
                                     case Some(res2: Repository) =>
@@ -225,13 +225,13 @@ class SvdGitManagerTest(_system: ActorSystem) extends DefaultTest {
                 val key = AccessKey("default", KeyUtils.load(testPublicKey).get) // we are sure this is valid key
 
                 (manager ? Git.AddAuthorizedKey(repo.uuid, key)) onSuccess {
-                    case Success =>
+                    case ApiSuccess =>
                     case _ =>
                         fail("Shouldn't happen")
                 }
 
                 (manager ? Git.RemoveAuthorizedKey(repo.uuid, key)) onSuccess {
-                    case Success =>
+                    case ApiSuccess =>
                     case _ =>
                         fail("Shouldn't happen")
                 }

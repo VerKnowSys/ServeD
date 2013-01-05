@@ -10,9 +10,9 @@ import com.verknowsys.served._
 import com.verknowsys.served.utils._
 import java.util.concurrent.TimeoutException
 import unfiltered.response._
-import akka.dispatch._
-import akka.util._
-import akka.util.duration._
+import scala.concurrent._
+import scala.concurrent.duration._
+import akka.util.Timeout
 
 
 /**
@@ -27,7 +27,7 @@ object SvdWebAPI extends SvdUtils {
         try {
             implicit val timeout = Timeout(SvdConfig.defaultAPITimeout / 1000 seconds)
             Await.result(future, timeout.duration) match {
-                case Success =>
+                case ApiSuccess =>
                     JsonContent ~> ResponseString("{\"message\": \"API request completed successfully.\", \"status\":0}")
 
                 case jsonContent: String =>

@@ -9,7 +9,7 @@ package com.verknowsys.served.ci
 import akka.pattern.ask
 import akka.util.Timeout
 import akka.testkit.TestKit
-import akka.util.duration._
+import scala.concurrent.duration._
 import akka.actor.ActorSystem
 import akka.actor.Props
 
@@ -41,7 +41,7 @@ class WorkerTest(_system: ActorSystem) extends TestKit(_system) with DefaultTest
     implicit val timeout = Timeout(30 seconds)
 
 
-    it should "return Success with empty history when given empty task list" in {
+    it should "return ApiSuccess with empty history when given empty task list" in {
         val worker = system.actorOf(Props(new TestWorker(Nil)))
         (worker ? Build) onSuccess {
             case BuildSucceed(x) =>
@@ -55,7 +55,7 @@ class WorkerTest(_system: ActorSystem) extends TestKit(_system) with DefaultTest
     }
 
 
-    it should "return Success with one item in history when given one task" in {
+    it should "return ApiSuccess with one item in history when given one task" in {
         val worker = system.actorOf(Props(new TestWorker(TestTask("foo") :: Nil)))
         (worker ? Build) onSuccess {
             case BuildSucceed(x :: Nil) =>
@@ -68,7 +68,7 @@ class WorkerTest(_system: ActorSystem) extends TestKit(_system) with DefaultTest
     }
 
 
-    it should "return Success with full history reversed when given list" in {
+    it should "return ApiSuccess with full history reversed when given list" in {
         val tasks = TestTask("a") :: TestTask("b") :: TestTask("c") :: Nil
         val worker = system.actorOf(Props(new TestWorker(tasks)))
         (worker ? Build) onSuccess {

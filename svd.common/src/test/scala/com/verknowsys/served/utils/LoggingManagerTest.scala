@@ -8,7 +8,7 @@
 //import akka.pattern.ask
 //import akka.util.Timeout
 //import akka.testkit.TestKit
-//import akka.util.duration._
+//import scala.concurrent.duration._
 //import akka.actor._
 //
 //import com.verknowsys.served.api.Logger

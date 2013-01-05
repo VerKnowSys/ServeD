@@ -24,7 +24,7 @@ object SvdNtpSync extends Logging {
                 false
             case e: java.net.SocketTimeoutException => log.error("%s\n".format(e))
                 false
-            case _ => log.error("Failed to get current offset time from `%s`.".format(host))
+            case e: Exception => log.error("Failed to get current offset time from `%s`.".format(host))
                 false
         }
     }

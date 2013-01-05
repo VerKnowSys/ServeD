@@ -5,9 +5,8 @@
 
 package com.verknowsys.served.ci
 
-import akka.actor.Actor
-import akka.actor.ActorRef
 
+import akka.actor.{Actor, ActorRef}
 import com.verknowsys.served.utils.Logging
 
 

@@ -19,12 +19,11 @@ import com.verknowsys.served.services._
 import akka.actor._
 import scala.io.Source
 
-import akka.dispatch._
+import scala.concurrent._
 import akka.pattern.ask
-import akka.remote._
-import akka.util.Duration
 import akka.util.Timeout
-import akka.util.duration._
+import scala.concurrent.duration._
+import ExecutionContext.Implicits.global
 
 /**
  *  ServeD Accounts Manager
@@ -80,7 +79,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
             val accountsWithoutThisOne = accountsAlive.filterNot{_.uuid == account.uuid}
             context.become(
                 awareOfUserManagers(accountsWithoutThisOne))
-            sender ! Success
+            sender ! ApiSuccess
             log.info("Becoming aware of dead account: %s", account)
             log.debug("Alive accounts: %s".format(accountsWithoutThisOne))
 
@@ -103,7 +102,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
             }
 
 
-        case Success =>
+        case ApiSuccess =>
             log.debug("Got success")
 
 

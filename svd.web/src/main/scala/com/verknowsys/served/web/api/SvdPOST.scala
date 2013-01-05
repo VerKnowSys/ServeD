@@ -14,7 +14,7 @@ import com.verknowsys.served.api._
 
 import akka.actor._
 import akka.util.Timeout
-import akka.util.duration._
+import scala.concurrent.duration._
 import akka.pattern.ask
 import unfiltered.Cookie
 

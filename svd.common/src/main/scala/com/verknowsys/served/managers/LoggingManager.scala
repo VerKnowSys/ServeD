@@ -6,7 +6,7 @@
 package com.verknowsys.served.managers
 
 
-import com.verknowsys.served.api.{Success, Logger}
+import com.verknowsys.served.api.{ApiSuccess, Logger}
 import com.verknowsys.served.utils._ //{LoggingMachine, GlobalActorRef, GlobalLogger}
 import akka.actor._
 
@@ -30,12 +30,12 @@ class LoggingManager(val loggingMachine: LoggingMachine) extends SvdManager {
         case Logger.AddEntry(className, level) =>
             log.trace("Setting logger level %s for class %s", level, className)
             loggingMachine.addEntry(className, level)
-            sender ! Success
+            sender ! ApiSuccess
 
         case Logger.RemoveEntry(className) =>
             log.trace("Removing logger level settings for class %s", className)
             loggingMachine.removeEntry(className)
-            sender ! Success
+            sender ! ApiSuccess
 
         // case events.SvdFileEvent(path, flags) =>
             // LoggerUtils.update

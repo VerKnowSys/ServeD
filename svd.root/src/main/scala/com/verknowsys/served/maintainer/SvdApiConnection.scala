@@ -5,7 +5,7 @@
 
 // package com.verknowsys.served.maintainer
 
-// import akka.actor.Actor
+// import akka.actor Actor
 // // import akka.serialization.RemoteActorSerialization.toRemoteActorRefProtocol
 
 // import com.verknowsys.served.utils.Logging

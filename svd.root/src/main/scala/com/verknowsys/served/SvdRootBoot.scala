@@ -11,7 +11,7 @@ import com.verknowsys.served.managers.SvdAccountsManager
 import com.verknowsys.served.systemmanager.SvdSystemManager
 import com.verknowsys.served.sshd.SSHD
 import com.verknowsys.served.api._
-import akka.util.duration._
+import scala.concurrent.duration._
 import akka.actor._
 import com.typesafe.config.ConfigFactory
 
@@ -80,7 +80,7 @@ class SvdRootBoot extends Logging with SvdActor {
 
     def receive = {
 
-        case Success =>
+        case ApiSuccess =>
             log.debug("RootBoot success")
 
         // case Shutdown =>

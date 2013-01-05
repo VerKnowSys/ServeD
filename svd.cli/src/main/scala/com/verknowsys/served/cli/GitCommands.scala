@@ -16,7 +16,7 @@ object GitCommands extends Commands {
             //
             // case "create" :: name :: Nil =>
             //     request(Git.CreateRepository(name)) {
-            //         case Success =>
+            //         case ApiSuccess =>
             //             info("Repository %s created", name)
             //         case Git.RepositoryExistsError =>
             //             error("Repository with name %s already exists", name)
@@ -25,7 +25,7 @@ object GitCommands extends Commands {
             // case ("remove" | "rm") :: name :: Nil =>
             //     if(confirm("Are you sure you want to remove repository %s? This operation cannot be undone!".format(name))){
             //         request(Git.RemoveRepository(name)) {
-            //             case Success =>
+            //             case ApiSuccess =>
             //                 info("Repository %s removed", name)
             //             case Git.RepositoryDoesNotExistError =>
             //                 error("Repository with name %s does not exist", name)

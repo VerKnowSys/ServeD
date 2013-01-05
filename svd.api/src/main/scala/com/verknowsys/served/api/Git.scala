@@ -39,11 +39,11 @@ object Git {
 
 
     case class UpdateRepositoryConfiguration(repository: Repository) extends Base
-        // Success
+        // ApiSuccess
 
 
     case class RemoveRepository(uuid: UUID) extends Base
-        // Success
+        // ApiSuccess
     case object RepositoryDoesNotExistError extends Base
 
 

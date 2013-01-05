@@ -20,7 +20,6 @@ import org.apache.commons.io.FileUtils
  *
  *  @author dmilith
  */
-
 case object SvdAccounts extends DB[SvdAccount]
 
 

@@ -74,7 +74,7 @@ package object utils {
     def catchException[T](f: => T): Option[T] = try {
         Some(f)
     } catch {
-        case _ => None
+        case x: Exception => None
     }
 
     // implicit def GlobalActorRef2ActorRef(global: GlobalActorRef) = global.actor

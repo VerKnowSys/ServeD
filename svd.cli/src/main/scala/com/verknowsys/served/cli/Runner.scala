@@ -25,7 +25,7 @@ class ApiClient(svd: Svd) {
 
     // Connect to ServeD
     // request(General.Connect(userUid)) {
-    //     case Success =>
+    //     case ApiSuccess =>
     //         info("ServeD interactive shell. Welcome %s", userUid)
     //         prompt(new Prompt)
     //     case Error(message) =>

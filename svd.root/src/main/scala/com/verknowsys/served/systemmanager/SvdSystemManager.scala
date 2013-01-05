@@ -66,7 +66,7 @@ class SvdSystemManager extends SvdManager with Logging {
             validateDomain(domain) match {
                 case None => // no errors detected
                     actorProxy ! User.StoreUserDomain(domain)
-                    sender ! Success
+                    sender ! ApiSuccess
                     log.info("Domain registration succeeded")
 
                 case Some(x) =>
@@ -85,7 +85,7 @@ class SvdSystemManager extends SvdManager with Logging {
 
             // SvdLowLevelSystemAccess.netstat.stat(SvdLowLevelSystemAccess.core)
             // log.warn("Network usage (bytes): IN: %s, OUT: %s".format(SvdLowLevelSystemAccess.netstat.getTcpInboundTotal, SvdLowLevelSystemAccess.netstat.getTcpOutboundTotal))
-            // self reply Success
+            // self reply ApiSuccess
 
         // case Quit =>
         //     log.info("Quitting SvdSystemManager")
@@ -94,12 +94,12 @@ class SvdSystemManager extends SvdManager with Logging {
         case System.Chown(what, userId, recursive) =>
             log.debug("Chown called on location: '%s' with uid: %s, recursive: %s".format(what, userId, recursive))
             chown(what, userId, SvdConfig.defaultUserGroup, recursive)
-            sender ! Success
+            sender ! ApiSuccess
 
         case System.Chmod(what, mode, recursive) =>
             log.debug("Chmod called on location: '%s' with mode: %s (recursively: %s)".format(what, mode, recursive))
             chmod(what, mode, recursive)
-            sender ! Success
+            sender ! ApiSuccess
 
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))

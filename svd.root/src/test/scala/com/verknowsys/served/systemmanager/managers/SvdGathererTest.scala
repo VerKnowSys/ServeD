@@ -49,7 +49,7 @@
 //        (gather1 ? ("Test signal 1")) onSuccess {
 //            case Error(y) =>
 //                (gather2 ? Init) onSuccess {
-//                    case Success =>
+//                    case ApiSuccess =>
 //                        true must be(true)
 //
 //                    case x =>

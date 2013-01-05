@@ -13,9 +13,12 @@ import akka.actor.{Props, ActorRef}
 
 import akka.pattern.ask
 import akka.util
-import akka.util.duration._
 import akka.util.Timeout
 import akka.pattern.ask
+import scala.util._
+import scala.concurrent._
+import scala.concurrent.duration._
+import ExecutionContext.Implicits.global
 
 
 class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
@@ -45,10 +48,10 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
             gate =>
                 (gate ? Notify.Connect) onComplete {
 
-                    case Right(content) =>
+                    case Success(content) =>
                         log.info("PreStart")
 
-                    case Left(exception) =>
+                    case Failure(exception) =>
                         log.error("Exception: %s", exception)
 
                 }
@@ -85,11 +88,11 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
                 gate =>
                     log.debug("Setting Status for gate: %s", gate)
                     (gate ? Notify.Status(status)) onComplete {
-                        case Right(some) =>
+                        case Success(some) =>
                             log.debug("Status set to %s", some)
-//                            sender ! Success
+//                            sender ! ApiSuccess
 
-                        case Left(exception) =>
+                        case Failure(exception) =>
                             log.error("Exception: %s", exception)
 //                            sender ! Error("Exception: %s", exception)
 
@@ -105,11 +108,11 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
                 gate =>
                     log.debug("Setting Message for gate: %s", gate)
                     (gate ? Notify.Message(msg)) onComplete {
-                        case Right(some) =>
+                        case Success(some) =>
                             log.debug("Sending message :%s", some)
-//                            sender ! Success
+//                            sender ! ApiSuccess
 
-                        case Left(exception) =>
+                        case Failure(exception) =>
                             log.error("Exception: %s", exception)
 //                            sender ! Error("Exception: %s", exception)
 

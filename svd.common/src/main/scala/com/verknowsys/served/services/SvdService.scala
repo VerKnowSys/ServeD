@@ -17,16 +17,16 @@ import com.verknowsys.served.scheduler._
 import scala.io._
 import java.io.File
 import akka.actor._
-import akka.dispatch._
+import scala.concurrent._
 import akka.pattern.ask
 import akka.util.Timeout
-import akka.util.duration._
+import scala.concurrent.duration._
 import java.lang.{System => JSystem}
 import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
 
 
 /**
- *  Service actor. All Svd services are started using this actor wrapper.
+ *  Service akka.actor. All Svd services are started using this actor wrapper.
  *
  *  @author dmilith
  */
@@ -327,7 +327,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
         case Run =>
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
-            sender ! Success
+            sender ! ApiSuccess
 
         /**
          *   Quit should be sent when we want to stop this service
@@ -339,8 +339,8 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             context.unwatch(self)
             context.stop(self)
 
-        case Success =>
-            log.trace("Success in SvdService from %s".format(sender.getClass.getName))
+        case ApiSuccess =>
+            log.trace("ApiSuccess in SvdService from %s".format(sender.getClass.getName))
     }
 
 
