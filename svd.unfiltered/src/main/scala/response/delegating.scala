@@ -12,7 +12,7 @@ extends HttpResponse[T](delegate.underlying) {
   def header(name: String, value: String) {
     delegate.header(name, value)
   }
-  @deprecated("use response combinator response.SetCookies(cookies)")
+  @deprecated("use response combinator response.SetCookies(cookies)", "")
   def cookies(cookie: Seq[unfiltered.Cookie]) {
     delegate.cookies(cookie)
   }

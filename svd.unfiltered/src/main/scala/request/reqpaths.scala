@@ -1,6 +1,5 @@
 package unfiltered.request
 
-import unfiltered.request.HttpRequest
 import javax.servlet.http.HttpServletRequest
 
 

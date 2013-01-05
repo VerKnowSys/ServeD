@@ -5,7 +5,7 @@ import unfiltered.Cookie
 /** Set-Cookie response header. See SetCookies */
 object ResponseCookies {
   private val Name = "Set-Cookie"
-  @deprecated("Use unfiltered.response.SetCookies(cookies) instead")
+  @deprecated("Use unfiltered.response.SetCookies(cookies) instead", "")
   def apply(cookies: Cookie*) =
     new ResponseHeader(Name, (Seq.empty[String] /: cookies)(
       (a, e) => ToCookies(e) +: a)
