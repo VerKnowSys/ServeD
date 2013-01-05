@@ -21,11 +21,11 @@ import com.verknowsys.served.api.SvdAccount
 package object testing {
 
 
-    // import akka.dispatch._
+    // import scala.concurrent._
     // import akka.pattern.ask
-    // import akka.util.Duration
+    // import scala.concurrent.Duration
     // import akka.util.Timeout
-    // import akka.util.duration._
+    // import scala.concurrent.duration._
     // import akka.actor._
 
 

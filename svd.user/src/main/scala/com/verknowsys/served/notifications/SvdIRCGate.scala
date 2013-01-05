@@ -20,7 +20,7 @@ import akka.util.Timeout
 import akka.util
 import akka.pattern.ask
 import akka.util.Timeout
-import akka.util.duration._
+import scala.concurrent.duration._
 import akka.actor._
 
 
@@ -388,24 +388,24 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
                 settings
             else
                 log.warn("Aborting startup duo to connection problems to Redis server")
-            sender ! Success
+            sender ! ApiSuccess
 
 
         case Notify.Disconnect =>
             log.info("Disconnecting from IRC Gate")
             disconnect
-            sender ! Success
+            sender ! ApiSuccess
 
 
         case Notify.Status(status) =>
             log.debug("IRC Status: NYI!")
-            sender ! Success
+            sender ! ApiSuccess
 
 
         case Notify.Message(message) =>
             Thread.sleep(10000) // XXX: hardcode
             sendMessage(SvdConfig.defaultIRCChannelName, message)
-            sender ! Success
+            sender ! ApiSuccess
 
     }
 

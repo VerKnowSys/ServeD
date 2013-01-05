@@ -6,13 +6,13 @@
 // import scala.collection.mutable.ListBuffer
 // import akka.testkit.TestActorRef
 // import com.typesafe.config.ConfigFactory
-// import akka.dispatch._
+// import scala.concurrent._
 // import akka.pattern.ask
 // import akka.remote._
-// import akka.util.Duration
+// import scala.concurrent.Duration
 // import akka.util.Timeout
 // import akka.testkit.TestKit
-// import akka.util.duration._
+// import scala.concurrent.duration._
 // import akka.actor.ActorSystem
 // import akka.actor._
 

@@ -6,7 +6,7 @@
 package com.verknowsys.served.utils
 
 
-import akka.actor.Actor
+import akka.actor.{Actor, ActorRef}
 
 
 /**
@@ -14,7 +14,7 @@ import akka.actor.Actor
  *
  *  @author dmilith
  */
-trait SvdActor extends Actor with Logging with SvdUtils {
+trait SvdActor extends  Actor with Logging with SvdUtils {
 
     val ancestor = this.getClass.getName
     val predecestor = super.getClass.getName

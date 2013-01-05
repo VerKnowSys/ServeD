@@ -16,5 +16,7 @@ import com.verknowsys.served.api._
 sealed abstract class Base extends ApiMessage
 
 case object ListKeys extends Base
+
 case class AddKey(key: AccessKey) extends Base
+
 case class RemoveKey(key: AccessKey) extends Base

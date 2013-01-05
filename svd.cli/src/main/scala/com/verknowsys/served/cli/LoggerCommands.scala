@@ -17,14 +17,14 @@ object LoggerCommands extends Commands {
 
             case ("remove" | "rm") :: className :: Nil =>
                 // request(Logger.RemoveEntry(className)){
-                //     case Success => info("Entry removed")
+                //     case ApiSuccess => info("Entry removed")
                 // }
 
             case className :: level :: Nil =>
                 loggerLevels.get(level) match {
                     case Some(lvl) =>
                         // request(Logger.AddEntry(className, lvl)){
-                        //     case Success => info("Entry added")
+                        //     case ApiSuccess => info("Entry added")
                         // }
 
                     case None =>

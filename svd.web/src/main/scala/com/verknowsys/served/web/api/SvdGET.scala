@@ -15,7 +15,7 @@ import com.verknowsys.served.utils._
 
 import akka.actor._
 import akka.util.Timeout
-import akka.util.duration._
+import scala.concurrent.duration._
 
 
 /**

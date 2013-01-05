@@ -8,13 +8,13 @@
 
 // import akka.testkit.TestActorRef
 // import com.typesafe.config.ConfigFactory
-// import akka.dispatch._
+// import scala.concurrent._
 // import akka.pattern.ask
 // import akka.remote._
-// import akka.util.Duration
+// import scala.concurrent.Duration
 // import akka.util.Timeout
 // import akka.testkit.TestKit
-// import akka.util.duration._
+// import scala.concurrent.duration._
 // import akka.actor.ActorSystem
 // import akka.actor.Props
 
@@ -47,7 +47,7 @@
 // //         case FileEvent(path, flags) => // handle event ..
 
 // //         case _ =>
-// //             sender ! Success
+// //             sender ! ApiSuccess
 // //     }
 // // }
 
@@ -111,7 +111,7 @@
 //         val expectActor = system.actorOf(Props(new SvdTestFileEventsReactor))
 //         senderOption = Some(expectActor)
 
-//         // expectActor ? Success
+//         // expectActor ? ApiSuccess
 
 //         (fem ? TestGetIdents) onSuccess {
 //             case Some(idents: SvdFileEventsManager#IdentsMap) => idents.mapValues { case (a,b) => (a, b.toList) } must haveValue( (DIR + "/single", (Modified, expectActor) :: Nil))
@@ -126,7 +126,7 @@
 //         expectActor = system.actorOf[SvdTestFileEventsReactor].start
 //         senderOption = Some(expectActor)
 
-//         expectActor ? Success
+//         expectActor ? ApiSuccess
 
 //         writeFile(DIR + "/single", "new content")
 
@@ -140,7 +140,7 @@
 //         // expectActor = system.actorOf[SvdTestFileEventsReactor].start
 //         // senderOption = Some(expectActor)
 
-//         expectActor ? Success
+//         expectActor ? ApiSuccess
 
 //         (fem ? TestGetIdents) onSuccess {
 //             case Some(idents: SvdFileEventsManager#IdentsMap) =>
@@ -162,7 +162,7 @@
 //         expectActor = system.actorOf(Props(new SvdTestFileEventsReactorForFile(DIR + "/four")))
 //         senderOption = Some(expectActor)
 
-//         expectActor ? Success
+//         expectActor ? ApiSuccess
 
 //         (fem ? TestGetIdents) onSuccess {
 //             case Some(idents: SvdFileEventsManager#IdentsMap) =>
@@ -181,9 +181,9 @@
 //         expectActor = system.actorOf(Props(new SvdTestFileEventsReactor))
 //         senderOption = Some(expectActor)
 
-//         expectActor ? Success
+//         expectActor ? ApiSuccess
 
-//         expectActor.stop
+//         expectakka.actor.stop
 
 //         (fem ? TestGetIdents) onSuccess {
 //             case Some(idents: SvdFileEventsManager#IdentsMap) => idents must beEmpty
@@ -207,9 +207,9 @@
 //         expectActor = system.actorOf(Props(new SvdTestFileEventsReactor))
 //         senderOption = Some(expectActor)
 
-//         expectActor ? Success
+//         expectActor ? ApiSuccess
 
-//         expectActor.stop
+//         expectakka.actor.stop
 
 //         (fem ? TestGetIdents) onSuccess {
 //             case Some(idents: SvdFileEventsManager#IdentsMap) => idents must beEmpty
@@ -249,18 +249,18 @@
 //     //             (name, system.actorOf(new SvdTestFileEventsReactorForFile(name)).start)
 //     //         }
 //     //
-//     //         actors.foreach { case(_, actor) =>
+//     //         akka.actor.foreach { case(_, actor) =>
 //     //             expectActor = actor
 //     //             senderOption = Some(expectActor)
 //     //
-//     //             expectActor ? Success
+//     //             expectActor ? ApiSuccess
 //     //         }
 //     //
-//     //         actors.foreach { case(name, _) =>
+//     //         akka.actor.foreach { case(name, _) =>
 //     //             writeFile(name, "new content")
 //     //         }
 //     //
-//     //         actors.foreach { case(name, actor) =>
+//     //         akka.actor.foreach { case(name, actor) =>
 //     //             println("expecting actor " + name)
 //     //             expectActor = actor
 //     //             senderOption = Some(expectActor)

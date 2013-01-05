@@ -104,6 +104,8 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
                 log.warn("ODBRuntimeException: %s", ex.toString)// XXX: Should we do something with it?
             case ex: NeoDatisError =>
                 log.warn("NeoDatisError: %s", ex.toString)// XXX: Should we do something with it?
+            case ex: Exception =>
+                log.error("Exception: %s", ex)
         }
     }
 }

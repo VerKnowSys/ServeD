@@ -51,7 +51,7 @@
 //    //     changePasswdPath("emptyPasswd")
 //
 //    //     (am ? Init) onSuccess {
-//    //         case Success =>
+//    //         case ApiSuccess =>
 //    //             true must be(true)
 //    //     }
 //    //     // system.system.actorFor(Props(new SvdAccountManager)) must haveSize(0)
@@ -63,7 +63,7 @@
 //
 //        // system.system.actorFor("/user/SvdAccountManager") must haveSize(0)
 //        // (am ? Init) onSuccess {
-//        //     case Success =>
+//        //     case ApiSuccess =>
 //        //         true must be(true)
 //        // }
 //
@@ -79,7 +79,7 @@
 //
 //        // system.system.actorFor("/user/SvdAccountManager") must haveSize(0)
 //        // (am ? Init) onSuccess {
-//        //     case Success =>
+//        //     case ApiSuccess =>
 //        //         true must be(true)
 //        // }
 //        // val managers = registry.actorsFor[SvdAccountManager]

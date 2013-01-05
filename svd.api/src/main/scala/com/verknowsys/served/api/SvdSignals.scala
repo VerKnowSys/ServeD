@@ -23,5 +23,5 @@ case object RevertBackup
 
 // Internal response
 // sealed abstract class InternalResponse
-// case object Success extends InternalResponse
+// case object ApiSuccess extends InternalResponse
 // case object Failure extends InternalResponse
