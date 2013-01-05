@@ -46,6 +46,7 @@ object BuildSettings {
 
         scalacOptions   += "-Xresident",
         scalacOptions   += "-Yrepl-sync",
+        // scalacOptions   += "-feature",
         // scalacOptions   += "-Yinline",
         // scalacOptions   += "-Ywarn-dead-code",
         // scalacOptions   += "-Xcheck-null",
@@ -105,11 +106,10 @@ object Dependencies {
     val akkaVersion = "2.1.0"
 
     // Scala
-    val akkaActor = "com.typesafe.akka" % "akka-actor_2.10" % akkaVersion
+    val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaVersion
+    val akkaRemote = "com.typesafe.akka" %% "akka-remote" % akkaVersion
     val actors = "org.scala-lang" % "scala-actors" % "2.10.0"
-    // val scalaActorRemote = "com.typesafe.scala" % "scala-actors" % "2.10.0"
     // val akkaTestkit = "com.typesafe.akka" % "akka-testkit" % akkaVersion % "test"
-    // val akkaRemote = "com.typesafe.akka" % "akka-remote" % akkaVersion
     val jline = "jline" % "jline" % "0.9.9"
     val scalatest = "org.scalatest" % "scalatest_2.10" % "2.0.M5b"
     // val unfilteredFilter = "net.databinder" % "unfiltered-filter_2.10" % "0.6.4"
@@ -160,7 +160,7 @@ object ServeD extends Build {
             // commands ++= Seq(warmup)
         )).settings(graph.Plugin.graphSettings: _*) aggregate(
 
-        api, cli, utils, testing, root, user, common, unfiltered, web
+        api, cli, utils, testing, unfiltered, root, user, common, web
     )
 
 
@@ -183,14 +183,14 @@ object ServeD extends Build {
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle, json, javaMail, jedis, smack, pircbot, commonsCodec) // akkaActor, scalaActorRemote
+            libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle, json, javaMail, jedis, smack, pircbot, commonsCodec)
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, unfiltered, utils, testing % "test")
 
 
     lazy val api = Project("api", file("svd.api"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(commonsio, actors, akkaActor) // akkaRemote
+            libraryDependencies ++= Seq(commonsio, actors, akkaActor, akkaRemote)
         )
     ).settings(graph.Plugin.graphSettings: _*)
 
