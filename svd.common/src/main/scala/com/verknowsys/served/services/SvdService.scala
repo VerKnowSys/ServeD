@@ -48,7 +48,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
     val servicePort = try {
         Source.fromFile(portsFile).mkString.toInt
     } catch {
-        case _ =>
+        case x: Exception =>
             writeToFile(portsFile, "%d".format(sPort))
             sPort
     }
