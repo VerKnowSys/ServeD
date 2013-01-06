@@ -6,20 +6,25 @@
 package com.verknowsys.served.api
 
 /**
- * User: dmilith
- * Date: Jun 30, 2009
- * Time: 11:53:57 PM
+ *  Defines signals to be used in Process/ Service managment API.
+ * @author dmilith
  */
 
-case object Init
-case object Run
-case object Reload
-case object Quit
-case object Ready
-case object MainLoop
-case object ProcessMessages
-case object RemoteBackupDone
-case object RevertBackup
+object Signal {
+
+    abstract class Base extends ApiMessage
+
+    case object Run extends Base
+    case object Reload extends Base
+    case object Quit extends Base
+
+    // case object Init extends Base
+    // case object Ready extends Base
+    // case object MainLoop extends Base
+    // case object ProcessMessages extends Base
+    // case object RemoteBackupDone extends Base
+    // case object RevertBackup extends Base
+}
 
 // Internal response
 // sealed abstract class InternalResponse

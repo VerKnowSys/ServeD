@@ -315,7 +315,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
          *
          *  @author dmilith
          */
-        case Reload =>
+        case Signal.Reload =>
             hookShot(validateHook, "validate")
             hookShot(reloadHook, "reload")
 
@@ -324,7 +324,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
          *
          *  @author dmilith
          */
-        case Run =>
+        case Signal.Run =>
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
             sender ! ApiSuccess
@@ -334,7 +334,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
          *
          *  @author dmilith
          */
-        case Quit =>
+        case Signal.Quit =>
             log.info("Got Quit in %s".format(this))
             context.unwatch(self)
             context.stop(self)

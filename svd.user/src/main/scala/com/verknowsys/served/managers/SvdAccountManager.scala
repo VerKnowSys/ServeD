@@ -350,7 +350,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
         case User.TerminateServices => // #5
             log.info("Terminating all services…")
-            context.actorSelection("../SvdAccountManager/Service-*") ! Quit
+            context.actorSelection("../SvdAccountManager/Service-*") ! Signal.Quit
             sender ! ApiSuccess
 
 
