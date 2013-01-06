@@ -12,6 +12,7 @@ import SvdPOSIX._
 
 import org.json4s._
 import org.json4s.native.JsonMethods._
+import reflect.{ClassTag, classTag}
 
 import java.security.MessageDigest
 import org.apache.commons.io.FileUtils
@@ -183,8 +184,8 @@ trait SvdUtils extends Logging {
         Unified & DRY method of throwing exceptions
         @author dmilith
     */
-    def throwException[T <: Throwable : Manifest](message: String) {
-        val exception = implicitly[Manifest[T]].erasure.getConstructor(classOf[String]).newInstance(message).asInstanceOf[T]
+    def throwException[T <: Throwable : ClassTag](message: String) {
+        val exception = classTag[T].runtimeClass.getConstructor(classOf[String]).newInstance(message).asInstanceOf[T]
         // log.error("Error occured in %s.\nException: %s\n\n%s".format(this.getClass.getName, exception, exception.getStackTrace.mkString("\n")))
         throw exception
     }
