@@ -296,19 +296,23 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             log.debug(msg)
             accountManager ! Notify.Message(msg)
 
+
         case User.ServiceStatus =>
             val msg = formatMessage("I:%s".format(this))
             log.debug(msg)
             accountManager ! Notify.Message(msg)
             sender ! "%s".format(this)
 
+
         case User.GetServicePort =>
             log.debug("Getting port of service: %s:%d".format(config.name, servicePort))
             sender ! servicePort
 
+
         case Notify.Ping =>
             log.debug("%s".format(this))
             sender ! Notify.Pong
+
 
         /**
          *   Reload by default should be SIGHUP signal sent to process pid
@@ -318,6 +322,8 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
         case Signal.Reload =>
             hookShot(validateHook, "validate")
             hookShot(reloadHook, "reload")
+            sender ! ApiSuccess
+
 
         /**
          *   Explicit method to launch service
@@ -329,6 +335,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             hookShot(afterStartHook, "afterStart")
             sender ! ApiSuccess
 
+
         /**
          *   Quit should be sent when we want to stop this service
          *
@@ -338,9 +345,12 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
             log.info("Got Quit in %s".format(this))
             context.unwatch(self)
             context.stop(self)
+            sender ! ApiSuccess
+
 
         case ApiSuccess =>
             log.trace("ApiSuccess in SvdService from %s".format(sender.getClass.getName))
+
     }
 
 
