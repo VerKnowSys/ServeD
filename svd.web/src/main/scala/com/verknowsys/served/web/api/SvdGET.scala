@@ -38,10 +38,10 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                 <link rel="stylesheet" type="text/css" href="/assets/css/main.css"/>
             </head>
             <body>
-                <script type="text/javascript" src="/assets/js/jquery-1.8.3.min.js"/>
-                <script type="text/javascript" src="/assets/js/bootstrap.min.js"/>
-                <script type="text/javascript" src="/assets/js/dough.min.js"/>
-                <script type="text/javascript" src="/assets/js/main.js"/>
+                <script type="text/javascript" src="/assets/js/jquery-1.8.3.min.js"></script>
+                <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+                <script type="text/javascript" src="/assets/js/dough.min.js"></script>
+                <script type="text/javascript" src="/assets/js/main.js"></script>
                 { content }
             </body>
         </html>
