@@ -46,9 +46,14 @@ object BuildSettings {
 
         scalacOptions   += "-Xresident",
         scalacOptions   += "-Yrepl-sync",
-        // scalacOptions   += "-feature",
+        scalacOptions   += "-feature",
+        scalacOptions   += "-language:postfixOps",
+        scalacOptions   += "-Xno-patmat-analysis",
+        scalacOptions   += "-language:reflectiveCalls",
+        scalacOptions   += "-language:implicitConversions",
+        // scalacOptions   += "-Ywarn-dead-code", // throws warning for fake dead code for case objects
+
         // scalacOptions   += "-Yinline",
-        // scalacOptions   += "-Ywarn-dead-code",
         // scalacOptions   += "-Xcheck-null",
         // scalacOptions   += "–Xshow-phases",
         // scalacOptions   += "–Xexperimental",
