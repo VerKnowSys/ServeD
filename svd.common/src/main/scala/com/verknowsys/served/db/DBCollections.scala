@@ -9,8 +9,10 @@ import org.neodatis.odb._
 import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery
 import org.neodatis.odb.core.query.nq.NativeQuery
 import scala.collection.JavaConversions._
+import reflect.{ClassTag, classTag}
 
-class TopLevelCollection[T <: Persistent : ClassManifest](db: DBClient) extends ClassQueryCollection[T](db.currentODB){
+
+class TopLevelCollection[T <: Persistent : ClassTag](db: DBClient) extends ClassQueryCollection[T](db.currentODB){
     def apply(uuid: UUID) = new FindByUUIDCollection(db.currentODB, uuid).headOption
 
     def historyFor(uuid: UUID): FindByUUIDCollection[T] = new FindByUUIDOrderedCollection(db.historyODB, uuid)
@@ -18,7 +20,7 @@ class TopLevelCollection[T <: Persistent : ClassManifest](db: DBClient) extends 
     def historyFor(obj: T): FindByUUIDCollection[T] = historyFor(obj.uuid)
 }
 
-class ClassQueryCollection[T <: Persistent : ClassManifest](odb: ODB) extends AbstractCollection[T] {
+class ClassQueryCollection[T <: Persistent : ClassTag](odb: ODB) extends AbstractCollection[T] {
     def objects = odb.getObjects(objectType)
 
     def count = odb.count(new CriteriaQuery(objectType)).intValue
@@ -26,7 +28,7 @@ class ClassQueryCollection[T <: Persistent : ClassManifest](odb: ODB) extends Ab
     def apply(f: T => Boolean) = new NativeQueryCollection(odb, f)
 }
 
-class FindByUUIDOrderedCollection[T <: Persistent : ClassManifest](odb: ODB, uuid: UUID) extends FindByUUIDCollection[T](odb, uuid) {
+class FindByUUIDOrderedCollection[T <: Persistent : ClassTag](odb: ODB, uuid: UUID) extends FindByUUIDCollection[T](odb, uuid) {
     override protected[db] def nativeQuery = {
         val nq = super.nativeQuery
         nq.orderByDesc("createdAt")
@@ -34,7 +36,7 @@ class FindByUUIDOrderedCollection[T <: Persistent : ClassManifest](odb: ODB, uui
     }
 }
 
-class FindByUUIDCollection[T <: Persistent : ClassManifest](odb: ODB, uuid: UUID) extends AbstractCollection[T] {
+class FindByUUIDCollection[T <: Persistent : ClassTag](odb: ODB, uuid: UUID) extends AbstractCollection[T] {
     def objects = odb.getObjects(nativeQuery)
 
     protected[db] def nativeQuery = new NativeQuery {
@@ -50,7 +52,7 @@ class FindByUUIDCollection[T <: Persistent : ClassManifest](odb: ODB, uuid: UUID
     }
 }
 
-class NativeQueryCollection[T <: Persistent : ClassManifest](odb: ODB, predicate: T => Boolean) extends AbstractCollection[T] {
+class NativeQueryCollection[T <: Persistent : ClassTag](odb: ODB, predicate: T => Boolean) extends AbstractCollection[T] {
     def objects = odb.getObjects(nativeQuery)
 
     protected[db] def nativeQuery = new NativeQuery {
@@ -62,8 +64,8 @@ class NativeQueryCollection[T <: Persistent : ClassManifest](odb: ODB, predicate
     }
 }
 
-abstract class AbstractCollection[T <: Persistent : ClassManifest] extends Iterable[T] {
-    val objectType = classManifest[T].erasure
+abstract class AbstractCollection[T <: Persistent : ClassTag] extends Iterable[T] {
+    val objectType = classTag[T].runtimeClass
 
     def iterator = collectionAsScalaIterable(objects).iterator
 

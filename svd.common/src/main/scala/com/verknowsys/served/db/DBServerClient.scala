@@ -8,6 +8,8 @@ package com.verknowsys.served.db
 import org.neodatis.odb._
 import org.neodatis.odb.core.NeoDatisError
 import com.verknowsys.served.utils.Logging
+import reflect.{ClassTag, classTag}
+
 
 class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
     /**
@@ -40,7 +42,7 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
      *
      * @author teamon
      */
-    def <<[T <: Persistent : ClassManifest](newObj: T) = {
+    def <<[T <: Persistent : ClassTag](newObj: T) = {
         // TODO: Hash neodatis internal oid when updating (relation consistency)
         find(newObj.uuid) match {
             case Some(oldObj) if oldObj != newObj =>
@@ -66,14 +68,14 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
      *
      * @author teamon
      */
-    def ~[T <: Persistent : ClassManifest](obj: T) { this ~ obj.uuid }
+    def ~[T <: Persistent : ClassTag](obj: T) { this ~ obj.uuid }
 
     /**
      * Remove object with given uuid from database
      *
      * @author teamon
      */
-    def ~[T <: Persistent : ClassManifest](uuid: UUID) = find(uuid) foreach { obj =>
+    def ~[T <: Persistent : ClassTag](uuid: UUID) = find(uuid) foreach { obj =>
         (new FindByUUIDOrderedCollection[T](historyODB, obj.uuid)).headOption match {
             case Some(o) if o == obj =>
             case _ =>
@@ -85,7 +87,7 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
         currentODB.commit
     }
 
-    protected[db] def find[T <: Persistent : ClassManifest](uuid: UUID) = {
+    protected[db] def find[T <: Persistent : ClassTag](uuid: UUID) = {
         val col = new TopLevelCollection[T](this)
         col(uuid)
     }
@@ -100,10 +102,12 @@ class DBClient(val currentODB: ODB, val historyODB: ODB) extends Logging {
             if(!currentODB.isClosed()) currentODB.close
             if(!historyODB.isClosed()) historyODB.close
         } catch {
+            // case ex: NeoDatisError =>
+            //     log.warn("NeoDatisError: %s", ex.toString)// XXX: Should we do something with it?
+
             case ex: ODBRuntimeException =>
                 log.warn("ODBRuntimeException: %s", ex.toString)// XXX: Should we do something with it?
-            case ex: NeoDatisError =>
-                log.warn("NeoDatisError: %s", ex.toString)// XXX: Should we do something with it?
+
             case ex: Exception =>
                 log.error("Exception: %s", ex)
         }
@@ -165,6 +169,6 @@ class DBServer(port: Int, path: String){
  *
  * @author teamon
  */
-class DB[T <: Persistent : ClassManifest] {
+class DB[T <: Persistent : ClassTag] {
     def apply(db: DBClient) = new TopLevelCollection[T](db)
 }
