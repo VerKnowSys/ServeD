@@ -58,7 +58,7 @@ object FromCookies {
         case (ns, vs, Some((n, v, _))) =>
           if(n == null) (ns.reverse, vs.reverse)
           else ((n :: ns).reverse, (v :: vs).reverse)
-        case x: Exception => sys.error("Error parsing cookie string %s" format cstr)
+        case x: Any => sys.error("Error parsing cookie string %s" format cstr)
       }
 
     if(names.isEmpty) { Seq.empty[Cookie] }
@@ -66,7 +66,7 @@ object FromCookies {
       // version may appear before name-value
       val (version, startAt) =
         if(names(0).equalsIgnoreCase(Version))
-          try { (Integer.parseInt(values(0)), 1) } catch { case _ => (0, 1) }
+          try { (Integer.parseInt(values(0)), 1) } catch { case x: Throwable => (0, 1) }
         else (0, 0)
 
       if(names.isEmpty) Seq.empty[Cookie]
