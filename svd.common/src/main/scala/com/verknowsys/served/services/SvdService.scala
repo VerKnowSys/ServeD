@@ -16,6 +16,7 @@ import com.verknowsys.served.scheduler._
 
 import scala.io._
 import java.io.File
+import java.text._
 import akka.actor._
 import scala.concurrent._
 import akka.pattern.ask
@@ -275,7 +276,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
                     accountManager ! SvdScheduler.StartJob(name, job, trigger)
 
                 } catch {
-                    case e: java.text.ParseException =>
+                    case e: ParseException =>
                         accountManager ! Notify.Message(formatMessage("E:%s".format(e)))
 
                     case e: Throwable =>
