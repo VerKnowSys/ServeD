@@ -41,7 +41,9 @@ class SvdAESKeyProvider extends AesKeyProvider with Logging with SvdUtils {
 
     def getKeyStrength = AesKeyProvider.KEY_STRENGTH_256
 
-    def setKeyStrength(keyStrength: Int) = AesKeyProvider.KEY_STRENGTH_256
+    def setKeyStrength(keyStrength: Int) {
+        // nothing
+    }
 }
 
 
