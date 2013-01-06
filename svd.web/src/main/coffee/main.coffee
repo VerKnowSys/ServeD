@@ -99,7 +99,7 @@ $ ->
         async: true
         processData: false
         success: (data) =>
-          $('section.processlist').html(data)
+          $('section.serviceslist').html(data)
 
           # Load all handlers for API elements:
           # (handleAPIAction(element.link, element.element, element.params) for element in apiCalls())

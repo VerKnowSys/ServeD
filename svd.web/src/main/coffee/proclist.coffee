@@ -1,4 +1,7 @@
 
+$ ->
+  console.log("Loaded process list")
+
 # $ ->
 #   console.log("Running ProcList code.")
 #   paper = Raphael("holder")
