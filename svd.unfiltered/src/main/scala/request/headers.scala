@@ -13,7 +13,7 @@ object DateFormatting {
 
   def parseAs(fmt: String)(value: String): Option[Date] =
     try { Some(new SimpleDateFormat(fmt, Locale.US).parse(value)) }
-    catch { case _ => None }
+    catch { case x: Exception => None }
 
   /** Preferred HTTP date format Sun, 06 Nov 1994 08:49:37 GMT */
   def RFC1123 = parseAs("EEE, dd MMM yyyy HH:mm:ss z")_
@@ -56,7 +56,7 @@ private [request] object DateValueParser extends (Iterator[String] => List[java.
 }
 
 private [request] object IntValueParser extends (Iterator[String] => List[Int]) {
-   def tryInt(raw: String) = try { Some(raw.toInt) } catch { case _ => None }
+   def tryInt(raw: String) = try { Some(raw.toInt) } catch { case x: Exception => None }
    def apply(values: Iterator[String]) =
      values.toList.flatMap(tryInt)
 }
@@ -69,7 +69,7 @@ private [request] object StringValueParser extends (Iterator[String] => List[Str
 private [request] object UriValueParser extends (Iterator[String] => List[java.net.URI]) {
   def toUri(raw: String) =
     try { Some(new java.net.URI(raw)) }
-    catch { case _ => None }
+    catch { case x: Exception => None }
 
   def apply(values: Iterator[String]) =
     values.toList.flatMap(toUri)

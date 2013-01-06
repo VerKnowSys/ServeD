@@ -88,3 +88,19 @@ $ ->
       # Load all handlers for API elements:
       (handleAPIAction(element.link, element.element, element.params) for element in apiCalls())
 
+
+      # note: section .admin is loaded right now
+      $.ajax
+        url: "/ServiceList"
+        type: "get"
+        contentType: "text/html"
+        dataType: "html"
+        cache: false
+        async: true
+        processData: false
+        success: (data) =>
+          $('section.processlist').html(data)
+
+          # Load all handlers for API elements:
+          # (handleAPIAction(element.link, element.element, element.params) for element in apiCalls())
+

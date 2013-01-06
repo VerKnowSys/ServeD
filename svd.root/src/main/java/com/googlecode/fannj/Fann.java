@@ -35,11 +35,12 @@ import java.util.Map;
  * This class invokes native code. You must call close() to prevent memory
  * leakage.
  * </p>
- * 
+ *
  * @author krenfro
  * @see <a href="http://leenissen.dk/fann">Fast Artificial Neural Network</a>
  * @see <a href="https://jna.dev.java.net/#direct">JNA Direct Maping</a>
  */
+@SuppressWarnings("unchecked")
 public class Fann {
 
     static {
@@ -48,14 +49,14 @@ public class Fann {
             fann = NativeLibrary.getInstance("fannfloat");
             Map options = fann.getOptions();
             options.put(Library.OPTION_CALLING_CONVENTION,  StdCallLibrary.STDCALL_CONVENTION);
-            options.put(Library.OPTION_FUNCTION_MAPPER, new WindowsFunctionMapper());            
+            options.put(Library.OPTION_FUNCTION_MAPPER, new WindowsFunctionMapper());
         }
         else{
             fann = NativeLibrary.getInstance("fann");
         }
         Native.register(fann);
     }
-    
+
     protected Pointer ann;
 
     protected Fann() {
@@ -63,7 +64,7 @@ public class Fann {
 
     /**
      * Load an existing FANN definition from a file
-     * 
+     *
      * @param file
      */
     public Fann(String file) {
@@ -72,7 +73,7 @@ public class Fann {
 
     /**
      * Create a new ANN with the provided layers.
-     * 
+     *
      * @param layers
      */
     public Fann(List<Layer> layers) {
@@ -116,7 +117,7 @@ public class Fann {
 
     /**
      * Save this FANN to a file.
-     * 
+     *
      * @param file
      * @return true on success
      */
@@ -127,7 +128,7 @@ public class Fann {
 
     /**
      * Run the ANN on a set of inputs.
-     * 
+     *
      * @param input
      *            length == numInputNeurons
      * @return the output of the ANN. (length = numOutputNeurons)

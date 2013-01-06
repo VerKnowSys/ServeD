@@ -15,21 +15,25 @@ import com.verknowsys.served.db.{DBServer, DBClient, DB}
 import com.verknowsys.served.utils._
 import com.verknowsys.served.systemmanager.native._
 import com.verknowsys.served.notifications._
+import com.verknowsys.served._
+import com.verknowsys.served.api._
+import com.verknowsys.served.utils._
+import com.verknowsys.served.utils.Logging
 
 import org.apache.commons.io.FileUtils
 import java.security.PublicKey
 import akka.actor._
-import scala.concurrent._
-import akka.pattern.ask
 import akka.pattern.AskTimeoutException
-// import akka.remote._
+import akka.pattern.ask
+import akka.util
 import akka.util.Timeout
+import scala.util._
+import scala.concurrent._
 import scala.concurrent.duration._
 import ExecutionContext.Implicits.global
-import akka.actor._
 
 import scala.math._
-import scala.util._
+import scala.util.Random
 import org.quartz._
 import org.quartz.impl._
 import org.quartz.JobKey._
@@ -321,7 +325,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                     val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
                     log.trace("Pinging service: %s".format(currServ))
                     (currServ ? Notify.Ping) onComplete {
-                        case Success(Notify.Pong) =>
+                        case Success(_) =>
                             val msg = "Service already running: %s.".format(serviceName)
                             log.warn(msg)
                             notificationsManager ! Notify.Message(formatMessage("W:%s".format(msg)))
@@ -381,7 +385,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             }
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
             (currServ ? Notify.Ping) onComplete {
-                case Success(Notify.Pong) =>
+                case Success(anyPong) =>
                     val msg = "Service already running: %s. Restarting".format(serviceName)
                     log.warn(msg)
                     notificationsManager ! Notify.Message(formatMessage("W:%s".format(msg)))
@@ -573,7 +577,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                             log.info("Launching trigger service for file: %s (if not already started)", path)
                             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(binding.serviceName))
                             (currServ ? Notify.Ping) onComplete {
-                                case Success(Notify.Pong) => // it seems that service is already started
+                                case Success(anyPong) => // it seems that service is already started
                                     log.info("Triggered Service already running")
 
                                 case Failure(ex) => // timeout probably?

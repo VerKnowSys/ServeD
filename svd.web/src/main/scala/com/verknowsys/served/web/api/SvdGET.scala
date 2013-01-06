@@ -38,14 +38,25 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                 <link rel="stylesheet" type="text/css" href="/assets/css/main.css"/>
             </head>
             <body>
-                <script type="text/javascript" src="/assets/js/jquery-1.8.3.min.js"/>
-                <script type="text/javascript" src="/assets/js/bootstrap.min.js"/>
-                <script type="text/javascript" src="/assets/js/dough.min.js"/>
-                <script type="text/javascript" src="/assets/js/main.js"/>
+                <script type="text/javascript" src="/assets/js/jquery-1.8.3.min.js"></script>
+                <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+                <script type="text/javascript" src="/assets/js/dough.min.js"></script>
+                <script type="text/javascript" src="/assets/js/main.js"></script>
                 { content }
             </body>
         </html>
     )
+
+
+    def raphaelDeps(content: scala.xml.NodeBuffer) = Html(
+        <div>
+            <script type="text/javascript" src="/assets/js/raphael-min.js"></script>
+            <script type="text/javascript" src="/assets/js/g.graphael.js"></script>
+            <script type="text/javascript" src="/assets/js/g.dot.js"></script>
+            { content }
+        </div>
+    )
+
 
 
     def intent = {
@@ -55,19 +66,28 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
             Ok ~> Html(
                 <h1>{ Dict("User Panel") }</h1>
                 <p>{ Dict("Welcome") + " " + account.userName }</p>
-                <p>{ Dict("Details") + ": " + account }</p>)
+                <p>{ Dict("Details") + ": " + account }</p>
+            )
 
 
         /** API GET call #002  */
-        case req @ GET(Path(Seg("ProcList" :: Nil))) =>
-            Ok ~> Html(
-                <script type="text/javascript" src="/assets/js/raphael-min.js"/>
-                <script type="text/javascript" src="/assets/js/g.graphael.js"/>
-                <script type="text/javascript" src="/assets/js/g.dot.js"/>
-                <script type="text/javascript" src="/assets/js/proclist.js"/>
+        case req @ GET(Path(Seg("ProcessList" :: Nil))) =>
+            Ok ~> raphaelDeps(
+                <script type="text/javascript" src="/assets/js/proclist.js"></script>
                 <article>
-                  <header>ProcList</header>
-                  <div id="holder">Cos</div>
+                  <header>ProcessList</header>
+                  <div class="holder">ProcessList</div>
+                </article>
+            )
+
+
+        /** API GET call #003  */
+        case req @ GET(Path(Seg("ServiceList" :: Nil))) =>
+            Ok ~> raphaelDeps(
+                <script type="text/javascript" src="/assets/js/servlist.js"></script>
+                <article>
+                  <header>ServiceList</header>
+                  <div class="holder">ServiceList</div>
                 </article>
             )
 
@@ -121,7 +141,8 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="target">Connection not estabilished yet.</div>
                     <div class="messages">No data yet.</div>
                     <section class="admin"></section>
-                    <section class="pslist"></section>
+                    <section class="processlist"></section>
+                    <section class="servicelist"></section>
                 </section>
             )
 
