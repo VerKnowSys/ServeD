@@ -61,10 +61,10 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
         /** API GET call #002  */
         case req @ GET(Path(Seg("ProcList" :: Nil))) =>
             Ok ~> Html(
-                <script type="text/javascript" src="/assets/js/raphael-min.js"/>
-                <script type="text/javascript" src="/assets/js/g.graphael.js"/>
-                <script type="text/javascript" src="/assets/js/g.dot.js"/>
-                <script type="text/javascript" src="/assets/js/proclist.js"/>
+                <script type="text/javascript" src="/assets/js/raphael-min.js"></script>
+                <script type="text/javascript" src="/assets/js/g.graphael.js"></script>
+                <script type="text/javascript" src="/assets/js/g.dot.js"></script>
+                <script type="text/javascript" src="/assets/js/proclist.js"></script>
                 <article>
                   <header>ProcList</header>
                   <div id="holder">Cos</div>
