@@ -112,8 +112,6 @@ object Dependencies {
     // val akkaTestkit = "com.typesafe.akka" % "akka-testkit" % akkaVersion % "test"
     val jline = "jline" % "jline" % "0.9.9"
     val scalatest = "org.scalatest" % "scalatest_2.10" % "2.0.M5b"
-    // val unfilteredFilter = "net.databinder" % "unfiltered-filter_2.10" % "0.6.4"
-    // val unfilteredJetty = "net.databinder" % "unfiltered-jetty_2.10" % "0.6.4"
     // val unfilteredSpec = "net.databinder" % "unfiltered-spec_2.10" % "0.6.4" % "test"
     val json = "org.json4s" %% "json4s-native" % "3.1.0"
 
@@ -140,8 +138,12 @@ object Dependencies {
     val commonsCodec = "commons-codec" % "commons-codec" % "1.4"
     val commonsFileUpload = "commons-fileupload" % "commons-fileupload" % "1.2.1"
     val jetty = "org.eclipse.jetty" % "jetty-webapp" % "7.6.8.v20121106" //"8.1.7.v20120910"
-    val jettyServer = "org.eclipse.jetty" % "jetty-server" % "7.6.8.v20121106" //"8.1.7.v20120910"
+    // val jettyServer = "org.eclipse.jetty" % "jetty-server" % "7.6.8.v20121106" //"8.1.7.v20120910"
     val jettyContinuations = "org.eclipse.jetty" % "jetty-continuation" % "7.6.8.v20121106" // "8.1.7.v20120910"
+
+    // internal verknowsys svd.unfiltered but prebuilt jar for Scala 2.10 to avoid recompilation of unchanged code (compilation speedup)
+    val unfiltered = "com.verknowsys" %% "unfiltered" % "0.6.4"
+
     // val javax = "javax.media" % "jai-core" % "1.1.3"
     // val javaxjmf = "javax.media" % "jmf" % "2.1.1b"
     // val smackx = "jivesoftware" % "smackx" % "3.0.4"
@@ -160,7 +162,7 @@ object ServeD extends Build {
             // commands ++= Seq(warmup)
         )).settings(graph.Plugin.graphSettings: _*) aggregate(
 
-        api, cli, utils, testing, unfiltered, root, user, common, web
+        api, utils, testing, root, user, common, web // unfiltered, cli,
     )
 
 
@@ -183,9 +185,9 @@ object ServeD extends Build {
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle, json, javaMail, jedis, smack, pircbot, commonsCodec)
+            libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle, json, javaMail, jedis, smack, pircbot, commonsCodec, unfiltered)
         )
-    ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, unfiltered, utils, testing % "test")
+    ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test") // unfiltered
 
 
     lazy val api = Project("api", file("svd.api"),
@@ -195,11 +197,11 @@ object ServeD extends Build {
     ).settings(graph.Plugin.graphSettings: _*)
 
 
-    lazy val cli = Project("cli", file("svd.cli"),
-        settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(jline)
-        )
-    ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test")
+    // lazy val cli = Project("cli", file("svd.cli"),
+    //     settings = buildSettings ++ Seq(
+    //         libraryDependencies ++= Seq(jline)
+    //     )
+    // ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test")
 
 
     lazy val utils = Project("utils", file("svd.utils"),
@@ -210,11 +212,11 @@ object ServeD extends Build {
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, testing % "test")
 
 
-    lazy val unfiltered = Project("unfiltered", file("svd.unfiltered"),
-        settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(jetty, jettyServer, jettyContinuations)
-        )
-    ).settings(graph.Plugin.graphSettings: _*) dependsOn(utils, testing % "test")
+    // lazy val unfiltered = Project("unfiltered", file("svd.unfiltered"),
+    //     settings = buildSettings ++ Seq(
+    //         libraryDependencies ++= Seq(jetty, jettyServer, jettyContinuations)
+    //     )
+    // ).settings(graph.Plugin.graphSettings: _*) dependsOn(utils, testing % "test")
 
 
     lazy val web = Project("web", file("svd.web"),
@@ -222,10 +224,10 @@ object ServeD extends Build {
                 (resourceManaged in (Compile, CoffeeKeys.coffee)) <<= (crossTarget in Compile)(_ / "classes" / "public" / "js"),
                 (resourceManaged in (Compile, LessKeys.less)) <<= (crossTarget in Compile)(_ / "classes" / "public" / "css"),
                 libraryDependencies ++= Seq(
-                    json // scalate, scalateUtil,
+                    json, jetty, jettyContinuations, unfiltered
                 )
             )
-        ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, unfiltered, common, utils, testing % "test")
+        ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, common, utils, testing % "test") // unfiltered,
 
 
     lazy val testing = Project("testkit", file("svd.testing"),
@@ -233,29 +235,6 @@ object ServeD extends Build {
             libraryDependencies ++= Seq(scalatest, commonsio, bouncycastle) // akkaTestkit
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api)
-
-
-    // def warmupEval: State => State = (state: State) => {
-
-    //     Project.runTask(Keys.clean, state)
-
-    //     Project.runTask(Keys.compile, state)
-
-    //     state
-    // }
-
-
-    /**
-     *  Warmup function
-     *
-     * @author Daniel (dmilith) Dettlaff
-     */
-    // def warmup: Command = Command.command("warmup") {
-    //         // warmupEval(_)
-    //         // scope =>
-
-    // }
-
 
 
 }
