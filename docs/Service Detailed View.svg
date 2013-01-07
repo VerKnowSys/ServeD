@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1920px"
+	 height="1080px" viewBox="0 0 1920 1080" enable-background="new 0 0 1920 1080" xml:space="preserve">
+<g id="ServiceLayer">
+	<rect id="ServiceBackground" x="-1" fill="#4D4D4D" width="1920" height="1081"/>
+	<g id="ServiceStandard">
+		
+			<circle id="ServiceStandardCircle" fill="#BEBFBB" stroke="#333333" stroke-width="9" stroke-miterlimit="10" cx="814.8926" cy="316.79" r="125"/>
+		
+			<text id="ServiceStandardCaption" transform="matrix(0.9955 0 0 1 885.2793 122.4629)" fill="#333333" font-family="'MyriadPro-Regular'" font-size="58.9051">Mywork3.some.pl</text>
+		<line fill="none" stroke="#333333" x1="897.3447" y1="226.25" x2="977.6855" y2="137.5986"/>
+		<line fill="#333333" stroke="#333333" x1="884" y1="137.5" x2="1312" y2="137.5"/>
+	</g>
+	<g id="ServiceFull">
+		<g id="Service">
+			
+				<ellipse id="ServiceCircle" fill="#8CC63F" stroke="#333333" stroke-width="9" stroke-miterlimit="10" cx="263.7119" cy="253.5088" rx="229.6611" ry="232.2031"/>
+			
+				<text id="ServiceDomain" transform="matrix(1 0 0 1 76.4409 270.5088)" fill="#4D4D4D" stroke="#000000" stroke-width="0.25" font-family="'MyriadPro-Regular'" font-size="60" letter-spacing="-1">MyFansite.com</text>
+		</g>
+		
+			<circle id="ServiceButton1" opacity="0.5" fill="#F2F2F2" stroke="#736357" stroke-width="9" stroke-miterlimit="10" cx="413.7119" cy="71.5088" r="50"/>
+		
+			<circle id="ServiceButton2" opacity="0.5" fill="#F2F2F2" stroke="#736357" stroke-width="9" stroke-miterlimit="10" cx="474.7119" cy="165.5088" r="50"/>
+		
+			<circle id="ServiceButton3" opacity="0.5" fill="#F2F2F2" stroke="#736357" stroke-width="9" stroke-miterlimit="10" cx="493.7119" cy="278.5088" r="50"/>
+	</g>
+</g>
+<g id="ServiceInfoLayer">
+	<g id="ServiceFullInfo">
+		<rect x="79" y="533" fill="#808080" width="395" height="347"/>
+		<path fill="#808080" d="M474,867.9922c0,94.4395-88.9839,170.9922-198.75,170.9922c-109.7666,0-198.75-76.5527-198.75-170.9922
+			C76.5,773.5547,165.4834,697,275.25,697C385.0161,697,474,773.5547,474,867.9922z"/>
+		<line fill="none" stroke="#333333" stroke-width="9" stroke-miterlimit="10" x1="76.5" y1="703" x2="76.5" y2="872"/>
+		<line fill="none" stroke="#333333" stroke-width="9" stroke-miterlimit="10" x1="476.5" y1="708" x2="476.5" y2="872"/>
+		<path fill="none" stroke="#333333" stroke-width="9" stroke-miterlimit="10" d="M76.5,872
+			c0,91.7891,87.8877,166.0625,196.5,166.0625"/>
+		<path fill="none" stroke="#333333" stroke-width="9" stroke-miterlimit="10" d="M476.5,872
+			c0,91.7881-91.0186,166.0625-203.5,166.0625"/>
+		<g id="ServiceInfo">
+			<text id="ServiceInfoLabels" transform="matrix(1 0 0 1 135.4111 867)"><tspan x="0" y="0" fill="#333333" font-family="'Optima-Regular'" font-size="30">RUNTIME:</tspan><tspan x="2.3105" y="36" fill="#333333" font-family="'Optima-Regular'" font-size="30">MEMORY</tspan><tspan x="132.2993" y="36" fill="#333333" font-family="'Optima-Regular'" font-size="30">:</tspan><tspan x="1.6802" y="72" fill="#333333" font-family="'Optima-Regular'" font-size="30">IO WRITE:</tspan><tspan x="13.3501" y="108" fill="#333333" font-family="'Optima-Regular'" font-size="30">IO READ:</tspan></text>
+			<text id="ServiceInfoContent" transform="matrix(1 0 0 1 284.4507 867)"><tspan x="0" y="0" fill="#333333" font-family="'Optima-Regular'" font-size="30">21m 34s</tspan><tspan x="0" y="36" fill="#333333" font-family="'Optima-Regular'" font-size="30">237 MiB</tspan><tspan x="0" y="72" fill="#333333" font-family="'Optima-Regular'" font-size="30">787 MiB</tspan><tspan x="0" y="108" fill="#333333" font-family="'Optima-Regular'" font-size="30">280 MiB</tspan></text>
+		</g>
+	</g>
+</g>
+</svg>
