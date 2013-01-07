@@ -66,6 +66,7 @@ $ ->
         dataType: "json"
         cache: false
         processData: false
+        async: false
         data:
           params
         success: (data) =>
@@ -80,7 +81,7 @@ $ ->
     contentType: "text/html"
     dataType: "html"
     cache: false
-    async: true
+    async: false
     processData: false
     success: (data) =>
       $('section.admin').html(data)
@@ -96,10 +97,10 @@ $ ->
         contentType: "text/html"
         dataType: "html"
         cache: false
-        async: true
+        async: false
         processData: false
         success: (data) =>
-          $('section.serviceslist').html(data)
+          $('section.servicelist').html(data)
 
           # Load all handlers for API elements:
           # (handleAPIAction(element.link, element.element, element.params) for element in apiCalls())
