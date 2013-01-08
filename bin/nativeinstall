@@ -23,8 +23,8 @@ else
 fi
 
 if [ -e "run" ]; then
-    echo "* Installing svdrun to /sbin"
-    cp -f ./run /sbin/svdrun
+    echo "* Installing svdrun to /bin"
+    cp -f ./run /bin/svdrun
 else
     echo "! Recompile to install svdrun"
 fi
