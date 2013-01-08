@@ -80,7 +80,7 @@ int main(int argc, char const *argv[]) {
     }
 
     const vector<string> coreLibPath = split(path, string("exports/") + string(exe));
-    string old_ld_library_path = getenv("LD_LIBRARY_PATH");
+    string old_ld_library_path = "/lib:/usr/lib";
     string someLibDir = coreLibPath.front() + "lib/";
     string ld_library_path = old_ld_library_path;
     struct stat st;
