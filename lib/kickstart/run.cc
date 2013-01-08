@@ -66,7 +66,10 @@ int main(int argc, char const *argv[]) {
     // count and gather arguments
     string appArguments = "";
     for (int i = 2; i < argc; i++) {
-        appArguments += string(argv[i]) + " ";
+        if (('\0' == argv[i+1]) || (NULL == argv[i+1]))
+            appArguments += string(argv[i]);
+        else
+            appArguments += string(argv[i]) + " ";
     }
 
     char path[PATH_MAX+1];
