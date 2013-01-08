@@ -116,7 +116,10 @@ int main(int argc, char const *argv[]) {
     // count and gather arguments
     string appArguments = "";
     for (int i = 2; i < argc; i++) {
-        appArguments += string(argv[i]) + " ";
+        if (('\0' == argv[i+1]) || (NULL == argv[i+1]))
+            appArguments += string(argv[i]);
+        else
+            appArguments += string(argv[i]) + " ";
     }
     string command = string(DEFAULT_SHELL_COMMAND) + " -i -s";
     if (argc > 2) { // additional arguments => spawn custom command with uid privileges
