@@ -25,6 +25,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <libgen.h>
 
 #ifdef __FreeBSD__
     #include <kvm.h>
@@ -48,7 +51,6 @@
 #ifdef __linux__
     #include <stdlib.h>
     #include <signal.h>
-    #include <limits.h>
     #include <sys/wait.h>
     #include <sys/fcntl.h>
     #define MAXPATHLEN PATH_MAX
@@ -58,7 +60,7 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.2.21"
+    #define APP_VERSION "0.2.22"
     #define COPYRIGHT "Copyright © 2oo9-2o12 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 

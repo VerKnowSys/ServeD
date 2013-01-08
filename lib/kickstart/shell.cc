@@ -15,14 +15,7 @@
 #endif
 
 
-void parse(char *line, char **argv) {
-    while (*line != '\0') {
-        while (*line == ' ' || *line == '\t' || *line == '\n') *line++ = '\0';
-        *argv++ = line;
-        while (*line != '\0' && *line != ' ' && *line != '\t' && *line != '\n') line++;
-    }
-    *argv = '\0';
-}
+extern void parse(char *line, char **argv);
 
 
 void execute(char **argv, int uid) {
