@@ -116,7 +116,7 @@ int main(int argc, char const *argv[]) {
     // count and gather arguments
     string appArguments = "";
     for (int i = 2; i < argc; i++) {
-        if (('\0' == argv[i+1]) || (NULL == argv[i+1]))
+        if (NULL == argv[i+1])
             appArguments += string(argv[i]);
         else
             appArguments += string(argv[i]) + " ";
