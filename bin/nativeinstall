@@ -22,6 +22,13 @@ else
     echo "! Recompile to install svdshell"
 fi
 
+if [ -e "run" ]; then
+    echo "* Installing svdrun to /sbin"
+    cp -f ./run /sbin/svdrun
+else
+    echo "! Recompile to install svdrun"
+fi
+
 echo "* Installing native libraries"
 if [ ! -d "/lib" ]; then
     mkdir /lib

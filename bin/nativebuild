@@ -74,6 +74,8 @@ check $? "UserShell" "shell"
 $CXX $FLAGS lib/kickstart/daemon.cc -o daemon lib/utils.o
 check $? "UserDaemon" "daemon"
 
+$CXX $FLAGS lib/kickstart/run.cc -o run lib/utils.o
+check $? "UserRunner" "run"
 
 $CXX $FLAGS lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
 check $? "KickStart" "kick"
