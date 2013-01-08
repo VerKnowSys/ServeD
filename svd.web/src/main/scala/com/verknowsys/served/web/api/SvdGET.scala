@@ -61,7 +61,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
 
     def intent = {
 
-        /** API GET call #001  */
+        /** API GET call #000  */
         case req @ GET(Path(Seg("Header" :: Nil))) =>
             Ok ~> Html(
                 <h1>{ Dict("User Panel") }</h1>
@@ -70,7 +70,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
             )
 
 
-        /** API GET call #002  */
+        /** API GET call #001  */
         case req @ GET(Path(Seg("ProcessList" :: Nil))) =>
             Ok ~> raphaelDeps(
                 <script type="text/javascript" src="/assets/js/proclist.js"></script>
@@ -81,18 +81,21 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
             )
 
 
-        /** API GET call #003  */
+        /** API GET call #002  */
         case req @ GET(Path(Seg("ServiceList" :: Nil))) =>
             Ok ~> raphaelDeps(
+                <script type="text/javascript" src="/assets/js/serviceStandardLayout.js"></script>
+                <script type="text/javascript" src="/assets/js/serviceLayout.js"></script>
+                <script type="text/javascript" src="/assets/js/serviceInfoLayout.js"></script>
                 <script type="text/javascript" src="/assets/js/servlist.js"></script>
                 <article>
                   <header>ServiceList</header>
-                  <div class="holder">ServiceList</div>
+                  <div id="raw_service_layout"></div>
                 </article>
             )
 
 
-        /** API GET call #003  */
+        /** API GET call #004  */
         case req @ GET(Path(Seg("AdminPanel" :: Nil))) =>
             Ok ~> Html(
                 <div class="services_result">Result should be shown here</div>
@@ -140,9 +143,9 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                 <section class="content">
                     <div class="target">Connection not estabilished yet.</div>
                     <div class="messages">No data yet.</div>
+                    <section class="servicelist"></section>
                     <section class="admin"></section>
                     <section class="processlist"></section>
-                    <section class="servicelist"></section>
                 </section>
             )
 
