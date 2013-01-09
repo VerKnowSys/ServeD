@@ -49,7 +49,7 @@ class SvdAccountsManager(localSystem: ActorSystem) extends SvdManager with SvdFi
     def launchSystemServices = {
         systemServices.map{
             service =>
-                val serv = localSystem.actorOf(Props(new SvdSuperService(service)), "SuperService-${service}")
+                val serv = localSystem.actorOf(Props(new SvdSuperService(service)), s"SuperService-${service}")
                 log.info(s"Launching SuperService: ${serv}")
                 context.watch(serv)
         }
