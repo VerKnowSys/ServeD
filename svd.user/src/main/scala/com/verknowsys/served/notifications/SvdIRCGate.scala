@@ -55,7 +55,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
                 log.warn("Can't connect to IRC. Nickname is already in use.")
 
             case e: Exception =>
-                log.error("IRC Gate Exception: %s".format(e))
+                log.warn("IRC Gate Exception: %s".format(e))
 
         }
     }
