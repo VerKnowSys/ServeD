@@ -37,8 +37,14 @@ class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, new S
     val prefixDir = SvdConfig.softwareRoot / config.softwareName
     val dataDir = SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.softwareName
 
-    checkOrCreateDir(prefixDir)
-    checkOrCreateDir(dataDir)
+
+    override def preStart = {
+        log.trace(s"Checking dirs: ${prefixDir}, ${dataDir}")
+        checkOrCreateDir(prefixDir)
+        checkOrCreateDir(dataDir)
+        log.debug(s"Prestarting ${this}")
+        super.preStart
+    }
 
 
     override def serviceRootPrefix = prefixDir
@@ -49,6 +55,9 @@ class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, new S
 
     override def installIndicator = new File(
         prefixDir / config.softwareName.toLowerCase + "." + SvdConfig.installed)
+
+
+    override def toString = "SvdSuperService name: %s. Uptime: %s".format(config.name, secondsToHMS((JSystem.currentTimeMillis - uptime).toInt / 1000))
 
 
 }
