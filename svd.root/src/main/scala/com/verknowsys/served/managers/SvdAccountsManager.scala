@@ -49,7 +49,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
     def launchSystemServices = {
         systemServices.map{
             service =>
-                val serv = context.actorOf(Props(new SvdSuperService(service)), "SuperService-%s".format(service))
+                val serv = context.actorOf(Props(new SvdSuperService(service)), "SuperService-${service}")
                 log.info(s"Launching SuperService: ${serv}")
                 context.watch(serv)
         }
@@ -59,7 +59,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
     def sendTerminationSignalForAllSuperServices = {
         systemServices.map{
             service =>
-                val serv = context.actorFor(s"SuperService-${service}")
+                val serv = context.actorFor("akka://${SvdConfig.served}@${SvdConfig.remoteApiServerHost}:${SvdConfig.remoteApiServerPort}/user/SvdAccountsManager/SuperService-${service}")
                 log.info(s"Stopping SuperService: ${serv}")
                 context.stop(serv)
         }
