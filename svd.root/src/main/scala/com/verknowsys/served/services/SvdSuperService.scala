@@ -41,8 +41,7 @@ class SvdSuperService(config: SvdServiceConfig) extends SvdService(config = conf
 
 
     override def preStart = {
-        log.trace(s"Checking dirs: ${serviceRootPrefix}, ${servicePrefix}")
-        log.debug(s"Prestarting ${this}")
+        log.trace(s"Checking dirs before start: ${serviceRootPrefix}, ${servicePrefix}")
         checkOrCreateDir(serviceRootPrefix)
         checkOrCreateDir(servicePrefix)
 
