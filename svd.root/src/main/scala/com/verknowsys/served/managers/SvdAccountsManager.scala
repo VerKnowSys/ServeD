@@ -7,62 +7,58 @@ package com.verknowsys.served.managers
 
 
 import com.verknowsys.served._
-import com.verknowsys.served.utils._
 import com.verknowsys.served.api._
-import com.verknowsys.served.utils.Events._
 import com.verknowsys.served.systemmanager.native._
+import com.verknowsys.served.utils._
+import com.verknowsys.served.utils.Events._
 import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.systemmanager.managers._
-
 import com.verknowsys.served.api.pools._
 import com.verknowsys.served.services._
+import com.verknowsys.served.api.scheduler._
+
 import akka.actor._
 import scala.io.Source
-
 import scala.concurrent._
 import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
 import ExecutionContext.Implicits.global
+import org.quartz._
+import org.quartz.impl._
+import org.quartz.JobKey._
+import org.quartz.impl.matchers._
+
 
 /**
  *  ServeD Accounts Manager
  *
  *  @author dmilith
  */
-class SvdAccountsManager(localSystem: ActorSystem) extends SvdManager with SvdFileEventsReactor with Logging {
+class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Logging {
 
     import Events._
 
 
-    val systemServices = "Redis" :: Nil // XXX: hardcoded system services
+    implicit val timeout = Timeout(SvdConfig.headlessTimeout / 1000 seconds) // cause of standard
+    // override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 1 minute) {
+    //     case _: ArithmeticException      => Resume
+    //     case _: NullPointerException     => Restart
+    //     case _: IllegalArgumentException => Stop
+    //     case _: Exception                => Escalate
+    // }
+    val scheduler = StdSchedulerFactory.getDefaultScheduler
+
 
 
 
     override def preStart = {
         super.preStart
+        log.info("Starting AccountsManager Quartz Scheduler")
+        scheduler.start
+
         log.info(s"SvdAccountsManager (v${SvdConfig.version}) is loading")
-        launchSystemServices
-    }
-
-
-    def launchSystemServices = {
-        systemServices.map{
-            service =>
-                val serv = context.actorOf(Props(new SvdSuperService(service)), s"SuperService-${service}")
-                log.info(s"Launching SuperService: ${serv}")
-                context.watch(serv)
-        }
-    }
-
-
-    def sendTerminationSignalForAllSuperServices = {
-        systemServices.map{
-            service =>
-                val serv = context.actorFor(s"/user/SvdAccountsManager/SuperService-${service}")
-                log.info(s"Stopping SuperService: ${serv}")
-                context.stop(serv)
-        }
+        // launchSystemServices
     }
 
 
@@ -109,6 +105,18 @@ class SvdAccountsManager(localSystem: ActorSystem) extends SvdManager with SvdFi
             log.debug(s"Alive accounts: ${accountsWithoutThisOne}")
 
 
+        case SvdScheduler.StartJob(name, job, trigger) =>
+            log.debug("Starting schedule job named: %s for service: %s".format(name, sender))
+            scheduler.scheduleJob(job, trigger)
+
+
+        case SvdScheduler.StopJob(name) =>
+            log.debug("Stopping scheduled jobs named: %s for service: %s".format(name, sender))
+            for (index <- 0 to SvdConfig.maxSchedulerDefinitions) { // XXX: hacky.. it's better to figure out how to get list of defined jobs from scheduler..
+                scheduler.deleteJob(jobKey("%s-%d".format(name, index)))
+            }
+
+
         case SvdFileEvent(path, flags) =>
             log.trace(s"REACT on file event on path: ${path}. Flags no: ${flags}")
             flags match {
@@ -131,6 +139,10 @@ class SvdAccountsManager(localSystem: ActorSystem) extends SvdManager with SvdFi
             log.debug("Got success")
 
 
+        case Notify.Message(x) =>
+            log.trace(s"Received Message: ${x}")
+
+
         case Terminated(ref) =>
             log.debug(s"SvdAccountsManager received Terminate service for: ${ref}")
             context.unwatch(ref)
@@ -148,14 +160,16 @@ class SvdAccountsManager(localSystem: ActorSystem) extends SvdManager with SvdFi
 
     override def postStop = {
         log.debug("Accounts Manager postStop.")
-        sendTerminationSignalForAllSuperServices
+        log.info("Shutting down AccountsManager Scheduler")
+        scheduler.shutdown
+        // sendTerminationSignalForAllSuperServices
         super.postStop
     }
 
 
     addShutdownHook {
         log.warn("Got termination signal. Unregistering file events")
-        sendTerminationSignalForAllSuperServices
+        // sendTerminationSignalForAllSuperServices
         unregisterFileEvents(self)
         log.info("All done.")
     }
