@@ -23,7 +23,7 @@ class SvdRootBoot extends Logging with SvdActor {
     import akka.actor.OneForOneStrategy
     import akka.actor.SupervisorStrategy._
 
-    val systemServices = "Redis" :: Nil // XXX: hardcoded system services
+    val systemServices = "Redis" :: "Coregnix" :: Nil // XXX: hardcoded system services
 
 
     override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 1 minute) {
