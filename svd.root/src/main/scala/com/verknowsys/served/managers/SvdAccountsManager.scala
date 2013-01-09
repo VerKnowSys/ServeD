@@ -35,9 +35,34 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
     import Events._
 
 
+    val systemServices = "Redis" :: Nil // XXX: hardcoded system services
+
+
+
     override def preStart = {
         super.preStart
-        log.info("SvdAccountsManager (v%s) is loading".format(SvdConfig.version))
+        log.info(s"SvdAccountsManager (v${SvdConfig.version}) is loading")
+        launchSystemServices
+    }
+
+
+    def launchSystemServices = {
+        systemServices.map{
+            service =>
+                val serv = context.actorOf(Props(new SvdSuperService(service)), "SuperService-%s".format(service))
+                log.info(s"Launching SuperService: ${serv}")
+                context.watch(serv)
+        }
+    }
+
+
+    def sendTerminationSignalForAllSuperServices = {
+        systemServices.map{
+            service =>
+                val serv = context.actorFor(s"SuperService-${service}")
+                log.info(s"Stopping SuperService: ${serv}")
+                context.stop(serv)
+        }
     }
 
 
@@ -118,12 +143,14 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
 
     override def postStop = {
         log.debug("Accounts Manager postStop.")
+        sendTerminationSignalForAllSuperServices
         super.postStop
     }
 
 
     addShutdownHook {
         log.warn("Got termination signal. Unregistering file events")
+        sendTerminationSignalForAllSuperServices
         unregisterFileEvents(self)
         log.info("All done.")
     }
