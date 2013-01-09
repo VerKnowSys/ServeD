@@ -47,10 +47,10 @@ class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, new S
     }
 
 
-    override def serviceRootPrefix = prefixDir
+    override val serviceRootPrefix = prefixDir
 
 
-    override def servicePrefix = dataDir
+    override val servicePrefix = dataDir
 
 
     override def installIndicator = new File(
