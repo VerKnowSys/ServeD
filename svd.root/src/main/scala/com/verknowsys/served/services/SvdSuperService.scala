@@ -31,11 +31,14 @@ import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
  *
  * @author Daniel (dmilith) Dettlaff
  */
-class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, new SvdAccount(uid = 0, userName = "SuperUser")) with SvdActor with SvdUtils {
+class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, new SvdAccount(uid = 0, userName = "SuperUser")) with Logging {
 
 
     val prefixDir = SvdConfig.softwareRoot / config.softwareName
-    val dataDir = SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.softwareName
+    val dataDir = SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.name
+
+    override val serviceRootPrefix = prefixDir
+    override val servicePrefix = dataDir
 
 
     override def preStart = {
@@ -45,12 +48,6 @@ class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, new S
         log.debug(s"Prestarting ${this}")
         super.preStart
     }
-
-
-    override val serviceRootPrefix = prefixDir
-
-
-    override val servicePrefix = dataDir
 
 
     override def installIndicator = new File(
