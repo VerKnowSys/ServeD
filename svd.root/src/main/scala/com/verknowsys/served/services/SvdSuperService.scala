@@ -54,8 +54,5 @@ class SvdSuperService(config: SvdServiceConfig) extends SvdService(config = conf
         serviceRootPrefix / config.softwareName.toLowerCase + "." + SvdConfig.installed)
 
 
-    override def toString = "SvdSuperService name: %s. Uptime: %s".format(config.name, secondsToHMS((JSystem.currentTimeMillis - uptime).toInt / 1000))
-
-
 }
 

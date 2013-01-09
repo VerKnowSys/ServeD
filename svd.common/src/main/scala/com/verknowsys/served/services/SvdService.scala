@@ -35,6 +35,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
 
 
     implicit val timeout = Timeout(SvdConfig.defaultAPITimeout / 1000 seconds)
+    val className = this.getClass.getSimpleName
 
     val serviceRootPrefix = SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.applicationsDir / config.softwareName
 
@@ -346,13 +347,13 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
 
 
         case ApiSuccess =>
-            log.trace("ApiSuccess in SvdService from %s".format(sender.getClass.getName))
+            log.trace(s"ApiSuccess in ${className} from %s".format(sender.getClass.getSimpleName))
 
     }
 
 
     override def postStop {
-        log.info("PostStop in SvdService: %s".format(config.name))
+        log.info(s"PostStop in ${className}: ${config.name}")
         hookShot(stopHook, "stop")
         hookShot(afterStopHook, "afterStop")
 
@@ -362,11 +363,11 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
         Thread.sleep(pause)
 
         shell.close
-        log.info("Stopped SvdService: %s".format(config.name))
+        log.info(s"Stopped ${className}: ${config.name}")
         super.postStop
     }
 
 
-    override def toString = "SvdService name: %s. Uptime: %s".format(config.name, secondsToHMS((JSystem.currentTimeMillis - uptime).toInt / 1000))
+    override def toString = s"${className} name: %s. Uptime: %s".format(config.name, secondsToHMS((JSystem.currentTimeMillis - uptime).toInt / 1000))
 
 }
