@@ -40,7 +40,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
 
     def settings = {
         setVerbose(false)
-        setName("tasks-robo")
+        setName("tasks")
         setAutoNickChange(false)
         setVersion("0.2.0")
         setEncoding(SvdConfig.defaultEncoding)
@@ -48,6 +48,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
             log.debug("Attepting to connect to irc server: %s on channel %s", SvdConfig.defaultIRCServerName, SvdConfig.defaultIRCChannelName)
             connect(SvdConfig.defaultIRCServerName)
             joinChannel(SvdConfig.defaultIRCChannelName)
+            sendMessage("NickServ", "identify ,lpmkonji")
 
         } catch {
 
