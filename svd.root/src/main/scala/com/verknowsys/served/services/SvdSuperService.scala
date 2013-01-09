@@ -35,30 +35,27 @@ import java.lang.{System => JSystem}
  */
 class SvdSuperService(config: SvdServiceConfig) extends SvdService(config = config, account = new SvdAccount(uid = 0, userName = "SuperUser")) with Logging {
 
-    val prefixDir = SvdConfig.softwareRoot / config.softwareName
-    val dataDir = SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.name
 
-    override val serviceRootPrefix = prefixDir
-    override val servicePrefix = dataDir
+    override val serviceRootPrefix = SvdConfig.softwareRoot / config.softwareName
+    override val servicePrefix = SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.name
 
 
     override def preStart = {
-        log.trace(s"Checking dirs: ${prefixDir}, ${dataDir}")
+        log.trace(s"Checking dirs: ${serviceRootPrefix}, ${servicePrefix}")
         log.debug(s"Prestarting ${this}")
-        checkOrCreateDir(prefixDir)
-        checkOrCreateDir(dataDir)
+        checkOrCreateDir(serviceRootPrefix)
+        checkOrCreateDir(servicePrefix)
 
         super.preStart
     }
 
 
     override def installIndicator = new File(
-        prefixDir / config.softwareName.toLowerCase + "." + SvdConfig.installed)
+        serviceRootPrefix / config.softwareName.toLowerCase + "." + SvdConfig.installed)
 
 
     override def toString = "SvdSuperService name: %s. Uptime: %s".format(config.name, secondsToHMS((JSystem.currentTimeMillis - uptime).toInt / 1000))
 
 
-    // override def receive = super.receive
 }
 
