@@ -10,18 +10,21 @@ import com.verknowsys.served._
 import com.verknowsys.served.api._
 import com.verknowsys.served.utils._
 
-import org.jibble.pircbot._
+import org.jibble.pircbot.PircBot
+import org.jibble.pircbot.NickAlreadyInUseException
 import org.json4s._
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import redis.clients.jedis._
 import scala.collection.JavaConverters._
-import akka.util.Timeout
 import akka.util
 import akka.pattern.ask
 import akka.util.Timeout
-import scala.concurrent.duration._
 import akka.actor._
+import scala.util._
+import scala.concurrent._
+import scala.concurrent.duration._
+import ExecutionContext.Implicits.global
 
 
 /**
@@ -65,10 +68,24 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
 
     def allowedUserNames = "dmilith" :: "tallica" :: "wick3d" :: Nil
     def tasksPerPage = 5
+    def redisDefPort = 6379
     def redisHost = SvdConfig.remoteApiServerHost
+    def redisPort = {
+        val redisServ = context.actorFor("akka://%s@%s:%d/user/SuperService-Redis".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
+        val future = redisServ ? User.GetServicePort
+        try {
+            val port = Await.result(future, timeout.duration).asInstanceOf[Int]
+            log.debug(s"Redis port: $port")
+            port
+        } catch {
+            case e: Exception =>
+                log.warn(s"Couldn't determinate the Redis port. Using default ($redisDefPort) port instead.")
+                redisDefPort
+        }
+    }
     def redisKey(nickname: String) = nickname + ".tasks"
 
-    lazy val jedis = new Jedis(redisHost)
+    lazy val jedis = new Jedis(redisHost, redisPort)
 
 
     abstract class TaskState
