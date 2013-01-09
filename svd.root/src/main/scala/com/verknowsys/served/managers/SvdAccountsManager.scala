@@ -59,7 +59,7 @@ class SvdAccountsManager(localSystem: ActorSystem) extends SvdManager with SvdFi
     def sendTerminationSignalForAllSuperServices = {
         systemServices.map{
             service =>
-                val serv = localSystem.actorFor("/user/SvdAccountsManager/SuperService-${service}")
+                val serv = localSystem.actorFor(s"/user/SvdAccountsManager/SuperService-${service}")
                 log.info(s"Stopping SuperService: ${serv}")
                 context.stop(serv)
         }
