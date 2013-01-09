@@ -153,7 +153,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
         } catch {
             case _: Exception => "no-version"
         })
-        .replaceAll("SERVICE_PORT", s"${servicePort}")
+        .replaceAll("SERVICE_PORT", if (config.staticPort == -1) s"${servicePort}" else s"${config.staticPort}")
 
 
     /**

@@ -6,8 +6,9 @@
     "reportAllDebugs": false,
 
     "name": "NO_SERVICE_NAME!",
-    "version": "0.2",
+    "version": "0.6",
     "softwareName": "NO_SOFTWARE_NAME!",
+    "staticPort": -1,
 
     "schedulerActions": [
     ],

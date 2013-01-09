@@ -23,6 +23,7 @@ case class SvdServiceConfig(
         afterStop: SvdShellOperations,
         reload: SvdShellOperations,
         validate: SvdShellOperations,
+        staticPort: Int = -1,
         autoStart: Boolean = true,
         autoRestart: Boolean = true, // TODO: Not yet Implemented
         reportAllErrors: Boolean = true,

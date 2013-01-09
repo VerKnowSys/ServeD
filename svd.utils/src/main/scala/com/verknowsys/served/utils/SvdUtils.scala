@@ -167,7 +167,7 @@ trait SvdUtils extends Logging {
         log.trace(s"Address option: ${addressOption}")
         val currentChoosenHost = currentHost.getHostAddress
         log.trace(s"Host: ${currentChoosenHost}")
-        addressOption getOrElse currentChoosenHost //).split("/").tail.head
+        addressOption getOrElse currentChoosenHost
     }
 
 

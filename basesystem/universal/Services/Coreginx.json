@@ -1,5 +1,6 @@
 {
     "softwareName": "Nginx",
+    "staticPort": 80,
     "schedulerActions": [
         {
             "cronEntry": "0 0/30 * * * ?",
