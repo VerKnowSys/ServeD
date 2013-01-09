@@ -31,6 +31,7 @@ class SvdServiceConfigLoader(name: String) extends Logging with SvdUtils {
     val defaultTemplate = parse(Source.fromFile(SvdConfig.defaultSoftwareTemplate + SvdConfig.defaultSoftwareTemplateExt).mkString) //.extract[SvdServiceConfig]
     val appSpecificTemplate = parse(
         try {
+            log.trace(s"Trying to load file: ${fullName}")
             Source.fromFile(fullName).mkString
         } catch {
             case x: FileNotFoundException => // template not exists in common igniter location, try at user space
