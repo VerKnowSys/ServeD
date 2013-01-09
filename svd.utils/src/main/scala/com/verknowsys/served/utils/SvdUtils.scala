@@ -18,8 +18,8 @@ import java.security.MessageDigest
 import org.apache.commons.io.FileUtils
 import clime.messadmin.providers.sizeof.ObjectProfiler
 import scala.collection.JavaConversions._
-import java.io._
 import java.net._
+import java.io.{File, ByteArrayOutputStream, FilenameFilter, IOException, FileInputStream, FileNotFoundException, FileWriter}
 import java.util.UUID
 import java.util.{Calendar, GregorianCalendar}
 import java.util.zip.DataFormatException
@@ -253,14 +253,19 @@ trait SvdUtils extends Logging {
      *
      *  @author dmilith
      */
-    def checkOrCreateDir(dir: String) = {
-        if (new File(dir).exists) {
-            log.debug("Directory: '%s' exists".format(dir))
-        } else {
-            log.debug("No directory named: '%s' available! Creating empty one.".format(dir))
-            new File(dir).mkdirs
+    def checkOrCreateDir(dir: String) {
+        try {
+            val file = new File(dir)
+            if (file.exists)
+                log.debug(s"Directory: '${dir}' exists")
+            else {
+                log.debug(s"No directory named: '${dir}' available! Creating empty one.")
+                new File(dir).mkdirs
+            }
+        } catch {
+            case _: Exception =>
+                log.debug(s"No dir/file found: ${dir}")
         }
-        dir
     }
 
 
