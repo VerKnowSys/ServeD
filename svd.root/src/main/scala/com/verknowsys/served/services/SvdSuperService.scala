@@ -34,8 +34,11 @@ import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
 class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, new SvdAccount(uid = 0, userName = "SuperUser")) with SvdActor with SvdUtils {
 
 
-    val prefixDir = checkOrCreateDir(SvdConfig.softwareRoot / config.softwareName)
-    val dataDir = checkOrCreateDir(SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.softwareName)
+    val prefixDir = SvdConfig.softwareRoot / config.softwareName
+    val dataDir = SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.softwareName
+
+    checkOrCreateDir(prefixDir)
+    checkOrCreateDir(dataDir)
 
 
     override def serviceRootPrefix = prefixDir
@@ -45,7 +48,7 @@ class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, new S
 
 
     override def installIndicator = new File(
-        serviceRootPrefix / config.softwareName.toLowerCase + "." + SvdConfig.installed)
+        prefixDir / config.softwareName.toLowerCase + "." + SvdConfig.installed)
 
 
 }
