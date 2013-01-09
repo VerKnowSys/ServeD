@@ -6,6 +6,8 @@
 package com.verknowsys.served
 
 
+// import
+import com.verknowsys.served.services._
 import com.verknowsys.served.utils._
 import com.verknowsys.served.managers.SvdAccountsManager
 import com.verknowsys.served.systemmanager.SvdSystemManager
@@ -21,6 +23,8 @@ class SvdRootBoot extends Logging with SvdActor {
     import akka.actor.OneForOneStrategy
     import akka.actor.SupervisorStrategy._
 
+    val systemServices = "Redis" :: Nil // XXX: hardcoded system services
+
 
     override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 1 minute) {
         case _: ArithmeticException      => Resume
@@ -33,8 +37,10 @@ class SvdRootBoot extends Logging with SvdActor {
     // core svd actors:
     val sshd = system.actorOf(Props[SSHD].withDispatcher("svd-single-dispatcher"), "SvdSSHD") // .withDispatcher("svd-core-dispatcher")
     val ssm = system.actorOf(Props[SvdSystemManager].withDispatcher("svd-single-dispatcher"), "SvdSystemManager")
-    val sam = system.actorOf(Props(new SvdAccountsManager(system)).withDispatcher("svd-single-dispatcher"), "SvdAccountsManager") //"akka://%s@deldagorin:10/user/SvdAccountsManager".format(SvdConfig.served))
+    val sam = system.actorOf(Props[SvdAccountsManager].withDispatcher("svd-single-dispatcher"), "SvdAccountsManager") //"akka://%s@deldagorin:10/user/SvdAccountsManager".format(SvdConfig.served))
     val fem = system.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-core-dispatcher"), "SvdFileEventsManager")
+
+    val internalRedis = system.actorOf(Props(new SvdSuperService("Redis")).withDispatcher("svd-single-dispatcher"), "SuperService-Redis")
 
     // val list = (
     //     fem ::
@@ -54,12 +60,24 @@ class SvdRootBoot extends Logging with SvdActor {
     //     )
     // )
 
+
+    override def postStop = {
+        context.stop(sshd)
+        context.stop(fem)
+        context.stop(ssm)
+        context.stop(internalRedis)
+        context.stop(sam)
+    }
+
+
     override def preStart = {
         super.preStart
         context.watch(fem)
         context.watch(ssm)
         context.watch(sshd)
         context.watch(sam)
+        context.watch(internalRedis)
+
         // (sam ? Admin.RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
         //     case _ =>
                 // log.trace("Spawning Account Manager for each user.")
@@ -82,6 +100,11 @@ class SvdRootBoot extends Logging with SvdActor {
 
         case ApiSuccess =>
             log.debug("RootBoot success")
+
+        case Terminated(ref) =>
+            log.debug(s"SvdAccountsManager received Terminate service for: ${ref}")
+            context.unwatch(ref)
+
 
         // case Shutdown =>
         //     sshd ! Shutdown
