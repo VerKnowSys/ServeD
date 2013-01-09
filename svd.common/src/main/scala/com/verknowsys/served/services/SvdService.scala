@@ -225,7 +225,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
                 log.info(s"Service already installed: ${config.name}")
 
             case false =>
-                log.info(s"Installing service: ${config.name}")
+                log.info(s"Installing ${className}: ${config.name}")
                 hookShot(installHook, "install")
                 hookShot(configureHook, "configure")
         }
@@ -236,7 +236,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
         // Thread.sleep(pause)
 
         if (config.autoStart) {
-            log.info(s"Starting service: ${config.name}")
+            log.info(s"Starting ${className}: ${config.name}")
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
         }
@@ -249,7 +249,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
                 log.trace(s"Proceeding with index: ${index}")
                 val action = config.schedulerActions(index)
 
-                log.debug(s"Config scheduler actions for service ${config.name} isn't empty.")
+                log.debug(s"Config scheduler actions for ${className} ${config.name} isn't empty.")
                 try {
                     val name = config.name
                     val jobInstance = new ShellJob
@@ -303,7 +303,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
 
 
         case User.GetServicePort =>
-            log.debug(s"Getting port of service: ${config.name}:${servicePort}")
+            log.debug(s"Getting port of ${className}: ${config.name}:${servicePort}")
             sender ! servicePort
 
 
