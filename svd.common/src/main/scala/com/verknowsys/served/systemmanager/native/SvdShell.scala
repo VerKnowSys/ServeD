@@ -22,7 +22,9 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
             else
                 new ExpectJ
 
-    var shell = expectinator.spawn(SvdConfig.defaultShell)
+    log.info(s"Spawning user Shell for account ${account}")
+    val shellToSpawn = if (account.uid == 0) SvdConfig.defaultShell + " -s" else SvdConfig.defaultShell
+    var shell = expectinator.spawn(shellToSpawn)
 
 
     def dead = shell.isClosed
@@ -31,7 +33,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     def exec(operations: SvdShellOperations) {
         if (dead) { // if shell is dead, respawn it! It MUST live no matter what
             log.debug("Found dead shell: %s".format(shell))
-            shell = expectinator.spawn(SvdConfig.defaultShell)
+            shell = expectinator.spawn(shellToSpawn)
             if (dead)
                 throwException[SvdShellException]("Found dead shell where it should be alive!")
         }
