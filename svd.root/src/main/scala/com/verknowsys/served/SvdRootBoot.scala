@@ -40,7 +40,9 @@ class SvdRootBoot extends Logging with SvdActor {
     val sam = system.actorOf(Props[SvdAccountsManager].withDispatcher("svd-single-dispatcher"), "SvdAccountsManager") //"akka://%s@deldagorin:10/user/SvdAccountsManager".format(SvdConfig.served))
     val fem = system.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-core-dispatcher"), "SvdFileEventsManager")
 
-    val internalRedis = system.actorOf(Props(new SvdSuperService("Redis")).withDispatcher("svd-single-dispatcher"), "SuperService-Redis")
+
+    val systemSuperServices = "Redis" :: Nil
+
 
     // val list = (
     //     fem ::
@@ -60,6 +62,32 @@ class SvdRootBoot extends Logging with SvdActor {
     //     )
     // )
 
+    /**
+     *  Starts all predefined super services
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    def startSuperServices = systemServices.map {
+        service =>
+            val internalService = system.actorOf(Props(new SvdSuperService(service)).withDispatcher("svd-single-dispatcher"), s"SuperService-${service}")
+            context.watch(internalService)
+            log.info(s"Spawning SuperService: ${service}")
+    }
+
+
+    /**
+     *  Stops all predefined super services
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    def stopSuperServices = systemServices.map {
+        service =>
+            val internalService = system.actorFor(s"/user/SuperService-${service}")
+            context.stop(internalService)
+            log.info(s"Terminating SuperService: ${service}")
+    }
+
+
     addShutdownHook {
         log.warn("Invoking SvdRootBoot shutdown hook")
         postStop
@@ -68,10 +96,10 @@ class SvdRootBoot extends Logging with SvdActor {
 
     override def postStop = {
         log.info("Post Stopping SvdRootBoot")
+        stopSuperServices
         context.stop(sshd)
         context.stop(fem)
         context.stop(ssm)
-        context.stop(internalRedis)
         context.stop(sam)
     }
 
@@ -82,7 +110,7 @@ class SvdRootBoot extends Logging with SvdActor {
         context.watch(ssm)
         context.watch(sshd)
         context.watch(sam)
-        context.watch(internalRedis)
+        startSuperServices
 
         // (sam ? Admin.RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
         //     case _ =>
@@ -104,8 +132,10 @@ class SvdRootBoot extends Logging with SvdActor {
 
     def receive = {
 
+
         case ApiSuccess =>
             log.debug("RootBoot success")
+
 
         case Terminated(ref) =>
             log.debug(s"SvdAccountsManager received Terminate service for: ${ref}")
