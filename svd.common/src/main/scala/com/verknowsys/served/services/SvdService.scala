@@ -42,9 +42,9 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
 
     val accountManager = if (account.uid != 0) context.actorFor("/user/SvdAccountManager") else context.actorFor("/user/SvdAccountsManager")
     val uptime = JSystem.currentTimeMillis // Service uptime measure point
-    val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
-    val future = accountManager ? System.GetPort
-    val sPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
+    lazy val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
+    lazy val future = accountManager ? System.GetPort
+    lazy val sPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
     log.trace(s"Expected port from Account Manager arrived: ${sPort}")
 
     lazy val portsFile = servicePrefix / ".service_ports"
