@@ -152,9 +152,23 @@ trait SvdUtils extends Logging {
      *
      * @author Daniel (dmilith) Dettlaff
      */
-    def currentVPNHost = InetAddress.getAllByName(currentHost.getHostName).map{_.getHostAddress}.find{
-            _.matches(SvdConfig.defaultVPNNetworkPrefix)
-        } getOrElse currentHost.getHostAddress
+    def currentVPNHost = {
+        val allAddresses = InetAddress.getAllByName(currentHost.getHostName)
+        log.debug(s"All addresses: ${allAddresses}")
+        val addressOption = allAddresses.filter{
+            elem =>
+                val address = elem.getHostAddress
+                val matcher = address.matches(SvdConfig.defaultVPNNetworkPrefix)
+                log.trace(s"Got Address: ${address} that matches? ${matcher}")
+                matcher
+        }.headOption.map{
+            _.getHostAddress
+        }
+        log.trace(s"Address option: ${addressOption}")
+        val currentChoosenHost = currentHost.getHostAddress
+        log.trace(s"Host: ${currentChoosenHost}")
+        addressOption getOrElse currentChoosenHost //).split("/").tail.head
+    }
 
 
     /**
