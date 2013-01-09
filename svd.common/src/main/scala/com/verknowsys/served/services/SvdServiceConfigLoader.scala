@@ -48,7 +48,8 @@ class SvdServiceConfigLoader(name: String) extends Logging with SvdUtils {
     log.debug("Extracted SvdServiceConfig from igniter: %s.".format(name))
     // log.trace("Default template: %s".format(defaultTemplate))
     // log.trace("App template: %s".format(appSpecificTemplate))
-    log.trace("Merged template: %s".format(compact(render(appTemplateMerged))))
+    log.trace(s"Merged template: ${compact(render(appTemplateMerged))}")
+
 
     def config = SvdServiceConfig( // OPTIMIZE: this should be done automatically
         name = name,
