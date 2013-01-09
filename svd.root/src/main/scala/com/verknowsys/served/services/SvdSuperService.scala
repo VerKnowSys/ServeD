@@ -31,7 +31,7 @@ import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
  *
  * @author Daniel (dmilith) Dettlaff
  */
-class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, new SvdAccount(uid = 0, userName = "SuperUser")) with Logging {
+class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, SvdAccount(uid = 0, userName = "SuperUser")) with Logging {
 
 
     val prefixDir = SvdConfig.softwareRoot / config.softwareName
