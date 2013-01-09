@@ -89,8 +89,8 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
         case Admin.Alive(account) =>
             context.become(
                 awareOfUserManagers(account :: accountsAlive))
-            log.info("Becoming aware of alive account: %s", account)
-            log.debug("Alive accounts: %s".format(account :: accountsAlive))
+            log.info(s"Becoming aware of alive account: ${account}")
+            log.debug(s"Alive accounts: ${account :: accountsAlive}")
 
 
         /**
@@ -105,12 +105,12 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
             context.become(
                 awareOfUserManagers(accountsWithoutThisOne))
             sender ! ApiSuccess
-            log.info("Becoming aware of dead account: %s", account)
-            log.debug("Alive accounts: %s".format(accountsWithoutThisOne))
+            log.info(s"Becoming aware of dead account: ${account}")
+            log.debug(s"Alive accounts: ${accountsWithoutThisOne}")
 
 
         case SvdFileEvent(path, flags) =>
-            log.trace("REACT on file event on path: %s. Flags no: %s".format(path, flags))
+            log.trace(s"REACT on file event on path: ${path}. Flags no: ${flags}")
             flags match {
                 case Modified =>
                     log.trace("File event type: Modified")
@@ -123,7 +123,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
                 case Revoked =>
                     log.trace("File event type: Revoked")
                 case x =>
-                    log.trace("Got event: %s", x)
+                    log.trace(s"Got event: ${x}")
             }
 
 
@@ -132,7 +132,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
 
 
         case x: Any =>
-            log.warn("%s has received unknown signal: %s".format(this.getClass, x))
+            log.warn(s"${this.getClass} has received unknown signal: ${x}")
             // sender ! Error("Unknown signal %s".format(x))
 
     }
