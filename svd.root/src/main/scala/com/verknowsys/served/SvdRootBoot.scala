@@ -41,9 +41,6 @@ class SvdRootBoot extends Logging with SvdActor {
     val fem = system.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-core-dispatcher"), "SvdFileEventsManager")
 
 
-    val systemSuperServices = "Redis" :: Nil
-
-
     // val list = (
     //     fem ::
     //     // system.actorOf(Props(new LoggingManager())) ::
