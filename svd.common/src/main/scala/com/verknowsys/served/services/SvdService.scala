@@ -45,7 +45,6 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
     lazy val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
     lazy val future = accountManager ? System.GetPort
     lazy val sPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
-    log.trace(s"Expected port from Account Manager arrived: ${sPort}")
 
     lazy val portsFile = servicePrefix / ".service_ports"
     lazy val servicePort = try {

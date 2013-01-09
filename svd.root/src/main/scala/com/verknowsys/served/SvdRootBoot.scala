@@ -60,8 +60,14 @@ class SvdRootBoot extends Logging with SvdActor {
     //     )
     // )
 
+    addShutdownHook {
+        log.warn("Invoking SvdRootBoot shutdown hook")
+        postStop
+    }
+
 
     override def postStop = {
+        log.info("Post Stopping SvdRootBoot")
         context.stop(sshd)
         context.stop(fem)
         context.stop(ssm)
