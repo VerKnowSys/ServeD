@@ -152,9 +152,9 @@ trait SvdUtils extends Logging {
      *
      * @author Daniel (dmilith) Dettlaff
      */
-    def currentVPNHost = InetAddress.getAllByName(currentHost.getHostName).map{_.getAddress.mkString(".")}.find{
+    def currentVPNHost = InetAddress.getAllByName(currentHost.getHostName).map{_.getHostAddress}.find{
             _.matches(SvdConfig.defaultVPNNetworkPrefix)
-        } getOrElse currentHost.getAddress.mkString(".")
+        } getOrElse currentHost.getHostAddress
 
 
     /**
