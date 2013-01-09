@@ -71,7 +71,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
      *  @author dmilith
      */
     def installIndicator = new File(
-        SvdConfig.systemHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.softwareName / config.softwareName.toLowerCase + "." + SvdConfig.installed)
+        SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.softwareName / config.softwareName.toLowerCase + "." + SvdConfig.installed)
 
 
     /**
