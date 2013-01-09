@@ -72,7 +72,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
      *  @author dmilith
      */
     def installIndicator = new File(
-        SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.softwareName / config.softwareName.toLowerCase + "." + SvdConfig.installed)
+        SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.applicationsDir / config.softwareName / config.softwareName.toLowerCase + "." + SvdConfig.installed)
 
 
     /**
@@ -153,7 +153,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
         } catch {
             case _: Exception => "no-version"
         })
-        .replaceAll("SERVICE_PORT", "%d".format(servicePort))
+        .replaceAll("SERVICE_PORT", s"${servicePort}")
 
 
     /**
@@ -174,17 +174,17 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
                 val matcher = """after.*""".r
                 hookName match {
                     case matcher() =>
-                        log.trace("MATCHED: %s".format(hookName))
+                        log.trace(s"MATCHED: ${hookName}")
                         if (config.reportAllDebugs)
-                            accountManager ! Notify.Message(formatMessage("D:Done %s of service: %s".format(hookName, config.name)))
+                            accountManager ! Notify.Message(formatMessage(s"D:Done ${hookName} of service: ${config.name}"))
 
                     case "validate" =>
                         if (config.reportAllDebugs)
-                            accountManager ! Notify.Message(formatMessage("D:Done %s of service: %s".format(hookName, config.name)))
+                            accountManager ! Notify.Message(formatMessage(s"D:Done ${hookName} of service: ${config.name}"))
 
                     case _ =>
                         if (config.reportAllInfos)
-                            accountManager ! Notify.Message(formatMessage("D:Done %s of service: %s".format(hookName, config.name)))
+                            accountManager ! Notify.Message(formatMessage(s"D:Done ${hookName} of service: ${config.name}"))
                 }
 
             } catch {
@@ -192,20 +192,20 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
                     val hk = hook.copy( commands = hook.commands.map { // map values for better message
                         replaceAllSpecialValues _
                     })
-                    val msg = formatMessage("E:Hook %s of service: %s failed to pass expectations: CMD: '%s', OUT: '%s', ERR: '%s'.".format(hookName, config.name, hk.commands.mkString(" "), hk.expectStdOut, hk.expectStdErr))
+                    val msg = formatMessage(s"E:Hook ${hookName} of service: ${config.name} failed to pass expectations: CMD: '${hk.commands.mkString(" ")}', OUT: '${hk.expectStdOut}', ERR: '${hk.expectStdErr}'.")
                     log.error(msg)
                     if (config.reportAllErrors)
                         accountManager ! Notify.Message(msg)
 
                 case x: Exception =>
-                    val msg = formatMessage("F:Thrown exception in hook: %s of service: %s an exception content below:\n%s".format(hookName, config.name, x.getMessage + " " + x.getStackTrace))
+                    val msg = formatMessage(s"F:Thrown exception in hook: ${hookName} of service: ${config.name} an exception content below:\n${x.getMessage} ${x.getStackTrace}")
                     log.error(msg)
                     if (config.reportAllErrors)
                         accountManager ! Notify.Message(msg)
             }
             // log.trace("after hookShot output: %s", shell.output)
         } else {
-            log.trace("Command list empty in hook: %s of service %s".format(hookName, config.name))
+            log.trace(s"Command list empty in hook: ${hookName} of service ${config.name}")
         }
     }
 
@@ -219,13 +219,13 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
     override def preStart = {
 
         /* check for previous installation */
-        log.info("Looking for %s file to check software installation status".format(installIndicator))
+        log.debug(s"Looking for ${installIndicator} file to check software installation status")
         installIndicator.exists match {
             case true =>
-                log.info("Service already installed: %s".format(config.name))
+                log.info(s"Service already installed: ${config.name}")
 
             case false =>
-                log.info("Installing service: %s".format(config.name))
+                log.info(s"Installing service: ${config.name}")
                 hookShot(installHook, "install")
                 hookShot(configureHook, "configure")
         }
@@ -236,7 +236,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
         // Thread.sleep(pause)
 
         if (config.autoStart) {
-            log.info("Starting service: %s", config.name)
+            log.info(s"Starting service: ${config.name}")
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
         }
@@ -244,17 +244,17 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
         // defining scheduler job
         if (!config.schedulerActions.isEmpty) {
             val amount = config.schedulerActions.length
-            log.trace("Scheduler triggers defined: %d".format(amount))
+            log.trace(s"Scheduler triggers defined: ${amount}")
             for (index <- 0 to amount - 1) {
-                log.trace("Proceeding with index: %d", index)
+                log.trace(s"Proceeding with index: ${index}")
                 val action = config.schedulerActions(index)
 
-                log.debug("Config scheduler actions for service %s isn't empty.".format(config.name))
+                log.debug(s"Config scheduler actions for service ${config.name} isn't empty.")
                 try {
                     val name = config.name
                     val jobInstance = new ShellJob
                     val job = JobBuilder.newJob(jobInstance.getClass)
-                        .withIdentity("%s-%d".format(name, index))
+                        .withIdentity(s"${name}-${index}")
                         .build
 
                     // setting job data values:
@@ -265,7 +265,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
                     job.getJobDataMap.put("shellOperations", shellOperations)
                     job.getJobDataMap.put("account", account)
                     val trigger = TriggerBuilder.newTrigger
-                        .withIdentity("%s-%d".format(name, index))
+                        .withIdentity(s"${name}-${index}")
                         .startNow
                         .withSchedule(cronEntry)
                         .build
@@ -274,10 +274,10 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
 
                 } catch {
                     case e: ParseException =>
-                        accountManager ! Notify.Message(formatMessage("E:%s".format(e)))
+                        accountManager ! Notify.Message(formatMessage(s"E:${e}"))
 
                     case e: Throwable =>
-                        accountManager ! Notify.Message(formatMessage("F:%s".format(e)))
+                        accountManager ! Notify.Message(formatMessage(s"F:${e}"))
                 }
 
             }
@@ -290,25 +290,25 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
 
         case User.ServiceAutostart =>
             touch(autostartFileLocation)
-            val msg = formatMessage("I:Turned on autostart of: %s".format(this))
+            val msg = formatMessage(s"I:Turned on autostart of: ${this}")
             log.debug(msg)
             accountManager ! Notify.Message(msg)
 
 
         case User.ServiceStatus =>
-            val msg = formatMessage("I:%s".format(this))
+            val msg = formatMessage(s"I:${this}")
             log.debug(msg)
             accountManager ! Notify.Message(msg)
-            sender ! "%s".format(this)
+            sender ! s"${this}"
 
 
         case User.GetServicePort =>
-            log.debug("Getting port of service: %s:%d".format(config.name, servicePort))
+            log.debug(s"Getting port of service: ${config.name}:${servicePort}")
             sender ! servicePort
 
 
         case Notify.Ping =>
-            log.debug("%s".format(this))
+            log.debug(s"Ping from: ${this}")
             sender ! Notify.Pong
 
 
@@ -340,14 +340,14 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
          *  @author dmilith
          */
         case Signal.Quit =>
-            log.info("Got Quit in %s".format(this))
+            log.info(s"Got Quit in ${className}")
             context.unwatch(self)
             context.stop(self)
             sender ! ApiSuccess
 
 
         case ApiSuccess =>
-            log.trace(s"ApiSuccess in ${className} from %s".format(sender.getClass.getSimpleName))
+            log.trace(s"ApiSuccess in ${className} from ${sender.getClass.getSimpleName}")
 
     }
 
@@ -359,7 +359,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
 
         stopScheduler
         val pause = SvdConfig.serviceRestartPause / 2
-        log.debug("Waiting for scheduler stop for %s seconds".format(pause /1000))
+        log.debug(s"Waiting for scheduler stop for ${pause /1000} seconds")
         Thread.sleep(pause)
 
         shell.close
@@ -368,6 +368,6 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
     }
 
 
-    override def toString = s"${className} name: %s. Uptime: %s".format(config.name, secondsToHMS((JSystem.currentTimeMillis - uptime).toInt / 1000))
+    override def toString = s"${className} name: ${config.name}. Uptime: ${secondsToHMS((JSystem.currentTimeMillis - uptime).toInt / 1000)}"
 
 }
