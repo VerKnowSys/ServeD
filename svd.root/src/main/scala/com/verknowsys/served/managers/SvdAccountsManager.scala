@@ -131,8 +131,13 @@ class SvdAccountsManager(localSystem: ActorSystem) extends SvdManager with SvdFi
             log.debug("Got success")
 
 
+        case Terminated(ref) =>
+            log.debug(s"SvdAccountsManager received Terminate service for: ${ref}")
+            context.unwatch(ref)
+
+
         case x: Any =>
-            log.warn(s"${this.getClass} has received unknown signal: ${x}")
+            log.warn(s"${this} has received unknown signal: ${x}")
             // sender ! Error("Unknown signal %s".format(x))
 
     }
