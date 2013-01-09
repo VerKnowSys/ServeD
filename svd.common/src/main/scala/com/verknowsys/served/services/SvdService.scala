@@ -27,17 +27,21 @@ import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
 
 
 /**
- *  Service akka.actor. All Svd services are started using this actor wrapper.
+ *  Service Actor. All Svd services are started using this actor wrapper.
  *
  *  @author dmilith
  */
 class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor with SvdUtils {
 
-    val uptime = JSystem.currentTimeMillis // Service uptime measure point
-    val serviceRootPrefix = SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.softwareName
-    val servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
 
-    val accountManager = context.actorFor("/user/SvdAccountManager")
+    def serviceRootPrefix = SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.softwareName
+
+
+    def servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
+
+
+    val uptime = JSystem.currentTimeMillis // Service uptime measure point
+    val accountManager = if (account.uid != 0) context.actorFor("/user/SvdAccountManager") else context.actorFor("/user/SvdAccountsManager")
     val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
     val portsFile = servicePrefix / ".service_ports"
     checkOrCreateDir(servicePrefix)
@@ -62,20 +66,8 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
      *  @example "redis.installed" implies installed Redis software.
      *  @author dmilith
      */
-    def installIndicator = {
-        // both cases: user side app (default) or root side (if no user service installed)
-        val userServiceLocation = new File(
-            SvdConfig.systemHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.softwareName / config.softwareName.toLowerCase + "." + SvdConfig.installed)
-        val rootServiceLocation = new File(
-            serviceRootPrefix / config.softwareName.toLowerCase + "." + SvdConfig.installed)
-
-        if (userServiceLocation.exists) // OPTIMIZE: do it better, but remember that userServiceLocation is default
-            userServiceLocation
-        else if (rootServiceLocation.exists)
-            rootServiceLocation
-        else
-            userServiceLocation
-    }
+    def installIndicator = new File(
+        SvdConfig.systemHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.softwareName / config.softwareName.toLowerCase + "." + SvdConfig.installed)
 
 
     /**
