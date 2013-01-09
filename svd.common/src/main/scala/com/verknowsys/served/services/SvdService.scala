@@ -41,7 +41,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor
 
 
     val uptime = JSystem.currentTimeMillis // Service uptime measure point
-    val accountManager = if (account.uid != 0) context.actorFor("/user/SvdAccountManager") else context.actorFor("/user/SvdAccountsManager")
+    val accountManager = if (account.uid != 0) context.actorFor("/user/SvdAccountManager") else context.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
     val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
     val portsFile = servicePrefix / ".service_ports"
     checkOrCreateDir(servicePrefix)
