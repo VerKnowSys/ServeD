@@ -31,7 +31,9 @@ class SvdSystemManager extends SvdManager with Logging {
     override def preStart = {
         super.preStart
         log.info("SvdSystemManager is loading")
-        // log.warn("SYSUSAGE: " + SvdLowLevelSystemAccess.usagesys(0))
+
+        log.debug("Checking required paths…")
+        checkOrCreateDir(SvdConfig.systemHomeDir / SvdConfig.softwareDataDir)
 
         log.debug("Updating system time")
         SvdNtpSync
