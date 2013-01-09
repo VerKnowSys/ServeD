@@ -6,6 +6,8 @@
 package com.verknowsys.served.services
 
 
+import com.verknowsys.served._
+import com.verknowsys.served.services._
 import com.verknowsys.served.api._
 import com.verknowsys.served.api.scheduler._
 //import com.verknowsys.served.db._
@@ -23,7 +25,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
 import java.lang.{System => JSystem}
-import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
+// import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
 
 
 /**
@@ -31,8 +33,7 @@ import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
  *
  * @author Daniel (dmilith) Dettlaff
  */
-class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, SvdAccount(uid = 0, userName = "SuperUser")) with Logging {
-
+class SvdSuperService(config: SvdServiceConfig) extends SvdService(config = config, account = new SvdAccount(uid = 0, userName = "SuperUser")) with Logging {
 
     val prefixDir = SvdConfig.softwareRoot / config.softwareName
     val dataDir = SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.name
@@ -43,9 +44,10 @@ class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, SvdAc
 
     override def preStart = {
         log.trace(s"Checking dirs: ${prefixDir}, ${dataDir}")
+        log.debug(s"Prestarting ${this}")
         checkOrCreateDir(prefixDir)
         checkOrCreateDir(dataDir)
-        log.debug(s"Prestarting ${this}")
+
         super.preStart
     }
 
@@ -57,5 +59,6 @@ class SvdSuperService(config: SvdServiceConfig) extends SvdService(config, SvdAc
     override def toString = "SvdSuperService name: %s. Uptime: %s".format(config.name, secondsToHMS((JSystem.currentTimeMillis - uptime).toInt / 1000))
 
 
+    // override def receive = super.receive
 }
 

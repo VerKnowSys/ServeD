@@ -31,33 +31,38 @@ import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
  *
  *  @author dmilith
  */
-class SvdService(config: SvdServiceConfig, account: SvdAccount) extends SvdActor with SvdUtils {
+class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid = 0)) extends SvdActor with SvdUtils with Logging {
 
-
-    val serviceRootPrefix = SvdConfig.userHomeDir / "%s".format(account.uid) / SvdConfig.applicationsDir / config.softwareName
-
-
-    val servicePrefix = SvdConfig.userHomeDir / "%d".format(account.uid) / SvdConfig.softwareDataDir / config.name
-
-
-    val uptime = JSystem.currentTimeMillis // Service uptime measure point
-    val accountManager = if (account.uid != 0) context.actorFor("/user/SvdAccountManager") else context.actorFor("/user/SvdAccountsManager")
-    val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
-    val portsFile = servicePrefix / ".service_ports"
-    checkOrCreateDir(servicePrefix)
 
     implicit val timeout = Timeout(SvdConfig.defaultAPITimeout / 1000 seconds)
+
+    val serviceRootPrefix = SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.applicationsDir / config.softwareName
+
+    val servicePrefix = SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.softwareDataDir / config.name
+
+    val accountManager = if (account.uid != 0) context.actorFor("/user/SvdAccountManager") else context.actorFor("/user/SvdAccountsManager")
+    val uptime = JSystem.currentTimeMillis // Service uptime measure point
+    val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
     val future = accountManager ? System.GetPort
     val sPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
-    log.trace("Expected port from Account Manager arrived: %d".format(servicePort))
-    val servicePort = try {
+    log.trace(s"Expected port from Account Manager arrived: ${sPort}")
+
+    lazy val portsFile = servicePrefix / ".service_ports"
+    lazy val servicePort = try {
+        checkOrCreateDir(servicePrefix)
+        checkOrCreateDir(serviceRootPrefix)
         Source.fromFile(portsFile).mkString.toInt
     } catch {
         case x: Exception =>
-            writeToFile(portsFile, "%d".format(sPort))
+            checkOrCreateDir(servicePrefix)
+            checkOrCreateDir(serviceRootPrefix)
+            touch(portsFile)
+            writeToFile(portsFile, s"${sPort}")
             sPort
     }
-    val shell = new SvdShell(account)
+
+
+    lazy val shell = new SvdShell(account)
 
 
     /**
