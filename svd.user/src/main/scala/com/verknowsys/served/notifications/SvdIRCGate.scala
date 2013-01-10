@@ -90,7 +90,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
     }
     def redisKey(nickname: String) = nickname + ".tasks"
 
-    lazy val jedis = new Jedis(redisHost, redisPort)
+    val jedis = new Jedis(redisHost, redisPort)
 
 
     abstract class TaskState
@@ -111,7 +111,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
             true
         } catch {
             case e: Exception =>
-                log.error(e.toString)
+                log.error(s"Got error in connectToRedis: ${e}")
                 false
         }
     }
@@ -178,7 +178,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
             }
         } catch {
             case e: Exception =>
-                log.error(e.toString)
+                log.error(s"Got error in getTasks: ${e.toString}")
                 Tasks(list = Nil, nextId = 1)
         }
 
@@ -199,7 +199,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
             true
         } catch {
             case e: Exception =>
-                log.error(e.toString)
+                log.error(s"Got error in setTasks: ${e.toString}")
                 false
         }
     }
