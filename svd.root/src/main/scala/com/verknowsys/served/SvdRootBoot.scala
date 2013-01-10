@@ -69,7 +69,7 @@ class SvdRootBoot extends Logging with SvdActor {
             val config = new SvdServiceConfigLoader(service).config
             val prefix = SvdConfig.softwareRoot / config.softwareName
             val internalService = system.actorOf(Props(new SvdService(
-                service,
+                config,
                 serviceRootPrefixPre = Some(prefix),
                 servicePrefixPre = Some(SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.name),
                 installIndicatorPre = Some(new java.io.File(
