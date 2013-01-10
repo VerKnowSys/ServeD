@@ -48,17 +48,22 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
     lazy val sPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
 
     lazy val portsFile = servicePrefix / ".service_ports"
-    lazy val servicePort = try {
-        checkOrCreateDir(servicePrefix)
-        checkOrCreateDir(serviceRootPrefix)
-        Source.fromFile(portsFile).mkString.toInt
-    } catch {
-        case x: Exception =>
+    lazy val servicePort = if (config.staticPort == -1) {
+        try {
             checkOrCreateDir(servicePrefix)
-            checkOrCreateDir(serviceRootPrefix)
-            touch(portsFile)
-            writeToFile(portsFile, s"${sPort}")
-            sPort
+            Source.fromFile(portsFile).mkString.toInt
+        } catch {
+            case x: Exception =>
+                checkOrCreateDir(servicePrefix)
+                touch(portsFile)
+                writeToFile(portsFile, s"${sPort}")
+                sPort
+        }
+    } else {
+        checkOrCreateDir(servicePrefix)
+        log.debug(s"Static port given. Using ${config.staticPort}")
+        writeToFile(portsFile, s"${config.staticPort}")
+        config.staticPort
     }
 
 
