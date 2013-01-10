@@ -1,0 +1,21 @@
+{
+    "softwareName": "James",
+    "staticPort": 25,
+
+    "install": {
+        "commands": ["sofin get james"],
+        "expectStdOut": ["All done."]
+    },
+    "start": {
+        "commands": [""]
+    },
+    "stop": {
+        "commands": [""]
+    },
+    "validate": {
+        "commands": ["sssss > SERVICE_PREFIX/service.conf",
+            "SERVICE_ROOT/exports/nginx -t -c SERVICE_PREFIX/service.conf"
+        ],
+        "expectStdErr": ["test is successful"]
+    }
+}
