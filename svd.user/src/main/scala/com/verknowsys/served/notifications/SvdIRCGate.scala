@@ -78,7 +78,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
         val redisServ = context.actorFor("akka://%s@%s:%d/user/SuperService-Redis".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
         val future = redisServ ? User.GetServicePort
         try {
-            val port = Await.result(future, timeout.duration).asInstanceOf[Int]
+            val port = Await.result(future, Timeout(10 seconds).duration).asInstanceOf[Int] // timeout.duration
             log.debug(s"Redis port: $port")
             port
         } catch {
