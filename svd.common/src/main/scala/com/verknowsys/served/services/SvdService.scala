@@ -46,7 +46,7 @@ class SvdService(
     val serviceRootPrefix = serviceRootPrefixPre getOrElse SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.applicationsDir / config.softwareName
     val servicePrefix = servicePrefixPre getOrElse SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.softwareDataDir / config.name
 
-    val accountManager = if (account.uid != 0) context.actorFor("/user/SvdAccountManager") else context.actorFor(s"akka://${SvdConfig.served}@${SvdConfig.remoteApiServerHost}:${SvdConfig.remoteApiServerHost}/user/SvdAccountsManager")
+    val accountManager = if (account.uid != 0) context.actorFor("/user/SvdAccountManager") else context.actorFor(s"/user/SvdAccountsManager") // context.actorFor(s"akka://${SvdConfig.served}@${SvdConfig.remoteApiServerHost}:${SvdConfig.remoteApiServerHost}/user/SvdAccountsManager")
 
     val uptime = JSystem.currentTimeMillis // Service uptime measure point
     val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
