@@ -25,7 +25,8 @@
     },
     "start": {
         "commands": [
-            "test ! -d SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database ; SERVICE_ROOT/exports/redis-server SERVICE_PREFIX/service.conf"
+            "test ! -d SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database",
+            "SERVICE_ROOT/exports/redis-server SERVICE_PREFIX/service.conf"
         ]
     },
     "stop": {
