@@ -39,14 +39,15 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
 
 
     def settings = {
-        setVerbose(true)
-        setName("tasks")
+        setVerbose(false)
+        setName("tasks-robot")
         setAutoNickChange(true)
         setVersion("0.4.0")
         setEncoding(SvdConfig.defaultEncoding)
         try {
             log.debug("Attepting to connect to irc server: %s on channel %s", SvdConfig.defaultIRCServerName, SvdConfig.defaultIRCChannelName)
             connect(SvdConfig.defaultIRCServerName)
+            Thread.sleep(5000)
             log.debug("Authenticating IRC gate in NickServ")
             sendMessage("NickServ", "identify ,lpmkonji")
             Thread.sleep(5000)
