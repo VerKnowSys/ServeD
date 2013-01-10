@@ -35,9 +35,16 @@ class SvdServiceConfigLoader(name: String) extends Logging with SvdUtils {
             Source.fromFile(fullName).mkString
         } catch {
             case x: FileNotFoundException => // template not exists in common igniter location, try at user space
-                val userSideIgniter = SvdConfig.userHomeDir / "%d".format(getUserUid) / SvdConfig.defaultUserIgnitersDir / name + SvdConfig.defaultSoftwareTemplateExt
-                log.debug("Common igniter not found: %s. Trying again with: %s", fullName, userSideIgniter)
-                Source.fromFile(userSideIgniter).mkString
+                val rootIgniterPrefix = SvdConfig.systemHomeDir / SvdConfig.defaultUserIgnitersDir
+                val rootIgniterName = rootIgniterPrefix / name + SvdConfig.defaultSoftwareTemplateExt
+                try { // try root igniter
+                    Source.fromFile(rootIgniterName).mkString
+                } catch {
+                    case x: FileNotFoundException => // standard template check
+                        val userSideIgniter = SvdConfig.userHomeDir / "%d".format(getUserUid) / SvdConfig.defaultUserIgnitersDir / name + SvdConfig.defaultSoftwareTemplateExt
+                        log.debug("Common igniter not found: %s. Trying again with: %s", fullName, userSideIgniter)
+                        Source.fromFile(userSideIgniter).mkString
+                }
 
             // case x: Exception => // template not exists
                 // log.error("SvdServiceConfigLoader Failure with igniter: %s", name)
