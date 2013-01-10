@@ -50,17 +50,14 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
     lazy val portsFile = servicePrefix / ".service_ports"
     lazy val servicePort = if (config.staticPort == -1) {
         try {
-            checkOrCreateDir(servicePrefix)
             Source.fromFile(portsFile).mkString.toInt
         } catch {
             case x: Exception =>
-                checkOrCreateDir(servicePrefix)
                 touch(portsFile)
                 writeToFile(portsFile, s"${sPort}")
                 sPort
         }
     } else {
-        checkOrCreateDir(servicePrefix)
         log.debug(s"Static port given. Using ${config.staticPort}")
         touch(portsFile)
         writeToFile(portsFile, s"${config.staticPort}")
@@ -77,7 +74,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
      *  @example "redis.installed" implies installed Redis software.
      *  @author dmilith
      */
-    def installIndicator = new File(
+    val installIndicator = new File(
         SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.applicationsDir / config.softwareName / config.softwareName.toLowerCase + "." + SvdConfig.installed)
 
 
@@ -223,6 +220,8 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
 
 
     override def preStart = {
+
+        checkOrCreateDir(servicePrefix)
 
         /* check for previous installation */
         log.debug(s"Looking for ${installIndicator} file to check software installation status")
