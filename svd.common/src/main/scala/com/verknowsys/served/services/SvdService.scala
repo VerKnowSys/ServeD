@@ -247,7 +247,7 @@ class SvdService(
         // Thread.sleep(pause)
 
         if (config.autoStart) {
-            log.info(s"Starting ${className}: ${config.name}")
+            log.info(s"Starting ${className}: ${config.name} on port ${servicePort}")
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
         }
