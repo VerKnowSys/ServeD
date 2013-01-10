@@ -48,24 +48,22 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
     lazy val sPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
 
     lazy val portsFile = servicePrefix / ".service_ports"
-    lazy val servicePort = if (config.staticPort == -1) {
-        try {
+    lazy val servicePort = try {
             Source.fromFile(portsFile).mkString.toInt
         } catch {
             case x: Exception =>
                 touch(portsFile)
-                writeToFile(portsFile, s"${sPort}")
-                sPort
+                if (config.staticPort == -1){
+                    writeToFile(portsFile, s"${sPort}")
+                    sPort
+                } else {
+                    writeToFile(portsFile, s"${config.staticPort}")
+                    config.staticPort
+                }
         }
-    } else {
-        log.debug(s"Static port given. Using ${config.staticPort}")
-        touch(portsFile)
-        writeToFile(portsFile, s"${config.staticPort}")
-        config.staticPort
-    }
 
 
-    lazy val shell = new SvdShell(account)
+    val shell = new SvdShell(account)
 
 
     /**
