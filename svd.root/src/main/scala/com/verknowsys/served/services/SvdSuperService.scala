@@ -40,13 +40,12 @@ class SvdSuperService(config: SvdServiceConfig) extends SvdService(config = conf
     override val servicePrefix = SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.name
 
 
-    override def preStart = {
-        log.trace(s"Checking dirs before start: ${serviceRootPrefix}, ${servicePrefix}")
-        checkOrCreateDir(serviceRootPrefix)
-        checkOrCreateDir(servicePrefix)
-
-        super.preStart
-    }
+    // override def preStart = {
+        // super.preStart
+        // log.trace(s"Checking dirs before start: ${serviceRootPrefix}, ${servicePrefix}")
+        // checkOrCreateDir(serviceRootPrefix)
+        // checkOrCreateDir(servicePrefix)
+    // }
 
 
     override def installIndicator = new File(
