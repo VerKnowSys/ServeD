@@ -13,9 +13,6 @@
         "commands": [""]
     },
     "validate": {
-        "commands": ["sssss > SERVICE_PREFIX/service.conf",
-            "SERVICE_ROOT/exports/nginx -t -c SERVICE_PREFIX/service.conf"
-        ],
-        "expectStdErr": ["test is successful"]
+        "commands": [""]
     }
 }
