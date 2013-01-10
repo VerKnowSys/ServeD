@@ -10,7 +10,7 @@
     ],
     "install": {
         "commands": ["sofin get mysql"],
-        "expectStdOut": ["Installing", "All done."]
+        "expectStdOut": ["All done."]
     },
     "start": {
         "commands": [

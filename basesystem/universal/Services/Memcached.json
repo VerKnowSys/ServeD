@@ -2,7 +2,7 @@
     "softwareName": "Memcached",
     "install": {
         "commands": ["sofin get memcached"],
-        "expectStdOut": ["Installing", "All done."]
+        "expectStdOut": ["All done."]
     },
     "start": {
         "commands": ["SERVICE_ROOT/exports/memcached -p SERVICE_PORT -P SERVICE_PREFIX/service.pid -d"]

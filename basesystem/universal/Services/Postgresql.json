@@ -10,7 +10,7 @@
     ],
     "install": {
         "commands": ["sofin get postgresql"],
-        "expectStdOut": ["Installing", "All done."]
+        "expectStdOut": ["All done."]
     },
     "configure": {
         "commands": [

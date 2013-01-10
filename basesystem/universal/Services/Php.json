@@ -2,7 +2,7 @@
     "softwareName": "Php",
     "install": {
         "commands": ["sofin get php"],
-        "expectStdOut": ["Installing", "All done."]
+        "expectStdOut": ["All done."]
     },
     "start": {
         "commands": [
