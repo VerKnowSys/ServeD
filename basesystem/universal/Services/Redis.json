@@ -2,13 +2,13 @@
     "softwareName": "Redis",
     "schedulerActions": [
         {
-            "cronEntry": "0 0/1 * * * ?",
+            "cronEntry": "0 0/10 * * * ?",
             "shellCommands": [
-                "cp SERVICE_PREFIX/database/database.rdf SERVICE_PREFIX/database/database.rdf.backup && echo 'Backup ok'"
+                "cp SERVICE_PREFIX/database/database.rdf SERVICE_PREFIX/database/database.rdf-$(date +'%Y-%m-%d').backup && echo 'Backup ok'"
             ]
         },
         {
-            "cronEntry": "0 0/2 * * * ?",
+            "cronEntry": "0 0/15 * * * ?",
             "shellCommands": [
                 "echo 'Redis pam pam pam'"
             ]
