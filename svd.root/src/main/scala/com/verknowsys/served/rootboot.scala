@@ -41,6 +41,9 @@ object rootboot extends Logging with SvdUtils with App {
         log.info(SvdConfig.servedFull)
         log.info(SvdConfig.copyright)
 
+        // set runtime properties
+        JSystem.setProperty("org.terracotta.quartz.skipUpdateCheck", "true")
+
         val rb = system.actorOf(Props(new SvdRootBoot).withDispatcher("svd-core-dispatcher"))
         addShutdownHook {
             log.warn("rootboot shutdown hook will wait for system")
