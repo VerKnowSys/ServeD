@@ -31,27 +31,33 @@ import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
  *
  *  @author dmilith
  */
-class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid = 0)) extends SvdActor with SvdUtils with Logging {
+class SvdService(
+        config: SvdServiceConfig,
+        account: SvdAccount = SvdAccount(uid = 0),
+        serviceRootPrefixPre: Option[String] = None,
+        servicePrefixPre: Option[String] = None,
+        installIndicatorPre: Option[File] = None
+    ) extends SvdActor with SvdUtils with Logging {
 
 
     implicit val timeout = Timeout(SvdConfig.defaultAPITimeout / 1000 seconds)
     val className = this.getClass.getSimpleName
 
-    val serviceRootPrefix = SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.applicationsDir / config.softwareName
-
-    val servicePrefix = SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.softwareDataDir / config.name
+    val serviceRootPrefix = serviceRootPrefixPre getOrElse SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.applicationsDir / config.softwareName
+    val servicePrefix = servicePrefixPre getOrElse SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.softwareDataDir / config.name
 
     val accountManager = if (account.uid != 0) context.actorFor("/user/SvdAccountManager") else context.actorFor("/user/SvdAccountsManager")
     val uptime = JSystem.currentTimeMillis // Service uptime measure point
-    lazy val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
-    lazy val future = accountManager ? System.GetPort
-    lazy val sPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
+    val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
+    val future = accountManager ? System.GetPort
+    val sPort = Await.result(future, timeout.duration).asInstanceOf[Int] // get any random port
 
-    lazy val portsFile = servicePrefix / ".service_ports"
-    lazy val servicePort = try {
+    val portsFile = servicePrefix / ".service_ports"
+    val servicePort = try {
             Source.fromFile(portsFile).mkString.toInt
         } catch {
             case x: Exception =>
+                log.debug("Touching ports file.")
                 touch(portsFile)
                 if (config.staticPort == -1){
                     writeToFile(portsFile, s"${sPort}")
@@ -72,7 +78,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
      *  @example "redis.installed" implies installed Redis software.
      *  @author dmilith
      */
-    val installIndicator = new File(
+    val installIndicator = installIndicatorPre getOrElse new File(
         SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.applicationsDir / config.softwareName / config.softwareName.toLowerCase + "." + SvdConfig.installed)
 
 
