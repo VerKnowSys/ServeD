@@ -62,6 +62,7 @@ class SvdService(config: SvdServiceConfig, account: SvdAccount = SvdAccount(uid 
     } else {
         checkOrCreateDir(servicePrefix)
         log.debug(s"Static port given. Using ${config.staticPort}")
+        touch(portsFile)
         writeToFile(portsFile, s"${config.staticPort}")
         config.staticPort
     }
