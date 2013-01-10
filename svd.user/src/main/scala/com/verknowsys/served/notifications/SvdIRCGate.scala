@@ -83,7 +83,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
             port
         } catch {
             case e: Exception =>
-                log.warn(s"Couldn't determinate the Redis port. Using default ($redisDefPort) port instead.")
+                log.warn(s"Couldn't determine the Redis port. Using default ($redisDefPort) port instead.")
                 redisDefPort
         }
     }
@@ -408,7 +408,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
             if (connectToRedis)
                 settings
             else
-                log.warn("Aborting startup duo to connection problems to Redis server")
+                log.warn("Aborting startup due to connection problems to Redis server")
             sender ! ApiSuccess
 
 
