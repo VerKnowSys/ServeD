@@ -59,10 +59,12 @@ class SvdService(
             case x: Exception =>
                 log.debug("Touching ports file.")
                 touch(portsFile)
-                if (config.staticPort == -1){
+                if (config.staticPort == -1) {
+                    log.trace("No static port defined. Writing SAM port")
                     writeToFile(portsFile, s"${sPort}")
                     sPort
-                } else {
+                } else { // NOTE: case when static port defined for service
+                    log.trace(s"Static port defined: ${config.staticPort}. Writing SAM port")
                     writeToFile(portsFile, s"${config.staticPort}")
                     config.staticPort
                 }
@@ -160,7 +162,7 @@ class SvdService(
         } catch {
             case _: Exception => "no-version"
         })
-        .replaceAll("SERVICE_PORT", if (config.staticPort == -1) s"${servicePort}" else s"${config.staticPort}")
+        .replaceAll("SERVICE_PORT", s"${servicePort}")
 
 
     /**
