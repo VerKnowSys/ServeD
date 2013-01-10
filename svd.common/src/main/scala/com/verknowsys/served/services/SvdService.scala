@@ -46,7 +46,8 @@ class SvdService(
     val serviceRootPrefix = serviceRootPrefixPre getOrElse SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.applicationsDir / config.softwareName
     val servicePrefix = servicePrefixPre getOrElse SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.softwareDataDir / config.name
 
-    val accountManager = if (account.uid != 0) context.actorFor("/user/SvdAccountManager") else context.actorFor("/user/SvdAccountsManager")
+    val accountManager = if (account.uid != 0) context.actorFor("/user/SvdAccountManager") else context.actorFor(s"akka://${SvdConfig.served}@${SvdConfig.remoteApiServerHost}:${SvdConfig.remoteApiServerHost}/user/SvdAccountsManager")
+
     val uptime = JSystem.currentTimeMillis // Service uptime measure point
     val autostartFileLocation = servicePrefix / SvdConfig.serviceAutostartFile
     val future = accountManager ? System.GetPort
@@ -71,13 +72,18 @@ class SvdService(
         }
 
 
+    /**
+     *  Defines shell for SvdService.
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
     val shell = new SvdShell(account)
 
 
     /**
-     *  Returns file of install indication from Sofin.
+     *  Returns file which if exists, should be proof of done installation of software running as SvdService.
      *
-     *  @example "redis.installed" implies installed Redis software.
+     *  @return new File("redis.installed") // implies installed Redis software.
      *  @author dmilith
      */
     val installIndicator = installIndicatorPre getOrElse new File(
