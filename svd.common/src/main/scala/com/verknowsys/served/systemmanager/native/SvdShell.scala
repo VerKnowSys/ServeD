@@ -37,10 +37,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
             if (dead)
                 throwException[SvdShellException]("Found dead shell where it should be alive!")
         }
-        operations.commands.foreach {
-            cmd =>
-                shell.send(cmd + "\n") // send commands one by one to shell
-        }
+        shell.send(operations.commands.mkString(" ; ") + "\n") // send commands one by one to shell
 
         if (operations.expectStdOut.size != 0) operations.expectStdOut.foreach {
             expect =>
