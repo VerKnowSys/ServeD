@@ -20,8 +20,7 @@
         "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s stop"]
     },
     "validate": {
-        "commands": [
-            "test ! -f SERVICE_PREFIX/service.conf && printf '
+        "commands": ["test ! -f SERVICE_PREFIX/service.conf && printf '
 worker_processes 2;
 events {
     worker_connections 1024;
@@ -42,8 +41,7 @@ http {
         }
     }
 }
-' > SERVICE_PREFIX/service.conf",
-            "SERVICE_ROOT/exports/nginx -t -c SERVICE_PREFIX/service.conf"
+' > SERVICE_PREFIX/service.conf ; SERVICE_ROOT/exports/nginx -t -c SERVICE_PREFIX/service.conf"
         ],
         "expectStdErr": ["test is successful"]
     },
