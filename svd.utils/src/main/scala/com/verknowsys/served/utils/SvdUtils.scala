@@ -154,7 +154,7 @@ trait SvdUtils extends Logging {
      */
     def currentVPNHost = {
         val allAddresses = InetAddress.getAllByName(currentHost.getHostName)
-        log.debug(s"All addresses: ${allAddresses}")
+        log.debug(s"All addresses: ${allAddresses.mkString(", ") }")
         val addressOption = allAddresses.filter{
             elem =>
                 val address = elem.getHostAddress
