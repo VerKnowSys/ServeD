@@ -6,6 +6,6 @@
         "commands": ["test -d /SystemUsers/WebApps/Genmosh && cd /SystemUsers/WebApps/Genmosh && sofin deps && npm install && coffee ./app.coffee"]
     },
     "stop": {
-        "commands": ["/bin/kill $(/bin/cat SERVICE_PREFIX/service.pid)"]
+        "commands": ["test -d /SystemUsers/WebApps/Genmosh && kill $(cat SERVICE_PREFIX/service.pid)"]
     }
 }

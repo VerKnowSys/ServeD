@@ -7,12 +7,12 @@
         "expectStdOut": ["All done."]
     },
     "start": {
-        "commands": [""]
+        "commands": []
     },
     "stop": {
-        "commands": [""]
+        "commands": []
     },
     "validate": {
-        "commands": [""]
+        "commands": []
     }
 }

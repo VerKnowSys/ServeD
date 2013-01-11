@@ -61,7 +61,7 @@ class SvdServiceConfigLoader(name: String) extends Logging with SvdUtils {
     val appTemplateMerged = defaultTemplate merge appSpecificTemplate
 
     // val svcName = (appSpecificTemplate \\ "name").extract[String]
-    log.debug("Extracted SvdServiceConfig from igniter: %s.".format(name))
+    log.debug(s"Extracted SvdServiceConfig from igniter: ${name}.")
     // log.trace("Default template: %s".format(defaultTemplate))
     // log.trace("App template: %s".format(appSpecificTemplate))
     log.trace(s"Merged template: ${compact(render(appTemplateMerged))}")
