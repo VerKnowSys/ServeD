@@ -33,7 +33,7 @@ import org.quartz.{TriggerBuilder, JobBuilder, CronScheduleBuilder}
  */
 class SvdService(
         config: SvdServiceConfig,
-        account: SvdAccount = SvdAccount(uid = 0),
+        account: SvdAccount = SvdAccount(uid = 0, userName = "SuperUser"),
         serviceRootPrefixPre: Option[String] = None,
         servicePrefixPre: Option[String] = None,
         installIndicatorPre: Option[File] = None
