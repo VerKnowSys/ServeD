@@ -47,8 +47,7 @@ object rootboot extends Logging with SvdUtils with App {
         val rb = system.actorOf(Props(new SvdRootBoot).withDispatcher("svd-core-dispatcher"))
         addShutdownHook {
             log.warn("rootboot shutdown hook will wait for system")
-            val pause = SvdConfig.serviceRestartPause / 2
-            Thread.sleep(pause)
+            Thread.sleep(SvdConfig.shutdownTimeout / 2)
 
             system.stop(rb)
             system.shutdown
