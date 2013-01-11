@@ -42,7 +42,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
         setVerbose(false)
         setName("tasks")
         setAutoNickChange(true)
-        setVersion("0.4.0")
+        setVersion("0.4.1")
         setEncoding(SvdConfig.defaultEncoding)
         try {
             log.debug("Attepting to connect to irc server: %s on channel %s", SvdConfig.defaultIRCServerName, SvdConfig.defaultIRCChannelName)
@@ -51,6 +51,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
             log.debug("Authenticating IRC gate in NickServ")
             sendMessage("NickServ", "identify ,lpmkonji")
             Thread.sleep(5000)
+
+            val topic = s"dev: ServeD v${SvdConfig.version.split("-").head}, Sofin v0.32.0 | ?term - for terms, .help - tasks bot, @help - lang bot"
+            sendMessage("ChanServ", s"topic #verknowsys ${topic}")
+
             log.debug("Joining default channel")
             joinChannel(SvdConfig.defaultIRCChannelName)
 
