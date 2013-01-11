@@ -3,16 +3,13 @@
     "staticPort": 1000,
 
     "install": {
-        "commands": ["sofin get node"],
+        "commands": ["sofin get node","sofin get mosh"],
         "expectStdOut": ["All done."]
     },
     "start": {
-        "commands": [""]
+        "commands": ["test -d /SystemUsers/WebApps/Genmosh && cd /SystemUsers/WebApps/Genmosh && npm install && coffee ./app.coffee"]
     },
     "stop": {
-        "commands": [""]
-    },
-    "validate": {
-        "commands": [""]
+        "commands": ["test -f /SystemUsers/WebApps/Genmosh/Genmosh.pid && kill $(cat /SystemUsers/WebApps/Genmosh/Genmosh.pid) && rm -f /SystemUsers/WebApps/Genmosh/Genmosh.pid"]
     }
 }
