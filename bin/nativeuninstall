@@ -7,7 +7,7 @@ fi
 
 system="$(uname)"
 
-if [ -e "/sbin/kick" ]; then
+if [ -e "/sbin/svdkick" ]; then
     echo "* Uninstalling svdkick"
     rm -f /sbin/svdkick
 fi
