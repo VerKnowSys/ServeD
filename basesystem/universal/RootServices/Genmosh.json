@@ -2,12 +2,8 @@
     "softwareName": "Node",
     "staticPort": 1000,
 
-    "install": {
-        "commands": ["sofin get node","sofin get mosh"],
-        "expectStdOut": ["All done."]
-    },
     "start": {
-        "commands": ["test -d /SystemUsers/WebApps/Genmosh && cd /SystemUsers/WebApps/Genmosh && npm install && coffee ./app.coffee"]
+        "commands": ["test -d /SystemUsers/WebApps/Genmosh && cd /SystemUsers/WebApps/Genmosh && sofin deps && npm install && coffee ./app.coffee"]
     },
     "stop": {
         "commands": ["test -e SERVICE_PREFIX/service.pid && kill -TERM $(cat SERVICE_PREFIX/service.pid) && rm -f SERVICE_PREFIX/service.pid"]
