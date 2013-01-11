@@ -114,6 +114,5 @@ int main(int argc, char const *argv[]) {
 
     char *arguments[argc];
     parse((char*)(command.c_str()), arguments);
-    cout << "Arguments: " << *arguments << endl;
     execute(arguments, uid);
 }
