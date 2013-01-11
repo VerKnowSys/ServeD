@@ -31,24 +31,27 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
 
 
     def exec(operations: SvdShellOperations) {
-        if (dead) { // if shell is dead, respawn it! It MUST live no matter what
-            log.debug("Found dead shell: %s".format(shell))
-            shell = expectinator.spawn(shellToSpawn)
-            if (dead)
-                throwException[SvdShellException]("Found dead shell where it should be alive!")
-        }
-        val ops = operations.commands.mkString(" ; ")
-        log.trace(s"Executing ${ops} on shell: ${shellToSpawn}")
-        shell.send(s"${ops}\n") // send commands one by one to shell
+        spawnThread {
+            if (dead) { // if shell is dead, respawn it! It MUST live no matter what
+                log.debug("Found dead shell: %s".format(shell))
+                shell = expectinator.spawn(shellToSpawn)
+                if (dead)
+                    throwException[SvdShellException]("Found dead shell where it should be alive!")
+            }
+            val ops = operations.commands.mkString(" ; ")
+            log.trace(s"Executing ${ops} on shell: ${shellToSpawn}")
+            shell.send(s"${ops}\n") // send commands one by one to shell
 
-        if (operations.expectStdOut.size != 0) operations.expectStdOut.foreach {
-            expect =>
-                shell.expect(expect, operations.expectOutputTimeout)
+            if (operations.expectStdOut.size != 0) operations.expectStdOut.foreach {
+                expect =>
+                    shell.expect(expect, operations.expectOutputTimeout)
+            }
+            if (operations.expectStdErr.size != 0) operations.expectStdErr.foreach {
+                expect =>
+                    shell.expectErr(expect, operations.expectOutputTimeout)
+            }
         }
-        if (operations.expectStdErr.size != 0) operations.expectStdErr.foreach {
-            expect =>
-                shell.expectErr(expect, operations.expectOutputTimeout)
-        }
+
     }
 
 

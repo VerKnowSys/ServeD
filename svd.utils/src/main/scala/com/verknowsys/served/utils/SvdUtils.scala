@@ -454,6 +454,18 @@ trait SvdUtils extends Logging {
 
 
     /**
+     *  Spawn code in separate thread
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    def spawnThread(f: => Unit) = {
+        val th = new SvdThread(f)
+        th.start
+        th.join
+    }
+
+
+    /**
      * Checks if file exists
      *
      * @author teamon
