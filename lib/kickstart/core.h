@@ -53,6 +53,7 @@
     #include <signal.h>
     #include <sys/wait.h>
     #include <sys/fcntl.h>
+    #include <algorithm>
     #define MAXPATHLEN PATH_MAX
 #endif
 
