@@ -1,6 +1,6 @@
 /*
     Authors: Daniel (dmilith) Dettlaff, Michał (tallica) Lipski
-    © 2011-2012 - VerKnowSys
+    © 2011-2013 - VerKnowSys
 */
 
 #include "core.h"
@@ -74,7 +74,7 @@ string escape(string input) {
     toBeEscaped.push_back("'");
     toBeEscaped.push_back("\"");
     for (unsigned int ind = 0; ind < toBeEscaped.size(); ind++) {
-        int position = input.find(toBeEscaped[ind]);
+        string::size_type position = input.find(toBeEscaped[ind]);
         while (position != string::npos) {
             input.replace(position, 1, "_");
             position = input.find(toBeEscaped[ind], position + 1);
@@ -166,7 +166,7 @@ void parse(char *line, char **argv) {
         *argv++ = line;
         while (*line != '\0' && *line != ' ' && *line != '\t' && *line != '\n') line++;
     }
-    *argv = '\0';
+    *argv = NULL;
 }
 
 
