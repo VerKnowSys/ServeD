@@ -23,6 +23,8 @@ class SvdRootBoot extends Logging with SvdActor {
     import akka.actor.OneForOneStrategy
     import akka.actor.SupervisorStrategy._
 
+
+    val root = new SvdAccount(uid = 0, userName = "SuperUser")
     val systemServices = "Genmosh" :: "James" :: "Redis" :: "Coreginx" :: Nil // XXX: hardcoded system services
 
 
@@ -70,6 +72,7 @@ class SvdRootBoot extends Logging with SvdActor {
             val prefix = SvdConfig.softwareRoot / config.softwareName
             val internalService = system.actorOf(Props(new SvdService(
                 config,
+                account = root,
                 serviceRootPrefixPre = Some(prefix),
                 servicePrefixPre = Some(SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.name),
                 installIndicatorPre = Some(new java.io.File(
