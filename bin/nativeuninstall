@@ -7,7 +7,7 @@ fi
 
 system="$(uname)"
 
-if [ -e "/sbin/kick" ]; then
+if [ -e "/sbin/svdkick" ]; then
     echo "* Uninstalling svdkick"
     rm -f /sbin/svdkick
 fi
@@ -15,6 +15,11 @@ fi
 if [ -e "/bin/svdshell" ]; then
     echo "* Uninstalling svdshell"
     rm -f /bin/svdshell
+fi
+
+if [ -e "/sbin/svdsushell" ]; then
+    echo "* Uninstalling svdsushell"
+    rm -f /sbin/svdsushell
 fi
 
 if [ -e "/bin/svdrun" ]; then

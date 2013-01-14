@@ -87,6 +87,7 @@ ctrlcli
 /daemon
 /kick
 /shell
+/sushell
 /svd.common/src/main/resources/FULLVERSION
 .project
 .history

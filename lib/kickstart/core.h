@@ -53,6 +53,7 @@
     #include <signal.h>
     #include <sys/wait.h>
     #include <sys/fcntl.h>
+    #include <algorithm>
     #define MAXPATHLEN PATH_MAX
 #endif
 
@@ -60,7 +61,7 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.4.2"
+    #define APP_VERSION "0.5.1"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -99,6 +100,7 @@
 
 
     #define CORE_HOMEDIR "/SystemUsers/"
+    #define SYSTEMUSERS_HOME_DIR "/SystemUsers" // no trailing slash
     #define USERS_HOME_DIR "/Users/"
     #define LIBRARIES_DIR "/lib/"
     #define LIBRARIES32_DIR "/lib32/"
