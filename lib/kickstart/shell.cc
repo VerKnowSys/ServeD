@@ -30,6 +30,7 @@ void execute(char **argv, int uid) {
         usr << uid;
         chdir(hd.str().c_str());
         setenv("HOME", hd.str().c_str(), 1);
+        setenv("~", hd.str().c_str(), 1);
         setenv("PWD", hd.str().c_str(), 1);
         setenv("OLDPWD", hd.str().c_str(), 1);
         setenv("USER", usr.str().c_str(), 1);

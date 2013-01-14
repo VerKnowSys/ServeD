@@ -42,7 +42,7 @@ const static string coreDir = currentDir();
 
         string libPath = "LD_LIBRARY_PATH=" + javaNative + "lib:" + javaNative + "openjdk6/jre/lib/amd64:" + javaNative + "openjdk6/jre/lib/amd64/client" + ":/lib";
         #ifdef DEVEL
-            int count = 13;
+            int count = 14;
         #endif
         char *args[] = {
             // (char*)libPath.c_str(),
@@ -53,6 +53,7 @@ const static string coreDir = currentDir();
             (char*)"-Xmx256m",
             (char*)"-XX:+UseCompressedOops",
             (char*)"-Dfile.encoding=UTF-8",
+            (char*)"-Djava.awt.headless=true",
             (char*)jnalp.c_str(),
             #ifndef DEVEL
                 /* when not devel, use classes from assembly jar */
@@ -93,7 +94,7 @@ const static string coreDir = currentDir();
 
         string libPath = "LD_LIBRARY_PATH=" + javaNative + "lib:" + javaNative + "openjdk6/jre/lib/i386:" + javaNative + "openjdk6/jre/lib/i386/client" + ":/lib32";
         #ifdef DEVEL
-            int count = 14;
+            int count = 15;
         #endif
         char *args[] = {
             // (char*)libPath.c_str(),
@@ -105,6 +106,7 @@ const static string coreDir = currentDir();
             (char*)"-Xms32m",
             (char*)"-Xmx64m",
             (char*)"-Dfile.encoding=UTF-8",
+            (char*)"-Djava.awt.headless=true",
             (char*)jnalp.c_str(),
             #ifndef DEVEL
                 /* when not devel, use classes from assembly jar */
