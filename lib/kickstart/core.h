@@ -14,6 +14,7 @@
 #include <sstream>
 #include <vector>
 #include <iomanip>
+#include <paths.h>
 
 #include <time.h>
 #include <errno.h>

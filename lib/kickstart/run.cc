@@ -26,6 +26,9 @@ void execute(char **argv, int uid, const char* env) {
         cerr << "Error forking child process failed!" << endl;
         exit(FORK_ERROR);
     } else if (pid == 0) {
+        int fd;
+        fd = open(_PATH_DEVNULL, O_RDWR, 0);
+        fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
 
         stringstream hd, usr;
         hd << USERS_HOME_DIR << uid;
