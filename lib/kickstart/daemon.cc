@@ -39,6 +39,7 @@ int spawnDaemon(int nochdir, int noclose) {
         (void)chdir("/");
 
     if (!noclose && (fd = open(_PATH_DEVNULL, O_RDWR, 0)) != -1) {
+        fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
         (void)dup2(fd, STDIN_FILENO);
         (void)dup2(fd, STDOUT_FILENO);
         (void)dup2(fd, STDERR_FILENO);
