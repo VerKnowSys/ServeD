@@ -36,7 +36,7 @@ void execute(char **argv, int uid, const char* env) {
         setenv("OLDPWD", hd.str().c_str(), 1);
         setenv("USER", usr.str().c_str(), 1);
         setenv("LOGNAME", usr.str().c_str(), 1);
-        setenv("LD_LIBRARY_PATH", env, 1); // most important env
+        // setenv("LD_LIBRARY_PATH", env, 1); // most important env
         unsetenv("USERNAME");
         unsetenv("SUDO_USERNAME");
         unsetenv("SUDO_USER");
