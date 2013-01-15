@@ -25,7 +25,7 @@ class SvdRootBoot extends Logging with SvdActor {
 
 
     val root = new SvdAccount(uid = 0, userName = "SuperUser")
-    val systemServices = "Genmosh" :: "James" :: "Redis" :: "Coreginx" :: Nil // XXX: hardcoded system services
+    val systemServices = "Redis" :: "Coreginx" :: Nil // "James" :: // XXX: hardcoded system services
 
 
     override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 1 minute) {
