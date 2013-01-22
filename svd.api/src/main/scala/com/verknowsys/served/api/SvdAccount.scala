@@ -88,6 +88,15 @@ object User {
      */
     case class CloneIgniterForUser(igniterName: String, userIgniterName: Option[String] = None) extends Base
 
+
+    /**
+     *  Call to create Mosh server for user.
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    case object MoshAuth extends Base
+
+
 }
 
 
