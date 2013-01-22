@@ -67,29 +67,14 @@ int main(int argc, char const *argv[]) {
         cout << endl << buffer.str() << endl;
     }
 
-    if (argc == 1) {
-        cerr << "No UID argument given!" << endl;
-        exit(NO_UID_GIVEN_ERROR);
-    }
-
-    string arg = string(argv[1]);
-    if (arg == "0") {
-        cerr << "Cannot spawn as root!" << endl;
-        exit(ROOT_UID_ERROR);
-    }
-
-    /* Checking uid validity */
-    uid_t uid;
-    bool valid_uid = istringstream(arg) >> uid;
-    if (!uid || !valid_uid) {
-        cerr << "Ambigous uid given!" << endl;
-        exit(AMBIGOUS_ENTRY_ERROR);
-    }
+    uid_t uid = getuid();
     gid_t gid = DEFAULT_USER_GROUP;
 
     /* Checking home directory existnace */
     struct stat st;
-    string homeDir = string(USERS_HOME_DIR) + arg; /* NOTE: /Users/$UID homedir format used here */
+    stringstream ss;
+    ss << string(USERS_HOME_DIR) << uid;
+    string homeDir = ss.str(); /* NOTE: /Users/$UID homedir format used here */
     if(stat(homeDir.c_str(), &st) == 0) {
         #ifdef DEVEL
             cerr << "Home directory " << homeDir << " is present" << endl;
@@ -120,14 +105,14 @@ int main(int argc, char const *argv[]) {
 
     // count and gather arguments
     string appArguments = "";
-    for (int i = 2; i < argc; i++) {
+    for (int i = 1; i < argc; i++) {
         if (NULL == argv[i+1])
             appArguments += string(argv[i]);
         else
             appArguments += string(argv[i]) + " ";
     }
     string command = string(DEFAULT_SHELL_COMMAND) + " -i -s";
-    if (argc > 2) { // additional arguments => spawn custom command with uid privileges
+    if (argc > 1) { // additional arguments => spawn custom command with uid privileges
         command = appArguments;
     }
     #ifdef DEVEL
