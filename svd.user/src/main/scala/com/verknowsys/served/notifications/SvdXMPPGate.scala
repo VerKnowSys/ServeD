@@ -83,12 +83,12 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
 
     override def preStart {
         super.preStart
-        log.info("Initiating XMPP Gate")
+        log.info("Launching XMPP Notifications Gate")
     }
 
 
     override def postStop {
-        log.info("Stopping XMPP Gate")
+        log.info("Terminating XMPP Notifications Gate")
         super.postStop
     }
 
