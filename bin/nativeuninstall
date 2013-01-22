@@ -17,11 +17,6 @@ if [ -e "/bin/svdshell" ]; then
     rm -f /bin/svdshell
 fi
 
-if [ -e "/sbin/svdsushell" ]; then
-    echo "* Uninstalling svdsushell"
-    rm -f /sbin/svdsushell
-fi
-
 if [ -e "/bin/svdrun" ]; then
     echo "* Uninstalling svdrun"
     rm -f /bin/svdrun

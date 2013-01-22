@@ -71,9 +71,6 @@ check $? "Utils"
 $CXX $FLAGS lib/kickstart/shell.cc -o shell lib/utils.o
 check $? "UserShell" "shell"
 
-$CXX $FLAGS lib/kickstart/sushell.cc -o sushell lib/utils.o
-check $? "SystemUserShell" "sushell"
-
 $CXX $FLAGS lib/kickstart/daemon.cc -o daemon lib/utils.o
 check $? "UserDaemon" "daemon"
 
