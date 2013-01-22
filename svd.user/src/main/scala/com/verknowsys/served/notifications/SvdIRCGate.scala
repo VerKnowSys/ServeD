@@ -47,9 +47,8 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
         try {
             log.debug("Attepting to connect to irc server: %s on channel %s", SvdConfig.defaultIRCServerName, SvdConfig.defaultIRCChannelName)
             connect(SvdConfig.defaultIRCServerName)
-            Thread.sleep(5000)
             log.debug("Authenticating IRC gate in NickServ")
-            sendMessage("NickServ", "identify ,lpmkonji")
+            identify(SvdConfig.defaultIRCGateIdentify)
             Thread.sleep(5000)
 
             val topic = s"dev: ServeD v${SvdConfig.version.split("-").head}, Sofin v0.32.0 | ?term - for terms, .help - tasks bot, @help - lang bot"
