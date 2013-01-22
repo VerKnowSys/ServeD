@@ -58,7 +58,7 @@ object BuildSettings {
         // scalacOptions   += "–Xshow-phases",
         // scalacOptions   += "–Xexperimental",
 
-        scalacOptions   += "-g:none",
+        scalacOptions   += "-g:vars",
         // scalacOptions   += "-explaintypes",
         scalacOptions   += "-unchecked",
         scalacOptions   += "-deprecation",
