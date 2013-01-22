@@ -283,7 +283,12 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         case SvdScheduler.StopJob(name) =>
             log.debug("Stopping scheduled jobs named: %s for service: %s".format(name, sender))
             for (index <- 0 to SvdConfig.maxSchedulerDefinitions) { // XXX: hacky.. it's better to figure out how to get list of defined jobs from scheduler..
-                scheduler.deleteJob(jobKey("%s-%d".format(name, index)))
+                try {
+                    scheduler.deleteJob(jobKey("%s-%d".format(name, index)))
+                } catch {
+                    case e: Exception =>
+                        log.debug(s"Exception when deleting job from user scheduler: ${e}")
+                }
             }
 
 
