@@ -130,6 +130,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="remove_all_reserved_ports">RemoveAllReservedPorts</div>
                     <div class="register_user_port">RegisterUserPort</div>
                     <div class="get_user_ports">GetUserPorts</div>
+                    <div class="mosh_auth">MoshAuth</div>
                 </article>
             )
 

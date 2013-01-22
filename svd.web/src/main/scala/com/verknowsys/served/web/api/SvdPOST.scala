@@ -191,6 +191,12 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
                 SvdWebAPI.apiRespond(webManager ? User.RegisterUserPort)
             }
 
+        /** API POST call #022  */
+        case req @ POST(Path("/MoshAuth") & Cookies(cookies)) =>
+            checkAuth(cookies) {
+                SvdWebAPI.apiRespond(webManager ? User.MoshAuth)
+            }
+
         /** API POST call #DEFAULT  */
         case req @ POST(_) =>
             JsonContent ~> ResponseString("{\"message\": \"Invalid API request.\", \"status\":3}")

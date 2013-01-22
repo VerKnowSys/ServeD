@@ -78,6 +78,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
     val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(bootAccount)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
     val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-single-dispatcher"), "SvdFileEventsManagerUser")
+    val moshManager = context.actorOf(Props(new SvdMoshManager(bootAccount)).withDispatcher("svd-single-dispatcher"), "SvdMoshManager")
 
     val accountsManager = context.actorFor("akka://%s@%s:%d/user/SvdAccountsManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
     val systemManager = context.actorFor("akka://%s@%s:%d/user/SvdSystemManager".format(SvdConfig.served, SvdConfig.remoteApiServerHost, SvdConfig.remoteApiServerPort))
@@ -540,6 +541,11 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             sender ! ApiSuccess
 
 
+        case User.MoshAuth =>
+            log.debug("Forwarding MoshAuth call to SvdMoshManager")
+            moshManager forward User.MoshAuth
+
+
         case AuthorizeWithKey(key) =>
             log.debug("Trying to find key in account: %s", account)
             sender ! accountKeys(db).keys.find(_.key == key).isDefined
@@ -699,10 +705,31 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             case x =>
                 log.error("TerminateServices fail: %s".format(x))
         }
-        log.debug("Unbecoming AccountManager")
-        context.unbecome
-        log.info("Shutting down Scheduler")
+
+        log.info("Terminating Mosh Sessions")
+        val ms = (moshManager ? Shutdown)
+        ms onSuccess {
+            case _ =>
+                log.info("All Mosh Sessions Terminated")
+        }
+        ms onFailure {
+            case x =>
+                log.error(s"TerminateMoshSessions fail: ${x}")
+        }
+        context.stop(moshManager)
+
+        log.info("Terminating Core Scheduler")
         scheduler.shutdown
+
+        log.info("Terminating File Events Manager")
+        context.stop(fem)
+
+        log.info("Terminating Notification center")
+        context.stop(notificationsManager)
+
+        log.info("Terminating Account Manager")
+        context.unbecome
+
         log.debug("Terminated successfully")
         super.postStop
     }
