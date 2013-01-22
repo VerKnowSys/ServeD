@@ -371,10 +371,11 @@ class SvdService(
 
     override def postStop {
         log.info(s"PostStop in ${className}: ${config.name}")
+        stopScheduler
+
         hookShot(stopHook, "stop")
         hookShot(afterStopHook, "afterStop")
 
-        stopScheduler
         val pause = SvdConfig.serviceRestartPause / 2
         log.debug(s"Waiting for scheduler stop for ${pause /1000} seconds")
         Thread.sleep(pause)
