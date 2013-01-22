@@ -98,11 +98,11 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
          */
         case Admin.Dead(account) =>
             val accountsWithoutThisOne = accountsAlive.filterNot{_.uuid == account.uuid}
+            log.info(s"Becoming aware of dead account: ${account}")
+            log.debug(s"Alive accounts: ${accountsWithoutThisOne}")
             context.become(
                 awareOfUserManagers(accountsWithoutThisOne))
             sender ! ApiSuccess
-            log.info(s"Becoming aware of dead account: ${account}")
-            log.debug(s"Alive accounts: ${accountsWithoutThisOne}")
 
 
         case SvdScheduler.StartJob(name, job, trigger) =>
