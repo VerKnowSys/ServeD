@@ -15,7 +15,7 @@ JAVA_PATH="/Software/Openjdk6-i386/exports/java"
 
 # read user configuration
 . "/Users/${userUID}/.profile"
-. "/Users/${userUID}/.profile_java"
+#. "/Users/${userUID}/.profile_java"
 
 if [ "$SYSTEM_NAME" = "Darwin" ]; then
   export JAVA_PATH="/usr/bin/java"
