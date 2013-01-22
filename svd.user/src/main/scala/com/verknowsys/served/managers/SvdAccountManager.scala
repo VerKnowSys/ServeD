@@ -268,6 +268,13 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
     private def started(account: SvdAccount, db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, utils: SvdAccountUtils): Receive = traceReceive {
 
 
+        case Shutdown =>
+            if (!headless) {
+                log.info("Sending Death Announcement to Account Manager")
+                accountsManager ! Admin.Dead(account)
+            }
+
+
         case SvdScheduler.StartJob(name, job, trigger) =>
             log.debug("Starting schedule job named: %s for service: %s".format(name, sender))
             scheduler.scheduleJob(job, trigger)
@@ -683,9 +690,6 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
     addShutdownHook {
         log.warn("Forcing POST Stop in Account Manager")
-        if (!headless)
-            accountsManager ! Admin.Dead(bootAccount)
-
         postStop
     }
 
@@ -728,10 +732,18 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         context.stop(notificationsManager)
 
         log.info("Terminating Account Manager")
-        context.unbecome
-
-        log.debug("Terminated successfully")
-        super.postStop
+        val shutdown = (self ? Shutdown)
+        shutdown onSuccess {
+            case _ =>
+                context.unbecome
+                log.info("Everything Terminated Successfully")
+        }
+        shutdown onFailure {
+            case x =>
+                context.unbecome
+                log.error("Failure while Termination process: ${x}")
+        }
+        context.stop _
     }
 
 
