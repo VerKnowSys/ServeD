@@ -722,14 +722,14 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         }
         context.stop(moshManager)
 
-        log.info("Terminating Core Scheduler")
-        scheduler.shutdown
-
         log.info("Terminating File Events Manager")
         context.stop(fem)
 
         log.info("Terminating Notification center")
         context.stop(notificationsManager)
+
+        log.info("Terminating Core Scheduler")
+        scheduler.shutdown
 
         log.info("Terminating Account Manager")
         val shutdown = (self ? Shutdown)
