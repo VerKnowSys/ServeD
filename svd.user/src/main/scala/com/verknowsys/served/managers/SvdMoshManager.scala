@@ -66,6 +66,7 @@ class SvdMoshManager(account: SvdAccount) extends Actor with Logging with SvdAct
                     context.unwatch(mosh)
                     context.stop(mosh)
             }
+            context.unbecome
             sender ! ApiSuccess
 
     }
