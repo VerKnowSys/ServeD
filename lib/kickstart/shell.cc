@@ -3,7 +3,7 @@
  *
  *   Shell wrapper with UID given as argument to main.
  *   This helper is used by SSHD side of ServeD
- *   © 2011-2012 - VerKnowSys
+ *   © 2011-2013 - VerKnowSys
  *
  */
 
@@ -30,7 +30,12 @@ void execute(char **argv, int uid) {
         fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
 
         stringstream hd, usr;
-        hd << USERS_HOME_DIR << uid;
+
+        if (uid == 0)
+            hd << SYSTEMUSERS_HOME_DIR;
+        else
+            hd << USERS_HOME_DIR << uid;
+
         usr << uid;
         chdir(hd.str().c_str());
         setenv("HOME", hd.str().c_str(), 1);
@@ -72,9 +77,16 @@ int main(int argc, char const *argv[]) {
 
     /* Checking home directory existnace */
     struct stat st;
-    stringstream ss;
-    ss << string(USERS_HOME_DIR) << uid;
-    string homeDir = ss.str(); /* NOTE: /Users/$UID homedir format used here */
+    string homeDir;
+
+    if (uid == 0)
+        homeDir = string(SYSTEMUSERS_HOME_DIR);
+    else {
+        stringstream ss;
+        ss << string(USERS_HOME_DIR) << uid;
+        homeDir = ss.str(); /* NOTE: /Users/$UID homedir format used here */
+    }
+
     if(stat(homeDir.c_str(), &st) == 0) {
         #ifdef DEVEL
             cerr << "Home directory " << homeDir << " is present" << endl;
