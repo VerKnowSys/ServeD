@@ -371,7 +371,6 @@ class SvdService(
 
     override def postStop {
         log.info(s"PostStop in ${className}: ${config.name}")
-        stopScheduler
 
         hookShot(stopHook, "stop")
         hookShot(afterStopHook, "afterStop")
@@ -381,6 +380,10 @@ class SvdService(
         Thread.sleep(pause)
 
         shell.close
+
+        log.debug("Stopping service scheduler")
+        stopScheduler
+
         log.info(s"Stopped ${className}: ${config.name}")
         super.postStop
     }
