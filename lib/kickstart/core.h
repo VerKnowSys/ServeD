@@ -70,9 +70,9 @@
     /* default BSD case: */
     #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh"
     #define DEFAULT_JAVA_PATH "/Software/Openjdk/"
-    #define DEFAULT_JAVA64_PATH "/Software/Openjdk-32/"
+    #define DEFAULT_JAVA64_PATH "/Software/Openjdk/"
     #define DEFAULT_JAVA7_PATH "/Software/Openjdk7/"
-    #define DEFAULT_JAVA764_PATH "/Software/Openjdk7-32/"
+    #define DEFAULT_JAVA764_PATH "/Software/Openjdk7/"
 
     #ifdef __FreeBSD__
         #ifndef JDK7
