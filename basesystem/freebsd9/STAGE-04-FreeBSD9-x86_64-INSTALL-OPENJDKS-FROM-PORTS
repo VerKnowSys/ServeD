@@ -49,37 +49,40 @@ echo "Install stage"
 # APP_EXPORTS="appletviewer idlj java javah jdb jmap jsadebugd jstatd orbd rmic schemagen tnameserv wsimport apt jar javac javah javap jhat jps jstack keytool pack200 rmid serialver unpack200 xjc extcheck jarsigner javadoc jconsole jinfo jrunscript jstat native2ascii policytool rmiregistry servertool wsgen"
 
 echo "6"
-${MKDIR_BIN} -p /Software/Openjdk6-${arch}/lib
-${MKDIR_BIN} -p /Software/Openjdk6-${arch}/exports
-${CP_BIN} -r /usr/local/openjdk6 /Software/Openjdk6-${arch}/
-check_command_result $?
-${CP_BIN} -r /usr/local/lib/* /Software/Openjdk6-${arch}/lib/
-check_command_result $?
+sofin get openjdk
+# ${MKDIR_BIN} -p /Software/Openjdk6-${arch}/lib
+# ${MKDIR_BIN} -p /Software/Openjdk6-${arch}/exports
+# ${CP_BIN} -r /usr/local/openjdk6 /Software/Openjdk6-${arch}/
+# check_command_result $?
+# ${CP_BIN} -r /usr/local/lib/* /Software/Openjdk6-${arch}/lib/
+# check_command_result $?
 # for i in $APP_EXPORTS; do
 #   ${LN_BIN} -s /Software/Openjdk6-${arch}/openjdk6/bin/$i /Software/Openjdk6-${arch}/exports/$i
 #   check_command_result $?
 # done
-${RM_BIN} -vfr /Software/Openjdk6-${arch}/openjdk6/demo
-${RM_BIN} -vfr /Software/Openjdk6-${arch}/openjdk6/sample
-${RM_BIN} -vfr /Software/Openjdk6-${arch}/openjdk6/man
-${RM_BIN} -vf /Software/Openjdk6-${arch}/openjdk6/src.zip
+# ${RM_BIN} -vfr /Software/Openjdk6-${arch}/openjdk6/demo
+# ${RM_BIN} -vfr /Software/Openjdk6-${arch}/openjdk6/sample
+# ${RM_BIN} -vfr /Software/Openjdk6-${arch}/openjdk6/man
+# ${RM_BIN} -vf /Software/Openjdk6-${arch}/openjdk6/src.zip
 
 
-echo "7"
-${MKDIR_BIN} -p /Software/Openjdk7-${arch}/lib
-${MKDIR_BIN} -p /Software/Openjdk7-${arch}/exports
-${CP_BIN} -r /usr/local/openjdk7 /Software/Openjdk7-${arch}/
-check_command_result $?
-${CP_BIN} -r /usr/local/lib/* /Software/Openjdk7-${arch}/lib/
-check_command_result $?
+# echo "7"
+# ${MKDIR_BIN} -p /Software/Openjdk7-${arch}/lib
+# ${MKDIR_BIN} -p /Software/Openjdk7-${arch}/exports
+# ${CP_BIN} -r /usr/local/openjdk7 /Software/Openjdk7-${arch}/
+# check_command_result $?
+# ${CP_BIN} -r /usr/local/lib/* /Software/Openjdk7-${arch}/lib/
+# check_command_result $?
+
+
 # for i in $APP_EXPORTS; do
 #   ${LN_BIN} -s /Software/Openjdk7-${arch}/openjdk7/bin/$i /Software/Openjdk7-${arch}/exports/$i
 #   check_command_result $?
 # done
-${RM_BIN} -vfr /Software/Openjdk7-${arch}/openjdk7/demo
-${RM_BIN} -vfr /Software/Openjdk7-${arch}/openjdk7/sample
-${RM_BIN} -vfr /Software/Openjdk7-${arch}/openjdk7/man
-${RM_BIN} -vf /Software/Openjdk7-${arch}/openjdk7/src.zip
+# ${RM_BIN} -vfr /Software/Openjdk7-${arch}/openjdk7/demo
+# ${RM_BIN} -vfr /Software/Openjdk7-${arch}/openjdk7/sample
+# ${RM_BIN} -vfr /Software/Openjdk7-${arch}/openjdk7/man
+# ${RM_BIN} -vf /Software/Openjdk7-${arch}/openjdk7/src.zip
 
 echo "Strip libs"
 cd /Software

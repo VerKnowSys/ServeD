@@ -2,8 +2,8 @@
 
 . /etc/rc.subr
 
-export PATH="$PATH:/Software/Openjdk6-amd64/bin"
-export JAVA_HOME="/Software/Openjdk6-amd64"
+export PATH="$PATH:/Software/Openjdk/bin"
+export JAVA_HOME="/Software/Openjdk"
 
 if [ ! -e $JAVA_HOME/bin/java ]; then
     echo "Cannot find OpenJDK"
