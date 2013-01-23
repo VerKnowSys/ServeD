@@ -162,10 +162,12 @@ int main(int argc, char *argv[]) {
         cerr << "Error setuid to uid: " << uid << endl;
         exit(SETUID_ERROR);
     }
-    if (setgid(gid) != 0) {
-        cerr << "Error setgid to gid: " << gid << endl;
-        exit(SETGID_ERROR);
-    }
+    #ifndef __APPLE__
+        if (setgid(gid) != 0) {
+            cerr << "Error setgid to gid: " << gid << endl;
+            exit(SETGID_ERROR);
+        }
+    #endif
     // chdir(homeDir.c_str());
 
     #ifdef DEVEL
