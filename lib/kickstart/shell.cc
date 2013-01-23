@@ -65,14 +65,6 @@ int main(int argc, char *argv[]) {
 
     cout << "ServeD Shell v" << APP_VERSION << " - " << COPYRIGHT << endl;
 
-    /* Print motd */
-    ifstream t(MOTD_FILE);
-    stringstream buffer;
-    buffer << t.rdbuf();
-    if (buffer.str() != "") {
-        cout << endl << buffer.str() << endl;
-    }
-
     uid_t uid = getuid();
     gid_t gid = DEFAULT_USER_GROUP;
 
