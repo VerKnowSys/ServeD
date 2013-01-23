@@ -26,7 +26,11 @@ if [ "$1" = "sysonly" ]; then
   exit
 fi
 
-bin/sbt clean
+if [ "$(uname)" = "FreeBSD" ]; then
+  bin/sbt64 clean
+else
+  bin/sbt clean
+fi
 echo "Project source cleaned.."
 
 rm -f ./kick ./shell ./usage_gather
