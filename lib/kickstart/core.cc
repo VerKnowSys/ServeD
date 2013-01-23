@@ -40,7 +40,6 @@ const static string coreDir = currentDir();
             javaNative = DEFAULT_JAVA764_PATH;
         #endif
 
-        string libPath = "LD_LIBRARY_PATH=" + javaNative + "lib:" + javaNative + "openjdk6/jre/lib/amd64:" + javaNative + "openjdk6/jre/lib/amd64/client" + ":/lib";
         const char *args[] = {
             // libPath.c_str(),
             DEFAULT_JAVA64_BIN,
@@ -83,22 +82,34 @@ const static string coreDir = currentDir();
 
 
     void load_svd(execParams params) {
-        string jnalp = "-Djava.library.path=" + string(LIBRARIES32_DIR);
+        #ifdef __FreeBSD__
+            string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
+        #else
+            string jnalp = "-Djava.library.path=" + string(LIBRARIES32_DIR);
+        #endif
         string javaNative = DEFAULT_JAVA_PATH;
         #ifdef JDK7
             javaNative = DEFAULT_JAVA7_PATH;
         #endif
-
-        string libPath = "LD_LIBRARY_PATH=" + javaNative + "lib:" + javaNative + "openjdk6/jre/lib/i386:" + javaNative + "openjdk6/jre/lib/i386/client" + ":/lib32";
         const char *args[] = {
             // libPath.c_str(),
             DEFAULT_JAVA_BIN,
-            "-d32",
+            #ifdef __FreeBSD__
+                "-d64",
+                "-XX:+UseCompressedOops",
+            #else
+                "-d32",
+            #endif
             "-client",
             "-Xmn1m",
             "-XX:NewRatio=1",
-            "-Xms32m",
-            "-Xmx64m",
+            #ifdef __FreeBSD__
+                "-Xms64m",
+                "-Xmx128m",
+            #else
+                "-Xms32m",
+                "-Xmx64m",
+            #endif
             "-Dfile.encoding=UTF-8",
             "-Djava.awt.headless=true",
             jnalp.c_str(),

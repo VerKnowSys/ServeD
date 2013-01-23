@@ -63,16 +63,16 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.7.5"
+    #define APP_VERSION "0.8.0"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     /* default BSD case: */
     #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh"
-    #define DEFAULT_JAVA_PATH "/Software/Openjdk6-i386/"
-    #define DEFAULT_JAVA64_PATH "/Software/Openjdk6-amd64/"
-    #define DEFAULT_JAVA7_PATH "/Software/Openjdk7-i386/"
-    #define DEFAULT_JAVA764_PATH "/Software/Openjdk7-amd64/"
+    #define DEFAULT_JAVA_PATH "/Software/Openjdk/"
+    #define DEFAULT_JAVA64_PATH "/Software/Openjdk-32/"
+    #define DEFAULT_JAVA7_PATH "/Software/Openjdk7/"
+    #define DEFAULT_JAVA764_PATH "/Software/Openjdk7-32/"
 
     #ifdef __FreeBSD__
         #ifndef JDK7
