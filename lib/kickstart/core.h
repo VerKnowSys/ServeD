@@ -63,7 +63,7 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.7.1"
+    #define APP_VERSION "0.7.2"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -96,7 +96,7 @@
 
     // Linux case:
     #ifdef __linux__
-        const string DEFAULT_SHELL_COMMAND = "/usr/bin/zsh";
+        const string DEFAULT_SHELL_COMMAND = "/bin/zsh";
         const string DEFAULT_JAVA_BIN = "/usr/bin/java";
         const string DEFAULT_JAVA64_BIN = "/usr/bin/java";
     #endif
