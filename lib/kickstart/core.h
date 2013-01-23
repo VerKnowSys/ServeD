@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <libgen.h>
+#include <getopt.h>
 
 #ifdef __FreeBSD__
     #include <kvm.h>
@@ -62,7 +63,7 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.6.0"
+    #define APP_VERSION "0.7.0"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 

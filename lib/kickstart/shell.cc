@@ -1,5 +1,5 @@
 /**
- *  @author dmilith
+ *  @author dmilith, tallica
  *
  *   Shell wrapper with UID given as argument to main.
  *   This helper is used by SSHD side of ServeD
@@ -13,9 +13,6 @@
 #ifdef __FreeBSD__
 #include <sys/wait.h>
 #endif
-
-
-extern void parse(char *line, char **argv);
 
 
 void execute(char **argv, int uid) {
@@ -60,7 +57,11 @@ void execute(char **argv, int uid) {
 }
 
 
-int main(int argc, char const *argv[]) {
+int main(int argc, char *argv[]) {
+
+    const char *defArguments[] = {DEFAULT_SHELL_COMMAND, "-i", "-s", NULL};
+    char **arguments = (char **) defArguments;
+    int opt = 0;
 
     cout << "ServeD Shell v" << APP_VERSION << " - " << COPYRIGHT << endl;
 
@@ -75,6 +76,41 @@ int main(int argc, char const *argv[]) {
     uid_t uid = getuid();
     gid_t gid = DEFAULT_USER_GROUP;
 
+    /* Available options */
+    static struct option options[] = {
+        {"uid", optional_argument, 0, 'u'},
+        {NULL, 0, NULL, 0}
+    };
+
+    while ((opt = getopt_long(argc, argv, "u:", options, NULL)) != -1) {
+        switch (opt) {
+            case 'u': {
+                    if (uid != 0) {
+                        cerr << "You are not allowed to specify custom uid!" << endl;
+                        exit(EXIT_FAILURE);
+                    }
+
+                    int optUid;
+                    if (!optarg || !(istringstream(optarg) >> optUid) || optUid < 0) {
+                        cerr << "Ambigous uid given!" << endl;
+                        exit(AMBIGOUS_ENTRY_ERROR);
+                    } else
+                        uid = optUid;
+                }
+                break;
+            case '?':
+            case ':':
+                exit(EXIT_FAILURE);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /* Checking for additional arguments */
+    if (optind < argc)
+        arguments = argv + optind; /* Spawn custom command with uid privileges */
+
     /* Checking home directory existnace */
     struct stat st;
     string homeDir;
@@ -87,7 +123,7 @@ int main(int argc, char const *argv[]) {
         homeDir = ss.str(); /* NOTE: /Users/$UID homedir format used here */
     }
 
-    if(stat(homeDir.c_str(), &st) == 0) {
+    if (stat(homeDir.c_str(), &st) == 0) {
         #ifdef DEVEL
             cerr << "Home directory " << homeDir << " is present" << endl;
         #endif
@@ -115,24 +151,13 @@ int main(int argc, char const *argv[]) {
     }
     // chdir(homeDir.c_str());
 
-    // count and gather arguments
-    string appArguments = "";
-    for (int i = 1; i < argc; i++) {
-        if (NULL == argv[i+1])
-            appArguments += string(argv[i]);
-        else
-            appArguments += string(argv[i]) + " ";
-    }
-    string command = string(DEFAULT_SHELL_COMMAND) + " -i -s";
-    if (argc > 1) { // additional arguments => spawn custom command with uid privileges
-        command = appArguments;
-    }
     #ifdef DEVEL
         cerr << "Spawning command for uid: " << uid << ", gid: " << gid << endl;
-        cerr << "Command line: " << command << endl;
+        cerr << "Command line:";
+        for (int i = 0; arguments[i] != NULL; i++)
+            cerr << " " << arguments[i];
+        cerr << endl;
     #endif
 
-    char *arguments[argc];
-    parse((char*)(command.c_str()), arguments);
     execute(arguments, uid);
 }
