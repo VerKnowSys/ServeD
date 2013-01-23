@@ -59,7 +59,7 @@ void execute(char **argv, int uid) {
 
 int main(int argc, char *argv[]) {
 
-    const char *defArguments[] = {DEFAULT_SHELL_COMMAND.c_str(), "-i", "-s", NULL};
+    const char *defArguments[] = {DEFAULT_SHELL_COMMAND, "-i", "-s", NULL};
     char **arguments = (char **) defArguments;
     int opt = 0;
 

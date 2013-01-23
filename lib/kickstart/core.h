@@ -63,26 +63,24 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.7.2"
+    #define APP_VERSION "0.7.3"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     /* default BSD case: */
-    #ifndef __linux__
-        const string DEFAULT_SHELL_COMMAND = "/Software/Zsh/exports/zsh";
-    #endif
-    const string DEFAULT_JAVA_PATH = "/Software/Openjdk6-i386/";
-    const string DEFAULT_JAVA64_PATH = "/Software/Openjdk6-amd64/";
-    const string DEFAULT_JAVA7_PATH = "/Software/Openjdk7-i386/";
-    const string DEFAULT_JAVA764_PATH = "/Software/Openjdk7-amd64/";
+    #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh"
+    #define DEFAULT_JAVA_PATH "/Software/Openjdk6-i386/"
+    #define DEFAULT_JAVA64_PATH "/Software/Openjdk6-amd64/"
+    #define DEFAULT_JAVA7_PATH "/Software/Openjdk7-i386/"
+    #define DEFAULT_JAVA764_PATH "/Software/Openjdk7-amd64/"
 
     #ifdef __FreeBSD__
         #ifndef JDK7
-            const string DEFAULT_JAVA_BIN = DEFAULT_JAVA_PATH + "exports/java";
-            const string DEFAULT_JAVA64_BIN = DEFAULT_JAVA64_PATH + "exports/java";
+            #define DEFAULT_JAVA_BIN (DEFAULT_JAVA_PATH "exports/java")
+            #define DEFAULT_JAVA64_BIN (DEFAULT_JAVA64_PATH "exports/java")
         #else
-            const string DEFAULT_JAVA_BIN = DEFAULT_JAVA7_PATH + "exports/java";
-            const string DEFAULT_JAVA64_BIN = DEFAULT_JAVA764_PATH + "exports/java";
+            #define DEFAULT_JAVA_BIN (DEFAULT_JAVA7_PATH "exports/java")
+            #define DEFAULT_JAVA64_BIN (DEFAULT_JAVA764_PATH "exports/java")
         #endif
     #endif
 
@@ -90,15 +88,16 @@
     #ifdef __APPLE__
         #define CLOCK_REALTIME REALTIME_CLOCK
         // NOTE: Darwin uses same zsh path as BSD
-        const string DEFAULT_JAVA_BIN = "/usr/bin/java";
-        const string DEFAULT_JAVA64_BIN = "/usr/bin/java";
+        #define DEFAULT_JAVA_BIN "/usr/bin/java"
+        #define DEFAULT_JAVA64_BIN "/usr/bin/java"
     #endif
 
     // Linux case:
     #ifdef __linux__
-        const string DEFAULT_SHELL_COMMAND = "/bin/zsh";
-        const string DEFAULT_JAVA_BIN = "/usr/bin/java";
-        const string DEFAULT_JAVA64_BIN = "/usr/bin/java";
+        #undef DEFAULT_SHELL_COMMAND
+        #define DEFAULT_SHELL_COMMAND "/bin/zsh"
+        #define DEFAULT_JAVA_BIN (DEFAULT_JAVA_PATH "exports/java")
+        #define DEFAULT_JAVA64_BIN "/usr/bin/java"
     #endif
 
 
