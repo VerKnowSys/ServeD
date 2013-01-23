@@ -57,25 +57,49 @@ void execute(char **argv, int uid) {
 }
 
 
+static void printVersion(void) {
+    cout << "ServeD Shell v" << APP_VERSION << " - " << COPYRIGHT << endl;
+}
+
+
+static void printUsage(void) {
+    cout << endl;
+    cout << "Usage: " << endl;
+    cout << "  svdshell [option] [command]" << endl;
+    cout << "  svdshell --uid=700 pstree" << endl;
+    cout << "  svdshell -u700 -- ls -la" << endl;
+    cout << endl;
+    cout << "Options:" << endl;
+    cout << "  -h, --help         This message." << endl;
+    cout << "  -u, --uid=<uid>    Spawn command with <uid> privileges." << endl;
+    cout << "  -v, --version      Show copyright and version information." << endl;
+}
+
+
 int main(int argc, char *argv[]) {
 
     const char *defArguments[] = {DEFAULT_SHELL_COMMAND, "-i", "-s", NULL};
     char **arguments = (char **) defArguments;
     int opt = 0;
 
-    cout << "ServeD Shell v" << APP_VERSION << " - " << COPYRIGHT << endl;
+    printVersion();
 
     uid_t uid = getuid();
     gid_t gid = DEFAULT_USER_GROUP;
 
     /* Available options */
     static struct option options[] = {
+        {"help", no_argument, 0, 'h'},
         {"uid", optional_argument, 0, 'u'},
+        {"version", no_argument, 0, 'v'},
         {NULL, 0, NULL, 0}
     };
 
-    while ((opt = getopt_long(argc, argv, "u:", options, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "hu:v", options, NULL)) != -1) {
         switch (opt) {
+            case 'h':
+                printUsage();
+                exit(EXIT_SUCCESS);
             case 'u': {
                     if (uid != 0) {
                         cerr << "You are not allowed to specify custom uid!" << endl;
@@ -90,10 +114,11 @@ int main(int argc, char *argv[]) {
                         uid = optUid;
                 }
                 break;
+            case 'v':
+                exit(EXIT_SUCCESS);
             case '?':
             case ':':
                 exit(EXIT_FAILURE);
-                break;
             default:
                 break;
         }
