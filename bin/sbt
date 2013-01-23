@@ -4,9 +4,6 @@ unset SBT_OPTS
 unset JAVA_OPTS
 
 FLAGS="-d32"
-if [ "$(uname)" = "FreeBSD" ]; then
-  export FLAGS="-d64 -XX:+UseCompressedOops"
-fi
 
 export SBT_OPTS=" ${FLAGS} -XX:MaxPermSize=768m -Xms256m -Xmx2048m -server -XX:+UseParNewGC -XX:+CMSClassUnloadingEnabled -XX:+AggressiveOpts"
 # -XX:ReservedCodeCacheSize=256m  -XX:MaxPermSize=512m
