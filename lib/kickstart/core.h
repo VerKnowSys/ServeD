@@ -63,12 +63,14 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.7.0"
+    #define APP_VERSION "0.7.1"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     /* default BSD case: */
-    const string DEFAULT_SHELL_COMMAND = "/Software/Zsh/exports/zsh";
+    #ifndef __linux__
+        const string DEFAULT_SHELL_COMMAND = "/Software/Zsh/exports/zsh";
+    #endif
     const string DEFAULT_JAVA_PATH = "/Software/Openjdk6-i386/";
     const string DEFAULT_JAVA64_PATH = "/Software/Openjdk6-amd64/";
     const string DEFAULT_JAVA7_PATH = "/Software/Openjdk7-i386/";
@@ -94,8 +96,7 @@
 
     // Linux case:
     #ifdef __linux__
-        #undef DEFAULT_SHELL_COMMAND
-        #define DEFAULT_SHELL_COMMAND "/bin/zsh"
+        const string DEFAULT_SHELL_COMMAND = "/usr/bin/zsh";
         const string DEFAULT_JAVA_BIN = "/usr/bin/java";
         const string DEFAULT_JAVA64_BIN = "/usr/bin/java";
     #endif
