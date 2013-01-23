@@ -3,7 +3,12 @@
 unset SBT_OPTS
 unset JAVA_OPTS
 
-export SBT_OPTS=" -d32 -XX:MaxPermSize=768m -Xms256m -Xmx2048m -server -XX:+UseParNewGC -XX:+CMSClassUnloadingEnabled -XX:+AggressiveOpts"
+FLAGS="-d32"
+if [ "$(uname)" = "FreeBSD" ]; then
+  export FLAGS="-d64 -XX:+UseCompressedOops"
+fi
+
+export SBT_OPTS=" ${FLAGS} -XX:MaxPermSize=768m -Xms256m -Xmx2048m -server -XX:+UseParNewGC -XX:+CMSClassUnloadingEnabled -XX:+AggressiveOpts"
 # -XX:ReservedCodeCacheSize=256m  -XX:MaxPermSize=512m
 
 #  -XX:+UseConcMarkSweepGC
@@ -17,7 +22,7 @@ export SBT_OPTS=" -d32 -XX:MaxPermSize=768m -Xms256m -Xmx2048m -server -XX:+UseP
 #-Xmx2000m \
 
 exec java \
--d32 \
+${FLAGS} \
 -XX:MaxPermSize=768m \
 -XX:+UseParNewGC \
 -XX:+CMSClassUnloadingEnabled \
