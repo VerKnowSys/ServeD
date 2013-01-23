@@ -1,6 +1,6 @@
 /*
     Author: Daniel (dmilith) Dettlaff
-    © 2011-2012 - VerKnowSys
+    © 2011-2013 - VerKnowSys
 */
 
 #include "core.h"
@@ -41,47 +41,44 @@ const static string coreDir = currentDir();
         #endif
 
         string libPath = "LD_LIBRARY_PATH=" + javaNative + "lib:" + javaNative + "openjdk6/jre/lib/amd64:" + javaNative + "openjdk6/jre/lib/amd64/client" + ":/lib";
-        #ifdef DEVEL
-            int count = 14;
-        #endif
-        char *args[] = {
-            // (char*)libPath.c_str(),
-            (char*)DEFAULT_JAVA64_BIN,
-            (char*)"-d64",
-            (char*)"-Xmn4m",
-            (char*)"-Xms16m",
-            (char*)"-Xmx256m",
-            (char*)"-XX:+UseCompressedOops",
-            (char*)"-Dfile.encoding=UTF-8",
-            (char*)"-Djava.awt.headless=true",
-            (char*)jnalp.c_str(),
+        const char *args[] = {
+            // libPath.c_str(),
+            DEFAULT_JAVA64_BIN,
+            "-d64",
+            "-Xmn4m",
+            "-Xms16m",
+            "-Xmx256m",
+            "-XX:+UseCompressedOops",
+            "-Dfile.encoding=UTF-8",
+            "-Djava.awt.headless=true",
+            jnalp.c_str(),
             #ifndef DEVEL
                 /* when not devel, use classes from assembly jar */
-                (char*)"-jar",
-                (char*)params.jar.c_str(),
+                "-jar",
+                params.jar.c_str(),
             #else
-                (char*)"-javaagent:/lib/jrebel/jrebel.jar", // XXX: hardcoded
-                // (char*)"-Dcom.sun.management.jmxremote=false",
-                // (char*)"-Dcom.sun.management.jmxremote.ssl=false",
-                // (char*)"-Dcom.sun.management.jmxremote.authenticate=false", // XXX: TODO: Security hole
-                // (char*)"-Dcom.sun.management.jmxremote.port=55555",
+                "-javaagent:/lib/jrebel/jrebel.jar", // XXX: hardcoded
+                // "-Dcom.sun.management.jmxremote=false",
+                // "-Dcom.sun.management.jmxremote.ssl=false",
+                // "-Dcom.sun.management.jmxremote.authenticate=false", // XXX: TODO: Security hole
+                // "-Dcom.sun.management.jmxremote.port=55555",
                 // /* when devel, use classes from compile folders */
-                (char*)"-cp",
-                (char*)getClassPath(params.classPathFile).c_str(),
-                (char*)params.mainClass.c_str(),
+                "-cp",
+                getClassPath(params.classPathFile).c_str(),
+                params.mainClass.c_str(),
             #endif
-            (char*)params.svdArg.c_str(),
-            (char*)0
+            params.svdArg.c_str(),
+            NULL
         };
 
         #ifdef DEVEL
             cerr << "Loading svd-64, with opts: [";
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; args[i] != NULL; i++) {
                 cerr << args[i] << " ";
             }
             cerr << "]" << endl;
         #endif
-        execv((char*)params.javaPath.c_str(), args);
+        execv((char *) params.javaPath.c_str(), (char **) args);
     }
 
 
@@ -93,44 +90,41 @@ const static string coreDir = currentDir();
         #endif
 
         string libPath = "LD_LIBRARY_PATH=" + javaNative + "lib:" + javaNative + "openjdk6/jre/lib/i386:" + javaNative + "openjdk6/jre/lib/i386/client" + ":/lib32";
-        #ifdef DEVEL
-            int count = 15;
-        #endif
-        char *args[] = {
-            // (char*)libPath.c_str(),
-            (char*)DEFAULT_JAVA_BIN,
-            (char*)"-d32",
-            (char*)"-client",
-            (char*)"-Xmn1m",
-            (char*)"-XX:NewRatio=1",
-            (char*)"-Xms32m",
-            (char*)"-Xmx64m",
-            (char*)"-Dfile.encoding=UTF-8",
-            (char*)"-Djava.awt.headless=true",
-            (char*)jnalp.c_str(),
+        const char *args[] = {
+            // libPath.c_str(),
+            DEFAULT_JAVA_BIN,
+            "-d32",
+            "-client",
+            "-Xmn1m",
+            "-XX:NewRatio=1",
+            "-Xms32m",
+            "-Xmx64m",
+            "-Dfile.encoding=UTF-8",
+            "-Djava.awt.headless=true",
+            jnalp.c_str(),
             #ifndef DEVEL
                 /* when not devel, use classes from assembly jar */
-                (char*)"-jar",
-                (char*)params.jar.c_str(),
+                "-jar",
+                params.jar.c_str(),
             #else
-                (char*)"-javaagent:/lib/jrebel/jrebel.jar", // XXX
+                "-javaagent:/lib/jrebel/jrebel.jar", // XXX
                 /* when devel, use classes from compile folders */
-                (char*)"-cp",
-                (char*)getClassPath(params.classPathFile).c_str(),
-                (char*)params.mainClass.c_str(),
+                "-cp",
+                getClassPath(params.classPathFile).c_str(),
+                params.mainClass.c_str(),
             #endif
-            (char*)params.svdArg.c_str(),
-            (char*)0
+            params.svdArg.c_str(),
+            NULL
         };
 
         #ifdef DEVEL
             cerr << "Loading svd, with opts: [";
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; args[i] != NULL; i++) {
                 cerr << args[i] << " ";
             }
             cerr << "]" << endl;
         #endif
-        execv((char*)params.javaPath.c_str(), args);
+        execv((char *) params.javaPath.c_str(), (char **) args);
     }
 
 

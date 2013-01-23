@@ -1,6 +1,6 @@
 /*
     Author: Daniel (dmilith) Dettlaff
-    © 2011-2012 - VerKnowSys
+    © 2011-2013 - VerKnowSys
 */
 
 
@@ -63,7 +63,7 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.7.3"
+    #define APP_VERSION "0.7.4"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
