@@ -23,7 +23,8 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
                 new ExpectJ
 
     log.debug(s"Spawning user Shell for account ${account}")
-    val shellToSpawn = if (account.uid == 0) SvdConfig.defaultShell + " -s" else SvdConfig.defaultShell
+
+    val shellToSpawn = if (account.uid == 0) SvdConfig.servedShell + s" --uid=0 --" else SvdConfig.servedShell + " --"
     var shell = expectinator.spawn(shellToSpawn)
 
 
