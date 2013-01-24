@@ -22,8 +22,10 @@ void execute(char **argv, const string& command, int uid) {
         .ws_col = 80,
         .ws_row = 30
     };
+
     /* Get the current size of the terminal */
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    if (isatty(STDOUT_FILENO))
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
     if ((pid = forkpty(&master, NULL, NULL, &w)) < 0) {
         cerr << "Error forking child process failed!" << endl;
