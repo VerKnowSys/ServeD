@@ -31,7 +31,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
 
 
     def exec(operations: SvdShellOperations) {
-        spawnThread {
+        // spawnThread {
             if (dead) { // if shell is dead, respawn it! It MUST live no matter what
                 log.debug("Found dead shell: %s".format(shell))
                 shell = expectinator.spawn(shellToSpawn)
@@ -50,7 +50,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
                 expect =>
                     shell.expectErr(expect, operations.expectOutputTimeout)
             }
-        }
+        // }
 
     }
 
