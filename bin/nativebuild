@@ -68,7 +68,7 @@ check $? "Core"
 $CXX $FLAGS -c lib/kickstart/utils.cc -o lib/utils.o
 check $? "Utils"
 
-$CXX $FLAGS lib/kickstart/shell.cc -o shell lib/utils.o
+$CXX $FLAGS lib/kickstart/shell.cc -o shell lib/utils.o -lutil
 check $? "UserShell" "shell"
 
 $CXX $FLAGS lib/kickstart/daemon.cc -o daemon lib/utils.o

@@ -15,17 +15,16 @@
 #endif
 
 
-void execute(char **argv, int uid) {
-    int status;
-    pid_t  pid;
-    if ((pid = fork()) < 0) {
+void execute(char **argv, char *command, int uid) {
+    int master;
+    pid_t pid;
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+    if ((pid = forkpty(&master, NULL, NULL, &w)) < 0) {
         cerr << "Error forking child process failed!" << endl;
         exit(FORK_ERROR);
     } else if (pid == 0) {
-        int fd;
-        fd = open(_PATH_DEVNULL, O_RDWR, 0);
-        fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
-
         stringstream hd, usr;
 
         if (uid == 0)
@@ -52,8 +51,44 @@ void execute(char **argv, int uid) {
             cerr << "Exec failed!" << endl;
             exit(EXEC_ERROR);
         }
-    } else
-        while (wait(&status) != pid); /* wait for process */
+    } else {
+        // remove the echo
+        struct termios tios;
+        tcgetattr(master, &tios);
+        tios.c_lflag &= ~(ECHO | ECHONL);
+        tcsetattr(master, TCSAFLUSH, &tios);
+
+        if (command)
+            write(master, command, strlen(command));
+
+        for (;;) {
+
+            fd_set read_fd;
+            FD_ZERO(&read_fd);
+
+            FD_SET(master, &read_fd);
+            FD_SET(STDIN_FILENO, &read_fd);
+
+            select(master+1, &read_fd, NULL, NULL, NULL);
+
+            char input;
+            char output;
+
+            if (FD_ISSET(master, &read_fd))
+            {
+                if (read(master, &output, 1) != -1)
+                    write(STDOUT_FILENO, &output, 1);
+                else
+                    break;
+            }
+
+            if (FD_ISSET(STDIN_FILENO, &read_fd))
+            {
+                read(STDIN_FILENO, &input, 1);
+                write(master, &input, 1);
+            }
+        }
+    }
 }
 
 
@@ -78,8 +113,8 @@ static void printUsage(void) {
 
 int main(int argc, char *argv[]) {
 
-    const char *defArguments[] = {DEFAULT_SHELL_COMMAND, "-i", "-s", NULL};
-    char **arguments = (char **) defArguments;
+    const char *defShell[] = {DEFAULT_SHELL_COMMAND, "-s", NULL};
+    char *command = NULL;
     int opt = 0;
 
     printVersion();
@@ -125,8 +160,18 @@ int main(int argc, char *argv[]) {
     }
 
     /* Checking for additional arguments */
-    if (optind < argc)
-        arguments = argv + optind; /* Spawn custom command with uid privileges */
+    if (optind < argc) {
+        char **args = argv + optind;
+        stringstream ss;
+        for (int i = 0; args[i] != NULL; i++) {
+            if (args[i + 1] != NULL)
+                ss << args[i] << " ";
+            else
+                ss << args[i] << endl;
+        }
+        command = (char *) malloc(sizeof(char) * ss.str().length());
+        strcpy(command, ss.str().c_str());
+    }
 
     /* Checking home directory existnace */
     struct stat st;
@@ -172,11 +217,11 @@ int main(int argc, char *argv[]) {
 
     #ifdef DEVEL
         cerr << "Spawning command for uid: " << uid << ", gid: " << gid << endl;
-        cerr << "Command line:";
-        for (int i = 0; arguments[i] != NULL; i++)
-            cerr << " " << arguments[i];
-        cerr << endl;
+        if (command)
+            cerr << "Command line: " << command;
+
     #endif
 
-    execute(arguments, uid);
+    execute((char **) defShell, command, uid);
+    free(command);
 }
