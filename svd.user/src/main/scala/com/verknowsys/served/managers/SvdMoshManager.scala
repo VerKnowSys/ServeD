@@ -45,16 +45,18 @@ class SvdMoshManager(account: SvdAccount) extends Actor with Logging with SvdAct
             log.info("Becoming aware of new Mosh Server")
             val moshUUID = newUuid
             val moshServer = context.actorOf(Props(new SvdService("Mosh", account)), s"MoshSession-${moshUUID}")
-            val future = (moshServer ? Notify.Ping)
-            future onSuccess {
-                case _ =>
-                    context.watch(moshServer)
-                    context.become(availableWith(moshServer :: activeSessions))
+            // val future = (moshServer ? Notify.Ping)
+            // future onSuccess {
+            //     case _ =>
+            context.watch(moshServer)
+            context.become(availableWith(moshServer :: activeSessions))
 
-                    val contentFile = SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.softwareDataDir / "Mosh" / "client.string.txt" // XXX: hardcoded client string file name
-                    val moshClientString = Source.fromFile(contentFile).mkString.trim
-                    sender ! s"""{"message": "Mosh Session Created", "content": "${moshClientString}"}"""
-            }
+            Thread.sleep(10000) // XXX: HACK. wait for mosh output
+
+            val contentFile = SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.softwareDataDir / "Mosh" / "client.string.txt" // XXX: hardcoded client string file name
+            val moshClientString = Source.fromFile(contentFile).mkString.trim
+            sender ! s"""{"message": "Mosh Session Created", "content": "${moshClientString}"}"""
+            // }
 
 
         case Shutdown =>
