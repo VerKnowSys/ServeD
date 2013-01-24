@@ -15,7 +15,7 @@
 #endif
 
 
-void execute(char **argv, char *command, int uid) {
+void execute(char **argv, const string& command, int uid) {
     int master;
     pid_t pid;
     struct winsize w;
@@ -58,8 +58,8 @@ void execute(char **argv, char *command, int uid) {
         tios.c_lflag &= ~(ECHO | ECHONL);
         tcsetattr(master, TCSAFLUSH, &tios);
 
-        if (command)
-            write(master, command, strlen(command));
+        if (command.length() > 0)
+            write(master, command.c_str(), command.length());
 
         for (;;) {
 
@@ -114,7 +114,7 @@ static void printUsage(void) {
 int main(int argc, char *argv[]) {
 
     const char *defShell[] = {DEFAULT_SHELL_COMMAND, "-s", NULL};
-    char *command = NULL;
+    string command;
     int opt = 0;
 
     printVersion();
@@ -169,8 +169,7 @@ int main(int argc, char *argv[]) {
             else
                 ss << args[i] << endl;
         }
-        command = (char *) malloc(sizeof(char) * ss.str().length());
-        strcpy(command, ss.str().c_str());
+        command = ss.str();
     }
 
     /* Checking home directory existnace */
@@ -217,11 +216,9 @@ int main(int argc, char *argv[]) {
 
     #ifdef DEVEL
         cerr << "Spawning command for uid: " << uid << ", gid: " << gid << endl;
-        if (command)
+        if (command.length() > 0)
             cerr << "Command line: " << command;
-
     #endif
 
     execute((char **) defShell, command, uid);
-    free(command);
 }
