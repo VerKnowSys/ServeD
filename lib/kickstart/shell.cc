@@ -15,7 +15,7 @@
 #endif
 
 
-void execute(char **argv, const string& command, int uid) {
+void execute(char **argv, int uid) {
     int master;
     pid_t pid;
     struct winsize w = {
@@ -53,6 +53,7 @@ void execute(char **argv, const string& command, int uid) {
         unsetenv("SUDO_GID");
         unsetenv("SUDO_COMMAND");
         unsetenv("MAIL");
+
         if (execvp(*argv, argv) < 0) {
             cerr << "Exec failed!" << endl;
             exit(EXEC_ERROR);
@@ -65,10 +66,6 @@ void execute(char **argv, const string& command, int uid) {
         tcgetattr(master, &tios);
         tios.c_lflag &= ~(ECHO | ECHONL);
         tcsetattr(master, TCSAFLUSH, &tios);
-
-        /* Execute custom command */
-        if (command.length() > 0)
-            write(master, command.c_str(), command.length());
 
         for (;;) {
             fd_set read_fd;
@@ -122,6 +119,7 @@ static void printUsage(void) {
 int main(int argc, char *argv[]) {
 
     const char *defShell[] = {DEFAULT_SHELL_COMMAND, "-s", NULL};
+    char **arguments = (char **) defShell;
     string command;
     int opt = 0;
 
@@ -138,7 +136,7 @@ int main(int argc, char *argv[]) {
         {NULL, 0, NULL, 0}
     };
 
-    while ((opt = getopt_long(argc, argv, "hu:v", options, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "hiu:v", options, NULL)) != -1) {
         switch (opt) {
             case 'h':
                 printUsage();
@@ -169,15 +167,16 @@ int main(int argc, char *argv[]) {
 
     /* Checking for additional arguments */
     if (optind < argc) {
-        char **args = argv + optind;
         stringstream ss;
-        for (int i = 0; args[i] != NULL; i++) {
-            if (args[i + 1] != NULL)
-                ss << args[i] << " ";
+        for (int i = optind; argv[i] != NULL; i++) {
+            if (argv[i + 1] != NULL)
+                ss << argv[i] << " ";
             else
-                ss << args[i] << endl;
+                ss << argv[i];
         }
-        command = ss.str();
+        command = ss.str(); /* Spawn custom command with uid privileges */
+        const char *args[4] = {DEFAULT_SHELL_COMMAND, "-c", command.c_str(), NULL};
+        arguments = (char **) args;
     }
 
     /* Checking home directory existnace */
@@ -224,9 +223,11 @@ int main(int argc, char *argv[]) {
 
     #ifdef DEVEL
         cerr << "Spawning command for uid: " << uid << ", gid: " << gid << endl;
-        if (command.length() > 0)
-            cerr << "Command line: " << command;
+        cerr << "Command line:";
+        for (int i = 0; arguments[i] != NULL; i++)
+            cerr << " " << arguments[i];
+        cerr << endl;
     #endif
 
-    execute((char **) defShell, command, uid);
+    execute(arguments, uid);
 }
