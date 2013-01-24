@@ -30,13 +30,13 @@
 #include <limits.h>
 #include <libgen.h>
 #include <getopt.h>
-#include <pty.h>
 #include <termios.h>
 
 #ifdef __FreeBSD__
     #include <kvm.h>
     #include <sys/capability.h>
     #include <libprocstat.h>
+    #include <libutil.h>
 #endif
 
 #ifdef __APPLE__
@@ -50,6 +50,8 @@
     #include <stdlib.h>
     #include <stdio.h>
     #include <sys/sysctl.h>
+    #include <util.h>
+    #include <sys/ioctl.h>
 #endif
 
 #ifdef __linux__
@@ -58,6 +60,7 @@
     #include <sys/wait.h>
     #include <sys/fcntl.h>
     #include <algorithm>
+    #include <pty.h>
     #define MAXPATHLEN PATH_MAX
 #endif
 
