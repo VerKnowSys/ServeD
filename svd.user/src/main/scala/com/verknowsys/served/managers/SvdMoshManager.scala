@@ -51,11 +51,12 @@ class SvdMoshManager(account: SvdAccount) extends Actor with Logging with SvdAct
             context.watch(moshServer)
             context.become(availableWith(moshServer :: activeSessions))
 
-            Thread.sleep(10000) // XXX: HACK. wait for mosh output
+            Thread.sleep(5000) // XXX: HACK. wait for mosh output
 
             val contentFile = SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.softwareDataDir / "Mosh" / "client.string.txt" // XXX: hardcoded client string file name
-            val moshClientString = Source.fromFile(contentFile).mkString.trim
-            sender ! s"""{"message": "Mosh Session Created", "content": "${moshClientString}"}"""
+            val moshClientString = Source.fromFile(contentFile).mkString.trim.split("MOSH CONNECT ").last
+            val moshClientCommand = s"MOSH_KEY=${moshClientString.split(" ").tail.head} mosh-client ${currentVPNHost} ${moshClientString.split(" ").head}"
+            sender ! s"""{"message": "Mosh Session Created", "content": "${moshClientCommand}"}"""
             // }
 
 
