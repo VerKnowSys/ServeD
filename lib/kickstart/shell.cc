@@ -18,7 +18,11 @@
 void execute(char **argv, const string& command, int uid) {
     int master;
     pid_t pid;
-    struct winsize w;
+    struct winsize w = {
+        .ws_col = 80,
+        .ws_row = 30
+    };
+    /* Get the current size of the terminal */
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
     if ((pid = forkpty(&master, NULL, NULL, &w)) < 0) {
@@ -52,17 +56,19 @@ void execute(char **argv, const string& command, int uid) {
             exit(EXEC_ERROR);
         }
     } else {
+        /* Adapted from https://gist.github.com/3547195 */
+
         // remove the echo
         struct termios tios;
         tcgetattr(master, &tios);
         tios.c_lflag &= ~(ECHO | ECHONL);
         tcsetattr(master, TCSAFLUSH, &tios);
 
+        /* Execute custom command */
         if (command.length() > 0)
             write(master, command.c_str(), command.length());
 
         for (;;) {
-
             fd_set read_fd;
             FD_ZERO(&read_fd);
 
