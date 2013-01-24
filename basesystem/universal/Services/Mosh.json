@@ -1,11 +1,11 @@
 {
     "softwareName": "Mosh",
     "install": {
-        "commands": ["sofin get openssh ; sofin get mosh"],
+        "commands": ["sofin get mosh"],
         "expectStdOut": ["All done."]
     },
     "start": {
-        "commands": ["svdshell SERVICE_ROOT/exports/mosh-server -- /Software/Zsh/exports/zsh -s > SERVICE_PREFIX/client.string.txt"]
+        "commands": ["SERVICE_ROOT/exports/mosh-server new -- /Software/Zsh/exports/zsh -s > SERVICE_PREFIX/client.string.txt"]
     },
     "stop": {
         "commands": ["rm -f SERVICE_PREFIX/client.string.txt"]
