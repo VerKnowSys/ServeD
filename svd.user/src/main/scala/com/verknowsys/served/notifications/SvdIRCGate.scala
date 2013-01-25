@@ -41,7 +41,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
     def settings = {
         setVerbose(false)
         setName("tasks")
-        setAutoNickChange(true)
+        setAutoNickChange(false)
         setVersion("0.4.1")
         setEncoding(SvdConfig.defaultEncoding)
         try {
