@@ -7,6 +7,7 @@ package com.verknowsys.served
 
 
 import com.verknowsys.served.utils._
+import com.verknowsys.served.systemmanager.native._
 // import com.verknowsys.served.maintainer.SvdApiConnection
 // import com.verknowsys.served.notifications.SvdNotificationCenter
 import com.verknowsys.served.api._
@@ -40,6 +41,15 @@ object rootboot extends Logging with SvdUtils with App {
         println()
         log.info(SvdConfig.servedFull)
         log.info(SvdConfig.copyright)
+
+        if (isBSD) {
+            log.info("Production system detected. Initializing VPN configuration before Akka")
+            val shell = new SvdShell(SvdAccount(uid = 0))
+            log.debug(s"Executing ${SvdConfig.vpnNetworkPreConfiguration}")
+            shell.exec(SvdShellOperations(commands = SvdConfig.vpnNetworkPreConfiguration :: Nil))
+            shell.close
+            log.debug("Done VPN setup")
+        }
 
         // set runtime properties
         JSystem.setProperty("org.terracotta.quartz.skipUpdateCheck", "true")
