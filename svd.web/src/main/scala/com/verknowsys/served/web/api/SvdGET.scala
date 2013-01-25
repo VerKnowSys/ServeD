@@ -35,10 +35,11 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                 <title>ServeD</title>
                 <meta http_equiv="Content-Type" content="text/html; charset=utf-8"/>
                 <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css"/>
+                <link rel="stylesheet" type="text/css" href="/assets/css/font-awesome.min.css"/>
                 <link rel="stylesheet" type="text/css" href="/assets/css/main.css"/>
             </head>
             <body>
-                <script type="text/javascript" src="/assets/js/jquery-1.8.3.min.js"></script>
+                <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
                 <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
                 <script type="text/javascript" src="/assets/js/dough.min.js"></script>
                 <script type="text/javascript" src="/assets/js/main.js"></script>
@@ -103,7 +104,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
 
                 <article class="services">
                     <header>Services</header>
-                    <div class="authorize">Authorize as dmilith</div>
+                    <div class="authorize icon-key clickicon"></div>
                     <div class="get_user_processes">GetUserProcesses</div>
                     <div class="get_stored_services">GetStoredServices</div>
                     <div class="terminate_services">TerminateServices</div>
