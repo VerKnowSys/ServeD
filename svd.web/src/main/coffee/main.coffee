@@ -106,7 +106,9 @@ $ ->
           # Load all handlers for API elements:
           # (handleAPIAction(element.link, element.element, element.params) for element in apiCalls())
 
-  $("div.clickicon").hover ->
-    console.log("chujciwdupe")
-          # $(".clickicon").unbind().bind 'click', ->
-          #    console.log("Action hover")
+  # $("").hover ->
+  $("div.clickicon").tooltip
+    delay:
+      show: 250
+      hide: 0
+    placement: 'top'
