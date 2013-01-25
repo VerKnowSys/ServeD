@@ -41,8 +41,8 @@ class SvdMoshManager(account: SvdAccount) extends Actor with Logging with SvdAct
 
     def availableWith(activeSessions: List[ActorRef]): Receive = {
 
-        case User.MoshAuth =>
-            log.debug("Got MoshAuth message in Mosh manager.")
+        case User.MoshSession =>
+            log.debug("Got MoshSession message in Mosh manager.")
             log.info("Becoming aware of new Mosh Server")
             val originSender = sender
             val moshMatcher = """MOSH CONNECT (\d+?) ([\w*|\/|\+]+)"""

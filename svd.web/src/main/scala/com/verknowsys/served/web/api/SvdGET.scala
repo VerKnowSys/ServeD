@@ -129,7 +129,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                 <article class="misc">
                     <header>Miscellaneous</header>
                     <div class="authorize icon-key clickicon" title="Authorize"></div>
-                    <div class="mosh_auth icon-sign-blank clickicon" title="Mosh terminal"></div>
+                    <div class="mosh_session icon-sign-blank clickicon" title="Mosh terminal session"></div>
                     <div class="register_account icon-globe clickicon" title="Register this account with whole state and make it global"></div>
                     <div class="clone_igniter_for_user icon-qrcode clickicon" title="Create private software igniter"></div>
                     <div class="account_security_pass icon-user clickicon" title="Get account priviledges"></div>

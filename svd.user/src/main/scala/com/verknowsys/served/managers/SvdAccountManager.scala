@@ -565,9 +565,9 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             sender ! ApiSuccess
 
 
-        case User.MoshAuth =>
-            log.debug("Forwarding MoshAuth call to SvdMoshManager")
-            moshManager forward User.MoshAuth
+        case User.MoshSession =>
+            log.debug("Forwarding MoshSession call to SvdMoshManager")
+            moshManager forward User.MoshSession
 
 
         case AuthorizeWithKey(key) =>

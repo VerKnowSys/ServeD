@@ -54,7 +54,7 @@ $ ->
     {link: "RemoveAllReservedPorts", element: "div.remove_all_reserved_ports", params: ""},
     {link: "RegisterUserPort", element: "div.register_user_port", params: "RegisterUserPort=12344"},
     {link: "GetUserPorts", element: "div.get_user_ports", params: ""},
-    {link: "MoshAuth", element: "div.mosh_auth", params: ""}
+    {link: "MoshSession", element: "div.mosh_session", params: ""}
   ]
 
 

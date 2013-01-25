@@ -94,7 +94,7 @@ object User {
      *
      * @author Daniel (dmilith) Dettlaff
      */
-    case object MoshAuth extends Base
+    case object MoshSession extends Base
 
 
     case class GetServiceStdOut(matcher: String = ".*") extends Base // by default match anything

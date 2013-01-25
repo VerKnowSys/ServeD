@@ -192,9 +192,9 @@ class SvdPOST(webManager: ActorRef, account: SvdAccount, webPort: Int) extends S
             }
 
         /** API POST call #022  */
-        case req @ POST(Path("/MoshAuth") & Cookies(cookies)) =>
+        case req @ POST(Path("/MoshSession") & Cookies(cookies)) =>
             checkAuth(cookies) {
-                SvdWebAPI.apiRespond(webManager ? User.MoshAuth)
+                SvdWebAPI.apiRespond(webManager ? User.MoshSession)
             }
 
         /** API POST call #DEFAULT  */
