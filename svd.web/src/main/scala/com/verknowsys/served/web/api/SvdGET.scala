@@ -33,7 +33,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
         <html>
             <head>
                 <title>ServeD</title>
-                <meta http_equiv="Content-Type" content="text/html; charset=utf-8"/>
+                // <meta http_equiv="Content-Type" content="text/html; charset=utf-8"/>
                 <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css"/>
                 <link rel="stylesheet" type="text/css" href="/assets/css/font-awesome.min.css"/>
                 <link rel="stylesheet" type="text/css" href="/assets/css/main.css"/>
