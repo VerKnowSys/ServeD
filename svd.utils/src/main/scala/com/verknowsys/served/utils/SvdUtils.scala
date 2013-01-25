@@ -641,10 +641,10 @@ trait SvdUtils extends Logging {
     }
 
 
-    def loadList(file: String) = {
+    def loadList(file: String, splitBy: String = " ") = {
         try {
             Some(
-                fileToString(file).split(" ").toList.filterNot(_.isEmpty)
+                fileToString(file).split(splitBy).toList.filterNot(_.isEmpty)
             ).getOrElse(Nil)
         } catch {
             case e: FileNotFoundException =>
