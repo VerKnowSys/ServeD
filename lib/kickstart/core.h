@@ -31,6 +31,7 @@
 #include <libgen.h>
 #include <getopt.h>
 #include <termios.h>
+#include <signal.h>
 
 #ifdef __FreeBSD__
     #include <kvm.h>

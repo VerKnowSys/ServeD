@@ -14,6 +14,59 @@
 #include <sys/wait.h>
 #endif
 
+#define BUFFER_SIZE 256
+
+
+void copyStreams(int master)
+{
+    pid_t child;
+    ssize_t nread;
+    char buffer[BUFFER_SIZE];
+
+    if ((child = fork()) < 0) {
+        cerr << "Error forking child process!" << endl;
+        exit(FORK_ERROR);
+    } else if (child == 0) {
+        /* Child process copies stdin to pty master. */
+        for (;;) {
+            if ((nread = read(STDIN_FILENO, buffer, BUFFER_SIZE)) < 0) {
+                cerr << "Error reading from stdin!" << endl;
+                exit(EXIT_FAILURE);
+            } else if (nread == 0) { /* EOF on stdin */
+                #ifdef DEVEL
+                    cerr << "EOF on stdin. Exiting." << endl;
+                #endif
+                break;
+            }
+            if (write(master, buffer, nread) != nread) {
+                cerr << "Error writing to PTY master!" << endl;
+                exit(EXIT_FAILURE);
+            }
+        }
+        /* Send SIGTERM signal to parent process. */
+        kill(getppid(), SIGTERM);
+        /* Terminate child process. */
+        exit(EXIT_SUCCESS);
+    }
+
+    /* Parent process copies pty master to stdout. */
+    for (;;) {
+        if ((nread = read(master, buffer, BUFFER_SIZE)) <= 0) { /* Signal caught, error or EOF */
+            #ifdef DEVEL
+                cerr << "Signal caught, error or EOF. Exiting." << endl;
+            #endif
+            break;
+        }
+        if (write(STDOUT_FILENO, buffer, nread) != nread) {
+            cerr << "Error writing to stdout!";
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    /* Send SIGTERM signal to child process. */
+    kill(child, SIGTERM);
+}
+
 
 void execute(char **argv, int uid) {
     int master;
@@ -28,7 +81,7 @@ void execute(char **argv, int uid) {
         ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
     if ((pid = forkpty(&master, NULL, NULL, &w)) < 0) {
-        cerr << "Error forking child process failed!" << endl;
+        cerr << "Error forking PTY master process!" << endl;
         exit(FORK_ERROR);
     } else if (pid == 0) {
         stringstream hd, usr;
@@ -54,45 +107,13 @@ void execute(char **argv, int uid) {
         unsetenv("SUDO_COMMAND");
         unsetenv("MAIL");
         if (execvp(*argv, argv) < 0) {
-            cerr << "Exec failed!" << endl;
+            cerr << "Can't execute: " << *argv << endl;
             exit(EXEC_ERROR);
         }
-    } else {
-        /* Adapted from https://gist.github.com/3547195 */
-
-        // remove the echo
-        struct termios tios;
-        tcgetattr(master, &tios);
-        tios.c_lflag &= ~(ECHO | ECHONL);
-        tcsetattr(master, TCSAFLUSH, &tios);
-
-        for (;;) {
-            fd_set read_fd;
-            FD_ZERO(&read_fd);
-
-            FD_SET(master, &read_fd);
-            FD_SET(STDIN_FILENO, &read_fd);
-
-            select(master+1, &read_fd, NULL, NULL, NULL);
-
-            char input;
-            char output;
-
-            if (FD_ISSET(master, &read_fd))
-            {
-                if (read(master, &output, 1) != -1)
-                    write(STDOUT_FILENO, &output, 1);
-                else
-                    break;
-            }
-
-            if (FD_ISSET(STDIN_FILENO, &read_fd))
-            {
-                read(STDIN_FILENO, &input, 1);
-                write(master, &input, 1);
-            }
-        }
     }
+
+    /* Copies between streams stdin, stdout and pty master */
+    copyStreams(master);
 }
 
 
