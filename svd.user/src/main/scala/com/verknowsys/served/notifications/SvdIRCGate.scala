@@ -39,10 +39,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
 
 
     def settings = {
-        setVerbose(false)
+        setVerbose(true)
         setName("tasks")
         setAutoNickChange(false)
-        setVersion("0.4.1")
+        setVersion("0.4.2")
         setEncoding(SvdConfig.defaultEncoding)
         try {
             log.debug("Attepting to connect to irc server: %s on channel %s", SvdConfig.defaultIRCServerName, SvdConfig.defaultIRCChannelName)
@@ -53,12 +53,12 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
 
             log.debug("Joining default channel")
             joinChannel(SvdConfig.defaultIRCChannelName)
-            Thread.sleep(5000)
+            Thread.sleep(2500)
 
             val shortVersion = SvdConfig.version.split("-").head
             val topic = s"dev: ServeD v${shortVersion}, Sofin v0.36.0 | ?term - for terms, .help - tasks bot, @help - lang bot"
             log.debug(s"Setting topic to: ${topic}")
-            sendMessage("ChanServ", s"topic #verknowsys ${topic}")
+            sendMessage("#verknowsys", s"/topic #verknowsys ${topic}")
 
 
         } catch {
@@ -432,7 +432,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
 
 
         case Notify.Message(message) =>
-            Thread.sleep(10000) // XXX: hardcode
+            Thread.sleep(5000) // XXX: hardcode
             sendMessage(SvdConfig.defaultIRCChannelName, message)
             sender ! ApiSuccess
 
