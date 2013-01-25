@@ -103,7 +103,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
 
                 <article class="services">
                     <header>Services</header>
-                    <div class="get_user_processes icon-list-ul clickicon" title="Get processes list"></div>
+                    <div class="get_user_processes icon-tasks clickicon" title="Get processes list"></div>
                     <div class="get_stored_services icon-building clickicon" title="Get stored services"></div>
                     <div class="terminate_services icon-remove-circle clickicon" title="Terminate all currently running services"></div>
                     <div class="store_services icon-sitemap clickicon" title="Store all running services"></div>
@@ -116,31 +116,25 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                 </article>
                 <article class="filewatchers">
                     <header>File Watchers</header>
-                    <div class="create_file_watch">CreateFileWatch</div>
-                    <div class="create_file_watch1">CreateFileWatch1</div>
-                    <div class="create_file_watch2">CreateFileWatch2</div>
-                    <div class="create_file_watch3">CreateFileWatch3</div>
-                    <div class="destroy_file_watch">DestroyFileWatch</div>
-                    <div class="destroy_file_watch1">DestroyFileWatch1</div>
-                    <div class="destroy_file_watch2">DestroyFileWatch2</div>
-                    <div class="destroy_file_watch3">DestroyFileWatch3</div>
+                    <div class="create_file_watch icon-plus clickicon" title="Create new file watch with action trigger"></div>
+                    <div class="destroy_file_watch icon-minus clickicon" title="Destroy one of existing file watches"></div>
                 </article>
                 <article class="domains">
                     <header>Domains</header>
-                    <div class="register_domain">RegisterDomain</div>
-                    <div class="registered_domains">GetRegisteredDomains</div>
+                    <div class="register_domain icon-asterisk clickicon" title="Registers given domain"></div>
+                    <div class="registered_domains icon-bar-chart clickicon" title="Show registered domains"></div>
                 </article>
                 <article class="misc">
                     <header>Miscellaneous</header>
                     <div class="authorize icon-key clickicon" title="Authorize"></div>
-                    <div class="mosh_auth">MoshAuth</div>
-                    <div class="register_account">RegisterAccount</div>
-                    <div class="clone_igniter_for_user">CloneIgniterForUser</div>
-                    <div class="account_security_pass">GetAccountPriviledges</div>
-                    <div class="restart_account_manager">RestartAccountManager</div>
-                    <div class="remove_all_reserved_ports">RemoveAllReservedPorts</div>
-                    <div class="register_user_port">RegisterUserPort</div>
-                    <div class="get_user_ports">GetUserPorts</div>
+                    <div class="mosh_auth icon-sign-blank clickicon" title="Mosh terminal"></div>
+                    <div class="register_account icon-globe clickicon" title="Register this account with whole state and make it global"></div>
+                    <div class="clone_igniter_for_user icon-qrcode clickicon" title="Create private software igniter"></div>
+                    <div class="account_security_pass icon-user clickicon" title="Get account priviledges"></div>
+                    <div class="restart_account_manager icon-warning-sign clickicon" title="Restart account manager"></div>
+                    <div class="remove_all_reserved_ports icon-cogs clickicon" title="Remove all ports reserved by user"></div>
+                    <div class="register_user_port icon-cog clickicon" title="Register user port"></div>
+                    <div class="get_user_ports icon-dashboard clickicon" title="Get user ports"></div>
                 </article>
             )
 
