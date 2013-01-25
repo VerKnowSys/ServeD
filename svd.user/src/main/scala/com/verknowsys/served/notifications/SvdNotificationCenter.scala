@@ -109,11 +109,11 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
                     (gate ? Notify.Message(msg)) onComplete {
                         case Success(some) =>
                             log.debug("Sending message :%s", some)
-//                            sender ! ApiSuccess
+                            sender ! ApiSuccess
 
                         case Failure(exception) =>
-                            log.error("Error sending notification: %s", exception)
-//                            sender ! Error("Exception: %s", exception)
+                            log.warn("Failed to send notification with message: ${msg} caused by: ${exception}")
+                            // sender ! Failure
 
                     }
             }
