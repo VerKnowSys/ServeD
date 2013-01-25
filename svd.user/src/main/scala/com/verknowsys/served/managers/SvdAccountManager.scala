@@ -521,7 +521,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         case User.GetUserPorts =>
             log.debug("Getting User ports for account: %s", account)
             val portsListFormatted = SvdUserPorts(db).map{_.number}.mkString(",")
-            sender ! """{"message": "Stored services", "content": [%s]}""".format(portsListFormatted)
+            sender ! s"""{"message": "Stored services", "content": [${portsListFormatted}]}"""
 
 
         case User.RegisterUserPort =>
@@ -529,6 +529,8 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                 val newFreeLocalPort = SvdAccountUtils.randomFreePort
                 log.debug("Registering user port: %s", newFreeLocalPort)
                 db << SvdUserPort(number = newFreeLocalPort)
+                sender ! s"""{"message": "Registered port for headless account", "content": "${newFreeLocalPort}"}"""
+
             } else { // "Connected to SvdRoot mode"
                 log.trace("Got User.RegisterUserPort")
 
