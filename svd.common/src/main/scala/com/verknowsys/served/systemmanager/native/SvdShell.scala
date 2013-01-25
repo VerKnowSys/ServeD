@@ -31,7 +31,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     def dead = shell.isClosed
 
 
-    def exec(operations: SvdShellOperations) {
+    def exec(operations: SvdShellOperations) = synchronized {
         // spawnThread {
             if (dead) { // if shell is dead, respawn it! It MUST live no matter what
                 log.debug("Found dead shell: %s".format(shell))
@@ -41,7 +41,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
             }
             val ops = operations.commands.mkString(" ; ")
             log.trace(s"Executing ${ops} on shell: ${shellToSpawn}")
-            shell.send(s"${ops}\n") // send commands one by one to shell
+            shell.send(s"\n${ops}\n") // send commands one by one to shell
 
             if (operations.expectStdOut.size != 0) operations.expectStdOut.foreach {
                 expect =>
@@ -56,16 +56,19 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     }
 
 
-    def stdOut = shell.getCurrentStandardOutContents
+    def stdOut = synchronized {
+        shell.getCurrentStandardOutContents
+    }
 
 
-    def stdErr = shell.getCurrentStandardErrContents
+    // def stdErr = shell.getCurrentStandardErrContents
 
 
-    def close {
+    def close = synchronized {
         try {
             log.trace("Closing shell. Is it closed? %s".format(shell.isClosed))
             shell.send("\nexit\n")
+            Thread.sleep(2000) // give shell some time to close properly
             shell.stop
             shell.expectClose
             log.debug("Shell closed. Is it really closed? %s".format(shell.isClosed))
