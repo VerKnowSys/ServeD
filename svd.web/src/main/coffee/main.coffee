@@ -106,7 +106,7 @@ $ ->
           # Load all handlers for API elements:
           # (handleAPIAction(element.link, element.element, element.params) for element in apiCalls())
 
-  # $("").hover ->
+
   $("div.clickicon").tooltip
     delay:
       show: 250
