@@ -97,6 +97,9 @@ object User {
     case object MoshAuth extends Base
 
 
+    case class GetServiceStdOut(matcher: String = ".*") extends Base // by default match anything
+    // case class GetServiceStdErr(matcher: String) extends Base
+
 }
 
 

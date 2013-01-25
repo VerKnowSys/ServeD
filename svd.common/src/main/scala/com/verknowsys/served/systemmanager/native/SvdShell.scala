@@ -56,9 +56,10 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     }
 
 
-    // def output = synchronized {
-    //     (shell.getCurrentStandardOutContents, shell.getCurrentStandardErrContents)
-    // }
+    def stdOut = shell.getCurrentStandardOutContents
+
+
+    def stdErr = shell.getCurrentStandardErrContents
 
 
     def close {
