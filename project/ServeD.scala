@@ -114,7 +114,7 @@ object Dependencies {
     val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaVersion
     val akkaRemote = "com.typesafe.akka" %% "akka-remote" % akkaVersion
     val actors = "org.scala-lang" % "scala-actors" % "2.10.0"
-    // val akkaTestkit = "com.typesafe.akka" % "akka-testkit" % akkaVersion % "test"
+    val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test"
     val jline = "jline" % "jline" % "0.9.9"
     val scalatest = "org.scalatest" % "scalatest_2.10" % "2.0.M5b"
     // val unfilteredSpec = "net.databinder" % "unfiltered-spec_2.10" % "0.6.4" % "test"
@@ -237,7 +237,7 @@ object ServeD extends Build {
 
     lazy val testing = Project("testkit", file("svd.testing"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(scalatest, commonsio, bouncycastle) // akkaTestkit
+            libraryDependencies ++= Seq(scalatest, commonsio, bouncycastle, akkaTestkit) // akkaTestkit
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api)
 
