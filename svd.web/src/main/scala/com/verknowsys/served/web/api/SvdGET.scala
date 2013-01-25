@@ -98,8 +98,10 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
         /** API GET call #004  */
         case req @ GET(Path(Seg("AdminPanel" :: Nil))) =>
             Ok ~> Html5(
-                <div class="services_result">Result should be shown here</div>
-                <div class="services_data">Data should be shown here</div>
+                <article class="results">
+                    <div class="services_result">Result should be shown here</div>
+                    <div class="services_data">Data should be shown here</div>
+                </article>
 
                 <article class="services">
                     <header>Services</header>
