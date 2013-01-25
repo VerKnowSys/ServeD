@@ -117,3 +117,4 @@ ctrlcli
 /.idea/misc.xml
 /docs/scaladocs/
 /run
+*.sty

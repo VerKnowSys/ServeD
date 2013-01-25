@@ -162,18 +162,38 @@
 # end
 
 
+if [ "$(uname)" != "Darwin" ]; then
+  echo "System not supported. OSX is currently required to do so"
+  exit
+fi
+
+export PATH="${PATH}:/usr/local/texlive/2012/bin/x86_64-darwin" # maybe it's hack, but it's default dir of pdflatex
+
 PDFLATEX_BIN="$(which pdflatex)"
 PYGMENTIZE_BIN="$(which pygmentize)"
 if [ "${PYGMENTIZE_BIN}" = "" ]; then
   sofin get ruby
-  gem install pygmentize
+  ${HOME}/Apps/Ruby/exports/gem install pygmentize
   sofin exportapp pygmentize ruby
   export PYGMENTIZE_BIN="$(which pygmentize)"
 fi
 
 if [ "${PDFLATEX_BIN}" != "" ]; then
   if [ "${PYGMENTIZE_BIN}" != "" ]; then # PYGMENTIZE is required for minted module.
-    cd docs/tex/
+    # first of all install minted bundled with docs directory..
+    LATEX_DIR="/usr/local/texlive/texmf-local"
+    cd docs/minted
+    if [ ! -d "${LATEX_DIR}/tex/latex/minted" ]; then
+      make
+      sudo mkdir "${LATEX_DIR}/tex/latex/minted/"
+      sudo cp minted.sty /usr/local/texlive/texmf-local/tex/latex/minted/
+      sudo mktexlsr
+      echo "Minted installed"
+    else
+      echo "Minted already installed"
+    fi
+
+    cd ../tex/
     for i in *.tex; do
       echo "Compiling $i with ${PDFLATEX_BIN}"
       ${PDFLATEX_BIN} -shell-escape $i #>/dev/null

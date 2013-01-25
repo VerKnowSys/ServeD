@@ -2,27 +2,27 @@
 
 % NOTE: packages used
 \usepackage{geometry}
-\usepackage{graphicx}
+% \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{hyperref}
 \usepackage{epstopdf}
 \usepackage{color}
-\usepackage{xcolor}
-\usepackage{xcolor, listings}
-\usepackage{caption}
+% \usepackage{xcolor}
+% \usepackage{xcolor, listings}
+% \usepackage{caption}
 
 
 % NOTE: declarations and definitions document wide:
-\DeclareCaptionFont{white}{\color{white}}
-\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
-\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
-\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+% \DeclareCaptionFont{white}{\color{white}}
+% \DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+% \captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+% \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 
-\setlength{\parskip}{1.2ex}
-\setlength{\parindent}{2em}
+% \setlength{\parskip}{1.2ex}
+% \setlength{\parindent}{2em}
 
 % dark green:
-\definecolor{green2}{HTML}{347235}
+% \definecolor{green2}{HTML}{347235}
 
 \title{Spawn explanation - HOW IT WORKS}
 \author{\href{mailto:dmilith@verknowsys.com}{Daniel (dmilith) Dettlaff}}
@@ -49,5 +49,5 @@
 		\item public String sendSpawnMessage(String message); - used to spawn userspawn from core svd. message is uid of user to be run as
 	\end{itemize}
 
-	
+
 \end{document}

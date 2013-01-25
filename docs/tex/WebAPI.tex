@@ -3,32 +3,32 @@
 % NOTE: packages used
 \usepackage[utf8x]{inputenc}
 \usepackage{geometry}
-\usepackage{graphicx}
+% \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{hyperref}
 \usepackage{epstopdf}
 \usepackage{color}
-\usepackage{xcolor}
-\usepackage{xcolor, listings}
-\usepackage{caption}
+% \usepackage{xcolor}
+% \usepackage{xcolor, listings}
+% \usepackage{caption}
 \usepackage{minted}
 
 % NOTE: declarations and definitions document wide:
-\DeclareCaptionFont{white}{\color{white}}
-\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
-\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
-\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+% \DeclareCaptionFont{white}{\color{white}}
+% \DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+% \captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+% \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 
-\setlength{\parskip}{1.2ex}
-\setlength{\parindent}{2em}
+% \setlength{\parskip}{1.2ex}
+% \setlength{\parindent}{2em}
 
 % dark green:
-\definecolor{green2}{HTML}{347235}
+% \definecolor{green2}{HTML}{347235}
 
 \title{ServeD WebAPI}
 \author{\href{mailto:dmilith@verknowsys.com}{Daniel (dmilith) Dettlaff}}
-\subtitle{version 0.8.0}
-\date{2012-12-14}
+\subtitle{version 0.8.4}
+\date{2013-01-25}
 
 
 % NOTE: document content:
@@ -337,6 +337,18 @@
         contents: [port]}
       \end{minted}
 
+    \item \#022:
+      \begin{minted}{bash}
+    /MoshSession
+      \end{minted}
+      \begin{minted}{scala}
+      @description spawns Mosh server with user
+        priviledges and returns client command.
+      @params nothing.
+      @format json: {message: information_string}
+      \end{minted}
+
+
   % \end{itemize}
 \end{description}
 
@@ -358,25 +370,6 @@
       \end{description}
 
   \end{itemize}
-
-
-% \section{Scala code usage examples}\label{sec:scalausage}
-%   Scala code examples to be used in own code.
-
-%   \begin{minted}[linenos,
-%                numbersep=4pt,
-%                gobble=2,
-%                frame=lines,
-%                framesep=2mm]{scala}
-%   /** API call #001  */
-%     case req @ POST(Path(Seg("GetUserProcesses" :: Nil))) =>
-%       SvdWebAPI.apiRespond(webManager ? System.GetUserProcesses(account.uid))
-
-%   /** API call #002  */
-%     case req @ POST(Path(Seg("RegisterDomain" :: domain :: Nil))) =>
-%       SvdWebAPI.apiRespond(webManager ? System.RegisterDomain(domain))
-
-%   \end{minted}
 
 
 \end{document}
