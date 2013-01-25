@@ -102,11 +102,10 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                 <div class="services_data">Data should be shown here</div>
 
                 <article class="services">
+                    <header>Services</header>
                     <div class="authorize">Authorize as dmilith</div>
                     <div class="get_user_processes">GetUserProcesses</div>
                     <div class="get_stored_services">GetStoredServices</div>
-                    <div class="register_domain">RegisterDomain</div>
-                    <div class="registered_domains">GetRegisteredDomains</div>
                     <div class="terminate_services">TerminateServices</div>
                     <div class="store_services">StoreServices</div>
                     <div class="spawn_service">SpawnService</div>
@@ -114,9 +113,10 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="show_available_services">ShowAvailableServices</div>
                     <div class="spawn_services">SpawnServices</div>
                     <div class="get_service_status">GetServiceStatus</div>
-                    <div class="clone_igniter_for_user">CloneIgniterForUser</div>
-                    <div class="register_account">RegisterAccount</div>
                     <div class="get_service_port">GetServicePort</div>
+                </article>
+                <article class="filewatchers">
+                    <header>File Watchers</header>
                     <div class="create_file_watch">CreateFileWatch</div>
                     <div class="create_file_watch1">CreateFileWatch1</div>
                     <div class="create_file_watch2">CreateFileWatch2</div>
@@ -125,12 +125,22 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="destroy_file_watch1">DestroyFileWatch1</div>
                     <div class="destroy_file_watch2">DestroyFileWatch2</div>
                     <div class="destroy_file_watch3">DestroyFileWatch3</div>
+                </article>
+                <article class="domains">
+                    <header>Domains</header>
+                    <div class="register_domain">RegisterDomain</div>
+                    <div class="registered_domains">GetRegisteredDomains</div>
+                </article>
+                <article class="misc">
+                    <header>Miscellaneous</header>
+                    <div class="mosh_auth">MoshAuth</div>
+                    <div class="register_account">RegisterAccount</div>
+                    <div class="clone_igniter_for_user">CloneIgniterForUser</div>
                     <div class="account_security_pass">GetAccountPriviledges</div>
                     <div class="restart_account_manager">RestartAccountManager</div>
                     <div class="remove_all_reserved_ports">RemoveAllReservedPorts</div>
                     <div class="register_user_port">RegisterUserPort</div>
                     <div class="get_user_ports">GetUserPorts</div>
-                    <div class="mosh_auth">MoshAuth</div>
                 </article>
             )
 
