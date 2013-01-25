@@ -463,7 +463,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
             (currServ ? User.ServiceStatus) onComplete {
                 case Success(content) =>
-                    s ! s"""{"message": "Status of service: ${serviceName}", "content": ["#{content}"], "status": 0}"""
+                    s ! s"""{"message": "Status of service: ${serviceName}", "content": ["${content}"], "status": 0}"""
 
                 case Failure(x) =>
                     x match {
