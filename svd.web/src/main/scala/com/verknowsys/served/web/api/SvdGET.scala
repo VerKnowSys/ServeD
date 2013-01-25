@@ -29,7 +29,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
     implicit val timeout = Timeout(SvdConfig.defaultAPITimeout/1000 seconds)
 
 
-    def layout(content: scala.xml.NodeBuffer) = Html(
+    def layout(content: scala.xml.NodeBuffer) = Html5(
         <html>
             <head>
                 <title>ServeD</title>
@@ -49,7 +49,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
     )
 
 
-    def raphaelDeps(content: scala.xml.NodeBuffer) = Html(
+    def raphaelDeps(content: scala.xml.NodeBuffer) = Html5(
         <div>
             <script type="text/javascript" src="/assets/js/raphael-min.js"></script>
             <script type="text/javascript" src="/assets/js/g.graphael.js"></script>
@@ -64,7 +64,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
 
         /** API GET call #000  */
         case req @ GET(Path(Seg("Header" :: Nil))) =>
-            Ok ~> Html(
+            Ok ~> Html5(
                 <h1>{ Dict("User Panel") }</h1>
                 <p>{ Dict("Welcome") + " " + account.userName }</p>
                 <p>{ Dict("Details") + ": " + account }</p>
@@ -98,7 +98,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
 
         /** API GET call #004  */
         case req @ GET(Path(Seg("AdminPanel" :: Nil))) =>
-            Ok ~> Html(
+            Ok ~> Html5(
                 <div class="services_result">Result should be shown here</div>
                 <div class="services_data">Data should be shown here</div>
 
