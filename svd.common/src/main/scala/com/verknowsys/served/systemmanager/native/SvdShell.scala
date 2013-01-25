@@ -25,20 +25,20 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     log.debug(s"Spawning user Shell for account ${account}")
 
     val shellToSpawn = if (account.uid == 0) SvdConfig.servedShell + s" --uid=0 --" else SvdConfig.servedShell + " --"
-    var shell = expectinator.spawn(shellToSpawn)
+    val shell = expectinator.spawn(shellToSpawn)
 
 
-    def dead = shell.isClosed
+    // def dead = shell.isClosed
 
 
     def exec(operations: SvdShellOperations) = synchronized {
         // spawnThread {
-            if (dead) { // if shell is dead, respawn it! It MUST live no matter what
-                log.debug("Found dead shell: %s".format(shell))
-                shell = expectinator.spawn(shellToSpawn)
-                if (dead)
-                    throwException[SvdShellException]("Found dead shell where it should be alive!")
-            }
+            if (shell.isClosed)
+                throwException[SvdShellException](s"Found dead shell where it should be alive! It happened with ${operations.commands.mkString(", ")}")
+            // if (dead) { // if shell is dead, respawn it! It MUST live no matter what
+            //     log.debug("Found dead shell: %s".format(shell))
+            //     shell = expectinator.spawn(shellToSpawn)
+            // }
             val ops = operations.commands.mkString(" ; ")
             log.trace(s"Executing ${ops} on shell: ${shellToSpawn}")
             shell.send(s"\n${ops}\n") // send commands one by one to shell
