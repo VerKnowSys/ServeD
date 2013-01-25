@@ -4,19 +4,13 @@
         {
             "cronEntry": "0 0/10 * * * ?",
             "shellCommands": [
-                "cp SERVICE_PREFIX/database/database.rdf SERVICE_PREFIX/database/database.rdf-$(date +'%Y-%m-%d').backup && echo 'Backup ok'"
-            ]
-        },
-        {
-            "cronEntry": "0 0/15 * * * ?",
-            "shellCommands": [
-                "echo 'Redis pam pam pam'"
+                "test -e SERVICE_PREFIX/database/database.rdf && cp SERVICE_PREFIX/database/database.rdf SERVICE_PREFIX/database/database.rdf-$(date +'%Y-%m-%d--%H%M').backup"
             ]
         }
     ],
     "install": {
         "commands": ["sofin get redis"],
-        "expectStdOut": ["All done."]
+        "expectStdOut": ["All done"]
     },
     "configure": {
         "commands": [
@@ -48,7 +42,6 @@ appendonly no
 appendfsync everysec
 activerehashing yes
 loglevel notice
-logfile SERVICE_PREFIX/service.log
-' > SERVICE_PREFIX/service.conf"]
+logfile SERVICE_PREFIX/service.log' > SERVICE_PREFIX/service.conf"]
     }
 }

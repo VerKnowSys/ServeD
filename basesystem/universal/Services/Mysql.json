@@ -10,14 +10,12 @@
     ],
     "install": {
         "commands": ["sofin get mysql"],
-        "expectStdOut": ["All done."]
+        "expectStdOut": ["All done"]
     },
     "start": {
         "commands": [
             "SERVICE_ROOT/exports/mysqld --defaults-file=SERVICE_PREFIX/service.conf --skip-grant-tables -C utf8 &",
-        ],
-        "expectStdErr": ["ready for connections"],
-        "expectOutputTimeout": 25
+        ]
     },
     "validate": {
         "commands": [

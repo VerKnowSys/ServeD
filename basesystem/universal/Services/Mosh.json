@@ -2,7 +2,7 @@
     "softwareName": "Mosh",
     "install": {
         "commands": ["sofin get mosh"],
-        "expectStdOut": ["All done."]
+        "expectStdOut": ["All done"]
     },
     "start": {
         "commands": ["SERVICE_ROOT/exports/mosh-server new -- /Software/Zsh/exports/zsh -s"]

@@ -4,7 +4,7 @@
 
     "install": {
         "commands": ["sofin get james"],
-        "expectStdOut": ["All done."]
+        "expectStdOut": ["All done"]
     },
     "start": {
         "commands": []

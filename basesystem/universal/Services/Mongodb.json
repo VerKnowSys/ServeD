@@ -2,7 +2,7 @@
     "softwareName": "Mongodb",
     "install": {
         "commands": ["sofin get mongodb"],
-        "expectStdOut": ["All done."]
+        "expectStdOut": ["All done"]
     },
     "schedulerActions": [
         {
