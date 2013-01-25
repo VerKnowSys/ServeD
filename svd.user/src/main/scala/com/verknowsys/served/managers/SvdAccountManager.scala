@@ -745,7 +745,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         }
         shutdown onFailure {
             case x =>
-                context.unbecome
+                // context.unbecome
                 log.error("Failure while Termination process: ${x}")
         }
         context.stop _
