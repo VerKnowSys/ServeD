@@ -308,7 +308,9 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                             igniterName
                     }
                 ))
-                FileUtils.copyFile(igniterFile, userIgniterName + SvdConfig.defaultSoftwareTemplateExt, false) // NOTE: false => don't copy attributes
+                val fullIgniterName = userIgniterName + SvdConfig.defaultSoftwareTemplateExt
+                log.debug(s"Creating user side igniter from base igniter file: ${igniterFile} to destination: ${fullIgniterName}")
+                FileUtils.copyFile(igniterFile, fullIgniterName, false) // NOTE: false => don't copy attributes
                 sender ! ApiSuccess
             } catch {
                 case e: Exception =>
