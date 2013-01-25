@@ -344,7 +344,7 @@ class SvdService(
             }.mkString("\n")
 
             log.debug(s"GetServiceStdOut with output: ${output}, matching: ${matcher}")
-            sender ! s"""{"message": "Service Standard Output", "content": "${output}"}"""
+            sender ! s"""{"message": "Service Standard Output", "content": "${output}", "status": 0}"""
 
 
         // case User.GetServiceStdErr(matcher) =>

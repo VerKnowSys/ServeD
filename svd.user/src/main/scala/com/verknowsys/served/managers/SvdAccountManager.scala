@@ -356,7 +356,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         case User.GetStoredServices => // #4
             val listOfServices = loadServicesList
             notificationsManager ! Notify.Message(formatMessage("I:%s".format(listOfServices.mkString(", "))))
-            sender ! """{"message": "Stored services", "content": [%s]}""".format(listOfServices.map{ c => "\"" +c+ "\"" }.mkString(", "))
+            sender ! s"""{"message": "Services were stored", "content": [${listOfServices.map{ c => "\"" +c+ "\"" }.mkString(", ")}], "status": 0}"""
 
 
         case User.TerminateServices => // #5
@@ -427,7 +427,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                 listFiles(SvdConfig.defaultSoftwareTemplatesDir) ++ listFiles(userHomeDir / SvdConfig.defaultUserIgnitersDir))
                 .filter{_.getName.endsWith(SvdConfig.defaultSoftwareTemplateExt)}.map{_.getName.split("/").last}.mkString(",").replaceAll(SvdConfig.defaultSoftwareTemplateExt, "") // XXX: replace with some good regexp
             notificationsManager ! Notify.Message("Available Services: " + availableSvces)
-            sender ! """{"message": "Available services", "content": [%s]}""".format(availableSvces.split(",").map{ c => "\"" +c+ "\"" }.mkString(", "))
+            sender ! s"""{"message": "Available services", "content": [${availableSvces.split(",").map{ c => "\"" +c+ "\"" }.mkString(", ")}], "status": 0}"""
 
 
         case User.ReadLogFile(serviceName, pattern) =>
@@ -444,7 +444,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             log.debug("Displaying registerd domains.")
             val domains = SvdUserDomains(db)
             log.info("GetRegisteredDomains: %s", domains.mkString(", "))
-            sender ! """{"message": "Domain list", "content": [%s]}""".format(domains.map{c => "\"" +c.name+ "\"" }.mkString(", "))
+            sender ! s"""{"message": "Domain list", "content": [${domains.map{c => "\"" +c.name+ "\"" }.mkString(", ")}], "status": 0}"""
 
 
         case User.GetServicePort(serviceName) => // #12
@@ -453,7 +453,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
             (currServ ? User.GetServicePort) onComplete {
                 case Success(port) =>
-                    s ! """{"message": "Port gathered successfully.", "content": [%d]}""".format(port)
+                    s ! s"""{"message": "Port gathered successfully.", "content": [${port}], "status": 0}"""
                 case Failure(exc) =>
                     s ! Error("Service port unavailable!")
             }
@@ -463,7 +463,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
             (currServ ? User.ServiceStatus) onComplete {
                 case Success(content) =>
-                    s ! """{"message": "Service: %s. %s", "status": 0}""".format(serviceName, content)
+                    s ! s"""{"message": "Status of service: ${serviceName}", "content": ["#{content}"], "status": 0}"""
 
                 case Failure(x) =>
                     x match {
@@ -521,7 +521,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         case User.GetUserPorts =>
             log.debug("Getting User ports for account: %s", account)
             val portsListFormatted = SvdUserPorts(db).map{_.number}.mkString(",")
-            sender ! s"""{"message": "Stored services", "content": [${portsListFormatted}]}"""
+            sender ! s"""{"message": "Stored services", "content": [${portsListFormatted}], "status": 0}"""
 
 
         case User.RegisterUserPort =>
@@ -529,7 +529,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                 val newFreeLocalPort = SvdAccountUtils.randomFreePort
                 log.debug("Registering user port: %s", newFreeLocalPort)
                 db << SvdUserPort(number = newFreeLocalPort)
-                sender ! s"""{"message": "Registered port for headless account", "content": "${newFreeLocalPort}"}"""
+                sender ! s"""{"message": "Registered port for headless account", "content": ["${newFreeLocalPort}"], "status": 0}"""
 
             } else { // "Connected to SvdRoot mode"
                 log.trace("Got User.RegisterUserPort. Asking System Manager…")
@@ -545,7 +545,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                         //     }
                         // }
                         db << SvdUserPort(number = port)
-                        originSender ! s"""{"message": "Port registered: ${port}", "content": [${port}]}"""
+                        originSender ! s"""{"message": "Port registered: ${port}", "content": [${port}], "status": 0}"""
                 }
                 futurePort onFailure {
                     case x =>
