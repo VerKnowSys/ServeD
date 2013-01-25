@@ -53,6 +53,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
 
             log.debug("Joining default channel")
             joinChannel(SvdConfig.defaultIRCChannelName)
+            Thread.sleep(5000)
 
             val shortVersion = SvdConfig.version.split("-").head
             val topic = s"dev: ServeD v${shortVersion}, Sofin v0.36.0 | ?term - for terms, .help - tasks bot, @help - lang bot"
