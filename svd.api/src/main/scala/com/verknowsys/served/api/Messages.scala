@@ -95,5 +95,6 @@ object System {
     case class Chown(what: String, userId: Int, recursive: Boolean) extends Base
 
     case class RegisterDomain(domain: String, proxyActor: ActorRef) extends Base
+    case object RegisterUserPort extends Base
     case object GetPort extends Base
 }

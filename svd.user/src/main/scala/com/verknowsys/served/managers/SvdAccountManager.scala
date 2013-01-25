@@ -532,18 +532,26 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                 sender ! s"""{"message": "Registered port for headless account", "content": "${newFreeLocalPort}"}"""
 
             } else { // "Connected to SvdRoot mode"
-                log.trace("Got User.RegisterUserPort")
-
-                SvdUserPorts(db).find{_.number == 12345} getOrElse { // XXX: HACK
-                    if (portAvailable(12345)) {
-                        log.trace("Registering port: %s", 12345)
-                        db << SvdUserPort(number = 12345) // XXX: HACK
-                    }
+                log.trace("Got User.RegisterUserPort. Asking System Manager…")
+                val originSender = sender
+                val futurePort = systemManager ? System.RegisterUserPort
+                futurePort onSuccess {
+                    case port: Int =>
+                        log.info(s"Registering user port gathered by System Manager: ${port}")
+                        // SvdUserPorts(db).find{_.number == 12345} getOrElse { // XXX: HACK
+                        //     if (portAvailable(12345)) {
+                        //         log.trace("Registering port: %s", 12345)
+                        //         db << SvdUserPort(number = 12345) // XXX: HACK
+                        //     }
+                        // }
+                        db << SvdUserPort(number = port)
+                        originSender ! s"""{"message": "Port registered: ${port}", "content": [${port}]}"""
                 }
-
-                systemManager forward User.RegisterUserPort // XXX: hack. It must be done on root side, but an utils is required to perform read and checks of all /SystemUsers/Security/*.json
-
-                sender ! """{"message": "Port registered: %s", "content": [%s]}""".format(12345, 12345)
+                futurePort onFailure {
+                    case x =>
+                        log.warn(s"Failure gathering port from System Manager. Cause: ${x}")
+                        originSender ! s"""{"message": "Port gathering failed", "status": 2}"""
+                }
             }
 
 

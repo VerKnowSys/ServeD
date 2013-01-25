@@ -81,6 +81,12 @@ class SvdSystemManager extends SvdManager with Logging {
             sender ! SvdLowLevelSystemAccess.usagesys(uid)
 
 
+        case System.RegisterUserPort =>
+            val newFreeLocalPort = SvdAccountUtils.randomFreePort
+            log.debug(s"Trying to get port from System Manager side: ${newFreeLocalPort}")
+            sender ! newFreeLocalPort
+
+
         case System.GetNetstat =>
             sender ! Error("Not implemented")
             // XXX: NOTE: TODO: this function causes SIGSEGV on FreeBSD. This requires some investigation!
