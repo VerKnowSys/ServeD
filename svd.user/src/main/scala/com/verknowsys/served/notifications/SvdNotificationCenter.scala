@@ -48,7 +48,7 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
                 (gate ? Notify.Connect) onComplete {
 
                     case Success(content) =>
-                        log.info("PreStart")
+                        log.info("Notifications Center started")
 
                     case Failure(exception) =>
                         log.error("Exception: %s", exception)
@@ -112,7 +112,7 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
 //                            sender ! ApiSuccess
 
                         case Failure(exception) =>
-                            log.error("Exception: %s", exception)
+                            log.error("Error sending notification: %s", exception)
 //                            sender ! Error("Exception: %s", exception)
 
                     }
