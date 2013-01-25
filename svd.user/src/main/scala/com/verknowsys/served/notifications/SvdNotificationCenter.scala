@@ -112,7 +112,7 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
                             sender ! ApiSuccess
 
                         case Failure(exception) =>
-                            log.warn("Failed to send notification with message: ${msg} caused by: ${exception}")
+                            log.warn(s"Failed to send notification with message: ${msg} caused by: ${exception}")
                             // sender ! Failure
 
                     }
