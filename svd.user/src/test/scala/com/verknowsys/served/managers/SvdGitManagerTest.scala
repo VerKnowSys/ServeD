@@ -16,6 +16,12 @@ import com.verknowsys.served.db._
 import com.verknowsys.served.api._
 import com.verknowsys.served.api.git._
 import com.verknowsys.served.testing._
+import akka.actor._
+import akka.pattern.ask
+import scala.concurrent.duration._
+import scala.concurrent._
+import akka.util.Timeout
+import ExecutionContext.Implicits._
 
 
 /**
