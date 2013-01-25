@@ -4,18 +4,17 @@
     <facet type="scala" name="Scala">
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
-        <option name="compilerLibraryName" value="SBT: scala:2.9.2" />
-        <option name="compilerOptions" value="-Ywarn-dead-code -Xresident -g:source -explaintypes -unchecked -deprecation" />
+        <option name="compilerLibraryName" value="SBT: scala:2.10.0" />
+        <option name="compilerOptions" value="-Xresident -Yrepl-sync -feature -language:postfixOps -Xno-patmat-analysis -language:reflectiveCalls -language:implicitConversions -g:vars -unchecked -deprecation" />
         <option name="deprecationWarnings" value="true" />
         <option name="fsc" value="true" />
-        <option name="languageLevel" value="Scala 2.9" />
         <option name="uncheckedWarnings" value="true" />
       </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../svd.web/target/scala-2.9.2/classes" />
-    <output-test url="file://$MODULE_DIR$/../svd.web/target/scala-2.9.2/test-classes" />
+    <output url="file://$MODULE_DIR$/../svd.web/target/scala-2.10/classes" />
+    <output-test url="file://$MODULE_DIR$/../svd.web/target/scala-2.10/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../svd.web">
       <sourceFolder url="file://$MODULE_DIR$/../svd.web/src/main/scala" isTestSource="false" />
@@ -28,20 +27,15 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.9.2" level="project" />
-    <orderEntry type="library" name="SBT: com.typesafe.akka:akka-remote:2.0.3" level="project" />
-    <orderEntry type="library" name="SBT: com.typesafe.akka:akka-actor:2.0.3" level="project" />
-    <orderEntry type="library" name="SBT: com.typesafe:config:0.3.1" level="project" />
-    <orderEntry type="library" name="SBT: io.netty:netty:3.5.3.Final" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.10.0" level="project" />
+    <orderEntry type="library" name="SBT: commons-io:commons-io:2.1" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-actors:2.10.0" level="project" />
+    <orderEntry type="library" name="SBT: com.typesafe.akka:akka-actor_2.10:2.1.0" level="project" />
+    <orderEntry type="library" name="SBT: com.typesafe:config:1.0.0" level="project" />
+    <orderEntry type="library" name="SBT: com.typesafe.akka:akka-remote_2.10:2.1.0" level="project" />
+    <orderEntry type="library" name="SBT: io.netty:netty:3.5.8.Final" level="project" />
     <orderEntry type="library" name="SBT: com.google.protobuf:protobuf-java:2.4.1" level="project" />
-    <orderEntry type="library" name="SBT: net.debasishg:sjson_2.9.1:0.15" level="project" />
-    <orderEntry type="library" name="SBT: net.databinder:dispatch-json_2.9.1:0.8.5" level="project" />
-    <orderEntry type="library" name="SBT: org.apache.httpcomponents:httpclient:4.1" level="project" />
-    <orderEntry type="library" name="SBT: org.apache.httpcomponents:httpcore:4.1" level="project" />
-    <orderEntry type="library" name="SBT: commons-logging:commons-logging:1.1.1" level="project" />
-    <orderEntry type="library" name="SBT: commons-codec:commons-codec:1.4" level="project" />
-    <orderEntry type="library" name="SBT: org.objenesis:objenesis:1.2" level="project" />
-    <orderEntry type="library" name="SBT: voldemort.store.compress:h2-lzf:1.0" level="project" />
+    <orderEntry type="library" name="SBT: org.uncommons.maths:uncommons-maths:1.2.2a" level="project" />
     <orderEntry type="library" name="SBT: net.sourceforge.messadmin:MessAdmin-Core:4.0" level="project" />
     <orderEntry type="library" name="SBT: net.java.dev.jna:jna:3.2.7" level="project" />
     <orderEntry type="library" name="SBT: de.schlichtherle:truezip:6.8.4" level="project" />
@@ -51,33 +45,36 @@
     <orderEntry type="library" name="SBT: org.slf4j:slf4j-api:1.6.6" level="project" />
     <orderEntry type="library" name="SBT: org.quartz-scheduler:quartz:2.1.6" level="project" />
     <orderEntry type="library" name="SBT: c3p0:c3p0:0.9.1.1" level="project" />
+    <orderEntry type="library" name="SBT: org.json4s:json4s-native_2.10:3.1.0" level="project" />
+    <orderEntry type="library" name="SBT: org.json4s:json4s-core_2.10:3.1.0" level="project" />
+    <orderEntry type="library" name="SBT: org.json4s:json4s-ast_2.10:3.1.0" level="project" />
+    <orderEntry type="library" name="SBT: com.thoughtworks.paranamer:paranamer:2.5.2" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scalap:2.10.0" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-compiler:2.10.0" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-reflect:2.10.0" level="project" />
+    <orderEntry type="library" name="SBT: commons-codec:commons-codec:1.4" level="project" />
+    <orderEntry type="library" name="SBT: commons-fileupload:commons-fileupload:1.2.1" level="project" />
     <orderEntry type="library" name="SBT: org.neodatis:neodatis-odb:1.9.24.679" level="project" />
     <orderEntry type="library" name="SBT: net.sourceforge.expectj:expectj:2.0.1" level="project" />
-    <orderEntry type="library" name="SBT: org.json4s:json4s-native_2.9.2:3.0.0" level="project" />
-    <orderEntry type="library" name="SBT: org.json4s:json4s-core_2.9.2:3.0.0" level="project" />
-    <orderEntry type="library" name="SBT: com.thoughtworks.paranamer:paranamer:2.4.1" level="project" />
-    <orderEntry type="library" name="SBT: org.scala-lang:scalap:2.9.2" level="project" />
-    <orderEntry type="library" name="SBT: org.scala-lang:scala-compiler:2.9.2" level="project" />
-    <orderEntry type="library" name="SBT: io.backchat.inflector:scala-inflector_2.9.2:1.3.5" level="project" />
+    <orderEntry type="library" name="SBT: commons-logging:commons-logging:1.1.1" level="project" />
     <orderEntry type="library" name="SBT: javax.mail:mail:1.4.5" level="project" />
     <orderEntry type="library" name="SBT: javax.activation:activation:1.1" level="project" />
-    <orderEntry type="library" name="SBT: net.databinder:unfiltered-filter_2.9.2:0.6.4" level="project" />
-    <orderEntry type="library" name="SBT: net.databinder:unfiltered_2.9.2:0.6.4" level="project" />
-    <orderEntry type="library" name="SBT: net.databinder:unfiltered-util_2.9.2:0.6.4" level="project" />
     <orderEntry type="library" name="SBT: redis.clients:jedis:2.1.0" level="project" />
     <orderEntry type="library" name="SBT: commons-pool:commons-pool:1.5.5" level="project" />
-    <orderEntry type="library" name="SBT: commons-io:commons-io:2.1" level="project" />
-    <orderEntry type="library" name="SBT: net.databinder:unfiltered-jetty_2.9.2:0.6.4" level="project" />
-    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-webapp:7.6.0.v20120127" level="project" />
-    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-xml:7.6.0.v20120127" level="project" />
-    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-util:7.6.0.v20120127" level="project" />
-    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-servlet:7.6.0.v20120127" level="project" />
-    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-security:7.6.0.v20120127" level="project" />
-    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-server:7.6.0.v20120127" level="project" />
-    <orderEntry type="library" name="SBT: javax.servlet:servlet-api:2.5" level="project" />
-    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-continuation:7.6.0.v20120127" level="project" />
-    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-http:7.6.0.v20120127" level="project" />
-    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-io:7.6.0.v20120127" level="project" />
+    <orderEntry type="library" name="SBT: org.jivesoftware:smack:3.2.2" level="project" />
+    <orderEntry type="library" name="SBT: pircbot:pircbot:1.5.0" level="project" />
+    <orderEntry type="library" name="SBT: com.verknowsys:unfiltered_2.10:0.6.4" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-webapp:7.6.8.v20121106" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-xml:7.6.8.v20121106" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-util:7.6.8.v20121106" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-servlet:7.6.8.v20121106" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-security:7.6.8.v20121106" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-server:7.6.8.v20121106" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty.orbit:javax.servlet:2.5.0.v201103041518" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-continuation:7.6.8.v20121106" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-http:7.6.8.v20121106" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty:jetty-io:7.6.8.v20121106" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scalatest:scalatest_2.10:2.0.M5b:test" level="project" />
     <orderEntry type="module" module-name="api" exported="" />
     <orderEntry type="module" module-name="common" exported="" />
     <orderEntry type="module" module-name="utils" exported="" />
