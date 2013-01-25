@@ -52,7 +52,7 @@ class SvdXMPPGate(host: String, port: Int, login: String, password: String, reso
                 }
 
                 log.debug("Number of users bound to be notified with repository changes: %s".format(chats.length))
-                presence.setStatus("ServeD® XMPP Notification Plugin")
+                presence.setStatus("ServeD® XMPP Notification Gate")
                 presence.setMode(Presence.Mode.available)
                 connection.sendPacket(presence)
 
