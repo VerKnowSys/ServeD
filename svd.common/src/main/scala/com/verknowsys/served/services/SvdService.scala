@@ -329,6 +329,27 @@ class SvdService(
             sender ! Notify.Pong
 
 
+        case User.GetServiceStdOut(matcher) =>
+            def getOutput(timeout: Int = 10): String = {
+                Thread.sleep(1000) // wait a second
+                val out = shell.stdOut.replaceAll("\r","").trim // try getting output without \r
+                if (timeout == 0) return out
+                if (out.isEmpty)
+                    getOutput(timeout - 1)
+                else
+                    out
+            }
+            val output = getOutput().split("\n").filter {
+                _.matches(matcher)
+            }.mkString("\n")
+
+            log.debug(s"GetServiceStdOut with output: ${output}, matching: ${matcher}")
+            sender ! s"""{"message": "Service Standard Output", "content": "${output}"}"""
+
+
+        // case User.GetServiceStdErr(matcher) =>
+
+
         /**
          *   Reload by default should be SIGHUP signal sent to process pid
          *

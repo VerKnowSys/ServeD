@@ -13,6 +13,7 @@ import akka.pattern.ask
 import akka.util
 import akka.util.Timeout
 import scala.util._
+import scala.util.matching.Regex
 import scala.concurrent._
 import scala.concurrent.duration._
 import ExecutionContext.Implicits.global
@@ -43,21 +44,26 @@ class SvdMoshManager(account: SvdAccount) extends Actor with Logging with SvdAct
         case User.MoshAuth =>
             log.debug("Got MoshAuth message in Mosh manager.")
             log.info("Becoming aware of new Mosh Server")
+            val originSender = sender
+            val moshMatcher = """MOSH CONNECT (\d+?) ([\w*|\/|\+]+)"""
             val moshUUID = newUuid
             val moshServer = context.actorOf(Props(new SvdService("Mosh", account)), s"MoshSession-${moshUUID}")
-            // val future = (moshServer ? Notify.Ping)
-            // future onSuccess {
-            //     case _ =>
             context.watch(moshServer)
             context.become(availableWith(moshServer :: activeSessions))
-
-            Thread.sleep(5000) // XXX: HACK. wait for mosh output
-
-            val contentFile = SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.softwareDataDir / "Mosh" / "client.string.txt" // XXX: hardcoded client string file name
-            val moshClientString = Source.fromFile(contentFile).mkString.trim.split("MOSH CONNECT ").last
-            val moshClientCommand = s"MOSH_KEY=${moshClientString.split(" ").tail.head} mosh-client ${currentVPNHost} ${moshClientString.split(" ").head}"
-            sender ! s"""{"message": "Mosh Session Created", "content": "${moshClientCommand}"}"""
-            // }
+            val future = (moshServer ? User.GetServiceStdOut(moshMatcher))
+            future onSuccess {
+                case content: String =>
+                    val splitMatch = new Regex(moshMatcher, "port", "key").findFirstMatchIn(content).get
+                    val key = splitMatch.group("key")
+                    val port = splitMatch.group("port")
+                    val moshClientCommand = s"MOSH_KEY=${key} mosh-client ${currentVPNHost} ${port}"
+                    log.trace(s"COMMAND CONTENT for client: ${moshClientCommand}")
+                    originSender ! s"""{"message": "Mosh Session Created", "content": "${moshClientCommand}", "status": 0}"""
+            }
+            future onFailure {
+                case _ =>
+                    originSender ! s"""{"message": "Mosh Session Not Created", "status": 2}"""
+            }
 
 
         case Shutdown =>
