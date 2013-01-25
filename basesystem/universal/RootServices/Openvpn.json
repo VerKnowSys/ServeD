@@ -41,7 +41,7 @@ push \"no-reply\"
 
 ifconfig-pool-persist SERVICE_PREFIX/ipp.txt 0
             ' > SERVICE_PREFIX/service.conf",
-            "SERVICE_ROOT/exports/openvpn --config SERVICE_PREFIX/service.conf --writepid SERVICE_PREFIX/service.pid"]
+            "SERVICE_ROOT/exports/openvpn --config SERVICE_PREFIX/service.conf --writepid SERVICE_PREFIX/service.pid --nice -3"]
     },
     "stop": {
         "commands": ["kill $(cat SERVICE_PREFIX/service.pid)"]
