@@ -103,17 +103,16 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
 
                 <article class="services">
                     <header>Services</header>
-                    <div class="authorize icon-key clickicon"></div>
-                    <div class="get_user_processes">GetUserProcesses</div>
-                    <div class="get_stored_services">GetStoredServices</div>
-                    <div class="terminate_services">TerminateServices</div>
-                    <div class="store_services">StoreServices</div>
-                    <div class="spawn_service">SpawnService</div>
-                    <div class="terminate_service">TerminateService</div>
-                    <div class="show_available_services">ShowAvailableServices</div>
-                    <div class="spawn_services">SpawnServices</div>
-                    <div class="get_service_status">GetServiceStatus</div>
-                    <div class="get_service_port">GetServicePort</div>
+                    <div class="get_user_processes icon-list-ul clickicon" title="Get processes list"></div>
+                    <div class="get_stored_services icon-building clickicon" title="Get stored services"></div>
+                    <div class="terminate_services icon-remove-circle clickicon" title="Terminate all currently running services"></div>
+                    <div class="store_services icon-sitemap clickicon" title="Store all running services"></div>
+                    <div class="spawn_service icon-off clickicon" title="Spawn this service"></div>
+                    <div class="terminate_service icon-remove clickicon" title="Terminate this service"></div>
+                    <div class="show_available_services icon-reorder clickicon" title="Show available services"></div>
+                    <div class="spawn_services icon-group clickicon" title="Spawn all stored services"></div>
+                    <div class="get_service_status icon-info-sign clickicon" title="Get status of this service"></div>
+                    <div class="get_service_port icon-cog clickicon" title="Get remote listening port"></div>
                 </article>
                 <article class="filewatchers">
                     <header>File Watchers</header>
@@ -133,6 +132,7 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                 </article>
                 <article class="misc">
                     <header>Miscellaneous</header>
+                    <div class="authorize icon-key clickicon" title="Authorize"></div>
                     <div class="mosh_auth">MoshAuth</div>
                     <div class="register_account">RegisterAccount</div>
                     <div class="clone_igniter_for_user">CloneIgniterForUser</div>
