@@ -126,9 +126,11 @@ void execute(char **argv, int uid) {
             cerr << "Can't get terminal settings." << endl;
             exit(EXIT_FAILURE);
         }
-    }
+        pid = forkpty(&master, NULL, &term, &size);
+    } else
+        pid = forkpty(&master, NULL, NULL, &size);
 
-    if ((pid = forkpty(&master, NULL, &term, &size)) < 0) {
+    if (pid < 0) {
         cerr << "Error forking PTY master process!" << endl;
         exit(FORK_ERROR);
     } else if (pid == 0) {
