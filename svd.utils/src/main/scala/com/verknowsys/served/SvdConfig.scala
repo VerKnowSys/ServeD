@@ -47,7 +47,6 @@ object SvdConfig {
     def defaultServicesFile             = "services.defined"
     def defaultServiceLogFile           = "service.log"
     def installed                       = "installed"
-    def defaultShell                    = "/Software/Zsh/exports/zsh"
     def defaultSchedulerShellTimeout    = 60000
     def defaultEncoding                 = "UTF-8"
     def publicHttpDir                   = "/Public/"

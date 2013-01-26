@@ -64,7 +64,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
             log.debug(s"Shell closed. Is it really closed? ${shell.isClosed}")
         } catch {
             case e: Exception =>
-                log.warn(s"${e} on exit from shell."
+                log.warn(s"${e} on exit from shell.")
         }
     }
 
