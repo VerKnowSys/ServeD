@@ -28,17 +28,10 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     val shell = expectinator.spawn(shellToSpawn)
 
 
-    // def dead = shell.isClosed
-
-
     def exec(operations: SvdShellOperations) = synchronized {
         // spawnThread {
             if (shell.isClosed)
                 throwException[SvdShellException](s"Found dead shell where it should be alive! It happened with ${operations.commands.mkString(", ")}")
-            // if (dead) { // if shell is dead, respawn it! It MUST live no matter what
-            //     log.debug("Found dead shell: %s".format(shell))
-            //     shell = expectinator.spawn(shellToSpawn)
-            // }
             val ops = operations.commands.mkString(" ; ")
             log.trace(s"Executing ${ops} on shell: ${shellToSpawn}")
             shell.send(s"\n${ops}\n") // send commands one by one to shell
@@ -61,20 +54,17 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     }
 
 
-    // def stdErr = shell.getCurrentStandardErrContents
-
-
     def close = synchronized {
         try {
-            log.trace("Closing shell. Is it closed? %s".format(shell.isClosed))
+            log.trace(s"Closing shell. Is it closed? ${shell.isClosed}")
             shell.send("\nexit\n")
             Thread.sleep(2000) // give shell some time to close properly
             shell.stop
             shell.expectClose
-            log.debug("Shell closed. Is it really closed? %s".format(shell.isClosed))
+            log.debug(s"Shell closed. Is it really closed? ${shell.isClosed}")
         } catch {
             case e: Exception =>
-                log.warn("%s on exit from shell.".format(e))
+                log.warn(s"${e} on exit from shell."
         }
     }
 
