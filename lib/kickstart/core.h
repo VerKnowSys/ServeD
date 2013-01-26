@@ -128,6 +128,7 @@
     #define DEFAULT_COUNT_OF_ROUNDS_OF_GATHERING 7200 // waiting half a second, hence 7200 is 60 minutes of gathering
     #define DEFAULT_USER_GROUP 0
     #define SOCK_DATA_PACKET_SIZE 32
+    #define BUFFER_SIZE 256
     #define LOCK_FILE_OCCUPIED_ERROR 100
     #define CANNOT_LOCK_ERROR 101
     #define POPEN_ERROR 102

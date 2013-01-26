@@ -10,12 +10,6 @@
 
 #include "core.h"
 
-#ifdef __FreeBSD__
-#include <sys/wait.h>
-#endif
-
-#define BUFFER_SIZE 256
-
 
 static struct termios saveTermios;
 static int interactive;
