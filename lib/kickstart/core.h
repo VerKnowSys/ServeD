@@ -69,7 +69,7 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.11.2"
+    #define APP_VERSION "0.11.3"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -143,6 +143,15 @@
     #define AMBIGOUS_ENTRY_ERROR 111
     #define ROOT_UID_ERROR 112
     #define INSTALLATION_MISSING_ERROR 113
+    #define STDIN_GETATTR_ERROR 114
+    #define STDIN_SETATTR_ERROR 115
+    #define STDIN_READ_ERROR 116
+    #define STDOUT_WRITE_ERROR 117
+    #define TERM_GETSIZE_ERROR 118
+    #define TERM_GETATTR_ERROR 119
+    #define PTY_WRITE_ERROR 120
+    #define PTY_FORK_ERROR 121
+    #define GETOPT_ERROR 122
 
     struct execParams {
         string javaPath;

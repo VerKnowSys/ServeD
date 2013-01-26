@@ -20,7 +20,7 @@ void ttySetRaw(void) {
 
     if (tcgetattr(STDIN_FILENO, &term) < 0) {
         cerr << "Unable to get terminal settings." << endl;
-        exit(EXIT_FAILURE);
+        exit(STDIN_GETATTR_ERROR);
     }
 
     saveTermios = term;
@@ -49,7 +49,7 @@ void ttySetRaw(void) {
 
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &term) < 0) {
         cerr << "Unable to set terminal in raw mode." << endl;
-        exit(EXIT_FAILURE);
+        exit(STDIN_SETATTR_ERROR);
     }
 }
 
@@ -72,12 +72,12 @@ void copyStreams(int master)
         for (;;) {
             if ((nread = read(STDIN_FILENO, buffer, BUFFER_SIZE)) < 0) {
                 cerr << "Error reading from stdin!" << endl;
-                exit(EXIT_FAILURE);
+                exit(STDIN_READ_ERROR);
             } else if (nread == 0) /* EOF on stdin */
                 break;
             if (write(master, buffer, nread) != nread) {
                 cerr << "Error writing to PTY master!" << endl;
-                exit(EXIT_FAILURE);
+                exit(PTY_WRITE_ERROR);
             }
         }
         /* Send SIGTERM signal to parent process. */
@@ -92,7 +92,7 @@ void copyStreams(int master)
             break;
         if (write(STDOUT_FILENO, buffer, nread) != nread) {
             cerr << "Error writing to stdout!";
-            exit(EXIT_FAILURE);
+            exit(STDOUT_WRITE_ERROR);
         }
     }
 
@@ -114,11 +114,11 @@ void execute(char **argv, int uid) {
     if (interactive) {
         if (ioctl(STDIN_FILENO, TIOCGWINSZ, &size) < 0) {
             cerr << "Can't get size of terminal window." << endl;
-            exit(EXIT_FAILURE);
+            exit(TERM_GETSIZE_ERROR);
         }
         if (tcgetattr(STDIN_FILENO, &term) < 0) {
             cerr << "Can't get terminal settings." << endl;
-            exit(EXIT_FAILURE);
+            exit(TERM_GETATTR_ERROR);
         }
         pid = forkpty(&master, NULL, &term, &size);
     } else
@@ -126,7 +126,7 @@ void execute(char **argv, int uid) {
 
     if (pid < 0) {
         cerr << "Error forking PTY master process!" << endl;
-        exit(FORK_ERROR);
+        exit(PTY_FORK_ERROR);
     } else if (pid == 0) {
         stringstream hd, usr;
 
@@ -216,7 +216,7 @@ int main(int argc, char *argv[]) {
             case 'u': {
                     if (uid != 0) {
                         cerr << "You are not allowed to specify custom uid!" << endl;
-                        exit(EXIT_FAILURE);
+                        exit(ROOT_UID_ERROR);
                     }
 
                     int optUid;
@@ -231,7 +231,7 @@ int main(int argc, char *argv[]) {
                 exit(EXIT_SUCCESS);
             case '?':
             case ':':
-                exit(EXIT_FAILURE);
+                exit(GETOPT_ERROR);
             default:
                 break;
         }
