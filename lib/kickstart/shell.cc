@@ -14,21 +14,124 @@
 #include <sys/wait.h>
 #endif
 
+#define BUFFER_SIZE 256
+
+
+static struct termios saveTermios;
+static int interactive;
+
+
+void ttySetRaw(void) {
+    struct termios term;
+
+    if (tcgetattr(STDIN_FILENO, &term) < 0) {
+        cerr << "Unable to get terminal settings." << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    saveTermios = term;
+
+    /* Echo off, canonical mode off, extended input
+       processing off, signal chars off. */
+    term.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+
+    /* No SIGINT on BREAK, CR-to-NL off, input parity
+       check off, don't strip 8th bit on input, output
+       flow control off. */
+    term.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+
+    /* Clear size bits, parity checking off. */
+    term.c_cflag &= ~(CSIZE | PARENB);
+
+    /* Set 8 bits/char. */
+    term.c_cflag |= CS8;
+
+    /* Output processing off. */
+    term.c_oflag &= ~(OPOST);
+
+    /* Case B: 1 byte at a time, no timer. */
+    term.c_cc[VMIN] = 1;
+    term.c_cc[VTIME] = 0;
+
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &term) < 0) {
+        cerr << "Unable to set terminal in raw mode." << endl;
+        exit(EXIT_FAILURE);
+    }
+}
+
+void ttyReset(void) {
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &saveTermios) < 0)
+        cerr << "Unable to reset terminal to its previous state." << endl;
+}
+
+void copyStreams(int master)
+{
+    pid_t child;
+    ssize_t nread;
+    char buffer[BUFFER_SIZE];
+
+    if ((child = fork()) < 0) {
+        cerr << "Error forking child process!" << endl;
+        exit(FORK_ERROR);
+    } else if (child == 0) {
+        /* Child process copies stdin to pty master. */
+        for (;;) {
+            if ((nread = read(STDIN_FILENO, buffer, BUFFER_SIZE)) < 0) {
+                cerr << "Error reading from stdin!" << endl;
+                exit(EXIT_FAILURE);
+            } else if (nread == 0) /* EOF on stdin */
+                break;
+            if (write(master, buffer, nread) != nread) {
+                cerr << "Error writing to PTY master!" << endl;
+                exit(EXIT_FAILURE);
+            }
+        }
+        /* Send SIGTERM signal to parent process. */
+        kill(getppid(), SIGTERM);
+        /* Terminate child process. */
+        exit(EXIT_SUCCESS);
+    }
+
+    /* Parent process copies pty master to stdout. */
+    for (;;) {
+        if ((nread = read(master, buffer, BUFFER_SIZE)) <= 0) /* Signal caught, error or EOF */
+            break;
+        if (write(STDOUT_FILENO, buffer, nread) != nread) {
+            cerr << "Error writing to stdout!";
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    /* Send SIGTERM signal to child process. */
+    kill(child, SIGTERM);
+}
+
 
 void execute(char **argv, int uid) {
     int master;
     pid_t pid;
-    struct winsize w = {
+    struct winsize size = {
         .ws_col = 80,
         .ws_row = 30
     };
+    struct termios term;
 
-    /* Get the current size of the terminal */
-    if (isatty(STDOUT_FILENO))
-        ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    /* Get the current window size and settings of the terminal */
+    if (interactive) {
+        if (ioctl(STDIN_FILENO, TIOCGWINSZ, &size) < 0) {
+            cerr << "Can't get size of terminal window." << endl;
+            exit(EXIT_FAILURE);
+        }
+        if (tcgetattr(STDIN_FILENO, &term) < 0) {
+            cerr << "Can't get terminal settings." << endl;
+            exit(EXIT_FAILURE);
+        }
+        pid = forkpty(&master, NULL, &term, &size);
+    } else
+        pid = forkpty(&master, NULL, NULL, &size);
 
-    if ((pid = forkpty(&master, NULL, NULL, &w)) < 0) {
-        cerr << "Error forking child process failed!" << endl;
+    if (pid < 0) {
+        cerr << "Error forking PTY master process!" << endl;
         exit(FORK_ERROR);
     } else if (pid == 0) {
         stringstream hd, usr;
@@ -54,45 +157,20 @@ void execute(char **argv, int uid) {
         unsetenv("SUDO_COMMAND");
         unsetenv("MAIL");
         if (execvp(*argv, argv) < 0) {
-            cerr << "Exec failed!" << endl;
+            cerr << "Can't execute: " << *argv << endl;
             exit(EXEC_ERROR);
         }
-    } else {
-        /* Adapted from https://gist.github.com/3547195 */
-
-        // remove the echo
-        struct termios tios;
-        tcgetattr(master, &tios);
-        tios.c_lflag &= ~(ECHO | ECHONL);
-        tcsetattr(master, TCSAFLUSH, &tios);
-
-        for (;;) {
-            fd_set read_fd;
-            FD_ZERO(&read_fd);
-
-            FD_SET(master, &read_fd);
-            FD_SET(STDIN_FILENO, &read_fd);
-
-            select(master+1, &read_fd, NULL, NULL, NULL);
-
-            char input;
-            char output;
-
-            if (FD_ISSET(master, &read_fd))
-            {
-                if (read(master, &output, 1) != -1)
-                    write(STDOUT_FILENO, &output, 1);
-                else
-                    break;
-            }
-
-            if (FD_ISSET(STDIN_FILENO, &read_fd))
-            {
-                read(STDIN_FILENO, &input, 1);
-                write(master, &input, 1);
-            }
-        }
     }
+
+    if (interactive) {
+        /* Set terminal in raw mode */
+        ttySetRaw();
+        /* Add "at exit" handler */
+        atexit(ttyReset);
+    }
+
+    /* Copies between streams stdin, stdout and pty master */
+    copyStreams(master);
 }
 
 
@@ -117,7 +195,7 @@ static void printUsage(void) {
 
 int main(int argc, char *argv[]) {
 
-    const char *defShell[] = {DEFAULT_SHELL_COMMAND, "-i", NULL};
+    const char *defShell[] = {DEFAULT_SHELL_COMMAND, "-s", NULL};
     char **arguments = (char **) defShell;
     int opt = 0;
 
@@ -125,6 +203,8 @@ int main(int argc, char *argv[]) {
 
     uid_t uid = getuid();
     gid_t gid = DEFAULT_USER_GROUP;
+
+    interactive = isatty(STDIN_FILENO);
 
     /* Available options */
     static struct option options[] = {
@@ -215,6 +295,7 @@ int main(int argc, char *argv[]) {
         for (int i = 0; arguments[i] != NULL; i++)
             cerr << " " << arguments[i];
         cerr << endl;
+        cerr << "Interactive mode: " << (interactive ? "yes" : "no") << endl;
     #endif
 
     execute(arguments, uid);
