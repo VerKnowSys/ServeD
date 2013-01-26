@@ -193,7 +193,7 @@ static void printUsage(void) {
 
 int main(int argc, char *argv[]) {
 
-    const char *defShell[] = {DEFAULT_SHELL_COMMAND, "-i", NULL};
+    const char *defShell[] = {DEFAULT_SHELL_COMMAND, "-s", NULL};
     char **arguments = (char **) defShell;
     int opt = 0;
 
