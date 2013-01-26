@@ -5,7 +5,7 @@
         "expectStdOut": ["All done"]
     },
     "start": {
-        "commands": ["SERVICE_ROOT/exports/mosh-server new -- /Software/Zsh/exports/zsh -s"]
+        "commands": ["SERVICE_ROOT/exports/mosh-server new -- svdshell"]
     },
     "stop": {
         "commands": ["rm -f SERVICE_PREFIX/client.string.txt"]
