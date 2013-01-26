@@ -32,7 +32,7 @@ class ShellJob extends Job with Logging {
         val account = data.get("account").asInstanceOf[SvdAccount]
 
         val shell = new SvdShell(account, SvdConfig.defaultSchedulerShellTimeout / 1000)
-        log.trace("Launching: %s".format(operations.commands.mkString(", ")))
+        log.debug(s"Launching ShellJob: ${operations.commands.mkString(", ")}")
         shell.exec(operations)
         shell.close
     }
