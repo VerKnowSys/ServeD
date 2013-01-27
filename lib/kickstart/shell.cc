@@ -275,7 +275,7 @@ int main(int argc, char *argv[]) {
         cerr << "Error setuid to uid: " << uid << endl;
         exit(SETUID_ERROR);
     }
-    #ifndef __APPLE__
+    #if !defined(__APPLE__) && !defined(__linux__)
         if (setgid(gid) != 0) {
             cerr << "Error setgid to gid: " << gid << endl;
             exit(SETGID_ERROR);
