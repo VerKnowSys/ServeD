@@ -12,7 +12,7 @@ libraryDependencies += "org.jcoffeescript" % "jcoffeescript" % "1.1" from "http:
 
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.8.4")
 
-addSbtPlugin("org.ensime" % "ensime-sbt-cmd" % "0.0.10")
+addSbtPlugin("org.ensime" % "ensime-sbt-cmd" % "0.1.0")
 
 // addSbtPlugin("cc.spray" % "sbt-revolver" % "0.6.1")
 
