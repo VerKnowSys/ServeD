@@ -28,7 +28,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     val shell = expectinator.spawn(shellToSpawn)
 
 
-    def exec(operations: SvdShellOperations) = synchronized {
+    def exec(operations: SvdShellOperations) = {
         // spawnThread {
             if (shell.isClosed)
                 throwException[SvdShellException](s"Found dead shell where it should be alive! It happened with ${operations.commands.mkString(", ")}")
@@ -49,12 +49,12 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     }
 
 
-    def stdOut = synchronized {
+    def stdOut = {
         shell.getCurrentStandardOutContents
     }
 
 
-    def close = synchronized {
+    def close = {
         try {
             log.trace(s"Closing shell. Is it closed? ${shell.isClosed}")
             shell.send("\nexit\n")
