@@ -16,7 +16,6 @@ ${FLAGS} \
 -XX:+AggressiveOpts \
 -XX:+UseFastAccessorMethods \
 -XX:+UseStringCache \
--XX:+UseCompressedStrings \
 -XX:+OptimizeStringConcat \
 -XX:+UseBiasedLocking \
 -XX:ParallelGCThreads=20 \
