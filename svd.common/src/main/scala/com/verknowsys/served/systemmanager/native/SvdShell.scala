@@ -30,19 +30,20 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
 
     def exec(operations: SvdShellOperations) = {
         // spawnThread {
-            if (shell.isClosed)
+            val sh = if (!shell.isClosed) shell else expectinator.spawn(shellToSpawn)
+            if (sh.isClosed)
                 throwException[SvdShellException](s"Found dead shell where it should be alive! It happened with ${operations.commands.mkString(", ")}")
             val ops = operations.commands.mkString(" ; ")
             log.trace(s"Executing ${ops} on shell: ${shellToSpawn}")
-            shell.send(s"${ops}\n") // send commands one by one to shell
+            sh.send(s"${ops}\n") // send commands one by one to shell
 
             if (operations.expectStdOut.size != 0) operations.expectStdOut.foreach {
                 expect =>
-                    shell.expect(expect, operations.expectOutputTimeout)
+                    sh.expect(expect, operations.expectOutputTimeout)
             }
             if (operations.expectStdErr.size != 0) operations.expectStdErr.foreach {
                 expect =>
-                    shell.expectErr(expect, operations.expectOutputTimeout)
+                    sh.expectErr(expect, operations.expectOutputTimeout)
             }
         // }
 
