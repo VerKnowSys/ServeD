@@ -5,25 +5,21 @@ unset JAVA_OPTS
 
 FLAGS="-d32"
 
-export SBT_OPTS=" ${FLAGS} -XX:MaxPermSize=768m -Xms256m -Xmx2048m -server -XX:+UseParNewGC -XX:+CMSClassUnloadingEnabled -XX:+AggressiveOpts"
-# -XX:ReservedCodeCacheSize=256m  -XX:MaxPermSize=512m
-
-#  -XX:+UseConcMarkSweepGC
-# -XX:ReservedCodeCacheSize=256m \
-# ${SBT_OPTS} \
-# -XX:+UseConcMarkSweepGC \
-# -XX:+CMSClassUnloadingEnabled \
-# -XX:+AggressiveOpts \
-# -XX:MaxPermSize=512m \
-# -Xms256m \
-#-Xmx2000m \
+# export SBT_OPTS=" ${FLAGS} -Xmx2000m -Xms2000m -Xmn2g -Xss128k -XX:MaxPermSize=1g -server -XX:+UseParNewGC -XX:+CMSClassUnloadingEnabled -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseStringCache -XX:+UseCompressedStrings -XX:+OptimizeStringConcat -XX:+UseBiasedLocking -XX:ParallelGCThreads=20"
 
 exec java \
 ${FLAGS} \
--XX:MaxPermSize=768m \
+-Xss128k \
+-XX:MaxPermSize=1g \
 -XX:+UseParNewGC \
 -XX:+CMSClassUnloadingEnabled \
 -XX:+AggressiveOpts \
+-XX:+UseFastAccessorMethods \
+-XX:+UseStringCache \
+-XX:+UseCompressedStrings \
+-XX:+OptimizeStringConcat \
+-XX:+UseBiasedLocking \
+-XX:ParallelGCThreads=20 \
 -Djna.library.path=$(pwd)/lib \
 -Dfile.encoding=UTF-8 \
 -server \
