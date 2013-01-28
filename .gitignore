@@ -118,3 +118,5 @@ ctrlcli
 /docs/scaladocs/
 /run
 *.sty
+/.ensime_lucene/
+/.idea/inspectionProfiles/
