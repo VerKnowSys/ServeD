@@ -25,8 +25,9 @@ class SvdRootBoot extends Logging with SvdActor {
 
 
     val root = new SvdAccount(uid = 0, userName = "SuperUser")
-    val systemServices = "Redis" :: "Openvpn" :: "Pptpd" :: "Coreginx" :: Nil // "James" :: // XXX: hardcoded system services
-
+    val defaultServices = "Openvpn" :: "Pptpd" :: "Redis" :: "Coreginx" :: Nil // "James" :: // XXX: hardcoded system services
+    val systemServices = if (isOSX) defaultServices.drop(2) else defaultServices
+    log.trace(s"Defined system services: ${systemServices}")
 
     override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 1 minute) {
         case _: ArithmeticException      => Resume
