@@ -82,7 +82,7 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
     def receive = {
 
         case Notify.Status(status) =>
-            log.trace("Setting status %s", status)
+            log.trace(s"Setting status ${status}")
             gates.par.map{
                 gate =>
                     log.debug("Setting Status for gate: %s", gate)

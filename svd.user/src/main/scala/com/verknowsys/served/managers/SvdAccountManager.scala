@@ -74,7 +74,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
     import Events._
 
     val scheduler = StdSchedulerFactory.getDefaultScheduler
-    val userHomeDir = SvdConfig.userHomeDir / "%s".format(bootAccount.uid)
+    val userHomeDir = SvdConfig.userHomeDir / s"${bootAccount.uid}"
 
     val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(bootAccount)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
     val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-single-dispatcher"), "SvdFileEventsManagerUser")
@@ -250,11 +250,11 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
      *  @author dmilith
      */
     def loadServicesList = {
-        val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(bootAccount.uid) / SvdConfig.softwareDataDir
+        val servicesLocationDir = SvdConfig.userHomeDir / s"${bootAccount.uid}" / SvdConfig.softwareDataDir
         log.debug("Found services dir: %s".format(servicesLocationDir))
         listDirectories(servicesLocationDir).map {
             dir =>
-                if (new File(dir.toString / ".autostart_service").exists) { // XXX: hardcode
+                if (new File(dir.toString / SvdConfig.serviceAutostartFile).exists) { // XXX: hardcode
                     log.debug("Found autostart for %s".format(dir))
                     dir.toString.split("/").last
                 } else {
@@ -281,10 +281,10 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
 
         case SvdScheduler.StopJob(name) =>
-            log.debug("Stopping scheduled jobs named: %s for service: %s".format(name, sender))
+            log.debug(s"Stopping scheduled jobs named: ${name} for service: ${sender}")
             for (index <- 0 to SvdConfig.maxSchedulerDefinitions) { // XXX: hacky.. it's better to figure out how to get list of defined jobs from scheduler..
                 try {
-                    scheduler.deleteJob(jobKey("%s-%d".format(name, index)))
+                    scheduler.deleteJob(jobKey(s"${name}-${index}"))
                 } catch {
                     case e: Exception =>
                         log.debug(s"Exception when deleting job from user scheduler: ${e}")
@@ -314,7 +314,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                 sender ! ApiSuccess
             } catch {
                 case e: Exception =>
-                    sender ! Error("Exception occured: %s".format(e))
+                    sender ! Error(s"Exception occured: ${e}")
             }
 
 
@@ -324,7 +324,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
         case User.SpawnServices => // #10
             val listOfServices = loadServicesList
-            log.debug("List of all services stored: %s".format(listOfServices.mkString(", ")))
+            log.debug(s"List of all services stored: ${listOfServices.mkString(", ")}")
             listOfServices.foreach {
                 serviceName =>
                     // look for old services already started, and stop it:
@@ -380,7 +380,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
             def joinContext { // look for old services already started, and stop it:
                 try { // XXX: TODO: make sure it's safe
-                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), "Service-%s".format(serviceName)) // spawn new service with that name:
+                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), s"Service-${serviceName}") // spawn new service with that name:
                     context.watch(serv)
                 } catch {
                     case x: InvalidActorNameException =>
@@ -394,12 +394,12 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                         notificationsManager ! Notify.Message(msg)
                 }
             }
-            val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
+            val currServ = context.actorFor(s"/user/SvdAccountManager/Service-${serviceName}")
             (currServ ? Notify.Ping) onComplete {
                 case Success(anyPong) =>
                     val msg = "Service already running: %s. Restarting".format(serviceName)
                     log.warn(msg)
-                    notificationsManager ! Notify.Message(formatMessage("W:%s".format(msg)))
+                    notificationsManager ! Notify.Message(formatMessage(s"W:${msg}"))
                     context.unwatch(currServ)
                     context.stop(currServ)
                     log.debug("Waiting for service shutdown hooks…")
@@ -407,7 +407,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                     joinContext
 
                 case Failure(exc) =>
-                    log.debug("No alive service found: %s".format(exc.getMessage))
+                    log.debug(s"No alive service found: ${exc.getMessage}")
                     joinContext
             }
             sender ! ApiSuccess
@@ -415,7 +415,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
         case User.TerminateService(name) => // #8
             log.debug("Stopping service: %s".format(name))
-            val serv = context.actorFor("/user/SvdAccountManager/Service-%s".format(name))
+            val serv = context.actorFor(s"/user/SvdAccountManager/Service-${name}")
             context.unwatch(serv)
             context.stop(serv)
             sender ! ApiSuccess
@@ -758,7 +758,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         shutdown onFailure {
             case x =>
                 // context.unbecome
-                log.error("Failure while Termination process: ${x}")
+                log.error(s"Failure while Termination process: ${x}")
         }
         context.stop _
     }
