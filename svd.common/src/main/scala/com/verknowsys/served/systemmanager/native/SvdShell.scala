@@ -34,7 +34,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
                 throwException[SvdShellException](s"Found dead shell where it should be alive! It happened with ${operations.commands.mkString(", ")}")
             val ops = operations.commands.mkString(" ; ")
             log.trace(s"Executing ${ops} on shell: ${shellToSpawn}")
-            shell.send(s"\n${ops}\n") // send commands one by one to shell
+            shell.send(s"${ops}\n") // send commands one by one to shell
 
             if (operations.expectStdOut.size != 0) operations.expectStdOut.foreach {
                 expect =>
