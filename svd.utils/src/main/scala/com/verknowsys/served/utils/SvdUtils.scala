@@ -215,7 +215,7 @@ trait SvdUtils extends Logging {
      *
      *  @author dmilith
      */
-    def isOSX = System.getProperty("os.name").contains("Darwin")
+    def isOSX = System.getProperty("os.name").contains("Mac")
 
 
     /**
