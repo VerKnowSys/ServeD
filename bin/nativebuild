@@ -92,11 +92,7 @@ if [ "$SYSTEM" = "FreeBSD" ]; then
         $CXX $FLAGS -shared lib/kickstart/system_time.cc -o lib/libsystemtime${postfix}.so -lrt
         check $? "SystemTimeLib" "lib/libsystemtime${postfix}.so"
     }
-    if [ "${ARCH}" = "i386" ]; then
-        fbsd_process "32"
-    else # x86_64
-        fbsd_process
-    fi
+    fbsd_process
 fi
 
 if [ "$SYSTEM" = "Darwin" ]; then
