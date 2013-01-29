@@ -94,6 +94,7 @@ class SvdRootBoot extends Logging with SvdActor {
     def stopSuperServices = systemServices.map {
         service =>
             val internalService = system.actorFor(s"/user/SuperService-${service}")
+            context.unwatch(internalService)
             context.stop(internalService)
             log.info(s"Terminating SuperService: ${service}")
     }
@@ -112,6 +113,7 @@ class SvdRootBoot extends Logging with SvdActor {
         context.stop(fem)
         context.stop(ssm)
         context.stop(sam)
+        super.postStop
     }
 
 
