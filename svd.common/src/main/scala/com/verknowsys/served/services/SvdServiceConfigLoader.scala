@@ -76,6 +76,7 @@ class SvdServiceConfigLoader(name: String) extends Logging with SvdUtils {
         reportAllInfos = (appTemplateMerged \ "reportAllInfos").extract[Boolean],
         reportAllDebugs = (appTemplateMerged \ "reportAllDebugs").extract[Boolean],
         staticPort = (appTemplateMerged \ "staticPort").extract[Int],
+        watchPort = (appTemplateMerged \ "watchPort").extract[Boolean],
         schedulerActions = (appTemplateMerged \ "schedulerActions").children.map {
             children =>
                 SvdSchedulerActions(

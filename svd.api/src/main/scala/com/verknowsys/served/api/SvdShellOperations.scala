@@ -24,6 +24,7 @@ case class SvdServiceConfig(
         reload: SvdShellOperations,
         validate: SvdShellOperations,
         staticPort: Int = -1,
+        watchPort: Boolean = true,
         autoStart: Boolean = true,
         autoRestart: Boolean = true, // TODO: Not yet Implemented
         reportAllErrors: Boolean = true,

@@ -101,14 +101,18 @@ class SvdService(
         try {
             Thread.sleep(SvdConfig.watchServiceInterval)
             log.trace(s"Invoking Service Watch Loop of service: ${config.name}")
-
-            if (portAvailable(servicePort)) {
-                log.warn("Service port is available although it shouldn't after start! Service watcher might found unstable/ not working service, and will try to restart this service right away")
-                hookShot(stopHook, "stop")
-                hookShot(afterStopHook, "afterStop")
-                Thread.sleep(SvdConfig.watchServiceInterval / 2)
-                hookShot(startHook, "start")
-                hookShot(afterStartHook, "afterStart")
+            if (config.watchPort) {
+                log.debug(s"Watch port enabled for service ${config.name}")
+                if (portAvailable(servicePort)) {
+                    log.warn("Service port is available although it shouldn't after start! Service watcher might found unstable/ not working service, and will try to restart this service right away")
+                    hookShot(stopHook, "stop")
+                    hookShot(afterStopHook, "afterStop")
+                    Thread.sleep(SvdConfig.watchServiceInterval / 2)
+                    hookShot(startHook, "start")
+                    hookShot(afterStartHook, "afterStart")
+                }
+            } else {
+                log.debug(s"Watch port disabled for service ${config.name}")
             }
 
         } catch {
