@@ -6,9 +6,10 @@
     "reportAllDebugs": false,
 
     "name": "NO_SERVICE_NAME!",
-    "version": "0.6",
+    "version": "0.8",
     "softwareName": "NO_SOFTWARE_NAME!",
     "staticPort": -1,
+    "watchPort": true,
 
     "schedulerActions": [
     ],

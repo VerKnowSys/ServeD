@@ -1,6 +1,7 @@
 {
     "softwareName": "Pptpd",
     "staticPort": 1723,
+    "watchPort": false,
     "install": {
         "commands": ["sofin get pptpd"],
         "expectStdOut": ["All done"]
