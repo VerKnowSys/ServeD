@@ -141,17 +141,21 @@ class SvdService(
 
             val pid = Source.fromFile(servicePidFile).mkString.trim.toInt
             log.trace(s"PID file found for service: ${config.name} with content: ${pid}")
-            val processList = parse(SvdLowLevelSystemAccess.usagesys(account.uid))
-            val onlyPPIDofService = (processList \\ "content").children.filter {
-                child =>
-                    (child \ "ppid").extract[Int] == pid
-            }
-            log.trace(s"Process list parsed: ${onlyPPIDofService}")
-            onlyPPIDofService.foreach{
-                related =>
-                    val relatedPid = (related \ "pid").extract[Int]
-                    log.debug(s"Setting death watch on pid: ${relatedPid} related to pid: ${pid}")
-                    deathWatch(relatedPid)
+            if (isOSX) {
+                log.warn("Mac OS X isn't supported with usagesys yet!")
+            } else {
+                val processList = parse(SvdLowLevelSystemAccess.usagesys(account.uid))
+                val onlyPPIDofService = (processList \\ "content").children.filter {
+                    child =>
+                        (child \ "ppid").extract[Int] == pid
+                }
+                log.trace(s"Process list parsed: ${onlyPPIDofService}")
+                onlyPPIDofService.foreach{
+                    related =>
+                        val relatedPid = (related \ "pid").extract[Int]
+                        log.debug(s"Setting death watch on pid: ${relatedPid} related to pid: ${pid}")
+                        deathWatch(relatedPid)
+                }
             }
             deathWatch(pid)
 
