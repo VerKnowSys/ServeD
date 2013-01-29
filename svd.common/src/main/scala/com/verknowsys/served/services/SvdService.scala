@@ -70,6 +70,7 @@ class SvdService(
                     config.staticPort
                 }
         }
+    val watchService = new SvdLoopThread(watchServiceHook)
 
 
     /**
@@ -88,6 +89,33 @@ class SvdService(
      */
     val installIndicator = installIndicatorPre getOrElse new File(
         SvdConfig.userHomeDir / s"${account.uid}" / SvdConfig.applicationsDir / config.softwareName / config.softwareName.toLowerCase + "." + SvdConfig.installed)
+
+
+
+    /**
+     *  Watches service and restarts it if it's unavailable
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    def watchServiceHook {
+        try {
+            Thread.sleep(SvdConfig.watchServiceInterval)
+            log.trace(s"Invoking Service Watch Loop of service: ${config.name}")
+
+            if (portAvailable(servicePort)) {
+                log.warn("Service port is available although it shouldn't after start! Service watcher might found unstable/ not working service, and will try to restart this service right away")
+                hookShot(stopHook, "stop")
+                hookShot(afterStopHook, "afterStop")
+                Thread.sleep(SvdConfig.watchServiceInterval / 2)
+                hookShot(startHook, "start")
+                hookShot(afterStartHook, "afterStart")
+            }
+
+        } catch {
+            case x: InterruptedException =>
+                log.trace("Watch service interrupted")
+        }
+    }
 
 
     /**
@@ -250,6 +278,7 @@ class SvdService(
             log.info(s"Starting ${className}: ${config.name} on port ${servicePort}")
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
+            watchService.start
         }
 
         // defining scheduler job
@@ -363,6 +392,7 @@ class SvdService(
         case Signal.Run =>
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
+            watchService.start
             sender ! ApiSuccess
 
 
@@ -389,6 +419,13 @@ class SvdService(
 
         hookShot(stopHook, "stop")
         hookShot(afterStopHook, "afterStop")
+
+        log.debug("Stopping service watch")
+        watchService.kill
+        watchService.interrupt
+        while (!watchService.isInterrupted) {
+            log.debug(s"Waiting for watch service thread: ${config.name}")
+        }
 
         log.debug("Stopping service scheduler")
         accountManager ! SvdScheduler.StopJob(config.name)

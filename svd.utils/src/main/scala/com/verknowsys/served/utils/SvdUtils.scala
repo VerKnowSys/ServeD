@@ -551,8 +551,11 @@ trait SvdUtils extends Logging {
                 ss.close
             return true
         } catch {
+            case e: java.net.BindException =>
+                log.trace(s"Port: ${port} already bound to some service")
+
             case e: IOException =>
-                println("ERROR: IOException: %s".format(e))
+                log.error(s"ERROR: IOException: ${e}")
         }
         false
     }

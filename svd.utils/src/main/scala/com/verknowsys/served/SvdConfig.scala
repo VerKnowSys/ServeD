@@ -78,6 +78,7 @@ object SvdConfig {
     def defaultHttpsPort                = 443 /* NOTE: also make sure that this port is automatically registered to be occupied by http server */
 
     def defaultUserGroup                = 0 // from now, every file created for user in filesystem will have 0 uid
+    def watchServiceInterval            = 10000
     def shutdownTimeout                 = 10000 // 10 seconds to shut down
     def kqueueWaitInterval              = 200
     def sleepDefaultPause               = 1000
