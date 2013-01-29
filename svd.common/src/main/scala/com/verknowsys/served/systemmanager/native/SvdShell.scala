@@ -24,7 +24,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
 
     log.debug(s"Spawning user Shell for account ${account}")
 
-    val shellToSpawn = if (account.uid == 0) SvdConfig.servedShell + s" --uid=0 --" else SvdConfig.servedShell + " --"
+    val shellToSpawn = if (account.uid == 0) SvdConfig.servedShell + s" --uid=0" else SvdConfig.servedShell
     val shell = expectinator.spawn(shellToSpawn)
 
 
@@ -58,14 +58,14 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     def close = {
         try {
             log.trace(s"Closing shell. Is it closed? ${shell.isClosed}")
-            shell.send("\nexit\n")
+            shell.send("exit\n")
             Thread.sleep(2000) // give shell some time to close properly
             shell.stop
             shell.expectClose
             log.debug(s"Shell closed. Is it really closed? ${shell.isClosed}")
         } catch {
             case e: Exception =>
-                log.warn(s"${e} on exit from shell.")
+                log.debug(s"Thrown ${e} on exit from shell.")
         }
     }
 
