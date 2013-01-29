@@ -1,13 +1,15 @@
 {
     "softwareName": "Pptpd",
     "staticPort": 1723,
-    "watchPort": false,
     "install": {
         "commands": ["sofin get pptpd"],
         "expectStdOut": ["All done"]
     },
     "start": {
         "commands": [
+            "test ! -L /etc/ppp/ppp.secret && rm -f /etc/ppp/ppp.secret && printf '
+guest   somepass    10.10.0.51
+' > SERVICE_PREFIX/ppp.secret && ln -s SERVICE_PREFIX/ppp.secret /etc/ppp/ppp.secret",
             "test ! -L /etc/ppp/ppp.conf && rm -f /etc/ppp/ppp.conf && printf '
 default:
  set timeout 0
