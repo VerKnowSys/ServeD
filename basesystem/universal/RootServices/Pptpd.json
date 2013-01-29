@@ -34,11 +34,5 @@ localip 10.10.0.1
 remoteip 10.10.0.50-250
 ' > SERVICE_PREFIX/service.conf",
             "SERVICE_ROOT/exports/pptpd --conf SERVICE_PREFIX/service.conf --pidfile SERVICE_PREFIX/service.pid"]
-    },
-    "stop": {
-        "commands": ["kill $(cat SERVICE_PREFIX/service.pid)"]
-    },
-    "afterStop": {
-        "commands": ["rm -f SERVICE_PREFIX/service.pid"]
     }
 }
