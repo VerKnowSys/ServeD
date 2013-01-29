@@ -225,12 +225,6 @@ class SvdService(
     }
 
 
-    def stopScheduler {
-        log.debug("Stopping scheduler for service.")
-        accountManager ! SvdScheduler.StopJob(config.name)
-    }
-
-
     override def preStart = {
 
         checkOrCreateDir(servicePrefix)
@@ -396,14 +390,15 @@ class SvdService(
         hookShot(stopHook, "stop")
         hookShot(afterStopHook, "afterStop")
 
+        log.debug("Stopping service scheduler")
+        accountManager ! SvdScheduler.StopJob(config.name)
+
         val pause = SvdConfig.serviceRestartPause / 2
         log.debug(s"Waiting for scheduler stop for ${pause /1000} seconds")
         Thread.sleep(pause)
 
         shell.close
 
-        log.debug("Stopping service scheduler")
-        stopScheduler
 
         log.info(s"Stopped ${className}: ${config.name}")
         super.postStop
