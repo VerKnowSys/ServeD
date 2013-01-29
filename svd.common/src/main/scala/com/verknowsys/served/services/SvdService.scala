@@ -148,7 +148,8 @@ class SvdService(
             }
             log.trace(s"Process list parsed: ${onlyPPIDofService}")
             onlyPPIDofService.foreach{
-                relatedPid =>
+                related =>
+                    val relatedPid = (related \ "pid").extract[Int]
                     log.debug(s"Setting death watch on pid: ${relatedPid} related to pid: ${pid}")
                     deathWatch(relatedPid)
             }
