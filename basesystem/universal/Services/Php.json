@@ -9,9 +9,6 @@
             "SERVICE_ROOT/exports/php-fpm -c SERVICE_PREFIX/service.ini --fpm-config SERVICE_PREFIX/service.conf --pid SERVICE_PREFIX/service.pid -D"
         ]
     },
-    "stop": {
-        "commands": ["kill $(cat SERVICE_PREFIX/service.pid)"]
-    },
     "validate": {
         "commands": [
             "test ! -d SERVICE_PREFIX/tmp && mkdir SERVICE_PREFIX/tmp",

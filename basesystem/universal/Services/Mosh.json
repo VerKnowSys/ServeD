@@ -6,8 +6,5 @@
     },
     "start": {
         "commands": ["SERVICE_ROOT/exports/mosh-server new -- svdshell"]
-    },
-    "stop": {
-        "commands": ["rm -f SERVICE_PREFIX/client.string.txt"]
     }
 }

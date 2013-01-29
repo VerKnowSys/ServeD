@@ -6,11 +6,5 @@
     },
     "start": {
         "commands": ["SERVICE_ROOT/exports/memcached -p SERVICE_PORT -P SERVICE_PREFIX/service.pid -d"]
-    },
-    "stop": {
-        "commands": ["kill $(cat SERVICE_PREFIX/service.pid)"]
-    },
-    "afterStop": {
-        "commands": ["rm -f SERVICE_PREFIX/service.pid"]
     }
 }
