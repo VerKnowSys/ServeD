@@ -50,6 +50,7 @@ const static string coreDir = currentDir();
             "-XX:+UseCompressedOops",
             "-Dfile.encoding=UTF-8",
             "-Djava.awt.headless=true",
+            "-Djava.net.preferIPv4Stack=true",
             jnalp.c_str(),
             #ifndef DEVEL
                 /* when not devel, use classes from assembly jar */
@@ -97,6 +98,7 @@ const static string coreDir = currentDir();
             "-Xmx128m",
             "-Dfile.encoding=UTF-8",
             "-Djava.awt.headless=true",
+            "-Djava.net.preferIPv4Stack=true",
             jnalp.c_str(),
             #ifndef DEVEL
                 /* when not devel, use classes from assembly jar */

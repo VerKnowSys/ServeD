@@ -21,6 +21,7 @@ ${FLAGS} \
 -XX:ParallelGCThreads=20 \
 -Djna.library.path=$(pwd)/lib \
 -Dfile.encoding=UTF-8 \
+-Djava.net.preferIPv4Stack=true \
 -server \
 -javaagent:/lib/jrebel/jrebel.jar \
 -jar $(dirname $0)/../vendor/sbt-launch.jar "$@"
