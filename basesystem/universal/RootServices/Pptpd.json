@@ -29,7 +29,7 @@ pptp:
             "test ! -e SERVICE_PREFIX/service.conf && printf '
 localip 10.10.0.1
 remoteip 10.10.0.50-250
-' > service.conf",
+' > SERVICE_PREFIX/service.conf",
             "SERVICE_ROOT/exports/pptpd --conf SERVICE_PREFIX/service.conf --pidfile SERVICE_PREFIX/service.pid"]
     },
     "stop": {
