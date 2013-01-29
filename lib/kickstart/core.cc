@@ -35,21 +35,22 @@ const static string coreDir = currentDir();
 
     void load_svd64(execParams params) {
         string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
-        string javaNative = DEFAULT_JAVA64_PATH;
+        string javaNative = DEFAULT_JAVA_PATH;
         #ifdef JDK7
-            javaNative = DEFAULT_JAVA764_PATH;
+            javaNative = DEFAULT_JAVA7_PATH;
         #endif
 
         const char *args[] = {
             // libPath.c_str(),
-            DEFAULT_JAVA64_BIN,
+            DEFAULT_JAVA_BIN,
             "-d64",
             "-Xmn4m",
             "-Xms16m",
-            "-Xmx256m",
+            "-Xmx128m",
             "-XX:+UseCompressedOops",
             "-Dfile.encoding=UTF-8",
             "-Djava.awt.headless=true",
+            "-Djava.net.preferIPv4Stack=true",
             jnalp.c_str(),
             #ifndef DEVEL
                 /* when not devel, use classes from assembly jar */
@@ -82,36 +83,22 @@ const static string coreDir = currentDir();
 
 
     void load_svd(execParams params) {
-        #ifdef __FreeBSD__
-            string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
-        #else
-            string jnalp = "-Djava.library.path=" + string(LIBRARIES32_DIR);
-        #endif
+        string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
         string javaNative = DEFAULT_JAVA_PATH;
         #ifdef JDK7
             javaNative = DEFAULT_JAVA7_PATH;
         #endif
         const char *args[] = {
-            // libPath.c_str(),
             DEFAULT_JAVA_BIN,
-            #ifdef __FreeBSD__
-                "-d64",
-                "-XX:+UseCompressedOops",
-            #else
-                "-d32",
-            #endif
-            "-client",
-            "-Xmn1m",
+            "-d64",
+            "-XX:+UseCompressedOops",
+            "-Xmn4m",
             "-XX:NewRatio=1",
-            #ifdef __FreeBSD__
-                "-Xms64m",
-                "-Xmx128m",
-            #else
-                "-Xms32m",
-                "-Xmx64m",
-            #endif
+            "-Xms64m",
+            "-Xmx128m",
             "-Dfile.encoding=UTF-8",
             "-Djava.awt.headless=true",
+            "-Djava.net.preferIPv4Stack=true",
             jnalp.c_str(),
             #ifndef DEVEL
                 /* when not devel, use classes from assembly jar */

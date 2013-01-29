@@ -580,6 +580,10 @@ trait SvdUtils extends Logging {
 
             case e: IOException =>
                 log.error(s"ERROR: IOException: ${e}")
+
+            case e: Exception =>
+                log.error(s"Exception: ${e}")
+
         }
         false
     }

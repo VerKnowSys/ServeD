@@ -69,24 +69,20 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.11.3"
+    #define APP_VERSION "0.12.1"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     /* default BSD case: */
     #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh"
-    #define DEFAULT_JAVA_PATH "/Software/Openjdk/"
-    #define DEFAULT_JAVA64_PATH "/Software/Openjdk/"
-    #define DEFAULT_JAVA7_PATH "/Software/Openjdk7/"
-    #define DEFAULT_JAVA764_PATH "/Software/Openjdk7/"
+    #define DEFAULT_JAVA_PATH "/Software/Openjdk6-amd64/"
+    #define DEFAULT_JAVA7_PATH "/Software/Openjdk7-amd64/"
 
     #ifdef __FreeBSD__
         #ifndef JDK7
             #define DEFAULT_JAVA_BIN (DEFAULT_JAVA_PATH "exports/java")
-            #define DEFAULT_JAVA64_BIN (DEFAULT_JAVA64_PATH "exports/java")
         #else
             #define DEFAULT_JAVA_BIN (DEFAULT_JAVA7_PATH "exports/java")
-            #define DEFAULT_JAVA64_BIN (DEFAULT_JAVA764_PATH "exports/java")
         #endif
     #endif
 
@@ -103,7 +99,6 @@
         #undef DEFAULT_SHELL_COMMAND
         #define DEFAULT_SHELL_COMMAND "/bin/zsh"
         #define DEFAULT_JAVA_BIN (DEFAULT_JAVA_PATH "exports/java")
-        #define DEFAULT_JAVA64_BIN "/usr/bin/java"
     #endif
 
 
@@ -111,7 +106,6 @@
     #define SYSTEMUSERS_HOME_DIR "/SystemUsers" // no trailing slash
     #define USERS_HOME_DIR "/Users/"
     #define LIBRARIES_DIR "/lib/"
-    #define LIBRARIES32_DIR "/lib32/"
     #define DEFAULT_BEHAVIORS_DIR "basesystem/behaviors"
     #define DEFAULT_BEHAVIORS_RAW "/output_raw_processes.raw.input"
 

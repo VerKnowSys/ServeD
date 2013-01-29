@@ -9,7 +9,7 @@ rootcheck() {
 
 requirementscheck() {
 
-    $(java -d32 -version)
+    $(java -d64 -version)
     if [ "$?" != "0" ]; then
         echo "System Deployer requires 32bit JDK available in PATH!"
         exit 1

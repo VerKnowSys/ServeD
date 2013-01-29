@@ -105,7 +105,7 @@ class SvdService(
             if (config.watchPort) {
                 log.debug(s"Watch port enabled for service ${config.name}")
                 if (portAvailable(servicePort)) {
-                    log.warn("Service port is available although it shouldn't after start! Service watcher might found unstable/ not working service, and will try to restart this service right away")
+                    log.warn(s"Service port: ${servicePort} is available although it shouldn't after start! Service watcher might found unstable/ not working service, and will try to restart this service right away")
 
                     hookShot(stopHook, "stop")
                     serviceDeathWatch
