@@ -70,6 +70,7 @@ class SvdService(
                     config.staticPort
                 }
         }
+    val servicePidFile = servicePrefix / "service.pid"
     val watchService = new SvdLoopThread(watchServiceHook)
 
 
@@ -105,8 +106,11 @@ class SvdService(
                 log.debug(s"Watch port enabled for service ${config.name}")
                 if (portAvailable(servicePort)) {
                     log.warn("Service port is available although it shouldn't after start! Service watcher might found unstable/ not working service, and will try to restart this service right away")
+
                     hookShot(stopHook, "stop")
+                    serviceDeathWatch
                     hookShot(afterStopHook, "afterStop")
+
                     Thread.sleep(SvdConfig.watchServiceInterval / 2)
                     hookShot(startHook, "start")
                     hookShot(afterStartHook, "afterStart")
@@ -118,6 +122,44 @@ class SvdService(
         } catch {
             case x: InterruptedException =>
                 log.trace("Watch service interrupted")
+        }
+    }
+
+
+    /**
+     *  Triggers dead watch for service by pid file, including services spawned by this service
+     *
+     * @author Daniel (dmilith) Dettlaff
+     */
+    def serviceDeathWatch {
+        log.debug(s"Service death watch executed for: ${config.name}")
+        if (new File(servicePidFile).exists) {
+            import org.json4s._
+            import org.json4s.native.JsonMethods._
+
+            implicit val formats = DefaultFormats // Brings in default date formats etc.
+
+            val pid = Source.fromFile(servicePidFile).mkString.trim.toInt
+            log.trace(s"PID file found for service: ${config.name} with content: ${pid}")
+            val processList = parse(SvdLowLevelSystemAccess.usagesys(account.uid))
+            val onlyPPIDofService = (processList \\ "content").children.filter {
+                child =>
+                    (child \ "ppid").extract[Int] == pid
+            }
+            log.trace(s"Process list parsed: ${onlyPPIDofService}")
+            onlyPPIDofService.foreach{
+                relatedPid =>
+                    log.debug(s"Setting death watch on pid: ${relatedPid} related to pid: ${pid}")
+                    deathWatch(relatedPid)
+            }
+            deathWatch(pid)
+
+            log.trace(s"Removing pid file: ${servicePidFile}")
+            rm_r(servicePidFile)
+
+        } else {
+            log.trace(s"PID file not found for ${config.name}. Assumming it's not necessary.")
+
         }
     }
 
@@ -422,6 +464,7 @@ class SvdService(
         log.info(s"PostStop in ${className}: ${config.name}")
 
         hookShot(stopHook, "stop")
+        serviceDeathWatch
         hookShot(afterStopHook, "afterStop")
 
         log.debug("Stopping service watch")
