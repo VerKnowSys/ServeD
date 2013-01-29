@@ -91,6 +91,8 @@ trait SvdUtils extends Logging {
                     deathWatch(pid, SIGTERM)
                 case SIGTERM =>
                     deathWatch(pid, SIGKILL)
+                case _ =>
+                    kill(pid, SIGKILL)
             }
         }
     }
