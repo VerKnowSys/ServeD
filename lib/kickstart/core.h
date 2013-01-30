@@ -69,7 +69,7 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.12.2"
+    #define APP_VERSION "0.12.3"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -91,7 +91,6 @@
         #define CLOCK_REALTIME REALTIME_CLOCK
         // NOTE: Darwin uses same zsh path as BSD
         #define DEFAULT_JAVA_BIN "/usr/bin/java"
-        #define DEFAULT_JAVA64_BIN "/usr/bin/java"
     #endif
 
     // Linux case:
