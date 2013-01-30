@@ -47,7 +47,7 @@
 //
 //    it should "create more than one instance of SvdGatherer" in {
 //        (gather1 ? ("Test signal 1")) onSuccess {
-//            case Error(y) =>
+//            case ApiError(y) =>
 //                (gather2 ? Init) onSuccess {
 //                    case ApiSuccess =>
 //                        true must be(true)

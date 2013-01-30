@@ -91,7 +91,7 @@ class SvdGatherer(account: SvdAccount) extends SvdManager {
 
         case x =>
             log.warn("SvdGatherer received unhandled signal: %s".format(x))
-            sender ! Error("SvdGatherer unknown signal")
+            sender ! ApiError("SvdGatherer unknown signal")
 
     }
 

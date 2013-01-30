@@ -150,7 +150,7 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
 
         case x: Any =>
             log.warn(s"${this} has received unknown signal: ${x}")
-            // sender ! Error("Unknown signal %s".format(x))
+            // sender ! ApiError("Unknown signal %s".format(x))
 
     }
 

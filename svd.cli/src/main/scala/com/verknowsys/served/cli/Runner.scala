@@ -28,7 +28,7 @@ class ApiClient(svd: Svd) {
     //     case ApiSuccess =>
     //         info("ServeD interactive shell. Welcome %s", userUid)
     //         prompt(new Prompt)
-    //     case Error(message) =>
+    //     case ApiError(message) =>
     //         error(message)
     //         quit
     // }

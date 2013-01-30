@@ -40,7 +40,7 @@ abstract class SvdWebAPI(webManager: ActorRef) extends Plan with Logging with Sv
 
             case _ =>
                 log.debug("No svd auth cookie.")
-                SvdWebAPI.apiRespond(webManager ? Error("Unauthorized. Use /Authorize/key first."))
+                SvdWebAPI.apiRespond(webManager ? ApiError("Unauthorized. Use /Authorize/key first."))
         }
     }
 

@@ -59,7 +59,7 @@ class SvdSystemManager extends SvdManager with Logging {
                     sender ! """{"message": "Security check passed.", "status": 0, "content": %s}""".format(container)
 
                 case None =>
-                    sender ! Error("Priviledges Check Failed")
+                    sender ! ApiError("Priviledges Check Failed")
             }
 
         case System.RegisterDomain(domain, actorProxy) =>
@@ -72,7 +72,7 @@ class SvdSystemManager extends SvdManager with Logging {
                     log.info("Domain registration succeeded")
 
                 case Some(x) =>
-                    sender ! Error("Domain registration failures: %s".format(x))
+                    sender ! ApiError("Domain registration failures: %s".format(x))
             }
 
 
@@ -88,7 +88,7 @@ class SvdSystemManager extends SvdManager with Logging {
 
 
         case System.GetNetstat =>
-            sender ! Error("Not implemented")
+            sender ! ApiError("Not implemented")
             // XXX: NOTE: TODO: this function causes SIGSEGV on FreeBSD. This requires some investigation!
 
             // SvdLowLevelSystemAccess.netstat.stat(SvdLowLevelSystemAccess.core)
@@ -111,7 +111,7 @@ class SvdSystemManager extends SvdManager with Logging {
 
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
-            // sender ! Error("Unknown signal %s".format(x))
+            // sender ! ApiError("Unknown signal %s".format(x))
 
     }
 

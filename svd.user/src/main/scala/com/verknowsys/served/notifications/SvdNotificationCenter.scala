@@ -93,7 +93,7 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
 
                         case Failure(exception) =>
                             log.error("Exception: %s", exception)
-//                            sender ! Error("Exception: %s", exception)
+//                            sender ! ApiError("Exception: %s", exception)
 
                     }
             }
@@ -102,18 +102,18 @@ class SvdNotificationCenter(account: SvdAccount) extends SvdActor with Logging {
 
 
         case Notify.Message(msg) =>
-            log.trace("Sending message %s", msg)
+            val originSender = sender
             gates.par.map{
                 gate =>
-                    log.debug("Setting Message for gate: %s", gate)
+                    log.debug(s"Setting Message for gate: ${gate}")
                     (gate ? Notify.Message(msg)) onComplete {
                         case Success(some) =>
-                            log.debug("Sending message :%s", some)
-                            sender ! ApiSuccess
+                            log.debug(s"Sending message: ${some}")
+                            originSender ! ApiSuccess
 
                         case Failure(exception) =>
                             log.warn(s"Failed to send notification with message: ${msg} caused by: ${exception}")
-                            // sender ! Failure
+                            originSender ! ApiError(s"Failed to send notification with message: ${msg} caused by: ${exception}")
 
                     }
             }

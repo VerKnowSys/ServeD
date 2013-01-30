@@ -39,11 +39,11 @@
 //                     sender ! ApiSuccess
 
 //                 case None =>
-//                     sender ! Error("No remote client found")
+//                     sender ! ApiError("No remote client found")
 
 //             } onFailure {
 //                 case x =>
-//                     sender ! Error("Failure linking to remote client, cause of %s".format(x))
+//                     sender ! ApiError("Failure linking to remote client, cause of %s".format(x))
 //             }
 
 //     }

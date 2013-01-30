@@ -97,7 +97,7 @@
 //            case res: SvdAccount =>
 //                fail("Shouldn't have available started context")
 //
-//            case Error(message) =>
+//            case ApiError(message) =>
 //                message must be("Unknown SvdAccountManager message: GetAccount(501)")
 //
 //        }

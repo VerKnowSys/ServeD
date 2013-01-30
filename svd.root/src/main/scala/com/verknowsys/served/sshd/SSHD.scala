@@ -80,19 +80,19 @@ sealed class SSHD(port: Int) extends SvdActor {
             //                 sshd.start
 
             //             case x =>
-            //                 sender ! Error("We don't like this: %s".format(x))
+            //                 sender ! ApiError("We don't like this: %s".format(x))
 
             //         } onFailure {
             //             case x =>
-            //                 sender ! Error("I'm trying, but, come on. Wtf?: %s".format(x))
+            //                 sender ! ApiError("I'm trying, but, come on. Wtf?: %s".format(x))
             //         }
 
             //     case x =>
-            //         sender ! Error("Got something weird for uid %d - %s".format(forUID, x))
+            //         sender ! ApiError("Got something weird for uid %d - %s".format(forUID, x))
 
             // } onFailure {
             //     case x =>
-            //         sender ! Error("Failed to ask for user SSHD keys with error: %s".format(x))
+            //         sender ! ApiError("Failed to ask for user SSHD keys with error: %s".format(x))
             // }
 
 

@@ -15,9 +15,9 @@ import akka.actor.ActorRef
 // ServeD -> Client messages
 // common responses
 
-case object ApiSuccess extends ApiResponse
 case object Shutdown extends ApiResponse
-case class Error(message: String) extends ApiResponse
+case class ApiSuccess(message: String = "API request completed successfully") extends ApiResponse
+case class ApiError(message: String = "API request failed") extends ApiResponse
 
 // General errors
 case object NotImplementedError

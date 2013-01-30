@@ -223,7 +223,7 @@ class SvdFileEventsManager extends Actor with Logging with SvdActor with SvdUtil
 
         case x: Any =>
             log.warn("%s has received unknown signal: %s".format(this.getClass, x))
-            // sender ! Error("Unknown signal: %s".format(x))
+            // sender ! ApiError("Unknown signal: %s".format(x))
 
     }
 

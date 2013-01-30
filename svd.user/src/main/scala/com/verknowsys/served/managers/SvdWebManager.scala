@@ -73,7 +73,7 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
         case ApiSuccess =>
             log.debug("ApiSuccess in WebManager")
 
-        case Error(x) =>
+        case ApiError(x) =>
             log.warn("Error occured: %s", x)
 
         case x: Notify.Base => // forward Notify messages from web panel
@@ -102,7 +102,7 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
         case x =>
             val m = "Unknown SvdWebManager message: %s".format(x)
             log.warn("%s".format(m))
-            sender ! Error(m)
+            sender ! ApiError(m)
 
     }
 

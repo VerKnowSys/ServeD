@@ -24,7 +24,7 @@ class SvdSystemInfo extends SvdActor {
 
     def receive = {
         case ListTreeActors =>
-            sender ! Error("not yet implemented")
+            sender ! ApiError("not yet implemented")
             // sender ! ActorsList(system.actorOf(Props[SupervisorActor])) //.map(ref2info))
             // XXX: CHECKME
     }
