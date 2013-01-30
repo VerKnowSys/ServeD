@@ -156,8 +156,8 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
     def receive = traceReceive {
 
-        case ApiSuccess(x) =>
-            log.debug("Got success")
+        case ApiSuccess(x, content) =>
+            log.debug("Got API success in SAM")
 
         case Terminated(ref) =>
             log.debug("Terminated service actor: %s".format(ref))
@@ -169,7 +169,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
         case x =>
             val m = "SvdAccountManager already become zombie stage but received message: %s".format(x)
-            log.warn("%s".format(m))
+            log.warn(s"$m")
             // sender ! ApiError(m)
 
     }
@@ -358,7 +358,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         case User.GetStoredServices => // #4
             val listOfServices = loadServicesList
             notificationsManager ! Notify.Message(formatMessage("I:%s".format(listOfServices.mkString(", "))))
-            sender ! s"""{"message": "Services were stored", "content": [${listOfServices.map{ c => "\"" +c+ "\"" }.mkString(", ")}], "status": 0}"""
+            sender ! ApiSuccess("Stored services", Some(listOfServices.map{ c => "\"" +c+ "\"" }.mkString(", ")))
 
 
         case User.TerminateServices => // #5
@@ -429,7 +429,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                 listFiles(SvdConfig.defaultSoftwareTemplatesDir) ++ listFiles(userHomeDir / SvdConfig.defaultUserIgnitersDir))
                 .filter{_.getName.endsWith(SvdConfig.defaultSoftwareTemplateExt)}.map{_.getName.split("/").last}.mkString(",").replaceAll(SvdConfig.defaultSoftwareTemplateExt, "") // XXX: replace with some good regexp
             notificationsManager ! Notify.Message("Available Services: " + availableSvces)
-            sender ! s"""{"message": "Available services", "content": [${availableSvces.split(",").map{ c => "\"" +c+ "\"" }.mkString(", ")}], "status": 0}"""
+            sender ! ApiSuccess("Available services", Some(availableSvces.split(",").map{ c => "\"" +c+ "\"" }.mkString(", ")))
 
 
         case User.ReadLogFile(serviceName, pattern) =>
@@ -446,7 +446,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             log.debug("Displaying registerd domains.")
             val domains = SvdUserDomains(db)
             log.info("GetRegisteredDomains: %s", domains.mkString(", "))
-            sender ! s"""{"message": "Domain list", "content": [${domains.map{c => "\"" +c.name+ "\"" }.mkString(", ")}], "status": 0}"""
+            sender ! ApiSuccess("Domain list", Some(domains.map{c => "\"" +c.name+ "\"" }.mkString(", ")))
 
 
         case User.GetServicePort(serviceName) => // #12
@@ -455,7 +455,8 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
             (currServ ? User.GetServicePort) onComplete {
                 case Success(port) =>
-                    s ! s"""{"message": "Port gathered successfully.", "content": [${port}], "status": 0}"""
+                    s ! ApiSuccess("Port gathered successfully.", Some(s"${port}"))
+
                 case Failure(exc) =>
                     s ! ApiError("Service port unavailable!")
             }
@@ -465,7 +466,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
             (currServ ? User.ServiceStatus) onComplete {
                 case Success(content) =>
-                    s ! s"""{"message": "Status of service: ${serviceName}", "content": ["${content}"], "status": 0}"""
+                    s ! ApiSuccess("Status of service: ${serviceName}", Some(s"${content}"))
 
                 case Failure(x) =>
                     x match {
@@ -524,7 +525,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         case User.GetUserPorts =>
             log.debug(s"Getting User ports for account: ${account}")
             val portsListFormatted = SvdUserPorts(db).map{_.number}.mkString(",")
-            sender ! s"""{"message": "Stored services", "content": [${portsListFormatted}], "status": 0}"""
+            sender ! ApiSuccess("Stored services", Some(portsListFormatted))
 
 
         case User.RegisterUserPort =>
@@ -533,7 +534,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                 val newFreeLocalPort = SvdAccountUtils.randomFreePort
                 log.debug(s"Registering user port: ${newFreeLocalPort}")
                 db << SvdUserPort(number = newFreeLocalPort)
-                originSender ! s"""{"message": "Registered port for headless account", "content": ["${newFreeLocalPort}"], "status": 0}"""
+                originSender ! ApiSuccess("Registered port for headless account", Some(s"${newFreeLocalPort}"))
 
             } else { // "Connected to SvdRoot mode"
                 log.trace("Got User.RegisterUserPort. Asking System Manager…")
@@ -548,7 +549,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                         //     }
                         // }
                         db << SvdUserPort(number = port)
-                        originSender ! s"""{"message": "Port registered: ${port}", "content": [${port}], "status": 0}"""
+                        originSender ! ApiSuccess(s"Port registered: ${port}", Some(s"${port}"))
                 }
                 futurePort onFailure {
                     case x =>

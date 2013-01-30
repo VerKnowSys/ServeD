@@ -16,8 +16,8 @@ import akka.actor.ActorRef
 // common responses
 
 case object Shutdown extends ApiResponse
-case class ApiSuccess(message: String = "API request completed successfully") extends ApiResponse
-case class ApiError(message: String = "API request failed") extends ApiResponse
+case class ApiSuccess(message: String = "API request completed successfully", content: Option[String] = None) extends ApiResponse
+case class ApiError(message: String = "API request failed", content: Option[String] = None) extends ApiResponse
 
 // General errors
 case object NotImplementedError

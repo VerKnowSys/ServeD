@@ -58,15 +58,15 @@ class SvdMoshManager(account: SvdAccount) extends Actor with Logging with SvdAct
                     val port = splitMatch.group("port")
                     val moshClientCommand = s"MOSH_KEY=${key} mosh-client ${currentVPNHost} ${port}"
                     log.trace(s"COMMAND CONTENT for client: ${moshClientCommand}")
-                    originSender ! s"""{"message": "Mosh Session Created. Please note that Mosh server will automatically shut down after a minute without connection attempt.", "content": "${moshClientCommand}", "status": 0}"""
+                    originSender ! ApiSuccess("Mosh Session Created. Please note that Mosh server will automatically shut down after a minute without connection attempt.", Some(moshClientCommand))
             }
             future onFailure {
                 case x: AskTimeoutException =>
                     log.trace(s"XXX: ${x}")
-                    originSender ! s"""{"message": "Mosh timed out, probably cause not yet installed. Try again later.", "status": 2}"""
+                    originSender ! ApiError("Mosh timed out, probably cause not yet installed. Try again later.")
 
                 case x =>
-                    originSender ! s"""{"message": "Mosh Session Error: ${x.getMessage}.", "status": 2}"""
+                    originSender ! ApiError(s"Mosh Session Error: ${x.getMessage}.")
             }
 
 

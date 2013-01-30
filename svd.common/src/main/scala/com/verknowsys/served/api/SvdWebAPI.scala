@@ -27,15 +27,27 @@ object SvdWebAPI extends SvdUtils {
         try {
             implicit val timeout = Timeout(SvdConfig.defaultAPITimeout / 1000 seconds)
             Await.result(future, timeout.duration) match {
-                case ApiSuccess(x) =>
-                    JsonContent ~> ResponseString(s"""{"message": "${x}", "status":0}""")
+                case ApiSuccess(message, content) =>
+                    content match {
+                        case Some(cont) =>
+                            JsonContent ~> ResponseString(s"""{"message": "${message}", "content":[${cont}], "status":0}""")
+
+                        case None =>
+                            JsonContent ~> ResponseString(s"""{"message": "${message}", "status":0}""")
+                    }
 
                 case jsonContent: String =>
                     log.trace(s"Sending WebAPI JSON content: ${jsonContent}")
                     JsonContent ~> ResponseString(s"${jsonContent}")
 
-                case ApiError(x) =>
-                    JsonContent ~> ResponseString(s"""{"message": "${x}", "status":2}""")
+                case ApiError(message, content) =>
+                    content match {
+                        case Some(cont) =>
+                            JsonContent ~> ResponseString(s"""{"message": "${message}", "content":[${cont}], "status":2}""")
+
+                        case None =>
+                            JsonContent ~> ResponseString(s"""{"message": "${message}", "status":2}""")
+                    }
             }
         } catch {
             case e: TimeoutException =>
