@@ -105,8 +105,9 @@ class SvdService(
             if (config.watchPort) {
                 log.debug(s"Watch port enabled for service ${config.name}")
                 if (portAvailable(servicePort)) {
-                    log.warn(s"Service port: ${servicePort} is available although it shouldn't after start! Service watcher might found unstable/ not working service, and will try to restart this service right away")
-
+                    val mesg = s"Service: ${config.name}, bound to port: ${servicePort} had just stopped serving. Service watcher might found unstable/ badly working service, and will try to restart this service right away."
+                    log.warn(mesg)
+                    accountManager ! Notify.Message(formatMessage(s"W:${mesg}"))
                     hookShot(stopHook, "stop")
                     serviceDeathWatch
                     hookShot(afterStopHook, "afterStop")
