@@ -40,12 +40,6 @@ fi
 # NOTE: TODO: maybe use case in case of support for more systems:
 if [ "$SYSTEM" = "FreeBSD" ]; then
     cp -fv lib/*.so /lib
-    if [ "${ARCH}" = "amd64" ]; then
-        mkdir -p /lib32
-        echo "* Installing 32bit precompiled libraries for headless mode."
-        cp -fv lib32/*.so /lib32
-    fi
-
 fi
 if [ "$SYSTEM" = "Darwin" ]; then
     cp -fv lib/*.dylib /lib
