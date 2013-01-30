@@ -57,7 +57,9 @@ const static string coreDir = currentDir();
                 "-jar",
                 params.jar.c_str(),
             #else
-                "-javaagent:/lib/jrebel/jrebel.jar", // XXX: hardcoded
+                #ifndef __FreeBSD__ /* temporarly disabled jrebel on FreeBSD hosts */
+                    "-javaagent:/lib/jrebel/jrebel.jar", // XXX: hardcoded
+                #endif
                 // "-Dcom.sun.management.jmxremote=false",
                 // "-Dcom.sun.management.jmxremote.ssl=false",
                 // "-Dcom.sun.management.jmxremote.authenticate=false", // XXX: TODO: Security hole
@@ -105,7 +107,9 @@ const static string coreDir = currentDir();
                 "-jar",
                 params.jar.c_str(),
             #else
-                "-javaagent:/lib/jrebel/jrebel.jar", // XXX
+                #ifndef __FreeBSD__ /* temporarly disabled jrebel on FreeBSD hosts */
+                    "-javaagent:/lib/jrebel/jrebel.jar", // XXX
+                #endif
                 /* when devel, use classes from compile folders */
                 "-cp",
                 getClassPath(params.classPathFile).c_str(),
