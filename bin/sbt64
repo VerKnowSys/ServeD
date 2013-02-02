@@ -8,6 +8,10 @@ unset JAVA_OPTS
 # -Dcom.sun.management.jmxremote.authenticate=false \
 # -XX:+UseConcMarkSweepGC \
 
+if [ "$(uname)" = "Darwin" ]; then
+  export JAVA_HOME="/usr/libexec/java_home --version 1.7"
+fi
+
 exec java \
 -d64 \
 -XX:MaxPermSize=1g \

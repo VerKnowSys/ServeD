@@ -18,6 +18,7 @@ JAVA_PATH="/Software/Openjdk6-amd64/openjdk6/bin/java"
 #. "/Users/${userUID}/.profile_java"
 
 if [ "$SYSTEM_NAME" = "Darwin" ]; then
+  export JAVA_HOME="/usr/libexec/java_home --version 1.7"
   export JAVA_PATH="/usr/bin/java"
 fi
 
@@ -32,6 +33,8 @@ echo "Killing currently spawned user boot for UID: ${DEFAULT_USER_UID}"
 kill `cat /Users/${DEFAULT_USER_UID}/${DEFAULT_USER_UID}.pid` > /dev/null 2>&1
 
 
+export JAVA_OPTS="-Djava.net.preferIPv4Stack=true -d64 -XX:+UseCompressedOops -Xmn4m -XX:NewRatio=1 -Xms32m -Xmx128m -Dfile.encoding=UTF-8 -XX:+AggressiveOpts -XX:+CMSClassUnloadingEnabled -XX:+DoEscapeAnalysis -XX:+UseBiasedLocking -XX:+OptimizeStringConcat -XX:+UseStringCache -javaagent:/lib/jrebel/jrebel.jar"
+
 case "${SYSTEM_NAME}" in
   Darwin)
     sudo mkdir -p "${DEFAULT_COMMON_PATH}"
@@ -39,7 +42,7 @@ case "${SYSTEM_NAME}" in
     sudo bin/ignitersinstall
     sudo chown ${DEFAULT_USER_UID} /Users/${DEFAULT_USER_UID}/.akka.conf
     sleep 3
-    "${JAVA_PATH}" -Djava.net.preferIPv4Stack=true -d64 -XX:+UseCompressedOops -Xmn4m -XX:NewRatio=1 -Xms32m -Xmx128m -Dfile.encoding=UTF-8 -javaagent:/lib/jrebel/jrebel.jar -cp "$(cat tmp/user.classpath)" com.verknowsys.served.userboot ${DEFAULT_USER_UID}
+    "${JAVA_PATH}" ${JAVA_OPTS} -cp "$(cat tmp/user.classpath)" com.verknowsys.served.userboot ${DEFAULT_USER_UID}
     ;;
 
   *)
@@ -47,7 +50,7 @@ case "${SYSTEM_NAME}" in
     bin/ignitersinstall
     chown ${DEFAULT_USER_UID} /Users/${DEFAULT_USER_UID}/.akka.conf
     sleep 3
-    "${JAVA_PATH}" -Djava.net.preferIPv4Stack=true -Xmn1m -XX:+UseCompressedOops -XX:NewRatio=1 -Xms64m -Xmx128m -Dfile.encoding=UTF-8 -cp "$(cat tmp/user.classpath)" com.verknowsys.served.userboot ${DEFAULT_USER_UID}
+    "${JAVA_PATH}" ${JAVA_OPTS} -cp "$(cat tmp/user.classpath)" com.verknowsys.served.userboot ${DEFAULT_USER_UID}
     ;;
 
 esac
