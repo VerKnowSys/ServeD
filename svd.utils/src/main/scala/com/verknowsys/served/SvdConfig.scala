@@ -103,6 +103,7 @@ object SvdConfig {
 
     def defaultIRCServerName            = "216.155.130.130" // *.freenode.org
     def defaultIRCChannelName           = "#verknowsys"
+    def defaultIRCGateNickname          = "tasks"
     def defaultIRCGateIdentify          = ",lpmkonji" // pass for identify to NickServ for registered nick "tasks"
     def defaultVPNNetworkPrefix         = "10.10.*"
     def vpnNetworkPreConfiguration      = "kldunload if_tap ; kldload if_tap ; ifconfig tap0 create ; ifconfig tap0 10.10.0.1 netmask 255.255.255.0"

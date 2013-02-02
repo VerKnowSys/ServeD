@@ -40,9 +40,9 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
 
     def settings = {
         setVerbose(true)
-        setName("tasks")
+        setName(SvdConfig.defaultIRCGateNickname)
         setAutoNickChange(false)
-        setVersion("0.4.2")
+        setVersion("0.5.0")
         setEncoding(SvdConfig.defaultEncoding)
         try {
             log.debug("Attepting to connect to irc server: %s on channel %s", SvdConfig.defaultIRCServerName, SvdConfig.defaultIRCChannelName)
@@ -56,9 +56,9 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
             Thread.sleep(2500)
 
             val shortVersion = SvdConfig.version.split("-").head
-            val topic = s"dev: ServeD v${shortVersion}, Sofin v0.36.0 | ?term - for terms, .help - tasks bot, @help - lang bot"
+            val topic = s"dev: ServeD v${shortVersion}, Sofin v0.36.1 | ?term - for terms, .help - tasks bot, @help - lang bot"
             log.debug(s"Setting topic to: ${topic}")
-            sendMessage("ChanServ", s"topic #verknowsys ${topic}")
+            sendMessage("ChanServ", s"topic ${SvdConfig.defaultIRCChannelName} ${topic}")
 
 
         } catch {
@@ -97,7 +97,15 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
     }
     def redisKey(nickname: String) = nickname + ".tasks"
 
-    val jedis = new Jedis(redisHost, redisPort)
+
+    def withJedis[A](f: Jedis => A): A = {
+        val jedis = new Jedis(redisHost, redisPort)
+        try {
+            f(jedis)
+        } finally {
+            jedis.disconnect
+        }
+    }
 
 
     abstract class TaskState
@@ -108,26 +116,6 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
 
     case class Task(id: Int, content: String, date: Long, done: Boolean)
     case class Tasks(list: List[Task], nextId: Int)
-
-
-    def connectToRedis = {
-        log.info("Connecting to Redis server")
-        try {
-            // jedis.auth("password")
-            jedis.connect
-            true
-        } catch {
-            case e: Exception =>
-                log.error(s"Got error in connectToRedis: ${e}")
-                false
-        }
-    }
-
-
-    def disconnectFromRedis {
-        log.info("Disconnecting from Redis server")
-        jedis.disconnect
-    }
 
 
     def renderTasks(tasks: Tasks) = (
@@ -174,7 +162,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
 
     def getTasks(nickname: String, state: TaskState) =
         try {
-            val json = parse(jedis.get(redisKey(nickname)))
+            val json = parse(withJedis { _.get(redisKey(nickname)) })
             state match {
                 case `finished` =>
                     parseTasks(json, true)
@@ -202,7 +190,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
         val json = compact(render(renderTasks(tasks)))
 
         try {
-            jedis.set(redisKey(nickname), json)
+            withJedis { _.set(redisKey(nickname), json) }
             true
         } catch {
             case e: Exception =>
@@ -339,7 +327,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
         if (message.startsWith("\\"))
             message.substring(1).split(" ", 2).toList match {
                 case term :: content :: Nil =>
-                    jedis.rpush(termKey(term), content)
+                    withJedis { _.rpush(termKey(term), content) }
                     sendMessage(channel, "%s: Added a new item to term %s.".format(sender, term))
 
                 case _ =>
@@ -350,10 +338,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
         if (message.startsWith("?"))
             message.substring(1).split(" ").toList match {
                 case term :: Nil =>
-                    val len = jedis.llen(termKey(term))
+                    val len = withJedis { _.llen(termKey(term)) }
 
                     if (len > 0) {
-                        val terms = jedis.lrange(termKey(term), 0, len)
+                        val terms = withJedis { _.lrange(termKey(term), 0, len) }
                         terms.asScala.map {
                             content => sendMessage(channel, "%s: %s".format(sender, content))
                         }
@@ -413,10 +401,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
 
         case Notify.Connect =>
             log.info("Initializing IRC Gate")
-            if (connectToRedis)
-                settings
-            else
-                log.warn("Aborting startup due to connection problems to Redis server")
+            settings
             sender ! ApiSuccess
 
 
@@ -436,21 +421,6 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
             sendMessage(SvdConfig.defaultIRCChannelName, message)
             sender ! ApiSuccess
 
-    }
-
-//
-//    def connect {
-//        log.info("Initializing IRC Gate")
-//        if (connectToRedis)
-//            settings
-//        else
-//            log.warn("Aborting startup duo to connection problems to Redis server")
-//    }
-
-
-    override def onDisconnect {
-        log.debug("Disconnect in IRC Gate")
-        disconnectFromRedis
     }
 
 
