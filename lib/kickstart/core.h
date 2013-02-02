@@ -69,21 +69,16 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.12.3"
+    #define APP_VERSION "0.13.0"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     /* default BSD case: */
     #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh"
-    #define DEFAULT_JAVA_PATH "/Software/Openjdk6-amd64/"
-    #define DEFAULT_JAVA7_PATH "/Software/Openjdk7-amd64/"
+    #define DEFAULT_JAVA_PATH "/Software/Openjdk/openjdk7/"
 
     #ifdef __FreeBSD__
-        #ifndef JDK7
-            #define DEFAULT_JAVA_BIN (DEFAULT_JAVA_PATH "exports/java")
-        #else
-            #define DEFAULT_JAVA_BIN (DEFAULT_JAVA7_PATH "exports/java")
-        #endif
+        #define DEFAULT_JAVA_BIN (DEFAULT_JAVA_PATH "bin/java")
     #endif
 
     // Darwin case:
@@ -97,7 +92,7 @@
     #ifdef __linux__
         #undef DEFAULT_SHELL_COMMAND
         #define DEFAULT_SHELL_COMMAND "/bin/zsh"
-        #define DEFAULT_JAVA_BIN (DEFAULT_JAVA_PATH "exports/java")
+        #define DEFAULT_JAVA_BIN (DEFAULT_JAVA_PATH "bin/java")
     #endif
 
 
