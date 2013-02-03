@@ -120,3 +120,4 @@ ctrlcli
 *.sty
 /.ensime_lucene/
 /.idea/inspectionProfiles/
+/sftp-config.json
