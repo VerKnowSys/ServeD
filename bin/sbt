@@ -7,6 +7,7 @@ unset JAVA_OPTS
 # -Dcom.sun.management.jmxremote.ssl=false \
 # -Dcom.sun.management.jmxremote.authenticate=false \
 
+export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF8"
 if [ "$(uname)" = "Darwin" ]; then
   export JAVA_HOME="/usr/libexec/java_home --version 1.7"
 fi
