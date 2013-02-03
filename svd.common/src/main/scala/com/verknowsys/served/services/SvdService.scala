@@ -478,6 +478,7 @@ class SvdService(
         watchService.interrupt
         while (!watchService.isInterrupted) {
             log.debug(s"Waiting for watch service thread: ${config.name}")
+            Thread.sleep(100)
         }
 
         log.debug("Stopping service scheduler")
