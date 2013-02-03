@@ -1,5 +1,6 @@
 {
     "softwareName": "Mosh",
+    "watchPort": false,
     "install": {
         "commands": ["sofin get mosh"],
         "expectStdOut": ["All done"]
