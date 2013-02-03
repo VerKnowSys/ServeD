@@ -70,7 +70,7 @@ object SvdConfig {
     def sshPort                         = 22
     def remoteApiServerPort             = 10
     def remoteAccountServerPort         = 12
-    def maxSchedulerDefinitions         = 100
+    def maxSchedulerDefinitions         = 25
     def defaultHttpKeepAliveTimeout     = 65
     def defaultHttpAmountOfWorkers      = 2
     def defaultHttpWorkerConnections    = 1024
