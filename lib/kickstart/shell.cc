@@ -61,6 +61,7 @@ void ttyReset(void) {
 void copyStreams(int master)
 {
     pid_t child;
+    pid_t parent = getpid();
     ssize_t nread;
     char buffer[BUFFER_SIZE];
 
@@ -81,7 +82,7 @@ void copyStreams(int master)
             }
         }
         /* Send SIGTERM signal to parent process. */
-        kill(getppid(), SIGTERM);
+        kill(parent, SIGTERM);
         /* Terminate child process. */
         exit(EXIT_SUCCESS);
     }
