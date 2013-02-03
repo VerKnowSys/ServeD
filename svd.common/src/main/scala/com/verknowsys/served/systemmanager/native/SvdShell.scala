@@ -58,10 +58,10 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     def close = {
         try {
             log.trace(s"Closing shell. Is it closed? ${shell.isClosed}")
-            shell.send("exit\n")
-            Thread.sleep(2000) // give shell some time to close properly
+            // shell.send("exit\n")
             shell.stop
             shell.expectClose
+            Thread.sleep(2000) // give shell some time to close properly
             log.debug(s"Shell closed. Is it really closed? ${shell.isClosed}")
         } catch {
             case e: Exception =>
