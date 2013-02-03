@@ -277,7 +277,13 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
         case SvdScheduler.StartJob(name, job, trigger) =>
             log.debug("Starting schedule job named: %s for service: %s".format(name, sender))
-            scheduler.scheduleJob(job, trigger)
+            try {
+                scheduler.scheduleJob(job, trigger)
+            } catch {
+                case e: Exception =>
+                    log.warn(s"Tried to start job name: ${name} on dead service scheduler.")
+            }
+
 
 
         case SvdScheduler.StopJob(name) =>
