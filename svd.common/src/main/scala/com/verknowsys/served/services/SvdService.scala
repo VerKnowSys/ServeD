@@ -460,8 +460,13 @@ class SvdService(
             sender ! ApiSuccess
 
 
-        case ApiSuccess =>
-            log.trace(s"ApiSuccess in ${className} from ${sender.getClass.getSimpleName}")
+        case ApiSuccess(x,y) =>
+            log.trace(s"ApiSuccess in ${className} from ${sender.getClass.getSimpleName}. Forwarding to AM")
+            accountManager ! ApiSuccess(x, y)
+
+        case ApiError(x,y) =>
+            log.trace(s"ApiError in ${className} from ${sender.getClass.getSimpleName}. Forwarding to AM")
+            accountManager ! ApiError(x, y)
 
     }
 
