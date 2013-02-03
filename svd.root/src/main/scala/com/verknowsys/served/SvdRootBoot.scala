@@ -97,6 +97,7 @@ class SvdRootBoot extends Logging with SvdActor {
             context.unwatch(internalService)
             context.stop(internalService)
             log.info(s"Terminating SuperService: ${service}")
+            Thread.sleep(500)
     }
 
 
