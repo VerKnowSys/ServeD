@@ -80,20 +80,24 @@ trait SvdUtils extends Logging {
      * @author Daniel (dmilith) Dettlaff
      */
     def deathWatch(pid: Long, signal: SvdPOSIX.Value = SIGINT) {
-        log.trace(s"DeathWatch for pid: ${pid} with signal: ${signal}")
-        kill(pid, signal) // true if it goes well, but still we need to make sure that process died
-        Thread.sleep(2000) // give process some time to die
-        if (clib.kill(pid, 0) == 0) { // if it's true, then it means that process ignored kill signal sent before
-            signal match {
-                case SIGINT =>
-                    deathWatch(pid, SIGQUIT)
-                case SIGQUIT =>
-                    deathWatch(pid, SIGTERM)
-                case SIGTERM =>
-                    deathWatch(pid, SIGKILL)
-                case _ =>
-                    kill(pid, SIGKILL)
+        if (pid != 1) {
+            log.trace(s"DeathWatch for pid: ${pid} with signal: ${signal}")
+            kill(pid, signal) // true if it goes well, but still we need to make sure that process died
+            Thread.sleep(2000) // give process some time to die
+            if (clib.kill(pid, 0) == 0) { // if it's true, then it means that process ignored kill signal sent before
+                signal match {
+                    case SIGINT =>
+                        deathWatch(pid, SIGQUIT)
+                    case SIGQUIT =>
+                        deathWatch(pid, SIGTERM)
+                    case SIGTERM =>
+                        deathWatch(pid, SIGKILL)
+                    case _ =>
+                        kill(pid, SIGKILL)
+                }
             }
+        } else {
+            log.warn("Something tried to kill init. Don't do it.")
         }
     }
 
