@@ -3,25 +3,30 @@
 unset SBT_OPTS
 unset JAVA_OPTS
 
-FLAGS="-d32"
+# -Dcom.sun.management.jmxremote=true \
+# -Dcom.sun.management.jmxremote.ssl=false \
+# -Dcom.sun.management.jmxremote.authenticate=false \
 
-# export SBT_OPTS=" ${FLAGS} -Xmx2000m -Xms2000m -Xmn2g -Xss128k -XX:MaxPermSize=1g -server -XX:+UseParNewGC -XX:+CMSClassUnloadingEnabled -XX:+AggressiveOpts -XX:+UseFastAccessorMethods -XX:+UseStringCache -XX:+UseCompressedStrings -XX:+OptimizeStringConcat -XX:+UseBiasedLocking -XX:ParallelGCThreads=20"
+if [ "$(uname)" = "Darwin" ]; then
+  export JAVA_HOME="/usr/libexec/java_home --version 1.7"
+fi
 
 exec java \
-${FLAGS} \
--Xss128k \
--XX:MaxPermSize=1g \
--XX:+UseParNewGC \
+-d64 \
+-Xms3g \
+-Xmx3g \
+-XX:+DoEscapeAnalysis \
+-XX:+UseCompressedOops \
+-XX:MaxPermSize=1200m \
 -XX:+CMSClassUnloadingEnabled \
 -XX:+AggressiveOpts \
 -XX:+UseFastAccessorMethods \
 -XX:+UseStringCache \
 -XX:+OptimizeStringConcat \
 -XX:+UseBiasedLocking \
--XX:ParallelGCThreads=20 \
 -Djna.library.path=$(pwd)/lib \
 -Dfile.encoding=UTF-8 \
 -Djava.net.preferIPv4Stack=true \
--server \
+-client \
 -javaagent:/lib/jrebel/jrebel.jar \
 -jar $(dirname $0)/../vendor/sbt-launch.jar "$@"
