@@ -69,13 +69,13 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.13.0"
+    #define APP_VERSION "0.13.1"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     /* default BSD case: */
     #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh"
-    #define DEFAULT_JAVA_PATH "/Software/Openjdk/openjdk7/"
+    #define DEFAULT_JAVA_PATH "/Software/Openjdk/openjdk6/"
 
     #ifdef __FreeBSD__
         #define DEFAULT_JAVA_BIN (DEFAULT_JAVA_PATH "bin/java")

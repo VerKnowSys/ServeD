@@ -36,15 +36,6 @@ else
     ${PORTSNAP_BIN} extract
 fi
 
-echo "Make stage"
-cd /usr/ports/java/openjdk6
-${MAKE_BIN} clean reinstall
-check_command_result $?
-
-cd /usr/ports/java/openjdk7
-${MAKE_BIN} clean reinstall
-check_command_result $?
-
 echo "Install stage"
 # APP_EXPORTS="appletviewer idlj java javah jdb jmap jsadebugd jstatd orbd rmic schemagen tnameserv wsimport apt jar javac javah javap jhat jps jstack keytool pack200 rmid serialver unpack200 xjc extcheck jarsigner javadoc jconsole jinfo jrunscript jstat native2ascii policytool rmiregistry servertool wsgen"
 

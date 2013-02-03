@@ -9,7 +9,7 @@ unset JAVA_OPTS
 
 export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF8"
 if [ "$(uname)" = "Darwin" ]; then
-  export JAVA_HOME="/usr/libexec/java_home --version 1.7"
+  export JAVA_HOME="/usr/libexec/java_home --version 1.6"
 fi
 
 exec java \
