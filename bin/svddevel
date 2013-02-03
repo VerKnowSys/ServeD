@@ -8,14 +8,13 @@ SYSTEM_NAME="$(uname -s)"
 userUID="$(id -u)"
 DEFAULT_COMMON_PATH="/Users/Common"
 DEFAULT_USER_UID="${userUID}"
-JAVA_PATH="/Software/Openjdk6-amd64/openjdk6/bin/java"
+JAVA_PATH="/Software/Openjdk/openjdk7/bin/java"
 
 # read sofin configuration
 . "/etc/profile_sofin"
 
 # read user configuration
 . "/Users/${userUID}/.profile"
-#. "/Users/${userUID}/.profile_java"
 
 if [ "$SYSTEM_NAME" = "Darwin" ]; then
   export JAVA_HOME="/usr/libexec/java_home --version 1.7"

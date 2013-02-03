@@ -1,34 +1,24 @@
 #!/bin/sh
 # @author dmilith
 
-unset JDK7
-
 CC="gcc"
 CXX="g++"
 STRIP="strip"
 UNAME="/usr/bin/uname"
 
+JAVA="1.7"
 SYSTEM="$(uname)"
 ARCH="$(uname -p)"
 DEVEL="false"
 
-export JDK7=1
-export FLAGS="-Os -fPIC -DJDK7"
+export FLAGS="-Os -fPIC"
 if [ "$1" = "devel" ]; then
     export DEVEL="true"
-elif [ "$1" = "6" ]; then
-    unset JDK7
-    export FLAGS="-Os -fPIC"
 fi
 
 if [ "$DEVEL" = "true" ]; then
     echo "Devel enabled"
     export FLAGS="$FLAGS -DDEVEL"
-fi
-
-if [ "$2" = "6" ]; then
-    unset JDK7
-    export FLAGS="-Os -fPIC"
 fi
 
 if [ -e "/usr/bin/clang++" ]; then
@@ -40,11 +30,7 @@ echo "System: $SYSTEM, Arch: ${ARCH}"
 echo "C compiler: $CC"
 echo "C++ compiler: $CXX"
 echo "Flags: $FLAGS"
-if [ -z "$JDK7" ]; then
-    echo "Platform: Java 1.6"
-else
-    echo "Platform: Java: 1.7"
-fi
+echo "Platform: Java ${JAVA}"
 echo
 
 check() {

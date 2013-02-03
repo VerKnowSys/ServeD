@@ -36,9 +36,6 @@ const static string coreDir = currentDir();
     void load_svd64(execParams params) {
         string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
         string javaNative = DEFAULT_JAVA_PATH;
-        #ifdef JDK7
-            javaNative = DEFAULT_JAVA7_PATH;
-        #endif
 
         const char *args[] = {
             // libPath.c_str(),
@@ -87,9 +84,6 @@ const static string coreDir = currentDir();
     void load_svd(execParams params) {
         string jnalp = "-Djava.library.path=" + string(LIBRARIES_DIR);
         string javaNative = DEFAULT_JAVA_PATH;
-        #ifdef JDK7
-            javaNative = DEFAULT_JAVA7_PATH;
-        #endif
         const char *args[] = {
             DEFAULT_JAVA_BIN,
             "-d64",
