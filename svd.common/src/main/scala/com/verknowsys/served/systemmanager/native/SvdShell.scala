@@ -25,27 +25,33 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     log.debug(s"Spawning user Shell for account ${account}")
 
     val shellToSpawn = if (account.uid == 0) SvdConfig.servedShell + s" --uid=0" else SvdConfig.servedShell
-    val shell = expectinator.spawn(shellToSpawn)
+
+    var shell = expectinator.spawn(shellToSpawn)
 
 
-    def exec(operations: SvdShellOperations) = {
+    def exec(operations: SvdShellOperations) = synchronized {
         // spawnThread {
-            val sh = if (!shell.isClosed) shell else expectinator.spawn(shellToSpawn)
-            if (sh.isClosed)
-                throwException[SvdShellException](s"Found dead shell where it should be alive! It happened with ${operations.commands.mkString(", ")}")
-            val ops = operations.commands.mkString(" ; ")
+        if (shell.isClosed)
+            shell = expectinator.spawn(shellToSpawn)
+
+            // if (shell.isClosed)
+            //     throwException[SvdShellException](s"Found dead shell where it should be alive! It happened with ${operations.commands.mkString(", ")}")
+        val ops = operations.commands.mkString(" ; ")
+        if (ops.isEmpty) {
+            log.debug("Empty shell operations. Skipping execution")
+        } else {
             log.trace(s"Executing ${ops} on shell: ${shellToSpawn}")
-            sh.send(s"${ops}\n") // send commands one by one to shell
+            shell.send(s"${ops}\n") // send commands one by one to shell
 
             if (operations.expectStdOut.size != 0) operations.expectStdOut.foreach {
                 expect =>
-                    sh.expect(expect, operations.expectOutputTimeout)
+                    shell.expect(expect, operations.expectOutputTimeout)
             }
             if (operations.expectStdErr.size != 0) operations.expectStdErr.foreach {
                 expect =>
-                    sh.expectErr(expect, operations.expectOutputTimeout)
+                    shell.expectErr(expect, operations.expectOutputTimeout)
             }
-        // }
+        }
 
     }
 
@@ -58,10 +64,8 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     def close = {
         try {
             log.trace(s"Closing shell. Is it closed? ${shell.isClosed}")
-            // shell.send("exit\n")
             shell.stop
             shell.expectClose
-            Thread.sleep(2000) // give shell some time to close properly
             log.debug(s"Shell closed. Is it really closed? ${shell.isClosed}")
         } catch {
             case e: Exception =>
