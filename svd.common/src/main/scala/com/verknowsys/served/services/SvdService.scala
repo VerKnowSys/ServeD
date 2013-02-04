@@ -293,7 +293,7 @@ class SvdService(
                         accountManager ! Notify.Message(msg)
 
                 case x: Exception =>
-                    val msg = formatMessage(s"F:Thrown exception in hook: ${hookName} of service: ${config.name} an exception content below:\n${x.getMessage} ${x.getStackTrace}")
+                    val msg = formatMessage(s"F:Thrown exception in hook: ${hookName} of service: ${config.name} an exception content below:\n${x.getMessage} ${x.getStackTrace.mkString("\n")}")
                     log.error(msg)
                     if (config.reportAllErrors)
                         accountManager ! Notify.Message(msg)
