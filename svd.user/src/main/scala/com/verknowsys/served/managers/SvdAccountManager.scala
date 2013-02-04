@@ -75,6 +75,8 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
     val scheduler = StdSchedulerFactory.getDefaultScheduler
     val userHomeDir = SvdConfig.userHomeDir / s"${bootAccount.uid}"
+    val servicesLocationDir = SvdConfig.userHomeDir / s"${bootAccount.uid}" / SvdConfig.softwareDataDir
+        log.debug(s"Found services dir: ${servicesLocationDir}")
 
     val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(bootAccount)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
     val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-single-dispatcher"), "SvdFileEventsManagerUser")
@@ -232,8 +234,9 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
      *  @author dmilith
      */
     def cleanServicesAutostart {
-        val servicesLocationDir = SvdConfig.userHomeDir / "%d".format(bootAccount.uid) / SvdConfig.softwareDataDir
-        listDirectories(servicesLocationDir).map {
+        val res = listDirectories(servicesLocationDir)
+        log.warn(s"Services to autostart: ${res.mkString(",")}")
+        res.map {
             dir =>
                 val file = new java.io.File(dir.toString / SvdConfig.serviceAutostartFile)
                 if (file.exists) {
@@ -250,9 +253,9 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
      *  @author dmilith
      */
     def loadServicesList = {
-        val servicesLocationDir = SvdConfig.userHomeDir / s"${bootAccount.uid}" / SvdConfig.softwareDataDir
-        log.debug("Found services dir: %s".format(servicesLocationDir))
-        listDirectories(servicesLocationDir).map {
+        val res = listDirectories(servicesLocationDir)
+        log.warn(s"Services to autostart: ${res.mkString(",")}")
+        res.map {
             dir =>
                 if (new File(dir.toString / SvdConfig.serviceAutostartFile).exists) { // XXX: hardcode
                     log.debug("Found autostart for %s".format(dir))
@@ -339,6 +342,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                         val serv = context.actorOf(Props(new SvdService(serviceName, account)), s"Service-${serviceName}")
                         log.debug("Launching Service through SpawnServices: %s".format(serv))
                         context.watch(serv)
+                        Thread.sleep(1000) // HACK: give it some more time to initialize properly
                     }
                     val currServ = context.actorFor(s"/user/SvdAccountManager/Service-${serviceName}")
                     log.trace("Pinging service: %s".format(currServ))
@@ -625,6 +629,9 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                 }
             }
 
+
+        case ApiSuccess =>
+            log.debug(s"Received ApiSuccess")
 
         case ApiSuccess(x,y) =>
             log.debug(s"Received ApiSuccess with message: ${x} and content: ${y}")
