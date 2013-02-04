@@ -29,7 +29,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
     var shell = expectinator.spawn(shellToSpawn)
 
 
-    def exec(operations: SvdShellOperations) = synchronized {
+    def exec(operations: SvdShellOperations) = {
         // spawnThread {
         if (shell.isClosed)
             shell = expectinator.spawn(shellToSpawn)
