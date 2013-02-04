@@ -33,6 +33,7 @@ $ ->
     {link: "TerminateServices", element: "div.terminate_services", params: "" },
     {link: "StoreServices", element: "div.store_services", params: "" },
     {link: "SpawnService", element: "div.spawn_service", params: "SpawnService=Redis" },
+    {link: "SpawnService", element: "div.spawn_service2", params: "SpawnService=Postgresql" },
     {link: "TerminateService", element: "div.terminate_service", params: "TerminateService=Redis" },
     {link: "ShowAvailableServices", element: "div.show_available_services", params: "" },
     {link: "SpawnServices", element: "div.spawn_services", params: "" },

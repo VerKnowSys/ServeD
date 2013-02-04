@@ -109,7 +109,8 @@ class SvdGET(webManager: ActorRef, account: SvdAccount, webPort: Int) extends Sv
                     <div class="get_stored_services icon-building clickicon" title="Get stored services"></div>
                     <div class="terminate_services icon-remove-circle clickicon" title="Terminate all currently running services"></div>
                     <div class="store_services icon-sitemap clickicon" title="Store all running services"></div>
-                    <div class="spawn_service icon-off clickicon" title="Spawn this service"></div>
+                    <div class="spawn_service icon-off clickicon" title="Spawn Redis service"></div>
+                    <div class="spawn_service2 icon-off clickicon" title="Spawn Postgresql service"></div>
                     <div class="terminate_service icon-remove clickicon" title="Terminate this service"></div>
                     <div class="show_available_services icon-reorder clickicon" title="Show available services"></div>
                     <div class="spawn_services icon-group clickicon" title="Spawn all stored services"></div>
