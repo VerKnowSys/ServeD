@@ -52,11 +52,12 @@ class SvdMoshManager(account: SvdAccount) extends Actor with Logging with SvdAct
             context.become(availableWith(moshServer :: activeSessions))
             val future = (moshServer ? User.GetServiceStdOut(moshMatcher))
             future onSuccess {
-                case content: String =>
+                case ApiSuccess(msg, contentOption) =>
+                    val content = contentOption.get
                     val splitMatch = new Regex(moshMatcher, "port", "key").findFirstMatchIn(content).get
                     val key = splitMatch.group("key")
                     val port = splitMatch.group("port")
-                    val moshClientCommand = s"MOSH_KEY=${key} mosh-client ${currentVPNHost} ${port}"
+                    val moshClientCommand = s""" "MOSH_KEY=${key} mosh-client ${currentVPNHost} ${port}" """
                     log.trace(s"COMMAND CONTENT for client: ${moshClientCommand}")
                     originSender ! ApiSuccess("Mosh Session Created. Please note that Mosh server will automatically shut down after a minute without connection attempt.", Some(moshClientCommand))
             }
