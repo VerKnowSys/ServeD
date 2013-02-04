@@ -69,7 +69,7 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.14.1"
+    #define APP_VERSION "0.14.2"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -110,6 +110,8 @@
     #define INTERNAL_LOG_FILE "svd-diagnostics.log"
     #define ROOT_JAR_FILE "/sbin/root.core"
     #define USER_JAR_FILE "/bin/user.core"
+
+    #define LOCALE "en_GB.UTF-8"
 
     #define DEFAULT_USER_UID 501
     #define DEFAULT_GATHERING_PAUSE_MICROSECONDS 500000 // half a second

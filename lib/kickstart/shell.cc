@@ -144,6 +144,8 @@ void execute(char **argv, int uid) {
         setenv("OLDPWD", hd.str().c_str(), 1);
         setenv("USER", usr.str().c_str(), 1);
         setenv("LOGNAME", usr.str().c_str(), 1);
+        setenv("LC_ALL", LOCALE, 1);
+        setenv("LANG", LOCALE, 1);
         unsetenv("USERNAME");
         unsetenv("SUDO_USERNAME");
         unsetenv("SUDO_USER");
