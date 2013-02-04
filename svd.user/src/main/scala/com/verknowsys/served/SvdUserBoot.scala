@@ -99,6 +99,7 @@ class SvdUserBoot(userUID: Int) extends Logging with SvdActor with SvdAkkaSuppor
         case Maintenance.RestartAccountManager =>
             log.debug("Killing Account Manager on demand of user: %s.", userUID)
             sender ! ApiSuccess
+            system.stop(accountsManager)
             system.shutdown
             sys.exit(0)
 
