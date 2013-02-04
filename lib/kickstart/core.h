@@ -69,7 +69,7 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.14.3"
+    #define APP_VERSION "0.14.4"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
