@@ -337,12 +337,12 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             log.debug(s"List of all services stored: ${listOfServices.mkString(", ")}")
             listOfServices.foreach {
                 serviceName =>
+                    log.info(s"Spawning process: ${serviceName}")
                     // look for old services already started, and stop it:
                     def joinContext {
                         val serv = context.actorOf(Props(new SvdService(serviceName, account)), s"Service-${serviceName}")
                         log.debug("Launching Service through SpawnServices: %s".format(serv))
                         context.watch(serv)
-                        Thread.sleep(1000) // HACK: give it some more time to initialize properly
                     }
                     val currServ = context.actorFor(s"/user/SvdAccountManager/Service-${serviceName}")
                     log.trace("Pinging service: %s".format(currServ))
