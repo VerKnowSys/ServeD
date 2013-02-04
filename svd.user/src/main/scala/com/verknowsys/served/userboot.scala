@@ -51,14 +51,14 @@ object userboot extends SvdAkkaSupport with Logging {
 
                 // Get account form remote service
                 log.info("Dispatching Account Manager for uid %s", userUID)
-                val rb = system.actorOf(Props(new SvdUserBoot(userUID.toInt)).withDispatcher("svd-core-dispatcher"), "SvdUserBoot")
+                system.actorOf(Props(new SvdUserBoot(userUID.toInt)).withDispatcher("svd-core-dispatcher"), "SvdUserBoot")
 
-                addShutdownHook {
-                    log.warn("userboot Shutdown Hook invoked")
-                    Thread.sleep(SvdConfig.shutdownTimeout)
-                    system.stop(rb)
-                    system.shutdown // shutting down main account actor manager
-                }
+                // addShutdownHook {
+                //     log.warn("userboot Shutdown Hook invoked")
+                //     Thread.sleep(SvdConfig.shutdownTimeout)
+                //     system.stop(rb)
+                //     system.shutdown // shutting down main account actor manager
+                // }
 
             case _ =>
                 log.error("Invalid arguments.")
