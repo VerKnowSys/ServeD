@@ -184,9 +184,10 @@ static void printUsage(void) {
     cout << "  svdshell -u700 -- ls -la" << endl;
     cout << endl;
     cout << "Options:" << endl;
-    cout << "  -h, --help         This message." << endl;
-    cout << "  -u, --uid=<uid>    Spawn command with <uid> privileges." << endl;
-    cout << "  -v, --version      Show copyright and version information." << endl;
+    cout << "  -h, --help                This message." << endl;
+    cout << "  -n, --non-interactive     Force non-interactive mode." << endl;
+    cout << "  -u, --uid=<uid>           Spawn command with <uid> privileges." << endl;
+    cout << "  -v, --version             Show copyright and version information." << endl;
 }
 
 
@@ -206,12 +207,13 @@ int main(int argc, char *argv[]) {
     /* Available options */
     static struct option options[] = {
         {"help", no_argument, 0, 'h'},
+        {"non-interactive", no_argument, 0, 'n'},
         {"uid", optional_argument, 0, 'u'},
         {"version", no_argument, 0, 'v'},
         {NULL, 0, NULL, 0}
     };
 
-    while ((opt = getopt_long(argc, argv, "hu:v", options, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "hnu:v", options, NULL)) != -1) {
         switch (opt) {
             case 'h':
                 printUsage();
@@ -229,6 +231,9 @@ int main(int argc, char *argv[]) {
                     } else
                         uid = optUid;
                 }
+                break;
+            case 'n':
+                interactive = 0;
                 break;
             case 'v':
                 exit(EXIT_SUCCESS);
