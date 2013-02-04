@@ -207,8 +207,8 @@ class SvdFileEventsManager extends Actor with Logging with SvdActor with SvdUtil
             }
             sender ! ApiSuccess
 
-        case ApiSuccess =>
-            log.trace("ApiSuccess in SEM")
+        case ApiSuccess(x,y) =>
+            log.trace(s"ApiSuccess in SEM with message: ${x} and content: ${y}")
 
 
         // case SvdFileEvent(path, flags) =>

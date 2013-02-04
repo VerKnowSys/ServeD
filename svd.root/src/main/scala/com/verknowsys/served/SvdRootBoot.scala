@@ -147,8 +147,8 @@ class SvdRootBoot extends Logging with SvdActor {
     def receive = {
 
 
-        case ApiSuccess =>
-            log.debug("RootBoot success")
+        case ApiSuccess(x,y) =>
+            log.debug(s"RootBoot success with msg: ${x} and content: ${y}")
 
 
         case Terminated(ref) =>

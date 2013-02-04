@@ -135,8 +135,8 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
             }
 
 
-        case ApiSuccess =>
-            log.debug("Got success")
+        case ApiSuccess(x, y) =>
+            log.debug(s"Got success with msg: ${x} and content: ${y}")
 
 
         case Notify.Message(x) =>

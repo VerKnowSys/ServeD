@@ -71,7 +71,7 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
     def receive = traceReceive {
 
         case ApiSuccess(x, content) =>
-            log.debug("ApiSuccess in WebManager")
+            log.debug(s"ApiSuccess in WebManager with message: ${x} and content: ${content}")
 
         case ApiError(x, content) =>
             log.warn("Error occured: %s", x)

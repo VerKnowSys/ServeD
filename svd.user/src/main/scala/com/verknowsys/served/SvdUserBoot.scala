@@ -92,8 +92,8 @@ class SvdUserBoot(userUID: Int) extends Logging with SvdActor with SvdAkkaSuppor
     def receive = {
 
 
-        case ApiSuccess =>
-            log.debug("UserBoot success.")
+        case ApiSuccess(x, y) =>
+            log.debug(s"UserBoot success with message: ${x} and content: ${y}")
 
 
         case Maintenance.RestartAccountManager =>

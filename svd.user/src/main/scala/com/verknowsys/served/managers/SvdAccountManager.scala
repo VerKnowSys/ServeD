@@ -626,8 +626,8 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             }
 
 
-        case ApiSuccess =>
-            log.debug("Received ApiSuccess")
+        case ApiSuccess(x,y) =>
+            log.debug(s"Received ApiSuccess with message: ${x} and content: ${y}")
 
         case Terminated(ref) =>
             log.debug("Terminated service actor: %s".format(ref))
