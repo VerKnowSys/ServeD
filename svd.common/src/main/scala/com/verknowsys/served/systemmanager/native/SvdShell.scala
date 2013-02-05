@@ -24,9 +24,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
 
     log.debug(s"Spawning user Shell for account ${account}")
 
-    val shellToSpawn = if (account.uid == 0) SvdConfig.servedShell + s" --uid=0" else SvdConfig.servedShell
-
-    val shell = expectinator.spawn(shellToSpawn)
+    val shell = expectinator.spawn(SvdConfig.servedShell)
 
 
     def exec(operations: SvdShellOperations) = {
