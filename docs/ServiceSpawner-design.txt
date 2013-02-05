@@ -1,6 +1,16 @@
-ProcessSpawner design
+--------------------------------------------
+ServiceSpawner design. © 2o13 verknowsys.com
+--------------------------------------------
 
-A. Launched for user
+
+A. Launched for root as system service, event loops / watchers spawned as forks/ threads with user priviledges.
+  I. (SS side)
+    1. user fork/ thread running for each /Users/ANYUID directory.
+    2. watches for /Users/ANYUID/.spawn_user_panel. If this file exists, spawn SvdUserBoot.
+
+  II. (JDK side)
+    1. touch /Users/ANYUID/.spawn_user_panel on user demand.
+
 
 B. Launching service "Service"
   I. (JDK side):
@@ -8,7 +18,7 @@ B. Launching service "Service"
     1. touch $HOME/SoftwareData/Service/.spawn
     2. wait for $HOME/SoftwareData/Service/.spawned to continue
 
-  II. (PS side):
+  II. (SS side):
     0. read "Service.json" igniter, replace values:
         SERVICE_ROOT => obvious (one of two: /Software/Service by default or $HOME/Apps/Service)
         SERVICE_PREFIX => obvious: $HOME/SoftwareData/Service
@@ -29,7 +39,7 @@ C. Stopping service "Service"
   I. (JDK side):
     1. close service connections (if any)
     2. touch $HOME/SoftwareData/Service/.terminate
-  II. (PS side):
+  II. (SS side):
     0. stop service
     1. remove $HOME/SoftwareData/Service/.spawned
     2. remove $HOME/SoftwareData/Service/.terminate
