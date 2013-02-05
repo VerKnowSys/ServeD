@@ -46,6 +46,7 @@ object SvdConfig {
     def softwareDataDir                 = "SoftwareData/"
     def defaultServicesFile             = "services.defined"
     def defaultServiceLogFile           = "service.log"
+    def defaultServicePidFile           = "service.pid"
     def installed                       = "installed"
     def defaultSchedulerShellTimeout    = 60000
     def defaultEncoding                 = "UTF-8"
