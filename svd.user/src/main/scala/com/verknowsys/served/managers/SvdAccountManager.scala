@@ -76,7 +76,6 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
     val scheduler = StdSchedulerFactory.getDefaultScheduler
     val userHomeDir = SvdConfig.userHomeDir / s"${bootAccount.uid}"
     val servicesLocationDir = SvdConfig.userHomeDir / s"${bootAccount.uid}" / SvdConfig.softwareDataDir
-        log.debug(s"Found services dir: ${servicesLocationDir}")
 
     val notificationsManager = context.actorOf(Props(new SvdNotificationCenter(bootAccount)).withDispatcher("svd-single-dispatcher"), "SvdNotificationCenter")
     val fem = context.actorOf(Props(new SvdFileEventsManager).withDispatcher("svd-single-dispatcher"), "SvdFileEventsManagerUser")
@@ -146,11 +145,15 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         if (!headless)
             accountsManager ! Admin.Alive(account) // registers current manager in accounts manager
 
-        self ! User.SpawnServices // spawn userside services
+
+        // self ! User.SpawnServices // spawn userside services
 
         // send availability of user to sshd manager
         addDefaultAccessKey(db)
         sshd ! InitSSHChannelForUID(account.uid)
+
+        // log.trace("Scheduled launch of default services")
+        // launchUserServices(account)
     }
 
 
@@ -228,44 +231,65 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
     }
 
 
-    /**
-     *  Cleans autostart mark from services software data dir.
-     *
-     *  @author dmilith
-     */
-    def cleanServicesAutostart {
-        val res = listDirectories(servicesLocationDir)
-        log.warn(s"Services to autostart: ${res.mkString(",")}")
-        res.map {
-            dir =>
-                val file = new java.io.File(dir.toString / SvdConfig.serviceAutostartFile)
-                if (file.exists) {
-                    log.debug("Removing autostart file: %s", file)
-                    rm_r(file.toString)
-                }
-        }
-    }
+    // /**
+    //  *  Load autostart marks from services software data dir.
+    //  *
+    //  *  @author dmilith
+    //  */
+    // def loadServicesList = {
+    //     val res = listDirectories(servicesLocationDir)
+    //     log.warn(s"Services to autostart: ${res.mkString(",")}")
+    //     res.map {
+    //         dir =>
+    //             if (new File(dir.toString / SvdConfig.serviceAutostartFile).exists) { // XXX: hardcode
+    //                 log.debug("Found autostart for %s".format(dir))
+    //                 dir.toString.split("/").last
+    //             } else {
+    //                 log.debug("No autostart for %s".format(dir))
+    //                 ""
+    //             }
+    //     }.filterNot(_.isEmpty)
+    // }
 
 
-    /**
-     *  Load autostart marks from services software data dir.
-     *
-     *  @author dmilith
-     */
-    def loadServicesList = {
-        val res = listDirectories(servicesLocationDir)
-        log.warn(s"Services to autostart: ${res.mkString(",")}")
-        res.map {
-            dir =>
-                if (new File(dir.toString / SvdConfig.serviceAutostartFile).exists) { // XXX: hardcode
-                    log.debug("Found autostart for %s".format(dir))
-                    dir.toString.split("/").last
-                } else {
-                    log.debug("No autostart for %s".format(dir))
-                    ""
-                }
-        }.filterNot(_.isEmpty)
-    }
+    // def launchUserServices(account: SvdAccount) = {
+    //     val listOfServices = loadServicesList
+    //     log.debug(s"List of all services stored: ${listOfServices.mkString(", ")}")
+    //     listOfServices.foreach {
+    //         serviceName =>
+    //             log.info(s"Spawning process: ${serviceName}")
+
+    //             // look for old services already started, and stop it:
+    //             def joinContext {
+    //                 val serv = context.actorOf(Props(new SvdService(serviceName, account)), s"Service-${serviceName}")
+    //                 log.debug("Launching Service through SpawnServices: %s".format(serv))
+    //                 context.watch(serv)
+    //             }
+    //             val currServ = context.actorFor(s"/user/Service-${serviceName}")
+    //             log.trace("Pinging service: %s".format(currServ))
+    //             val svcFuture = (currServ ? Notify.Ping)
+    //             svcFuture onComplete {
+    //                 case Success(_) =>
+    //                     val msg = s"Service already running: ${serviceName}."
+    //                     log.warn(msg)
+    //                     notificationsManager ! Notify.Message(formatMessage(s"W:${msg}"))
+    //                     // senderOrigin ! ApiError(s"Service ${serviceName} already spawned")
+    //                     // currServ ! Quit
+    //                     // log.debug("Waiting for service shutdown hooks…")
+    //                     // Thread.sleep(SvdConfig.serviceRestartPause)
+    //                     // joinContext
+
+    //                 case Failure(exc) =>
+    //                     log.debug("No alive actors found: %s".format(exc.getMessage))
+    //                     joinContext
+    //             }
+    //             svcFuture onFailure {
+    //                 case exc =>
+    //                     log.debug("Failure happened: %s".format(exc.getMessage))
+    //                     // joinContext
+    //             }
+    //     }
+    // }
 
 
     private def started(account: SvdAccount, db: DBClient, dbServer: DBServer, gitManager: ActorRef, notificationsManager: ActorRef, webManager: ActorRef, utils: SvdAccountUtils): Receive = traceReceive {
@@ -332,114 +356,86 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
 
         case User.SpawnServices => // #10
-            val senderOrigin = sender
-            val listOfServices = loadServicesList
-            log.debug(s"List of all services stored: ${listOfServices.mkString(", ")}")
-            listOfServices.foreach {
-                serviceName =>
-                    log.info(s"Spawning process: ${serviceName}")
-                    // look for old services already started, and stop it:
-                    def joinContext {
-                        val serv = context.actorOf(Props(new SvdService(serviceName, account)), s"Service-${serviceName}")
-                        log.debug("Launching Service through SpawnServices: %s".format(serv))
-                        context.watch(serv)
-                    }
-                    val currServ = context.actorFor(s"/user/SvdAccountManager/Service-${serviceName}")
-                    log.trace("Pinging service: %s".format(currServ))
-                    (currServ ? Notify.Ping) onComplete {
-                        case Success(_) =>
-                            val msg = s"Service already running: ${serviceName}."
-                            log.warn(msg)
-                            notificationsManager ! Notify.Message(formatMessage(s"W:${msg}"))
-                            // senderOrigin ! ApiError(s"Service ${serviceName} already spawned")
-                            // currServ ! Quit
-                            // log.debug("Waiting for service shutdown hooks…")
-                            // Thread.sleep(SvdConfig.serviceRestartPause)
-                            // joinContext
 
-                        case Failure(exc) =>
-                            log.debug("No alive actors found: %s".format(exc.getMessage))
-                            joinContext
-                    }
-            }
-            sender ! ApiSuccess("Sent services spawn for all stored services")
+            // SvdAccountUtils.launchUserServices(account)
+            // sender ! ApiSuccess("Sent services spawn for all stored services")
 
 
         case User.GetStoredServices => // #4
-            val listOfServices = loadServicesList
-            notificationsManager ! Notify.Message(formatMessage("I:%s".format(listOfServices.mkString(", "))))
-            sender ! ApiSuccess("Stored services", Some(listOfServices.map{ c => "\"" +c+ "\"" }.mkString(", ")))
+            // val listOfServices = SvdAccountUtils.loadServicesList(servicesLocationDir)
+            // notificationsManager ! Notify.Message(formatMessage("I:%s".format(listOfServices.mkString(", "))))
+            // sender ! ApiSuccess("Stored services", Some(listOfServices.map{ c => "\"" +c+ "\"" }.mkString(", ")))
 
 
         case User.TerminateServices => // #5
-            log.info("Terminating all services…")
-            context.actorSelection("../SvdAccountManager/Service-*") ! Signal.Quit
-            sender ! ApiSuccess("Termination signal sent to all running services")
+            // log.info("Terminating all services…")
+            // system.actorSelection("/user/Service-*") ! Signal.Quit
+            // sender ! ApiSuccess("Termination signal sent to all running services")
 
 
         case User.StoreServices => // #6
-            cleanServicesAutostart
-            context.actorSelection("../SvdAccountManager/Service-*") ! User.ServiceAutostart
-            sender ! ApiSuccess("Stored state of all launched services")
+            // SvdAccountUtils.cleanServicesAutostart(servicesLocationDir)
+            // system.actorSelection("/user/Service-*") ! User.ServiceAutostart // was ../Service-*
+            // sender ! ApiSuccess("Stored state of all launched services")
 
 
         case User.GetRunningServices =>
-            context.actorSelection("../SvdAccountManager/Service-*") ! User.ServiceStatus
+            // system.actorSelection("/user/Service-*") ! User.ServiceStatus
 
 
         case User.SpawnService(serviceName) => // #7
-            log.debug(s"Spawning service: ${serviceName}")
+            // log.debug(s"Spawning service: ${serviceName}")
 
-            def joinContext { // look for old services already started, and stop it:
-                try { // XXX: TODO: make sure it's safe
-                    val serv = context.actorOf(Props(new SvdService(serviceName, account)), s"Service-${serviceName}") // spawn new service with that name:
-                    context.watch(serv)
-                } catch {
-                    case x: InvalidActorNameException =>
-                        val msg = formatMessage("E:Invalid name exception (duplicate same service): %s. Causing Restart of Service.".format(x.getMessage))
-                        log.warn(msg)
-                        notificationsManager ! Notify.Message(msg)
+            // def joinContext { // look for old services already started, and stop it:
+            //     try { // XXX: TODO: make sure it's safe
+            //         val serv = system.actorOf(Props(new SvdService(serviceName, account)).withDispatcher("svd-single-dispatcher"), s"Service-${serviceName}") // spawn new service with that name:
+            //         context.watch(serv)
+            //     } catch {
+            //         case x: InvalidActorNameException =>
+            //             val msg = formatMessage(s"E:Invalid name exception (duplicate same service): ${x.getMessage}. Causing Restart of Service.")
+            //             log.warn(msg)
+            //             notificationsManager ! Notify.Message(msg)
 
-                    case x: Exception =>
-                        val msg = formatMessage("E:Something nasty happened with service: %s".format(x.getMessage))
-                        log.warn(msg)
-                        notificationsManager ! Notify.Message(msg)
-                }
-            }
-            val currServ = context.actorFor(s"/user/SvdAccountManager/Service-${serviceName}")
-            (currServ ? Notify.Ping) onComplete {
-                case Success(anyPong) =>
-                    val msg = "Service already running: %s. Restarting".format(serviceName)
-                    log.warn(msg)
-                    notificationsManager ! Notify.Message(formatMessage(s"W:${msg}"))
-                    context.unwatch(currServ)
-                    context.stop(currServ)
-                    log.debug("Waiting for service shutdown hooks…")
-                    Thread.sleep(SvdConfig.serviceRestartPause)
-                    joinContext
+            //         case x: Exception =>
+            //             val msg = formatMessage(s"E:Something nasty happened with service: ${x.getMessage}")
+            //             log.warn(msg)
+            //             notificationsManager ! Notify.Message(msg)
+            //     }
+            // }
+            // val currServ = system.actorFor(s"/user/Service-${serviceName}")
+            // (currServ ? Notify.Ping) onComplete {
+            //     case Success(anyPong) =>
+            //         val msg = "Service already running: %s. Restarting".format(serviceName)
+            //         log.warn(msg)
+            //         notificationsManager ! Notify.Message(formatMessage(s"W:${msg}"))
+            //         context.unwatch(currServ)
+            //         context.stop(currServ)
+            //         log.debug("Waiting for service shutdown hooks…")
+            //         Thread.sleep(SvdConfig.serviceRestartPause)
+            //         joinContext
 
-                case Failure(exc) =>
-                    log.debug(s"No alive service found: ${exc.getMessage}")
-                    joinContext
-            }
-            sender ! ApiSuccess(s"Service ${serviceName} spawned successfully")
+            //     case Failure(exc) =>
+            //         log.debug(s"No alive service found: ${exc.getMessage}")
+            //         joinContext
+            // }
+            // sender ! ApiSuccess(s"Service ${serviceName} spawned successfully")
 
 
         case User.TerminateService(name) => // #8
-            log.debug("Stopping service: %s".format(name))
-            val serv = context.actorFor(s"/user/SvdAccountManager/Service-${name}")
-            context.unwatch(serv)
-            context.stop(serv)
-            sender ! ApiSuccess(s"Service ${name} terminated successfully")
+            // log.debug("Stopping service: %s".format(name))
+            // val serv = system.actorFor(s"/user/Service-${name}")
+            // context.unwatch(serv)
+            // context.stop(serv)
+            // sender ! ApiSuccess(s"Service ${name} terminated successfully")
 
 
         case User.ShowAvailableServices => // #9
-            log.debug("Showing available services definitions")
-            val availableSvces = (
-                listFiles(SvdConfig.defaultSoftwareTemplatesDir) ++ listFiles(userHomeDir / SvdConfig.defaultUserIgnitersDir))
-                .filter{_.getName.endsWith(SvdConfig.defaultSoftwareTemplateExt)}.map{_.getName.split("/").last}.mkString(",").replaceAll(SvdConfig.defaultSoftwareTemplateExt, "") // XXX: replace with some good regexp
-            notificationsManager ! Notify.Message("Available Services: " + availableSvces)
-            sender ! ApiSuccess("Available services", Some(availableSvces.split(",").map{ c => "\"" +c+ "\"" }.mkString(", ")))
+            // log.debug("Showing available services definitions")
+            // val availableSvces = (
+            //     listFiles(SvdConfig.defaultSoftwareTemplatesDir) ++ listFiles(userHomeDir / SvdConfig.defaultUserIgnitersDir))
+            //     .filter{_.getName.endsWith(SvdConfig.defaultSoftwareTemplateExt)}.map{_.getName.split("/").last}.mkString(",").replaceAll(SvdConfig.defaultSoftwareTemplateExt, "") // XXX: replace with some good regexp
+            // notificationsManager ! Notify.Message("Available Services: " + availableSvces)
+            // sender ! ApiSuccess("Available services", Some(availableSvces.split(",").map{ c => "\"" +c+ "\"" }.mkString(", ")))
 
 
         case User.ReadLogFile(serviceName, pattern) =>
@@ -462,7 +458,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         case User.GetServicePort(serviceName) => // #12
             log.debug("Asking service %s for port it's using.".format(serviceName))
             val s = sender
-            val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
+            val currServ = system.actorFor("/user/Service-%s".format(serviceName))
             (currServ ? User.GetServicePort) onComplete {
                 case Success(port) =>
                     s ! ApiSuccess("Port gathered successfully.", Some(s"${port}"))
@@ -473,7 +469,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
         case User.GetServiceStatus(serviceName) => // #11
             val s = sender
-            val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(serviceName))
+            val currServ = system.actorFor("/user/Service-%s".format(serviceName))
             (currServ ? User.ServiceStatus) onComplete {
                 case Success(content) =>
                     s ! ApiSuccess("Status of service: ${serviceName}", Some(s"${content}"))
@@ -513,7 +509,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             SvdFileEventBindings(db).find{_.absoluteFilePath == path}.map {
                 binding =>
                     log.info(s"Destroying file watch and binding for: $path")
-                    val currServ = context.actorFor(s"/user/SvdAccountManager/Service-${binding.serviceName}")
+                    val currServ = system.actorFor(s"/user/Service-${binding.serviceName}")
                     (currServ ? User.ServiceStatus) onComplete {
                         case Success(content) =>
                             log.debug(s"Found FEM Triggered Service: ${binding.serviceName}")
@@ -615,14 +611,14 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
                         if ((path == binding.absoluteFilePath) &&  // this must be exactly same path
                             (flags < binding.flags)) { // FIXME: XXX: NOT SURE it's ok, but flags must be at least same right?
                             log.info("Launching trigger service for file: %s (if not already started)", path)
-                            val currServ = context.actorFor("/user/SvdAccountManager/Service-%s".format(binding.serviceName))
+                            val currServ = system.actorFor("/user/Service-%s".format(binding.serviceName))
                             (currServ ? Notify.Ping) onComplete {
                                 case Success(anyPong) => // it seems that service is already started
                                     log.info("Triggered Service already running")
 
                                 case Failure(ex) => // timeout probably?
                                     log.trace("CurrServ exception: %s", ex)
-                                    val service = context.actorOf(Props(new SvdService(binding.serviceName, account)), "Service-%s".format(binding.serviceName))
+                                    val service = system.actorOf(Props(new SvdService(binding.serviceName, account)), "Service-%s".format(binding.serviceName))
                                     context.watch(service)
                             }
                         }
