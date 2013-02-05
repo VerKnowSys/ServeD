@@ -162,22 +162,24 @@ trait SvdUtils extends Logging {
      *
      * @author Daniel (dmilith) Dettlaff
      */
-    def currentVPNHost = {
-        val allAddresses = InetAddress.getAllByName(currentHost.getHostName)
-        log.debug(s"All addresses: ${allAddresses.mkString(", ") }")
-        val addressOption = allAddresses.filter{
-            elem =>
-                val address = elem.getHostAddress
-                val matcher = address.matches(SvdConfig.defaultVPNNetworkPrefix)
-                log.trace(s"Got Address: ${address} that matches? ${matcher}")
-                matcher
-        }.headOption.map{
-            _.getHostAddress
+    def currentVPNHost: String = {
+        val ifcs = NetworkInterface.getNetworkInterfaces
+
+        while (ifcs.hasMoreElements) {
+            val ifc = ifcs.nextElement
+            if (ifc.isUp) {
+                log.debug("IPs of interface: %s", ifc.getDisplayName)
+                val addresses = ifc.getInetAddresses
+                while (addresses.hasMoreElements) {
+                    val element = addresses.nextElement.getHostAddress
+                    val matcher = element.matches(SvdConfig.defaultVPNNetworkPrefix)
+                    log.trace(s"Got Address: ${element} that matches? ${matcher}")
+                    if (matcher) return element
+                }
+            }
         }
-        log.trace(s"Address option: ${addressOption}")
-        val currentChoosenHost = currentHost.getHostAddress
-        log.trace(s"Host: ${currentChoosenHost}")
-        addressOption getOrElse currentChoosenHost
+        // else just get current local host address
+        currentHost.getHostAddress
     }
 
 
@@ -700,13 +702,15 @@ trait SvdUtils extends Logging {
         val ifcs = NetworkInterface.getNetworkInterfaces
         while (ifcs.hasMoreElements) {
             val ifc = ifcs.nextElement
-            log.debug("IPs of interface: %s", ifc.getDisplayName)
-            val adresses = ifc.getInetAddresses
-            while (adresses.hasMoreElements) {
-                val element = adresses.nextElement.getHostAddress
-                log.trace("IP address: %s vs %s", element, ip)
-                if (element == ip)
-                    return true
+            if (ifc.isUp) {
+                log.debug("IPs of interface: %s", ifc.getDisplayName)
+                val adresses = ifc.getInetAddresses
+                while (adresses.hasMoreElements) {
+                    val element = adresses.nextElement.getHostAddress
+                    log.trace("IP address: %s vs %s", element, ip)
+                    if (element == ip)
+                        return true
+                }
             }
         }
         false
