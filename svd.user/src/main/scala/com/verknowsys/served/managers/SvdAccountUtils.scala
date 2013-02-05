@@ -13,6 +13,7 @@ import com.verknowsys.served.api.{SvdUserPort, SvdUserUID, SvdAccount, SvdSystem
 import com.verknowsys.served.api.pools._
 
 import scala.util._
+import java.io.File
 
 
 object SvdAccountUtils extends SvdUtils {
@@ -30,6 +31,70 @@ object SvdAccountUtils extends SvdUtils {
         } else
             randomFreePort
     }
+
+
+    // /**
+    //  *  Load autostart marks from services software data dir.
+    //  *
+    //  *  @author dmilith
+    //  */
+    // def loadServicesList(servicesLocationDir: String) = {
+    //     val res = listDirectories(servicesLocationDir)
+    //     log.trace(s"Services with softwareData list: ${res.mkString(",")}")
+    //     res.map {
+    //         dir =>
+    //             if (new File(dir.toString / SvdConfig.serviceAutostartFile).exists) {
+    //                 log.debug(s"Found autostart for ${dir}")
+    //                 dir.toString.split("/").last
+    //             } else {
+    //                 log.debug(s"No autostart for ${dir}")
+    //                 ""
+    //             }
+    //     }.filterNot(_.isEmpty)
+    // }
+
+
+    // /**
+    //  *  Load services list by pid files (they should be running).
+    //  *
+    //  *  @author dmilith
+    //  */
+    // def loadRunningServicesList(servicesLocationDir: String) = {
+    //     val res = listDirectories(servicesLocationDir)
+    //     res.map {
+    //         dir =>
+    //             if ((new File(dir.toString / SvdConfig.defaultServicePidFile).exists) ||
+    //                 (new File(dir.toString / "database" / "postmaster.pid").exists) // XXX: hack
+    //                 ) { // XXX: hardcode
+    //                 log.debug(s"Found pid for ${dir}")
+    //                 dir.toString.split("/").last
+    //             } else {
+    //                 log.debug(s"No pid for ${dir}")
+    //                 ""
+    //             }
+    //     }.filterNot(_.isEmpty)
+    // }
+
+
+    // /**
+    //  *  Cleans autostart mark from services software data dir.
+    //  *
+    //  *  @author dmilith
+    //  */
+    // def cleanServicesAutostart(servicesLocationDir: String) {
+    //     val res = listDirectories(servicesLocationDir)
+    //     log.warn(s"Services to autostart: ${res.mkString(",")}")
+    //     res.map {
+    //         dir =>
+    //             val file = new java.io.File(dir.toString / SvdConfig.serviceAutostartFile)
+    //             if (file.exists) {
+    //                 log.debug("Removing autostart file: %s", file)
+    //                 rm_r(file.toString)
+    //             }
+    //     }
+    // }
+
+
 
 }
 
@@ -100,23 +165,23 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
         }
 
         if (!userUIDRegistered(uid)) {
-            log.trace("Generated user manager port: %d for account with uid: %d", userManagerPort, uid)
+            log.trace(s"Generated user manager port: ${userManagerPort} for account with uid: ${uid}")
             if (!userPortRegistered(userManagerPort)) {
                 registerUserPort(userManagerPort)
-                log.trace("Registered user manager port: %s", userManagerPort)
+                log.trace(s"Registered user manager port: ${userManagerPort}")
             } else {
-                log.trace("Registering once again cause of port dup: %s", userManagerPort)
+                log.trace(s"Registering once again cause of port dup: ${userManagerPort}")
                 registerUserAccount(name, uid)
             }
             registerUserUID(uid)
             performChecks()
-            log.debug("Writing account data of uid: %d", uid)
+            log.debug(s"Writing account data of uid: ${uid}")
             db << SvdAccount(userName = name, uid = uid, accountManagerPort = userManagerPort)
             log.debug("Account Registered Successfully.")
         } else {
             val userAccount = SvdAccounts(db).filter{_.uid == uid}.head
             val userManagerPort = userAccount.accountManagerPort
-            log.trace("User already registered with manager port: %d, but still validating existance of akka user file and home directory: %s", userManagerPort, userHomeDir)
+            log.trace(s"User already registered with manager port: ${userManagerPort}, but still validating existance of akka user file and home directory: ${userHomeDir}")
             performChecks(userManagerPort)
         }
     }
@@ -207,7 +272,7 @@ class SvdAccountUtils(db: DBClient) extends SvdAkkaSupport with Logging {
         if (!userDomainRegistered(domain)) {
             db << SvdUserDomain(name = domain)
         } else {
-            log.trace("Domain already registered: %s", domain)
+            log.trace(s"Domain already registered: ${domain}")
         }
     }
 
