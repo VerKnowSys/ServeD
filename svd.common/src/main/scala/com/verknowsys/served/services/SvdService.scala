@@ -70,7 +70,7 @@ class SvdService(
                     config.staticPort
                 }
         }
-    val servicePidFile = servicePrefix / "service.pid"
+    val servicePidFile = servicePrefix / SvdConfig.defaultServicePidFile
     val watchService = new SvdLoopThread(watchServiceHook)
 
 
@@ -99,8 +99,8 @@ class SvdService(
      * @author Daniel (dmilith) Dettlaff
      */
     def watchServiceHook {
+        Thread.sleep(SvdConfig.watchServiceInterval)
         try {
-            Thread.sleep(SvdConfig.watchServiceInterval)
             log.trace(s"Invoking Service Watch Loop of service: ${config.name}")
             if (config.watchPort) {
                 log.debug(s"Watch port enabled for service ${config.name}")
@@ -257,6 +257,7 @@ class SvdService(
      *  @author dmilith
      */
     def hookShot(hook: SvdShellOperations, hookName: String) { // XXX: this should be done better. String should be replaced
+        log.trace(s"Invoked hookShot for ${hookName} of ${config.name}")
         if (!hook.commands.isEmpty) { // don't report empty / undefined hooks
             try {
                 val execCommands = hook.commands.map {
@@ -306,6 +307,7 @@ class SvdService(
 
 
     override def preStart = {
+        super.preStart
 
         checkOrCreateDir(servicePrefix)
 
@@ -331,6 +333,7 @@ class SvdService(
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
             watchService.start
+            watchService.join
         }
 
         // defining scheduler job
@@ -445,6 +448,7 @@ class SvdService(
             hookShot(startHook, "start")
             hookShot(afterStartHook, "afterStart")
             watchService.start
+            watchService.join
             sender ! ApiSuccess
 
 
