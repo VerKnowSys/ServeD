@@ -49,12 +49,14 @@ strip:
 
 
 clean:
-	$(RM) -f $(LIB_FANN) \
-		*.o
+	$(RM) -f *.o
 
 
 distclean:
 	$(RM) -f $(LIB_FANN_LIB) \
+		$(LIB_FANNFIXED_LIB) \
+		$(LIB_FANNFLOAT_LIB) \
+		$(LIB_FANNDOUBLE_LIB) \
 		*.o
 
 
