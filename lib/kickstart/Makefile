@@ -13,37 +13,43 @@ KICK_OBJS  				= utils.o core.o kick.o
 SHELL_PROG  			= ../../shell
 SHELL_OBJS  			= utils.o shell.o
 
-LIB_USAGE_LIB			= ../libusagesys.so
+LIB_USAGE_LIB			= ../libusagesys$(LIB_POSTFIX)
 LIB_USAGE_OBJS		= utils.o usage_sys.o
 
-LIB_STAT_LIB			= ../libstat.so
+LIB_STAT_LIB			= ../libstat$(LIB_POSTFIX)
 LIB_STAT_OBJS			= stat.o
 
-LIB_SYSTIME_LIB		= ../libsystemtime.so
+LIB_SYSTIME_LIB		= ../libsystemtime$(LIB_POSTFIX)
 LIB_SYSTIME_OBJS  = system_time.o
 
 
+.if $(DARWIN) == false
 all: kick shell libusage libstat libsystime
+.else
+all: kick shell libstat libsystime
+.endif
 
 
 kick: $(KICK_OBJS)
-	$(CXX) $(CFLAGS) -o $(KICK_PROG) $(LDFLAGS) $(KICK_OBJS)
+	$(CXX) $(CFLAGS) $(BIN_OPTS) -o $(KICK_PROG) $(LDFLAGS) $(KICK_OBJS)
 
 
 shell: $(SHELL_OBJS)
-	$(CXX) $(CFLAGS) $(SHELL_OBJS) -o $(SHELL_PROG) $(LDFLAGS) -lutil
+	$(CXX) $(CFLAGS) $(BIN_OPTS) -o $(SHELL_PROG) $(LDFLAGS) -lutil $(SHELL_OBJS)
 
 
+.if $(DARWIN) == false
 libusage: $(LIB_USAGE_OBJS)
-	$(CXX) $(CFLAGS) $(LDFLAGS) $(LIB_OPTS) -o $(LIB_USAGE_LIB) -lutil -lprocstat -lkvm
+	$(CXX) $(CFLAGS) $(LDFLAGS) $(LIB_OPTS) -o $(LIB_USAGE_LIB) -lutil -lprocstat -lkvm $(LIB_USAGE_OBJS)
+.endif
 
 
 libstat: $(LIB_STAT_OBJS)
-	$(CXX) $(CFLAGS) $(LDFLAGS) $(LIB_OPTS) -o $(LIB_STAT_LIB)
+	$(CXX) $(CFLAGS) $(LDFLAGS) $(LIB_OPTS) -o $(LIB_STAT_LIB) $(LIB_STAT_OBJS)
 
 
 libsystime: $(LIB_SYSTIME_OBJS)
-	$(CXX) $(CFLAGS) $(LDFLAGS) $(LIB_OPTS) -o $(LIB_SYSTIME_LIB)
+	$(CXX) $(CFLAGS) $(LDFLAGS) $(LIB_OPTS) -o $(LIB_SYSTIME_LIB) $(LIB_SYSTIME_OBJS)
 
 
 clean:

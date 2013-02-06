@@ -7,7 +7,7 @@
 .include <../Build.mk>
 
 
-LIB_FANN_LIB			= ../libfann.so
+LIB_FANN_LIB			= ../libfann$(LIB_POSTFIX)
 LIB_FANN_OBJS			= fann.o fann_train_data.o fann_train.o fann_io.o fann_error.o fann_cascade.o
 
 
