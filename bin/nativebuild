@@ -20,11 +20,14 @@ case "${SYSTEM}" in
         if [ ! "$?" = "0" ]; then
             DEVEL= sofin get bsdmake
         fi
+        if [ "${SYSTEM}" = "Darwin" ]; then
+            export MAKE_OPTS="DARWIN=true ${MAKE_OPTS}"
+        fi
         cd lib/kickstart
-        bsdmake DEVEL=${DEVEL} DARWIN=true ${MAKE_OPTS}
+        bsdmake DEVEL=${DEVEL} ${MAKE_OPTS}
         cd ../..
         cd lib/fann
-        bsdmake DEVEL=${DEVEL} DARWIN=true ${MAKE_OPTS}
+        bsdmake DEVEL=${DEVEL} ${MAKE_OPTS}
         cd ../..
         ;;
 
