@@ -11,6 +11,7 @@ CC                = clang
 CXX               = clang++
 RM                = rm
 MAKE              = make
+STRIP             = strip
 BIN_OPTS          = -fPIE
 LIB_OPTS					= -shared
 LDFLAGS           =

@@ -35,8 +35,8 @@ echo
 
 
 if [ "${SYSTEM}" = "Darwin" ]; then
-    $(which bsdmake) 2> /dev/null
-    if [ "$?" != "0" ]; then
+    $(which bsdmake > /dev/null)
+    if [ ! "$?" = "0" ]; then
         DEVEL= sofin get bsdmake
     fi
     cd lib/kickstart
