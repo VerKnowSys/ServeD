@@ -16,6 +16,10 @@ fi
 case "${SYSTEM}" in
 
     Darwin|Linux)
+        $(which bsdmake > /dev/null)
+        if [ ! "$?" = "0" ]; then
+            DEVEL= sofin get bsdmake
+        fi
         cd lib/kickstart
         bsdmake DEVEL=${DEVEL} DARWIN=true ${MAKE_OPTS}
         cd ../..
