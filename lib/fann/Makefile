@@ -18,6 +18,10 @@ fann: $(LIB_FANN_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LIB_FANN_CFLAGS) $(LIB_OPTS) -o $(LIB_FANN_LIB) $(LIB_FANN_OBJS)
 
 
+strip:
+	$(STRIP) $(LIB_FANN_LIB)
+
+
 clean:
 	$(RM) -f $(LIB_FANN) \
 		*.o
@@ -28,4 +32,4 @@ distclean:
 		*.o
 
 
-.PHONY: all clean distclean
+.PHONY: all clean distclean strip

@@ -25,8 +25,8 @@ LIB_POSTFIX       = .so
 
 
 .if $(DEVEL) == true
-CFLAGS            = -O0 -fPIC -DDEVEL
-CXXFLAGS          = -O0 -fPIC -DDEVEL
+CFLAGS            = -O0 -g -fPIC -DDEVEL
+CXXFLAGS          = -O0 -g -fPIC -DDEVEL
 .else
 CFLAGS            = -Os -fPIC
 CXXFLAGS          = -Os -fPIC

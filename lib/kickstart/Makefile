@@ -52,6 +52,16 @@ libsystime: $(LIB_SYSTIME_OBJS)
 	$(CXX) $(CFLAGS) $(LDFLAGS) $(LIB_OPTS) -o $(LIB_SYSTIME_LIB) $(LIB_SYSTIME_OBJS)
 
 
+strip:
+	$(STRIP) $(KICK_PROG)
+	$(STRIP) $(SHELL_PROG)
+	$(STRIP) $(LIB_SYSTIME_LIB)
+	$(STRIP) $(LIB_STAT_LIB)
+.if $(DARWIN) == false
+	$(STRIP) $(LIB_USAGE_LIB)
+.endif
+
+
 clean:
 	$(RM) -f *.o
 
@@ -65,4 +75,4 @@ distclean:
 		*.o
 
 
-.PHONY: all clean distclean
+.PHONY: all clean distclean strip

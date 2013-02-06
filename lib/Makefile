@@ -19,6 +19,9 @@ distclean:
 	-for d in $(MODULES); do (cd $$d; $(MAKE) distclean ); done
 
 
+strip:
+	-for d in $(MODULES); do (cd $$d; $(MAKE) strip ); done
+
 # install:
 # 	-for d in $(MODULES); do (cd $$d; $(MAKE) install ); done
 
@@ -27,4 +30,4 @@ distclean:
 # 	-for d in $(MODULES); do (cd $$d; $(MAKE) uninstall ); done
 
 
-.PHONY: all clean distclean
+.PHONY: all clean distclean strip
