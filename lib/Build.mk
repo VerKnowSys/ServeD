@@ -15,8 +15,8 @@ LIB_OPTS					= -shared
 
 
 .if $(DEVEL) == true
-CFLAGS            = -O0 -fPIC -fPIE -DDEVEL
-CXXFLAGS          = -O0 -fPIC -fPIE -DDEVEL
+CFLAGS            = -O0 -fPIC -DDEVEL
+CXXFLAGS          = -O0 -fPIC -DDEVEL
 .else
 CFLAGS            = -Os -fPIC -fPIE
 CXXFLAGS          = -Os -fPIC -fPIE
