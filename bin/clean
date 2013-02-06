@@ -7,6 +7,7 @@ fi
 if [ "$1" = "deep" ]; then
     echo "Deep clean"
     rm -rf ~/.ivy2
+    export DIST="dist"
 fi
 
 if [ "$1" = "sysonly" ]; then
@@ -26,15 +27,30 @@ if [ "$1" = "sysonly" ]; then
   exit
 fi
 
-if [ "$(uname)" = "FreeBSD" ]; then
-  bin/sbt64 clean
-else
-  bin/sbt clean
-fi
+bin/sbt64 clean
 echo "Project source cleaned.."
 
-rm -f ./kick ./shell ./usage_gather
-rm -f lib/*.o*
-rm -f lib/*.so
-rm -f lib/*.dylib
+case "${SYSTEM}" in
+
+    Darwin|Linux)
+        $(which bsdmake > /dev/null)
+        if [ ! "$?" = "0" ]; then
+            DEVEL= sofin get bsdmake
+        fi
+
+        cd lib/kickstart
+        bsdmake ${DIST}clean
+        cd ../..
+        cd lib/fann
+        bsdmake ${DIST}clean
+        cd ../..
+        ;;
+
+    *)
+        cd lib
+        make ${DIST}clean
+        cd ..
+        ;;
+
+esac
 echo "Native code and libraries wiped out."
