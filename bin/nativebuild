@@ -33,6 +33,15 @@ echo "Flags: $FLAGS"
 echo "Platform: Java ${JAVA}"
 echo
 
+
+if [ "${SYSTEM}" = "FreeBSD" ]; then
+    cd lib
+    make DEVEL=${DEVEL}
+    cd ..
+    exit 0
+fi
+
+
 check() {
     if [ "$1" = "0" ]; then
         echo "* $2 => Compiled Sucessfully"
