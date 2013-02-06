@@ -1,37 +1,16 @@
 #!/bin/sh
 # @author dmilith
 
-CC="gcc"
-CXX="g++"
-STRIP="strip"
-UNAME="/usr/bin/uname"
-
-JAVA="1.7"
 SYSTEM="$(uname)"
 ARCH="$(uname -p)"
 DEVEL="false"
+MAKE_OPTS="strip"
 
-export FLAGS="-Os -fPIC"
 if [ "$1" = "devel" ]; then
-    export DEVEL="true"
-fi
-
-if [ "$DEVEL" = "true" ]; then
     echo "Devel enabled"
-    export FLAGS="$FLAGS -DDEVEL"
+    export DEVEL="true"
+    unset MAKE_OPTS
 fi
-
-if [ -e "/usr/bin/clang++" ]; then
-    CXX="clang++"
-    CC="clang"
-fi
-
-echo "System: $SYSTEM, Arch: ${ARCH}"
-echo "C compiler: $CC"
-echo "C++ compiler: $CXX"
-echo "Flags: $FLAGS"
-echo "Platform: Java ${JAVA}"
-echo
 
 
 if [ "${SYSTEM}" = "Darwin" ]; then
@@ -40,14 +19,14 @@ if [ "${SYSTEM}" = "Darwin" ]; then
         DEVEL= sofin get bsdmake
     fi
     cd lib/kickstart
-    bsdmake DEVEL=${DEVEL} DARWIN=true
+    bsdmake DEVEL=${DEVEL} DARWIN=true ${MAKE_OPTS}
     cd ../..
     cd lib/fann
-    bsdmake DEVEL=${DEVEL} DARWIN=true
+    bsdmake DEVEL=${DEVEL} DARWIN=true ${MAKE_OPTS}
     cd ../..
 else
     cd lib
-    make DEVEL=${DEVEL}
+    make DEVEL=${DEVEL} ${MAKE_OPTS}
     cd ..
     exit 0
 fi
