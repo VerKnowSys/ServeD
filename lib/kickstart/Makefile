@@ -7,10 +7,10 @@
 .include <../Build.mk>
 
 
-KICK_PROG  				= ../kick
+KICK_PROG  				= ../../kick
 KICK_OBJS  				= utils.o core.o kick.o
 
-SHELL_PROG  			= ../shell
+SHELL_PROG  			= ../../shell
 SHELL_OBJS  			= utils.o shell.o
 
 LIB_USAGE_LIB			= ../libusagesys.so
