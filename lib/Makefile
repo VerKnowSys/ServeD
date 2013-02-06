@@ -1,31 +1,30 @@
 # ServeD natives - © 2013 verknowsys.com
 #
-# authors:
+# author:
 #		Daniel (dmilith) Dettlaff
-#		Michał (tallica) Lipski
 #
 
-CC								= clang
-CXX								= clang++
-RM								= rm
-CFLAGS						= -Os -fPIC -fPIC -fPIE
-LDFLAGS						= -Wl,--enable-new-dtags
-LIB_OPTS					= -shared
+.include <Build.mk>
 
 
-
-all: fann kick shell libusage libstat libsystime
+all:
+	-for d in $(MODULES); do (cd $$d; $(MAKE) ); done
 
 
 clean:
-	$(RM) -f $(KICK_PROG) \
-		$(SHELL_PROG) \
-		$(LIB_USAGE_LIB) \
-		$(LIB_STAT_LIB) \
-		$(LIB_SYSTIME_LIB) \
-		$(LIB_FANN) \
-		*.o \
-		kickstart/*.o
+	-for d in $(MODULES); do (cd $$d; $(MAKE) clean ); done
 
 
-.PHONY: all clean
+distclean:
+	-for d in $(MODULES); do (cd $$d; $(MAKE) distclean ); done
+
+
+# install:
+# 	-for d in $(MODULES); do (cd $$d; $(MAKE) install ); done
+
+
+# uninstall:
+# 	-for d in $(MODULES); do (cd $$d; $(MAKE) uninstall ); done
+
+
+.PHONY: all clean distclean

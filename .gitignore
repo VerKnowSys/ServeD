@@ -39,7 +39,6 @@ tmtags
 *.Plo
 *.a
 *.lo
-Makefile
 lib/acct-6.5.4/config.h
 lib/acct-6.5.4/config.status
 lib/acct-6.5.4/files.h

@@ -1,23 +1,33 @@
+# ServeD natives - © 2013 verknowsys.com
+#
+# author:
+#		Daniel (dmilith) Dettlaff
+#
 
-KICK_PROG  				= kick
-KICK_OBJS  				= kickstart/utils.o kickstart/core.o kickstart/kick.o
+.include <../Build.mk>
 
-SHELL_PROG  			= shell
-SHELL_OBJS  			= kickstart/utils.o kickstart/shell.o
 
-LIB_USAGE_LIB			= libusagesys.so
-LIB_USAGE_OBJS		= kickstart/utils.o kickstart/usage_sys.o
+KICK_PROG  				= ../kick
+KICK_OBJS  				= utils.o core.o kick.o
 
-LIB_STAT_LIB			= libstat.so
-LIB_STAT_OBJS			= kickstart/stat.o
+SHELL_PROG  			= ../shell
+SHELL_OBJS  			= utils.o shell.o
 
-LIB_SYSTIME_LIB		= libsystemtime.so
-LIB_SYSTIME_OBJS  = kickstart/system_time.o
+LIB_USAGE_LIB			= ../libusagesys.so
+LIB_USAGE_OBJS		= utils.o usage_sys.o
 
+LIB_STAT_LIB			= ../libstat.so
+LIB_STAT_OBJS			= stat.o
+
+LIB_SYSTIME_LIB		= ../libsystemtime.so
+LIB_SYSTIME_OBJS  = system_time.o
+
+
+all: kick shell libusage libstat libsystime
 
 
 kick: $(KICK_OBJS)
-	$(CXX) $(CFLAGS) $(KICK_OBJS) -o $(KICK_PROG) $(LDFLAGS)
+	$(CXX) $(CFLAGS) -o $(KICK_PROG) $(LDFLAGS) $(KICK_OBJS)
 
 
 shell: $(SHELL_OBJS)
@@ -34,3 +44,19 @@ libstat: $(LIB_STAT_OBJS)
 
 libsystime: $(LIB_SYSTIME_OBJS)
 	$(CXX) $(CFLAGS) $(LDFLAGS) $(LIB_OPTS) -o $(LIB_SYSTIME_LIB)
+
+
+clean:
+	$(RM) -f *.o
+
+
+distclean:
+	$(RM) -f $(KICK_PROG) \
+		$(SHELL_PROG) \
+		$(LIB_USAGE_LIB) \
+		$(LIB_STAT_LIB) \
+		$(LIB_SYSTIME_LIB) \
+		*.o
+
+
+.PHONY: all clean distclean
