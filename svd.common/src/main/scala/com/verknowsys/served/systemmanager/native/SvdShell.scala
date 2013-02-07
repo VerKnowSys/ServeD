@@ -35,7 +35,7 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
         if (ops.isEmpty) {
             log.debug("Empty shell operations. Skipping execution")
         } else {
-            log.trace(s"Executing ${ops} on shell: ${shellToSpawn}")
+            log.trace(s"Executing ${ops} on shell: ${SvdConfig.servedShell}")
             shell.send(s"${ops}\n") // send commands one by one to shell
 
             if (operations.expectOutput.size != 0) operations.expectOutput.foreach {
