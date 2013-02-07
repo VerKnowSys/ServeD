@@ -7,7 +7,7 @@
 .include <../Build.mk>
 
 
-LIB_JSON_LIB			= ../libjson.a
+LIB_JSON_LIB			= ../libjson
 LIB_JSON_OBJS			= json_value.o json_reader.o json_writer.o
 
 
@@ -15,8 +15,8 @@ all: libjson
 
 
 libjson: $(LIB_JSON_OBJS)
-	# $(CXX) $(CFLAGS) $(LDFLAGS) $(LIB_OPTS) -o $(LIB_JSON_LIB) $(LIB_JSON_OBJS)
-	$(AR) crv $(LIB_JSON_LIB) $(LIB_JSON_OBJS)
+	$(CXX) $(CFLAGS) $(LDFLAGS) $(LIB_OPTS) -o $(LIB_JSON_LIB)$(LIB_POSTFIX) $(LIB_JSON_OBJS)
+	$(AR) crv $(LIB_JSON_LIB).a $(LIB_JSON_OBJS)
 
 
 strip:
