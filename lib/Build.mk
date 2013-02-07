@@ -21,11 +21,11 @@ LDFLAGS           =
 .if $(DARWIN) == true
 CFLAGS            = -arch x86_64
 CXXFLAGS          = -arch x86_64
-MAKE              = bsdmake
+MAKE              = bsdmake CC=$(CC) CXX=$(CXX)
 QMAKE_OPTS        = -spec darwin-g++
 LIB_POSTFIX       = .dylib
 .else
-MAKE              = make
+MAKE              = make CC=$(CC) CXX=$(CXX)
 LIB_POSTFIX       = .so
 .endif
 
@@ -39,4 +39,4 @@ CXXFLAGS          = -Os -fPIC
 .endif
 
 
-MODULES           = kickstart fann jsoncpp service_spawner
+MODULES           = kickstart fann jsoncpp service_spawner test
