@@ -1,6 +1,9 @@
 {
     "name": "No-Name",
-    "staticPort": -1, // by default assign dynamic port for service
+    "softwareName": "No-Name",
+
+    /* by default assign dynamic port for service */
+    "staticPort": -1,
 
     "watchPort": true,
     "autoStart": true,
@@ -9,8 +12,8 @@
     "reportAllInfos": false,
     "reportAllDebugs": false,
 
-    "version": "0.10", // should match version of ServeD
-    "softwareName": "No-Name",
+    /* should match version of ServeD */
+    "version": "0.10",
 
     "schedulerActions": [
     ],
