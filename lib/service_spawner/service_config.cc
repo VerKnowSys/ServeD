@@ -16,11 +16,76 @@ SvdSchedulerAction::SvdSchedulerAction(const QString& initialCronEntry, const QS
 }
 
 
-SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
-
+SvdServiceConfig::SvdServiceConfig() { /* Load default values */
     try {
-        Json::Value defaults = defaultIgniterDataLoad();
-        Json::Value root = serviceDataLoad(serviceName, getuid()); // NOTE: the question is.. how will this behave ;]
+        Json::Value defaults = (new SvdConfigLoader())->defaultIgniterDataLoad();
+        name = "Defaults";
+        softwareName = defaults["softwareName"].asString().c_str();
+        autoRestart = defaults["autoRestart"].asBool();
+        autoStart = defaults["autoStart"].asBool();
+        reportAllErrors = defaults["reportAllErrors"].asBool();
+        reportAllInfos = defaults["reportAllInfos"].asBool();
+        reportAllDebugs = defaults["reportAllDebugs"].asBool();
+        watchPort = defaults["watchPort"].asBool();
+        staticPort = defaults["staticPort"].asInt();
+
+        /* load service scheduler data */
+        Json::Value _preSchedActions = defaults["schedulerActions"];
+        for ( uint index = 0; index < _preSchedActions.size(); ++index ) {
+            schedulerActions.push_back(
+                new SvdSchedulerAction(
+                    _preSchedActions[index].get("cronEntry", "0 0/10 * * * ?").asString().c_str(),
+                    _preSchedActions[index].get("shellCommands", "true").toStyledString().c_str() // HACK
+                ));
+        }
+
+        /* laod service hooks */
+        install = new SvdShellOperations(
+            defaults["install"]["commands"].asString().c_str(),
+            defaults["install"]["expectOutput"].asString().c_str());
+
+        configure = new SvdShellOperations(
+            defaults["configure"]["commands"].asString().c_str(),
+            defaults["configure"]["expectOutput"].asString().c_str());
+
+        start = new SvdShellOperations(
+            defaults["start"]["commands"].asString().c_str(),
+            defaults["start"]["expectOutput"].asString().c_str());
+
+        afterStart = new SvdShellOperations(
+            defaults["afterStart"]["commands"].asString().c_str(),
+            defaults["afterStart"]["expectOutput"].asString().c_str());
+
+        stop = new SvdShellOperations(
+            defaults["stop"]["commands"].asString().c_str(),
+            defaults["stop"]["expectOutput"].asString().c_str());
+
+        afterStop = new SvdShellOperations(
+            defaults["afterStop"]["commands"].asString().c_str(),
+            defaults["afterStop"]["expectOutput"].asString().c_str());
+
+        reload = new SvdShellOperations(
+            defaults["reload"]["commands"].asString().c_str(),
+            defaults["reload"]["expectOutput"].asString().c_str());
+
+        validate = new SvdShellOperations(
+            defaults["validate"]["commands"].asString().c_str(),
+            defaults["validate"]["expectOutput"].asString().c_str());
+
+    } catch (std::exception &e) {
+        cerr << "Thrown Exception: " << e.what() << " in Default service." << endl;
+        exit(JSON_FORMAT_EXCEPTION_ERROR);
+    } catch (...) {
+        cerr << "Exception !" << endl;
+        exit(OTHER_EXCEPTION_ERROR);
+    }
+}
+
+
+SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
+    try {
+        Json::Value defaults = (new SvdConfigLoader())->defaultIgniterDataLoad();
+        Json::Value root = (new SvdConfigLoader())->serviceDataLoad(serviceName, getuid()); // NOTE: the question is.. how will this behave ;]
 
         name = serviceName;
         softwareName = root.get("softwareName", defaults["softwareName"]).asString().c_str();

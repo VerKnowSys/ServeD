@@ -36,10 +36,11 @@ class SvdShellOperations {
 };
 
 
-class SvdServiceConfig { // : QObject
-    // Q_OBJECT
+class SvdServiceConfig : QObject {
+    Q_OBJECT
 
     public:
+        SvdServiceConfig(); /* Load default values */
         SvdServiceConfig(const QString& serviceName);
 
     // private:
