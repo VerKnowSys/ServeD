@@ -122,3 +122,4 @@ ctrlcli
 /sftp-config.json
 /ss
 /lib/service_spawner/Makefile
+/lib/service_spawner/service_spawner.moc
