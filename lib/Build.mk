@@ -9,6 +9,7 @@ DARWIN            = false
 
 CC                = clang
 CXX               = clang++
+AR                = ar
 RM                = rm
 QMAKE             = qmake
 STRIP             = strip
@@ -36,4 +37,4 @@ CXXFLAGS          = -Os -fPIC
 .endif
 
 
-MODULES           = kickstart fann service_spawner jsoncpp
+MODULES           = kickstart fann jsoncpp service_spawner

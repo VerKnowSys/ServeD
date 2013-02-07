@@ -8,5 +8,6 @@ TEMPLATE  = app
 QT -= gui
 HEADERS   += ../kickstart/core.h
 SOURCES   += service_spawner.cc
+LIBS      += ../libjson.a
 TARGET    = ../../ss
 
