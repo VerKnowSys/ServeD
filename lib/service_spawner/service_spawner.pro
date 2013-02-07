@@ -6,8 +6,8 @@
 
 TEMPLATE  = app
 QT -= gui
-HEADERS   += ../kickstart/core.h ../jsoncpp/json/json.h
-SOURCES   += service_spawner.cc
+HEADERS   += config_loader.h ../kickstart/core.h ../jsoncpp/json/json.h
+SOURCES   += config_loader.cc service_spawner.cc
 LIBS      += ../libjson.a
 TARGET    = ../../ss
 

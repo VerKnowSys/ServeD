@@ -1,9 +1,13 @@
 /**
  *  @author tallica
  *
+ *   © 2011-2013 - VerKnowSys
+ *
  */
 
+
 #include "../kickstart/core.h"
+#include "config_loader.h"
 
 #include <QCoreApplication>
 #include <QFileSystemWatcher>
@@ -125,6 +129,9 @@ int main(int argc, char *argv[]) {
     QCoreApplication app(argc, argv);
     QList<int> userIdsToWatch;
     QList<UserWatcher *> watchers;
+
+    QString config = serviceConfigLoad("Redis", 501);
+    cout << "Igniter Redis config install element: " << config.toStdString() << endl;
 
     QFile file("/SystemUsers/service_spawner.log");
     file.remove();
