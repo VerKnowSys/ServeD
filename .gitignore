@@ -121,3 +121,4 @@ ctrlcli
 /.idea/inspectionProfiles/
 /sftp-config.json
 /ss
+/lib/service_spawner/Makefile
