@@ -39,12 +39,6 @@ strip:
 test: prepare
 	cd test/; $(MAKE)
 
-# install:
-# 	-for d in $(MODULES); do (cd $$d; $(MAKE) install ); done
-
-
-# uninstall:
-# 	-for d in $(MODULES); do (cd $$d; $(MAKE) uninstall ); done
 
 
 .PHONY: all clean distclean strip prepare test
