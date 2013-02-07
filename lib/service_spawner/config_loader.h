@@ -18,13 +18,18 @@
 #include <QTextStream>
 
 
-Json::Value serviceDataLoad(const QString& name, uint uid);
-Json::Value defaultIgniterDataLoad();
+class SvdConfigLoader : QObject {
+    Q_OBJECT
 
-Json::Value loadIgniter(const QString& name, uint uid);
-Json::Value parse(const QString& filename);
-QString readFileContents(const QString& fileName);
+    public:
+        Json::Value serviceDataLoad(const QString& name, uint uid);
+        Json::Value defaultIgniterDataLoad();
 
+        Json::Value loadIgniter(const QString& name, uint uid);
+        Json::Value parseJSON(const QString& filename);
+        QString readFileContents(const QString& fileName);
+
+};
 
 #endif
 

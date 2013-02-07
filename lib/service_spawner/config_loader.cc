@@ -9,11 +9,21 @@
 #include "config_loader.h"
 
 
+/*
+ * Service config loader.
+ * Uses igniters to read service data from it and returns prepared object of Service
+ */
+Json::Value SvdConfigLoader::serviceDataLoad(const QString& name, uint uid) {
+    Json::Value appSpecificTemplate = loadIgniter(name, uid);
+    const Json::Value config = appSpecificTemplate;
+    return config;
+}
+
 
 /*
  *  Read file contents of text file
  */
-QString readFileContents(const QString& fileName) {
+QString SvdConfigLoader::readFileContents(const QString& fileName) {
     QString lines = "";
     string line;
     ifstream file(fileName.toStdString().c_str(), ios::in);
@@ -35,7 +45,7 @@ QString readFileContents(const QString& fileName) {
 /*
  *  Parse string contents to Json value.
  */
-Json::Value parse(const QString& filename) {
+Json::Value SvdConfigLoader::parseJSON(const QString& filename) {
     Json::Reader reader; /* parse json file */
     Json::Value root;
     bool parsedSuccess = reader.parse(readFileContents(filename).toStdString(), root, false);
@@ -51,21 +61,21 @@ Json::Value parse(const QString& filename) {
 /*
  *  Load igniter data in Json.
  */
-Json::Value defaultIgniterDataLoad() {
+Json::Value SvdConfigLoader::defaultIgniterDataLoad() {
     const QString defaultTemplateFile = QString(DEFAULTSOFTWARETEMPLATE) + QString(DEFAULTSOFTWARETEMPLATEEXT);
     QFile defaultIgniter(defaultTemplateFile); /* try loading root igniter as second */
     if(!defaultIgniter.open(QIODevice::ReadOnly)) { /* check file access */
         cerr << "No file: " << defaultTemplateFile.toStdString() << endl;
         exit(NO_DEFAULT_IGNITERS_FOUND_ERROR);
     } else
-        return parse(defaultTemplateFile);
+        return parseJSON(defaultTemplateFile);
 }
 
 
 /*
  *  Load igniter data in Json.
  */
-Json::Value loadIgniter(const QString& name, uint uid) {
+Json::Value SvdConfigLoader::loadIgniter(const QString& name, uint uid) {
     const QString rootIgniter = QString(DEFAULTSOFTWARETEMPLATESDIR) + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
     const QString userIgniter = QString(USERS_HOME_DIR) + QString::number(uid) + "/" + QString(DEFAULTUSERIGNITERSDIR) + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
 
@@ -74,23 +84,12 @@ Json::Value loadIgniter(const QString& name, uint uid) {
     if(!fileUser.open(QIODevice::ReadOnly)) { /* check file access */
         cerr << "No file: " << userIgniter.toStdString() << endl;
     } else
-        return parse(userIgniter);
+        return parseJSON(userIgniter);
 
     if(!fileRoot.open(QIODevice::ReadOnly)) {
         cerr << "No file: " << rootIgniter.toStdString() << endl;
         exit(NO_SUCH_FILE_ERROR);
     } else
-        return parse(rootIgniter);
-}
-
-
-/*
- * Service config loader.
- * Uses igniters to read service data from it and returns prepared object of Service
- */
-Json::Value serviceDataLoad(const QString& name, uint uid) {
-    Json::Value appSpecificTemplate = loadIgniter(name, uid);
-    const Json::Value config = appSpecificTemplate;
-    return config;
+        return parseJSON(rootIgniter);
 }
 
