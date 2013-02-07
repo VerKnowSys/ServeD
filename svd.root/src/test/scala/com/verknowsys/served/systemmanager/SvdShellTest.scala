@@ -17,7 +17,7 @@ import java.util.concurrent.TimeoutException
 class SvdShellTest extends DefaultTest {
 
 
-    def shr(op: String, env: String = "", expectStdOut: List[String] = Nil, expectStdErr: List[String] = Nil, waitForOutputFor: Int = 5) = SvdShellOperations(List(op), expectStdOut, expectStdErr, waitForOutputFor)
+    def shr(op: String, env: String = "", expectOutput: List[String] = Nil, expectOutput: List[String] = Nil, waitForOutputFor: Int = 5) = SvdShellOperations(List(op), expectOutput, expectOutput, waitForOutputFor)
 
 
     it should "spawn command properly and know when it's dead and throw proper exception when shell is dead" in {
@@ -44,14 +44,14 @@ class SvdShellTest extends DefaultTest {
             )
         )
 
-        sh.exec(shr("ls -m /dev", expectStdOut = List("null", "zero"), waitForOutputFor = 2))
+        sh.exec(shr("ls -m /dev", expectOutput = List("null", "zero"), waitForOutputFor = 2))
 
         evaluating {
-            sh.exec(shr("ls -m /dev", expectStdOut = List("somethingNonExistant"), waitForOutputFor = 1))
+            sh.exec(shr("ls -m /dev", expectOutput = List("somethingNonExistant"), waitForOutputFor = 1))
         } should produce [TimeoutException]
 
         evaluating {
-            sh.exec(shr("ls -m /dev", expectStdErr = List("somethingNonExistant"), waitForOutputFor = 1))
+            sh.exec(shr("ls -m /dev", expectOutput = List("somethingNonExistant"), waitForOutputFor = 1))
         } should produce [TimeoutException]
 
         sh.close
@@ -66,11 +66,11 @@ class SvdShellTest extends DefaultTest {
             )
         )
         sh.exec(shr("lsdjf"))
-        sh.exec(shr("echo $?", expectStdOut = List("127"))) // NOTE: 127 - command not found code from shell
+        sh.exec(shr("echo $?", expectOutput = List("127"))) // NOTE: 127 - command not found code from shell
         sh.exec(shr("ls /nonexistantSomethingBlaBla"))
-        sh.exec(shr("echo $?", expectStdOut = List("1"))) // NOTE: 1 - error thrown from ls command
+        sh.exec(shr("echo $?", expectOutput = List("1"))) // NOTE: 1 - error thrown from ls command
         sh.exec(shr("ls"))
-        sh.exec(shr("echo $?", expectStdOut = List("0")))
+        sh.exec(shr("echo $?", expectOutput = List("0")))
         sh.close
     }
 

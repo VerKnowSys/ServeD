@@ -39,7 +39,7 @@ http {
 ' > SERVICE_PREFIX/service.conf
 
 SERVICE_ROOT/exports/nginx -t -c SERVICE_PREFIX/service.conf",
-        "expectStdErr": "test is successful"
+        "expectOutput": "test is successful"
     },
     "reload": {
         "commands": "SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s reload"

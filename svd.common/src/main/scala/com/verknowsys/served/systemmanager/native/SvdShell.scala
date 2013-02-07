@@ -38,13 +38,9 @@ class SvdShell(account: SvdAccount, timeout: Int = 0) extends Logging with SvdUt
             log.trace(s"Executing ${ops} on shell: ${shellToSpawn}")
             shell.send(s"${ops}\n") // send commands one by one to shell
 
-            if (operations.expectStdOut.size != 0) operations.expectStdOut.foreach {
+            if (operations.expectOutput.size != 0) operations.expectOutput.foreach {
                 expect =>
                     shell.expect(expect, operations.expectOutputTimeout)
-            }
-            if (operations.expectStdErr.size != 0) operations.expectStdErr.foreach {
-                expect =>
-                    shell.expectErr(expect, operations.expectOutputTimeout)
             }
         }
 

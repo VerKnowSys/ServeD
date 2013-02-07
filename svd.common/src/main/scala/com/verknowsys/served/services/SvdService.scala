@@ -288,7 +288,7 @@ class SvdService(
                     val hk = hook.copy( commands = hook.commands.map { // map values for better message
                         replaceAllSpecialValues _
                     })
-                    val msg = formatMessage(s"E:Hook ${hookName} of service: ${config.name} failed to pass expectations: CMD: '${hk.commands.mkString(" ")}', OUT: '${hk.expectStdOut}', ERR: '${hk.expectStdErr}'.")
+                    val msg = formatMessage(s"E:Hook ${hookName} of service: ${config.name} failed to pass expectations: CMD: '${hk.commands.mkString(" ")}', OUT: '${hk.expectOutput}'.")
                     log.error(msg)
                     if (config.reportAllErrors)
                         accountManager ! Notify.Message(msg)
