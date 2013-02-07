@@ -1,7 +1,6 @@
 
-CC = clang
-CXX = clang++
 CONFIG += qtestlib
+QT -= gui
 TEMPLATE = app
 TARGET = ../../test
 DEPENDPATH += .
