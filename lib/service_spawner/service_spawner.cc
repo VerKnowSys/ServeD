@@ -6,7 +6,7 @@
  */
 
 
-#include "../kickstart/core.h"
+#include "../globals/globals.h"
 #include "config_loader.h"
 
 #include <QCoreApplication>

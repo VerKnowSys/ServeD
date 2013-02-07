@@ -9,7 +9,7 @@
 #ifndef __SERVICE_CONFIG__
 #define __SERVICE_CONFIG__
 
-#include "../kickstart/core.h"
+#include "../globals/globals.h"
 #include <QObject>
 #include <QFile>
 #include <QTextStream>
