@@ -69,7 +69,7 @@
     using namespace std;
 
     /* global constants */
-    #define APP_VERSION "0.14.4"
+    #define APP_VERSION "0.15.0"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -114,6 +114,14 @@
     #define LOCALE "en_GB.UTF-8"
 
     #define DEFAULT_USER_UID 501
+
+    #define USERS_HOME_DIR "/Users/"
+    #define DEFAULTSOFTWARETEMPLATEEXT ".json"
+    #define DEFAULTSOFTWARETEMPLATE (USERS_HOME_DIR "Common/Igniters/Default")
+    #define DEFAULTSOFTWARETEMPLATESDIR (USERS_HOME_DIR "Common/Igniters/Services/")
+    #define DEFAULTUSERIGNITERSDIR "Igniters/Services/"
+
+
     #define DEFAULT_GATHERING_PAUSE_MICROSECONDS 500000 // half a second
     #define DEFAULT_COUNT_OF_ROUNDS_OF_GATHERING 7200 // waiting half a second, hence 7200 is 60 minutes of gathering
     #define DEFAULT_USER_GROUP 0
