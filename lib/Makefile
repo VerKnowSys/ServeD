@@ -8,23 +8,31 @@
 
 
 all: prepare
-	-for d in $(MODULES); do (cd $$d; $(MAKE) ); done
+.for d in $(MODULES)
+	cd $d; $(MAKE)
+.endfor
 
 
 prepare:
-	cd service_spawner; $(QMAKE) service_spawner.pro
+	cd service_spawner; $(QMAKE) $(QMAKE_OPTS) service_spawner.pro
 
 
 clean:
-	-for d in $(MODULES); do (cd $$d; $(MAKE) clean ); done
+.for d in $(MODULES)
+	cd $d; $(MAKE) clean
+.endfor
 
 
 distclean:
-	-for d in $(MODULES); do (cd $$d; $(MAKE) distclean ); done
+.for d in $(MODULES)
+	cd $d; $(MAKE) distclean
+.endfor
 
 
 strip:
-	-for d in $(MODULES); do (cd $$d; $(MAKE) strip ); done
+.for d in $(MODULES)
+	cd $d; $(MAKE) strip
+.endfor
 
 
 

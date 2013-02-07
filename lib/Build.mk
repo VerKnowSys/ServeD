@@ -10,7 +10,6 @@ DARWIN            = false
 CC                = clang
 CXX               = clang++
 RM                = rm
-MAKE              = make
 QMAKE             = qmake
 STRIP             = strip
 BIN_OPTS          = -fPIE
@@ -19,8 +18,11 @@ LDFLAGS           =
 
 
 .if $(DARWIN) == true
+MAKE              = bsdmake
+QMAKE_OPTS        = -spec darwin-g++
 LIB_POSTFIX       = .dylib
 .else
+MAKE              = make
 LIB_POSTFIX       = .so
 .endif
 
