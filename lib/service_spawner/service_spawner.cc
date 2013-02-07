@@ -133,14 +133,26 @@ int main(int argc, char *argv[]) {
     SvdServiceConfig *config = new SvdServiceConfig("Redis");
     cout << "Igniter softwareName element: " << config->softwareName.toStdString() << endl;
     cout << "Igniter install element: " << config->install->commands.toStdString() << endl;
+    cout << "Igniter start element: " << config->start->commands.toStdString() << endl;
+    cout << "Igniter stop element: " << config->stop->commands.toStdString() << endl;
+    cout << "Igniter autoStart element: " << config->autoStart << endl;
+    cout << "Igniter staticPort element: " << config->staticPort << endl;
+    cout << "Igniter watchPort element: " << config->watchPort << endl;
+    cout << "Igniter schedulerActions element: " << config->schedulerActions.first() << endl;
 
-    // QString config2 = serviceConfigLoad("RedisDrugi", 501);
-    // cout << "Igniter RedisDrugi config install element: " << config2.toStdString() << endl;
+    SvdServiceConfig *config2 = new SvdServiceConfig("Nginx");
+    cout << "Igniter2 softwareName element: " << config2->softwareName.toStdString() << endl;
+    cout << "Igniter2 install element: " << config2->install->commands.toStdString() << endl;
+    cout << "Igniter2 start element: " << config2->start->commands.toStdString() << endl;
+    cout << "Igniter2 stop element: " << config2->stop->commands.toStdString() << endl;
+    cout << "Igniter2 autoStart element: " << config2->autoStart << endl;
+    cout << "Igniter2 staticPort element: " << config2->staticPort << endl;
+    cout << "Igniter2 watchPort element: " << config2->watchPort << endl;
+    cout << "Igniter2 schedulerActions element: " << config2->schedulerActions.first() << endl;
 
-    // QString config3 = serviceConfigLoad("RedisNieistniejacy", 501);
-    // cout << "Igniter RedisNieistniejacy config install element: " << config3.toStdString() << endl;
+    cout << "Quitting!" << endl;
+    exit(0);
 
-    exit(666);
 
     QFile file("/SystemUsers/service_spawner.log");
     file.remove();
