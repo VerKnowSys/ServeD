@@ -14,7 +14,8 @@ all: prepare
 
 
 prepare:
-	cd service_spawner; $(QMAKE) $(QMAKE_OPTS) service_spawner.pro
+	cd service_spawner; $(QMAKE) $(QMAKE_OPTS) service_spawner.pro ; cd ..
+	cd test; $(QMAKE) $(QMAKE_OPTS) test.pro ; cd ..
 
 
 clean:
@@ -35,6 +36,8 @@ strip:
 .endfor
 
 
+test: prepare
+	cd test/; $(MAKE)
 
 # install:
 # 	-for d in $(MODULES); do (cd $$d; $(MAKE) install ); done
@@ -44,4 +47,4 @@ strip:
 # 	-for d in $(MODULES); do (cd $$d; $(MAKE) uninstall ); done
 
 
-.PHONY: all clean distclean strip prepare
+.PHONY: all clean distclean strip prepare test
