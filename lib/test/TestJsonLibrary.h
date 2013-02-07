@@ -19,7 +19,7 @@ class TestJsonLibrary: public QObject {
 
 };
 
-QTEST_MAIN(TestJsonLibrary)
+QTEST_APPLESS_MAIN(TestJsonLibrary)
 #include "moc_TestJsonLibrary.cpp"
 
 #endif
