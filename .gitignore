@@ -127,3 +127,4 @@ ctrlcli
 /lib/test/moc_config_loader.cpp
 /lib/test/moc_service_config.cpp
 /lib/test/moc_TestJsonLibrary.cpp
+/test
