@@ -47,6 +47,21 @@ Json::Value parse(const QString& filename) {
 }
 
 
+
+/*
+ *  Load igniter data in Json.
+ */
+Json::Value defaultIgniterDataLoad() {
+    const QString defaultTemplateFile = QString(DEFAULTSOFTWARETEMPLATE) + QString(DEFAULTSOFTWARETEMPLATEEXT);
+    QFile defaultIgniter(defaultTemplateFile); /* try loading root igniter as second */
+    if(!defaultIgniter.open(QIODevice::ReadOnly)) { /* check file access */
+        cerr << "No file: " << defaultTemplateFile.toStdString() << endl;
+        exit(NO_DEFAULT_IGNITERS_FOUND_ERROR);
+    } else
+        return parse(defaultTemplateFile);
+}
+
+
 /*
  *  Load igniter data in Json.
  */
@@ -73,14 +88,9 @@ Json::Value loadIgniter(const QString& name, uint uid) {
  * Service config loader.
  * Uses igniters to read service data from it and returns prepared object of Service
  */
-const QString serviceConfigLoad(const QString& name, uint uid) {
-    const QString defaultTemplateFile = QString(DEFAULTSOFTWARETEMPLATE) + QString(DEFAULTSOFTWARETEMPLATEEXT);
-    Json::Value defaultTemplate = loadIgniter(name, uid);
+Json::Value serviceDataLoad(const QString& name, uint uid) {
     Json::Value appSpecificTemplate = loadIgniter(name, uid);
-
-    const Json::Value installDefault = defaultTemplate["install"];
-    const Json::Value installTemplateSpecific = appSpecificTemplate["install"];
-
-    return QString(appSpecificTemplate.get("install", "No value").toStyledString().c_str());
+    const Json::Value config = appSpecificTemplate;
+    return config;
 }
 

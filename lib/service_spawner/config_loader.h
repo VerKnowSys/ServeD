@@ -11,13 +11,19 @@
 
 #include "../kickstart/core.h"
 #include "../jsoncpp/json/json.h"
+#include "service_config.h"
+
 #include <QObject>
 #include <QFile>
 #include <QTextStream>
 
-// class
 
-const QString serviceConfigLoad(const QString& igniterFileName, uint uid);
+Json::Value serviceDataLoad(const QString& name, uint uid);
+Json::Value defaultIgniterDataLoad();
+
+Json::Value loadIgniter(const QString& name, uint uid);
+Json::Value parse(const QString& filename);
+QString readFileContents(const QString& fileName);
 
 
 #endif
