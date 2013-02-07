@@ -36,4 +36,4 @@ CXXFLAGS          = -Os -fPIC
 .endif
 
 
-MODULES           = kickstart fann service_spawner
+MODULES           = kickstart fann service_spawner jsoncpp
