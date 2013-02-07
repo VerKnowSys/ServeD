@@ -38,7 +38,7 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
             schedulerActions.push_back(
                 new SvdSchedulerAction(
                     _preSchedActions[index].get("cronEntry", "0 0/10 * * * ?").asString().c_str(),
-                    _preSchedActions[index].get("shellCommands", "true").asString().c_str()
+                    _preSchedActions[index].get("shellCommands", "true").toStyledString().c_str() // HACK
                 ));
         }
 
