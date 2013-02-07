@@ -1,21 +1,19 @@
 {
     "softwareName": "Mongodb",
     "install": {
-        "commands": ["sofin get mongodb"],
-        "expectStdOut": ["All done"]
+        "commands": "sofin get mongodb",
+        "expectOutput": "All done"
     },
     "schedulerActions": [
         {
             "cronEntry": "0 0/1 * * * ?",
-            "shellCommands": [
-                "echo 'Mongo pom pom'"
-            ]
+            "shellCommands": "echo 'Mongo pom pom'"
         }
     ],
     "start": {
-        "commands": [
-            "test ! -f SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database && chmod 700 SERVICE_PREFIX/database",
-            "test ! -f SERVICE_PREFIX/service.conf && printf '
+        "commands": "
+test ! -f SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database && chmod 700 SERVICE_PREFIX/database
+test ! -f SERVICE_PREFIX/service.conf && printf '
 port = SERVICE_PORT
 dbpath = SERVICE_PREFIX/database
 logappend = true
@@ -23,8 +21,8 @@ logpath = SERVICE_PREFIX/service.log
 pidfilepath = SERVICE_PREFIX/service.pid
 unixSocketPrefix = SERVICE_PREFIX
 fork = true
-' > SERVICE_PREFIX/service.conf",
-            "SERVICE_ROOT/exports/mongod -f SERVICE_PREFIX/service.conf"
-        ]
+' > SERVICE_PREFIX/service.conf
+
+SERVICE_ROOT/exports/mongod -f SERVICE_PREFIX/service.conf"
     }
 }

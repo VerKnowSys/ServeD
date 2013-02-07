@@ -1,18 +1,16 @@
 {
     "softwareName": "Php",
     "install": {
-        "commands": ["sofin get php"],
-        "expectStdOut": ["All done"]
+        "commands": "sofin get php",
+        "expectOutput": "All done"
     },
     "start": {
-        "commands": [
-            "SERVICE_ROOT/exports/php-fpm -c SERVICE_PREFIX/service.ini --fpm-config SERVICE_PREFIX/service.conf --pid SERVICE_PREFIX/service.pid -D"
-        ]
+        "commands": "SERVICE_ROOT/exports/php-fpm -c SERVICE_PREFIX/service.ini --fpm-config SERVICE_PREFIX/service.conf --pid SERVICE_PREFIX/service.pid -D"
     },
     "validate": {
-        "commands": [
-            "test ! -d SERVICE_PREFIX/tmp && mkdir SERVICE_PREFIX/tmp",
-            "test ! -f SERVICE_PREFIX/service.conf && printf '
+        "commands": "
+test ! -d SERVICE_PREFIX/tmp && mkdir SERVICE_PREFIX/tmp
+test ! -f SERVICE_PREFIX/service.conf && printf '
 [global]
     error_log = SERVICE_PREFIX/service.log
     ;emergency_restart_threshold = 0
@@ -199,6 +197,6 @@
 [dba]
     apc.include_once_override = Off
     apc.canonicalize = On
-' > SERVICE_PREFIX/service.ini"]
+' > SERVICE_PREFIX/service.ini"
     }
 }

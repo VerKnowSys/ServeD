@@ -1,64 +1,65 @@
 {
+    "name": "No-Name",
+    "staticPort": -1, // by default assign dynamic port for service
+
+    "watchPort": true,
     "autoStart": true,
     "autoRestart": true,
     "reportAllErrors": true,
     "reportAllInfos": false,
     "reportAllDebugs": false,
 
-    "name": "NO_SERVICE_NAME!",
-    "version": "0.8",
-    "softwareName": "NO_SOFTWARE_NAME!",
-    "staticPort": -1,
-    "watchPort": true,
+    "version": "0.10", // should match version of ServeD
+    "softwareName": "No-Name",
 
     "schedulerActions": [
     ],
     "install": {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
+        "expectStdErr": "",
         "expectOutputTimeout": 0
     },
     "configure":  {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
+        "expectStdErr": "",
         "expectOutputTimeout": 60
     },
     "start":  {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
+        "expectStdErr": "",
         "expectOutputTimeout": 60
     },
     "afterStart":  {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
+        "expectStdErr": "",
         "expectOutputTimeout": 60
     },
     "stop":  {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
+        "expectStdErr": "",
         "expectOutputTimeout": 60
     },
     "afterStop":  {
-        "commands": [""],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
+        "expectStdErr": "",
         "expectOutputTimeout": 60
     },
     "reload":  {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
+        "expectStdErr": "",
         "expectOutputTimeout": 60
     },
     "validate": {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
+        "expectStdErr": "",
         "expectOutputTimeout": 60
     }
 }

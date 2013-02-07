@@ -3,28 +3,22 @@
     "schedulerActions": [
         {
             "cronEntry": "0 0/10 * * * ?",
-            "shellCommands": [
-                "test -e SERVICE_PREFIX/database/database.rdf && cp SERVICE_PREFIX/database/database.rdf SERVICE_PREFIX/database/database.rdf-$(date +'%Y-%m-%d--%H%M').backup"
-            ]
+            "shellCommands": "test -e SERVICE_PREFIX/database/database.rdf && cp SERVICE_PREFIX/database/database.rdf SERVICE_PREFIX/database/database.rdf-$(date +'%Y-%m-%d--%H%M').backup"
         }
     ],
     "install": {
-        "commands": ["sofin get redis"],
-        "expectStdOut": ["All done"]
+        "commands": "sofin get redis",
+        "expectOutput": "All done"
     },
     "configure": {
-        "commands": [
-            "test ! -d SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database"
-        ]
+        "commands": "test ! -d SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database"
     },
     "start": {
-        "commands": [
-            "test ! -d SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database",
-            "SERVICE_ROOT/exports/redis-server SERVICE_PREFIX/service.conf"
-        ]
+        "commands": "test ! -d SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database
+SERVICE_ROOT/exports/redis-server SERVICE_PREFIX/service.conf"
     },
     "validate": {
-        "commands": ["test ! -f SERVICE_PREFIX/service.conf && printf '
+        "commands": "test ! -f SERVICE_PREFIX/service.conf && printf '
 # Default Redis service configuration
 port SERVICE_PORT
 pidfile SERVICE_PREFIX/service.pid
@@ -39,6 +33,6 @@ appendonly no
 appendfsync everysec
 activerehashing yes
 loglevel notice
-logfile SERVICE_PREFIX/service.log' > SERVICE_PREFIX/service.conf"]
+logfile SERVICE_PREFIX/service.log' > SERVICE_PREFIX/service.conf"
     }
 }

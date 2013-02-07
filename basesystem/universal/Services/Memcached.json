@@ -1,10 +1,10 @@
 {
     "softwareName": "Memcached",
     "install": {
-        "commands": ["sofin get memcached"],
-        "expectStdOut": ["All done"]
+        "commands": "sofin get memcached",
+        "expectOutput": "All done"
     },
     "start": {
-        "commands": ["SERVICE_ROOT/exports/memcached -p SERVICE_PORT -P SERVICE_PREFIX/service.pid -d"]
+        "commands": "SERVICE_ROOT/exports/memcached -p SERVICE_PORT -P SERVICE_PREFIX/service.pid -d"
     }
 }

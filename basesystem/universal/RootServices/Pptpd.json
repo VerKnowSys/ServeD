@@ -2,15 +2,15 @@
     "softwareName": "Pptpd",
     "staticPort": 1723,
     "install": {
-        "commands": ["sofin get pptpd"],
-        "expectStdOut": ["All done"]
+        "commands": "sofin get pptpd",
+        "expectOutput": "All done"
     },
     "start": {
-        "commands": [
-            "test ! -L /etc/ppp/ppp.secret && rm -f /etc/ppp/ppp.secret && printf '
+        "commands": "test ! -L /etc/ppp/ppp.secret && rm -f /etc/ppp/ppp.secret && printf '
 guest   somepass    10.10.0.51
-' > SERVICE_PREFIX/ppp.secret && ln -s SERVICE_PREFIX/ppp.secret /etc/ppp/ppp.secret",
-            "test ! -L /etc/ppp/ppp.conf && rm -f /etc/ppp/ppp.conf && printf '
+' > SERVICE_PREFIX/ppp.secret && ln -s SERVICE_PREFIX/ppp.secret /etc/ppp/ppp.secret
+
+test ! -L /etc/ppp/ppp.conf && rm -f /etc/ppp/ppp.conf && printf '
 default:
  set timeout 0
  set log Phase Chat LCP IPCP CCP TUN Command Connect
@@ -28,11 +28,12 @@ pptp:
  enable proxy
  disable ipv6cp
  allow mode direct
-' > SERVICE_PREFIX/ppp.conf && ln -s SERVICE_PREFIX/ppp.conf /etc/ppp/ppp.conf",
-            "test ! -e SERVICE_PREFIX/service.conf && printf '
+' > SERVICE_PREFIX/ppp.conf && ln -s SERVICE_PREFIX/ppp.conf /etc/ppp/ppp.conf
+
+test ! -e SERVICE_PREFIX/service.conf && printf '
 localip 10.10.0.1
 remoteip 10.10.0.50-250
 ' > SERVICE_PREFIX/service.conf",
-            "SERVICE_ROOT/exports/pptpd --conf SERVICE_PREFIX/service.conf --pidfile SERVICE_PREFIX/service.pid"]
+            "SERVICE_ROOT/exports/pptpd --conf SERVICE_PREFIX/service.conf --pidfile SERVICE_PREFIX/service.pid"
     }
 }
