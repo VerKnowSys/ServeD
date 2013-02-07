@@ -153,6 +153,8 @@
     #define JSON_PARSE_ERROR 123
     #define NO_SUCH_FILE_ERROR 124
     #define NO_DEFAULT_IGNITERS_FOUND_ERROR 125
+    #define JSON_FORMAT_EXCEPTION_ERROR 125
+    #define OTHER_EXCEPTION_ERROR 126
 
 
     struct execParams {
