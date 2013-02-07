@@ -14,7 +14,8 @@ class TestJsonLibrary: public QObject {
     Q_OBJECT
 
         private slots:
-            void testParse1();
+            void testParseDefault();
+            void testParseJSONRedis();
 
 
 };
