@@ -1,8 +1,11 @@
+
+/* This is default definition used as base for all igniters */
+
 {
     "name": "No-Name",
     "softwareName": "No-Name",
 
-    /* by default assign dynamic port for service */
+/* by default assign dynamic port for service   */
     "staticPort": -1,
 
     "watchPort": true,
@@ -12,57 +15,57 @@
     "reportAllInfos": false,
     "reportAllDebugs": false,
 
-    /* should match version of ServeD */
+/* should match version of ServeD               */
     "version": "0.10",
 
+/* default schedulerActions format:             */
+/*   "schedulerActions": [                      */
+/*     {                                        */
+/*         "cronEntry": "0 0/10 * * * ?",       */
+/*         "shellCommands": "my shell commands" */
+/*     },                                       */
+/*     …                                        */
+/* ],                                           */
     "schedulerActions": [
     ],
     "install": {
         "commands": "",
         "expectOutput": "",
-        "expectStdErr": "",
         "expectOutputTimeout": 0
     },
     "configure":  {
         "commands": "",
         "expectOutput": "",
-        "expectStdErr": "",
         "expectOutputTimeout": 60
     },
     "start":  {
         "commands": "",
         "expectOutput": "",
-        "expectStdErr": "",
         "expectOutputTimeout": 60
     },
     "afterStart":  {
         "commands": "",
         "expectOutput": "",
-        "expectStdErr": "",
         "expectOutputTimeout": 60
     },
     "stop":  {
         "commands": "",
         "expectOutput": "",
-        "expectStdErr": "",
         "expectOutputTimeout": 60
     },
     "afterStop":  {
         "commands": "",
         "expectOutput": "",
-        "expectStdErr": "",
         "expectOutputTimeout": 60
     },
     "reload":  {
         "commands": "",
         "expectOutput": "",
-        "expectStdErr": "",
         "expectOutputTimeout": 60
     },
     "validate": {
         "commands": "",
         "expectOutput": "",
-        "expectStdErr": "",
         "expectOutputTimeout": 60
     }
 }
