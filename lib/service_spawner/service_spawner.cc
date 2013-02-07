@@ -130,8 +130,17 @@ int main(int argc, char *argv[]) {
     QList<int> userIdsToWatch;
     QList<UserWatcher *> watchers;
 
-    QString config = serviceConfigLoad("Redis", 501);
-    cout << "Igniter Redis config install element: " << config.toStdString() << endl;
+    SvdServiceConfig *config = new SvdServiceConfig("Redis");
+    cout << "Igniter softwareName element: " << config->softwareName.toStdString() << endl;
+    cout << "Igniter install element: " << config->install->commands.toStdString() << endl;
+
+    // QString config2 = serviceConfigLoad("RedisDrugi", 501);
+    // cout << "Igniter RedisDrugi config install element: " << config2.toStdString() << endl;
+
+    // QString config3 = serviceConfigLoad("RedisNieistniejacy", 501);
+    // cout << "Igniter RedisNieistniejacy config install element: " << config3.toStdString() << endl;
+
+    exit(666);
 
     QFile file("/SystemUsers/service_spawner.log");
     file.remove();
