@@ -11,6 +11,7 @@ CC                = clang
 CXX               = clang++
 RM                = rm
 MAKE              = make
+QMAKE             = qmake
 STRIP             = strip
 BIN_OPTS          = -fPIE
 LIB_OPTS					= -shared
@@ -33,4 +34,4 @@ CXXFLAGS          = -Os -fPIC
 .endif
 
 
-MODULES           = kickstart fann
+MODULES           = kickstart fann service_spawner

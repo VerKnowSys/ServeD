@@ -7,8 +7,12 @@
 .include <Build.mk>
 
 
-all:
+all: prepare
 	-for d in $(MODULES); do (cd $$d; $(MAKE) ); done
+
+
+prepare:
+	cd service_spawner; $(QMAKE) service_spawner.pro
 
 
 clean:
@@ -22,6 +26,8 @@ distclean:
 strip:
 	-for d in $(MODULES); do (cd $$d; $(MAKE) strip ); done
 
+
+
 # install:
 # 	-for d in $(MODULES); do (cd $$d; $(MAKE) install ); done
 
@@ -30,4 +36,4 @@ strip:
 # 	-for d in $(MODULES); do (cd $$d; $(MAKE) uninstall ); done
 
 
-.PHONY: all clean distclean strip
+.PHONY: all clean distclean strip prepare
