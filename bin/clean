@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export SYSTEM=$(uname)
+
 if [ "$(id -u)" != "0" ]; then
 	echo "Consider running this script as root to be sure of cleaning non current user / root old files."
 fi
@@ -26,7 +28,7 @@ if [ "$1" = "sysonly" ]; then
   exit
 fi
 
-bin/sbt64 clean
+# bin/sbt clean
 echo "Project source cleaned.."
 
 case "${SYSTEM}" in
@@ -36,13 +38,12 @@ case "${SYSTEM}" in
         if [ ! "$?" = "0" ]; then
             DEVEL= sofin get bsdmake
         fi
-
-        cd lib/kickstart
-        bsdmake ${DIST}clean
-        cd ../..
-        cd lib/fann
-        bsdmake ${DIST}clean
-        cd ../..
+        if [ "${SYSTEM}" = "Darwin" ]; then
+            export MAKE_OPTS="DARWIN=true ${MAKE_OPTS}"
+        fi
+        cd lib
+        bsdmake ${DIST}clean ${MAKE_OPTS}
+        cd ..
         ;;
 
     *)
