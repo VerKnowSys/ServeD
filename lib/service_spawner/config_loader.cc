@@ -25,7 +25,8 @@ QString readFileContents(const QString& fileName) {
         }
         file.close();
     } else {
-        cerr << "Erro reading file:" << fileName.toStdString() << endl;
+        cerr << "Error reading file:" << fileName.toStdString() << endl;
+        exit(NO_SUCH_FILE_ERROR);
     }
     return lines.trimmed();
 }
@@ -40,7 +41,7 @@ Json::Value parse(const QString& filename) {
     bool parsedSuccess = reader.parse(readFileContents(filename).toStdString(), root, false);
     if (!parsedSuccess) {
         cerr << "JSON Parse Failure of file: " << filename.toStdString() << endl;
-        exit(178);
+        exit(JSON_PARSE_ERROR);
     }
     return root; /* return user side igniter first by default */
 }
@@ -62,7 +63,7 @@ Json::Value loadIgniter(const QString& name, uint uid) {
 
     if(!fileRoot.open(QIODevice::ReadOnly)) {
         cerr << "No file: " << rootIgniter.toStdString() << endl;
-        exit(177);
+        exit(NO_SUCH_FILE_ERROR);
     } else
         return parse(rootIgniter);
 }

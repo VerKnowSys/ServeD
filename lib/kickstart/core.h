@@ -150,6 +150,10 @@
     #define PTY_WRITE_ERROR 120
     #define PTY_FORK_ERROR 121
     #define GETOPT_ERROR 122
+    #define JSON_PARSE_ERROR 123
+    #define NO_SUCH_FILE_ERROR 124
+    #define NO_DEFAULT_IGNITERS_FOUND_ERROR 125
+
 
     struct execParams {
         string javaPath;
