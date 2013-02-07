@@ -21,6 +21,5 @@ class TestJsonLibrary: public QObject {
 
 QTEST_MAIN(TestJsonLibrary)
 #include "moc_TestJsonLibrary.cpp"
-// #include "moc_service_config.cpp"
 
 #endif
