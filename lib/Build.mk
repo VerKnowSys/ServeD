@@ -19,6 +19,8 @@ LDFLAGS           =
 
 
 .if $(DARWIN) == true
+CFLAGS            = -arch x86_64
+CXXFLAGS          = -arch x86_64
 MAKE              = bsdmake
 QMAKE_OPTS        = -spec darwin-g++
 LIB_POSTFIX       = .dylib
@@ -29,8 +31,8 @@ LIB_POSTFIX       = .so
 
 
 .if $(DEVEL) == true
-CFLAGS            = -O0 -g -fPIC -DDEVEL
-CXXFLAGS          = -O0 -g -fPIC -DDEVEL
+CFLAGS            += -O0 -g -fPIC -DDEVEL
+CXXFLAGS          += -O0 -g -fPIC -DDEVEL
 .else
 CFLAGS            = -Os -fPIC
 CXXFLAGS          = -Os -fPIC
