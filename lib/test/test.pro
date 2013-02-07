@@ -1,4 +1,6 @@
 
+CC = clang
+CXX = clang++
 CONFIG += qtestlib
 TEMPLATE = app
 TARGET = ../../test
