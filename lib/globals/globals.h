@@ -50,6 +50,7 @@
     #define DEFAULT_USER_UID 501
 
     #define USERS_HOME_DIR "/Users/"
+    #define SOFTWARE_DIR "/Software/"
     #define DEFAULTSOFTWARETEMPLATEEXT ".json"
     #define DEFAULTSOFTWARETEMPLATE (USERS_HOME_DIR "Common/Igniters/Default")
     #define DEFAULTSOFTWARETEMPLATESDIR (USERS_HOME_DIR "Common/Igniters/Services/")
