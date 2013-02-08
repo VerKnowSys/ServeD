@@ -7,58 +7,6 @@
  */
 
 #include "service_config.h"
-#include "config_loader.h"
-
-
-extern QString readFileContents(const QString& fileName);
-
-
-uint registerFreeTcpPort(uint specificPort) {
-    QTime midnight(0, 0, 0);
-    // val port = SvdPools.userPortPool.start + rnd.nextInt(SvdPools.userPortPool.end - SvdPools.userPortPool.start)
-    uint port = 0;
-    int rand = (qrand() % 50000);
-    if (specificPort == 0) {
-        qsrand(midnight.msecsTo(QTime::currentTime()));
-        port = 10000 + rand;
-    } else
-        port = specificPort;
-
-    #ifdef DEBUG
-        cerr << "Trying port: " << port << ". Randseed: " << rand << endl;
-    #endif
-
-    QNetworkInterface *inter = new QNetworkInterface();
-    QList<QHostAddress> list = inter->allAddresses(); /* all interfaces */
-    #ifdef DEBUG
-        cerr << "Addresses amount: " << list.size() << endl;
-    #endif
-    for (int j = 0; j < list.size(); j++) {
-        QString hostName = list.at(j).toString();
-        // cerr << "Trying hostname: " << hostName.toStdString() << endl;
-        QHostInfo info = QHostInfo::fromName(hostName);
-        if (!info.addresses().isEmpty()) {
-            QHostAddress address = info.addresses().first();
-            #ifdef DEBUG
-                cerr << "Current address: " << address.toString().toStdString() << endl;
-            #endif
-            QTcpServer *tcpServer = new QTcpServer();
-            if (!tcpServer->listen(address, port)) {
-                #ifdef DEBUG
-                    cerr << "Already taken port found: " << port << endl;
-                #endif
-                delete tcpServer;
-                return registerFreeTcpPort(10000 + rand);
-            } else {
-                tcpServer->close();
-                delete tcpServer;
-            }
-        } else {
-            cerr << "No network interfaces available. Skipping" << endl;
-        }
-    }
-    return port;
-}
 
 
 SvdSchedulerAction::SvdSchedulerAction(const QString& initialCronEntry, const QString& initialCommands) {

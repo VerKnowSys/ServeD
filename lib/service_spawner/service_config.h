@@ -10,16 +10,15 @@
 #define __SERVICE_CONFIG__
 
 #include "../globals/globals.h"
+#include "utils.h"
+#include "config_loader.h"
+
 #include <QObject>
 #include <QFile>
 #include <QTime>
-#include <QTextStream>
 #include <QtNetwork/QHostInfo>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QNetworkInterface>
-
-
-uint registerFreeTcpPort(uint specificPort = 0);
 
 
 class SvdSchedulerAction {
@@ -35,7 +34,6 @@ class SvdShellOperations {
     public:
         SvdShellOperations();
         SvdShellOperations(const QString& initialCommand, const QString& initialExpectOutput);
-        // SvdShellOperations(QList<QString> *initialCommands, QList<QString> *initialExpectOutput);
 
         QString commands;
         QString expectOutput;

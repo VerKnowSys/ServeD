@@ -18,10 +18,6 @@
 #include <QTextStream>
 
 
-QString readFileContents(const QString& fileName);
-Json::Value* parseJSON(const QString& filename);
-
-
 class SvdConfigLoader : QObject {
     Q_OBJECT
 

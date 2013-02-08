@@ -9,7 +9,6 @@
 #include "config_loader.h"
 
 
-
 /*
  * Default config loader.
  * Uses igniters to read service data from it and returns prepared object of Service
@@ -37,43 +36,6 @@ SvdConfigLoader::SvdConfigLoader(QString preName) {
     this->uid = getuid();
     this->config = loadIgniter(); // load app specific igniter data
 }
-
-
-/*
- *  Read file contents of text file
- */
-QString readFileContents(const QString& fileName) {
-    QString lines = "", l = "";
-    string line;
-    ifstream file(fileName.toStdString().c_str(), ios::in);
-    if (file.is_open()) {
-        while ( file.good() ) {
-            getline(file, line);
-            lines += QString(line.c_str()) + "\n";
-        }
-        file.close();
-    } else {
-        cerr << "Error reading file:" << fileName.toStdString() << endl;
-        exit(NO_SUCH_FILE_ERROR);
-    }
-    return lines;
-}
-
-
-/*
- *  Parse string contents to Json value.
- */
-Json::Value* parseJSON(const QString& filename) {
-    Json::Reader reader; /* parse json file */
-    Json::Value* root = new Json::Value();
-    bool parsedSuccess = reader.parse(readFileContents(filename).toStdString(), *root, false);
-    if (!parsedSuccess) {
-        cerr << "JSON Parse Failure of file: " << filename.toStdString() << endl;
-        exit(JSON_PARSE_ERROR);
-    }
-    return root; /* return user side igniter first by default */
-}
-
 
 
 /*
