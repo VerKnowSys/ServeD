@@ -12,8 +12,14 @@
 #include "../globals/globals.h"
 #include <QObject>
 #include <QFile>
+#include <QTime>
 #include <QTextStream>
 #include <QtNetwork/QHostInfo>
+#include <QtNetwork/QTcpServer>
+#include <QtNetwork/QNetworkInterface>
+
+
+uint registerFreeTcpPort(uint specificPort = 0);
 
 
 class SvdSchedulerAction {
