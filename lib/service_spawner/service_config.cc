@@ -224,9 +224,9 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
         QFile portFile(portFilePath);
         if (portFile.exists()) {
             portFilePath = readFileContents(portFilePath).trimmed();
-            ccont = ccont.replace("SERVICE_PORT", portFilePath); /* replace with user domain content */
+            ccont = ccont.replace("SERVICE_PORT", portFilePath); /* replace with user port content */
         } else {
-            cout << "No ports file! This might be something nasty!. It happened with file: " << portFilePath.toStdString() << endl;
+            cerr << "No port file for service " << name.toStdString() << " (software: " << softwareName.toStdString() << ")! This might be something nasty!. It happened in file: " << portFilePath.toStdString() << endl;
             ccont = ccont.replace("SERVICE_PORT", 0); /* this shouldn't happen */
         }
 
