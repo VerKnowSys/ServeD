@@ -29,3 +29,32 @@ void TestJsonLibrary::TestFreePortFunctionality() {
     cout << "Port: " << takenPort << endl;
     QVERIFY(takenPort != 22);
 }
+
+
+void writeSampleOf(const char* sample, const char* file) {
+    int lfp = open(file, O_RDWR | O_CREAT, 0600);
+    write(lfp, sample, strlen(sample));
+    close(lfp);
+}
+
+
+void TestJsonLibrary::TestJSONParse() {
+    const char* fileName = "/tmp/test-file-TestJSONParse.json";
+    QString value = "";
+
+    writeSampleOf("{\"somekey\": \"somevalue\"}", fileName);
+    QFile file(fileName);
+    if (!file.exists()) {
+        QFAIL("JSON file should exists.");
+    }
+
+    Json::Value parsed = parseJSON(fileName);
+    value = parsed.get("somekey", "none").asString().c_str();
+    QVERIFY(value == QString("somevalue"));
+
+    value = parsed.get("someNOKEY", "none").asString().c_str();
+    QVERIFY(value == QString("none"));
+
+    file.deleteLater();
+}
+

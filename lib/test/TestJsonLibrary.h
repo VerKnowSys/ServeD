@@ -17,6 +17,7 @@ class TestJsonLibrary: public QObject {
             void testParseDefault();
             void testParseJSONRedis();
             void TestFreePortFunctionality();
+            void TestJSONParse();
 
 
 };
