@@ -49,6 +49,7 @@ class SvdServiceConfig : QObject {
     public:
         SvdServiceConfig(); /* Load default values */
         SvdServiceConfig(const QString& serviceName);
+        ~SvdServiceConfig(); /* free allocated objects */
 
         QString replaceAllSpecialsIn(const QString& content);
 
@@ -57,7 +58,7 @@ class SvdServiceConfig : QObject {
         QString name, softwareName;
         bool autoRestart, autoStart, reportAllErrors, reportAllInfos, reportAllDebugs, watchPort;
         int staticPort;
-        QList<SvdSchedulerAction*> schedulerActions;
+        QList<SvdSchedulerAction*> *schedulerActions;
         SvdShellOperations *install, *configure, *start, *afterStart, *stop, *afterStop, *reload, *validate;
 
 };

@@ -1,6 +1,7 @@
 #ifndef __GLOBALS__
 #define __GLOBALS__
 
+    #define DEBUG true
 
     /* global constants */
     #define APP_VERSION "0.16.0"

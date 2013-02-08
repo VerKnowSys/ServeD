@@ -47,9 +47,11 @@ uint registerFreeTcpPort(uint specificPort) {
                 #ifdef DEBUG
                     cerr << "Already taken port found: " << port << endl;
                 #endif
+                delete tcpServer;
                 return registerFreeTcpPort(10000 + rand);
             } else {
                 tcpServer->close();
+                delete tcpServer;
             }
         } else {
             cerr << "No network interfaces available. Skipping" << endl;
@@ -67,60 +69,53 @@ SvdSchedulerAction::SvdSchedulerAction(const QString& initialCronEntry, const QS
 
 SvdServiceConfig::SvdServiceConfig() { /* Load default values */
     uid = getuid();
+    schedulerActions = new QList<SvdSchedulerAction*>();
     try {
-        Json::Value defaults = (new SvdConfigLoader())->config;
+        Json::Value* defaults = (new SvdConfigLoader())->config;
         name = "Default";
-        softwareName = defaults["softwareName"].asString().c_str();
-        autoRestart = defaults["autoRestart"].asBool();
-        autoStart = defaults["autoStart"].asBool();
-        reportAllErrors = defaults["reportAllErrors"].asBool();
-        reportAllInfos = defaults["reportAllInfos"].asBool();
-        reportAllDebugs = defaults["reportAllDebugs"].asBool();
-        watchPort = defaults["watchPort"].asBool();
-        staticPort = defaults["staticPort"].asInt();
-
-        /* load service scheduler data */
-        Json::Value _preSchedActions = defaults["schedulerActions"];
-        for ( uint index = 0; index < _preSchedActions.size(); ++index ) {
-            schedulerActions.push_back(
-                new SvdSchedulerAction(
-                    _preSchedActions[index].get("cronEntry", "0 0/10 * * * ?").asString().c_str(),
-                    _preSchedActions[index].get("shellCommands", "true").toStyledString().c_str() // HACK
-                ));
-        }
+        softwareName = (*defaults)["softwareName"].asString().c_str();
+        autoRestart = (*defaults)["autoRestart"].asBool();
+        autoStart = (*defaults)["autoStart"].asBool();
+        reportAllErrors = (*defaults)["reportAllErrors"].asBool();
+        reportAllInfos = (*defaults)["reportAllInfos"].asBool();
+        reportAllDebugs = (*defaults)["reportAllDebugs"].asBool();
+        watchPort = (*defaults)["watchPort"].asBool();
+        staticPort = (*defaults)["staticPort"].asInt();
 
         /* laod service hooks */
         install = new SvdShellOperations(
-            defaults["install"]["commands"].asString().c_str(),
-            defaults["install"]["expectOutput"].asString().c_str());
+            (*defaults)["install"]["commands"].asString().c_str(),
+            (*defaults)["install"]["expectOutput"].asString().c_str());
 
         configure = new SvdShellOperations(
-            defaults["configure"]["commands"].asString().c_str(),
-            defaults["configure"]["expectOutput"].asString().c_str());
+            (*defaults)["configure"]["commands"].asString().c_str(),
+            (*defaults)["configure"]["expectOutput"].asString().c_str());
 
         start = new SvdShellOperations(
-            defaults["start"]["commands"].asString().c_str(),
-            defaults["start"]["expectOutput"].asString().c_str());
+            (*defaults)["start"]["commands"].asString().c_str(),
+            (*defaults)["start"]["expectOutput"].asString().c_str());
 
         afterStart = new SvdShellOperations(
-            defaults["afterStart"]["commands"].asString().c_str(),
-            defaults["afterStart"]["expectOutput"].asString().c_str());
+            (*defaults)["afterStart"]["commands"].asString().c_str(),
+            (*defaults)["afterStart"]["expectOutput"].asString().c_str());
 
         stop = new SvdShellOperations(
-            defaults["stop"]["commands"].asString().c_str(),
-            defaults["stop"]["expectOutput"].asString().c_str());
+            (*defaults)["stop"]["commands"].asString().c_str(),
+            (*defaults)["stop"]["expectOutput"].asString().c_str());
 
         afterStop = new SvdShellOperations(
-            defaults["afterStop"]["commands"].asString().c_str(),
-            defaults["afterStop"]["expectOutput"].asString().c_str());
+            (*defaults)["afterStop"]["commands"].asString().c_str(),
+            (*defaults)["afterStop"]["expectOutput"].asString().c_str());
 
         reload = new SvdShellOperations(
-            defaults["reload"]["commands"].asString().c_str(),
-            defaults["reload"]["expectOutput"].asString().c_str());
+            (*defaults)["reload"]["commands"].asString().c_str(),
+            (*defaults)["reload"]["expectOutput"].asString().c_str());
 
         validate = new SvdShellOperations(
-            defaults["validate"]["commands"].asString().c_str(),
-            defaults["validate"]["expectOutput"].asString().c_str());
+            (*defaults)["validate"]["commands"].asString().c_str(),
+            (*defaults)["validate"]["expectOutput"].asString().c_str());
+
+        delete defaults;
 
     } catch (std::exception &e) {
         cerr << "Thrown Exception: " << e.what() << " in Default service." << endl;
@@ -132,65 +127,95 @@ SvdServiceConfig::SvdServiceConfig() { /* Load default values */
 }
 
 
+/* destructor with memory free - welcome in C++ dmilith */
+SvdServiceConfig::~SvdServiceConfig() {
+
+    /* laod service hooks */
+    delete install;
+    delete configure;
+    delete start;
+    delete afterStart;
+    delete stop;
+    delete afterStop;
+    delete reload;
+    delete validate;
+    for (int i = 0; i < schedulerActions->size(); i++)
+        delete schedulerActions->at(i);
+    delete schedulerActions;
+
+}
+
+
 SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
+    schedulerActions = new QList<SvdSchedulerAction*>();
     uid = getuid();
     try {
-        Json::Value defaults = (new SvdConfigLoader())->config;
-        Json::Value root = (new SvdConfigLoader(serviceName))->config; // NOTE: the question is.. how will this behave ;]
+        Json::Value* defaults = (new SvdConfigLoader())->config;
+        Json::Value* root = (new SvdConfigLoader(serviceName))->config; // NOTE: the question is.. how will this behave ;]
 
         name = serviceName;
-        softwareName = root.get("softwareName", defaults["softwareName"]).asString().c_str();
-        autoRestart = root.get("autoRestart", defaults["autoRestart"]).asBool();
-        autoStart = root.get("autoStart", defaults["autoStart"]).asBool();
-        reportAllErrors = root.get("reportAllErrors", defaults["reportAllErrors"]).asBool();
-        reportAllInfos = root.get("reportAllInfos", defaults["reportAllInfos"]).asBool();
-        reportAllDebugs = root.get("reportAllDebugs", defaults["reportAllDebugs"]).asBool();
-        watchPort = root.get("watchPort", defaults["watchPort"]).asBool();
-        staticPort = root.get("staticPort", defaults["staticPort"]).asInt();
+        softwareName = root->get("softwareName", (*defaults)["softwareName"]).asString().c_str();
+        autoRestart = root->get("autoRestart", (*defaults)["autoRestart"]).asBool();
+        autoStart = root->get("autoStart", (*defaults)["autoStart"]).asBool();
+        reportAllErrors = root->get("reportAllErrors", (*defaults)["reportAllErrors"]).asBool();
+        reportAllInfos = root->get("reportAllInfos", (*defaults)["reportAllInfos"]).asBool();
+        reportAllDebugs = root->get("reportAllDebugs", (*defaults)["reportAllDebugs"]).asBool();
+        watchPort = root->get("watchPort", (*defaults)["watchPort"]).asBool();
+        staticPort = root->get("staticPort", (*defaults)["staticPort"]).asInt();
 
         /* load service scheduler data */
-        Json::Value _preSchedActions = root["schedulerActions"];
-        for ( uint index = 0; index < _preSchedActions.size(); ++index ) {
-            schedulerActions.push_back(
-                new SvdSchedulerAction(
-                    _preSchedActions[index].get("cronEntry", "0 0/10 * * * ?").asString().c_str(),
-                    _preSchedActions[index].get("shellCommands", "true").toStyledString().c_str() // HACK
-                ));
-        }
+        // int _preSchedActions = root->get("schedulerActions", new Json::Value()).size();
+        // Json::Value jarray = (*root)["schedulerActions"];
+        // for ( uint index = 0; index < _preSchedActions; ++index ) {
+        //     try {
+        //         schedulerActions->push_back(
+        //             new SvdSchedulerAction(
+        //                 jarray.get("cronEntry", "0 0/10 * * * ?").asString().c_str(),
+        //                 jarray.get("shellCommands", "true").toStyledString().c_str() // HACK
+        //             ));
+        //     } catch (std::exception &e) {
+        //         cerr << "Exception" << endl;
+        //     }
+        //     #ifdef DEBUG
+        //         cerr << "Defined scheduler action" << endl;
+        //     #endif
+        // }
 
         /* laod service hooks */
         install = new SvdShellOperations(
-            replaceAllSpecialsIn(root["install"].get("commands", defaults["install"]["commands"]).asString().c_str()),
-            replaceAllSpecialsIn(root["install"].get("expectOutput", defaults["install"]["expectOutput"]).asString().c_str()));
+            replaceAllSpecialsIn((*root)["install"].get("commands", (*defaults)["install"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn((*root)["install"].get("expectOutput", (*defaults)["install"]["expectOutput"]).asString().c_str()));
 
         configure = new SvdShellOperations(
-            replaceAllSpecialsIn(root["configure"].get("commands", defaults["configure"]["commands"]).asString().c_str()),
-            replaceAllSpecialsIn(root["configure"].get("expectOutput", defaults["configure"]["expectOutput"]).asString().c_str()));
+            replaceAllSpecialsIn((*root)["configure"].get("commands", (*defaults)["configure"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn((*root)["configure"].get("expectOutput", (*defaults)["configure"]["expectOutput"]).asString().c_str()));
 
         start = new SvdShellOperations(
-            replaceAllSpecialsIn(root["start"].get("commands", defaults["start"]["commands"]).asString().c_str()),
-            replaceAllSpecialsIn(root["start"].get("expectOutput", defaults["start"]["expectOutput"]).asString().c_str()));
+            replaceAllSpecialsIn((*root)["start"].get("commands", (*defaults)["start"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn((*root)["start"].get("expectOutput", (*defaults)["start"]["expectOutput"]).asString().c_str()));
 
         afterStart = new SvdShellOperations(
-            replaceAllSpecialsIn(root["afterStart"].get("commands", defaults["afterStart"]["commands"]).asString().c_str()),
-            replaceAllSpecialsIn(root["afterStart"].get("expectOutput", defaults["afterStart"]["expectOutput"]).asString().c_str()));
+            replaceAllSpecialsIn((*root)["afterStart"].get("commands", (*defaults)["afterStart"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn((*root)["afterStart"].get("expectOutput", (*defaults)["afterStart"]["expectOutput"]).asString().c_str()));
 
         stop = new SvdShellOperations(
-            replaceAllSpecialsIn(root["stop"].get("commands", defaults["stop"]["commands"]).asString().c_str()),
-            replaceAllSpecialsIn(root["stop"].get("expectOutput", defaults["stop"]["expectOutput"]).asString().c_str()));
+            replaceAllSpecialsIn((*root)["stop"].get("commands", (*defaults)["stop"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn((*root)["stop"].get("expectOutput", (*defaults)["stop"]["expectOutput"]).asString().c_str()));
 
         afterStop = new SvdShellOperations(
-            replaceAllSpecialsIn(root["afterStop"].get("commands", defaults["afterStop"]["commands"]).asString().c_str()),
-            replaceAllSpecialsIn(root["afterStop"].get("expectOutput", defaults["afterStop"]["expectOutput"]).asString().c_str()));
+            replaceAllSpecialsIn((*root)["afterStop"].get("commands", (*defaults)["afterStop"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn((*root)["afterStop"].get("expectOutput", (*defaults)["afterStop"]["expectOutput"]).asString().c_str()));
 
         reload = new SvdShellOperations(
-            replaceAllSpecialsIn(root["reload"].get("commands", defaults["reload"]["commands"]).asString().c_str()),
-            replaceAllSpecialsIn(root["reload"].get("expectOutput", defaults["reload"]["expectOutput"]).asString().c_str()));
+            replaceAllSpecialsIn((*root)["reload"].get("commands", (*defaults)["reload"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn((*root)["reload"].get("expectOutput", (*defaults)["reload"]["expectOutput"]).asString().c_str()));
 
         validate = new SvdShellOperations(
-            replaceAllSpecialsIn(root["validate"].get("commands", defaults["validate"]["commands"]).asString().c_str()),
-            replaceAllSpecialsIn(root["validate"].get("expectOutput", defaults["validate"]["expectOutput"]).asString().c_str()));
+            replaceAllSpecialsIn((*root)["validate"].get("commands", (*defaults)["validate"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn((*root)["validate"].get("expectOutput", (*defaults)["validate"]["expectOutput"]).asString().c_str()));
 
+        delete defaults;
+        delete root;
 
     } catch (std::exception &e) {
         cerr << "Thrown Exception: " << e.what() << " in " << serviceName.toStdString() << " service." << endl;
@@ -220,6 +245,8 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
         } else {
             // cout << "Not found user service root of " << name.toStdString() << " " << userServiceRoot.toStdString() << endl;
         }
+        userServiceRootFile.close();
+
         QFile serviceRootFile(serviceRoot);
         if ((serviceRootFile.exists())) {
             // cout << "Service root found in: " << serviceRoot.toStdString() << endl;
@@ -229,6 +256,7 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
              return "";
              // exit(NO_SUCH_FILE_ERROR);
         }
+        serviceRootFile.close();
 
         /* Replace SERVICE_PREFIX */
         QString prefixDir = QString(USERS_HOME_DIR) + QString::number(uid) + QString(SOFTWARE_DATA_DIR) + name;
@@ -244,6 +272,7 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
             ccont = ccont.replace("SERVICE_DOMAIN", userDomain); /* replace with user domain content */
         } else
             ccont = ccont.replace("SERVICE_DOMAIN", domain); /* replace with default domain */
+        domainFile.close();
 
         /* Replace SERVICE_ADDRESS */
         QString address = QString(DEFAULT_SYSTEM_ADDRESS);
@@ -275,6 +304,7 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
             cerr << "No port file for service " << name.toStdString() << " (software: " << softwareName.toStdString() << ")! This might be something nasty!. It happened in file: " << portFilePath.toStdString() << endl;
             ccont = ccont.replace("SERVICE_PORT", QString::number(registerFreeTcpPort())); /* this shouldn't happen */
         }
+        portFile.close();
 
         #ifdef DEBUG
             cerr << "DEBUG: Given content: " << ccont.toStdString() << endl;

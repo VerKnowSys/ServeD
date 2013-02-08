@@ -77,30 +77,31 @@ void TestLibrary::TestJSONParse() {
         QFAIL("JSON file should exists.");
     }
 
-    Json::Value parsed = parseJSON(fileName);
-    value = parsed.get("somekey", "none").asString().c_str();
+    Json::Value* parsed = parseJSON(fileName);
+    value = parsed->get("somekey", "none").asString().c_str();
     QVERIFY(value == QString("somevalue"));
 
-    value = parsed.get("someNOKEY", "none").asString().c_str();
+    value = parsed->get("someNOKEY", "none").asString().c_str();
     QVERIFY(value == QString("none"));
 
-    valueInt = parsed.get("someNOKEY", 12345).asInt();
+    valueInt = parsed->get("someNOKEY", 12345).asInt();
     QVERIFY(valueInt == 12345);
 
     try {
-        valueInt = parsed.get("somekey", 12345).asInt();
+        valueInt = parsed->get("somekey", 12345).asInt();
         QFAIL("It should throw an exception!");
     } catch (std::exception &e) {
         QCOMPARE(e.what(), "Type is not convertible to int");
     }
+    delete parsed;
 
     file.deleteLater();
 }
 
 
 void TestLibrary::TestMemoryAllocations() {
-    uint amount = 30; // s
-    cout << "Beginning " << 30 << " seconds of allocation test.";
+    uint amount = 60; // s
+    cout << "Beginning " << amount << " seconds of allocation test.";
     for (int i = 0; i < amount; ++i) {
         SvdServiceConfig *config = new SvdServiceConfig("Redis"); /* Load app specific values */
         usleep(1000000); // 1s
