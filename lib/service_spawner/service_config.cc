@@ -10,6 +10,9 @@
 #include "config_loader.h"
 
 
+extern QString readFileContents(const QString& fileName);
+
+
 SvdSchedulerAction::SvdSchedulerAction(const QString& initialCronEntry, const QString& initialCommands) {
     cronEntry = initialCronEntry;
     commands = initialCommands;
@@ -185,20 +188,47 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
         QString prefixDir = QString(USERS_HOME_DIR) + QString::number(uid) + QString(SOFTWARE_DATA_DIR) + name;
         ccont = ccont.replace("SERVICE_PREFIX", prefixDir);
 
-    // TODO: SERVICE_DOMAIN => read $HOME/SoftwareData/Service/.domain
         /* Replace SERVICE_DOMAIN */
-        QString domain = "localhost";
-        ccont = ccont.replace("SERVICE_DOMAIN", domain);
+        QString domain = QString(DEFAULT_SYSTEM_DOMAIN);
+        QString domainFilePath = prefixDir + "/" + QString(DEFAULT_USER_DOMAIN_FILE);
+        QFile domainFile(domainFilePath);
+        QString userDomain = "";
+        if (domainFile.exists()) {
+            userDomain = readFileContents(domainFilePath).trimmed();
+            ccont = ccont.replace("SERVICE_DOMAIN", userDomain); /* replace with user domain content */
+        } else
+            ccont = ccont.replace("SERVICE_DOMAIN", domain); /* replace with default domain */
 
-    // TODO: SERVICE_ADDRESS => to resolved IP of SERVICE_DOMAIN
         /* Replace SERVICE_ADDRESS */
-        QString address = "127.0.0.1";
-        ccont = ccont.replace("SERVICE_ADDRESS", address);
+        QString address = QString(DEFAULT_SYSTEM_ADDRESS);
+        QString userAddress = "";
+        QHostInfo info;
+        if (!userDomain.isEmpty()) {
+            info = QHostInfo::fromName(QString(userDomain));
+            if (!info.addresses().isEmpty()) {
+                QHostAddress address = info.addresses().first();
+                userAddress = address.toString();
+                cout << "Resolved address of domain " << userDomain.toStdString() << " is " << userAddress.toStdString() << endl;
+                ccont = ccont.replace("SERVICE_ADDRESS", userAddress); /* replace with user address content */
+            } else {
+                cerr << "Empty domain resolve of: " << userDomain.toStdString() << endl;
+                ccont = ccont.replace("SERVICE_ADDRESS", address); /* replace with user address content */
+            }
+        } else {
+            cerr << "Filling address with default value" << endl;
+            ccont = ccont.replace("SERVICE_ADDRESS", address);
+        }
 
-    // TODO: SERVICE_PORT => to poer from .service_ports
         /* Replace SERVICE_PORT */
-        QString port = QString::number(12345);
-        ccont = ccont.replace("SERVICE_PORT", port);
+        QString portFilePath = prefixDir + "/" + QString(DEFAULT_USER_PORTS_FILE);
+        QFile portFile(portFilePath);
+        if (portFile.exists()) {
+            portFilePath = readFileContents(portFilePath).trimmed();
+            ccont = ccont.replace("SERVICE_PORT", portFilePath); /* replace with user domain content */
+        } else {
+            cout << "No ports file! This might be something nasty!. It happened with file: " << portFilePath.toStdString() << endl;
+            ccont = ccont.replace("SERVICE_PORT", 0); /* this shouldn't happen */
+        }
 
         cerr << "DEBUG: Given content: " << ccont.toStdString() << endl;
         return ccont;

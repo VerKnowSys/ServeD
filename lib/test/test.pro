@@ -1,6 +1,7 @@
 
 CONFIG += qtestlib
 QT -= gui
+QT += network
 TEMPLATE = app
 TARGET = ../../test
 DEPENDPATH += .

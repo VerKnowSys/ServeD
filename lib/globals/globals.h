@@ -56,6 +56,10 @@
     #define DEFAULTSOFTWARETEMPLATE (USERS_HOME_DIR "Common/Igniters/Default")
     #define DEFAULTSOFTWARETEMPLATESDIR (USERS_HOME_DIR "Common/Igniters/Services/")
     #define DEFAULTUSERIGNITERSDIR "Igniters/Services/"
+    #define DEFAULT_SYSTEM_DOMAIN "localhost"
+    #define DEFAULT_SYSTEM_ADDRESS "127.0.0.1"
+    #define DEFAULT_USER_DOMAIN_FILE ".domain"
+    #define DEFAULT_USER_PORTS_FILE ".service_ports"
 
 
     #define DEFAULT_GATHERING_PAUSE_MICROSECONDS 500000 // half a second
