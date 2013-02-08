@@ -100,8 +100,8 @@ Json::Value* SvdConfigLoader::loadDefaultIgniter() {
  *  Load igniter data in Json.
  */
 Json::Value* SvdConfigLoader::loadIgniter() {
-    const QString& rootIgniter = QString(DEFAULTSOFTWARETEMPLATESDIR) + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
-    const QString& userIgniter = QString(USERS_HOME_DIR) + QString::number(uid) + "/" + QString(DEFAULTUSERIGNITERSDIR) + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
+    const QString rootIgniter = QString(DEFAULTSOFTWARETEMPLATESDIR) + "/" + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
+    const QString userIgniter = QString(USERS_HOME_DIR) + "/" + QString::number(uid) + QString(DEFAULTUSERIGNITERSDIR) + "/" + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
 
     Json::Value* result = new Json::Value();
     QFile fileUser(userIgniter); /* try loading user igniter as first */

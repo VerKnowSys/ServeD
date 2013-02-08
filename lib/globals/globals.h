@@ -4,7 +4,7 @@
     #define DEBUG true
 
     /* global constants */
-    #define APP_VERSION "0.16.0"
+    #define APP_VERSION "0.17.0"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -31,10 +31,9 @@
     #endif
 
 
-    #define CORE_HOMEDIR "/SystemUsers/"
-    #define SYSTEMUSERS_HOME_DIR "/SystemUsers" // no trailing slash
-    #define USERS_HOME_DIR "/Users/"
-    #define LIBRARIES_DIR "/lib/"
+    #define SYSTEMUSERS_HOME_DIR "/SystemUsers"
+    #define USERS_HOME_DIR "/Users"
+    #define LIBRARIES_DIR "/lib"
     #define DEFAULT_BEHAVIORS_DIR "basesystem/behaviors"
     #define DEFAULT_BEHAVIORS_RAW "/output_raw_processes.raw.input"
 
@@ -50,13 +49,12 @@
 
     #define DEFAULT_USER_UID 501
 
-    #define USERS_HOME_DIR "/Users/"
-    #define SOFTWARE_DIR "/Software/"
-    #define SOFTWARE_DATA_DIR "/SoftwareData/"
+    #define SOFTWARE_DIR "/Software"
+    #define SOFTWARE_DATA_DIR "/SoftwareData"
     #define DEFAULTSOFTWARETEMPLATEEXT ".json"
-    #define DEFAULTSOFTWARETEMPLATE (USERS_HOME_DIR "Common/Igniters/Default")
-    #define DEFAULTSOFTWARETEMPLATESDIR (USERS_HOME_DIR "Common/Igniters/Services/")
-    #define DEFAULTUSERIGNITERSDIR "Igniters/Services/"
+    #define DEFAULTSOFTWARETEMPLATE (USERS_HOME_DIR "/Common/Igniters/Default")
+    #define DEFAULTSOFTWARETEMPLATESDIR (USERS_HOME_DIR "/Common/Igniters/Services")
+    #define DEFAULTUSERIGNITERSDIR "/Igniters/Services"
     #define DEFAULT_SYSTEM_DOMAIN "localhost"
     #define DEFAULT_SYSTEM_ADDRESS "127.0.0.1"
     #define DEFAULT_USER_DOMAIN_FILE ".domain"

@@ -229,8 +229,8 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
 
 QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
     QString ccont = content;
-    QString userServiceRoot = QString(USERS_HOME_DIR) + QString::number(uid) + "/Apps/" + softwareName + "/";
-    QString serviceRoot = QString(SOFTWARE_DIR) + softwareName + "/"; // low prio
+    QString userServiceRoot = QString(USERS_HOME_DIR) + "/" + QString::number(uid) + "/Apps/" + softwareName;
+    QString serviceRoot = QString(SOFTWARE_DIR) + "/" + softwareName; // low prio
 
     if (name == QString("Default")) {
         cout << "No specials in Default file." << endl;
@@ -259,7 +259,7 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
         serviceRootFile.close();
 
         /* Replace SERVICE_PREFIX */
-        QString prefixDir = QString(USERS_HOME_DIR) + QString::number(uid) + QString(SOFTWARE_DATA_DIR) + name;
+        QString prefixDir = QString(USERS_HOME_DIR) + "/" + QString::number(uid) + QString(SOFTWARE_DATA_DIR) + "/" + name;
         ccont = ccont.replace("SERVICE_PREFIX", prefixDir);
 
         /* Replace SERVICE_DOMAIN */

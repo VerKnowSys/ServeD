@@ -5,6 +5,7 @@
 #include "../jsoncpp/json/json.h"
 #include "../service_spawner/config_loader.h"
 #include "../service_spawner/service_config.h"
+#include "../service_spawner/utils.h"
 
 #include <QObject>
 #include <QtTest/QtTest>
@@ -19,6 +20,7 @@ class TestLibrary: public QObject {
             void TestFreePortFunctionality();
             void TestJSONParse();
             void TestMemoryAllocations();
+            void testUtils();
 
 
 };
