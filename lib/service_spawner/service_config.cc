@@ -19,7 +19,7 @@ uint registerFreeTcpPort(uint specificPort) {
     uint port = 0;
     int rand = (qrand() % 50000);
     if (specificPort == 0) {
-        qsrand(midnight.secsTo(QTime::currentTime()));
+        qsrand(midnight.msecsTo(QTime::currentTime()));
         port = 10000 + rand;
     } else
         port = specificPort;
