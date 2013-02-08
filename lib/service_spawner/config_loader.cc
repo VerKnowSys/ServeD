@@ -56,7 +56,7 @@ QString readFileContents(const QString& fileName) {
 /*
  *  Parse string contents to Json value.
  */
-Json::Value SvdConfigLoader::parseJSON(const QString& filename) {
+Json::Value parseJSON(const QString& filename) {
     Json::Reader reader; /* parse json file */
     Json::Value root;
     bool parsedSuccess = reader.parse(readFileContents(filename).toStdString(), root, false);
