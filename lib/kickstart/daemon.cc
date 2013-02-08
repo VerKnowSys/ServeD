@@ -52,7 +52,7 @@ int spawnDaemon(int nochdir, int noclose) {
 
 void execute(char **argv, int uid) {
     stringstream hd, usr;
-    hd << USERS_HOME_DIR << uid;
+    hd << USERS_HOME_DIR << "/" << uid;
     usr << uid;
     chdir(hd.str().c_str());
     setenv("HOME", hd.str().c_str(), 1);
@@ -100,7 +100,7 @@ int main(int argc, char const *argv[]) {
 
     /* Checking home directory existnace */
     struct stat st;
-    string homeDir = string(USERS_HOME_DIR) + arg; /* NOTE: /Users/$UID homedir format used here */
+    string homeDir = string(USERS_HOME_DIR) + "/" + arg; /* NOTE: /Users/$UID homedir format used here */
     if(stat(homeDir.c_str(), &st) == 0) {
         #ifdef DEVEL
             cerr << "Home directory " << homeDir << " is present" << endl;

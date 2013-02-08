@@ -31,7 +31,7 @@ void execute(char **argv, int uid, const char* env) {
         fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
 
         stringstream hd, usr;
-        hd << USERS_HOME_DIR << uid;
+        hd << USERS_HOME_DIR << "/" << uid;
         usr << uid;
         chdir(hd.str().c_str());
         setenv("HOME", hd.str().c_str(), 1);

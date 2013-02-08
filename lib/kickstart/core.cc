@@ -143,7 +143,7 @@ const static string coreDir = currentDir();
             cerr << "Spawning boot svd in dir: " << currentDir() << endl;
         } else {
             userSpawn = true;
-            string homeDir = string(USERS_HOME_DIR) + params.svdArg;
+            string homeDir = string(USERS_HOME_DIR) + "/" + params.svdArg;
             cerr << "Spawning user svd in home dir: " << homeDir << endl;
             chdir(homeDir.c_str());
         }

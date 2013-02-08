@@ -47,21 +47,21 @@ int main(int argc, char const *argv[]) {
     execParams params;
     if (argc == 1) {
         params.svdArg = "0"; /* NOTE: root will always has uid 0 */
-        homeDir = CORE_HOMEDIR;
+        homeDir = SYSTEMUSERS_HOME_DIR;
         #ifdef DEVEL
             cerr << "Spawning ServeD Core" << endl;
             cerr << "HomeDir: " << homeDir << " and argument: " << params.svdArg << endl;
-            string log = homeDir + CORE_SVD_ID + "-" + INTERNAL_LOG_FILE;
+            string log = homeDir + "/" + CORE_SVD_ID + "-" + INTERNAL_LOG_FILE;
             cerr << "Development mode. Cleaning log: " << log << endl;
             remove(log.c_str());
         #endif
     } else {
         params.svdArg = string(argv[1]);
-        homeDir = string(USERS_HOME_DIR) + params.svdArg + "/"; /* NOTE: /Users/$UID homedir format */
+        homeDir = string(USERS_HOME_DIR) + "/" + params.svdArg; /* NOTE: /Users/$UID homedir format */
         #ifdef DEVEL
             cerr << "Spawning ServeD Controller for UID: " << params.svdArg << endl;
             cerr << "HomeDir: " << homeDir << " and argument: " << params.svdArg << endl;
-            string log = homeDir + params.svdArg + "-" + INTERNAL_LOG_FILE;
+            string log = homeDir + "/" + params.svdArg + "-" + INTERNAL_LOG_FILE;
             cerr << "Development mode. Cleaning log: " << log << endl;
             remove(log.c_str());
         #endif
@@ -79,7 +79,7 @@ int main(int argc, char const *argv[]) {
 
     pid_t pid;
     uid_t uid = atoi(params.svdArg.c_str());
-    string lockName = homeDir + params.svdArg + ".pid";
+    string lockName = homeDir + "/" + params.svdArg + ".pid";
     ifstream ifs(lockName.c_str(), ios::in);
     ifs >> pid;
     ifs.close();

@@ -49,7 +49,7 @@ protected:
         if (uid == 0)
             hd << SYSTEMUSERS_HOME_DIR;
         else
-            hd << USERS_HOME_DIR << uid;
+            hd << USERS_HOME_DIR << "/" << uid;
 
         usr << uid;
 
