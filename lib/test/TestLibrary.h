@@ -10,7 +10,7 @@
 #include <QtTest/QtTest>
 
 
-class TestJsonLibrary: public QObject {
+class TestLibrary: public QObject {
     Q_OBJECT
 
         private slots:
@@ -18,11 +18,12 @@ class TestJsonLibrary: public QObject {
             void testParseJSONRedis();
             void TestFreePortFunctionality();
             void TestJSONParse();
+            void TestMemoryAllocations();
 
 
 };
 
-QTEST_APPLESS_MAIN(TestJsonLibrary)
-#include "moc_TestJsonLibrary.cpp"
+QTEST_APPLESS_MAIN(TestLibrary)
+#include "moc_TestLibrary.cpp"
 
 #endif

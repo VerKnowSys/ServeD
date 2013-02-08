@@ -7,7 +7,7 @@ TARGET = ../../test
 DEPENDPATH += .
 INCLUDEPATH += .
 
-HEADERS += TestJsonLibrary.h \
+HEADERS += TestLibrary.h \
            ../jsoncpp/json/json.h \
            ../service_spawner/config_loader.h \
            ../globals/globals.h \
@@ -17,4 +17,4 @@ SOURCES += ../service_spawner/config_loader.cc \
            ../jsoncpp/json_reader.cpp \
            ../jsoncpp/json_writer.cpp \
            ../jsoncpp/json_value.cpp \
-           TestJsonLibrary.cc
+           TestLibrary.cc

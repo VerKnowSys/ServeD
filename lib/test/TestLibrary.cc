@@ -1,4 +1,4 @@
-#include "TestJsonLibrary.h"
+#include "TestLibrary.h"
 
 
 /* test utilities */
@@ -14,7 +14,7 @@ void writeSampleOf(const char* sample, const char* file) {
 
 /* test functions */
 
-void TestJsonLibrary::testParseJSONRedis() {
+void TestLibrary::testParseJSONRedis() {
     SvdServiceConfig *config = new SvdServiceConfig("Redis"); /* Load app specific values */
     QCOMPARE(config->name, QString("Redis"));
     QCOMPARE(config->softwareName, QString("Redis"));
@@ -45,13 +45,13 @@ void TestJsonLibrary::testParseJSONRedis() {
 }
 
 
-void TestJsonLibrary::testParseDefault() {
+void TestLibrary::testParseDefault() {
     SvdServiceConfig *config = new SvdServiceConfig(); /* Load default values */
     QCOMPARE(config->staticPort, -1);
 }
 
 
-void TestJsonLibrary::TestFreePortFunctionality() {
+void TestLibrary::TestFreePortFunctionality() {
     uint port = registerFreeTcpPort();
     QVERIFY(port != 0);
     cout << "Port: " << port << endl;
@@ -66,7 +66,7 @@ void TestJsonLibrary::TestFreePortFunctionality() {
 }
 
 
-void TestJsonLibrary::TestJSONParse() {
+void TestLibrary::TestJSONParse() {
     const char* fileName = "/tmp/test-file-TestJSONParse.json";
     QString value = "";
     int valueInt = -1;
@@ -95,5 +95,17 @@ void TestJsonLibrary::TestJSONParse() {
     }
 
     file.deleteLater();
+}
+
+
+void TestLibrary::TestMemoryAllocations() {
+    uint amount = 30; // s
+    cout << "Beginning " << 30 << " seconds of allocation test.";
+    for (int i = 0; i < amount; ++i) {
+        SvdServiceConfig *config = new SvdServiceConfig("Redis"); /* Load app specific values */
+        usleep(1000000); // 1s
+        delete config;
+    }
+    QVERIFY(true);
 }
 
