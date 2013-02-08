@@ -43,7 +43,10 @@ class SvdServiceConfig : QObject {
         SvdServiceConfig(); /* Load default values */
         SvdServiceConfig(const QString& serviceName);
 
-    // private:
+        QString replaceAllSpecialsIn(const QString& content);
+
+        uint uid; // user uid who loads igniter config
+
         QString name, softwareName;
         bool autoRestart, autoStart, reportAllErrors, reportAllInfos, reportAllDebugs, watchPort;
         int staticPort;

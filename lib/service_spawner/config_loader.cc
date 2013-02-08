@@ -15,9 +15,9 @@
  * Uses igniters to read service data from it and returns prepared object of Service
  */
 SvdConfigLoader::SvdConfigLoader() {
-    uid = getuid();
-    name = QString("Default");
-    config = loadDefaultIgniter(); // load app specific igniter data
+    this->name = QString("Default");
+    this->uid = getuid();
+    this->config = loadDefaultIgniter(); // load app specific igniter data
 }
 
 
@@ -25,51 +25,10 @@ SvdConfigLoader::SvdConfigLoader() {
  * Service config loader.
  * Uses igniters to read service data from it and returns prepared object of Service
  */
-SvdConfigLoader::SvdConfigLoader(const QString& preName) {
-    uid = getuid();
-    name = preName;
-    config = loadIgniter(); // load app specific igniter data
-}
-
-
-QString SvdConfigLoader::replaceAllSpecialsIn(const QString& content) {
-
-    cout << "Given content: " << content.toStdString() << endl;
-
-    // SERVICE_ROOT => obvious (one of two: /Software/Service by default or $HOME/Apps/Service)
-    // SERVICE_PREFIX => obvious: $HOME/SoftwareData/Service
-    // SERVICE_DOMAIN => read $HOME/SoftwareData/Service/.domain
-    // SERVICE_ADDRESS => to resolved IP of SERVICE_DOMAIN
-
-    // const QString preContent = content;
-    QString ccont = content;
-    QString userServiceRoot = QString(USERS_HOME_DIR) + QString::number(uid) + "/Apps/" + name + "/";
-    QString serviceRoot = QString(SOFTWARE_DIR) + name + "/"; // low prio
-
-    if (name == QString("Default")) {
-        cout << "No specials in Default file." << endl;
-        return content;
-    } else {
-        // QString serviceRoot = userServiceRoot; // prio 1
-        QFile userServiceRootFile(userServiceRoot);
-        if (userServiceRootFile.exists()) {
-            cout << "User service root found in: " << userServiceRoot.toStdString() << endl;
-            ccont.replace("SERVICE_ROOT", userServiceRoot);
-        } else {
-            cout << "Not found user service root of " << name.toStdString() << " " << userServiceRoot.toStdString() << endl;
-        }
-
-        QFile serviceRootFile(serviceRoot);
-        if ((serviceRootFile.exists())) {
-            cout << "Service root found in: " << serviceRoot.toStdString() << endl;
-            ccont.replace("SERVICE_ROOT", serviceRoot);
-        } else {
-             cout << "Not found root service of " << name.toStdString() << " " << serviceRoot.toStdString() << endl;
-             return "";
-             // exit(NO_SUCH_FILE_ERROR);
-        }
-        return ccont;
-    }
+SvdConfigLoader::SvdConfigLoader(QString preName) {
+    this->name = preName;
+    this->uid = getuid();
+    this->config = loadIgniter(); // load app specific igniter data
 }
 
 
@@ -90,7 +49,7 @@ QString SvdConfigLoader::readFileContents(const QString& fileName) {
         cerr << "Error reading file:" << fileName.toStdString() << endl;
         exit(NO_SUCH_FILE_ERROR);
     }
-    return replaceAllSpecialsIn(lines);
+    return lines;
 }
 
 

@@ -17,6 +17,7 @@ SvdSchedulerAction::SvdSchedulerAction(const QString& initialCronEntry, const QS
 
 
 SvdServiceConfig::SvdServiceConfig() { /* Load default values */
+    uid = getuid();
     try {
         Json::Value defaults = (new SvdConfigLoader())->config;
         name = "Default";
@@ -83,6 +84,7 @@ SvdServiceConfig::SvdServiceConfig() { /* Load default values */
 
 
 SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
+    uid = getuid();
     try {
         Json::Value defaults = (new SvdConfigLoader())->config;
         Json::Value root = (new SvdConfigLoader(serviceName))->config; // NOTE: the question is.. how will this behave ;]
@@ -109,36 +111,36 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
 
         /* laod service hooks */
         install = new SvdShellOperations(
-            root["install"].get("commands", defaults["install"]["commands"]).asString().c_str(),
-            root["install"].get("expectOutput", defaults["install"]["expectOutput"]).asString().c_str());
+            replaceAllSpecialsIn(root["install"].get("commands", defaults["install"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn(root["install"].get("expectOutput", defaults["install"]["expectOutput"]).asString().c_str()));
 
         configure = new SvdShellOperations(
-            root["configure"].get("commands", defaults["configure"]["commands"]).asString().c_str(),
-            root["configure"].get("expectOutput", defaults["configure"]["expectOutput"]).asString().c_str());
+            replaceAllSpecialsIn(root["configure"].get("commands", defaults["configure"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn(root["configure"].get("expectOutput", defaults["configure"]["expectOutput"]).asString().c_str()));
 
         start = new SvdShellOperations(
-            root["start"].get("commands", defaults["start"]["commands"]).asString().c_str(),
-            root["start"].get("expectOutput", defaults["start"]["expectOutput"]).asString().c_str());
+            replaceAllSpecialsIn(root["start"].get("commands", defaults["start"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn(root["start"].get("expectOutput", defaults["start"]["expectOutput"]).asString().c_str()));
 
         afterStart = new SvdShellOperations(
-            root["afterStart"].get("commands", defaults["afterStart"]["commands"]).asString().c_str(),
-            root["afterStart"].get("expectOutput", defaults["afterStart"]["expectOutput"]).asString().c_str());
+            replaceAllSpecialsIn(root["afterStart"].get("commands", defaults["afterStart"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn(root["afterStart"].get("expectOutput", defaults["afterStart"]["expectOutput"]).asString().c_str()));
 
         stop = new SvdShellOperations(
-            root["stop"].get("commands", defaults["stop"]["commands"]).asString().c_str(),
-            root["stop"].get("expectOutput", defaults["stop"]["expectOutput"]).asString().c_str());
+            replaceAllSpecialsIn(root["stop"].get("commands", defaults["stop"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn(root["stop"].get("expectOutput", defaults["stop"]["expectOutput"]).asString().c_str()));
 
         afterStop = new SvdShellOperations(
-            root["afterStop"].get("commands", defaults["afterStop"]["commands"]).asString().c_str(),
-            root["afterStop"].get("expectOutput", defaults["afterStop"]["expectOutput"]).asString().c_str());
+            replaceAllSpecialsIn(root["afterStop"].get("commands", defaults["afterStop"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn(root["afterStop"].get("expectOutput", defaults["afterStop"]["expectOutput"]).asString().c_str()));
 
         reload = new SvdShellOperations(
-            root["reload"].get("commands", defaults["reload"]["commands"]).asString().c_str(),
-            root["reload"].get("expectOutput", defaults["reload"]["expectOutput"]).asString().c_str());
+            replaceAllSpecialsIn(root["reload"].get("commands", defaults["reload"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn(root["reload"].get("expectOutput", defaults["reload"]["expectOutput"]).asString().c_str()));
 
         validate = new SvdShellOperations(
-            root["validate"].get("commands", defaults["validate"]["commands"]).asString().c_str(),
-            root["validate"].get("expectOutput", defaults["validate"]["expectOutput"]).asString().c_str());
+            replaceAllSpecialsIn(root["validate"].get("commands", defaults["validate"]["commands"]).asString().c_str()),
+            replaceAllSpecialsIn(root["validate"].get("expectOutput", defaults["validate"]["expectOutput"]).asString().c_str()));
 
 
     } catch (std::exception &e) {
@@ -148,7 +150,59 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
         cerr << "Exception !" << endl;
         exit(OTHER_EXCEPTION_ERROR);
     }
+}
 
+
+QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
+    QString ccont = content;
+    QString userServiceRoot = QString(USERS_HOME_DIR) + QString::number(uid) + "/Apps/" + softwareName + "/";
+    QString serviceRoot = QString(SOFTWARE_DIR) + softwareName + "/"; // low prio
+
+    if (name == QString("Default")) {
+        cout << "No specials in Default file." << endl;
+        return ccont;
+    } else {
+
+        /* Replace SERVICE_ROOT */
+        QFile userServiceRootFile(userServiceRoot);
+        if (userServiceRootFile.exists()) {
+            // cout << "User service root found in: " << userServiceRoot.toStdString() << endl;
+            ccont = ccont.replace("SERVICE_ROOT", userServiceRoot);
+        } else {
+            // cout << "Not found user service root of " << name.toStdString() << " " << userServiceRoot.toStdString() << endl;
+        }
+        QFile serviceRootFile(serviceRoot);
+        if ((serviceRootFile.exists())) {
+            // cout << "Service root found in: " << serviceRoot.toStdString() << endl;
+            ccont = ccont.replace("SERVICE_ROOT", serviceRoot);
+        } else {
+             cerr << "Not found root service of " << name.toStdString() << " " << serviceRoot.toStdString() << endl;
+             return "";
+             // exit(NO_SUCH_FILE_ERROR);
+        }
+
+        /* Replace SERVICE_PREFIX */
+        QString prefixDir = QString(USERS_HOME_DIR) + QString::number(uid) + QString(SOFTWARE_DATA_DIR) + name;
+        ccont = ccont.replace("SERVICE_PREFIX", prefixDir);
+
+    // TODO: SERVICE_DOMAIN => read $HOME/SoftwareData/Service/.domain
+        /* Replace SERVICE_DOMAIN */
+        QString domain = "localhost";
+        ccont = ccont.replace("SERVICE_DOMAIN", domain);
+
+    // TODO: SERVICE_ADDRESS => to resolved IP of SERVICE_DOMAIN
+        /* Replace SERVICE_ADDRESS */
+        QString address = "127.0.0.1";
+        ccont = ccont.replace("SERVICE_ADDRESS", address);
+
+    // TODO: SERVICE_PORT => to poer from .service_ports
+        /* Replace SERVICE_PORT */
+        QString port = QString::number(12345);
+        ccont = ccont.replace("SERVICE_PORT", port);
+
+        cerr << "DEBUG: Given content: " << ccont.toStdString() << endl;
+        return ccont;
+    }
 }
 
 

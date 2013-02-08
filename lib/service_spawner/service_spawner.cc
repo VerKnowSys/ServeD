@@ -130,7 +130,8 @@ int main(int argc, char *argv[]) {
     QList<int> userIdsToWatch;
     QList<UserWatcher *> watchers;
 
-    SvdServiceConfig *config = new SvdServiceConfig("Redis");
+    SvdServiceConfig *config = new SvdServiceConfig("RedisDrugi");
+    cout << "Igniter name element: " << config->name.toStdString() << endl;
     cout << "Igniter softwareName element: " << config->softwareName.toStdString() << endl;
     cout << "Igniter install element: " << config->install->commands.toStdString() << endl;
     cout << "Igniter start element: " << config->start->commands.toStdString() << endl;
@@ -141,6 +142,7 @@ int main(int argc, char *argv[]) {
     cout << "Igniter schedulerActions element: " << config->schedulerActions.first() << endl;
 
     SvdServiceConfig *config2 = new SvdServiceConfig("Nginx");
+    cout << "Igniter2 name element: " << config2->name.toStdString() << endl;
     cout << "Igniter2 softwareName element: " << config2->softwareName.toStdString() << endl;
     cout << "Igniter2 install element: " << config2->install->commands.toStdString() << endl;
     cout << "Igniter2 start element: " << config2->start->commands.toStdString() << endl;
