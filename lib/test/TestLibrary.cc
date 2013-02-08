@@ -100,11 +100,11 @@ void TestLibrary::TestJSONParse() {
 
 
 void TestLibrary::TestMemoryAllocations() {
-    uint amount = 500;
+    uint amount = 50;
     cout << "Beginning " << amount << " seconds of allocation test.";
     for (int i = 0; i < amount; ++i) {
         SvdServiceConfig *config = new SvdServiceConfig("Redis"); /* Load app specific values */
-        usleep(1000000/100); // 0.01s
+        usleep(1000000/10); // 0.01s
         delete config;
     }
     QVERIFY(true);
