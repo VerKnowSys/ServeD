@@ -13,6 +13,12 @@
 #include <QtCore>
 
 
+/*
+    TODO:
+    * Split classes into seperate files.
+*/
+
+
 class SandboxProcess: public QProcess {
 
 public:
@@ -82,18 +88,18 @@ class SvdEventFiles {
 
 public:
     QString spawnPath;
-    QString stopPath;
+    QString terminatePath;
     QString spawnedPath;
     QFile spawnFile;
-    QFile stopFile;
+    QFile terminateFile;
     QFile spawnedFile;
 
-    SvdEventFiles(const QString & path, const QString & name, const QString & prefix = ".") {
-        spawnPath   = path + "/" + prefix + "spawn_" + name;
-        stopPath    = path + "/" + prefix + "stop_" + name;
-        spawnedPath = path + "/" + prefix + "spawned_" + name;
+    SvdEventFiles(const QString & path) {
+        spawnPath     = path + "/.spawn";
+        terminatePath = path + "/.terminate";
+        spawnedPath   = path + "/.spawned";
         spawnFile.setFileName(spawnPath);
-        stopFile.setFileName(stopPath);
+        terminateFile.setFileName(terminatePath);
         spawnedFile.setFileName(spawnedPath);
     }
 
@@ -126,35 +132,50 @@ public:
 };
 
 
-void setHomeDir(int uid, QString & homeDir) {
-    if (uid == 0)
+void setHomeDir(QString & homeDir) {
+    if (getuid() == 0)
         homeDir = QString::fromStdString(SYSTEMUSERS_HOME_DIR);
     else
-        homeDir = QString::fromStdString(USERS_HOME_DIR) + QString::number(uid);
+        homeDir = QString::fromStdString(USERS_HOME_DIR) + QString::number(getuid());
 }
 
 
-class SvdUserWatcher: public QObject
+void setSoftwareDataDir(QString & softwareDataDir) {
+    QString homeDir;
+    setHomeDir(homeDir);
+    softwareDataDir = homeDir + QString::fromStdString(SOFTWARE_DATA_DIR);
+}
+
+
+void setServiceDataDir(QString & serviceDataDir, const QString & name) {
+    QString softwareDataDir;
+    setSoftwareDataDir(softwareDataDir);
+    serviceDataDir = softwareDataDir + name;
+}
+
+
+class SvdServiceWatcher: public QObject
 {
     Q_OBJECT
 
 
 public:
-    SvdUserWatcher(int uid) {
-        qDebug() << "Starting SvdUserWatcher for uid:" << uid;
+    SvdServiceWatcher(const QString & name) {
+        qDebug() << "Starting SvdServiceWatcher for service:" << name;
 
-        setHomeDir(uid, homeDir);
-        this->uid = uid;
+        setServiceDataDir(dataDir, name);
 
         loop = new QEventLoop();
 
-        cleanupEventFiles();
+        config = new SvdServiceConfig(name);
 
         fileWatcher = new SvdEventFilesWatcher;
-        fileWatcher->registerFile(homeDir);
+        fileWatcher->registerFile(dataDir);
 
-        /* Check for event files at startup */
-        dirChangedSlot(homeDir);
+        eventFiles = new SvdEventFiles(dataDir);
+
+        /* Not sure if necessary */
+        cleanupEventFiles();
 
         connect(fileWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(dirChangedSlot(QString)));
         connect(fileWatcher, SIGNAL(fileChanged(QString)), this, SLOT(fileChangedSlot(QString)));
@@ -163,123 +184,97 @@ public:
     }
 
 private:
-    int uid;
-    QString homeDir;
     QEventLoop *loop;
+    SvdServiceConfig *config;
     SvdEventFilesWatcher *fileWatcher;
+    SvdEventFiles *eventFiles;
     QList<SandboxProcess *> spawnedServices;
+    QString dataDir;
 
     void cleanupEventFiles() {
-        SvdEventFiles userPanel(homeDir, "user_panel");
-        userPanel.stopFile.remove();
-        userPanel.spawnedFile.remove();
+        eventFiles->terminateFile.remove();
+        eventFiles->spawnedFile.remove();
     }
 
 
 signals:
-    void spawnUserPanel(int uid);
-    void stopUserPanel(int uid);
-    void spawnedUserPanel(int uid);
-    void stoppedUserPanel(int uid);
+    void spawnService(const SvdServiceConfig & config);
+    void terminateService(const SvdServiceConfig & config);
+    void spawnedService(const SvdServiceConfig & config);
+    void terminatedService(const SvdServiceConfig & config);
 
 
 public slots:
-    void dirChangedSlot(const QString& str) {
-        QFile file;
+    void dirChangedSlot(const QString & dir) {
+        // qDebug() << "Directory changed:" << dir;
 
-        if (str.compare(homeDir) == 0) {
-            SvdEventFiles userPanel(homeDir, "user_panel");
-
-            if (userPanel.spawnFile.exists()) {
-                userPanel.spawnFile.remove();
-                if (userPanel.spawnedFile.exists())
-                    qDebug() << "Interrupted emission of spawnUserPanel signal. User panel is already running for uid:" << uid;
-                else {
-                    qDebug() << "Emitting spawnUserPanel signal for uid:" << uid;
-                    emit spawnUserPanel(uid);
-                }
-                return;
+        if (eventFiles->spawnFile.exists()) {
+            eventFiles->spawnFile.remove();
+            if (eventFiles->spawnedFile.exists())
+                qDebug() << "Interrupted emission of spawnService(" << config->name << ") signal. Service is already running.";
+            else {
+                qDebug() << "Emitting spawnService(" << config->name << ") signal.";
+                emit spawnService(*config);
             }
+            return;
+        }
 
-            if (userPanel.stopFile.exists()) {
-                userPanel.stopFile.remove();
-                if (userPanel.spawnedFile.exists()) {
-                    qDebug() << "Emitting stopUserPanel signal for uid:" << uid;
-                    emit stopUserPanel(uid);
-                } else
-                    qDebug() << "Interrupted emission of stopUserPanel signal. User panel is not running for uid:" << uid;
-                return;
-            }
+        if (eventFiles->terminateFile.exists()) {
+            eventFiles->terminateFile.remove();
+            if (eventFiles->spawnedFile.exists()) {
+                qDebug() << "Emitting terminateService(" << config->name << ") signal.";
+                emit terminateService(*config);
+            } else
+                qDebug() << "Interrupted emission of terminateService(" << config->name << ") signal. Service is not running.";
+            return;
+        }
 
-            if (userPanel.spawnedFile.exists() && not fileWatcher->isWatchingFile(userPanel.spawnedPath)) {
-                qDebug() << "Emitting spawnedUserPanel signal for uid:" << uid;
-                fileWatcher->registerFile(userPanel.spawnedPath);
-                emit spawnedUserPanel(uid);
-                return;
-            }
+        if (eventFiles->spawnedFile.exists() && not fileWatcher->isWatchingFile(eventFiles->spawnedPath)) {
+            qDebug() << "Emitting spawnedService(" << config->name << ") signal.";
+            fileWatcher->registerFile(eventFiles->spawnedPath);
+            emit spawnedService(*config);
+            return;
         }
     }
 
 
-    void fileChangedSlot(const QString& str) {
-        qDebug() << "File changed:" << str;
+    void fileChangedSlot(const QString & file) {
+        qDebug() << "File changed:" << file;
 
-        SvdEventFiles userPanel(homeDir, "user_panel");
-
-        if (str.compare(userPanel.spawnedPath) == 0 && not userPanel.spawnedFile.exists()) {
-            qDebug() << "Emitting stoppedUserPanel signal for uid:" << uid;
-            emit stoppedUserPanel(uid);
+        if (file.compare(eventFiles->spawnedPath) == 0 && not eventFiles->spawnedFile.exists()) {
+            qDebug() << "Emitting terminatedService(" << config->name << ") signal.";
+            emit terminatedService(*config);
         }
     }
 };
 
 
-void spawnSvdUserWatcher(int uid) {
-    SvdUserWatcher userWatcher(uid);
+void spawnSvdServiceWatcher(const QString & name) {
+    SvdServiceWatcher serviceWatcher(name);
 }
 
 
 int main(int argc, char *argv[]) {
 
     QCoreApplication app(argc, argv);
-    QList<int> userIdsToWatch;
     QFutureWatcher<void> watcher;
+    QString softwareDataDir;
+    QStringList services;
 
-
-    SvdServiceConfig *config = new SvdServiceConfig("RedisDrugi");
-    cout << "Igniter name element: " << config->name.toStdString() << endl;
-    cout << "Igniter softwareName element: " << config->softwareName.toStdString() << endl;
-    cout << "Igniter install element: " << config->install->commands.toStdString() << endl;
-    cout << "Igniter start element: " << config->start->commands.toStdString() << endl;
-    cout << "Igniter stop element: " << config->stop->commands.toStdString() << endl;
-    cout << "Igniter autoStart element: " << config->autoStart << endl;
-    cout << "Igniter staticPort element: " << config->staticPort << endl;
-    cout << "Igniter watchPort element: " << config->watchPort << endl;
-    cout << "Igniter schedulerActions element: " << config->schedulerActions.first() << endl;
-
-    SvdServiceConfig *config2 = new SvdServiceConfig("Nginx");
-    cout << "Igniter2 name element: " << config2->name.toStdString() << endl;
-    cout << "Igniter2 softwareName element: " << config2->softwareName.toStdString() << endl;
-    cout << "Igniter2 install element: " << config2->install->commands.toStdString() << endl;
-    cout << "Igniter2 start element: " << config2->start->commands.toStdString() << endl;
-    cout << "Igniter2 stop element: " << config2->stop->commands.toStdString() << endl;
-    cout << "Igniter2 autoStart element: " << config2->autoStart << endl;
-    cout << "Igniter2 staticPort element: " << config2->staticPort << endl;
-    cout << "Igniter2 watchPort element: " << config2->watchPort << endl;
-    cout << "Igniter2 schedulerActions element: " << config2->schedulerActions.first() << endl;
-
-    cout << "Quitting!" << endl;
-    exit(0);
-
-
+    // XXX
     QFile file("/SystemUsers/service_spawner.log");
     file.remove();
 
-    // XXX
-    userIdsToWatch << 500 << 501 << 1000;
+    setSoftwareDataDir(softwareDataDir);
+
+    qDebug() << "Looking for services inside" << softwareDataDir;
+    services = QDir(softwareDataDir).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+
+    Q_FOREACH(QString name, services)
+        qDebug() << "Found" << name << "service.";
 
 
-    QFuture<void> result = QtConcurrent::map(userIdsToWatch, spawnSvdUserWatcher);
+    QFuture<void> result = QtConcurrent::map(services, spawnSvdServiceWatcher);
     watcher.setFuture(result);
 
     return app.exec();
