@@ -22,12 +22,19 @@ class SvdConfigLoader : QObject {
     Q_OBJECT
 
     public:
-        Json::Value serviceDataLoad(const QString& name, uint uid);
-        Json::Value defaultIgniterDataLoad();
+        Json::Value config; // Igniter config
+        QString name; // Igniter name
+        uint uid; // user uid who loads igniter config
+        SvdConfigLoader(); // this will load Default igniter
+        SvdConfigLoader(const QString& preName); // this will set uid and name automatically
 
-        Json::Value loadIgniter(const QString& name, uint uid);
+        // Json::Value serviceDataLoad(); // built into constructor
+        Json::Value loadDefaultIgniter();
+        Json::Value loadIgniter();
+
         Json::Value parseJSON(const QString& filename);
         QString readFileContents(const QString& fileName);
+        QString replaceAllSpecialsIn(const QString& content);
 
 };
 
