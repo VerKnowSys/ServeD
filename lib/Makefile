@@ -17,7 +17,6 @@ prepare:
 	cd cutelogger; $(QMAKE) $(QMAKE_OPTS) CuteLogger.pro ; cd ..
 	cd service_spawner; $(QMAKE) $(QMAKE_OPTS) service_spawner.pro ; cd ..
 	cd test; $(QMAKE) $(QMAKE_OPTS) test.pro ; cd ..
-	cd cutelogger; $(QMAKE) $(QMAKE_OPTS) CuteLogger.pro ; cd ..
 
 
 clean:
