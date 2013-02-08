@@ -276,7 +276,9 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
             ccont = ccont.replace("SERVICE_PORT", QString::number(registerFreeTcpPort())); /* this shouldn't happen */
         }
 
-        cerr << "DEBUG: Given content: " << ccont.toStdString() << endl;
+        #ifdef DEBUG
+            cerr << "DEBUG: Given content: " << ccont.toStdString() << endl;
+        #endif
         return ccont;
     }
 }
@@ -293,9 +295,3 @@ SvdShellOperations::SvdShellOperations(const QString& initialCommand, const QStr
     commands += initialCommand;
     expectOutput += initialExpectOutput;
 }
-
-
-// SvdShellOperations::SvdShellOperations(QList<QString> *initialCommands, QList<QString> *initialExpectOutput) {
-//     commands = initialCommands;
-//     expectOutput = initialExpectOutput;
-// }

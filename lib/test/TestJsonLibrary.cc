@@ -20,6 +20,8 @@ void TestJsonLibrary::testParseJSONRedis() {
     QCOMPARE(config->softwareName, QString("Redis"));
     QCOMPARE(config->staticPort, -1);
 
+    QCOMPARE(config->uid, getuid());
+
     /* verify replaceAllIn result, should not contain SERVICE_PORT, SERVICE_DOMAIN, SERVICE_ROOT, SERVICE_ADDRESS */
     QVERIFY(!config->install->commands.contains("SERVICE_PORT"));
     QVERIFY(!config->start->commands.contains("SERVICE_PORT"));
