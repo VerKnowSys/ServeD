@@ -18,8 +18,8 @@ SvdSchedulerAction::SvdSchedulerAction(const QString& initialCronEntry, const QS
 
 SvdServiceConfig::SvdServiceConfig() { /* Load default values */
     try {
-        Json::Value defaults = (new SvdConfigLoader())->defaultIgniterDataLoad();
-        name = "Defaults";
+        Json::Value defaults = (new SvdConfigLoader())->config;
+        name = "Default";
         softwareName = defaults["softwareName"].asString().c_str();
         autoRestart = defaults["autoRestart"].asBool();
         autoStart = defaults["autoStart"].asBool();
@@ -84,8 +84,8 @@ SvdServiceConfig::SvdServiceConfig() { /* Load default values */
 
 SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
     try {
-        Json::Value defaults = (new SvdConfigLoader())->defaultIgniterDataLoad();
-        Json::Value root = (new SvdConfigLoader())->serviceDataLoad(serviceName, getuid()); // NOTE: the question is.. how will this behave ;]
+        Json::Value defaults = (new SvdConfigLoader())->config;
+        Json::Value root = (new SvdConfigLoader(serviceName))->config; // NOTE: the question is.. how will this behave ;]
 
         name = serviceName;
         softwareName = root.get("softwareName", defaults["softwareName"]).asString().c_str();
