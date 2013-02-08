@@ -47,7 +47,7 @@ Json::Value* SvdConfigLoader::loadDefaultIgniter() {
     QFile defaultIgniter(defaultTemplateFile); /* try loading root igniter as second */
     if(!defaultIgniter.open(QIODevice::ReadOnly)) { /* check file access */
         #ifdef DEBUG
-            cerr << "No file: " << defaultTemplateFile.toStdString() << endl;
+            qDebug() << "No file: " << defaultTemplateFile << endl;
         #endif
         // exit(NO_DEFAULT_IGNITERS_FOUND_ERROR);
     } else {
@@ -69,9 +69,7 @@ Json::Value* SvdConfigLoader::loadIgniter() {
     QFile fileUser(userIgniter); /* try loading user igniter as first */
     QFile fileRoot(rootIgniter); /* try loading root igniter as second */
     if(!fileUser.open(QIODevice::ReadOnly)) { /* check file access */
-        #ifdef DEBUG
-            cerr << "No file: " << userIgniter.toStdString() << endl;
-        #endif
+        qDebug() << "No file: " << userIgniter << endl;
     } else {
         fileRoot.close();
         fileUser.close();
@@ -81,12 +79,9 @@ Json::Value* SvdConfigLoader::loadIgniter() {
     fileUser.close();
 
     if(!fileRoot.open(QIODevice::ReadOnly)) {
-        #ifdef DEBUG
-            cerr << "No file: " << rootIgniter.toStdString() << endl;
-        #endif
-        // exit(NO_SUCH_FILE_ERROR);
+        qDebug() << "No file: " << rootIgniter << endl;
         fileRoot.close();
-        result = new Json::Value();
+        result = new Json::Value(); // when returning "empty json" it basically means loading Default.json
         return result;
     }
 

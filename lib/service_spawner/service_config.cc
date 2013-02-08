@@ -66,10 +66,10 @@ SvdServiceConfig::SvdServiceConfig() { /* Load default values */
         delete defaults;
 
     } catch (std::exception &e) {
-        cerr << "Thrown Exception: " << e.what() << " in Default service." << endl;
+        qDebug() << "Thrown Exception: " << e.what() << " in Default service." << endl;
         exit(JSON_FORMAT_EXCEPTION_ERROR);
     } catch (...) {
-        cerr << "Exception !" << endl;
+        qDebug() << "Exception !" << endl;
         exit(OTHER_EXCEPTION_ERROR);
     }
 }
@@ -122,10 +122,10 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
         //                 jarray.get("shellCommands", "true").toStyledString().c_str() // HACK
         //             ));
         //     } catch (std::exception &e) {
-        //         cerr << "Exception" << endl;
+        //         qDebug() << "Exception" << endl;
         //     }
         //     #ifdef DEBUG
-        //         cerr << "Defined scheduler action" << endl;
+        //         qDebug() << "Defined scheduler action" << endl;
         //     #endif
         // }
 
@@ -166,10 +166,10 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
         delete root;
 
     } catch (std::exception &e) {
-        cerr << "Thrown Exception: " << e.what() << " in " << serviceName.toStdString() << " service." << endl;
+        qDebug() << "Thrown Exception: " << e.what() << " in " << serviceName << " service." << endl;
         exit(JSON_FORMAT_EXCEPTION_ERROR);
     } catch (...) {
-        cerr << "Exception !" << endl;
+        qDebug() << "Exception !" << endl;
         exit(OTHER_EXCEPTION_ERROR);
     }
 }
@@ -181,28 +181,27 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
     QString serviceRoot = QString(SOFTWARE_DIR) + "/" + softwareName; // low prio
 
     if (name == QString("Default")) {
-        cout << "No specials in Default file." << endl;
+        qDebug() << "No specials in Default file." << endl;
         return ccont;
     } else {
 
         /* Replace SERVICE_ROOT */
         QFile userServiceRootFile(userServiceRoot);
         if (userServiceRootFile.exists()) {
-            // cout << "User service root found in: " << userServiceRoot.toStdString() << endl;
+            qDebug() << "User service root found in: " << userServiceRoot << endl;
             ccont = ccont.replace("SERVICE_ROOT", userServiceRoot);
         } else {
-            // cout << "Not found user service root of " << name.toStdString() << " " << userServiceRoot.toStdString() << endl;
+            qDebug() << "Not found user service root of " << name << " " << userServiceRoot << endl;
         }
         userServiceRootFile.close();
 
         QFile serviceRootFile(serviceRoot);
         if ((serviceRootFile.exists())) {
-            // cout << "Service root found in: " << serviceRoot.toStdString() << endl;
+            qDebug() << "Service root found in: " << serviceRoot << endl;
             ccont = ccont.replace("SERVICE_ROOT", serviceRoot);
         } else {
-             cerr << "Not found root service of " << name.toStdString() << " " << serviceRoot.toStdString() << endl;
+             qDebug() << "Not found root service of " << name << " " << serviceRoot << endl;
              return "";
-             // exit(NO_SUCH_FILE_ERROR);
         }
         serviceRootFile.close();
 
@@ -231,14 +230,14 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
             if (!info.addresses().isEmpty()) {
                 QHostAddress address = info.addresses().first();
                 userAddress = address.toString();
-                // cout << "Resolved address of domain " << userDomain.toStdString() << " is " << userAddress.toStdString() << endl;
+                // qDebug() << "Resolved address of domain " << userDomain << " is " << userAddress << endl;
                 ccont = ccont.replace("SERVICE_ADDRESS", userAddress); /* replace with user address content */
             } else {
-                cerr << "Empty domain resolve of: " << userDomain.toStdString() << endl;
+                qDebug() << "Empty domain resolve of: " << userDomain << endl;
                 ccont = ccont.replace("SERVICE_ADDRESS", address); /* replace with user address content */
             }
         } else {
-            // cerr << "Filling address with default value" << endl;
+            // qDebug() << "Filling address with default value" << endl;
             ccont = ccont.replace("SERVICE_ADDRESS", address);
         }
 
@@ -249,14 +248,12 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
             portFilePath = readFileContents(portFilePath).trimmed();
             ccont = ccont.replace("SERVICE_PORT", portFilePath); /* replace with user port content */
         } else {
-            cerr << "No port file for service " << name.toStdString() << " (software: " << softwareName.toStdString() << ")! This might be something nasty!. It happened in file: " << portFilePath.toStdString() << endl;
+            qDebug() << "No port file for service " << name << " (software: " << softwareName << ")! This might be something nasty!. It happened in file: " << portFilePath << endl;
             ccont = ccont.replace("SERVICE_PORT", QString::number(registerFreeTcpPort())); /* this shouldn't happen */
         }
         portFile.close();
 
-        #ifdef DEBUG
-            cerr << "DEBUG: Given content: " << ccont.toStdString() << endl;
-        #endif
+        // qDebug() << "Given content: " << ccont.replace("\n", " ") << endl;
         return ccont;
     }
 }

@@ -54,7 +54,7 @@ uint registerFreeTcpPort(uint specificPort) {
     #endif
     for (int j = 0; j < list.size(); j++) {
         QString hostName = list.at(j).toString();
-        // cerr << "Trying hostname: " << hostName.toStdString() << endl;
+        // qDebug() << "Trying hostname: " << hostName << endl;
         QHostInfo info = QHostInfo::fromName(hostName);
         if (!info.addresses().isEmpty()) {
             QHostAddress address = info.addresses().first();
@@ -109,8 +109,8 @@ Json::Value* parseJSON(const QString& filename) {
     Json::Value* root = new Json::Value();
     bool parsedSuccess = reader.parse(readFileContents(filename).toStdString(), *root, false);
     if (!parsedSuccess) {
-        cerr << "JSON Parse Failure of file: " << filename.toStdString() << endl;
-        exit(JSON_PARSE_ERROR);
+        qDebug() << "JSON Parse Failure of file: " << filename << endl;
+        return root;
     }
     return root; /* return user side igniter first by default */
 }
