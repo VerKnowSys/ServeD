@@ -48,10 +48,31 @@ void TestLibrary::testParseJSONRedis() {
 void TestLibrary::testParseDefault() {
     SvdServiceConfig *config = new SvdServiceConfig(); /* Load default values */
     QCOMPARE(config->staticPort, -1);
+    delete config;
 }
 
 
-void TestLibrary::TestFreePortFunctionality() {
+void TestLibrary::testMultipleConfigsLoading() {
+    SvdServiceConfig *config = new SvdServiceConfig(); /* Load default values */
+    QVERIFY(config->name == "Default");
+    QVERIFY(config->install->commands.length() == 0);
+
+    config = new SvdServiceConfig("Redis");
+    QCOMPARE(config->name, QString("Redis"));
+    QVERIFY(config->install->commands.length() > 0);
+
+    delete config;
+}
+
+
+void TestLibrary::testNonExistantConfigLoading() {
+    SvdServiceConfig *config = new SvdServiceConfig("PlewisŚmiewis");
+    QVERIFY(config->name == "PlewisŚmiewis");
+    QVERIFY(config->install->commands.length() == 0);
+}
+
+
+void TestLibrary::testFreePortFunctionality() {
     uint port = registerFreeTcpPort();
     QVERIFY(port != 0);
     cout << "Port: " << port << endl;
@@ -66,7 +87,7 @@ void TestLibrary::TestFreePortFunctionality() {
 }
 
 
-void TestLibrary::TestJSONParse() {
+void TestLibrary::testJSONParse() {
     const char* fileName = "/tmp/test-file-TestJSONParse.json";
     QString value = "";
     int valueInt = -1;
@@ -99,8 +120,8 @@ void TestLibrary::TestJSONParse() {
 }
 
 
-void TestLibrary::TestMemoryAllocations() {
-    uint amount = 50;
+void TestLibrary::testMemoryAllocations() {
+    int amount = 10;
     cout << "Beginning " << amount << " seconds of allocation test.";
     for (int i = 0; i < amount; ++i) {
         SvdServiceConfig *config = new SvdServiceConfig("Redis"); /* Load app specific values */

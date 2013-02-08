@@ -16,9 +16,11 @@ class TestLibrary: public QObject {
         private slots:
             void testParseDefault();
             void testParseJSONRedis();
-            void TestFreePortFunctionality();
-            void TestJSONParse();
-            void TestMemoryAllocations();
+            void testFreePortFunctionality();
+            void testJSONParse();
+            void testMemoryAllocations();
+            void testMultipleConfigsLoading();
+            void testNonExistantConfigLoading();
             void testUtils();
 
 

@@ -14,9 +14,9 @@
 #include <iostream>
 #include <fstream>
 
-#include <QObject>
-#include <QString>
+#include <QtCore>
 #include <QTime>
+#include <QTextCodec>
 #include <QtNetwork/QHostInfo>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QNetworkInterface>
@@ -27,7 +27,7 @@ using namespace std;
 
 uint registerFreeTcpPort(uint specificPort = 0);
 Json::Value* parseJSON(const QString& filename);
-QString readFileContents(const QString& fileName);
+string readFileContents(const QString& fileName);
 
 void setHomeDir(QString & homeDir);
 void setSoftwareDataDir(QString & softwareDataDir);

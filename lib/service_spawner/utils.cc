@@ -83,21 +83,19 @@ uint registerFreeTcpPort(uint specificPort) {
 /*
  *  Read file contents of text file
  */
-QString readFileContents(const QString& fileName) {
-    QString lines = "", l = "";
-    string line;
-    ifstream file(fileName.toStdString().c_str(), ios::in);
-    if (file.is_open()) {
-        while ( file.good() ) {
-            getline(file, line);
-            lines += QString(line.c_str()) + "\n";
-        }
-        file.close();
-    } else {
-        qDebug() << "Error reading file:" << fileName << endl;
-        exit(NO_SUCH_FILE_ERROR);
+string readFileContents(const QString& fileName) {
+    QString lines = "";
+    QFile f(fileName);
+    f.open(QIODevice::ReadOnly);
+    QTextStream stream(&f);
+    stream.setCodec(QTextCodec::codecForName(DEFAULT_STRING_CODEC));
+    while (!stream.atEnd()) {
+        QString line = stream.readLine();
+        qDebug() << fileName << ":" << line;
+        lines += line;
     }
-    return lines;
+    f.close();
+    return string(lines.toUtf8());
 }
 
 
@@ -107,7 +105,8 @@ QString readFileContents(const QString& fileName) {
 Json::Value* parseJSON(const QString& filename) {
     Json::Reader reader; /* parse json file */
     Json::Value* root = new Json::Value();
-    bool parsedSuccess = reader.parse(readFileContents(filename).toStdString(), *root, false);
+    // string cont = string(QString::fromUtf8(filename).toUtf8());
+    bool parsedSuccess = reader.parse(readFileContents(filename), *root, false);
     if (!parsedSuccess) {
         qDebug() << "JSON Parse Failure of file: " << filename << endl;
         return root;
