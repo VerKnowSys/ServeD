@@ -16,7 +16,7 @@
 
 // Local
 #include "CuteLogger_global.h"
-#include <AbstractAppender.h>
+#include "AbstractAppender.h"
 
 // Qt
 #include <QReadWriteLock>

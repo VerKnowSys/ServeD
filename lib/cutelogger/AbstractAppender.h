@@ -16,7 +16,7 @@
 
 // Local
 #include "CuteLogger_global.h"
-#include <Logger.h>
+#include "Logger.h"
 
 // Qt
 #include <QMutex>

@@ -16,7 +16,7 @@
 
 // Logger
 #include "CuteLogger_global.h"
-#include <AbstractStringAppender.h>
+#include "AbstractStringAppender.h"
 
 // Qt
 #include <QFile>

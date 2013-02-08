@@ -16,7 +16,7 @@
 #define OUTPUTDEBUGAPPENDER_H
 
 #include "CuteLogger_global.h"
-#include <AbstractStringAppender.h>
+#include "AbstractStringAppender.h"
 
 //! OutputDebugAppender is the appender that writes the log records to the Microsoft Debug Log
 class CUTELOGGERSHARED_EXPORT OutputDebugAppender : public AbstractStringAppender
