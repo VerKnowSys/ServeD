@@ -41,6 +41,7 @@ void writeSampleOf(const char* sample, const char* file) {
 void TestJsonLibrary::TestJSONParse() {
     const char* fileName = "/tmp/test-file-TestJSONParse.json";
     QString value = "";
+    int valueInt = -1;
 
     writeSampleOf("{\"somekey\": \"somevalue\"}", fileName);
     QFile file(fileName);
@@ -54,6 +55,16 @@ void TestJsonLibrary::TestJSONParse() {
 
     value = parsed.get("someNOKEY", "none").asString().c_str();
     QVERIFY(value == QString("none"));
+
+    valueInt = parsed.get("someNOKEY", 12345).asInt();
+    QVERIFY(valueInt == 12345);
+
+    try {
+        valueInt = parsed.get("somekey", 12345).asInt();
+        QFAIL("It should throw an exception!");
+    } catch (std::exception &e) {
+        QCOMPARE(e.what(), "Type is not convertible to int");
+    }
 
     file.deleteLater();
 }
