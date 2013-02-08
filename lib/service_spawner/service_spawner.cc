@@ -9,18 +9,12 @@
 #include "../globals/globals.h"
 #include "config_loader.h"
 
-#include <QCoreApplication>
-#include <QFileSystemWatcher>
-#include <QObject>
-#include <QDebug>
-#include <QStringList>
-#include <QProcess>
-#include <QFile>
+
+#include <QtCore>
 
 
+class SandboxProcess: public QProcess {
 
-class SandboxProcess: public QProcess
-{
 public:
     SandboxProcess(int uid) {
         this->uid = uid;
@@ -78,57 +72,179 @@ protected:
         unsetenv("MAIL");
     }
 
+
 private:
     int uid;
 };
 
 
-class UserWatcher: public QObject
+class SvdEventFiles {
+
+public:
+    QString spawnPath;
+    QString stopPath;
+    QString spawnedPath;
+    QFile spawnFile;
+    QFile stopFile;
+    QFile spawnedFile;
+
+    SvdEventFiles(const QString & path, const QString & name, const QString & prefix = ".") {
+        spawnPath   = path + "/" + prefix + "spawn_" + name;
+        stopPath    = path + "/" + prefix + "stop_" + name;
+        spawnedPath = path + "/" + prefix + "spawned_" + name;
+        spawnFile.setFileName(spawnPath);
+        stopFile.setFileName(stopPath);
+        spawnedFile.setFileName(spawnedPath);
+    }
+
+};
+
+
+class SvdEventFilesWatcher: public QFileSystemWatcher {
+
+public:
+    void registerFile(const QString & path) {
+        qDebug() << "Registering file:" << path;
+        addPath(path);
+    }
+
+
+    void unregisterFile(const QString & path) {
+        qDebug() << "Unregistering file:" << path;
+        removePath(path);
+    }
+
+
+    bool isWatchingFile(const QString & path) {
+        return files().contains(path);
+    }
+
+
+    bool isWatchingDir(const QString & path) {
+        return directories().contains(path);
+    }
+};
+
+
+void setHomeDir(int uid, QString & homeDir) {
+    if (uid == 0)
+        homeDir = QString::fromStdString(SYSTEMUSERS_HOME_DIR);
+    else
+        homeDir = QString::fromStdString(USERS_HOME_DIR) + QString::number(uid);
+}
+
+
+class SvdUserWatcher: public QObject
 {
     Q_OBJECT
 
 
 public:
-    UserWatcher(int uid) {
-        qDebug() << "Starting UserWatcher for uid:" << uid;
+    SvdUserWatcher(int uid) {
+        qDebug() << "Starting SvdUserWatcher for uid:" << uid;
 
-        if (uid == 0)
-            homeDir = QString::fromStdString(SYSTEMUSERS_HOME_DIR);
-        else
-            homeDir = QString::fromStdString(USERS_HOME_DIR) + QString::number(uid);
-
+        setHomeDir(uid, homeDir);
         this->uid = uid;
 
-        watcher.addPath(homeDir);
-        connect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(dirChangedSlot(QString)));
-    }
+        loop = new QEventLoop();
 
-public slots:
-    void dirChangedSlot(const QString& str) {
-        qDebug() << "Directory changed:" << str;
-        // QFile file(str + "/.spawn_user_panel");
-        // if (file.exists())
-        //     qDebug() << "Spawning UserPanel for:" << uid;
-    }
+        cleanupEventFiles();
 
-    void fileChangedSlot(const QString& str) {
-        qDebug() << "File changed:" << str;
+        fileWatcher = new SvdEventFilesWatcher;
+        fileWatcher->registerFile(homeDir);
+
+        /* Check for event files at startup */
+        dirChangedSlot(homeDir);
+
+        connect(fileWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(dirChangedSlot(QString)));
+        connect(fileWatcher, SIGNAL(fileChanged(QString)), this, SLOT(fileChangedSlot(QString)));
+
+        loop->exec();
     }
 
 private:
     int uid;
     QString homeDir;
-    QFileSystemWatcher watcher;
-    QList<SandboxProcess *> spawnedServices;
     QEventLoop *loop;
+    SvdEventFilesWatcher *fileWatcher;
+    QList<SandboxProcess *> spawnedServices;
+
+    void cleanupEventFiles() {
+        SvdEventFiles userPanel(homeDir, "user_panel");
+        userPanel.stopFile.remove();
+        userPanel.spawnedFile.remove();
+    }
+
+
+signals:
+    void spawnUserPanel(int uid);
+    void stopUserPanel(int uid);
+    void spawnedUserPanel(int uid);
+    void stoppedUserPanel(int uid);
+
+
+public slots:
+    void dirChangedSlot(const QString& str) {
+        QFile file;
+
+        if (str.compare(homeDir) == 0) {
+            SvdEventFiles userPanel(homeDir, "user_panel");
+
+            if (userPanel.spawnFile.exists()) {
+                userPanel.spawnFile.remove();
+                if (userPanel.spawnedFile.exists())
+                    qDebug() << "Interrupted emission of spawnUserPanel signal. User panel is already running for uid:" << uid;
+                else {
+                    qDebug() << "Emitting spawnUserPanel signal for uid:" << uid;
+                    emit spawnUserPanel(uid);
+                }
+                return;
+            }
+
+            if (userPanel.stopFile.exists()) {
+                userPanel.stopFile.remove();
+                if (userPanel.spawnedFile.exists()) {
+                    qDebug() << "Emitting stopUserPanel signal for uid:" << uid;
+                    emit stopUserPanel(uid);
+                } else
+                    qDebug() << "Interrupted emission of stopUserPanel signal. User panel is not running for uid:" << uid;
+                return;
+            }
+
+            if (userPanel.spawnedFile.exists() && not fileWatcher->isWatchingFile(userPanel.spawnedPath)) {
+                qDebug() << "Emitting spawnedUserPanel signal for uid:" << uid;
+                fileWatcher->registerFile(userPanel.spawnedPath);
+                emit spawnedUserPanel(uid);
+                return;
+            }
+        }
+    }
+
+
+    void fileChangedSlot(const QString& str) {
+        qDebug() << "File changed:" << str;
+
+        SvdEventFiles userPanel(homeDir, "user_panel");
+
+        if (str.compare(userPanel.spawnedPath) == 0 && not userPanel.spawnedFile.exists()) {
+            qDebug() << "Emitting stoppedUserPanel signal for uid:" << uid;
+            emit stoppedUserPanel(uid);
+        }
+    }
 };
+
+
+void spawnSvdUserWatcher(int uid) {
+    SvdUserWatcher userWatcher(uid);
+}
 
 
 int main(int argc, char *argv[]) {
 
     QCoreApplication app(argc, argv);
     QList<int> userIdsToWatch;
-    QList<UserWatcher *> watchers;
+    QFutureWatcher<void> watcher;
+
 
     SvdServiceConfig *config = new SvdServiceConfig("RedisDrugi");
     cout << "Igniter name element: " << config->name.toStdString() << endl;
@@ -162,16 +278,9 @@ int main(int argc, char *argv[]) {
     // XXX
     userIdsToWatch << 500 << 501 << 1000;
 
-    Q_FOREACH(int uid, userIdsToWatch) {
-        watchers << new UserWatcher(uid);
-    }
 
-    // XXX
-    SandboxProcess proc(501);
-    proc.spawnService("redis-server");
-
-    SandboxProcess proc2(500);
-    proc2.spawnService("redis-server --port 1234");
+    QFuture<void> result = QtConcurrent::map(userIdsToWatch, spawnSvdUserWatcher);
+    watcher.setFuture(result);
 
     return app.exec();
 }
