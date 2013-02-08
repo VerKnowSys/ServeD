@@ -35,7 +35,7 @@ SvdConfigLoader::SvdConfigLoader(QString preName) {
 /*
  *  Read file contents of text file
  */
-QString SvdConfigLoader::readFileContents(const QString& fileName) {
+QString readFileContents(const QString& fileName) {
     QString lines = "", l = "";
     string line;
     ifstream file(fileName.toStdString().c_str(), ios::in);

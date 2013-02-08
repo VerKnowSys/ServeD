@@ -18,6 +18,9 @@
 #include <QTextStream>
 
 
+QString readFileContents(const QString& fileName);
+
+
 class SvdConfigLoader : QObject {
     Q_OBJECT
 
@@ -35,7 +38,6 @@ class SvdConfigLoader : QObject {
         Json::Value loadIgniter();
 
         Json::Value parseJSON(const QString& filename);
-        QString readFileContents(const QString& fileName);
         QString replaceAllSpecialsIn(const QString& content);
 
 };
