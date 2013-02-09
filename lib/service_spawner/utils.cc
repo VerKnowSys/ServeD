@@ -41,7 +41,7 @@ uint registerFreeTcpPort(uint specificPort) {
     } else
         port = specificPort;
 
-    logDebug() << "Trying port: " << port << ". Randseed: " << rand;
+    logTrace() << "Trying port: " << port << ". Randseed: " << rand;
 
     auto inter = new QNetworkInterface();
     auto list = inter->allAddresses(); /* all interfaces */
@@ -63,7 +63,7 @@ uint registerFreeTcpPort(uint specificPort) {
                 delete tcpServer;
             }
         } else {
-            logDebug() << "No network interfaces available. Skipping";
+            logTrace() << "No network interfaces available. Skipping";
         }
     }
     return port;
@@ -97,7 +97,7 @@ Json::Value* parseJSON(const QString& filename) {
     auto root = new Json::Value();
     auto parsedSuccess = reader.parse(readFileContents(filename), *root, false);
     if (!parsedSuccess) {
-        logDebug() << "JSON Parse Failure of file: " << filename;
+        logError() << "JSON Parse Failure of file: " << filename;
         return root;
     }
     return root; /* return user side igniter first by default */

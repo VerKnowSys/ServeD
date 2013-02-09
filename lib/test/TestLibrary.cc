@@ -11,10 +11,16 @@ void writeSampleOf(const char* sample, const char* file) {
 
 /* eof test utilities */
 
+
+TestLibrary::~TestLibrary() {
+    delete consoleAppender;
+}
+
+
 TestLibrary::TestLibrary() {
     /* Logger setup */
-    auto *consoleAppender = new ConsoleAppender();
-    consoleAppender->setFormat("%t{yyyy-MM-dd HH:mm:ss} [%-7l] <%c> %m\n");
+    consoleAppender = new ConsoleAppender();
+    consoleAppender->setFormat("%t{dd-HH:mm:ss} [%-7l] <%c> %m\n");
     Logger::registerAppender(consoleAppender);
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
 }

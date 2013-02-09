@@ -12,8 +12,11 @@
 
 class TestLibrary: public QObject {
     Q_OBJECT
+        ConsoleAppender* consoleAppender;
+
         public:
             TestLibrary();
+            ~TestLibrary();
 
         private slots:
             void testParseDefault();
