@@ -172,7 +172,7 @@ SvdServiceConfig::~SvdServiceConfig() {
 
 
 const QString SvdServiceConfig::userServiceRoot() {
-    return QString(USERS_HOME_DIR) + "/" + QString(uid) + QString(DEFAULT_USER_APPS_DIR) + "/" + softwareName;
+    return QString(USERS_HOME_DIR) + "/" + QString::number(uid) + QString(DEFAULT_USER_APPS_DIR) + "/" + softwareName;
 }
 
 
@@ -185,7 +185,7 @@ const QString SvdServiceConfig::prefixDir() {
     if (uid == 0) {
         return QString(SYSTEM_USERS_DIR) + QString(SOFTWARE_DATA_DIR) + "/" + name;
     } else {
-        return QString(USERS_HOME_DIR) + "/" + QString(uid) + QString(SOFTWARE_DATA_DIR) + "/" + name;
+        return QString(USERS_HOME_DIR) + "/" + QString::number(uid) + QString(SOFTWARE_DATA_DIR) + "/" + name;
     }
 }
 
