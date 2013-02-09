@@ -34,9 +34,7 @@ void setServiceDataDir(QString & serviceDataDir, const QString & name) {
 /* author: dmilith */
 uint registerFreeTcpPort(uint specificPort) {
     QTime midnight(0, 0, 0);
-    // val port = SvdPools.userPortPool.start + rnd.nextInt(SvdPools.userPortPool.end - SvdPools.userPortPool.start)
-    uint port = 0;
-    int rand = (qrand() % 50000);
+    uint port = 0, rand = (qrand() % 40000);
     if (specificPort == 0) {
         qsrand(midnight.msecsTo(QTime::currentTime()));
         port = 10000 + rand;
@@ -47,8 +45,8 @@ uint registerFreeTcpPort(uint specificPort) {
         logDebug() << "Trying port: " << port << ". Randseed: " << rand;
     #endif
 
-    QNetworkInterface *inter = new QNetworkInterface();
-    QList<QHostAddress> list = inter->allAddresses(); /* all interfaces */
+    auto inter = new QNetworkInterface();
+    auto list = inter->allAddresses(); /* all interfaces */
     #ifdef DEBUG
         logDebug() << "Addresses amount: " << list.size();
     #endif
@@ -57,11 +55,11 @@ uint registerFreeTcpPort(uint specificPort) {
         // logDebug() << "Trying hostname: " << hostName;
         QHostInfo info = QHostInfo::fromName(hostName);
         if (!info.addresses().isEmpty()) {
-            QHostAddress address = info.addresses().first();
+            auto address = info.addresses().first();
             #ifdef DEBUG
                 logDebug() << "Current address: " << address.toString();
             #endif
-            QTcpServer *tcpServer = new QTcpServer();
+            auto tcpServer = new QTcpServer();
             if (!tcpServer->listen(address, port)) {
                 #ifdef DEBUG
                     logDebug() << "Already taken port found: " << port;
@@ -104,8 +102,8 @@ string readFileContents(const QString& fileName) {
  */
 Json::Value* parseJSON(const QString& filename) {
     Json::Reader reader; /* parse json file */
-    Json::Value* root = new Json::Value();
-    bool parsedSuccess = reader.parse(readFileContents(filename), *root, false);
+    auto root = new Json::Value();
+    auto parsedSuccess = reader.parse(readFileContents(filename), *root, false);
     if (!parsedSuccess) {
         logDebug() << "JSON Parse Failure of file: " << filename;
         return root;
