@@ -42,18 +42,15 @@ uint registerFreeTcpPort(uint specificPort) {
         port = specificPort;
 
     logTrace() << "Trying port: " << port << ". Randseed: " << rand;
-
-
-            auto tcpServer = new QTcpServer();
-            if (!tcpServer->listen(QHostAddress::Any, port) || (!tcpServer->isListening()) ) { // address
-                logDebug() << "Already taken port found: " << port;
-                delete tcpServer;
-                // delete inter;
-                return registerFreeTcpPort(10000 + rand);
-            } else {
-                tcpServer->close();
-                delete tcpServer;
-            }
+    auto tcpServer = new QTcpServer();
+    if (!tcpServer->listen(QHostAddress::Any, port) || (!tcpServer->isListening()) ) { // address
+        logDebug() << "Already taken port found: " << port;
+        delete tcpServer;
+        return registerFreeTcpPort(10000 + rand);
+    } else {
+        tcpServer->close();
+        delete tcpServer;
+    }
     return port;
 }
 
