@@ -188,3 +188,38 @@ void TestLibrary::testUtils() {
     QVERIFY(dir == serviceDataDir);
 }
 
+
+void TestLibrary::testSomeRealCraziness() {
+    auto *config = new SvdServiceConfig(); /* Load default values */
+    config->name = "OmgOmgOmg";
+    config->loadIgniter();
+    QVERIFY(config->name == "OmgOmgOmg");
+    config->name = "";
+    config->loadIgniter();
+    QVERIFY(config->name == "");
+    delete config;
+}
+
+
+void TestLibrary::testSanityValueCheck() {
+    auto *config = new SvdServiceConfig("Redis");
+
+    QVERIFY(config->userServiceRoot().contains(QString(config->uid)));
+    QVERIFY(config->userServiceRoot().contains("Users"));
+    QVERIFY(config->userServiceRoot().contains(QString(DEFAULT_USER_APPS_DIR)));
+    QVERIFY(config->userServiceRoot().contains(config->softwareName));
+
+    QVERIFY(config->serviceRoot().contains(QString(SOFTWARE_DIR)));
+    QVERIFY(config->serviceRoot().contains(config->softwareName));
+
+    if (config->uid == 0) {
+        QVERIFY(config->prefixDir().contains(QString(SYSTEM_USERS_DIR)));
+        QVERIFY(!config->prefixDir().contains(QString(config->uid))); // root service prefix dir doens't contains uid in path!
+    } else {
+        QVERIFY(config->prefixDir().contains(QString(USERS_HOME_DIR)));
+        QVERIFY(config->prefixDir().contains(QString(config->uid)));
+    }
+    QVERIFY(config->prefixDir().contains(QString(QString(SOFTWARE_DATA_DIR))));
+    delete config;
+}
+

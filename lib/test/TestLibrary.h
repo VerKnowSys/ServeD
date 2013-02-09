@@ -27,6 +27,8 @@ class TestLibrary: public QObject {
             void testMultipleConfigsLoading();
             void testNonExistantConfigLoading();
             void testUtils();
+            void testSomeRealCraziness();
+            void testSanityValueCheck();
 
 
 };
