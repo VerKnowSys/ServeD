@@ -21,9 +21,6 @@
 #define logError LOG_ERROR
 #define logFatal LOG_FATAL
 
-#include <iostream>
-#include <fstream>
-
 #include <QtCore>
 #include <QTime>
 #include <QTextCodec>
