@@ -1,8 +1,6 @@
 #ifndef __GLOBALS__
 #define __GLOBALS__
 
-    #define DEBUG true
-
     /* global constants */
     #define APP_VERSION "0.17.1"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."

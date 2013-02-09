@@ -41,29 +41,21 @@ uint registerFreeTcpPort(uint specificPort) {
     } else
         port = specificPort;
 
-    #ifdef DEBUG
-        logDebug() << "Trying port: " << port << ". Randseed: " << rand;
-    #endif
+    logDebug() << "Trying port: " << port << ". Randseed: " << rand;
 
     auto inter = new QNetworkInterface();
     auto list = inter->allAddresses(); /* all interfaces */
-    #ifdef DEBUG
-        logDebug() << "Addresses amount: " << list.size();
-    #endif
+    logDebug() << "Addresses amount: " << list.size();
     for (int j = 0; j < list.size(); j++) {
         QString hostName = list.at(j).toString();
         // logDebug() << "Trying hostname: " << hostName;
         QHostInfo info = QHostInfo::fromName(hostName);
         if (!info.addresses().isEmpty()) {
             auto address = info.addresses().first();
-            #ifdef DEBUG
-                logDebug() << "Current address: " << address.toString();
-            #endif
+            logDebug() << "Current address: " << address.toString();
             auto tcpServer = new QTcpServer();
             if (!tcpServer->listen(address, port)) {
-                #ifdef DEBUG
-                    logDebug() << "Already taken port found: " << port;
-                #endif
+                logDebug() << "Already taken port found: " << port;
                 delete tcpServer;
                 return registerFreeTcpPort(10000 + rand);
             } else {
