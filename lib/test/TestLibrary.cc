@@ -22,7 +22,7 @@ TestLibrary::TestLibrary() {
 /* test functions */
 
 void TestLibrary::testParseJSONRedis() {
-    auto *config = new SvdServiceConfig("Redis"); /* Load app specific values */
+    auto config = new SvdServiceConfig("Redis"); /* Load app specific values */
     QCOMPARE(config->name, QString("Redis"));
     QCOMPARE(config->softwareName, QString("Redis"));
     QCOMPARE(config->staticPort, -1);
@@ -53,6 +53,8 @@ void TestLibrary::testParseJSONRedis() {
     QVERIFY(!config->start->commands.contains("SERVICE_ADDRESS"));
     QVERIFY(!config->configure->commands.contains("SERVICE_ADDRESS"));
     QVERIFY(!config->afterStart->commands.contains("SERVICE_ADDRESS"));
+
+    delete config;
 }
 
 
@@ -70,18 +72,19 @@ void TestLibrary::testMultipleConfigsLoading() {
     QVERIFY(config->install->commands.length() == 0);
     QVERIFY(config->schedulerActions->length() == 0);
     QVERIFY(config->watchPort == true);
+    delete config;
 
     config = new SvdServiceConfig("Redis");
     QCOMPARE(config->name, QString("Redis"));
     QVERIFY(config->install->commands.length() > 0);
     QVERIFY(config->watchPort == true);
+    delete config;
 
     config = new SvdServiceConfig("Mosh");
     QVERIFY(config->name == "Mosh");
     QVERIFY(config->softwareName == "Mosh");
     QVERIFY(config->install->commands.length() == 0);
     QVERIFY(config->watchPort == false);
-
     delete config;
 }
 
@@ -91,6 +94,7 @@ void TestLibrary::testNonExistantConfigLoading() {
     QVERIFY(config->name == "PlewisŚmiewis");
     QVERIFY(config->install->commands.length() == 0);
     QVERIFY(config->watchPort == true);
+    delete config;
 }
 
 
@@ -121,8 +125,9 @@ void TestLibrary::testJSONParse() {
     if (!file.exists()) {
         QFAIL("JSON file should exists.");
     }
+    file.close();
 
-    Json::Value* parsed = parseJSON(fileName);
+    auto parsed = parseJSON(fileName);
     value = parsed->get("somekey", "none").asString().c_str();
     QVERIFY(value == QString("somevalue"));
 
@@ -148,8 +153,8 @@ void TestLibrary::testMemoryAllocations() {
     int amount = 1;
     logDebug() << "Beginning" << amount << "loops of allocation test.";
     for (int i = 0; i < amount; ++i) {
-        SvdServiceConfig *config = new SvdServiceConfig("Redis"); /* Load app specific values */
-        usleep(1000000);
+        auto config = new SvdServiceConfig("Redis"); /* Load app specific values */
+        usleep(1000000); // 1000000 - 1s
         delete config;
     }
 }
