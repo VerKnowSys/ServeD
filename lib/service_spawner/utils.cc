@@ -43,33 +43,39 @@ uint registerFreeTcpPort(uint specificPort) {
 
     logTrace() << "Trying port: " << port << ". Randseed: " << rand;
 
-    auto inter = new QNetworkInterface();
-    auto list = inter->allAddresses(); /* all interfaces */
-    logDebug() << "Addresses amount: " << list.size();
-    for (int j = 0; j < list.size(); j++) {
-        QString hostName = list.at(j).toString();
-        // logDebug() << "Trying hostname: " << hostName;
-        QHostInfo info = QHostInfo::fromName(hostName);
-        if (!info.addresses().isEmpty()) {
-            auto address = info.addresses().first();
-            logDebug() << "Current address: " << address.toString();
+
             auto tcpServer = new QTcpServer();
-            if (!tcpServer->listen(address, port)) {
+            if (!tcpServer->listen(QHostAddress::Any, port) || (!tcpServer->isListening()) ) { // address
                 logDebug() << "Already taken port found: " << port;
                 delete tcpServer;
-                delete inter;
+                // delete inter;
                 return registerFreeTcpPort(10000 + rand);
             } else {
                 tcpServer->close();
                 delete tcpServer;
             }
-        } else {
-            logTrace() << "No network interfaces available. Skipping";
-        }
-    }
-    delete inter;
     return port;
 }
+
+
+// XXX: this code might be used later to get all network interfaces available on current machine:
+// auto inter = new QNetworkInterface();
+// auto list = inter->allAddresses(); /* all interfaces */
+// logDebug() << "Addresses amount: " << list.size();
+// for (int j = 0; j < list.size(); j++) {
+    // QString hostName = list.at(j).toString();
+    // logDebug() << "Trying hostname: " << hostName;
+    // QHostInfo info = QHostInfo::fromName(hostName);
+    // if (!info.addresses().isEmpty()) {
+        // auto address = info.addresses().first();
+        // logDebug() << "Current address: " << address.toString();
+        //     } else {
+//         logTrace() << "No network interfaces available. Skipping";
+//     }
+// }
+// delete inter;
+
+
 
 
 /*
