@@ -118,6 +118,16 @@ void TestLibrary::testFreePortFunctionality() {
     logDebug() << "Port:" << takenPort;
     QVERIFY(takenPort != 22);
     QVERIFY(takenPort != 0);
+
+    uint takenPort2 = registerFreeTcpPort(1000); // some port under 1024 (root port)
+    logDebug() << "Port:" << takenPort2;
+    QVERIFY(takenPort2 != 1000);
+    QVERIFY(takenPort2 != 0);
+
+    uint takenPort3 = registerFreeTcpPort(1025); // some port over 1024 (suer port)
+    logDebug() << "Port:" << takenPort3;
+    QVERIFY(takenPort3 == 1025);
+    QVERIFY(takenPort3 != 0);
 }
 
 
