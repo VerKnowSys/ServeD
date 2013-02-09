@@ -215,7 +215,7 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
         QFile domainFile(domainFilePath);
         QString userDomain = "";
         if (domainFile.exists()) {
-            userDomain = QString::fromUtf8(readFileContents(domainFilePath).c_str()).trimmed();
+            userDomain = QString(readFileContents(domainFilePath).c_str()).trimmed();
             ccont = ccont.replace("SERVICE_DOMAIN", userDomain); /* replace with user domain content */
         } else
             ccont = ccont.replace("SERVICE_DOMAIN", domain); /* replace with default domain */
@@ -245,7 +245,7 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
         QString portFilePath = prefixDir + "/" + QString(DEFAULT_USER_PORTS_FILE);
         QFile portFile(portFilePath);
         if (portFile.exists()) {
-            portFilePath = QString::fromUtf8(readFileContents(portFilePath).c_str()).trimmed();
+            portFilePath = QString(readFileContents(portFilePath).c_str()).trimmed();
             ccont = ccont.replace("SERVICE_PORT", portFilePath); /* replace with user port content */
         } else {
             logDebug() << "No port file for service " << name << " (software: " << softwareName << ")! This might be something nasty!. It happened in file: " << portFilePath;
