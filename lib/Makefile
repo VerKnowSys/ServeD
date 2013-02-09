@@ -27,8 +27,11 @@ clean:
 
 distclean:
 .for d in $(MODULES)
-	cd $d; $(MAKE) distclean
+	cd $d; $(MAKE) clean
 .endfor
+	cd cutelogger; $(RM) Makefile; cd ..
+	cd service_spawner; $(RM) Makefile; cd ..
+	cd test; $(RM) Makefile; cd ..
 
 
 strip:
