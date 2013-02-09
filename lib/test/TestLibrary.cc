@@ -178,7 +178,7 @@ void TestLibrary::testMemoryAllocations() {
 
 void TestLibrary::testUtils() {
     uid_t uid = getuid();
-    QString dir, homeDir, softwareDataDir, serviceDataDir, name = "Redis";
+    QString homeDir, softwareDataDir, serviceDataDir, name = "Redis";
 
     if (uid == 0)
         homeDir = "/SystemUsers";
@@ -188,14 +188,9 @@ void TestLibrary::testUtils() {
     softwareDataDir = homeDir + "/SoftwareData";
     serviceDataDir = softwareDataDir + "/" + name;
 
-    setHomeDir(dir);
-    QVERIFY(dir == homeDir);
-
-    setSoftwareDataDir(dir);
-    QVERIFY(dir == softwareDataDir);
-
-    setServiceDataDir(dir, name);
-    QVERIFY(dir == serviceDataDir);
+    QVERIFY(homeDir == getHomeDir());
+    QVERIFY(softwareDataDir == getSoftwareDataDir());
+    QVERIFY(serviceDataDir == getServiceDataDir(name));
 }
 
 

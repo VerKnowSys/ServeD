@@ -9,25 +9,22 @@
 #include "utils.h"
 
 
-void setHomeDir(QString & homeDir) {
-    if (getuid() == 0)
-        homeDir = QString(SYSTEMUSERS_HOME_DIR);
+const QString getHomeDir() {
+    uid_t uid = getuid();
+    if (uid == 0)
+        return QString(SYSTEM_USERS_DIR);
     else
-        homeDir = QString(USERS_HOME_DIR) + "/" + QString::number(getuid());
+        return QString(USERS_HOME_DIR) + "/" + QString::number(uid);
 }
 
 
-void setSoftwareDataDir(QString & softwareDataDir) {
-    QString homeDir;
-    setHomeDir(homeDir);
-    softwareDataDir = homeDir + QString(SOFTWARE_DATA_DIR);
+const QString getSoftwareDataDir() {
+    return getHomeDir() + QString(SOFTWARE_DATA_DIR);
 }
 
 
-void setServiceDataDir(QString & serviceDataDir, const QString & name) {
-    QString softwareDataDir;
-    setSoftwareDataDir(softwareDataDir);
-    serviceDataDir = softwareDataDir + "/" + name;
+const QString getServiceDataDir(const QString& name) {
+    return getSoftwareDataDir() + "/" + name;
 }
 
 

@@ -1,5 +1,5 @@
 /**
- *  @author tallica
+ *  @author tallica, dmilith
  *
  *   © 2013 - VerKnowSys
  *
@@ -36,8 +36,8 @@ uint registerFreeTcpPort(uint specificPort = 0);
 Json::Value* parseJSON(const QString& filename);
 string readFileContents(const QString& fileName);
 
-void setHomeDir(QString & homeDir);
-void setSoftwareDataDir(QString & softwareDataDir);
-void setServiceDataDir(QString & serviceDataDir, const QString & name);
+const QString getHomeDir();
+const QString getSoftwareDataDir();
+const QString getServiceDataDir(const QString& name);
 
 #endif
