@@ -112,8 +112,7 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
         staticPort = root->get("staticPort", (*defaults)["staticPort"]).asInt();
 
         /* load service scheduler data */
-        auto _preSchedActions = (*root)["schedulerActions"];
-        for (uint index = 0; index < _preSchedActions.size(); ++index ) {
+        for (uint index = 0; index < (*root)["schedulerActions"].size(); ++index ) {
             try {
                 schedulerActions->push_back(
                     new SvdSchedulerAction(
