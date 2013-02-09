@@ -244,7 +244,7 @@ int main(int argc, char *argv[]) {
 
     /* Logger setup */
     ConsoleAppender *consoleAppender = new ConsoleAppender();
-    consoleAppender->setFormat("%t{yyyy-MM-dd HH:mm:ss} [%-7l] <%c> %m\n");
+    consoleAppender->setFormat("%t{dd-HH:mm:ss} [%-7l] <%c> %m\n");
     Logger::registerAppender(consoleAppender);
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
 
