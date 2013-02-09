@@ -44,27 +44,27 @@ uint registerFreeTcpPort(uint specificPort) {
         port = specificPort;
 
     #ifdef DEBUG
-        qDebug() << "Trying port: " << port << ". Randseed: " << rand << endl;
+        logDebug() << "Trying port: " << port << ". Randseed: " << rand;
     #endif
 
     QNetworkInterface *inter = new QNetworkInterface();
     QList<QHostAddress> list = inter->allAddresses(); /* all interfaces */
     #ifdef DEBUG
-        qDebug() << "Addresses amount: " << list.size() << endl;
+        logDebug() << "Addresses amount: " << list.size();
     #endif
     for (int j = 0; j < list.size(); j++) {
         QString hostName = list.at(j).toString();
-        // qDebug() << "Trying hostname: " << hostName << endl;
+        // logDebug() << "Trying hostname: " << hostName;
         QHostInfo info = QHostInfo::fromName(hostName);
         if (!info.addresses().isEmpty()) {
             QHostAddress address = info.addresses().first();
             #ifdef DEBUG
-                qDebug() << "Current address: " << address.toString() << endl;
+                logDebug() << "Current address: " << address.toString();
             #endif
             QTcpServer *tcpServer = new QTcpServer();
             if (!tcpServer->listen(address, port)) {
                 #ifdef DEBUG
-                    qDebug() << "Already taken port found: " << port << endl;
+                    logDebug() << "Already taken port found: " << port;
                 #endif
                 delete tcpServer;
                 return registerFreeTcpPort(10000 + rand);
@@ -73,7 +73,7 @@ uint registerFreeTcpPort(uint specificPort) {
                 delete tcpServer;
             }
         } else {
-            qDebug() << "No network interfaces available. Skipping" << endl;
+            logDebug() << "No network interfaces available. Skipping";
         }
     }
     return port;
@@ -91,7 +91,7 @@ string readFileContents(const QString& fileName) {
     stream.setCodec(QTextCodec::codecForName(DEFAULT_STRING_CODEC));
     while (!stream.atEnd()) {
         QString line = stream.readLine();
-        qDebug() << fileName << ":" << line;
+        logDebug() << fileName << ":" << line;
         lines += line;
     }
     f.close();
@@ -108,7 +108,7 @@ Json::Value* parseJSON(const QString& filename) {
     // string cont = string(QString::fromUtf8(filename).toUtf8());
     bool parsedSuccess = reader.parse(readFileContents(filename), *root, false);
     if (!parsedSuccess) {
-        qDebug() << "JSON Parse Failure of file: " << filename << endl;
+        logDebug() << "JSON Parse Failure of file: " << filename;
         return root;
     }
     return root; /* return user side igniter first by default */

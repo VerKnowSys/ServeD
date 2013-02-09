@@ -29,13 +29,13 @@ public:
     }
 
     void spawnDefaultShell() {
-        qDebug() << "Spawning default shell for uid:" << uid;
+        logDebug() << "Spawning default shell for uid:" << uid;
         start(QString(DEFAULT_SHELL_COMMAND), QStringList() << "-s");
     }
 
     void spawnService(const char *command) {
         spawnDefaultShell();
-        qDebug() << "Spawning command" << QString(command) << "for uid:" << uid;
+        logDebug() << "Spawning command" << QString(command) << "for uid:" << uid;
         write(command);
         closeWriteChannel();
     }
@@ -43,7 +43,7 @@ public:
 
 protected:
     void setupChildProcess() {
-        qDebug() << "Setup process environment";
+        logDebug() << "Setup process environment";
         stringstream hd, usr;
 
         if (uid == 0)
@@ -110,13 +110,13 @@ class SvdEventFilesWatcher: public QFileSystemWatcher {
 
 public:
     void registerFile(const QString & path) {
-        qDebug() << "Registering file:" << path;
+        logDebug() << "Registering file:" << path;
         addPath(path);
     }
 
 
     void unregisterFile(const QString & path) {
-        qDebug() << "Unregistering file:" << path;
+        logDebug() << "Unregistering file:" << path;
         removePath(path);
     }
 
@@ -142,7 +142,7 @@ class SvdServiceWatcher: public QObject
 
 public:
     SvdServiceWatcher(const QString & name) {
-        qDebug() << "Starting SvdServiceWatcher for service:" << name;
+        logDebug() << "Starting SvdServiceWatcher for service:" << name;
 
         setServiceDataDir(dataDir, name);
 
@@ -187,14 +187,14 @@ signals:
 
 public slots:
     void dirChangedSlot(const QString & dir) {
-        // qDebug() << "Directory changed:" << dir;
+        // logDebug() << "Directory changed:" << dir;
 
         if (eventFiles->spawnFile.exists()) {
             eventFiles->spawnFile.remove();
             if (eventFiles->spawnedFile.exists())
-                qDebug() << "Interrupted emission of spawnService(" << config->name << ") signal. Service is already running.";
+                logDebug() << "Interrupted emission of spawnService(" << config->name << ") signal. Service is already running.";
             else {
-                qDebug() << "Emitting spawnService(" << config->name << ") signal.";
+                logDebug() << "Emitting spawnService(" << config->name << ") signal.";
                 emit spawnService(*config);
             }
             return;
@@ -203,15 +203,15 @@ public slots:
         if (eventFiles->terminateFile.exists()) {
             eventFiles->terminateFile.remove();
             if (eventFiles->spawnedFile.exists()) {
-                qDebug() << "Emitting terminateService(" << config->name << ") signal.";
+                logDebug() << "Emitting terminateService(" << config->name << ") signal.";
                 emit terminateService(*config);
             } else
-                qDebug() << "Interrupted emission of terminateService(" << config->name << ") signal. Service is not running.";
+                logDebug() << "Interrupted emission of terminateService(" << config->name << ") signal. Service is not running.";
             return;
         }
 
         if (eventFiles->spawnedFile.exists() && not fileWatcher->isWatchingFile(eventFiles->spawnedPath)) {
-            qDebug() << "Emitting spawnedService(" << config->name << ") signal.";
+            logDebug() << "Emitting spawnedService(" << config->name << ") signal.";
             fileWatcher->registerFile(eventFiles->spawnedPath);
             emit spawnedService(*config);
             return;
@@ -220,10 +220,10 @@ public slots:
 
 
     void fileChangedSlot(const QString & file) {
-        qDebug() << "File changed:" << file;
+        logDebug() << "File changed:" << file;
 
         if (file.compare(eventFiles->spawnedPath) == 0 && not eventFiles->spawnedFile.exists()) {
-            qDebug() << "Emitting terminatedService(" << config->name << ") signal.";
+            logDebug() << "Emitting terminatedService(" << config->name << ") signal.";
             emit terminatedService(*config);
         }
     }
@@ -242,17 +242,24 @@ int main(int argc, char *argv[]) {
     QString softwareDataDir;
     QStringList services;
 
+    /* Logger setup */
+    ConsoleAppender *consoleAppender = new ConsoleAppender();
+    consoleAppender->setFormat("%t{yyyy-MM-dd HH:mm:ss} [%-7l] <%c> %m\n");
+    Logger::registerAppender(consoleAppender);
+
+    logInfo() << "Starting Service Spawner for uid:" << getuid();
+
     // XXX
     QFile file("/SystemUsers/service_spawner.log");
     file.remove();
 
     setSoftwareDataDir(softwareDataDir);
 
-    qDebug() << "Looking for services inside" << softwareDataDir;
+    logDebug() << "Looking for services inside" << softwareDataDir;
     services = QDir(softwareDataDir).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
 
     Q_FOREACH(QString name, services)
-        qDebug() << "Found" << name << "service.";
+        logDebug() << "Found" << name << "service.";
 
 
     QFuture<void> result = QtConcurrent::map(services, spawnSvdServiceWatcher);

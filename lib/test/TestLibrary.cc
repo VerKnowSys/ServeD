@@ -11,6 +11,12 @@ void writeSampleOf(const char* sample, const char* file) {
 
 /* eof test utilities */
 
+TestLibrary::TestLibrary() {
+    /* Logger setup */
+    ConsoleAppender *consoleAppender = new ConsoleAppender();
+    consoleAppender->setFormat("%t{yyyy-MM-dd HH:mm:ss} [%-7l] <%c> %m\n");
+    Logger::registerAppender(consoleAppender);
+}
 
 /* test functions */
 
