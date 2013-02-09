@@ -35,8 +35,8 @@ void setServiceDataDir(QString & serviceDataDir, const QString & name) {
 uint registerFreeTcpPort(uint specificPort) {
     QTime midnight(0, 0, 0);
     uint port = 0, rand = (qrand() % 40000);
+    qsrand(midnight.msecsTo(QTime::currentTime()));
     if (specificPort == 0) {
-        qsrand(midnight.msecsTo(QTime::currentTime()));
         port = 10000 + rand;
     } else
         port = specificPort;
@@ -57,6 +57,7 @@ uint registerFreeTcpPort(uint specificPort) {
             if (!tcpServer->listen(address, port)) {
                 logDebug() << "Already taken port found: " << port;
                 delete tcpServer;
+                delete inter;
                 return registerFreeTcpPort(10000 + rand);
             } else {
                 tcpServer->close();
@@ -66,6 +67,7 @@ uint registerFreeTcpPort(uint specificPort) {
             logTrace() << "No network interfaces available. Skipping";
         }
     }
+    delete inter;
     return port;
 }
 

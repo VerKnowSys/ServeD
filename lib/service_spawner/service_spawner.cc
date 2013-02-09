@@ -7,10 +7,16 @@
 
 
 #include "../globals/globals.h"
-#include "config_loader.h"
+#include "service_config.h"
 #include "utils.h"
 
 #include <QtCore>
+
+
+// XXX: REMOVE THOSE:
+#include <iostream>
+#include <sstream>
+// EOF XXX
 
 
 /*

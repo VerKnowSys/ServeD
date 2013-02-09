@@ -1,8 +1,8 @@
 #ifndef __JSON_TEST_CONFIG__
 #define __JSON_TEST_CONFIG__
 
+#include "../kickstart/core.h"
 #include "../jsoncpp/json/json.h"
-#include "../service_spawner/config_loader.h"
 #include "../service_spawner/service_config.h"
 #include "../service_spawner/utils.h"
 

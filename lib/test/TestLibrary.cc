@@ -134,10 +134,10 @@ void TestLibrary::testJSONParse() {
     file.close();
 
     auto parsed = parseJSON(fileName);
-    value = parsed->get("somekey", "none").asString().c_str();
+    value = parsed->get("somekey", "none").asCString();
     QVERIFY(value == QString("somevalue"));
 
-    value = parsed->get("someNOKEY", "none").asString().c_str();
+    value = parsed->get("someNOKEY", "none").asCString();
     QVERIFY(value == QString("none"));
 
     valueInt = parsed->get("someNOKEY", 12345).asInt();
@@ -156,11 +156,11 @@ void TestLibrary::testJSONParse() {
 
 
 void TestLibrary::testMemoryAllocations() {
-    int amount = 1;
+    int amount = 10;
     logDebug() << "Beginning" << amount << "loops of allocation test.";
     for (int i = 0; i < amount; ++i) {
         auto config = new SvdServiceConfig("Redis"); /* Load app specific values */
-        usleep(1000000); // 1000000 - 1s
+        usleep(10000); // 1000000 - 1s
         delete config;
     }
 }

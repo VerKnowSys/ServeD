@@ -10,10 +10,11 @@
 #define __SERVICE_CONFIG__
 
 #include "../globals/globals.h"
+#include "../jsoncpp/json/json.h"
 #include "utils.h"
-#include "config_loader.h"
 
 #include <QObject>
+#include <QTextStream>
 #include <QFile>
 #include <QTime>
 #include <QtNetwork/QHostInfo>
@@ -49,10 +50,20 @@ class SvdServiceConfig : QObject {
         SvdServiceConfig(const QString& serviceName);
         ~SvdServiceConfig(); /* free allocated objects */
 
-        QString replaceAllSpecialsIn(const QString& content);
+        const QString replaceAllSpecialsIn(const QString content);
+        const QString userServiceRoot();
+        const QString serviceRoot();
+        const QString prefixDir();
+        const QString defaultTemplateFile();
+        const QString rootIgniter();
+        const QString userIgniter();
 
+        Json::Value* loadDefaultIgniter();
+        Json::Value* loadIgniter();
+
+
+        // Json::Value *config, *defaultConfig; // Igniter config
         uint uid; // user uid who loads igniter config
-
         QString name, softwareName;
         bool autoRestart, autoStart, reportAllErrors, reportAllInfos, reportAllDebugs, watchPort;
         int staticPort;

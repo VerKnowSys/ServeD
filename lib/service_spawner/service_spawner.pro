@@ -7,7 +7,6 @@
 QT -= gui
 QT += network
 HEADERS   += service_config.h \
-             config_loader.h \
              utils.h \
              ../kickstart/core.h \
              ../jsoncpp/json/json.h \
@@ -15,7 +14,6 @@ HEADERS   += service_config.h \
              ../cutelogger/ConsoleAppender.h \
              ../cutelogger/FileAppender.h
 SOURCES   += service_config.cc \
-             config_loader.cc \
              utils.cc \
              service_spawner.cc
 LIBS      += ../libjson.a ../liblogger.a
