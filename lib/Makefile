@@ -26,12 +26,12 @@ clean:
 
 
 distclean:
-.for d in $(MODULES)
-	cd $d; $(MAKE) clean
-.endfor
-	cd cutelogger; $(RM) Makefile; cd ..
-	cd service_spawner; $(RM) Makefile; cd ..
-	cd test; $(RM) Makefile; cd ..
+	cd fann; $(MAKE) distclean; cd ..
+	cd kickstart; $(MAKE) distclean; cd ..
+	cd cutelogger; $(MAKE) clean; $(RM) -rf Makefile ../liblogger.a; cd ..
+	cd service_spawner; $(MAKE) clean; $(RM) -rf Makefile ../../ss; cd ..
+	cd test; $(MAKE) clean; $(RM) -rf Makefile ../../test; cd ..
+	cd jsoncpp; $(MAKE) clean; cd .. ; $(RM) -rf libjson.*
 
 
 strip:
