@@ -69,10 +69,18 @@ void TestLibrary::testMultipleConfigsLoading() {
     QVERIFY(config->name == "Default");
     QVERIFY(config->install->commands.length() == 0);
     QVERIFY(config->schedulerActions->length() == 0);
+    QVERIFY(config->watchPort == true);
 
     config = new SvdServiceConfig("Redis");
     QCOMPARE(config->name, QString("Redis"));
     QVERIFY(config->install->commands.length() > 0);
+    QVERIFY(config->watchPort == true);
+
+    config = new SvdServiceConfig("Mosh");
+    QVERIFY(config->name == "Mosh");
+    QVERIFY(config->softwareName == "Mosh");
+    QVERIFY(config->install->commands.length() == 0);
+    QVERIFY(config->watchPort == false);
 
     delete config;
 }
@@ -82,21 +90,24 @@ void TestLibrary::testNonExistantConfigLoading() {
     auto *config = new SvdServiceConfig("PlewisŚmiewis");
     QVERIFY(config->name == "PlewisŚmiewis");
     QVERIFY(config->install->commands.length() == 0);
+    QVERIFY(config->watchPort == true);
 }
 
 
 void TestLibrary::testFreePortFunctionality() {
     uint port = registerFreeTcpPort();
     QVERIFY(port != 0);
-    cout << "Port: " << port << endl;
+    logDebug() << "Port:" << port;
 
     uint port2 = registerFreeTcpPort();
     QVERIFY(port2 != 0);
-    cout << "Port: " << port2 << endl;
+    QVERIFY(port2 != port); // shouldn't be same if randomize seed is fine
+    logDebug() << "Port:" << port2;
 
     uint takenPort = registerFreeTcpPort(22); // XXX: not yet determined used port.. so using ssh default port
-    cout << "Port: " << takenPort << endl;
+    logDebug() << "Port:" << takenPort;
     QVERIFY(takenPort != 22);
+    QVERIFY(takenPort != 0);
 }
 
 
@@ -134,14 +145,13 @@ void TestLibrary::testJSONParse() {
 
 
 void TestLibrary::testMemoryAllocations() {
-    int amount = 10;
-    cout << "Beginning " << amount << " seconds of allocation test.";
+    int amount = 1;
+    logDebug() << "Beginning" << amount << "loops of allocation test.";
     for (int i = 0; i < amount; ++i) {
         SvdServiceConfig *config = new SvdServiceConfig("Redis"); /* Load app specific values */
-        usleep(1000000/10); // 0.1s
+        usleep(1000000);
         delete config;
     }
-    QVERIFY(true);
 }
 
 
