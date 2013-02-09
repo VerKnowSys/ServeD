@@ -29,6 +29,10 @@ void TestLibrary::testParseJSONRedis() {
 
     QCOMPARE(config->uid, getuid());
 
+    QVERIFY(config->schedulerActions->first()->cronEntry.contains("*"));
+    logDebug() << config->schedulerActions->first()->cronEntry;
+    logDebug() << config->schedulerActions->first()->commands;
+
     /* verify replaceAllIn result, should not contain SERVICE_PORT, SERVICE_DOMAIN, SERVICE_ROOT, SERVICE_ADDRESS */
     QVERIFY(!config->install->commands.contains("SERVICE_PORT"));
     QVERIFY(!config->start->commands.contains("SERVICE_PORT"));
@@ -55,6 +59,7 @@ void TestLibrary::testParseJSONRedis() {
 void TestLibrary::testParseDefault() {
     SvdServiceConfig *config = new SvdServiceConfig(); /* Load default values */
     QCOMPARE(config->staticPort, -1);
+    QVERIFY(config->schedulerActions->length() == 0);
     delete config;
 }
 
@@ -63,6 +68,7 @@ void TestLibrary::testMultipleConfigsLoading() {
     SvdServiceConfig *config = new SvdServiceConfig(); /* Load default values */
     QVERIFY(config->name == "Default");
     QVERIFY(config->install->commands.length() == 0);
+    QVERIFY(config->schedulerActions->length() == 0);
 
     config = new SvdServiceConfig("Redis");
     QCOMPARE(config->name, QString("Redis"));
@@ -132,7 +138,7 @@ void TestLibrary::testMemoryAllocations() {
     cout << "Beginning " << amount << " seconds of allocation test.";
     for (int i = 0; i < amount; ++i) {
         SvdServiceConfig *config = new SvdServiceConfig("Redis"); /* Load app specific values */
-        usleep(1000000/10); // 0.01s
+        usleep(1000000/10); // 0.1s
         delete config;
     }
     QVERIFY(true);

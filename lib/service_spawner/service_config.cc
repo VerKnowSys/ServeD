@@ -112,22 +112,19 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
         staticPort = root->get("staticPort", (*defaults)["staticPort"]).asInt();
 
         /* load service scheduler data */
-        // int _preSchedActions = root->get("schedulerActions", new Json::Value()).size();
-        // Json::Value jarray = (*root)["schedulerActions"];
-        // for ( uint index = 0; index < _preSchedActions; ++index ) {
-        //     try {
-        //         schedulerActions->push_back(
-        //             new SvdSchedulerAction(
-        //                 jarray.get("cronEntry", "0 0/10 * * * ?").asString().c_str(),
-        //                 jarray.get("shellCommands", "true").toStyledString().c_str() // HACK
-        //             ));
-        //     } catch (std::exception &e) {
-        //         logDebug() << "Exception";
-        //     }
-        //     #ifdef DEBUG
-        //         logDebug() << "Defined scheduler action";
-        //     #endif
-        // }
+        Json::Value _preSchedActions = (*root)["schedulerActions"];
+        for (uint index = 0; index < _preSchedActions.size(); ++index ) {
+            try {
+                schedulerActions->push_back(
+                    new SvdSchedulerAction(
+                        (*root)["schedulerActions"][index].get("cronEntry", "0 0/10 * * * ?").asString().c_str(),
+                        (*root)["schedulerActions"][index].get("shellCommands", "true").asString().c_str()
+                    ));
+            } catch (std::exception &e) {
+                logDebug() << "Exception while parsing scheduler actions of" << name;
+            }
+            logDebug() << "Defined scheduler action";
+        }
 
         /* laod service hooks */
         install = new SvdShellOperations(
