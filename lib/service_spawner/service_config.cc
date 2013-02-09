@@ -182,24 +182,20 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
     } else {
 
         /* Replace SERVICE_ROOT */
-        QFile userServiceRootFile(userServiceRoot);
-        if (userServiceRootFile.exists()) {
+        if (QFile::exists(userServiceRoot)) {
             logDebug() << "User service root found in: " << userServiceRoot;
             ccont = ccont.replace("SERVICE_ROOT", userServiceRoot);
         } else {
-            logDebug() << "Not found user service root of " << name << " " << userServiceRoot;
+            logDebug() << "Not found user service root of " << name << userServiceRoot;
         }
-        userServiceRootFile.close();
 
-        QFile serviceRootFile(serviceRoot);
-        if ((serviceRootFile.exists())) {
+        if (QFile::exists(serviceRoot)) {
             logDebug() << "Service root found in: " << serviceRoot;
             ccont = ccont.replace("SERVICE_ROOT", serviceRoot);
         } else {
-             logDebug() << "Not found root service of " << name << " " << serviceRoot;
+             logWarn() << "Not found root service of " << name << serviceRoot;
              return "";
         }
-        serviceRootFile.close();
 
         /* Replace SERVICE_PREFIX */
         QString prefixDir = QString(USERS_HOME_DIR) + "/" + QString::number(uid) + QString(SOFTWARE_DATA_DIR) + "/" + name;
@@ -208,14 +204,12 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
         /* Replace SERVICE_DOMAIN */
         QString domain = QString(DEFAULT_SYSTEM_DOMAIN);
         QString domainFilePath = prefixDir + "/" + QString(DEFAULT_USER_DOMAIN_FILE);
-        QFile domainFile(domainFilePath);
         QString userDomain = "";
-        if (domainFile.exists()) {
+        if (QFile::exists(domainFilePath)) {
             userDomain = QString(readFileContents(domainFilePath).c_str()).trimmed();
             ccont = ccont.replace("SERVICE_DOMAIN", userDomain); /* replace with user domain content */
         } else
             ccont = ccont.replace("SERVICE_DOMAIN", domain); /* replace with default domain */
-        domainFile.close();
 
         /* Replace SERVICE_ADDRESS */
         QString address = QString(DEFAULT_SYSTEM_ADDRESS);
@@ -239,15 +233,13 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
 
         /* Replace SERVICE_PORT */
         QString portFilePath = prefixDir + "/" + QString(DEFAULT_USER_PORTS_FILE);
-        QFile portFile(portFilePath);
-        if (portFile.exists()) {
+        if (QFile::exists(portFilePath)) {
             portFilePath = QString(readFileContents(portFilePath).c_str()).trimmed();
             ccont = ccont.replace("SERVICE_PORT", portFilePath); /* replace with user port content */
         } else {
             logDebug() << "No port file for service " << name << " (software: " << softwareName << ")! This might be something nasty!. It happened in file: " << portFilePath;
             ccont = ccont.replace("SERVICE_PORT", QString::number(registerFreeTcpPort())); /* this shouldn't happen */
         }
-        portFile.close();
 
         // logDebug() << "Given content: " << ccont.replace("\n", " ");
         return ccont;

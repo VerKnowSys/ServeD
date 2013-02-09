@@ -46,8 +46,7 @@ Json::Value* SvdConfigLoader::loadDefaultIgniter() {
     auto result = new Json::Value();
     QFile defaultIgniter(defaultTemplateFile); /* try loading root igniter as second */
     if(!defaultIgniter.open(QIODevice::ReadOnly)) { /* check file access */
-        logDebug() << "No file: " << defaultTemplateFile;
-        // exit(NO_DEFAULT_IGNITERS_FOUND_ERROR);
+        logWarn() << "No file: " << defaultTemplateFile;
     } else {
         result = parseJSON(defaultTemplateFile);
     }
