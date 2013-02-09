@@ -8,7 +8,7 @@ DEVEL             = false
 DARWIN            = false
 
 CC                = clang
-CXX               = clang++
+CXX               = "clang++ -std=c++11"
 AR                = ar
 RM                = rm
 QMAKE             = qmake
