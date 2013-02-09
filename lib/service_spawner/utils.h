@@ -10,6 +10,16 @@
 
 #include "../globals/globals.h"
 #include "../jsoncpp/json/json.h"
+#include "../cutelogger/Logger.h"
+#include "../cutelogger/ConsoleAppender.h"
+#include "../cutelogger/FileAppender.h"
+
+#define logTrace LOG_TRACE
+#define logDebug LOG_DEBUG
+#define logInfo  LOG_INFO
+#define logWarn  LOG_WARNING
+#define logError LOG_ERROR
+#define logFatal LOG_FATAL
 
 #include <iostream>
 #include <fstream>
