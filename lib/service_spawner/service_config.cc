@@ -172,7 +172,7 @@ SvdServiceConfig::~SvdServiceConfig() {
 
 
 const QString SvdServiceConfig::userServiceRoot() {
-    return QString(USERS_HOME_DIR) + "/" + QString(uid) + "/Apps/" + softwareName;
+    return QString(USERS_HOME_DIR) + "/" + QString(uid) + QString(DEFAULT_USER_APPS_DIR) + "/" + softwareName;
 }
 
 
