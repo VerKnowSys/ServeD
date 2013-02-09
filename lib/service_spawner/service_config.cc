@@ -163,11 +163,11 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
         delete root;
 
     } catch (std::exception &e) {
-        logDebug() << "Thrown Exception: " << e.what() << " in " << serviceName << " service.";
-        exit(JSON_FORMAT_EXCEPTION_ERROR);
+        logError() << "Thrown Exception: " << e.what() << " in " << serviceName << " service.";
+        // exit(JSON_FORMAT_EXCEPTION_ERROR);
     } catch (...) {
-        logDebug() << "Exception !";
-        exit(OTHER_EXCEPTION_ERROR);
+        logError() << "Exception !";
+        // exit(OTHER_EXCEPTION_ERROR);
     }
 }
 
