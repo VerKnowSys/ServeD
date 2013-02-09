@@ -105,7 +105,6 @@ string readFileContents(const QString& fileName) {
 Json::Value* parseJSON(const QString& filename) {
     Json::Reader reader; /* parse json file */
     Json::Value* root = new Json::Value();
-    // string cont = string(QString::fromUtf8(filename).toUtf8());
     bool parsedSuccess = reader.parse(readFileContents(filename), *root, false);
     if (!parsedSuccess) {
         logDebug() << "JSON Parse Failure of file: " << filename;
