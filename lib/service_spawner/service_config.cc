@@ -182,7 +182,11 @@ const QString SvdServiceConfig::serviceRoot() {
 
 
 const QString SvdServiceConfig::prefixDir() {
-    return QString(USERS_HOME_DIR) + "/" + QString(uid) + QString(SOFTWARE_DATA_DIR) + "/" + name;
+    if (uid == 0) {
+        return QString(SYSTEM_USERS_DIR) + QString(SOFTWARE_DATA_DIR) + "/" + name;
+    } else {
+        return QString(USERS_HOME_DIR) + "/" + QString(uid) + QString(SOFTWARE_DATA_DIR) + "/" + name;
+    }
 }
 
 
