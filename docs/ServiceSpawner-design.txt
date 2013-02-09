@@ -12,7 +12,13 @@ A. Launched for root as system service, event loops / watchers spawned as forks/
     1. touch /Users/ANYUID/.spawn_user_panel on user demand.
 
 
-B. Launching service "Service"
+B. Launched for user.
+  I. (SS side)
+    0. Create file watchers fo $HOME/SoftwareData/
+    1. If $HOME/SoftwareData/.autostart_process exists, launch SvdService
+
+
+C. Launching service "Service"
   I. (JDK side):
     0. touch $HOME/SoftwareData/Service/.domain with value of user domain
     1. touch $HOME/SoftwareData/Service/.spawn
@@ -35,7 +41,7 @@ B. Launching service "Service"
     2. (…) optionally read $HOME/SoftwareData/Service/.outputs or do whatever is required
 
 
-C. Stopping service "Service"
+D. Stopping service "Service"
   I. (JDK side):
     1. close service connections (if any)
     2. touch $HOME/SoftwareData/Service/.terminate
