@@ -182,7 +182,7 @@ class LoggerPrivate
       else
       {
         // Fallback
-        QString result = QString(QLatin1String("[%1] <%2> %3")).arg(Logger::levelToString(logLevel), -7)
+        QString result = QString("[%1] <%2> %3").arg(Logger::levelToString(logLevel), -7)
                                                                .arg(function).arg(message);
 
         std::cerr << qPrintable(result) << std::endl;
@@ -291,17 +291,17 @@ QString Logger::levelToString(Logger::LogLevel logLevel)
   switch (logLevel)
   {
     case Trace:
-      return QLatin1String("Trace");
+      return QString("Trace");
     case Debug:
-      return QLatin1String("Debug");
+      return QString("Debug");
     case Info:
-      return QLatin1String("Info");
+      return QString("Info");
     case Warning:
-      return QLatin1String("Warning");
+      return QString("Warning");
     case Error:
-      return QLatin1String("Error");
+      return QString("Error");
     case Fatal:
-      return QLatin1String("Fatal");
+      return QString("Fatal");
   }
 
   return QString();
@@ -314,17 +314,17 @@ Logger::LogLevel Logger::levelFromString(const QString& s)
 
   LogLevel result = Debug;
 
-  if (str == QLatin1String("trace"))
+  if (str == QString("trace"))
     result = Trace;
-  else if (str == QLatin1String("debug"))
+  else if (str == QString("debug"))
     result = Debug;
-  else if (str == QLatin1String("info"))
+  else if (str == QString("info"))
     result = Info;
-  else if (str == QLatin1String("warning"))
+  else if (str == QString("warning"))
     result = Warning;
-  else if (str == QLatin1String("error"))
+  else if (str == QString("error"))
     result = Error;
-  else if (str == QLatin1String("fatal"))
+  else if (str == QString("fatal"))
     result = Fatal;
 
   return result;

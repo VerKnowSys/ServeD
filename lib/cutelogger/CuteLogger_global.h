@@ -1,6 +1,8 @@
 #ifndef CUTELOGGER_GLOBAL_H
 #define CUTELOGGER_GLOBAL_H
 
+#define DEFAULT_STRING_CODEC "UTF-8"
+
 #include <QtCore/qglobal.h>
 
 #if defined(CUTELOGGER_LIBRARY)
