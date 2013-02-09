@@ -38,7 +38,7 @@ strip:
 
 
 test: prepare
-	cd test/; $(MAKE)
+	cd test/; $(MAKE) ; ../../test 2>/dev/null
 
 
 
