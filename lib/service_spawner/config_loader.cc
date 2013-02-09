@@ -42,8 +42,8 @@ SvdConfigLoader::SvdConfigLoader(QString preName) {
  *  Load igniter data in Json.
  */
 Json::Value* SvdConfigLoader::loadDefaultIgniter() {
-    const QString defaultTemplateFile = QString(DEFAULTSOFTWARETEMPLATE) + QString(DEFAULTSOFTWARETEMPLATEEXT);
-    Json::Value* result = new Json::Value();
+    auto defaultTemplateFile = QString(DEFAULTSOFTWARETEMPLATE) + QString(DEFAULTSOFTWARETEMPLATEEXT);
+    auto result = new Json::Value();
     QFile defaultIgniter(defaultTemplateFile); /* try loading root igniter as second */
     if(!defaultIgniter.open(QIODevice::ReadOnly)) { /* check file access */
         #ifdef DEBUG
@@ -65,7 +65,7 @@ Json::Value* SvdConfigLoader::loadIgniter() {
     const QString rootIgniter = QString(DEFAULTSOFTWARETEMPLATESDIR) + "/" + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
     const QString userIgniter = QString(USERS_HOME_DIR) + "/" + QString::number(uid) + QString(DEFAULTUSERIGNITERSDIR) + "/" + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
 
-    Json::Value* result = new Json::Value();
+    auto result = new Json::Value();
     QFile fileUser(userIgniter); /* try loading user igniter as first */
     QFile fileRoot(rootIgniter); /* try loading root igniter as second */
     if(!fileUser.open(QIODevice::ReadOnly)) { /* check file access */

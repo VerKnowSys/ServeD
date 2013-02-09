@@ -13,7 +13,7 @@ void writeSampleOf(const char* sample, const char* file) {
 
 TestLibrary::TestLibrary() {
     /* Logger setup */
-    ConsoleAppender *consoleAppender = new ConsoleAppender();
+    auto *consoleAppender = new ConsoleAppender();
     consoleAppender->setFormat("%t{yyyy-MM-dd HH:mm:ss} [%-7l] <%c> %m\n");
     Logger::registerAppender(consoleAppender);
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
@@ -22,7 +22,7 @@ TestLibrary::TestLibrary() {
 /* test functions */
 
 void TestLibrary::testParseJSONRedis() {
-    SvdServiceConfig *config = new SvdServiceConfig("Redis"); /* Load app specific values */
+    auto *config = new SvdServiceConfig("Redis"); /* Load app specific values */
     QCOMPARE(config->name, QString("Redis"));
     QCOMPARE(config->softwareName, QString("Redis"));
     QCOMPARE(config->staticPort, -1);
@@ -57,7 +57,7 @@ void TestLibrary::testParseJSONRedis() {
 
 
 void TestLibrary::testParseDefault() {
-    SvdServiceConfig *config = new SvdServiceConfig(); /* Load default values */
+    auto *config = new SvdServiceConfig(); /* Load default values */
     QCOMPARE(config->staticPort, -1);
     QVERIFY(config->schedulerActions->length() == 0);
     delete config;
@@ -65,7 +65,7 @@ void TestLibrary::testParseDefault() {
 
 
 void TestLibrary::testMultipleConfigsLoading() {
-    SvdServiceConfig *config = new SvdServiceConfig(); /* Load default values */
+    auto *config = new SvdServiceConfig(); /* Load default values */
     QVERIFY(config->name == "Default");
     QVERIFY(config->install->commands.length() == 0);
     QVERIFY(config->schedulerActions->length() == 0);
@@ -79,7 +79,7 @@ void TestLibrary::testMultipleConfigsLoading() {
 
 
 void TestLibrary::testNonExistantConfigLoading() {
-    SvdServiceConfig *config = new SvdServiceConfig("PlewisŚmiewis");
+    auto *config = new SvdServiceConfig("PlewisŚmiewis");
     QVERIFY(config->name == "PlewisŚmiewis");
     QVERIFY(config->install->commands.length() == 0);
 }

@@ -19,7 +19,7 @@ SvdServiceConfig::SvdServiceConfig() { /* Load default values */
     uid = getuid();
     schedulerActions = new QList<SvdSchedulerAction*>();
     try {
-        Json::Value* defaults = (new SvdConfigLoader())->config;
+        auto defaults = (new SvdConfigLoader())->config;
         name = "Default";
         softwareName = (*defaults)["softwareName"].asString().c_str();
         autoRestart = (*defaults)["autoRestart"].asBool();
@@ -98,8 +98,8 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
     schedulerActions = new QList<SvdSchedulerAction*>();
     uid = getuid();
     try {
-        Json::Value* defaults = (new SvdConfigLoader())->config;
-        Json::Value* root = (new SvdConfigLoader(serviceName))->config; // NOTE: the question is.. how will this behave ;]
+        auto defaults = (new SvdConfigLoader())->config;
+        auto root = (new SvdConfigLoader(serviceName))->config; // NOTE: the question is.. how will this behave ;]
 
         name = serviceName;
         softwareName = root->get("softwareName", (*defaults)["softwareName"]).asString().c_str();
@@ -112,7 +112,7 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
         staticPort = root->get("staticPort", (*defaults)["staticPort"]).asInt();
 
         /* load service scheduler data */
-        Json::Value _preSchedActions = (*root)["schedulerActions"];
+        auto _preSchedActions = (*root)["schedulerActions"];
         for (uint index = 0; index < _preSchedActions.size(); ++index ) {
             try {
                 schedulerActions->push_back(
@@ -225,7 +225,7 @@ QString SvdServiceConfig::replaceAllSpecialsIn(const QString& content) {
         if (!userDomain.isEmpty()) {
             info = QHostInfo::fromName(QString(userDomain));
             if (!info.addresses().isEmpty()) {
-                QHostAddress address = info.addresses().first();
+                auto address = info.addresses().first();
                 userAddress = address.toString();
                 // logDebug() << "Resolved address of domain " << userDomain << " is " << userAddress;
                 ccont = ccont.replace("SERVICE_ADDRESS", userAddress); /* replace with user address content */
@@ -263,7 +263,6 @@ SvdShellOperations::SvdShellOperations() {
 
 
 SvdShellOperations::SvdShellOperations(const QString& initialCommand, const QString& initialExpectOutput) {
-    SvdShellOperations();
     commands += initialCommand;
     expectOutput += initialExpectOutput;
 }
