@@ -22,6 +22,15 @@ void spawnSvdServiceWatcher(const QString & name) {
 int main(int argc, char *argv[]) {
 
     QCoreApplication app(argc, argv);
+    QStringList args = app.arguments();
+    QRegExp rxEnableDebug("-d");
+
+    bool debug = false;
+    for (int i = 1; i < args.size(); ++i) {
+        if (rxEnableDebug.indexIn(args.at(i)) != -1 ) {
+            debug = true;
+        }
+    }
     QFutureWatcher<void> watcher;
     QString softwareDataDir;
     QStringList services;
@@ -30,7 +39,10 @@ int main(int argc, char *argv[]) {
     ConsoleAppender *consoleAppender = new ConsoleAppender();
     consoleAppender->setFormat("%t{dd-HH:mm:ss} [%-7l] <%c> %m\n");
     Logger::registerAppender(consoleAppender);
-    consoleAppender->setDetailsLevel(Logger::Trace);
+    if (debug)
+        consoleAppender->setDetailsLevel(Logger::Trace);
+    else
+        consoleAppender->setDetailsLevel(Logger::Info);
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
 
     logInfo() << "Starting Service Spawner for uid:" << getuid();
