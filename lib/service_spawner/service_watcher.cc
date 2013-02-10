@@ -63,7 +63,7 @@ SvdServiceWatcher::SvdServiceWatcher(const QString& name) {
 }
 
 void SvdServiceWatcher::dirChangedSlot(const QString& dir) {
-    logDebug() << "Directory changed:" << dir;
+    logTrace() << "Directory changed:" << dir;
 
     if (triggerFiles->start->exists()) {
         triggerFiles->start->remove();

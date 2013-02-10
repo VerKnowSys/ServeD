@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
     ConsoleAppender *consoleAppender = new ConsoleAppender();
     consoleAppender->setFormat("%t{dd-HH:mm:ss} [%-7l] <%c> %m\n");
     Logger::registerAppender(consoleAppender);
+    consoleAppender->setDetailsLevel(Logger::Trace);
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
 
     logInfo() << "Starting Service Spawner for uid:" << getuid();
