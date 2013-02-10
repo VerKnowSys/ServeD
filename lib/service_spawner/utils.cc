@@ -45,7 +45,7 @@ uint registerFreeTcpPort(uint specificPort) {
 
     logTrace() << "Trying port: " << port << ". Randseed: " << rand;
     auto tcpServer = new QTcpServer();
-    if (!tcpServer->listen(QHostAddress::Any, port) || (!tcpServer->isListening()) ) { // address
+    if (!tcpServer->listen(QHostAddress::Any, port) && (!tcpServer->isListening()) ) {
         logDebug() << "Already taken port found: " << port;
         delete tcpServer;
         return registerFreeTcpPort(10000 + rand);
