@@ -209,7 +209,7 @@ void TestLibrary::testSomeRealCraziness() {
 void TestLibrary::testSanityValueCheck() {
     auto *config = new SvdServiceConfig("Redis");
 
-    QVERIFY(config->userServiceRoot().contains(QString(config->uid)));
+    QVERIFY(config->userServiceRoot().contains(QString::number(config->uid)));
     QVERIFY(config->userServiceRoot().contains("Users"));
     QVERIFY(config->userServiceRoot().contains(QString(DEFAULT_USER_APPS_DIR)));
     QVERIFY(config->userServiceRoot().contains(config->softwareName));
@@ -219,10 +219,10 @@ void TestLibrary::testSanityValueCheck() {
 
     if (config->uid == 0) {
         QVERIFY(config->prefixDir().contains(QString(SYSTEM_USERS_DIR)));
-        QVERIFY(!config->prefixDir().contains(QString(config->uid))); // root service prefix dir doens't contains uid in path!
+        QVERIFY(!config->prefixDir().contains(QString::number(config->uid))); // root service prefix dir doens't contains uid in path!
     } else {
         QVERIFY(config->prefixDir().contains(QString(USERS_HOME_DIR)));
-        QVERIFY(config->prefixDir().contains(QString(config->uid)));
+        QVERIFY(config->prefixDir().contains(QString::number(config->uid)));
     }
     QVERIFY(config->prefixDir().contains(QString(QString(SOFTWARE_DATA_DIR))));
     delete config;
