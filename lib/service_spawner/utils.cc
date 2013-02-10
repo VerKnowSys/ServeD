@@ -19,7 +19,12 @@ const QString getHomeDir() {
 
 
 const QString getSoftwareDataDir() {
-    return getHomeDir() + QString(SOFTWARE_DATA_DIR);
+    QString dataDir = getHomeDir() + QString(SOFTWARE_DATA_DIR);
+    if (!QFile::exists(dataDir)) {
+        logTrace() << "Software data dir:" << dataDir << ", doesn't exists. Creating it.";
+        QDir().mkpath(dataDir);
+    }
+    return dataDir;
 }
 
 
