@@ -64,6 +64,7 @@ SvdServiceWatcher::SvdServiceWatcher(const QString& name) {
 
 void SvdServiceWatcher::dirChangedSlot(const QString& dir) {
     logTrace() << "Directory changed:" << dir;
+    const QString serviceName = dir.split("/").last(); // ServiceName
 
     if (triggerFiles->start->exists()) {
         triggerFiles->start->remove();
@@ -71,7 +72,7 @@ void SvdServiceWatcher::dirChangedSlot(const QString& dir) {
             logWarn() << "Interrupted emission of startService() signal. Service is already running.";
         else {
             logDebug() << "Emitting startService() signal.";
-            emit startService();
+            emit startService(serviceName);
         }
         return;
     }
@@ -80,7 +81,7 @@ void SvdServiceWatcher::dirChangedSlot(const QString& dir) {
         triggerFiles->stop->remove();
         if (indicatorFiles->running->exists()) {
             logDebug() << "Emitting stopService() signal.";
-            emit stopService();
+            emit stopService(serviceName);
         } else
             logWarn() << "Interrupted emission of stopService() signal. Service is not running.";
         return;

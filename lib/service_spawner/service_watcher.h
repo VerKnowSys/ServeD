@@ -74,8 +74,8 @@ class SvdServiceWatcher: public QObject {
         void installService();
         void configureService();
         void validateService();
-        void startService();
-        void stopService();
+        void startService(const QString& serviceName);
+        void stopService(const QString& serviceName);
         void restartService();
         void reloadService();
 
