@@ -11,19 +11,19 @@
 
 void SvdFileEventsManager::registerFile(const QString& path) {
     if (QFile::exists(path)) {
-        logInfo() << "Registering watcher on an existing file:" << path;
+        logDebug() << "Registering watcher on an existing file:" << path;
         addPath(path);
     } else {
-        logDebug() << "File to watch does not exist. Assumming that we want to monitor a directory:" << path;
+        logTrace() << "File to watch does not exist. Assumming that we want to monitor a directory:" << path;
         QDir().mkpath(path);
-        logInfo() << "Creating and registering watcher on a new directory:" << path;
+        logDebug() << "Creating and registering watcher on a new directory:" << path;
         addPath(path);
     }
 }
 
 
 void SvdFileEventsManager::unregisterFile(const QString& path) {
-    logInfo() << "Unregistering watcher on file:" << path;
+    logDebug() << "Unregistering watcher on file:" << path;
     removePath(path);
 }
 

@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     services = QDir(softwareDataDir).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
 
     Q_FOREACH(QString name, services)
-        logDebug() << "Found" << name << "service.";
+        logInfo() << "Found" << name << "service.";
 
 
     QFuture<void> result = QtConcurrent::map(services, spawnSvdServiceWatcher);

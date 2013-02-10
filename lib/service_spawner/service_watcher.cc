@@ -44,7 +44,7 @@ SvdHookIndicatorFiles::~SvdHookIndicatorFiles() {
 
 
 SvdServiceWatcher::SvdServiceWatcher(const QString& name) {
-    logInfo() << "Starting SvdServiceWatcher for service:" << name;
+    logDebug() << "Starting SvdServiceWatcher for service:" << name;
 
     dataDir = getServiceDataDir(name);
 
