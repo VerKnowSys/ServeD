@@ -71,6 +71,12 @@ SvdServiceWatcher::SvdServiceWatcher(const QString& name) {
     connect(this, SIGNAL(restartService()), service, SLOT(restartSlot()));
     connect(this, SIGNAL(reloadService()), service, SLOT(reloadSlot()));
 
+    /* manage service autostart */
+    if (indicatorFiles->autostart->exists()) {
+        logInfo() << "Performing autostart of service:" << name;
+        emit startService();
+    }
+
     loop->exec();
 }
 
