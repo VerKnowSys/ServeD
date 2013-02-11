@@ -26,10 +26,15 @@ int main(int argc, char *argv[]) {
 
     QStringList args = app.arguments();
     QRegExp rxEnableDebug("-d");
-    bool debug = false;
+    QRegExp rxEnableTrace("-t");
+    bool debug = false, trace = false;
     for (int i = 1; i < args.size(); ++i) {
         if (rxEnableDebug.indexIn(args.at(i)) != -1 ) {
             debug = true;
+        }
+        if (rxEnableTrace.indexIn(args.at(i)) != -1 ) {
+            debug = true;
+            trace = true;
         }
     }
 
@@ -42,8 +47,10 @@ int main(int argc, char *argv[]) {
     ConsoleAppender *consoleAppender = new ConsoleAppender();
     consoleAppender->setFormat("%t{dd-HH:mm:ss} [%-7l] <%c> %m\n");
     Logger::registerAppender(consoleAppender);
-    if (debug)
+    if (trace && debug)
         consoleAppender->setDetailsLevel(Logger::Trace);
+    else if (debug && !trace)
+        consoleAppender->setDetailsLevel(Logger::Debug);
     else
         consoleAppender->setDetailsLevel(Logger::Info);
 
