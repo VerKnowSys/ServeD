@@ -28,9 +28,9 @@ clean:
 distclean:
 	cd fann; $(MAKE) distclean; cd ..
 	cd kickstart; $(MAKE) distclean; cd ..
-	cd cutelogger; $(MAKE) clean; $(RM) -rf Makefile ../liblogger.a; cd ..
-	cd service_spawner; $(MAKE) clean; $(RM) -rf Makefile ../../ss; cd ..
-	cd test; $(MAKE) clean; $(RM) -rf Makefile ../../test; cd ..
+	cd cutelogger; $(MAKE) clean; $(RM) -rf Makefile ../liblogger.a *.moc; cd ..
+	cd service_spawner; $(MAKE) clean; $(RM) -rf Makefile ../../ss *.moc; cd ..
+	cd test; $(MAKE) clean; $(RM) -rf Makefile ../../test *.moc; cd ..
 	cd jsoncpp; $(MAKE) clean; cd .. ; $(RM) -rf libjson.*
 
 
