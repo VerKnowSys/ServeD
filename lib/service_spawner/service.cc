@@ -7,7 +7,7 @@
 
 
 #include "service.h"
-
+#include "process.h"
 
 
 SvdService::SvdService(const QString& name) {
@@ -42,6 +42,17 @@ void SvdService::configureSlot() {
 void SvdService::startSlot() {
     logDebug() << "Invoked start slot for service:" << name;
     uptime->start();
+
+    logTrace() << "Launching commands:" << config->start->commands;
+    auto proc = new SvdProcess(name, "start");
+    proc->spawnProcess(config->start->commands);
+
+    touch(config->prefixDir() + "/.running");
+
+    proc->waitForFinished();
+    proc->kill();
+    logTrace("After proc execution");
+    delete proc;
 }
 
 
@@ -52,6 +63,23 @@ void SvdService::afterStartSlot() {
 
 void SvdService::stopSlot() {
     logDebug() << "Invoked stop slot for service:" << name;
+    auto proc = new SvdProcess(name, "stop");
+
+    proc->spawnProcess(config->stop->commands); // invoke igniter stop, and then try to look for service.pid in prefix directory:
+
+    QString servicePidFile = config->prefixDir() + "/service.pid";
+    if (QFile::exists(servicePidFile)) {
+        uint pid = QString(readFileContents(servicePidFile).c_str()).toUInt();
+        logDebug() << "Service pid found:" << QString::number(pid) << "in file:" << servicePidFile;
+        kill(pid, SIGTERM);
+        logDebug() << "Service terminated.";
+    }
+    QFile::remove(config->prefixDir() + "/.running");
+
+    proc->waitForFinished();
+    proc->kill();
+    logTrace("After proc execution");
+    delete proc;
 }
 
 

@@ -12,6 +12,7 @@
 #include "service_config.h"
 #include "utils.h"
 
+#include <signal.h>
 #include <QObject>
 #include <QElapsedTimer>
 
