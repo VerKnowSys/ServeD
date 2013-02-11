@@ -241,8 +241,10 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
         if (QFile::exists(domainFilePath)) {
             userDomain = QString(readFileContents(domainFilePath).c_str()).trimmed();
             ccont = ccont.replace("SERVICE_DOMAIN", userDomain); /* replace with user domain content */
-        } else
+        } else {
             ccont = ccont.replace("SERVICE_DOMAIN", domain); /* replace with default domain */
+            writeToFile(domainFilePath, domain);
+        }
 
         /* Replace SERVICE_ADDRESS */
         QString address = QString(DEFAULT_SYSTEM_ADDRESS);
