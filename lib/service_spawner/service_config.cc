@@ -210,10 +210,10 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
     QString ccont = content;
 
     if (name == QString("Default")) {
-        logDebug() << "No specials in Default file.";
+        logTrace() << "No specials in Default file.";
         return ccont;
     } else if (content.trimmed().isEmpty()) {
-        logDebug() << "No content to replace specials in.";
+        logTrace() << "No content to replace specials in.";
         return ccont;
     } else {
 
