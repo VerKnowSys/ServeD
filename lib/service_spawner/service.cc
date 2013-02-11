@@ -12,7 +12,6 @@
 
 SvdService::SvdService(const QString& name) {
     this->name = name;
-    this->config = new SvdServiceConfig(name);
     this->uptime = new QElapsedTimer();
     logTrace() << "Creating SvdService with name" << this->name;
 }
@@ -21,7 +20,6 @@ SvdService::SvdService(const QString& name) {
 SvdService::~SvdService() {
     logTrace() << "Service was alive for" << getUptime() /1000 << "seconds.";
     delete uptime;
-    delete config;
 }
 
 
@@ -44,6 +42,8 @@ void SvdService::startSlot() {
     logDebug() << "Invoked start slot for service:" << name;
     uptime->start();
 
+    auto config = new SvdServiceConfig(name);
+
     logTrace() << "Launching commands:" << config->start->commands;
     auto proc = new SvdProcess(name, "start");
     proc->spawnProcess(config->start->commands);
@@ -54,6 +54,7 @@ void SvdService::startSlot() {
     proc->kill();
     logTrace("After proc execution");
     delete proc;
+    delete config;
 }
 
 
@@ -66,6 +67,7 @@ void SvdService::stopSlot() {
     logDebug() << "Invoked stop slot for service:" << name;
     auto proc = new SvdProcess(name, "stop");
 
+    auto config = new SvdServiceConfig(name);
     proc->spawnProcess(config->stop->commands); // invoke igniter stop, and then try to look for service.pid in prefix directory:
 
     QString servicePidFile = config->prefixDir() + "/service.pid";
@@ -81,6 +83,7 @@ void SvdService::stopSlot() {
     proc->kill();
     logTrace("After proc execution");
     delete proc;
+    delete config;
 }
 
 

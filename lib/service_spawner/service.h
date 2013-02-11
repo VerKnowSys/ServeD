@@ -29,7 +29,6 @@ class SvdService: public QObject {
     private:
         QString name;
         QElapsedTimer *uptime;
-        SvdServiceConfig *config;
 
 
     public slots:
