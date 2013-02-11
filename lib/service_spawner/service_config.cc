@@ -212,6 +212,9 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
     if (name == QString("Default")) {
         logDebug() << "No specials in Default file.";
         return ccont;
+    } else if (content.trimmed().isEmpty()) {
+        logDebug() << "No content to replace specials in.";
+        return ccont;
     } else {
 
         /* Replace SERVICE_ROOT */
