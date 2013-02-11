@@ -8,8 +8,8 @@ DEVEL             = false
 DARWIN            = false
 
 CCACHE            = ccache
-CC                = "$(CCACHE) clang"
-CXX               = "$(CCACHE) clang++ -std=c++11"
+CC                = "$(CCACHE) clang -fcolor-diagnostics -Qunused-arguments -Wself-assign"
+CXX               = "$(CCACHE) clang++ -std=c++11 -fcolor-diagnostics -Qunused-arguments -Wself-assign"
 AR                = ar
 RM                = rm
 QMAKE             = qmake
