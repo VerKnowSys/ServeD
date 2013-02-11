@@ -14,6 +14,14 @@
 #include <QtCore>
 
 
+void unixSignalHandler(int sigNum) {
+    if (sigNum == SIGINT) {
+        logDebug() << "Caught SIGINT signal. Quitting application.";
+        qApp->quit();
+    }
+}
+
+
 int main(int argc, char *argv[]) {
 
     QCoreApplication app(argc, argv);
@@ -59,6 +67,8 @@ int main(int argc, char *argv[]) {
         logInfo() << "Found" << name << "service.";
         watchers << new SvdServiceWatcher(name);
     }
+
+    signal(SIGINT, unixSignalHandler);
 
     return app.exec();
 }

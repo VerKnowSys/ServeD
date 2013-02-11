@@ -82,6 +82,7 @@ class SvdServiceWatcher: public QObject {
         void reloadService();
 
     public slots:
+        void shutdownSlot();
         void dirChangedSlot(const QString& dir);
         void fileChangedSlot(const QString& file);
 

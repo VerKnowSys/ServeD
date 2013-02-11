@@ -69,12 +69,22 @@ SvdServiceWatcher::SvdServiceWatcher(const QString& name) {
     connect(this, SIGNAL(restartService()), service, SLOT(restartSlot()));
     connect(this, SIGNAL(reloadService()), service, SLOT(reloadSlot()));
 
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(shutdownSlot()));
+
     /* manage service autostart */
     if (indicatorFiles->autostart->exists()) {
         logInfo() << "Performing autostart of service:" << name;
         emit startService();
     }
 }
+
+
+void SvdServiceWatcher::shutdownSlot() {
+    qDebug() << "Invoked shutdown slot.";
+    qDebug() << "Emitting stopService signal.";
+    emit stopService();
+}
+
 
 void SvdServiceWatcher::dirChangedSlot(const QString& dir) {
     logTrace() << "Directory changed:" << dir;
