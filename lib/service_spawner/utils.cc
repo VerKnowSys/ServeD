@@ -1,5 +1,5 @@
 /**
- *  @author tallica
+ *  @author tallica, dmilith
  *
  *   © 2013 - VerKnowSys
  *
@@ -14,6 +14,16 @@ void touch(const QString& fileName) {
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     file.close();
     return;
+}
+
+
+void writeToFile(const QString& fileName, const QString& contents) {
+    QFile file(fileName);
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream << contents << endl;
+    }
+    file.close();
 }
 
 
@@ -98,7 +108,7 @@ string readFileContents(const QString& fileName) {
         QString line = stream.readLine();
         if (!line.trimmed().isEmpty()) {
             lines += line + "\n";
-            logDebug() << fileName << ":" << line;
+            logTrace() << fileName << ":" << line;
         }
     }
     lines += "\n";
