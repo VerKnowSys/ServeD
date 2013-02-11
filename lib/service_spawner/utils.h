@@ -32,6 +32,7 @@
 using namespace std;
 
 
+void touch(const QString& fileName);
 uint registerFreeTcpPort(uint specificPort = 0);
 Json::Value* parseJSON(const QString& filename);
 string readFileContents(const QString& fileName);

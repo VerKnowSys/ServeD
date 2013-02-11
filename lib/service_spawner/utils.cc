@@ -9,6 +9,14 @@
 #include "utils.h"
 
 
+void touch(const QString& fileName) {
+    QFile file(fileName);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    file.close();
+    return;
+}
+
+
 const QString getHomeDir() {
     uid_t uid = getuid();
     if (uid == 0)
