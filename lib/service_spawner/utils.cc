@@ -97,7 +97,7 @@ string readFileContents(const QString& fileName) {
     while (!stream.atEnd()) {
         QString line = stream.readLine();
         logDebug() << fileName << ":" << line;
-        lines += line;
+        lines += line + "\n";
     }
     f.close();
     return string(lines.toUtf8());
