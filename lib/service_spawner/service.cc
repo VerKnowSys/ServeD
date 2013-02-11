@@ -67,6 +67,10 @@ void SvdService::stopSlot() {
     logDebug() << "Invoked stop slot for service:" << name;
     auto proc = new SvdProcess(name, "stop");
 
+    logInfo() << "Stopping service" << name << "after" << getUptime() << "seconds";
+    delete uptime;
+    uptime = new QElapsedTimer();
+
     auto config = new SvdServiceConfig(name);
     proc->spawnProcess(config->stop->commands); // invoke igniter stop, and then try to look for service.pid in prefix directory:
 
