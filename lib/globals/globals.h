@@ -43,7 +43,7 @@
     #define ROOT_JAR_FILE "/sbin/root.core"
     #define USER_JAR_FILE "/bin/user.core"
 
-    #define DEFAULT_STRING_CODEC "UTF-8"
+    #define DEFAULT_STRING_CODEC "utf8"
     #define LOCALE "en_GB.UTF-8"
 
     #define DEFAULT_USER_UID 501
