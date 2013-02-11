@@ -10,6 +10,7 @@
 
 #include "file_events_manager.h"
 #include "service_config.h"
+#include "service.h"
 
 #include <QObject>
 #include <QFile>
@@ -63,12 +64,12 @@ class SvdServiceWatcher: public QObject {
         ~SvdServiceWatcher();
 
     private:
-        SvdServiceConfig *config;
         QEventLoop *loop;
         SvdFileEventsManager *fileEvents;
         SvdHookTriggerFiles *triggerFiles;
         SvdHookIndicatorFiles *indicatorFiles;
         QString dataDir;
+        SvdService *service;
 
         void cleanupTriggerHookFiles();
 

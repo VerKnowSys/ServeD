@@ -1,5 +1,5 @@
 /**
- *  @author tallica
+ *  @author tallica, dmilith
  *
  *   © 2013 - VerKnowSys
  *
@@ -48,7 +48,7 @@ SvdServiceWatcher::SvdServiceWatcher(const QString& name) {
 
     dataDir = getServiceDataDir(name);
 
-    config = new SvdServiceConfig(name);
+    service = new SvdService(name);
 
     loop = new QEventLoop();
 
@@ -58,8 +58,18 @@ SvdServiceWatcher::SvdServiceWatcher(const QString& name) {
     triggerFiles = new SvdHookTriggerFiles(dataDir);
     indicatorFiles = new SvdHookIndicatorFiles(dataDir);
 
+    /* connect file event slots to watcher: */
     connect(fileEvents, SIGNAL(directoryChanged(QString)), this, SLOT(dirChangedSlot(QString)));
     connect(fileEvents, SIGNAL(fileChanged(QString)), this, SLOT(fileChangedSlot(QString)));
+
+    /* connect watcher signals to slots of service: */
+    connect(this, SIGNAL(installService()), service, SLOT(installSlot()));
+    connect(this, SIGNAL(configureService()), service, SLOT(configureSlot()));
+    connect(this, SIGNAL(validateService()), service, SLOT(validateSlot()));
+    connect(this, SIGNAL(startService()), service, SLOT(startSlot()));
+    connect(this, SIGNAL(stopService()), service, SLOT(stopSlot()));
+    connect(this, SIGNAL(restartService()), service, SLOT(restartSlot()));
+    connect(this, SIGNAL(reloadService()), service, SLOT(reloadSlot()));
 
     loop->exec();
 }
@@ -101,5 +111,5 @@ SvdServiceWatcher::~SvdServiceWatcher() {
     delete fileEvents;
     delete triggerFiles;
     delete indicatorFiles;
-    delete config;
+    delete service;
 }
