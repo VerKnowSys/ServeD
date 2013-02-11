@@ -42,6 +42,7 @@ void SvdService::startSlot() {
     logDebug() << "Invoked start slot for service:" << name;
     uptime->start();
 
+    logDebug() << "Reloading service igniter" << name;
     auto config = new SvdServiceConfig(name);
 
     logTrace() << "Launching commands:" << config->start->commands;
@@ -98,6 +99,8 @@ void SvdService::afterStopSlot() {
 
 void SvdService::restartSlot() {
     logDebug() << "Invoked restart slot for service:" << name;
+    stopSlot();
+    startSlot();
 }
 
 
