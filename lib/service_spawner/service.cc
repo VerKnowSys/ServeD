@@ -12,8 +12,9 @@
 
 SvdService::SvdService(const QString& name) {
     this->name = name;
-    config = new SvdServiceConfig(name);
-    uptime = new QElapsedTimer();
+    this->config = new SvdServiceConfig(name);
+    this->uptime = new QElapsedTimer();
+    logTrace() << "Creating SvdService with name" << this->name;
 }
 
 
