@@ -225,7 +225,7 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
             logDebug() << "Service root found in: " << serviceRoot();
             ccont = ccont.replace("SERVICE_ROOT", serviceRoot());
         } else {
-             logWarn() << "Not found root service of " << name << serviceRoot();
+             logDebug() << "Not found root service of " << name << serviceRoot();
              return "";
         }
 
@@ -285,7 +285,7 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
 Json::Value* SvdServiceConfig::loadDefaultIgniter() {
     QFile defaultIgniter(defaultTemplateFile()); /* try loading root igniter as second */
     if(!defaultIgniter.open(QIODevice::ReadOnly)) { /* check file access */
-        logWarn() << "No file: " << defaultTemplateFile();
+        logDebug() << "No file: " << defaultTemplateFile();
     } else {
         return parseJSON(defaultTemplateFile());
     }
