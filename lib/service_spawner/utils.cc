@@ -96,9 +96,12 @@ string readFileContents(const QString& fileName) {
     stream.setCodec(QTextCodec::codecForName(DEFAULT_STRING_CODEC));
     while (!stream.atEnd()) {
         QString line = stream.readLine();
-        logDebug() << fileName << ":" << line;
-        lines += line + "\n";
+        if (!line.trimmed().isEmpty()) {
+            lines += line + "\n";
+            logDebug() << fileName << ":" << line;
+        }
     }
+    lines += "\n";
     f.close();
     return string(lines.toUtf8());
 }
