@@ -9,7 +9,7 @@
 
 
 SvdProcess::SvdProcess(const QString& serviceName, const QString& prefix) {
-    setProcessChannelMode(MergedChannels);
+    // setProcessChannelMode(MergedChannels);
     setupChildProcess();
     // XXX:
     setStandardOutputFile(getSoftwareDataDir() + "/" + serviceName + "/."+ prefix + ".stdout.log", QIODevice::Append);
@@ -19,7 +19,7 @@ SvdProcess::SvdProcess(const QString& serviceName, const QString& prefix) {
 
 void SvdProcess::spawnDefaultShell() {
     logDebug() << "Spawning default shell.";
-    start(QString(DEFAULT_SHELL_COMMAND), QStringList());
+    start(QString(DEFAULT_SHELL_COMMAND), QStringList("-s"));
 }
 
 
