@@ -22,7 +22,7 @@ void spawnSvdServiceWatcher(const QString & name) {
 int main(int argc, char *argv[]) {
 
     QCoreApplication app(argc, argv);
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForName(DEFAULT_STRING_CODEC));
 
     QStringList args = app.arguments();
     QRegExp rxEnableDebug("-d");
