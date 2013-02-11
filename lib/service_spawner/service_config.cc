@@ -205,6 +205,7 @@ const QString SvdServiceConfig::userIgniter() {
 }
 
 
+/* XXX: TODO: OPTIMIZE, define cache for values explictly read from files for each service hook for each service */
 const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
     QString ccont = content;
 
@@ -215,17 +216,17 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
 
         /* Replace SERVICE_ROOT */
         if (QFile::exists(userServiceRoot())) {
-            logDebug() << "User service root found in: " << userServiceRoot();
+            logTrace() << "User service root found in:" << userServiceRoot();
             ccont = ccont.replace("SERVICE_ROOT", userServiceRoot());
         } else {
-            logDebug() << "Not found user service root of " << name << userServiceRoot();
+            logDebug() << "Not found user service root of" << name << userServiceRoot();
         }
 
-        if (QFile::exists(serviceRoot())) {
-            logDebug() << "Service root found in: " << serviceRoot();
+        if (!QFile::exists(userServiceRoot()) && QFile::exists(serviceRoot())) { // check it only if user service isn't installed
+            logTrace() << "Service root found in:" << serviceRoot();
             ccont = ccont.replace("SERVICE_ROOT", serviceRoot());
-        } else {
-             logDebug() << "Not found root service of " << name << serviceRoot();
+        } else if (!QFile::exists(userServiceRoot()) && !QFile::exists(serviceRoot())) {
+             logWarn() << "Not found service root of" << name << serviceRoot();
              return "";
         }
 
@@ -269,8 +270,10 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
             portFilePath = QString(readFileContents(portFilePath).c_str()).trimmed();
             ccont = ccont.replace("SERVICE_PORT", portFilePath); /* replace with user port content */
         } else {
-            logDebug() << "No port file for service " << name << " (software: " << softwareName << ")! This might be something nasty!. It happened in file: " << portFilePath;
-            ccont = ccont.replace("SERVICE_PORT", QString::number(registerFreeTcpPort())); /* this shouldn't happen */
+            uint freePort = registerFreeTcpPort();
+            logDebug() << "No port file for service " << name << " (software: " << softwareName << ")! Ports file will be created and filled with generated port:" << freePort;
+            ccont = ccont.replace("SERVICE_PORT", QString::number(freePort)); /* this happens when no service port file exists */
+            writeToFile(portFilePath, QString::number(freePort));
         }
 
         // logDebug() << "Given content: " << ccont.replace("\n", " ");
