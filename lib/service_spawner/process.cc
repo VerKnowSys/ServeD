@@ -8,45 +8,48 @@
 #include "process.h"
 
 
-SvdProcess::SvdProcess() {
+SvdProcess::SvdProcess(const QString& serviceName, const QString& prefix) {
     setProcessChannelMode(MergedChannels);
-    // XXX
-    // setStandardOutputFile("/Users/UID/SoftwareData/SERVICE/process.log", QIODevice::Append);
+    setupChildProcess();
+    // XXX:
+    setStandardOutputFile(getSoftwareDataDir() + "/" + serviceName + "/."+ prefix + ".stdout.log", QIODevice::Append);
+    setStandardErrorFile(getSoftwareDataDir() + "/" + serviceName + "/."+ prefix + ".stderr.log", QIODevice::Append);
 }
 
 
 void SvdProcess::spawnDefaultShell() {
     logDebug() << "Spawning default shell.";
-    start(QString(DEFAULT_SHELL_COMMAND), QStringList() << "-s");
+    start(QString(DEFAULT_SHELL_COMMAND), QStringList());
 }
 
 
-void SvdProcess::spawnService(const char *command) {
+void SvdProcess::spawnProcess(const QString& command) {
     spawnDefaultShell();
     logDebug() << "Spawning command:" << QString(command);
-    write(command);
+    write(command.toUtf8());
     closeWriteChannel();
+    // stop();
 }
 
 
 void SvdProcess::setupChildProcess() {
-    logDebug() << "Setup process environment.";
     uid_t uid = getuid();
 
-    const char *homeDir = getHomeDir().toStdString().c_str();
-    const char *user = QString::number(uid).toStdString().c_str();
+    const QString home = getHomeDir();
+    const QString user = QString::number(uid).toUtf8();
+    logDebug() << "Setup process environment with home:" << home << "and user:" << user;
 
     #ifdef __FreeBSD__
         setgroups(0, 0);
     #endif
     setuid(uid);
-    chdir(homeDir);
-    setenv("HOME", homeDir, 1);
-    setenv("~", homeDir, 1);
-    setenv("PWD", homeDir, 1);
-    setenv("OLDPWD", homeDir, 1);
-    setenv("USER", user, 1);
-    setenv("LOGNAME", user, 1);
+    chdir(home.toUtf8());
+    setenv("HOME", home.toUtf8(), 1);
+    setenv("~", home.toUtf8(), 1);
+    setenv("PWD", home.toUtf8(), 1);
+    setenv("OLDPWD", home.toUtf8(), 1);
+    setenv("USER", user.toUtf8(), 1);
+    setenv("LOGNAME", user.toUtf8(), 1);
     setenv("LC_ALL", LOCALE, 1);
     setenv("LANG", LOCALE, 1);
     unsetenv("USERNAME");
