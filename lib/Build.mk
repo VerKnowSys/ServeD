@@ -7,8 +7,9 @@
 DEVEL             = false
 DARWIN            = false
 
-CC                = clang
-CXX               = "clang++ -std=c++11"
+CCACHE            = ccache
+CC                = "$(CCACHE) clang"
+CXX               = "$(CCACHE) clang++ -std=c++11"
 AR                = ar
 RM                = rm
 QMAKE             = qmake
