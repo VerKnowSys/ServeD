@@ -238,15 +238,14 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
         ccont = ccont.replace("SERVICE_PREFIX", prefixDir());
 
         /* Replace SERVICE_DOMAIN */
-        QString domain = QString(DEFAULT_SYSTEM_DOMAIN);
         QString domainFilePath = prefixDir() + "/" + QString(DEFAULT_USER_DOMAIN_FILE);
         QString userDomain = "";
         if (QFile::exists(domainFilePath)) {
             userDomain = QString(readFileContents(domainFilePath).c_str()).trimmed();
             ccont = ccont.replace("SERVICE_DOMAIN", userDomain); /* replace with user domain content */
         } else {
-            ccont = ccont.replace("SERVICE_DOMAIN", domain); /* replace with default domain */
-            writeToFile(domainFilePath, domain);
+            ccont = ccont.replace("SERVICE_DOMAIN", QHostInfo::localHostName()); /* replace with default domain */
+            writeToFile(domainFilePath, QHostInfo::localHostName());
         }
 
         /* Replace SERVICE_ADDRESS */
