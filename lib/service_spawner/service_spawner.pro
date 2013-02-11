@@ -7,6 +7,7 @@
 QT -= gui
 QT += network
 HEADERS   += service.h \
+             process.h \
              service_config.h \
              utils.h \
              service_watcher.h \
@@ -17,6 +18,7 @@ HEADERS   += service.h \
              ../cutelogger/ConsoleAppender.h \
              ../cutelogger/FileAppender.h
 SOURCES   += service.cc \
+             process.cc \
              service_config.cc \
              utils.cc \
              service_watcher.cc \
