@@ -14,11 +14,6 @@
 #include <QtCore>
 
 
-void spawnSvdServiceWatcher(const QString & name) {
-    SvdServiceWatcher serviceWatcher(name);
-}
-
-
 int main(int argc, char *argv[]) {
 
     QCoreApplication app(argc, argv);
@@ -39,9 +34,9 @@ int main(int argc, char *argv[]) {
     }
 
     /* Setting up watchers */
-    QFutureWatcher<void> watcher;
     QString softwareDataDir;
     QStringList services;
+    QList<SvdServiceWatcher *> watchers;
 
     /* Logger setup */
     ConsoleAppender *consoleAppender = new ConsoleAppender();
@@ -60,12 +55,10 @@ int main(int argc, char *argv[]) {
     logDebug() << "Looking for services inside" << softwareDataDir;
     services = QDir(softwareDataDir).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
 
-    Q_FOREACH(QString name, services)
+    Q_FOREACH(QString name, services) {
         logInfo() << "Found" << name << "service.";
-
-
-    QFuture<void> result = QtConcurrent::map(services, spawnSvdServiceWatcher);
-    watcher.setFuture(result);
+        watchers << new SvdServiceWatcher(name);
+    }
 
     return app.exec();
 }

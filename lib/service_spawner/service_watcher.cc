@@ -50,8 +50,6 @@ SvdServiceWatcher::SvdServiceWatcher(const QString& name) {
 
     service = new SvdService(name);
 
-    loop = new QEventLoop();
-
     fileEvents = new SvdFileEventsManager();
     fileEvents->registerFile(dataDir);
 
@@ -76,8 +74,6 @@ SvdServiceWatcher::SvdServiceWatcher(const QString& name) {
         logInfo() << "Performing autostart of service:" << name;
         emit startService();
     }
-
-    loop->exec();
 }
 
 void SvdServiceWatcher::dirChangedSlot(const QString& dir) {
@@ -124,7 +120,6 @@ void SvdServiceWatcher::fileChangedSlot(const QString& file) {
 
 
 SvdServiceWatcher::~SvdServiceWatcher() {
-    delete loop;
     delete fileEvents;
     delete triggerFiles;
     delete indicatorFiles;

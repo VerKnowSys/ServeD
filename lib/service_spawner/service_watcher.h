@@ -64,7 +64,6 @@ class SvdServiceWatcher: public QObject {
         ~SvdServiceWatcher();
 
     private:
-        QEventLoop *loop;
         SvdFileEventsManager *fileEvents;
         SvdHookTriggerFiles *triggerFiles;
         SvdHookIndicatorFiles *indicatorFiles;
