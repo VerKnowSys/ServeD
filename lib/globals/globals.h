@@ -7,7 +7,7 @@
     #define MOTD_FILE "/etc/motd"
 
     /* default BSD case: */
-    #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh"
+    #define DEFAULT_SHELL_COMMAND "/bin/svdshell" // "/Software/Zsh/exports/zsh"
     #define DEFAULT_JAVA_PATH "/Software/Openjdk/openjdk7/"
 
     #ifdef __FreeBSD__
