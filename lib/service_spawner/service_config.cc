@@ -201,7 +201,7 @@ const QString SvdServiceConfig::rootIgniter() {
 
 
 const QString SvdServiceConfig::userIgniter() {
-    return QString(USERS_HOME_DIR) + "/" + QString(uid) + QString(DEFAULTUSERIGNITERSDIR) + "/" + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
+    return QString(USERS_HOME_DIR) + "/" + QString::number(uid) + QString(DEFAULTUSERIGNITERSDIR) + "/" + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
 }
 
 
