@@ -53,7 +53,8 @@ int main(int argc, char *argv[]) {
     else
         consoleAppender->setDetailsLevel(Logger::Info);
 
-    logInfo() << "Starting Service Spawner for uid:" << getuid();
+    logInfo("Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
+    logDebug() << "Spawning for uid:" << getuid();
 
     /* Setting up watchers */
     auto userWatcher = new SvdUserWatcher();
