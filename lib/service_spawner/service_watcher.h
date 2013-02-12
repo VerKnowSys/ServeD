@@ -51,7 +51,7 @@ class SvdHookIndicatorFiles {
         SvdHookIndicatorFiles(const QString& path);
         ~SvdHookIndicatorFiles();
 
-        SvdHookIndicatorFile *running, *autostart;
+        SvdHookIndicatorFile *running, *autostart, *installing;
 
 };
 
