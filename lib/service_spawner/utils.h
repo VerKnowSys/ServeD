@@ -37,6 +37,7 @@ void writeToFile(const QString& fileName, const QString& contents);
 uint registerFreeTcpPort(uint specificPort = 0);
 Json::Value* parseJSON(const QString& filename);
 string readFileContents(const QString& fileName);
+bool removeDir(const QString& dirName);
 
 const QString getHomeDir();
 const QString getSoftwareDataDir();
