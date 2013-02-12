@@ -238,3 +238,41 @@ void TestLibrary::testSanityValueCheck() {
     delete config;
 }
 
+
+/* SvdService tests */
+void TestLibrary::testReInstallingRedis() {
+    QString name = "Redis";
+    auto config = new SvdServiceConfig(name);
+    removeDir(config->userServiceRoot());
+    QVERIFY(not QFile::exists(config->userServiceRoot()));
+
+    auto service = new SvdService(name);
+    service->installSlot();
+    QVERIFY(config->serviceInstalled());
+    QVERIFY(QFile::exists(config->userServiceRoot()));
+
+    removeDir(config->userServiceRoot());
+    QVERIFY(not QFile::exists(config->userServiceRoot()));
+    service->startSlot(); // should install and start redis
+    QString runningFile = config->prefixDir() + "/.running";
+    QString portsFile = config->prefixDir() + "/.ports";
+    QString domainFile = config->prefixDir() + "/.domain";
+    QVERIFY(QFile::exists(runningFile));
+
+    uint portOfRunningRedis = QString(readFileContents(portsFile).c_str()).trimmed().toUInt();
+    logInfo() << "Redis port:" << portOfRunningRedis;
+    uint port = registerFreeTcpPort(portOfRunningRedis);
+    logInfo() << "Registered port:" << port;
+    service->stopSlot();
+
+    QVERIFY(QFile::exists(config->userServiceRoot()));
+    QVERIFY(QFile::exists(config->prefixDir()));
+    QVERIFY(QFile::exists(portsFile));
+    QVERIFY(QFile::exists(domainFile));
+    QVERIFY(not QFile::exists(runningFile));
+    QVERIFY(port != portOfRunningRedis);
+
+    delete service;
+    delete config;
+}
+

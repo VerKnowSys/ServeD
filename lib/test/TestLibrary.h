@@ -5,6 +5,8 @@
 #include "../jsoncpp/json/json.h"
 #include "../service_spawner/service_config.h"
 #include "../service_spawner/utils.h"
+#include "../service_spawner/service.h"
+#include "../service_spawner/process.h"
 
 #include <QObject>
 #include <QtTest/QtTest>
@@ -29,6 +31,8 @@ class TestLibrary: public QObject {
             void testUtils();
             void testSomeRealCraziness();
             void testSanityValueCheck();
+
+            void testReInstallingRedis();
 
 
 };
