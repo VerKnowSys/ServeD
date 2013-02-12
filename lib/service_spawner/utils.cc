@@ -18,7 +18,7 @@ void touch(const QString& fileName) {
 
 
 bool removeDir(const QString& dirName) {
-    bool result;
+    bool result = false;
     QDir dir(dirName);
     if (dir.exists(dirName)) {
         Q_FOREACH(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
