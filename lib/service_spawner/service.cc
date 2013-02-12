@@ -41,11 +41,10 @@ void SvdService::installSlot() {
     proc->waitForFinished();
     proc->kill();
 
-    while (!config->serviceInstalled()) {
-        sleep(1);
+    if (config->serviceInstalled()) {
+        logDebug() << "Found installed file indicator of software:" << config->softwareName << ", which is base for service:" << name;
+        QFile::remove(config->prefixDir() + "/.installing");
     }
-    logDebug() << "Found installed file indicator of software:" << config->softwareName << ", which is base for service:" << name;
-    QFile::remove(config->prefixDir() + "/.installing");
 
     logTrace() << "After proc install execution:" << name;
     delete proc;
