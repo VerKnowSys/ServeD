@@ -14,6 +14,8 @@ SvdHookTriggerFiles::SvdHookTriggerFiles(const QString& path) {
     configure = new SvdHookTriggerFile(path + "/.configure");
     start     = new SvdHookTriggerFile(path + "/.start");
     stop      = new SvdHookTriggerFile(path + "/.stop");
+    afterStart= new SvdHookTriggerFile(path + "/.afterStart");
+    afterStop = new SvdHookTriggerFile(path + "/.afterStop");
     restart   = new SvdHookTriggerFile(path + "/.restart");
     reload    = new SvdHookTriggerFile(path + "/.reload");
     validate  = new SvdHookTriggerFile(path + "/.validate");
@@ -24,7 +26,9 @@ SvdHookTriggerFiles::~SvdHookTriggerFiles() {
     delete install;
     delete configure;
     delete start;
+    delete afterStart;
     delete stop;
+    delete afterStop;
     delete restart;
     delete reload;
     delete validate;
@@ -67,7 +71,9 @@ SvdServiceWatcher::SvdServiceWatcher(const QString& name) {
     connect(this, SIGNAL(configureService()), service, SLOT(configureSlot()));
     connect(this, SIGNAL(validateService()), service, SLOT(validateSlot()));
     connect(this, SIGNAL(startService()), service, SLOT(startSlot()));
+    connect(this, SIGNAL(afterStartService()), service, SLOT(afterStartSlot()));
     connect(this, SIGNAL(stopService()), service, SLOT(stopSlot()));
+    connect(this, SIGNAL(afterStopService()), service, SLOT(afterStopSlot()));
     connect(this, SIGNAL(restartService()), service, SLOT(restartSlot()));
     connect(this, SIGNAL(reloadService()), service, SLOT(reloadSlot()));
 
@@ -139,6 +145,14 @@ void SvdServiceWatcher::dirChangedSlot(const QString& dir) {
         return;
     }
 
+    /* afterStart */
+    if (triggerFiles->afterStart->exists()) {
+        triggerFiles->afterStart->remove();
+        logDebug() << "Emitting afterStartService() signal.";
+        emit afterStartService();
+        return;
+    }
+
     /* stop */
     if (triggerFiles->stop->exists()) {
         triggerFiles->stop->remove();
@@ -147,6 +161,14 @@ void SvdServiceWatcher::dirChangedSlot(const QString& dir) {
             emit stopService();
         } else
             logWarn() << "Interrupted emission of stopService() signal. Service is not running.";
+        return;
+    }
+
+    /* afterStop */
+    if (triggerFiles->afterStop->exists()) {
+        triggerFiles->afterStop->remove();
+        logDebug() << "Emitting afterStopService() signal.";
+        emit afterStopService();
         return;
     }
 
