@@ -125,7 +125,6 @@ void SvdServiceWatcher::dirChangedSlot(const QString& dir) {
             emit installService();
         }
         return;
-    }
 
     /* start */
     if (triggerFiles->start->exists()) {
@@ -156,6 +155,12 @@ void SvdServiceWatcher::dirChangedSlot(const QString& dir) {
         logDebug() << "Emitting restartService() signal.";
         emit restartService();
         return;
+    }
+
+    /* Check if directory wasn't removed */
+    if (not QFile::exists(dir)) {
+        logWarn() << "Service data directory was removed. Shutting down service watcher.";
+        emit shutdownSlot();
     }
 
 }

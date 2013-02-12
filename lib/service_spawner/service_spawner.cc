@@ -9,6 +9,7 @@
 #include "../globals/globals.h"
 #include "service_config.h"
 #include "service_watcher.h"
+#include "user_watcher.h"
 #include "utils.h"
 
 #include <QtCore>
@@ -41,11 +42,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    /* Setting up watchers */
-    QString softwareDataDir;
-    QStringList services;
-    QList<SvdServiceWatcher *> watchers;
-
     /* Logger setup */
     ConsoleAppender *consoleAppender = new ConsoleAppender();
     consoleAppender->setFormat("%t{dd-HH:mm:ss} [%-7l] <%c> %m\n");
@@ -58,15 +54,9 @@ int main(int argc, char *argv[]) {
         consoleAppender->setDetailsLevel(Logger::Info);
 
     logInfo() << "Starting Service Spawner for uid:" << getuid();
-    softwareDataDir = getSoftwareDataDir();
 
-    logDebug() << "Looking for services inside" << softwareDataDir;
-    services = QDir(softwareDataDir).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
-
-    Q_FOREACH(QString name, services) {
-        logInfo() << "Found" << name << "service.";
-        watchers << new SvdServiceWatcher(name);
-    }
+    /* Setting up watchers */
+    auto userWatcher = new SvdUserWatcher();
 
     signal(SIGINT, unixSignalHandler);
 
