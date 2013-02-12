@@ -125,6 +125,7 @@ void SvdServiceWatcher::dirChangedSlot(const QString& dir) {
             emit installService();
         }
         return;
+    }
 
     /* start */
     if (triggerFiles->start->exists()) {
