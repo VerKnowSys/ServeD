@@ -111,6 +111,15 @@ void TestLibrary::testFreePortFunctionality() {
     logDebug() << "Port:" << port;
 
     uint port2 = registerFreeTcpPort();
+    uint port3 = registerFreeTcpPort();
+    uint port4 = registerFreeTcpPort();
+    uint port5 = registerFreeTcpPort();
+    uint port6 = registerFreeTcpPort();
+    uint port7 = registerFreeTcpPort();
+    uint port8 = registerFreeTcpPort();
+    uint port9 = registerFreeTcpPort();
+    uint port10 = registerFreeTcpPort();
+    QVERIFY(port10 != port9 != port8 != port7 != port6 != port5 != port4 != port3 != port2 != port);
     QVERIFY(port2 != 0);
     logDebug() << "Port:" << port2;
 

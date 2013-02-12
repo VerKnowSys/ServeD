@@ -54,8 +54,9 @@ const QString getServiceDataDir(const QString& name) {
 /* author: dmilith */
 uint registerFreeTcpPort(uint specificPort) {
     QTime midnight(0, 0, 0);
+    qsrand(midnight.msecsTo(QTime::currentTime())); // accuracy is in ms.. so let's hack it a bit
+    usleep(10000); // this practically means no chance to generate same port when generating multiple ports at once
     uint port = 0, rand = (qrand() % 40000);
-    qsrand(midnight.msecsTo(QTime::currentTime()));
     if (specificPort == 0) {
         port = 10000 + rand;
     } else
