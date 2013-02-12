@@ -91,6 +91,42 @@ void SvdServiceWatcher::shutdownSlot() {
 void SvdServiceWatcher::dirChangedSlot(const QString& dir) {
     logTrace() << "Directory changed:" << dir;
 
+    /* configure */
+    if (triggerFiles->configure->exists()) {
+        triggerFiles->configure->remove();
+        logDebug() << "Emitting configureService() signal.";
+        emit configureService();
+        return;
+    }
+
+    /* validate */
+    if (triggerFiles->validate->exists()) {
+        triggerFiles->validate->remove();
+        logDebug() << "Emitting validateService() signal.";
+        emit validateService();
+        return;
+    }
+
+    /* reload */
+    if (triggerFiles->reload->exists()) {
+        triggerFiles->reload->remove();
+        logDebug() << "Emitting reloadService() signal.";
+        emit reloadService();
+        return;
+    }
+
+    /* install */
+    if (triggerFiles->install->exists()) {
+        triggerFiles->install->remove();
+        if (indicatorFiles->installing->exists())
+            logWarn() << "Interrupted emission of installService() signal. Service is currently installing.";
+        else {
+            logDebug() << "Emitting installService() signal.";
+            emit installService();
+        }
+        return;
+    }
+
     /* start */
     if (triggerFiles->start->exists()) {
         triggerFiles->start->remove();
