@@ -27,8 +27,7 @@ void writeToFile(const QString& fileName, const QString& contents) {
 }
 
 
-const QString getHomeDir() {
-    uid_t uid = getuid();
+const QString getHomeDir(uid_t uid) {
     if (uid == 0)
         return QString(SYSTEM_USERS_DIR);
     else
@@ -36,8 +35,8 @@ const QString getHomeDir() {
 }
 
 
-const QString getSoftwareDataDir() {
-    QString dataDir = getHomeDir() + QString(SOFTWARE_DATA_DIR);
+const QString getSoftwareDataDir(uid_t uid) {
+    QString dataDir = getHomeDir(uid) + QString(SOFTWARE_DATA_DIR);
     if (!QFile::exists(dataDir)) {
         logTrace() << "Software data dir:" << dataDir << ", doesn't exists. Creating it.";
         QDir().mkpath(dataDir);
@@ -46,8 +45,23 @@ const QString getSoftwareDataDir() {
 }
 
 
+const QString getServiceDataDir(uid_t uid, const QString& name) {
+    return getSoftwareDataDir(uid) + "/" + name;
+}
+
+
+const QString getHomeDir() {
+    return getHomeDir(getuid());
+}
+
+
+const QString getSoftwareDataDir() {
+    return getSoftwareDataDir(getuid());
+}
+
+
 const QString getServiceDataDir(const QString& name) {
-    return getSoftwareDataDir() + "/" + name;
+    return getServiceDataDir(getuid(), name);
 }
 
 

@@ -11,6 +11,7 @@ HEADERS   += service.h \
              service_config.h \
              utils.h \
              service_watcher.h \
+             user_watcher.h \
              file_events_manager.h \
              ../kickstart/core.h \
              ../jsoncpp/json/json.h \
@@ -22,6 +23,7 @@ SOURCES   += service.cc \
              service_config.cc \
              utils.cc \
              service_watcher.cc \
+             user_watcher.cc \
              file_events_manager.cc \
              service_spawner.cc
 LIBS      += ../libjson.a ../liblogger.a
