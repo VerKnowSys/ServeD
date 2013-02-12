@@ -83,14 +83,14 @@ void TestLibrary::testMultipleConfigsLoading() {
 
     config = new SvdServiceConfig("Redis");
     QCOMPARE(config->name, QString("Redis"));
-    QVERIFY(config->install->commands.length() > 0);
+    QVERIFY(config->install->commands == "sofin get redis");
     QVERIFY(config->watchPort == true);
     delete config;
 
     config = new SvdServiceConfig("Mosh");
     QVERIFY(config->name == "Mosh");
     QVERIFY(config->softwareName == "Mosh");
-    QVERIFY(config->install->commands.length() == 0);
+    QVERIFY(config->install->commands == "sofin get mosh");
     QVERIFY(config->watchPort == false);
     delete config;
 }
