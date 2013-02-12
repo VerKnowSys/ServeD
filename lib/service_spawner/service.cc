@@ -38,7 +38,7 @@ void SvdService::installSlot() {
     auto proc = new SvdProcess(name, "install");
     touch(config->prefixDir() + "/.installing");
     proc->spawnProcess(config->install->commands);
-    proc->waitForFinished();
+    proc->waitForFinished(-1); // no timeout
     proc->kill();
 
     if (config->serviceInstalled()) {
