@@ -57,6 +57,7 @@ class SvdServiceConfig : QObject {
         const QString defaultTemplateFile();
         const QString rootIgniter();
         const QString userIgniter();
+        bool serviceInstalled();
 
         Json::Value* loadDefaultIgniter();
         Json::Value* loadIgniter();

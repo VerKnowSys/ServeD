@@ -176,6 +176,14 @@ const QString SvdServiceConfig::userServiceRoot() {
 }
 
 
+bool SvdServiceConfig::serviceInstalled() {
+    if (uid == 0)
+        return QFile::exists(serviceRoot() + "/" + softwareName.toLower() + ".installed");
+    else
+        return QFile::exists(userServiceRoot() + "/" + softwareName.toLower() + ".installed");
+}
+
+
 const QString SvdServiceConfig::serviceRoot() {
     return QString(SOFTWARE_DIR) + "/" + softwareName; // low prio
 }
