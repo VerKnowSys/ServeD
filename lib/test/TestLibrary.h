@@ -32,7 +32,7 @@ class TestLibrary: public QObject {
             void testSomeRealCraziness();
             void testSanityValueCheck();
 
-            void testReInstallingRedis();
+            void testStartingRedis();
 
 
 };
