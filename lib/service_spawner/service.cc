@@ -146,7 +146,7 @@ void SvdService::stopSlot() {
     logDebug() << "Invoked stop slot for service:" << name;
     auto config = new SvdServiceConfig(name);
     QString indicator = config->prefixDir() + "/.running";
-    if (QFile::exists(indicator)) {
+    if (not QFile::exists(indicator)) {
         logInfo() << "No need to stop service" << name << "because it's already stopped.";
     } else {
         auto proc = new SvdProcess(name, "stop");
