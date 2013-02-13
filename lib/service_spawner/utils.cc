@@ -15,6 +15,11 @@ void rotateLog(const QString& fileName) {
 }
 
 
+bool expect(const QString& inputFileContent, const QString& expectedString) {
+    return inputFileContent.trimmed().contains(expectedString.trimmed());
+}
+
+
 QString getOrCreateDir(const QString& path) {
     if (not QFile::exists(path)) {
         logTrace() << "Creating non existant dir:" << path ;

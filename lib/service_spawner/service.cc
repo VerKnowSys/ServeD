@@ -40,11 +40,14 @@ void SvdService::installSlot() {
         logDebug() << "Loading service igniter" << name;
 
         logTrace() << "Launching commands:" << config->install->commands;
-        auto proc = new SvdProcess(name, "install");
+        auto proc = new SvdProcess(name);
         touch(indicator);
         proc->spawnProcess(config->install->commands);
         proc->waitForFinished(-1); // no timeout
         proc->kill();
+        if (not expect(readFileContents(proc->outputFile).c_str(), config->install->expectOutput)) {
+            writeToFile(config->prefixDir() + "/.errors", "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->install->expectOutput + "'");
+        }
 
         /* inform output about some kind of a problem */
         if (config->serviceInstalled()) {
@@ -71,10 +74,13 @@ void SvdService::configureSlot() {
         logTrace() << "Loading service igniter" << name;
         touch(indicator);
         logTrace() << "Launching commands:" << config->configure->commands;
-        auto proc = new SvdProcess(name, "configure");
+        auto proc = new SvdProcess(name);
         proc->spawnProcess(config->configure->commands);
         proc->waitForFinished(-1);
         proc->kill();
+        if (not expect(readFileContents(proc->outputFile).c_str(), config->configure->expectOutput)) {
+            writeToFile(config->prefixDir() + "/.errors", "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->configure->expectOutput + "'");
+        }
 
         QFile::remove(indicator);
         logTrace() << "After proc configure execution:" << name;
@@ -105,13 +111,17 @@ void SvdService::startSlot() {
 
         logInfo() << "Launching service" << name;
         logTrace() << "Launching commands:" << config->start->commands;
-        auto proc = new SvdProcess(name, "start");
+        auto proc = new SvdProcess(name);
         proc->spawnProcess(config->start->commands);
 
         touch(indicator);
 
         proc->waitForFinished(-1);
         proc->kill();
+        if (not expect(readFileContents(proc->outputFile).c_str(), config->start->expectOutput)) {
+            writeToFile(config->prefixDir() + "/.errors", "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->start->expectOutput + "'");
+        }
+
         logTrace() << "After proc start execution:" << name;
         delete proc;
     }
@@ -129,10 +139,13 @@ void SvdService::afterStartSlot() {
     } else {
         logTrace() << "Launching commands:" << config->afterStart->commands;
         touch(indicator);
-        auto proc = new SvdProcess(name, "afterStart");
+        auto proc = new SvdProcess(name);
         proc->spawnProcess(config->afterStart->commands);
         proc->waitForFinished(-1);
         proc->kill();
+        if (not expect(readFileContents(proc->outputFile).c_str(), config->afterStart->expectOutput)) {
+            writeToFile(config->prefixDir() + "/.errors", "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->afterStart->expectOutput + "'");
+        }
 
         QFile::remove(indicator);
         logTrace() << "After proc afterStart execution:" << name;
@@ -149,7 +162,7 @@ void SvdService::stopSlot() {
     if (not QFile::exists(indicator)) {
         logInfo() << "No need to stop service" << name << "because it's already stopped.";
     } else {
-        auto proc = new SvdProcess(name, "stop");
+        auto proc = new SvdProcess(name);
         logInfo() << "Stopping service" << name << "after" << toHMS(getUptime()) << "seconds of uptime.";
         delete uptime;
         uptime = new QElapsedTimer(); // reset uptime count
@@ -167,6 +180,9 @@ void SvdService::stopSlot() {
         }
         proc->waitForFinished(-1);
         proc->kill();
+        if (not expect(readFileContents(proc->outputFile).c_str(), config->stop->expectOutput)) {
+            writeToFile(config->prefixDir() + "/.errors", "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->stop->expectOutput + "'");
+        }
 
         QFile::remove(indicator);
         logTrace() << "After proc stop execution:" << name;
@@ -186,10 +202,13 @@ void SvdService::afterStopSlot() {
     } else {
         touch(indicator);
         logTrace() << "Launching commands:" << config->afterStop->commands;
-        auto proc = new SvdProcess(name, "afterStop");
+        auto proc = new SvdProcess(name);
         proc->spawnProcess(config->afterStop->commands);
         proc->waitForFinished(-1);
         proc->kill();
+        if (not expect(readFileContents(proc->outputFile).c_str(), config->afterStop->expectOutput)) {
+            writeToFile(config->prefixDir() + "/.errors", "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->afterStop->expectOutput + "'");
+        }
 
         QFile::remove(indicator);
         logTrace() << "After proc afterStop execution:" << name;
@@ -216,10 +235,13 @@ void SvdService::reloadSlot() {
     } else {
         logTrace() << "Launching commands:" << config->reload->commands;
         touch(indicator);
-        auto proc = new SvdProcess(name, "reload");
+        auto proc = new SvdProcess(name);
         proc->spawnProcess(config->reload->commands);
         proc->waitForFinished(-1);
         proc->kill();
+        if (not expect(readFileContents(proc->outputFile).c_str(), config->reload->expectOutput)) {
+            writeToFile(config->prefixDir() + "/.errors", "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->reload->expectOutput + "'");
+        }
 
         QFile::remove(indicator);
         logTrace() << "After proc reload execution:" << name;
@@ -239,10 +261,13 @@ void SvdService::validateSlot() {
     } else {
         logTrace() << "Launching commands:" << config->validate->commands;
         touch(indicator);
-        auto proc = new SvdProcess(name, "validate");
+        auto proc = new SvdProcess(name);
         proc->spawnProcess(config->validate->commands);
         proc->waitForFinished(-1);
         proc->kill();
+        if (not expect(readFileContents(proc->outputFile).c_str(), config->validate->expectOutput)) {
+            writeToFile(config->prefixDir() + "/.errors", "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->validate->expectOutput + "'");
+        }
 
         QFile::remove(indicator);
         logTrace() << "After proc validate execution:" << name;

@@ -34,6 +34,7 @@ using namespace std;
 
 QString toHMS(uint duration);
 QString getOrCreateDir(const QString& path);
+bool expect(const QString& inputFileContent, const QString& expectedString);
 void touch(const QString& fileName);
 void writeToFile(const QString& fileName, const QString& contents);
 void rotateLog(const QString& fileName);
