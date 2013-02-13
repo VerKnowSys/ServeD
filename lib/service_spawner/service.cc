@@ -18,7 +18,7 @@ SvdService::SvdService(const QString& name) {
 
 
 SvdService::~SvdService() {
-    logTrace() << "Service was alive for" << getUptime() /1000 << "seconds.";
+    logInfo() << "Service was alive for" << toHMS(getUptime());
     delete uptime;
 }
 
