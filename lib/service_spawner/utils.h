@@ -33,6 +33,7 @@ using namespace std;
 
 
 QString toHMS(uint duration);
+QString getOrCreateDir(const QString& path);
 void touch(const QString& fileName);
 void writeToFile(const QString& fileName, const QString& contents);
 uint registerFreeTcpPort(uint specificPort = 0);

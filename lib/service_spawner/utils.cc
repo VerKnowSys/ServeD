@@ -9,6 +9,15 @@
 #include "utils.h"
 
 
+QString getOrCreateDir(const QString& path) {
+    if (not QFile::exists(path)) {
+        logTrace() << "Creating non existant dir:" << path ;
+        QDir().mkdir(path);
+    }
+    return path;
+}
+
+
 QString toHMS(uint duration) {
     QString res;
     const int seconds = (int)(duration % 60);
