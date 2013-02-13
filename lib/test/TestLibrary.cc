@@ -24,6 +24,8 @@ TestLibrary::TestLibrary() {
     consoleAppender->setDetailsLevel(Logger::Debug);
     Logger::registerAppender(consoleAppender);
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
+
+    testDataDirs << QDir::currentPath() + "/../basesystem/universal/TestData" << QDir::currentPath() + "/basesystem/universal/TestData";
 }
 
 /* test functions */
@@ -290,3 +292,15 @@ void TestLibrary::testInstallingWrongRedis() {
     delete service;
     delete config;
 }
+
+
+void TestLibrary::testWebAppDetection() {
+    auto statik = new StaticSiteType();
+    auto rails = new RailsSiteType();
+    auto node = new NodeSiteType();
+
+    QVERIFY(statik->detect(testDataDirs.at(0) + "/SomeStaticApp") or statik->detect(testDataDirs.at(1) + "/SomeStaticApp"));
+    QVERIFY(rails->detect(testDataDirs.at(0) + "/SomeRailsApp") or rails->detect(testDataDirs.at(1) + "/SomeRailsApp"));
+    QVERIFY(node->detect(testDataDirs.at(0) + "/SomeNodeApp") or node->detect(testDataDirs.at(1) + "/SomeNodeApp"));
+}
+

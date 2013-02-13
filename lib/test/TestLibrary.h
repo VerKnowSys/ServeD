@@ -7,6 +7,8 @@
 #include "../service_spawner/utils.h"
 #include "../service_spawner/service.h"
 #include "../service_spawner/process.h"
+#include "../service_spawner/webapp_types.h"
+#include "../service_spawner/webapp_deployer.h"
 
 #include <QObject>
 #include <QtTest/QtTest>
@@ -15,6 +17,8 @@
 class TestLibrary: public QObject {
     Q_OBJECT
         ConsoleAppender* consoleAppender;
+        QStringList testDataDirs;
+
 
         public:
             TestLibrary();
@@ -35,6 +39,7 @@ class TestLibrary: public QObject {
             void testStartingRedis();
             void testInstallingWrongRedis();
 
+            void testWebAppDetection();
 
 };
 
