@@ -17,7 +17,8 @@ HEADERS   += service.h \
              ../jsoncpp/json/json.h \
              ../cutelogger/Logger.h \
              ../cutelogger/ConsoleAppender.h \
-             ../cutelogger/FileAppender.h
+             ../cutelogger/FileAppender.h \
+             webapp_deployer.h
 SOURCES   += service.cc \
              process.cc \
              service_config.cc \
@@ -25,6 +26,7 @@ SOURCES   += service.cc \
              service_watcher.cc \
              user_watcher.cc \
              file_events_manager.cc \
+             webapp_deployer.cc \
              service_spawner.cc
 LIBS      += ../libjson.a ../liblogger.a
 TARGET    = ../../ss
