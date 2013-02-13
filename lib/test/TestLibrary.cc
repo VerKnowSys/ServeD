@@ -250,6 +250,7 @@ void TestLibrary::testStartingRedis() {
     QString portsFile = config->prefixDir() + "/.ports";
     QString domainFile = config->prefixDir() + "/.domain";
     QString pidFile = config->prefixDir() + "/service.pid";
+    QString outputFile = config->prefixDir() + "/.output.log";
     QVERIFY(QFile::exists(runningFile));
 
     uint portOfRunningRedis = QString(readFileContents(portsFile).c_str()).trimmed().toUInt();
@@ -258,6 +259,7 @@ void TestLibrary::testStartingRedis() {
     logInfo() << "Registered port:" << port;
     service->stopSlot();
 
+    QVERIFY(QFile::exists(outputFile));
     QVERIFY(QFile::exists(config->userServiceRoot()));
     QVERIFY(QFile::exists(config->prefixDir()));
     QVERIFY(QFile::exists(portsFile));
@@ -271,3 +273,20 @@ void TestLibrary::testStartingRedis() {
     delete config;
 }
 
+
+void TestLibrary::testInstallingWrongRedis() {
+    QString name = "TestWrongRedis";
+    auto config = new SvdServiceConfig(name);
+    auto service = new SvdService(name);
+    service->installSlot();
+    QString outputFile = config->prefixDir() + "/.output.log";
+    QString errorsFile = config->prefixDir() + "/.errors";
+    QVERIFY(expect("some crap", "crap"));
+    QVERIFY(not expect("anything", "crap"));
+    QVERIFY(QFile::exists(outputFile));
+    QVERIFY(QFile::exists(errorsFile));
+    removeDir(config->prefixDir());
+
+    delete service;
+    delete config;
+}

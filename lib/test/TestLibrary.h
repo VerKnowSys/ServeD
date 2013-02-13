@@ -33,6 +33,7 @@ class TestLibrary: public QObject {
             void testSanityValueCheck();
 
             void testStartingRedis();
+            void testInstallingWrongRedis();
 
 
 };
