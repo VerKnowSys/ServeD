@@ -50,6 +50,7 @@
 
     #define SOFTWARE_DIR "/Software"
     #define DEFAULT_USER_APPS_DIR "/Apps"
+    #define DEFAULT_DEPLOYER_DIR "/WebApps"
     #define SOFTWARE_DATA_DIR "/SoftwareData"
     #define SYSTEM_USERS_DIR "/SystemUsers"
     #define DEFAULTSOFTWARETEMPLATEEXT ".json"
@@ -66,7 +67,6 @@
     #define DEFAULT_SERVICE_INSTALLING_FILE "/.installing"
     #define DEFAULT_SERVICE_AFTERSTOPPING_FILE "/.afterStopping"
     #define DEFAULT_SERVICE_AFTERSTARTING_FILE "/.afterStarting"
-
     #define DEFAULT_SERVICE_CONFIGURING_FILE "/.configuring"
     #define DEFAULT_SERVICE_RELOADING_FILE "/.reloading"
     #define DEFAULT_SERVICE_VALIDATING_FILE "/.validating"
