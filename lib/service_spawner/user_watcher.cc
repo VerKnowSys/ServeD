@@ -20,7 +20,7 @@ SvdUserHookTriggerFiles::~SvdUserHookTriggerFiles() {
 
 
 SvdUserHookIndicatorFiles::SvdUserHookIndicatorFiles(const QString& path) {
-    autostart = new SvdHookIndicatorFile(path + "/.autostart");
+    autostart = new SvdHookIndicatorFile(path + DEFAULT_SERVICE_AUTOSTART_FILE);
 }
 
 

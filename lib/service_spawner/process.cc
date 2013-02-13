@@ -9,7 +9,7 @@
 
 
 SvdProcess::SvdProcess(const QString& name) {
-    outputFile = getSoftwareDataDir() + "/" + name + "/.output.log";
+    outputFile = getSoftwareDataDir() + "/" + name + DEFAULT_SERVICE_OUTPUT_FILE;
     setProcessChannelMode(MergedChannels);
     setupChildProcess();
     if (QFile::exists(outputFile)) {

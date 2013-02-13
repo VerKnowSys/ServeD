@@ -248,7 +248,7 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
         ccont = ccont.replace("SERVICE_PREFIX", prefixDir());
 
         /* Replace SERVICE_DOMAIN */
-        QString domainFilePath = prefixDir() + "/" + QString(DEFAULT_USER_DOMAIN_FILE);
+        QString domainFilePath = prefixDir() + QString(DEFAULT_USER_DOMAIN_FILE);
         QString userDomain = "";
         if (QFile::exists(domainFilePath)) {
             userDomain = QString(readFileContents(domainFilePath).c_str()).trimmed();
@@ -279,7 +279,7 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
         }
 
         /* Replace SERVICE_PORT */
-        QString portFilePath = prefixDir() + "/" + QString(DEFAULT_USER_PORTS_FILE);
+        QString portFilePath = prefixDir() + QString(DEFAULT_USER_PORTS_FILE);
         if (QFile::exists(portFilePath)) {
             portFilePath = QString(readFileContents(portFilePath).c_str()).trimmed();
             ccont = ccont.replace("SERVICE_PORT", portFilePath); /* replace with user port content */

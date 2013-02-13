@@ -246,11 +246,11 @@ void TestLibrary::testStartingRedis() {
     auto service = new SvdService(name);
 
     service->startSlot(); // should install and start redis
-    QString runningFile = config->prefixDir() + "/.running";
+    QString runningFile = config->prefixDir() + DEFAULT_SERVICE_RUNNING_FILE;
     QString portsFile = config->prefixDir() + "/.ports";
     QString domainFile = config->prefixDir() + "/.domain";
     QString pidFile = config->prefixDir() + "/service.pid";
-    QString outputFile = config->prefixDir() + "/.output.log";
+    QString outputFile = config->prefixDir() + DEFAULT_SERVICE_OUTPUT_FILE;
     QVERIFY(QFile::exists(runningFile));
 
     uint portOfRunningRedis = QString(readFileContents(portsFile).c_str()).trimmed().toUInt();
@@ -279,8 +279,8 @@ void TestLibrary::testInstallingWrongRedis() {
     auto config = new SvdServiceConfig(name);
     auto service = new SvdService(name);
     service->installSlot();
-    QString outputFile = config->prefixDir() + "/.output.log";
-    QString errorsFile = config->prefixDir() + "/.errors";
+    QString outputFile = config->prefixDir() + DEFAULT_SERVICE_OUTPUT_FILE;
+    QString errorsFile = config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE;
     QVERIFY(expect("some crap", "crap"));
     QVERIFY(not expect("anything", "crap"));
     QVERIFY(QFile::exists(outputFile));

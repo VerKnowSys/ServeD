@@ -2,7 +2,7 @@
 #define __GLOBALS__
 
     /* global constants */
-    #define APP_VERSION "0.17.4"
+    #define APP_VERSION "0.17.5"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -57,8 +57,19 @@
     #define DEFAULTSOFTWARETEMPLATESDIR (USERS_HOME_DIR "/Common/Igniters/Services")
     #define DEFAULTUSERIGNITERSDIR "/Igniters/Services"
     #define DEFAULT_SYSTEM_ADDRESS "127.0.0.1"
-    #define DEFAULT_USER_DOMAIN_FILE ".domain"
-    #define DEFAULT_USER_PORTS_FILE ".ports"
+    #define DEFAULT_USER_DOMAIN_FILE "/.domain"
+    #define DEFAULT_USER_PORTS_FILE "/.ports"
+    #define DEFAULT_SERVICE_OUTPUT_FILE "/.output"
+    #define DEFAULT_SERVICE_ERRORS_FILE "/.errors"
+    #define DEFAULT_SERVICE_AUTOSTART_FILE "/.autostart"
+    #define DEFAULT_SERVICE_RUNNING_FILE "/.running"
+    #define DEFAULT_SERVICE_INSTALLING_FILE "/.installing"
+    #define DEFAULT_SERVICE_AFTERSTOPPING_FILE "/.afterStopping"
+    #define DEFAULT_SERVICE_AFTERSTARTING_FILE "/.afterStarting"
+
+    #define DEFAULT_SERVICE_CONFIGURING_FILE "/.configuring"
+    #define DEFAULT_SERVICE_RELOADING_FILE "/.reloading"
+    #define DEFAULT_SERVICE_VALIDATING_FILE "/.validating"
 
 
     #define DEFAULT_GATHERING_PAUSE_MICROSECONDS 500000 // half a second
