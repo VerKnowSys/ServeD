@@ -36,16 +36,26 @@ SvdHookTriggerFiles::~SvdHookTriggerFiles() {
 
 
 SvdHookIndicatorFiles::SvdHookIndicatorFiles(const QString& path) {
-    autostart   = new SvdHookIndicatorFile(path + "/.autostart");
-    running     = new SvdHookIndicatorFile(path + "/.running");
-    installing  = new SvdHookIndicatorFile(path + "/.installing");
+    autostart       = new SvdHookIndicatorFile(path + "/.autostart");
+    afterStarting   = new SvdHookIndicatorFile(path + "/.afterStarting");
+    afterStopping   = new SvdHookIndicatorFile(path + "/.afterStopping");
+    running         = new SvdHookIndicatorFile(path + "/.running");
+    installing      = new SvdHookIndicatorFile(path + "/.installing");
+    configuring     = new SvdHookIndicatorFile(path + "/.configuring");
+    reloading       = new SvdHookIndicatorFile(path + "/.reloading");
+    validating      = new SvdHookIndicatorFile(path + "/.validating");
 }
 
 
 SvdHookIndicatorFiles::~SvdHookIndicatorFiles() {
     delete autostart;
+    delete afterStarting;
+    delete afterStopping;
     delete running;
     delete installing;
+    delete configuring;
+    delete reloading;
+    delete validating;
 }
 
 
