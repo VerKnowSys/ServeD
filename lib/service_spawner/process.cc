@@ -12,7 +12,11 @@ SvdProcess::SvdProcess(const QString& name) {
     outputFile = getSoftwareDataDir() + "/" + name + "/.output.log";
     setProcessChannelMode(MergedChannels);
     setupChildProcess();
-    setStandardOutputFile(outputFile, QIODevice::Append);
+    if (QFile::exists(outputFile)) {
+        logTrace() << "Rotating log file" << outputFile;
+        rotateLog(outputFile);
+    }
+    setStandardOutputFile(outputFile, QIODevice::Truncate);
 }
 
 
