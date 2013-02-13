@@ -8,12 +8,12 @@
 #include "process.h"
 
 
-SvdProcess::SvdProcess(const QString& serviceName, const QString& prefix) {
-    // setProcessChannelMode(MergedChannels);
+SvdProcess::SvdProcess(const QString& name, const QString& prefix) {
+    setProcessChannelMode(MergedChannels);
     setupChildProcess();
     // XXX:
-    setStandardOutputFile(getSoftwareDataDir() + "/" + serviceName + "/."+ prefix + ".stdout.log", QIODevice::Append);
-    setStandardErrorFile(getSoftwareDataDir() + "/" + serviceName + "/."+ prefix + ".stderr.log", QIODevice::Append);
+    setStandardOutputFile(getSoftwareDataDir() + "/" + name + "/."+ prefix + ".output.log", QIODevice::Append);
+    // setStandardErrorFile(getSoftwareDataDir() + "/" + name + "/."+ prefix + ".stderr.log", QIODevice::Append);
 }
 
 
