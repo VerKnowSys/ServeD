@@ -150,7 +150,7 @@ void SvdService::stopSlot() {
         logInfo() << "No need to stop service" << name << "because it's already stopped.";
     } else {
         auto proc = new SvdProcess(name, "stop");
-        logInfo() << "Stopping service" << name << "after" << QDateTime::fromTime_t(getUptime()).toString("ss hh DD") << "of uptime.";
+        logInfo() << "Stopping service" << name << "after" << toHMS(getUptime()) << "seconds of uptime.";
         delete uptime;
         uptime = new QElapsedTimer(); // reset uptime count
 
