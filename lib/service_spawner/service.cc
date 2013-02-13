@@ -73,7 +73,7 @@ void SvdService::configureSlot() {
         logTrace() << "Launching commands:" << config->configure->commands;
         auto proc = new SvdProcess(name, "configure");
         proc->spawnProcess(config->configure->commands);
-        proc->waitForFinished();
+        proc->waitForFinished(-1);
         proc->kill();
 
         QFile::remove(indicator);
@@ -110,7 +110,7 @@ void SvdService::startSlot() {
 
         touch(indicator);
 
-        proc->waitForFinished();
+        proc->waitForFinished(-1);
         proc->kill();
         logTrace() << "After proc start execution:" << name;
         delete proc;
@@ -131,7 +131,7 @@ void SvdService::afterStartSlot() {
         touch(indicator);
         auto proc = new SvdProcess(name, "afterStart");
         proc->spawnProcess(config->afterStart->commands);
-        proc->waitForFinished();
+        proc->waitForFinished(-1);
         proc->kill();
 
         QFile::remove(indicator);
@@ -165,7 +165,7 @@ void SvdService::stopSlot() {
             QFile::remove(servicePidFile);
             logDebug() << "Service terminated.";
         }
-        proc->waitForFinished();
+        proc->waitForFinished(-1);
         proc->kill();
 
         QFile::remove(indicator);
@@ -188,7 +188,7 @@ void SvdService::afterStopSlot() {
         logTrace() << "Launching commands:" << config->afterStop->commands;
         auto proc = new SvdProcess(name, "afterStop");
         proc->spawnProcess(config->afterStop->commands);
-        proc->waitForFinished();
+        proc->waitForFinished(-1);
         proc->kill();
 
         QFile::remove(indicator);
@@ -218,7 +218,7 @@ void SvdService::reloadSlot() {
         touch(indicator);
         auto proc = new SvdProcess(name, "reload");
         proc->spawnProcess(config->reload->commands);
-        proc->waitForFinished();
+        proc->waitForFinished(-1);
         proc->kill();
 
         QFile::remove(indicator);
@@ -241,7 +241,7 @@ void SvdService::validateSlot() {
         touch(indicator);
         auto proc = new SvdProcess(name, "validate");
         proc->spawnProcess(config->validate->commands);
-        proc->waitForFinished();
+        proc->waitForFinished(-1);
         proc->kill();
 
         QFile::remove(indicator);
