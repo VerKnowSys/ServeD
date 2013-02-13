@@ -9,6 +9,23 @@
 #include "utils.h"
 
 
+QString toHMS(uint duration) {
+    QString res;
+    const int seconds = (int)(duration % 60);
+    duration /= 60;
+    const int minutes = (int)(duration % 60);
+    duration /= 60;
+    const int hours = (int)(duration % 24);
+    const int days = (int)(duration / 24);
+
+    if ((hours == 0) && (days == 0))
+        return res.sprintf("%02d:%02d", minutes, seconds);
+    if (days == 0)
+        return res.sprintf("%02d:%02d:%02d", hours, minutes, seconds);
+    return res.sprintf("%dd%02d:%02d:%02d", days, hours, minutes, seconds);
+}
+
+
 void touch(const QString& fileName) {
     QFile file(fileName);
     file.open(QIODevice::WriteOnly | QIODevice::Text);
