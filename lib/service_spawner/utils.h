@@ -36,6 +36,7 @@ QString toHMS(uint duration);
 QString getOrCreateDir(const QString& path);
 void touch(const QString& fileName);
 void writeToFile(const QString& fileName, const QString& contents);
+void rotateLog(const QString& fileName);
 uint registerFreeTcpPort(uint specificPort = 0);
 Json::Value* parseJSON(const QString& filename);
 string readFileContents(const QString& fileName);

@@ -9,6 +9,12 @@
 #include "utils.h"
 
 
+void rotateLog(const QString& fileName) {
+    // TODO: implement real functionality here
+
+}
+
+
 QString getOrCreateDir(const QString& path) {
     if (not QFile::exists(path)) {
         logTrace() << "Creating non existant dir:" << path ;
