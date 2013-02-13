@@ -17,9 +17,10 @@
 class SvdProcess: public QProcess {
 
     public:
-        SvdProcess(const QString& name, const QString& prefix);
+        SvdProcess(const QString& name);
         void spawnDefaultShell();
         void spawnProcess(const QString& command);
+        QString outputFile;
 
     protected:
         void setupChildProcess();
