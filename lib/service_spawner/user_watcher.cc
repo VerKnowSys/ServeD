@@ -7,6 +7,7 @@
 
 #include "user_watcher.h"
 #include "utils.h"
+#include "webapp_deployer.h"
 
 
 SvdUserHookTriggerFiles::SvdUserHookTriggerFiles(const QString& path) {
@@ -37,10 +38,12 @@ void SvdUserWatcher::init(uid_t uid) {
     this->softwareDataDir = getSoftwareDataDir(uid);
 
     collectServices();
+    collectWebApplications();
 
     fileEvents = new SvdFileEventsManager();
     fileEvents->registerFile(homeDir);
     fileEvents->registerFile(softwareDataDir);
+    fileEvents->registerFile(homeDir + DEFAULT_DEPLOYER_DIR);
 
     triggerFiles = new SvdUserHookTriggerFiles(homeDir);
     indicatorFiles = new SvdUserHookIndicatorFiles(homeDir);
@@ -50,6 +53,24 @@ void SvdUserWatcher::init(uid_t uid) {
     connect(fileEvents, SIGNAL(fileChanged(QString)), this, SLOT(fileChangedSlot(QString)));
 
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(shutdownSlot()));
+}
+
+
+void SvdUserWatcher::collectWebApplications() {
+
+    logDebug() << "Looking for WebApps inside" << homeDir + DEFAULT_DEPLOYER_DIR;
+    QStringList oldWebApps = webApps;
+    logDebug() << "Previous list of WebApps:" << oldWebApps;
+    webApps = QDir(homeDir + DEFAULT_DEPLOYER_DIR).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    logDebug() << "Current list of WebApps:" << webApps;
+
+    Q_FOREACH(QString name, webApps) {
+        if (not oldWebApps.contains(name)) {
+            qDebug() << "Found WebApp:" << name;
+            new SvdWebAppDeployer(name);
+            // this->serviceWatchers << new SvdServiceWatcher(name);
+        }
+    }
 }
 
 
@@ -88,6 +109,12 @@ void SvdUserWatcher::dirChangedSlot(const QString& dir) {
     logTrace() << "Directory changed:" << dir;
 
     if (dir == homeDir) {
+        return;
+    }
+
+    if (dir.contains(DEFAULT_DEPLOYER_DIR)) {
+        logInfo() << "Deployer has been triggered with new web application";
+        collectWebApplications();
         return;
     }
 

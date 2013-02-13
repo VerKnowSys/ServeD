@@ -49,6 +49,8 @@ class SvdUserWatcher: public QObject {
         ~SvdUserWatcher();
         QList<SvdServiceWatcher *> serviceWatchers;
         QStringList services;
+        // QList<SvdWebApplicationWatcher *> webAppWatchers;
+        QStringList webApps;
 
     protected:
 
@@ -61,6 +63,7 @@ class SvdUserWatcher: public QObject {
         uid_t uid;
         void init(uid_t uid);
         void collectServices();
+        void collectWebApplications();
 
     signals:
         void autostartUser();
