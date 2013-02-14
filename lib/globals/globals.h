@@ -50,7 +50,7 @@
 
     #define SOFTWARE_DIR "/Software"
     #define DEFAULT_USER_APPS_DIR "/Apps"
-    #define DEFAULT_DEPLOYER_DIR "/WebApps"
+    #define DEFAULT_WEBAPPS_DIR "/WebApps"
     #define SOFTWARE_DATA_DIR "/SoftwareData"
     #define SYSTEM_USERS_DIR "/SystemUsers"
     #define DEFAULTSOFTWARETEMPLATEEXT ".json"

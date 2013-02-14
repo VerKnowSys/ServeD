@@ -43,7 +43,7 @@ void SvdUserWatcher::init(uid_t uid) {
     fileEvents = new SvdFileEventsManager();
     fileEvents->registerFile(homeDir);
     fileEvents->registerFile(softwareDataDir);
-    fileEvents->registerFile(homeDir + DEFAULT_DEPLOYER_DIR);
+    fileEvents->registerFile(homeDir + DEFAULT_WEBAPPS_DIR);
 
     triggerFiles = new SvdUserHookTriggerFiles(homeDir);
     indicatorFiles = new SvdUserHookIndicatorFiles(homeDir);
@@ -58,10 +58,10 @@ void SvdUserWatcher::init(uid_t uid) {
 
 void SvdUserWatcher::collectWebApplications() {
 
-    logDebug() << "Looking for WebApps inside" << homeDir + DEFAULT_DEPLOYER_DIR;
+    logDebug() << "Looking for WebApps inside" << homeDir + DEFAULT_WEBAPPS_DIR;
     QStringList oldWebApps = webApps;
     logDebug() << "Previous list of WebApps:" << oldWebApps;
-    webApps = QDir(homeDir + DEFAULT_DEPLOYER_DIR).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    webApps = QDir(homeDir + DEFAULT_WEBAPPS_DIR).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     logDebug() << "Current list of WebApps:" << webApps;
 
     Q_FOREACH(QString name, webApps) {
@@ -112,7 +112,7 @@ void SvdUserWatcher::dirChangedSlot(const QString& dir) {
         return;
     }
 
-    if (dir.contains(DEFAULT_DEPLOYER_DIR)) {
+    if (dir.contains(DEFAULT_WEBAPPS_DIR)) {
         logInfo() << "Deployer has been triggered with new web application";
         collectWebApplications();
         return;
