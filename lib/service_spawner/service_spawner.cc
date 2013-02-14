@@ -17,7 +17,7 @@
 
 void unixSignalHandler(int sigNum) {
     if (sigNum == SIGINT) {
-        logDebug() << "Caught SIGINT signal. Quitting application.";
+        logWarn() << "Caught SIGINT signal. Quitting application.";
         qApp->quit();
     }
 }
