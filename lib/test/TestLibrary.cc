@@ -25,7 +25,8 @@ TestLibrary::TestLibrary() {
     Logger::registerAppender(consoleAppender);
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
 
-    testDataDirs << QDir::currentPath() + "/../basesystem/universal/TestData" << QDir::currentPath() + "/basesystem/universal/TestData";
+    testDataDir = QDir::currentPath() + "/basesystem/universal/TestData";
+    testDataDir2 = QDir::currentPath() + "/../basesystem/universal/TestData";
 }
 
 /* test functions */
@@ -295,12 +296,35 @@ void TestLibrary::testInstallingWrongRedis() {
 
 
 void TestLibrary::testWebAppDetection() {
-    auto statik = new StaticSiteType();
-    auto rails = new RailsSiteType();
-    auto node = new NodeSiteType();
 
-    QVERIFY(statik->detect(testDataDirs.at(0) + "/SomeStaticApp") or statik->detect(testDataDirs.at(1) + "/SomeStaticApp"));
-    QVERIFY(rails->detect(testDataDirs.at(0) + "/SomeRailsApp") or rails->detect(testDataDirs.at(1) + "/SomeRailsApp"));
-    QVERIFY(node->detect(testDataDirs.at(0) + "/SomeNodeApp") or node->detect(testDataDirs.at(1) + "/SomeNodeApp"));
+    /* static app */
+    QString path = testDataDir2;
+    if (not QFile::exists(path)) {
+        path = testDataDir;
+    }
+    auto appDetector = new WebAppTypeDetector(path + "/SomeStaticApp");
+    logDebug() << "Detected application type:" << appDetector->type;
+    QVERIFY(appDetector->getType() == StaticSite);
+    QVERIFY(appDetector->type == "Static");
+    delete appDetector;
+
+    appDetector = new WebAppTypeDetector(path + "/SomeRailsApp");
+    logDebug() << "Detected application type:" << appDetector->type;
+    QVERIFY(appDetector->getType() == RailsSite);
+    QVERIFY(appDetector->type == "Rails");
+    delete appDetector;
+
+    appDetector = new WebAppTypeDetector(path + "/SomeNodeApp");
+    logDebug() << "Detected application type:" << appDetector->type;
+    QVERIFY(appDetector->getType() == NodeSite);
+    QVERIFY(appDetector->type == "Node");
+    delete appDetector;
+
+    appDetector = new WebAppTypeDetector(path + "/SomeNoWebApp");
+    logDebug() << "Detected application type:" << appDetector->type;
+    QVERIFY(appDetector->getType() == NoType);
+    QVERIFY(appDetector->type == "NoType");
+    delete appDetector;
+
 }
 

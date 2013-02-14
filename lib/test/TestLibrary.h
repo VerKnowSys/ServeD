@@ -17,7 +17,7 @@
 class TestLibrary: public QObject {
     Q_OBJECT
         ConsoleAppender* consoleAppender;
-        QStringList testDataDirs;
+        QString testDataDir, testDataDir2;
 
 
         public:
