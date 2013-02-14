@@ -12,36 +12,23 @@
 #include "utils.h"
 
 
-class WebAppType: QObject {
-    Q_OBJECT
-
-    public:
-        QStringList filesThatShouldExist, filesThatShouldNotExist;
-        bool detect(const QString& path);
+enum WebAppTypes {
+    StaticSite  = 0x01,
+    RailsSite   = 0x02,
+    NodeSite    = 0x03,
+    NoType      = 0x04
 };
 
 
-class StaticSiteType: public WebAppType {
+class WebAppTypeDetector {
+
+    WebAppTypes appType = NoType;
 
     public:
-        bool detect(const QString& path);
-
+        WebAppTypeDetector(const QString& path);
+        WebAppTypes getType();
+        QString type;
 };
 
-
-class RailsSiteType: public WebAppType {
-
-    public:
-        bool detect(const QString& path);
-
-};
-
-
-class NodeSiteType: public WebAppType {
-
-    public:
-        bool detect(const QString& path);
-
-};
 
 #endif

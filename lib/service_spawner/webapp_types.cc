@@ -8,52 +8,67 @@
 #include "webapp_types.h"
 
 
-bool WebAppType::detect(const QString& path) {
-    return false; // default value. it's overloaded by child classes
-}
-
-
-bool StaticSiteType::detect(const QString& path) {
-    filesThatShouldExist << "/index.html";
-    filesThatShouldNotExist << "/Gemfile" << "/package.json";
-
+bool shouldExist(const QStringList filesThatShouldExist, const QString& path) {
     Q_FOREACH(QString file, filesThatShouldExist) {
+        logDebug() << "Checking existance of file:" << path + file;
         if (not QFile::exists(path + file)) return false;
     }
-    Q_FOREACH(QString file, filesThatShouldNotExist) {
-        if (QFile::exists(path + file)) return false;
-    }
-
-    logDebug() << "Static Site detected in path:" << path;
     return true;
 }
 
 
-bool RailsSiteType::detect(const QString& path) {
-    filesThatShouldExist << "/Gemfile" << "/config/boot.rb" << "/public";
-    filesThatShouldNotExist << "/index.html" << "/package.json";
-
-    Q_FOREACH(QString file, filesThatShouldExist) {
-        if (not QFile::exists(path + file)) return false;
-    }
+bool shouldNotExist(const QStringList filesThatShouldNotExist, const QString& path) {
     Q_FOREACH(QString file, filesThatShouldNotExist) {
+        logDebug() << "Checking nonexistance of file:" << path + file;
         if (QFile::exists(path + file)) return false;
     }
-    logDebug() << "RailsSiteType detected in path:" << path;
     return true;
 }
 
 
-bool NodeSiteType::detect(const QString& path) {
-    filesThatShouldExist << "/package.json";
-    filesThatShouldNotExist << "/index.html" << "/Gemfile";
+WebAppTypeDetector::WebAppTypeDetector(const QString& path) {
 
-    Q_FOREACH(QString file, filesThatShouldExist) {
-        if (not QFile::exists(path + file)) return false;
+    QStringList filesThatShouldExist, filesThatShouldNotExist;
+    for (WebAppTypes i = StaticSite; i <= NoType; i++) {
+        this->type = "NoType";
+        filesThatShouldExist = QStringList();
+        filesThatShouldNotExist = QStringList();
+        logDebug() << "Iterating through.. " << i;
+
+        switch (i) {
+            case StaticSite:
+                this->type = "Static";
+                filesThatShouldExist << "/index.html";
+                filesThatShouldNotExist << "/package.json" << "/Gemfile";
+                break;
+
+            case RailsSite:
+                this->type = "Rails";
+                filesThatShouldExist << "/config/boot.rb" << "/Gemfile";
+                filesThatShouldNotExist << "/index.html";
+                break;
+
+            case NodeSite:
+                this->type = "Node";
+                filesThatShouldExist << "/package.json";
+                filesThatShouldNotExist << "/index.html";
+                break;
+
+            default:
+                this->type = "NoType";
+                break;
+        }
+
+        if (shouldExist(filesThatShouldExist, path) and shouldNotExist(filesThatShouldNotExist, path)) {
+            logDebug() << "Passed all requirements of type:" << type;
+            this->appType = i;
+            return;
+        }
+
     }
-    Q_FOREACH(QString file, filesThatShouldNotExist) {
-        if (QFile::exists(path + file)) return false;
-    }
-    logDebug() << "NodeSiteType detected in path:" << path;
-    return true;
+}
+
+
+WebAppTypes WebAppTypeDetector::getType() {
+    return this->appType;
 }
