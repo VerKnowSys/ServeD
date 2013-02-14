@@ -40,8 +40,8 @@ strip:
 .endfor
 
 
-test:
-	cd test/; $(QMAKE) $(QMAKE_OPTS) test.pro ; $(MAKE) ; cd .. ;  ../test -v2 -nocrashhandler 2>/dev/null
+test: all
+	cd test/; $(MAKE) ; cd .. ;  ../test -v2 -nocrashhandler 2>/dev/null
 
 
 
