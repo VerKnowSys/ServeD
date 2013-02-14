@@ -13,11 +13,12 @@
 
 
 enum WebAppTypes {
-    StaticSite  = 0x01,
-    RailsSite   = 0x02,
-    NodeSite    = 0x03,
+    StaticSite          = 0x01,
+    UnicornRailsSite    = 0x02,
+    RailsSite           = 0x03,
+    NodeSite            = 0x04,
 
-    NoType      = 0x04 /* NOTE: this one *must* be always last type */
+    NoType              = 0x05 /* NOTE: this one *must* be always last type */
 };
 
 

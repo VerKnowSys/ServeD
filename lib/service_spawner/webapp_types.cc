@@ -41,6 +41,12 @@ WebAppTypeDetector::WebAppTypeDetector(const QString& path) {
                 filesThatShouldNotExist << "/package.json" << "/Gemfile";
                 break;
 
+            case UnicornRailsSite:
+                this->typeName = "RailsUnicorn";
+                filesThatShouldExist << "/config/unicorn.rb" << "/Gemfile" << "/Rakefile";
+                filesThatShouldNotExist << "/index.html";
+                break;
+
             case RailsSite:
                 this->typeName = "Rails";
                 filesThatShouldExist << "/config/boot.rb" << "/Gemfile" << "/Rakefile";
