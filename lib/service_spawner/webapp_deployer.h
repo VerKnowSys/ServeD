@@ -13,6 +13,7 @@
 #include "../kickstart/core.h"
 #include "../jsoncpp/json/json.h"
 #include "service_config.h"
+#include "webapp_types.h"
 #include "utils.h"
 #include "service.h"
 #include "process.h"
@@ -24,9 +25,11 @@
 class SvdWebAppDeployer: QObject {
     Q_OBJECT
 
+    WebAppTypes appType = NoType;
+
     public:
         SvdWebAppDeployer(const QString& domain);
-
+        ~SvdWebAppDeployer();
 
 };
 
