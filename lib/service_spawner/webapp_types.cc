@@ -33,7 +33,6 @@ WebAppTypeDetector::WebAppTypeDetector(const QString& path) {
         this->type = "NoType";
         filesThatShouldExist = QStringList();
         filesThatShouldNotExist = QStringList();
-        logDebug() << "Iterating through.. " << i;
 
         switch (i) {
             case StaticSite:
