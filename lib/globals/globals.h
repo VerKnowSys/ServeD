@@ -2,7 +2,7 @@
 #define __GLOBALS__
 
     /* global constants */
-    #define APP_VERSION "0.17.5"
+    #define APP_VERSION "0.17.6"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -49,6 +49,7 @@
     #define DEFAULT_USER_UID 501
 
     #define SOFTWARE_DIR "/Software"
+    #define DEFAULT_PUBLIC_DIR "/Public"
     #define DEFAULT_USER_APPS_DIR "/Apps"
     #define DEFAULT_WEBAPPS_DIR "/WebApps"
     #define SOFTWARE_DATA_DIR "/SoftwareData"

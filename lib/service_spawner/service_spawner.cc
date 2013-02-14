@@ -57,11 +57,15 @@ int main(int argc, char *argv[]) {
 
     if (uid == 0) {
         logInfo("Root Mode Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
+        setPublicDirPriviledges(getOrCreateDir(DEFAULT_PUBLIC_DIR));
         // TODO: auto coreginxWatcher = …
 
     } else {
         logInfo("Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
         logDebug() << "Spawning for uid:" << getuid();
+
+        logDebug() << "Checking user directory priviledges";
+        setUserDirPriviledges(getHomeDir());
 
         /* Setting up user watchers */
         auto userWatcher = new SvdUserWatcher();
