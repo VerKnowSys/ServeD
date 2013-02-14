@@ -84,6 +84,11 @@ void writeToFile(const QString& fileName, const QString& contents) {
 }
 
 
+const QString getWebAppsDir() {
+    return getHomeDir() + DEFAULT_DEPLOYER_DIR;
+}
+
+
 const QString getHomeDir(uid_t uid) {
     if (uid == 0)
         return QString(SYSTEM_USERS_DIR);

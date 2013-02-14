@@ -43,6 +43,7 @@ Json::Value* parseJSON(const QString& filename);
 string readFileContents(const QString& fileName);
 bool removeDir(const QString& dirName);
 
+const QString getWebAppsDir();
 const QString getHomeDir();
 const QString getSoftwareDataDir();
 const QString getServiceDataDir(const QString& name);
