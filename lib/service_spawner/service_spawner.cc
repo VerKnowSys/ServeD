@@ -27,10 +27,11 @@ int main(int argc, char *argv[]) {
 
     QCoreApplication app(argc, argv);
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName(DEFAULT_STRING_CODEC));
-
     QStringList args = app.arguments();
     QRegExp rxEnableDebug("-d");
     QRegExp rxEnableTrace("-t");
+    uint uid = getuid();
+
     bool debug = false, trace = false;
     for (int i = 1; i < args.size(); ++i) {
         if (rxEnableDebug.indexIn(args.at(i)) != -1 ) {
@@ -53,11 +54,18 @@ int main(int argc, char *argv[]) {
     else
         consoleAppender->setDetailsLevel(Logger::Info);
 
-    logInfo("Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
-    logDebug() << "Spawning for uid:" << getuid();
 
-    /* Setting up watchers */
-    auto userWatcher = new SvdUserWatcher();
+    if (uid == 0) {
+        logInfo("Root Mode Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
+        // TODO: auto coreginxWatcher = …
+
+    } else {
+        logInfo("Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
+        logDebug() << "Spawning for uid:" << getuid();
+
+        /* Setting up user watchers */
+        auto userWatcher = new SvdUserWatcher();
+    }
 
     signal(SIGINT, unixSignalHandler);
 
