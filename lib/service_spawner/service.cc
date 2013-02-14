@@ -53,7 +53,7 @@ void SvdService::installSlot() {
         if (config->serviceInstalled()) {
             logDebug() << "Found installed file indicator of software:" << config->softwareName << ", which is base for service:" << name;
         } else { /* software wasn't installed, generate error */
-            // TODO
+            writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "Installation failed for service:" + config->name);
         }
         QFile::remove(indicator); // this indicates finish of installing process
 
