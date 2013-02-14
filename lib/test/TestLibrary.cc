@@ -250,9 +250,9 @@ void TestLibrary::testStartingRedis() {
 
     service->startSlot(); // should install and start redis
     QString runningFile = config->prefixDir() + DEFAULT_SERVICE_RUNNING_FILE;
-    QString portsFile = config->prefixDir() + "/.ports";
-    QString domainFile = config->prefixDir() + "/.domain";
-    QString pidFile = config->prefixDir() + "/service.pid";
+    QString portsFile = config->prefixDir() + DEFAULT_SERVICE_PORTS_FILE;
+    QString domainFile = config->prefixDir() + DEFAULT_SERVICE_DOMAIN_FILE;
+    QString pidFile = config->prefixDir() + DEFAULT_SERVICE_PID_FILE;
     QString outputFile = config->prefixDir() + DEFAULT_SERVICE_OUTPUT_FILE;
     QVERIFY(QFile::exists(runningFile));
 
@@ -303,27 +303,27 @@ void TestLibrary::testWebAppDetection() {
         path = testDataDir;
     }
     auto appDetector = new WebAppTypeDetector(path + "/SomeStaticApp");
-    logDebug() << "Detected application type:" << appDetector->type;
+    logDebug() << "Detected application type:" << appDetector->typeName;
     QVERIFY(appDetector->getType() == StaticSite);
-    QVERIFY(appDetector->type == "Static");
+    QVERIFY(appDetector->typeName == "Static");
     delete appDetector;
 
     appDetector = new WebAppTypeDetector(path + "/SomeRailsApp");
-    logDebug() << "Detected application type:" << appDetector->type;
+    logDebug() << "Detected application type:" << appDetector->typeName;
     QVERIFY(appDetector->getType() == RailsSite);
-    QVERIFY(appDetector->type == "Rails");
+    QVERIFY(appDetector->typeName == "Rails");
     delete appDetector;
 
     appDetector = new WebAppTypeDetector(path + "/SomeNodeApp");
-    logDebug() << "Detected application type:" << appDetector->type;
+    logDebug() << "Detected application type:" << appDetector->typeName;
     QVERIFY(appDetector->getType() == NodeSite);
-    QVERIFY(appDetector->type == "Node");
+    QVERIFY(appDetector->typeName == "Node");
     delete appDetector;
 
     appDetector = new WebAppTypeDetector(path + "/SomeNoWebApp");
-    logDebug() << "Detected application type:" << appDetector->type;
+    logDebug() << "Detected application type:" << appDetector->typeName;
     QVERIFY(appDetector->getType() == NoType);
-    QVERIFY(appDetector->type == "NoType");
+    QVERIFY(appDetector->typeName == "NoType");
     delete appDetector;
 
 }
