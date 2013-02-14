@@ -328,3 +328,23 @@ void TestLibrary::testWebAppDetection() {
 
 }
 
+
+void TestLibrary::testWebAppDeployer() {
+
+    /* static app */
+    QString path = testDataDir2;
+    if (not QFile::exists(path)) {
+        path = testDataDir;
+    }
+
+    QString testDomain = "test.my.local.domain";
+    QDir().mkdir(getWebAppsDir() + "/" + testDomain);
+    touch(getWebAppsDir() + "/" + testDomain + "/package.json");
+
+    auto deployer = new SvdWebAppDeployer(testDomain);
+    QVERIFY(deployer->getType() == NodeSite);
+    QVERIFY(deployer->getTypeName() == "Node");
+    delete deployer;
+
+}
+

@@ -35,11 +35,10 @@ class TestLibrary: public QObject {
             void testUtils();
             void testSomeRealCraziness();
             void testSanityValueCheck();
-
             void testStartingRedis();
             void testInstallingWrongRedis();
-
             void testWebAppDetection();
+            void testWebAppDeployer();
 
 };
 
