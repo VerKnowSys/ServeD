@@ -43,7 +43,7 @@ WebAppTypeDetector::WebAppTypeDetector(const QString& path) {
 
             case RailsSite:
                 this->type = "Rails";
-                filesThatShouldExist << "/config/boot.rb" << "/Gemfile";
+                filesThatShouldExist << "/config/boot.rb" << "/Gemfile" << "/Rakefile";
                 filesThatShouldNotExist << "/index.html";
                 break;
 
