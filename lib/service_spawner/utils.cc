@@ -85,7 +85,7 @@ void writeToFile(const QString& fileName, const QString& contents) {
 
 
 const QString getWebAppsDir() {
-    return getHomeDir() + DEFAULT_DEPLOYER_DIR;
+    return getOrCreateDir(getHomeDir() + DEFAULT_WEBAPPS_DIR);
 }
 
 
