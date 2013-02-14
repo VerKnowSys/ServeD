@@ -270,7 +270,7 @@ void TestLibrary::testStartingRedis() {
     QVERIFY(not QFile::exists(pidFile));
     QVERIFY(not QFile::exists(runningFile));
     QVERIFY(port != portOfRunningRedis);
-    removeDir(config->prefixDir());
+    // removeDir(config->prefixDir());
 
     delete service;
     delete config;
@@ -288,7 +288,7 @@ void TestLibrary::testInstallingWrongRedis() {
     QVERIFY(not expect("anything", "crap"));
     QVERIFY(QFile::exists(outputFile));
     QVERIFY(QFile::exists(errorsFile));
-    removeDir(config->prefixDir());
+    // removeDir(config->prefixDir());
 
     delete service;
     delete config;
