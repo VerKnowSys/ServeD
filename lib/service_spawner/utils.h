@@ -21,6 +21,9 @@
 #define logError LOG_ERROR
 #define logFatal LOG_FATAL
 
+#include <sys/stat.h>
+#include <errno.h>
+
 #include <QtCore>
 #include <QTime>
 #include <QTextCodec>
@@ -32,17 +35,22 @@
 using namespace std;
 
 
-QString toHMS(uint duration);
-QString getOrCreateDir(const QString& path);
+string readFileContents(const QString& fileName);
+
 bool expect(const QString& inputFileContent, const QString& expectedString);
+bool removeDir(const QString& dirName);
+bool setPublicDirPriviledges(const QString& path);
+bool setUserDirPriviledges(const QString& path);
+
 void touch(const QString& fileName);
 void writeToFile(const QString& fileName, const QString& contents);
 void rotateLog(const QString& fileName);
+
 uint registerFreeTcpPort(uint specificPort = 0);
 Json::Value* parseJSON(const QString& filename);
-string readFileContents(const QString& fileName);
-bool removeDir(const QString& dirName);
 
+const QString toHMS(uint duration);
+const QString getOrCreateDir(const QString& path);
 const QString getWebAppsDir();
 const QString getHomeDir();
 const QString getSoftwareDataDir();

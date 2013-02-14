@@ -15,12 +15,36 @@ void rotateLog(const QString& fileName) {
 }
 
 
+bool setPublicDirPriviledges(const QString& path) {
+    char mode[] = "0733"; // no read: rwx-wx-wx equivalent
+    int i = strtol(mode, 0, 8);
+    auto err = errno;
+    if (chmod(path.toUtf8(), i) < 0) {
+        logDebug() << "Error chmoding:" << strerror(err);
+        return false;
+    }
+    return true;
+}
+
+
+bool setUserDirPriviledges(const QString& path) {
+    char mode[] = "0711"; // no read: rwx--x--x equivalent
+    int i = strtol(mode, 0, 8);
+    auto err = errno;
+    if (chmod(path.toUtf8(), i) < 0) {
+        logDebug() << "Error chmoding:" << strerror(err);
+        return false;
+    }
+    return true;
+}
+
+
 bool expect(const QString& inputFileContent, const QString& expectedString) {
     return inputFileContent.trimmed().contains(expectedString.trimmed());
 }
 
 
-QString getOrCreateDir(const QString& path) {
+const QString getOrCreateDir(const QString& path) {
     if (not QFile::exists(path)) {
         logTrace() << "Creating non existant dir:" << path ;
         QDir().mkdir(path);
@@ -29,7 +53,7 @@ QString getOrCreateDir(const QString& path) {
 }
 
 
-QString toHMS(uint duration) {
+const QString toHMS(uint duration) {
     QString res;
     const int seconds = (int)(duration % 60);
     duration /= 60;
