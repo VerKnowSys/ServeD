@@ -31,7 +31,8 @@ class SvdWebAppDeployer: QObject {
     public:
         SvdWebAppDeployer(const QString& domain);
         ~SvdWebAppDeployer();
-
+        WebAppTypes getType();
+        QString getTypeName();
 };
 
 
