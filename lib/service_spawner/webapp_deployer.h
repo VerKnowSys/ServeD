@@ -26,6 +26,7 @@ class SvdWebAppDeployer: QObject {
     Q_OBJECT
 
     WebAppTypes appType = NoType;
+    QString typeName;
 
     public:
         SvdWebAppDeployer(const QString& domain);

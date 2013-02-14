@@ -14,8 +14,11 @@ SvdWebAppDeployer::SvdWebAppDeployer(const QString& domain) {
 
     auto appDetector = new WebAppTypeDetector(getHomeDir() + DEFAULT_DEPLOYER_DIR + "/" + domain);
     this->appType = appDetector->getType();
-    logDebug() << "Detected application type:" << appDetector->type;
+    this->typeName = appDetector->typeName;
+    logDebug() << "Detected application type:" << this->typeName;
     delete appDetector;
+
+
 }
 
 

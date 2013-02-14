@@ -58,8 +58,9 @@
     #define DEFAULTSOFTWARETEMPLATESDIR (USERS_HOME_DIR "/Common/Igniters/Services")
     #define DEFAULTUSERIGNITERSDIR "/Igniters/Services"
     #define DEFAULT_SYSTEM_ADDRESS "127.0.0.1"
-    #define DEFAULT_USER_DOMAIN_FILE "/.domain"
-    #define DEFAULT_USER_PORTS_FILE "/.ports"
+    #define DEFAULT_SERVICE_PID_FILE "/service.pid"
+    #define DEFAULT_SERVICE_DOMAIN_FILE "/.domain"
+    #define DEFAULT_SERVICE_PORTS_FILE "/.ports"
     #define DEFAULT_SERVICE_OUTPUT_FILE "/.output"
     #define DEFAULT_SERVICE_ERRORS_FILE "/.errors"
     #define DEFAULT_SERVICE_AUTOSTART_FILE "/.autostart"

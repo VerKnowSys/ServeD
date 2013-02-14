@@ -30,36 +30,36 @@ WebAppTypeDetector::WebAppTypeDetector(const QString& path) {
 
     QStringList filesThatShouldExist, filesThatShouldNotExist;
     for (WebAppTypes i = StaticSite; i <= NoType; i++) {
-        this->type = "NoType";
+        this->typeName = "NoType";
         filesThatShouldExist = QStringList();
         filesThatShouldNotExist = QStringList();
 
         switch (i) {
             case StaticSite:
-                this->type = "Static";
+                this->typeName = "Static";
                 filesThatShouldExist << "/index.html";
                 filesThatShouldNotExist << "/package.json" << "/Gemfile";
                 break;
 
             case RailsSite:
-                this->type = "Rails";
+                this->typeName = "Rails";
                 filesThatShouldExist << "/config/boot.rb" << "/Gemfile" << "/Rakefile";
                 filesThatShouldNotExist << "/index.html";
                 break;
 
             case NodeSite:
-                this->type = "Node";
+                this->typeName = "Node";
                 filesThatShouldExist << "/package.json";
                 filesThatShouldNotExist << "/index.html";
                 break;
 
             default:
-                this->type = "NoType";
+                this->typeName = "NoType";
                 break;
         }
 
         if (shouldExist(filesThatShouldExist, path) and shouldNotExist(filesThatShouldNotExist, path)) {
-            logDebug() << "Passed all requirements of type:" << type;
+            logDebug() << "Passed all requirements of type:" << this->typeName;
             this->appType = i;
             return;
         }

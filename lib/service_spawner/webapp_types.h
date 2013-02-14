@@ -28,7 +28,7 @@ class WebAppTypeDetector {
     public:
         WebAppTypeDetector(const QString& path);
         WebAppTypes getType();
-        QString type;
+        QString typeName;
 };
 
 
