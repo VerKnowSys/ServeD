@@ -344,5 +344,15 @@ void TestLibrary::testWebAppDeployer() {
     QVERIFY(deployer->getTypeName() == "Node");
     delete deployer;
 
+    testDomain = "test.żółw.pl";
+    QDir().mkdir(getWebAppsDir() + "/" + testDomain);
+    touch(getWebAppsDir() + "/" + testDomain + "/index.html");
+
+    QVERIFY(QDir().exists(getWebAppsDir() + "/test.żółw.pl"));
+    deployer = new SvdWebAppDeployer(testDomain);
+    QVERIFY(deployer->getType() == StaticSite);
+    QVERIFY(deployer->getTypeName() == "Static");
+    delete deployer;
+
 }
 
