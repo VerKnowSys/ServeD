@@ -34,6 +34,9 @@ class SvdWebAppDeployer: public QObject {
         WebAppTypes getType();
         QString getTypeName();
 
+    private:
+        QString domain;
+
     public slots:
         void startSlot();
         void stopSlot();

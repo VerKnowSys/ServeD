@@ -15,6 +15,7 @@ SvdWebAppDeployer::SvdWebAppDeployer(const QString& domain) {
     auto appDetector = new WebAppTypeDetector(getWebAppsDir() + "/" + domain);
     this->appType = appDetector->getType();
     this->typeName = appDetector->typeName;
+    this->domain = domain;
     logDebug() << "Detected application type:" << this->typeName;
     delete appDetector;
 
@@ -32,5 +33,27 @@ QString SvdWebAppDeployer::getTypeName() {
 
 
 SvdWebAppDeployer::~SvdWebAppDeployer() {}
+
+
+void SvdWebAppDeployer::startSlot() {
+    logDebug() << "Invoked start slot for:" << typeName << "webapp for domain:" << domain;
+}
+
+
+void SvdWebAppDeployer::stopSlot() {
+    logDebug() << "Invoked stop slot for:" << typeName << "webapp for domain:" << domain;
+}
+
+
+void SvdWebAppDeployer::restartSlot() {
+    logDebug() << "Invoked restart slot for:" << typeName << "webapp for domain:" << domain;
+    stopSlot();
+    startSlot();
+}
+
+
+void SvdWebAppDeployer::reloadSlot() {
+    logDebug() << "Invoked reload slot for:" << typeName << "webapp for domain:" << domain;
+}
 
 
