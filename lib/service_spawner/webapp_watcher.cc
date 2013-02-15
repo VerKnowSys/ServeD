@@ -26,11 +26,13 @@ SvdWebAppHookTriggerFiles::~SvdWebAppHookTriggerFiles() {
 
 
 SvdWebAppHookIndicatorFiles::SvdWebAppHookIndicatorFiles(const QString& path) {
-    running         = new SvdHookIndicatorFile(path + DEFAULT_SERVICE_RUNNING_FILE);
+    autostart   = new SvdHookIndicatorFile(path + DEFAULT_SERVICE_AUTOSTART_FILE);
+    running     = new SvdHookIndicatorFile(path + DEFAULT_SERVICE_RUNNING_FILE);
 }
 
 
 SvdWebAppHookIndicatorFiles::~SvdWebAppHookIndicatorFiles() {
+    delete autostart;
     delete running;
 }
 
@@ -61,10 +63,10 @@ SvdWebAppWatcher::SvdWebAppWatcher(const QString& domain) {
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(shutdownSlot()));
 
     /* manage web application autostart */
-    // if (indicatorFiles->autostart->exists()) {
-    //     logInfo() << "Performing autostart of WebApplication:" << name;
-    //     emit startWebApp();
-    // }
+    if (indicatorFiles->autostart->exists()) {
+        logInfo() << "Performing autostart of WebApplication domain:" << domain;
+        emit startWebApp();
+    }
 }
 
 

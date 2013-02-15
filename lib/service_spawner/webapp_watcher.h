@@ -36,7 +36,7 @@ class SvdWebAppHookIndicatorFiles {
         SvdWebAppHookIndicatorFiles(const QString& path);
         ~SvdWebAppHookIndicatorFiles();
 
-        SvdHookIndicatorFile *running;
+        SvdHookIndicatorFile *autostart, *running;
 
 };
 
