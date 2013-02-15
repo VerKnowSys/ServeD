@@ -22,7 +22,7 @@
 
 
 
-class SvdWebAppDeployer: QObject {
+class SvdWebAppDeployer: public QObject {
     Q_OBJECT
 
     WebAppTypes appType = NoType;
@@ -33,6 +33,12 @@ class SvdWebAppDeployer: QObject {
         ~SvdWebAppDeployer();
         WebAppTypes getType();
         QString getTypeName();
+
+    public slots:
+        void startSlot();
+        void stopSlot();
+        void restartSlot();
+        void reloadSlot();
 };
 
 
