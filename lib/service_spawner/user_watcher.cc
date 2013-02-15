@@ -64,10 +64,10 @@ void SvdUserWatcher::collectWebApplications() {
     webApps = QDir(homeDir + DEFAULT_WEBAPPS_DIR).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     logDebug() << "Current list of WebApps:" << webApps;
 
-    Q_FOREACH(QString name, webApps) {
-        if (not oldWebApps.contains(name)) {
-            qDebug() << "Found WebApp:" << name;
-            this->webAppWatchers << new SvdWebAppWatcher(name);
+    Q_FOREACH(QString domain, webApps) {
+        if (not oldWebApps.contains(domain)) {
+            qDebug() << "Found WebApp:" << domain;
+            this->webAppWatchers << new SvdWebAppWatcher(domain);
         }
     }
 }
