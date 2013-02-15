@@ -11,6 +11,7 @@
 #include "file_events_manager.h"
 #include "service_config.h"
 #include "service_watcher.h"
+#include "webapp_watcher.h"
 #include "service.h"
 
 #include <QObject>
@@ -48,8 +49,8 @@ class SvdUserWatcher: public QObject {
         SvdUserWatcher();
         ~SvdUserWatcher();
         QList<SvdServiceWatcher *> serviceWatchers;
+        QList<SvdWebAppWatcher *> webAppWatchers;
         QStringList services;
-        // QList<SvdWebApplicationWatcher *> webAppWatchers;
         QStringList webApps;
 
     protected:

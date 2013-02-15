@@ -67,8 +67,7 @@ void SvdUserWatcher::collectWebApplications() {
     Q_FOREACH(QString name, webApps) {
         if (not oldWebApps.contains(name)) {
             qDebug() << "Found WebApp:" << name;
-            new SvdWebAppDeployer(name);
-            // this->serviceWatchers << new SvdServiceWatcher(name);
+            this->webAppWatchers << new SvdWebAppWatcher(name);
         }
     }
 }
