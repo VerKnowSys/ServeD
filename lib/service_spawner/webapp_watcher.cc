@@ -91,7 +91,7 @@ void SvdWebAppWatcher::dirChangedSlot(const QString& dir) {
     if (triggerFiles->start->exists()) {
         triggerFiles->start->remove();
         if (indicatorFiles->running->exists())
-            logWarn() << "Interrupted emission of startWebApp() signal. Service is already running.";
+            logWarn() << "Interrupted emission of startWebApp() signal. Domain is already running.";
         else {
             logDebug() << "Emitting startWebApp() signal.";
             emit startWebApp();
@@ -106,7 +106,7 @@ void SvdWebAppWatcher::dirChangedSlot(const QString& dir) {
             logDebug() << "Emitting stopWebApp() signal.";
             emit stopWebApp();
         } else
-            logWarn() << "Interrupted emission of stopWebApp() signal. Service is not running.";
+            logWarn() << "Interrupted emission of stopWebApp() signal. Domain is not running.";
         return;
     }
 

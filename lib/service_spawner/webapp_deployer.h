@@ -26,16 +26,16 @@ class SvdWebAppDeployer: public QObject {
     Q_OBJECT
 
     WebAppTypes appType = NoType;
-    QString typeName;
+    QString typeName, domain;
 
     public:
         SvdWebAppDeployer(const QString& domain);
         ~SvdWebAppDeployer();
         WebAppTypes getType();
         QString getTypeName();
+        QString getDomain();
+        void detect(); /* used to detect application type */
 
-    private:
-        QString domain;
 
     public slots:
         void startSlot();
