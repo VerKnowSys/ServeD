@@ -37,14 +37,16 @@ int main(int argc, char *argv[]) {
 
     /* Logger setup */
     ConsoleAppender *consoleAppender = new ConsoleAppender();
-    consoleAppender->setFormat("%t{dd-HH:mm:ss} [%-7l] <%C> %m\n");
     Logger::registerAppender(consoleAppender);
+    consoleAppender->setFormat("%t{dd-HH:mm:ss} [%-7l] <%c:(%F:%i)> %m\n");
     if (trace && debug)
         consoleAppender->setDetailsLevel(Logger::Trace);
     else if (debug && !trace)
         consoleAppender->setDetailsLevel(Logger::Debug);
-    else
+    else {
         consoleAppender->setDetailsLevel(Logger::Info);
+        consoleAppender->setFormat("%t{dd-HH:mm:ss} [%-7l] %m\n");
+    }
 
 
     if (uid == 0) {
