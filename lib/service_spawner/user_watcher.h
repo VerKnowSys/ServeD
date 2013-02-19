@@ -65,6 +65,7 @@ class SvdUserWatcher: public QObject {
         void init(uid_t uid);
         void collectServices();
         void collectWebApplications();
+        void checkUserControlTriggers();
 
     signals:
         void autostartUser();
