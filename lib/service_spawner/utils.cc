@@ -15,6 +15,14 @@ void rotateLog(const QString& fileName) {
 }
 
 
+void unixSignalHandler(int sigNum) {
+    if (sigNum == SIGINT) {
+        logWarn() << "Caught SIGINT signal. Quitting application.";
+        qApp->quit();
+    }
+}
+
+
 bool setPublicDirPriviledges(const QString& path) {
     char mode[] = "0733"; // no read: rwx-wx-wx equivalent
     int i = strtol(mode, 0, 8);

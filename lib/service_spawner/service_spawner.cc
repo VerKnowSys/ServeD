@@ -15,14 +15,6 @@
 #include <QtCore>
 
 
-void unixSignalHandler(int sigNum) {
-    if (sigNum == SIGINT) {
-        logWarn() << "Caught SIGINT signal. Quitting application.";
-        qApp->quit();
-    }
-}
-
-
 int main(int argc, char *argv[]) {
 
     QCoreApplication app(argc, argv);

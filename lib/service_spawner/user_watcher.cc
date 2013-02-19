@@ -100,7 +100,7 @@ SvdUserWatcher::SvdUserWatcher(uid_t uid) {
 
 
 void SvdUserWatcher::shutdownSlot() {
-    qDebug() << "Invoked shutdown slot.";
+    logDebug() << "Invoked shutdown slot.";
 }
 
 

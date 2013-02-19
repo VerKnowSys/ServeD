@@ -45,6 +45,7 @@ bool setUserDirPriviledges(const QString& path);
 void touch(const QString& fileName);
 void writeToFile(const QString& fileName, const QString& contents);
 void rotateLog(const QString& fileName);
+void unixSignalHandler(int sigNum);
 
 uint registerFreeTcpPort(uint specificPort = 0);
 Json::Value* parseJSON(const QString& filename);
