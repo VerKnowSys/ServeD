@@ -108,6 +108,13 @@ void SvdUserWatcher::dirChangedSlot(const QString& dir) {
     logTrace() << "Directory changed:" << dir;
 
     if (dir == homeDir) {
+        logDebug() << "Invoked trigger in dir:" << dir;
+
+        if (QFile::exists(dir + DEFAULT_SS_SHUTDOWN_HOOK_FILE)) {
+            logInfo() << "Invoked shutdown trigger. Sending SS down.";
+            QFile::remove(dir + DEFAULT_SS_SHUTDOWN_HOOK_FILE);
+            raise(SIGINT);
+        }
         return;
     }
 

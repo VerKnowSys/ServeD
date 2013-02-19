@@ -72,6 +72,7 @@
     #define DEFAULT_SERVICE_CONFIGURING_FILE "/.configuring"
     #define DEFAULT_SERVICE_RELOADING_FILE "/.reloading"
     #define DEFAULT_SERVICE_VALIDATING_FILE "/.validating"
+    #define DEFAULT_SS_SHUTDOWN_HOOK_FILE "/.shutdown"
 
 
     #define DEFAULT_GATHERING_PAUSE_MICROSECONDS 500000 // half a second
