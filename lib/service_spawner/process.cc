@@ -8,7 +8,8 @@
 #include "process.h"
 
 
-SvdProcess::SvdProcess(const QString& name) {
+void SvdProcess::init(const QString& name, uid_t uid) {
+    this->uid = uid;
     outputFile = getSoftwareDataDir() + "/" + name + DEFAULT_SERVICE_OUTPUT_FILE;
     setProcessChannelMode(MergedChannels);
     setupChildProcess();
@@ -17,6 +18,16 @@ SvdProcess::SvdProcess(const QString& name) {
         rotateLog(outputFile);
     }
     setStandardOutputFile(outputFile, QIODevice::Truncate);
+}
+
+
+SvdProcess::SvdProcess(const QString& name, uid_t uid) {
+    init(name, uid);
+}
+
+
+SvdProcess::SvdProcess(const QString& name) {
+    init(name, getuid());
 }
 
 
@@ -36,9 +47,7 @@ void SvdProcess::spawnProcess(const QString& command) {
 
 
 void SvdProcess::setupChildProcess() {
-    uid_t uid = getuid();
-
-    const QString home = getHomeDir();
+    const QString home = getHomeDir(uid);
     const QString user = QString::number(uid).toUtf8();
     logDebug() << "Setup process environment with home:" << home << "and user:" << user;
 
