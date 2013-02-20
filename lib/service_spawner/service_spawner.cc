@@ -15,6 +15,38 @@
 #include <QtCore>
 
 
+void spawnSSForEachUser() {
+    auto userDirs = QDir(USERS_HOME_DIR).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    QList<int> dirs;
+
+    /* filter through invalid directories */
+    Q_FOREACH(QString directory, userDirs) {
+        bool ok;
+        int validUserDir = directory.toInt(&ok, 10); /* valid user directory must be number here */
+        if (ok)
+            dirs << validUserDir;
+        else
+            logTrace() << "Filtering out userDir:" << directory;
+    }
+
+    /* spawn ss for each of uids in /Users */
+    Q_FOREACH(int directory, dirs) {
+        logDebug() << "Spawning user SS for:" << QString::number(directory);
+
+        seteuid(directory);
+
+        /* ############ */
+
+        // auto proc = new SvdProcess("SS");
+        // proc->spawnDefaultShell();
+        // proc->spawnProcess("/Users/dmilith/Projects/ServeD/ss");
+        // delete proc;
+        seteuid(0);
+    }
+
+}
+
+
 int main(int argc, char *argv[]) {
 
     QCoreApplication app(argc, argv);
@@ -53,6 +85,7 @@ int main(int argc, char *argv[]) {
         logInfo("Root Mode Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
         setPublicDirPriviledges(getOrCreateDir(DEFAULT_PUBLIC_DIR));
         // TODO: auto coreginxWatcher = …
+        spawnSSForEachUser();
 
     } else {
         logInfo("Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
