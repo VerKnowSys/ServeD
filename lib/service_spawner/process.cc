@@ -17,7 +17,14 @@ void SvdProcess::init(const QString& name, uid_t uid) {
         logTrace() << "Rotating log file" << outputFile;
         rotateLog(outputFile);
     }
-    setStandardOutputFile(outputFile, QIODevice::Truncate);
+    if (this->redirectOutput)
+        setStandardOutputFile(outputFile, QIODevice::Truncate);
+}
+
+
+SvdProcess::SvdProcess(const QString& name, uid_t uid, bool redirectOutput) {
+    this->redirectOutput = redirectOutput;
+    init(name, uid);
 }
 
 
