@@ -33,17 +33,9 @@ void spawnSSForEachUser() {
     Q_FOREACH(int directory, dirs) {
         logDebug() << "Spawning user SS for:" << QString::number(directory);
 
-        seteuid(directory);
-
-        /* ############ */
-
-        // auto proc = new SvdProcess("SS");
-        // proc->spawnDefaultShell();
-        // proc->spawnProcess("/Users/dmilith/Projects/ServeD/ss");
-        // delete proc;
-        seteuid(0);
+        auto proc = new SvdProcess("SS", directory, false); // don't redirect output
+        proc->spawnProcess(DEFAULT_SS_COMMAND);
     }
-
 }
 
 

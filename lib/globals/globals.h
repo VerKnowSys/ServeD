@@ -2,12 +2,13 @@
 #define __GLOBALS__
 
     /* global constants */
-    #define APP_VERSION "0.17.7"
+    #define APP_VERSION "0.17.8"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     /* default BSD case: */
     #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh" // "/bin/svdshell" //
+    #define DEFAULT_SS_COMMAND "/bin/svdss"
     #define DEFAULT_JAVA_PATH "/Software/Openjdk/openjdk7/"
 
     #ifdef __FreeBSD__
