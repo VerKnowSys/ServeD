@@ -23,6 +23,7 @@
 
 #include <sys/stat.h>
 #include <errno.h>
+#include <signal.h>
 
 #include <QtCore>
 #include <QTime>
