@@ -114,6 +114,13 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
     case object all extends TaskState
 
 
+    abstract class TasksPagination
+    case object head extends TasksPagination
+    case object tail extends TasksPagination
+    case object more extends TasksPagination
+    case object less extends TasksPagination
+
+
     case class Task(id: Int, content: String, date: Long, done: Boolean)
     case class Tasks(list: List[Task], nextId: Int)
 
@@ -200,19 +207,72 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
     }
 
 
+    def getTasksPage(nickname: String) = {
+        try {
+            withJedis { _.get(nickname + ".tasks.page") }.toInt
+        } catch {
+            case e: Exception =>
+                log.error(s"Got error in getTasksPage: ${e.toString}")
+                0
+        }
+    }
+
+
+    def setTasksPage(nickname: String, page: Int) = {
+        try {
+            withJedis { _.set(nickname + ".tasks.page", s"$page") }
+            true
+        } catch {
+            case e: Exception =>
+                log.error(s"Got error in setTasksPage: ${e.toString}")
+                false
+        }
+    }
+
+
     override def onMessage(channel: String, sender: String, login: String, hostname: String, message: String) {
 
 
-        def listTasksCmd(nickname: String, state: TaskState) {
+        def listTasksCmd(nickname: String, state: TaskState, paginate: TasksPagination) {
             if (allowedUserNames.contains(nickname)) {
                 log.debug("Found allowed nickname: %s", nickname)
                 val tasks = getTasks(nickname, state)
 
                 if (tasks.list.length > 0) {
-                    val count = "(%d of %d)".format(math.min(tasks.list.length, tasksPerPage), tasks.list.length)
+
+                    def limit(x: Int, min: Int, max: Int) = x match {
+                        case x if x < min => min
+                        case x if x > max => max
+                        case _ => x
+                    }
+
                     val forWhom = if (sender != nickname) "for %s ".format(nickname) else ""
-                    sendMessage(channel, "%s: Listing %s tasks %s%s.".format(sender, state, forWhom, count))
-                    tasks.list.takeRight(tasksPerPage).map {
+                    val groupedTasks = tasks.list.grouped(tasksPerPage).toList
+                    def currentPage = getTasksPage(nickname)
+                    val lastPage = groupedTasks.length - 1
+                    val nextPage = limit(currentPage + 1, 0, lastPage)
+                    val prevPage = limit(currentPage - 1, 0, lastPage)
+
+                    val tasksToShow = paginate match {
+                        case `head` =>
+                            setTasksPage(nickname, 0)
+                            groupedTasks.head
+                        case `tail` =>
+                            setTasksPage(nickname, lastPage)
+                            groupedTasks.last
+                        case `more` =>
+                            setTasksPage(nickname, nextPage)
+                            groupedTasks(nextPage)
+                        case `less` =>
+                            setTasksPage(nickname, prevPage)
+                            groupedTasks(prevPage)
+                        case _ =>
+                            setTasksPage(nickname, lastPage)
+                            groupedTasks.last
+                    }
+
+                    sendMessage(channel, "%s: Listing %s tasks %s(page %d of %d).".format(sender, state, forWhom, currentPage + 1, lastPage + 1))
+                    tasksToShow.map {
                         task =>
                             sendMessage(channel, "%s: #%d → %s".format(sender, task.id, task.content))
                     }
@@ -358,7 +418,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
         if (message.startsWith(".")) {
             message.split(" ").toList match {
                 case ".help" :: Nil =>
-                    sendMessage(channel, "%s: Available commands: .(add|done|finished|ping|remove|task|tasks|wipe)".format(sender))
+                    sendMessage(channel, "%s: Available commands: .(add|done|finished|head|less|more|ping|remove|tail|task|tasks|wipe)".format(sender))
 
                 case ".ping" :: Nil =>
                     log.debug("Received ping request from: %s", sender)
@@ -371,10 +431,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
                     doneTasksCmd(sender, ids)
 
                 case ".finished" :: Nil =>
-                    listTasksCmd(sender, finished)
+                    listTasksCmd(sender, finished, tail)
 
                 case ".finished" :: nickname :: Nil =>
-                    listTasksCmd(nickname, finished)
+                    listTasksCmd(nickname, finished, tail)
 
                 case ".remove" :: ids =>
                     removeTasksCmd(sender, ids)
@@ -383,13 +443,25 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
                     addTaskCmd(nickname, content)
 
                 case ".tasks" :: Nil =>
-                    listTasksCmd(sender, open)
+                    listTasksCmd(sender, open, tail)
 
                 case ".tasks" :: nickname :: Nil =>
-                    listTasksCmd(nickname, open)
+                    listTasksCmd(nickname, open, tail)
 
                 case ".wipe" :: Nil =>
                     wipeTasksCmd(sender)
+
+                case ".head" :: Nil =>
+                    listTasksCmd(sender, open, head)
+
+                case ".tail" :: Nil =>
+                    listTasksCmd(sender, open, tail)
+
+                case ".more" :: Nil =>
+                    listTasksCmd(sender, open, more)
+
+                case ".less" :: Nil =>
+                    listTasksCmd(sender, open, less)
 
                 case _ =>
             }
