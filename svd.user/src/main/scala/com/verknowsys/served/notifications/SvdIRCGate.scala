@@ -117,8 +117,8 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
     abstract class TasksPagination
     case object head extends TasksPagination
     case object tail extends TasksPagination
-    case object more extends TasksPagination
-    case object less extends TasksPagination
+    case object next extends TasksPagination
+    case object prev extends TasksPagination
 
 
     case class Task(id: Int, content: String, date: Long, done: Boolean)
@@ -260,10 +260,10 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
                         case `tail` =>
                             setTasksPage(nickname, lastPage)
                             groupedTasks.last
-                        case `more` =>
+                        case `next` =>
                             setTasksPage(nickname, nextPage)
                             groupedTasks(nextPage)
-                        case `less` =>
+                        case `prev` =>
                             setTasksPage(nickname, prevPage)
                             groupedTasks(prevPage)
                         case _ =>
@@ -418,7 +418,7 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
         if (message.startsWith(".")) {
             message.split(" ").toList match {
                 case ".help" :: Nil =>
-                    sendMessage(channel, "%s: Available commands: .(add|done|finished|head|less|more|ping|remove|tail|task|tasks|wipe)".format(sender))
+                    sendMessage(channel, "%s: Available commands: .(add|done|finished|head|next|ping|prev|remove|tail|task|tasks|wipe)".format(sender))
 
                 case ".ping" :: Nil =>
                     log.debug("Received ping request from: %s", sender)
@@ -457,11 +457,11 @@ class SvdIRCGate(account: SvdAccount) extends PircBot with SvdActor with Logging
                 case ".tail" :: Nil =>
                     listTasksCmd(sender, open, tail)
 
-                case ".more" :: Nil =>
-                    listTasksCmd(sender, open, more)
+                case ".next" :: Nil =>
+                    listTasksCmd(sender, open, next)
 
-                case ".less" :: Nil =>
-                    listTasksCmd(sender, open, less)
+                case ".prev" :: Nil =>
+                    listTasksCmd(sender, open, prev)
 
                 case _ =>
             }
