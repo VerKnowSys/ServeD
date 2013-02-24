@@ -14,6 +14,7 @@
         "commands": "
 test ! -f SERVICE_PREFIX/database && mkdir -p SERVICE_PREFIX/database && chmod 700 SERVICE_PREFIX/database
 test ! -f SERVICE_PREFIX/service.conf && printf '
+bind_ip = SERVICE_ADDRESS
 port = SERVICE_PORT
 dbpath = SERVICE_PREFIX/database
 logappend = true
