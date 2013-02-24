@@ -45,13 +45,45 @@ void SvdService::babySitterSlot() {
 
         if (config->babySitter->commands.isEmpty()) {
             logTrace() << "Dealing with default service baby sitter for" << name;
+
+            /* perform additional port check if watchPort property is set to true */
+            if (config->watchPort) {
+                logDebug() << "Checking port availability for service" << name;
+
+                /* check static port if it's defined for service */
+                if (config->staticPort != -1) {
+                    int port = registerFreeTcpPort(config->staticPort);
+                    if (port == config->staticPort) {
+                        /* if port is equal then it implies that nothing is listening on that port */
+                        logError() << "Babysitter has found unoccupied static port:" << config->staticPort << "registered for service" << name;
+                    }
+
+                /* check dynamic port for service */
+                } else {
+                    QString portFilePath = config->prefixDir() + QString(DEFAULT_SERVICE_PORTS_FILE);
+                    if (QFile::exists(portFilePath)) {
+                        int currentPort = QString(readFileContents(portFilePath).c_str()).trimmed().toInt();
+                        int port = registerFreeTcpPort(currentPort);
+                        logDebug() << "Compare:" << currentPort << "with" << port;
+                        if (port == currentPort) {
+                            /* if port is equal then it implies that nothing is listening on that port */
+                            logError() << "Babysitter has found unoccupied dynamic port:" << currentPort << "registered for service" << name;
+                        }
+                    } else {
+                        logError() << "Babysitter hasn't found port file for service" << name;
+                    }
+                }
+            }
+
             if (QFile::exists(servicePidFile)) {
                 logDebug() << "Babysitter has found service pid for" << name;
+                // processDataToLearn(getuid());
                 // TODO: check pid validity
                 // TODO: check port validity if "checkPort": true
 
             } else {
                 logWarn() << "No service pid file found for service:" << name << "! Service Babysitter will try to respawn dead children immediately.";
+
 
             }
         } else {

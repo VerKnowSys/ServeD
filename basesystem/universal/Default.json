@@ -11,7 +11,7 @@
     /* alwaysOn with true will always invoke babysitter to watch for service pid validity */
     "alwaysOn": true,
 
-    /* TODO: watchPort with true will always watch for service port with babysitter */
+    /* watchPort with true will always watch for service port with babysitter */
     "watchPort": true,
 
     /* autoStart with true will cause service to start automatically */
