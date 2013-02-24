@@ -64,7 +64,7 @@ void SvdService::babySitterSlot() {
                     if (QFile::exists(portFilePath)) {
                         int currentPort = QString(readFileContents(portFilePath).c_str()).trimmed().toInt();
                         int port = registerFreeTcpPort(currentPort);
-                        logDebug() << "Compare:" << currentPort << "with" << port;
+                        logDebug() << "Port compare:" << currentPort << "with" << port << "(should be different)";
                         if (port == currentPort) {
                             /* if port is equal then it implies that nothing is listening on that port */
                             logError() << "Babysitter has found unoccupied dynamic port:" << currentPort << "registered for service" << name;
