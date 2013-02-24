@@ -8,15 +8,21 @@
 /* by default assign dynamic port for service   */
     "staticPort": -1,
 
+    /* alwaysOn with true will always invoke babysitter to watch for service pid validity */
+    "alwaysOn": true,
+
+    /* TODO: watchPort with true will always watch for service port with babysitter */
     "watchPort": true,
+
+    /* autoStart with true will cause service to start automatically */
     "autoStart": true,
-    "autoRestart": true,
+
     "reportAllErrors": true,
     "reportAllInfos": false,
     "reportAllDebugs": false,
 
 /* should match version of ServeD               */
-    "version": "0.10.1",
+    "version": "0.10.2",
 
 /* default schedulerActions format:             */
 /*   "schedulerActions": [                      */

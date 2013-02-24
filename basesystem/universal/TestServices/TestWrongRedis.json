@@ -1,5 +1,6 @@
 {
     "softwareName": "NonExistantThing",
+    "alwaysOn": false,
     "install": {
         "commands": "sofin get redis",
         "expectOutput": "SOMETHING ISN'T RIGHT HERE"

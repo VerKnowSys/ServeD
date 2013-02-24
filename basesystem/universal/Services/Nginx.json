@@ -46,5 +46,11 @@ SERVICE_ROOT/exports/nginx -t -c SERVICE_PREFIX/service.conf",
     },
     "reload": {
         "commands": "SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s reload"
+    },
+    "babySitter": {
+        "commands": "SERVICE_ROOT/exports/nginx -t",
+        "expectOutput": "test is successful",
+        "expectOutputTimeout": 60
     }
+
 }

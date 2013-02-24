@@ -1,5 +1,6 @@
 {
     "softwareName": "Redis",
+    "alwaysOn": false,
     "schedulerActions": [
         {
             "cronEntry": "0 0/10 * * * ?",

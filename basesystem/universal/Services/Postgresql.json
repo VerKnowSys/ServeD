@@ -41,5 +41,10 @@ SERVICE_ROOT/exports/pg_ctl -D SERVICE_PREFIX/database -l SERVICE_PREFIX/service
     },
     "stop": {
         "commands": "SERVICE_ROOT/exports/pg_ctl --timeout=60 -w -D SERVICE_PREFIX/database stop"
+    },
+    "babySitter": {
+        "commands": "SERVICE_ROOT/exports/pg_ctl -D SERVICE_PREFIX/database status",
+        "expectOutput": "server is running",
+        "expectOutputTimeout": 60
     }
 }
