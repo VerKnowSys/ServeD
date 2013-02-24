@@ -95,9 +95,21 @@ void SvdService::babySitterSlot() {
                 }
             }
 
+        /* case when custom babysitter must be invoked, cause there's f.e. auto managment of pid by service */
         } else {
             logTrace() << "Dealing with custom service baby sitter for" << name << "with commands:" << config->babySitter->commands;
-            // TODO: implement expectations check for process
+
+            auto babySit = new SvdProcess(name);
+            babySit->spawnProcess(config->babySitter->commands);
+            babySit->waitForFinished(-1); // TODO: implement support for config->babySitter->expectOutputTimeout
+            babySit->kill();
+            logDebug() << "Checking contents of file:" << babySit->outputFile;
+            if (not expect(readFileContents(babySit->outputFile).c_str(), config->babySitter->expectOutput)) {
+                writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "BabySitter expectations failed in:" + babySit->outputFile +  " - No match for: '" + config->babySitter->expectOutput + "'");
+            } else {
+                logDebug() << "Babysitter expectations passed for service:" << name;
+            }
+            delete babySit;
 
         }
     } else {
