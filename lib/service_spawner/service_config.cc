@@ -22,12 +22,12 @@ SvdServiceConfig::SvdServiceConfig() { /* Load default values */
     try {
         auto defaults = loadDefaultIgniter();
         softwareName = (*defaults)["softwareName"].asCString();
-        autoRestart = (*defaults)["autoRestart"].asBool();
         autoStart = (*defaults)["autoStart"].asBool();
         reportAllErrors = (*defaults)["reportAllErrors"].asBool();
         reportAllInfos = (*defaults)["reportAllInfos"].asBool();
         reportAllDebugs = (*defaults)["reportAllDebugs"].asBool();
         watchPort = (*defaults)["watchPort"].asBool();
+        alwaysOn = (*defaults)["alwaysOn"].asBool();
         staticPort = (*defaults)["staticPort"].asInt();
 
         /* laod service hooks */
@@ -88,12 +88,12 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
         auto root = loadIgniter(); // NOTE: the question is.. how will this behave ;]
 
         softwareName = root->get("softwareName", (*defaults)["softwareName"]).asCString();
-        autoRestart = root->get("autoRestart", (*defaults)["autoRestart"]).asBool();
         autoStart = root->get("autoStart", (*defaults)["autoStart"]).asBool();
         reportAllErrors = root->get("reportAllErrors", (*defaults)["reportAllErrors"]).asBool();
         reportAllInfos = root->get("reportAllInfos", (*defaults)["reportAllInfos"]).asBool();
         reportAllDebugs = root->get("reportAllDebugs", (*defaults)["reportAllDebugs"]).asBool();
         watchPort = root->get("watchPort", (*defaults)["watchPort"]).asBool();
+        alwaysOn = root->get("alwaysOn", (*defaults)["alwaysOn"]).asBool();
         staticPort = root->get("staticPort", (*defaults)["staticPort"]).asInt();
 
         /* load service scheduler data */
