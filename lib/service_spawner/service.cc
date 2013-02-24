@@ -56,6 +56,9 @@ void SvdService::babySitterSlot() {
                     if (port == config->staticPort) {
                         /* if port is equal then it implies that nothing is listening on that port */
                         logError() << "Babysitter has found unoccupied static port:" << config->staticPort << "registered for service" << name;
+                        usleep(DEFAULT_SERVICE_PAUSE_INTERVAL);
+                        logWarn() << "Restarting service:" << name;
+                        restartSlot();
                     }
 
                 /* check dynamic port for service */
@@ -68,6 +71,9 @@ void SvdService::babySitterSlot() {
                         if (port == currentPort) {
                             /* if port is equal then it implies that nothing is listening on that port */
                             logError() << "Babysitter has found unoccupied dynamic port:" << currentPort << "registered for service" << name;
+                            usleep(DEFAULT_SERVICE_PAUSE_INTERVAL);
+                            logWarn() << "Restarting service:" << name;
+                            restartSlot();
                         }
                     } else {
                         logError() << "Babysitter hasn't found port file for service" << name;
