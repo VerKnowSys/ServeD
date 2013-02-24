@@ -46,6 +46,24 @@ void SvdService::babySitterSlot() {
         if (config->babySitter->commands.isEmpty()) {
             logTrace() << "Dealing with default service baby sitter for" << name;
 
+            /* checking status of pid of service */
+            if (QFile::exists(servicePidFile)) {
+                logDebug() << "Babysitter has found service pid for" << name;
+                uint pid = QString(readFileContents(servicePidFile).c_str()).toUInt();
+                logDebug() << "Checking status of pid:" << QString::number(pid);
+
+                int result = kill(pid, 0);
+                if (result == 0) {
+                    logDebug() << "Service:" << name << "seems to be alive and kicking.";
+                } else {
+                    logError() << "Service:" << name << "seems to be down. Performing restart.";
+                    restartSlot();
+                }
+            } else {
+                logWarn() << "No service pid file found for service:" << name << "! Service Babysitter will try to respawn dead children immediately.";
+                restartSlot();
+            }
+
             /* perform additional port check if watchPort property is set to true */
             if (config->watchPort) {
                 logDebug() << "Checking port availability for service" << name;
@@ -56,8 +74,6 @@ void SvdService::babySitterSlot() {
                     if (port == config->staticPort) {
                         /* if port is equal then it implies that nothing is listening on that port */
                         logError() << "Babysitter has found unoccupied static port:" << config->staticPort << "registered for service" << name;
-                        usleep(DEFAULT_SERVICE_PAUSE_INTERVAL);
-                        logWarn() << "Restarting service:" << name;
                         restartSlot();
                     }
 
@@ -71,8 +87,6 @@ void SvdService::babySitterSlot() {
                         if (port == currentPort) {
                             /* if port is equal then it implies that nothing is listening on that port */
                             logError() << "Babysitter has found unoccupied dynamic port:" << currentPort << "registered for service" << name;
-                            usleep(DEFAULT_SERVICE_PAUSE_INTERVAL);
-                            logWarn() << "Restarting service:" << name;
                             restartSlot();
                         }
                     } else {
@@ -81,17 +95,6 @@ void SvdService::babySitterSlot() {
                 }
             }
 
-            if (QFile::exists(servicePidFile)) {
-                logDebug() << "Babysitter has found service pid for" << name;
-                // processDataToLearn(getuid());
-                // TODO: check pid validity
-                // TODO: check port validity if "checkPort": true
-
-            } else {
-                logWarn() << "No service pid file found for service:" << name << "! Service Babysitter will try to respawn dead children immediately.";
-
-
-            }
         } else {
             logTrace() << "Dealing with custom service baby sitter for" << name << "with commands:" << config->babySitter->commands;
             // TODO: implement expectations check for process
@@ -296,6 +299,8 @@ void SvdService::afterStopSlot() {
 
 void SvdService::restartSlot() {
     logDebug() << "Invoked restart slot for service:" << name;
+    usleep(DEFAULT_SERVICE_PAUSE_INTERVAL);
+    logWarn() << "Restarting service:" << name;
     stopSlot();
     startSlot();
 }
