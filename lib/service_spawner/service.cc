@@ -105,6 +105,7 @@ void SvdService::babySitterSlot() {
             babySit->kill();
             logDebug() << "Checking contents of file:" << babySit->outputFile;
             if (not expect(readFileContents(babySit->outputFile).c_str(), config->babySitter->expectOutput)) {
+                logError() << "Failed expectations of service:" << name << "with expected output of babySitter slot:" << config->babySitter->expectOutput;
                 writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "BabySitter expectations failed in:" + babySit->outputFile +  " - No match for: '" + config->babySitter->expectOutput + "'");
             } else {
                 logDebug() << "Babysitter expectations passed for service:" << name;
@@ -137,6 +138,7 @@ void SvdService::installSlot() {
         proc->waitForFinished(-1); // no timeout
         proc->kill();
         if (not expect(readFileContents(proc->outputFile).c_str(), config->install->expectOutput)) {
+            logError() << "Failed expectations of service:" << name << "with expected output of install slot:" << config->install->expectOutput;
             writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->install->expectOutput + "'");
         }
 
@@ -170,6 +172,7 @@ void SvdService::configureSlot() {
         proc->waitForFinished(-1);
         proc->kill();
         if (not expect(readFileContents(proc->outputFile).c_str(), config->configure->expectOutput)) {
+            logError() << "Failed expectations of service:" << name << "with expected output of configure slot:" << config->configure->expectOutput;
             writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->configure->expectOutput + "'");
         }
 
@@ -210,6 +213,7 @@ void SvdService::startSlot() {
         proc->waitForFinished(-1);
         proc->kill();
         if (not expect(readFileContents(proc->outputFile).c_str(), config->start->expectOutput)) {
+            logError() << "Failed expectations of service:" << name << "with expected output of start slot:" << config->start->expectOutput;
             writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->start->expectOutput + "'");
         }
 
@@ -235,6 +239,7 @@ void SvdService::afterStartSlot() {
         proc->waitForFinished(-1);
         proc->kill();
         if (not expect(readFileContents(proc->outputFile).c_str(), config->afterStart->expectOutput)) {
+            logError() << "Failed expectations of service:" << name << "with expected output of afterStart slot:" << config->afterStart->expectOutput;
             writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->afterStart->expectOutput + "'");
         }
 
@@ -272,6 +277,7 @@ void SvdService::stopSlot() {
         proc->waitForFinished(-1);
         proc->kill();
         if (not expect(readFileContents(proc->outputFile).c_str(), config->stop->expectOutput)) {
+            logError() << "Failed expectations of service:" << name << "with expected output of stop slot:" << config->stop->expectOutput;
             writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->stop->expectOutput + "'");
         }
 
@@ -298,6 +304,7 @@ void SvdService::afterStopSlot() {
         proc->waitForFinished(-1);
         proc->kill();
         if (not expect(readFileContents(proc->outputFile).c_str(), config->afterStop->expectOutput)) {
+            logError() << "Failed expectations of service:" << name << "with expected output of afterStop slot:" << config->afterStop->expectOutput;
             writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->afterStop->expectOutput + "'");
         }
 
@@ -333,6 +340,7 @@ void SvdService::reloadSlot() {
         proc->waitForFinished(-1);
         proc->kill();
         if (not expect(readFileContents(proc->outputFile).c_str(), config->reload->expectOutput)) {
+            logError() << "Failed expectations of service:" << name << "with expected output of reload slot:" << config->reload->expectOutput;
             writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->reload->expectOutput + "'");
         }
 
@@ -359,6 +367,7 @@ void SvdService::validateSlot() {
         proc->waitForFinished(-1);
         proc->kill();
         if (not expect(readFileContents(proc->outputFile).c_str(), config->validate->expectOutput)) {
+            logError() << "Failed expectations of service:" << name << "with expected output of validate slot:" << config->validate->expectOutput;
             writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->validate->expectOutput + "'");
         }
 
