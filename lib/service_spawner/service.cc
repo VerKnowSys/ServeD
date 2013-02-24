@@ -11,20 +11,58 @@
 
 
 SvdService::SvdService(const QString& name) {
+    /* setup service */
     this->name = name;
     this->uptime = new QElapsedTimer();
     logTrace() << "Creating SvdService with name" << this->name;
+
+    /* setup baby sitter */
+    babySitter = new QTimer(this);
+    connect(babySitter, SIGNAL(timeout()), this, SLOT(babySitterSlot()));
+    babySitter->start(10000); // XXX: hardcoded 10s
 }
 
 
 SvdService::~SvdService() {
-    logInfo() << "Service was alive for" << toHMS(getUptime());
+    logInfo() << "Service had uptime:" << toHMS(getUptime());
     delete uptime;
+    delete babySitter;
 }
 
 
 qint64 SvdService::getUptime() {
     return uptime->elapsed() / 1000; // seconds
+}
+
+
+/* baby sitting slot is used to watch service pid */
+void SvdService::babySitterSlot() {
+    logTrace() << "Babysitter invoked for:" << name;
+    auto config = new SvdServiceConfig(name);
+    QString servicePidFile = config->prefixDir() + "/service.pid";
+
+    if (config->alwaysOn) {
+
+        if (config->babySitter->commands.isEmpty()) {
+            logTrace() << "Dealing with default service baby sitter for" << name;
+            if (QFile::exists(servicePidFile)) {
+                logDebug() << "Babysitter has found service pid for" << name;
+                // TODO: check pid validity
+                // TODO: check port validity if "checkPort": true
+
+            } else {
+                logWarn() << "No service pid file found for service:" << name << "! Service Babysitter will try to respawn dead children immediately.";
+
+            }
+        } else {
+            logTrace() << "Dealing with custom service baby sitter for" << name << "with commands:" << config->babySitter->commands;
+            // TODO: implement expectations check for process
+
+        }
+    } else {
+        logTrace() << "alwaysOn option disabled for service:" << name;
+    }
+    delete config;
 }
 
 

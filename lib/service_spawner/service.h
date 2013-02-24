@@ -29,9 +29,11 @@ class SvdService: public QObject {
     private:
         QString name;
         QElapsedTimer *uptime;
+        QTimer *babySitter;
 
 
     public slots:
+        void babySitterSlot();
         void installSlot();
         void configureSlot();
         void startSlot();
