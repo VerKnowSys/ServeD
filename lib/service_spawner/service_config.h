@@ -69,7 +69,7 @@ class SvdServiceConfig : QObject {
         bool autoRestart, autoStart, reportAllErrors, reportAllInfos, reportAllDebugs, watchPort;
         int staticPort;
         QList<SvdSchedulerAction*> *schedulerActions;
-        SvdShellOperations *install, *configure, *start, *afterStart, *stop, *afterStop, *reload, *validate;
+        SvdShellOperations *install, *configure, *start, *afterStart, *stop, *afterStop, *reload, *validate, *babySitter;
 
 };
 

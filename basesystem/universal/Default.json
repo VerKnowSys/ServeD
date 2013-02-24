@@ -16,7 +16,7 @@
     "reportAllDebugs": false,
 
 /* should match version of ServeD               */
-    "version": "0.10",
+    "version": "0.10.1",
 
 /* default schedulerActions format:             */
 /*   "schedulerActions": [                      */
@@ -64,6 +64,11 @@
         "expectOutputTimeout": 60
     },
     "validate": {
+        "commands": "",
+        "expectOutput": "",
+        "expectOutputTimeout": 60
+    },
+    "babySitter": {
         "commands": "",
         "expectOutput": "",
         "expectOutputTimeout": 60

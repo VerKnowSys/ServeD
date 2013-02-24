@@ -63,6 +63,10 @@ SvdServiceConfig::SvdServiceConfig() { /* Load default values */
             (*defaults)["validate"]["commands"].asCString(),
             (*defaults)["validate"]["expectOutput"].asCString());
 
+        babySitter = new SvdShellOperations(
+            (*defaults)["babySitter"]["commands"].asCString(),
+            (*defaults)["babySitter"]["expectOutput"].asCString());
+
         delete defaults;
 
     } catch (std::exception &e) {
@@ -139,6 +143,10 @@ SvdServiceConfig::SvdServiceConfig(const QString& serviceName) {
             replaceAllSpecialsIn((*root)["validate"].get("commands", (*defaults)["validate"]["commands"]).asCString()),
             replaceAllSpecialsIn((*root)["validate"].get("expectOutput", (*defaults)["validate"]["expectOutput"]).asCString()));
 
+        babySitter = new SvdShellOperations(
+            replaceAllSpecialsIn((*root)["babySitter"].get("commands", (*defaults)["babySitter"]["commands"]).asCString()),
+            replaceAllSpecialsIn((*root)["babySitter"].get("expectOutput", (*defaults)["babySitter"]["expectOutput"]).asCString()));
+
         delete defaults;
         delete root;
 
@@ -164,6 +172,7 @@ SvdServiceConfig::~SvdServiceConfig() {
     delete afterStop;
     delete reload;
     delete validate;
+    delete babySitter;
     for (int i = 0; i < schedulerActions->length(); i++)
         delete schedulerActions->at(i);
     delete schedulerActions;
