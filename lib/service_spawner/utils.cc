@@ -15,6 +15,15 @@ void rotateLog(const QString& fileName) {
 }
 
 
+bool pidIsAlive(uint pid) {
+    int result = kill(pid, 0);
+    if (result == 0)
+        return true;
+    else
+        return false;
+}
+
+
 void unixSignalHandler(int sigNum) {
     if (sigNum == SIGINT) {
         logWarn() << "Caught SIGINT signal. Quitting application.";

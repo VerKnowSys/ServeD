@@ -52,8 +52,7 @@ void SvdService::babySitterSlot() {
                 uint pid = QString(readFileContents(servicePidFile).c_str()).toUInt();
                 logDebug() << "Checking status of pid:" << QString::number(pid);
 
-                int result = kill(pid, 0);
-                if (result == 0) {
+                if (pidIsAlive(pid)) {
                     logDebug() << "Service:" << name << "seems to be alive and kicking.";
                 } else {
                     logError() << "Service:" << name << "seems to be down. Performing restart.";

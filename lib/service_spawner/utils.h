@@ -42,6 +42,7 @@ bool expect(const QString& inputFileContent, const QString& expectedString);
 bool removeDir(const QString& dirName);
 bool setPublicDirPriviledges(const QString& path);
 bool setUserDirPriviledges(const QString& path);
+bool pidIsAlive(uint pid);
 
 void touch(const QString& fileName);
 void writeToFile(const QString& fileName, const QString& contents);
