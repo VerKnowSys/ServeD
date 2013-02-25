@@ -72,6 +72,17 @@ int main(int argc, char *argv[]) {
         consoleAppender->setFormat("%t{dd-HH:mm:ss} [%-7l] %m\n");
     }
 
+    /* file lock setup */
+    QString lockName = getHomeDir() + "/." + QString::number(uid) + ".pid";
+    if (QFile::exists(lockName)) {
+        uint pid = QString(readFileContents(lockName).c_str()).trimmed().toUInt();
+        if (pidIsAlive(pid)) {
+            logError() << "Service Spawner is already running.";
+            exit(LOCK_FILE_OCCUPIED_ERROR); /* can not open */
+        }
+    }
+    logDebug() << "Lock name:" << lockName;
+    writeToFile(lockName, QString::number(getpid())); /* get process pid and record it to pid file */
 
     if (uid == 0) {
         logInfo("Root Mode Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
