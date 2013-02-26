@@ -40,6 +40,7 @@ void SvdService::babySitterSlot() {
     logTrace() << "Babysitter invoked for:" << name;
     auto config = new SvdServiceConfig(name);
     QString servicePidFile = config->prefixDir() + "/service.pid";
+    validateSlot();
 
     if (config->alwaysOn) {
 
@@ -319,8 +320,10 @@ void SvdService::restartSlot() {
     logDebug() << "Invoked restart slot for service:" << name;
     usleep(DEFAULT_SERVICE_PAUSE_INTERVAL);
     logWarn() << "Restarting service:" << name;
+    validateSlot();
     stopSlot();
     startSlot();
+    logWarn() << "Service restarted:" << name;
 }
 
 
