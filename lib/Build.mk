@@ -7,7 +7,7 @@
 DEVEL             = false
 DARWIN            = false
 
-CCACHE            = ccache
+CCACHE            =
 CC                = "$(CCACHE) clang -fcolor-diagnostics -Qunused-arguments -Wself-assign"
 CXX               = "$(CCACHE) clang++ -std=c++11 -fcolor-diagnostics -Qunused-arguments -Wself-assign"
 AR                = ar
