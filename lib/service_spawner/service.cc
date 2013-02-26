@@ -26,7 +26,7 @@ SvdService::SvdService(const QString& name) {
 SvdService::~SvdService() {
     logInfo() << "Service had uptime:" << toHMS(getUptime());
     delete uptime;
-    // delete babySitter;
+    delete babySitter;
 }
 
 
@@ -289,7 +289,7 @@ void SvdService::stopSlot() {
     logDebug() << "Stopping internal baby sitter timer for process:" << name;
     if (babySitter->isActive())
         babySitter->stop();
-    delete babySitter;
+    // delete babySitter;
     delete config;
 }
 
