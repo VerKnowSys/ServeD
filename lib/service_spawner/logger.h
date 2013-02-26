@@ -1,3 +1,10 @@
+/**
+ *  @author dmilith
+ *
+ *   © 2013 - VerKnowSys
+ *
+ */
+
 #ifndef __SERVICE_CONFIG__
 #define __SERVICE_CONFIG__
 

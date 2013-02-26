@@ -1,8 +1,7 @@
 /**
  *  @author dmilith
  *
- *   Software config loader for json igniters.
- *   © 2011-2013 - VerKnowSys
+ *   © 2013 - VerKnowSys
  *
  */
 

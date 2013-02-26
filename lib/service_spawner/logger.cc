@@ -1,3 +1,10 @@
+/**
+ *  @author dmilith
+ *
+ *   © 2013 - VerKnowSys
+ *
+ */
+
 #include "logger.h"
 
 
