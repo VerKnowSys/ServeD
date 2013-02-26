@@ -287,7 +287,8 @@ void SvdService::stopSlot() {
     }
 
     logDebug() << "Stopping internal baby sitter timer for process:" << name;
-    babySitter->stop();
+    if (babySitter->isActive())
+        babySitter->stop();
     delete babySitter;
     delete config;
 }
