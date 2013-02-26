@@ -6,6 +6,7 @@
  */
 
 
+#include "logger.h"
 #include "../globals/globals.h"
 #include "service_config.h"
 #include "service_watcher.h"
@@ -102,6 +103,8 @@ int main(int argc, char *argv[]) {
     }
 
     signal(SIGINT, unixSignalHandler);
+
+    auto loggerTimer = new LoggerTimer(consoleAppender);
 
     return app.exec();
 }

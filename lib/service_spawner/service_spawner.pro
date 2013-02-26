@@ -20,7 +20,8 @@ HEADERS   += service.h \
              ../cutelogger/FileAppender.h \
              webapp_deployer.h \
              webapp_types.h \
-             webapp_watcher.h
+             webapp_watcher.h \
+             logger.h
 SOURCES   += service.cc \
              process.cc \
              service_config.cc \
@@ -31,6 +32,7 @@ SOURCES   += service.cc \
              webapp_deployer.cc \
              webapp_types.cc \
              webapp_watcher.cc \
-             service_spawner.cc
+             service_spawner.cc \
+             logger.cc
 LIBS      += ../libjson.a ../liblogger.a
 TARGET    = ../../ss
