@@ -3,16 +3,16 @@
     "staticPort": 25,
 
     "install": {
-        "commands": ["sofin get james"],
-        "expectStdOut": ["All done"]
+        "commands": "sofin get james",
+        "expectOutput": "All done"
     },
     "start": {
-        "commands": []
+        "commands": ""
     },
     "stop": {
-        "commands": []
+        "commands": ""
     },
     "validate": {
-        "commands": []
+        "commands": ""
     }
 }

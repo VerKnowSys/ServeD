@@ -12,11 +12,18 @@ A. Launched for root as system service, event loops / watchers spawned as forks/
     1. touch /Users/ANYUID/.spawn_user_panel on user demand.
 
 
-B. Launching service "Service"
+B. Launched for user.
+  I. (SS side)
+    0. Create file watcher for $HOME/SoftwareData. If new service added, create file watcher for that service.
+    2. Create file watchers for $HOME/SoftwareData/Services.
+    3. If $HOME/SoftwareData/Service/.autostart exists, launch SvdService
+
+
+C. Launching service "Service"
   I. (JDK side):
     0. touch $HOME/SoftwareData/Service/.domain with value of user domain
-    1. touch $HOME/SoftwareData/Service/.spawn
-    2. wait for $HOME/SoftwareData/Service/.spawned to continue
+    1. touch $HOME/SoftwareData/Service/.start
+    2. wait for $HOME/SoftwareData/Service/.running to continue
 
   II. (SS side):
     0. read "Service.json" igniter, replace values:
@@ -26,20 +33,20 @@ B. Launching service "Service"
         SERVICE_ADDRESS => to resolved IP of SERVICE_DOMAIN
     1. launch cron jobs for service
     2. launch svdshell with Service
-    3. remove $HOME/SoftwareData/Service/.spawn
+    3. remove $HOME/SoftwareData/Service/.start
     4. redirect process outputs to $HOME/SoftwareData/Service/.outputs
-    5. touch $HOME/SoftwareData/Service/.spawned
+    5. touch $HOME/SoftwareData/Service/.running
 
   III. (JDK side):
-    1. continue work when $HOME/SoftwareData/Service/.spawned is found
+    1. continue work when $HOME/SoftwareData/Service/.running is found
     2. (…) optionally read $HOME/SoftwareData/Service/.outputs or do whatever is required
 
 
-C. Stopping service "Service"
+D. Stopping service "Service"
   I. (JDK side):
     1. close service connections (if any)
-    2. touch $HOME/SoftwareData/Service/.terminate
+    2. touch $HOME/SoftwareData/Service/.stop
   II. (SS side):
     0. stop service
-    1. remove $HOME/SoftwareData/Service/.spawned
-    2. remove $HOME/SoftwareData/Service/.terminate
+    1. remove $HOME/SoftwareData/Service/.running
+    2. remove $HOME/SoftwareData/Service/.stop

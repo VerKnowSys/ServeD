@@ -23,12 +23,9 @@ case "${SYSTEM}" in
         if [ "${SYSTEM}" = "Darwin" ]; then
             export MAKE_OPTS="DARWIN=true ${MAKE_OPTS}"
         fi
-        cd lib/kickstart
+        cd lib
         bsdmake DEVEL=${DEVEL} ${MAKE_OPTS}
-        cd ../..
-        cd lib/fann
-        bsdmake DEVEL=${DEVEL} ${MAKE_OPTS}
-        cd ../..
+        cd ..
         ;;
 
     *)

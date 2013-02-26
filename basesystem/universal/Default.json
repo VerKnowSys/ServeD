@@ -1,64 +1,82 @@
+
+/* This is default definition used as base for all igniters */
+
 {
+    "name": "No-Name",
+    "softwareName": "No-Name",
+
+/* by default assign dynamic port for service   */
+    "staticPort": -1,
+
+    /* alwaysOn with true will always invoke babysitter to watch for service pid validity */
+    "alwaysOn": true,
+
+    /* watchPort with true will always watch for service port with babysitter */
+    "watchPort": true,
+
+    /* autoStart with true will cause service to start automatically */
     "autoStart": true,
-    "autoRestart": true,
+
     "reportAllErrors": true,
     "reportAllInfos": false,
     "reportAllDebugs": false,
 
-    "name": "NO_SERVICE_NAME!",
-    "version": "0.8",
-    "softwareName": "NO_SOFTWARE_NAME!",
-    "staticPort": -1,
-    "watchPort": true,
+/* should match version of ServeD               */
+    "version": "0.10.2",
 
+/* default schedulerActions format:             */
+/*   "schedulerActions": [                      */
+/*     {                                        */
+/*         "cronEntry": "0 0/10 * * * ?",       */
+/*         "shellCommands": "my shell commands" */
+/*     },                                       */
+/*     …                                        */
+/* ],                                           */
     "schedulerActions": [
     ],
     "install": {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
         "expectOutputTimeout": 0
     },
     "configure":  {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
         "expectOutputTimeout": 60
     },
     "start":  {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
         "expectOutputTimeout": 60
     },
     "afterStart":  {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
         "expectOutputTimeout": 60
     },
     "stop":  {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
         "expectOutputTimeout": 60
     },
     "afterStop":  {
-        "commands": [""],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
         "expectOutputTimeout": 60
     },
     "reload":  {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
         "expectOutputTimeout": 60
     },
     "validate": {
-        "commands": [],
-        "expectStdOut": [],
-        "expectStdErr": [],
+        "commands": "",
+        "expectOutput": "",
+        "expectOutputTimeout": 60
+    },
+    "babySitter": {
+        "commands": "",
+        "expectOutput": "",
         "expectOutputTimeout": 60
     }
 }

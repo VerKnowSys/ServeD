@@ -81,7 +81,7 @@
 //                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir, /* mkdir */
 //                     SvdConfig.softwareRoot / name, SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir), /* cp */
 //                 waitForOutputFor = 90,
-//                 expectStdOut = List("install")) :: Nil,
+//                 expectOutput = List("install")) :: Nil,
 
 //         configure = SvdShellOperations(
 //                 "mkdir -p %s ; chown -R nobody %s && ".format(SvdConfig.publicHttpDir, SvdConfig.publicHttpDir) // chowning /Public on Coreginx reload
@@ -110,14 +110,14 @@
 //                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "sbin" / "nginx",
 //                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name),
 //                 waitForOutputFor = 10,
-//                 expectStdErr = List("test is successful")) :: Nil,
+//                 expectOutput = List("test is successful")) :: Nil,
 
 //         start = SvdShellOperation(
 //             "%s -p %s/ && echo start".format(
 //                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "sbin" / "nginx",
 //                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name),
 //                 waitForOutputFor = 5,
-//                 expectStdOut = List("start")) ::
+//                 expectOutput = List("start")) ::
 //             SvdShellOperation(
 //                 "mkdir -p %s ; chown -R nobody %s && ".format(SvdConfig.publicHttpDir, SvdConfig.publicHttpDir) // chowning /Public on Coreginx reload
 //             ) :: Nil,
@@ -127,7 +127,7 @@
 //                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name / "sbin" / "nginx",
 //                     SvdConfig.systemHomeDir / "0" / SvdConfig.applicationsDir / name),
 //                 waitForOutputFor = 15,
-//                 expectStdOut = List("stop")) :: Nil
+//                 expectOutput = List("stop")) :: Nil
 
 //     )
 

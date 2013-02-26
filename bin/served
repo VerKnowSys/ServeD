@@ -2,14 +2,6 @@
 
 . /etc/rc.subr
 
-export PATH="$PATH:/Software/Openjdk/bin"
-export JAVA_HOME="/Software/Openjdk"
-
-if [ ! -e $JAVA_HOME/bin/java ]; then
-    echo "Cannot find OpenJDK"
-    exit 1
-fi
-
 name="served"
 pid_file="/SystemUsers/0.pid"
 start_cmd="${name}_start"
@@ -17,16 +9,11 @@ stop_cmd="${name}_stop"
 status_cmd="${name}_status"
 restart_cmd="${name}_restart"
 extra_commands="status"
-root=$(jps | grep -v Jps |grep root\.core | wc -l)
-users=$(ps -Af |grep user\.core | grep -v grep | wc -l)
 
 
 served_status() {
     if [ -e "$pid_file" ]; then
-        echo "* RootCore worker:"
-        echo "== $(echo ${root})"
-        echo "* UserCore workers:"
-        echo "== $(echo ${users})"
+        echo "* Service Spawner:"
     else
         echo "No workers around."
     fi

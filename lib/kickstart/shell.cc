@@ -134,7 +134,7 @@ void execute(char **argv, int uid) {
         if (uid == 0)
             hd << SYSTEMUSERS_HOME_DIR;
         else
-            hd << USERS_HOME_DIR << uid;
+            hd << USERS_HOME_DIR << "/" << uid;
 
         usr << uid;
         chdir(hd.str().c_str());
@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
         homeDir = string(SYSTEMUSERS_HOME_DIR);
     else {
         stringstream ss;
-        ss << string(USERS_HOME_DIR) << uid;
+        ss << string(USERS_HOME_DIR) << "/" << uid;
         homeDir = ss.str(); /* NOTE: /Users/$UID homedir format used here */
     }
 

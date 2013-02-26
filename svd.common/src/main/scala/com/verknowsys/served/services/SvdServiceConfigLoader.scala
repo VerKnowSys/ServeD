@@ -88,50 +88,42 @@ class SvdServiceConfigLoader(name: String) extends Logging with SvdUtils {
 
         install = SvdShellOperations(
                 commands = (appTemplateMerged \ "install" \ "commands").extract[List[String]],
-                expectStdOut = (appTemplateMerged \ "install" \ "expectStdOut").extract[List[String]],
-                expectStdErr = (appTemplateMerged \ "install" \ "expectStdErr").extract[List[String]],
+                expectOutput = (appTemplateMerged \ "install" \ "expectOutput").extract[List[String]],
                 expectOutputTimeout = (appTemplateMerged \ "install" \ "expectOutputTimeout").extract[Int]
             ),
         configure = SvdShellOperations(
                 commands = (appTemplateMerged \ "configure" \ "commands").extract[List[String]],
-                expectStdOut = (appTemplateMerged \ "configure" \ "expectStdOut").extract[List[String]],
-                expectStdErr = (appTemplateMerged \ "configure" \ "expectStdErr").extract[List[String]],
+                expectOutput = (appTemplateMerged \ "configure" \ "expectOutput").extract[List[String]],
                 expectOutputTimeout = (appTemplateMerged \ "configure" \ "expectOutputTimeout").extract[Int]
             ),
         start = SvdShellOperations(
                 commands = (appTemplateMerged \ "start" \ "commands").extract[List[String]],
-                expectStdOut = (appTemplateMerged \ "start" \ "expectStdOut").extract[List[String]],
-                expectStdErr = (appTemplateMerged \ "start" \ "expectStdErr").extract[List[String]],
+                expectOutput = (appTemplateMerged \ "start" \ "expectOutput").extract[List[String]],
                 expectOutputTimeout = (appTemplateMerged \ "start" \ "expectOutputTimeout").extract[Int]
             ),
         afterStart = SvdShellOperations(
                 commands = (appTemplateMerged \ "afterStart" \ "commands").extract[List[String]],
-                expectStdOut = (appTemplateMerged \ "afterStart" \ "expectStdOut").extract[List[String]],
-                expectStdErr = (appTemplateMerged \ "afterStart" \ "expectStdErr").extract[List[String]],
+                expectOutput = (appTemplateMerged \ "afterStart" \ "expectOutput").extract[List[String]],
                 expectOutputTimeout = (appTemplateMerged \ "afterStart" \ "expectOutputTimeout").extract[Int]
             ),
         stop = SvdShellOperations(
                 commands = (appTemplateMerged \ "stop" \ "commands").extract[List[String]],
-                expectStdOut = (appTemplateMerged \ "stop" \ "expectStdOut").extract[List[String]],
-                expectStdErr = (appTemplateMerged \ "stop" \ "expectStdErr").extract[List[String]],
+                expectOutput = (appTemplateMerged \ "stop" \ "expectOutput").extract[List[String]],
                 expectOutputTimeout = (appTemplateMerged \ "stop" \ "expectOutputTimeout").extract[Int]
             ),
         afterStop = SvdShellOperations(
                 commands = (appTemplateMerged \ "afterStop" \ "commands").extract[List[String]],
-                expectStdOut = (appTemplateMerged \ "afterStop" \ "expectStdOut").extract[List[String]],
-                expectStdErr = (appTemplateMerged \ "afterStop" \ "expectStdErr").extract[List[String]],
+                expectOutput = (appTemplateMerged \ "afterStop" \ "expectOutput").extract[List[String]],
                 expectOutputTimeout = (appTemplateMerged \ "afterStop" \ "expectOutputTimeout").extract[Int]
             ),
         reload = SvdShellOperations(
                 commands = (appTemplateMerged \ "reload" \ "commands").extract[List[String]],
-                expectStdOut = (appTemplateMerged \ "reload" \ "expectStdOut").extract[List[String]],
-                expectStdErr = (appTemplateMerged \ "reload" \ "expectStdErr").extract[List[String]],
+                expectOutput = (appTemplateMerged \ "reload" \ "expectOutput").extract[List[String]],
                 expectOutputTimeout = (appTemplateMerged \ "reload" \ "expectOutputTimeout").extract[Int]
             ),
         validate = SvdShellOperations(
                 commands = (appTemplateMerged \ "validate" \ "commands").extract[List[String]],
-                expectStdOut = (appTemplateMerged \ "validate" \ "expectStdOut").extract[List[String]],
-                expectStdErr = (appTemplateMerged \ "validate" \ "expectStdErr").extract[List[String]],
+                expectOutput = (appTemplateMerged \ "validate" \ "expectOutput").extract[List[String]],
                 expectOutputTimeout = (appTemplateMerged \ "validate" \ "expectOutputTimeout").extract[Int]
             )
         )

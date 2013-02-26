@@ -4,23 +4,22 @@
     "schedulerActions": [
         {
             "cronEntry": "0 0/30 * * * ?",
-            "shellCommands": [
-                "SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -t && SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s reload"
-            ]
+            "shellCommands": "SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -t && SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s reload"
+
         }
     ],
     "install": {
-        "commands": ["sofin get nginx"],
-        "expectStdOut": ["All done"]
+        "commands": "sofin get nginx",
+        "expectOutput": "All done"
     },
     "start": {
-        "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf"]
+        "commands": "SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf"
     },
     "stop": {
-        "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s stop"]
+        "commands": "SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s stop"
     },
     "validate": {
-        "commands": ["test ! -f SERVICE_PREFIX/service.conf && printf '
+        "commands": "test ! -f SERVICE_PREFIX/service.conf && printf '
 worker_processes 2;
 events {
     worker_connections 1024;
@@ -41,12 +40,24 @@ http {
         }
     }
 }
-' > SERVICE_PREFIX/service.conf",
-            "SERVICE_ROOT/exports/nginx -t -c SERVICE_PREFIX/service.conf"
-        ],
-        "expectStdOut": ["test is successful"]
+' > SERVICE_PREFIX/service.conf
+
+SERVICE_ROOT/exports/nginx -t -c SERVICE_PREFIX/service.conf",
+        "expectOutput": "test is successful"
     },
     "reload": {
-        "commands": ["SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s reload"]
+        "commands": "SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s reload"
+    },
+    "babySitter": {
+        "commands": "SERVICE_ROOT/exports/nginx -t",
+        "expectOutput": "test is successful",
+        "expectOutputTimeout": 60
+    },
+    "babySitter": {
+        "commands": "SERVICE_ROOT/exports/nginx -t",
+        "expectOutput": "test is successful",
+        "expectOutputTimeout": 20
     }
+
+
 }

@@ -29,6 +29,13 @@ else
     echo "! Recompile to install svdrun"
 fi
 
+if [ -e "ss" ]; then
+    echo "* Installing svdss to /bin"
+    cp -f ./ss /bin/svdss
+else
+    echo "! Recompile to install svdss"
+fi
+
 echo "* Installing native libraries"
 if [ ! -d "/lib" ]; then
     mkdir /lib

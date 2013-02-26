@@ -123,7 +123,7 @@
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / name /* data folder */
 //             ),
 //             waitForOutputFor = 120,
-//             expectStdOut = List("install")) :: Nil,
+//             expectOutput = List("install")) :: Nil,
 
 //         validate = SvdShellOperation(
 //             "test -x %s && test -x %s && test -x %s && echo validation".format(
@@ -132,7 +132,7 @@
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "postgres"
 //             ),
 //             waitForOutputFor = 5,
-//             expectStdOut = List("validation")) :: Nil,
+//             expectOutput = List("validation")) :: Nil,
 
 //         configure = SvdShellOperation(
 //             "mkdir -p %s ; echo \"%s\" > \"%s\" && echo \"%s\" > \"%s\" && echo configuration".format(
@@ -174,7 +174,7 @@
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / name / "postgresql.conf" /* postgresql.conf */
 //             ),
 //             waitForOutputFor = 15,
-//             expectStdOut = List("configuration")) :: Nil,
+//             expectOutput = List("configuration")) :: Nil,
 
 //         start = SvdShellOperation(
 //             "%s -m fast -D %s start && echo start".format(
@@ -182,7 +182,7 @@
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / name /* data folder */
 //             ),
 //             waitForOutputFor = 90,
-//             expectStdOut = List("start")) :: Nil,
+//             expectOutput = List("start")) :: Nil,
 
 //         stop = SvdShellOperation(
 //             "%s -m fast -D '%s' stop && echo stop".format(
@@ -190,7 +190,7 @@
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / name /* data folder */
 //             ),
 //             waitForOutputFor = 15,
-//             expectStdOut = List("stop")) :: Nil
+//             expectOutput = List("stop")) :: Nil
 
 //     )
 
@@ -205,7 +205,7 @@
 //                 SvdConfig.softwareRoot / name,
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir),
 //                 waitForOutputFor = 120,
-//                 expectStdOut = List("install")) :: Nil,
+//                 expectOutput = List("install")) :: Nil,
 
 //         configure = SvdShellOperation(
 //             "echo \"%s\" > \"%s\" && echo \"%s\" > \"%s\" && echo configuration".format(
@@ -414,7 +414,7 @@
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "etc" / "php.ini" /* php.ini */
 //             ),
 //             waitForOutputFor = 15,
-//             expectStdOut = List("configuration")) :: Nil,
+//             expectOutput = List("configuration")) :: Nil,
 
 
 //         validate = SvdShellOperation(
@@ -423,21 +423,21 @@
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "sbin" / "php-fpm",
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "php-config"),
 //             waitForOutputFor = 5,
-//             expectStdOut = List("validation")) :: Nil,
+//             expectOutput = List("validation")) :: Nil,
 
 //         start = SvdShellOperation(
 //             "%s -p %s && echo start".format(
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "sbin" / "php-fpm",
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name),
 //             waitForOutputFor = 90,
-//             expectStdOut = List("start")) :: Nil,
+//             expectOutput = List("start")) :: Nil,
 
 //         stop = SvdShellOperation(
 //             "kill $(cat %s) && echo stop".format(
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "var/run" / "php5-fpm.pid"
 //                 ),
 //             waitForOutputFor = 15,
-//             expectStdOut = List("stop")) :: Nil
+//             expectOutput = List("stop")) :: Nil
 
 //         )
 
@@ -454,7 +454,7 @@
 //                 SvdConfig.softwareRoot / name,
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir),
 //             waitForOutputFor = 120,
-//             expectStdOut = List("install")) :: Nil,
+//             expectOutput = List("install")) :: Nil,
 
 //         validate = SvdShellOperation(
 //             "test -d %s && test -x %s && test -x %s && echo validation".format(
@@ -462,7 +462,7 @@
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "ruby",
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "gem"),
 //             waitForOutputFor = 5,
-//             expectStdOut = List("validation")) :: Nil,
+//             expectOutput = List("validation")) :: Nil,
 
 //         start = SvdShellOperation(
 //             "cd %s && %s start -e production -S %s -d && echo start".format( /* XXX: FIXME: HARDCODE: port should be generated, pool size should be automatically set */
@@ -470,7 +470,7 @@
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "passenger",
 //                 SvdConfig.temporaryDir / "%s-%s.socket".format(domain.name, account.uuid)),
 //             waitForOutputFor = 90,
-//             expectStdOut = List("start")) :: Nil,
+//             expectOutput = List("start")) :: Nil,
 
 //         stop = SvdShellOperation(
 //             "cd %s && %s stop --pid-file %s && echo stop".format(
@@ -478,7 +478,7 @@
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.applicationsDir / name / "bin" / "passenger",
 //                 SvdConfig.userHomeDir / account.uid.toString / SvdConfig.webApplicationsDir / domain.name / "tmp" / "pids" / "passenger.pid"),
 //             waitForOutputFor = 15,
-//             expectStdOut = List("stop")) :: Nil
+//             expectOutput = List("stop")) :: Nil
 
 //      )
 
