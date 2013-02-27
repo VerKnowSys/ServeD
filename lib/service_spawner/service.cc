@@ -363,24 +363,30 @@ void SvdService::validateSlot() {
     logDebug() << "Invoked validate slot for service:" << name;
     logTrace() << "Loading service igniter" << name;
     auto config = new SvdServiceConfig(name);
-    QString indicator = config->prefixDir() + DEFAULT_SERVICE_VALIDATING_FILE;
-    if (QFile::exists(indicator)) {
-        logInfo() << "No need to validate service" << name << "because it's already validating.";
-    } else {
-        logTrace() << "Launching commands:" << config->validate->commands;
-        touch(indicator);
-        auto proc = new SvdProcess(name);
-        proc->spawnProcess(config->validate->commands);
-        proc->waitForFinished(-1);
-        proc->kill();
-        if (not expect(readFileContents(proc->outputFile).c_str(), config->validate->expectOutput)) {
-            logError() << "Failed expectations of service:" << name << "with expected output of validate slot:" << config->validate->expectOutput;
-            writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->validate->expectOutput + "'");
-        }
 
-        QFile::remove(indicator);
-        logTrace() << "After proc validate execution:" << name;
-        delete proc;
+    /* don't perform validation if no validate hook is defined */
+    if (not config->validate->commands.isEmpty()) {
+        QString indicator = config->prefixDir() + DEFAULT_SERVICE_VALIDATING_FILE;
+        if (QFile::exists(indicator)) {
+            logInfo() << "No need to validate service" << name << "because it's already validating.";
+        } else {
+            logTrace() << "Launching commands:" << config->validate->commands;
+            touch(indicator);
+            auto proc = new SvdProcess(name);
+            proc->spawnProcess(config->validate->commands);
+            proc->waitForFinished(-1);
+            proc->kill();
+            if (not expect(readFileContents(proc->outputFile).c_str(), config->validate->expectOutput)) {
+                logError() << "Failed expectations of service:" << name << "with expected output of validate slot:" << config->validate->expectOutput;
+                writeToFile(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE, "Expectations Failed in:" + proc->outputFile +  " - No match for: '" + config->validate->expectOutput + "'");
+            }
+
+            QFile::remove(indicator);
+            logTrace() << "After proc validate execution:" << name;
+            delete proc;
+        }
+    } else {
+        logDebug() << "Skipping validate slot (not defined in igniter) for service:" << name;
     }
     delete config;
 }
