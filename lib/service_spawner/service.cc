@@ -41,7 +41,8 @@ void SvdService::babySitterSlot() {
     auto config = new SvdServiceConfig(name);
 
     /* look for three required files as indicators of already running services software */
-    if (not (QFile::exists(config->prefixDir() + "/.domain") && QFile::exists(config->prefixDir() + "/.ports") && QFile::exists(config->prefixDir() + "/.running"))) {
+    bool filesExistance = QFile::exists(config->prefixDir() + "/.domain") && QFile::exists(config->prefixDir() + "/.ports") && QFile::exists(config->prefixDir() + "/.running");
+    if (not filesExistance) {
         logDebug() << "Skipping babysitter spawn for service:" << name << ", because no service baby around.";
         delete config;
         return;
