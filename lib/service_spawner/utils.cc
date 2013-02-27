@@ -9,10 +9,75 @@
 #include "utils.h"
 
 
-void rotateLog(const QString& fileName) {
-    // TODO: implement real functionality here
+void rotateFile(const QString& fileName) {
+    if (QFile::exists(fileName)) {
+        logDebug() << "Rotating file:" << fileName;
+        const QDateTime now = QDateTime::currentDateTime();
+        const QString fullPath = QFileInfo(fileName).absoluteFilePath();
+        const QStringList splt = fullPath.split("/");
+        const QString fileStandaloneName = splt.value(splt.length() - 1);
+        const QString parentCwdFolderName = splt.value(splt.length() - 2);
+        const QString destLogsDir = getHomeDir() + LOGS_DIR + "/" + parentCwdFolderName;
+        const QString destinationFile = destLogsDir + "/" + fileStandaloneName + "." + now.toString(".yyyy-MM-dd--hh_mm_ss");
 
+        logTrace() << "Log folder name appendix:" << parentCwdFolderName;
+        logDebug() << "Rotate file:" << fileName << ", Dest logs DIR:" << destLogsDir;
+        getOrCreateDir(destLogsDir);
+
+        logTrace() << "Destination file:" << destinationFile;
+        QFile::copy(fileName, destinationFile);
+        performCleanupOfOldLogs();
+
+    } else {
+        logDebug() << "No file found to rotate:" << fileName;
+    }
 }
+
+
+void performCleanupOfOldLogs() {
+    auto rootDirectory = getHomeDir() + LOGS_DIR;
+    auto logDirs = QDir(rootDirectory).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    logTrace() << "Log dirs cleanup invoke in dir with:" << logDirs.length() << "elements, Root Logs DIR:" << rootDirectory;
+    Q_FOREACH(QString directory, logDirs) {
+        auto cwdFiles = QDir(rootDirectory + "/" + directory).entryList(QDir::Files | QDir::Hidden, QDir::Name);
+        auto fileAmount = cwdFiles.length();
+        if (fileAmount > AMOUNT_OF_LOG_FILES_TO_KEEP) {
+            for (int i = fileAmount; i > AMOUNT_OF_LOG_FILES_TO_KEEP; i--) {
+                QString file = rootDirectory + "/" + directory + "/" + cwdFiles.at(fileAmount - i);
+                logTrace() << "Removing old log file:" << file;
+                QFile::remove(file);
+            }
+        }
+
+        logDebug() << "Cleanup of dir:" << rootDirectory + "/" + directory << ", with files:" << cwdFiles.length();
+    }
+}
+
+
+// bool cpDir(const QString &srcPath, const QString &dstPath) {
+//     // removeDir(dstPath);
+//     QDir parentDstDir(QFileInfo(dstPath).path());
+//     if (!parentDstDir.mkdir(QFileInfo(dstPath).fileName()))
+//         return false;
+
+//     QDir srcDir(srcPath);
+//     foreach(const QFileInfo &info, srcDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot)) {
+//         QString srcItemPath = srcPath + "/" + info.fileName();
+//         QString dstItemPath = dstPath + "/" + info.fileName();
+//         if (info.isDir()) {
+//             if (!cpDir(srcItemPath, dstItemPath)) {
+//                 return false;
+//             }
+//         } else if (info.isFile()) {
+//             if (!QFile::copy(srcItemPath, dstItemPath)) {
+//                 return false;
+//             }
+//         } else {
+//             logDebug() << "Unhandled item" << info.filePath() << "in cpDir";
+//         }
+//     }
+//     return true;
+// }
 
 
 bool pidIsAlive(uint pid) {

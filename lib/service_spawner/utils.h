@@ -40,13 +40,15 @@ string readFileContents(const QString& fileName);
 
 bool expect(const QString& inputFileContent, const QString& expectedString);
 bool removeDir(const QString& dirName);
+// bool cpDir(const QString &srcPath, const QString &dstPath);
 bool setPublicDirPriviledges(const QString& path);
 bool setUserDirPriviledges(const QString& path);
 bool pidIsAlive(uint pid);
 
+void performCleanupOfOldLogs();
 void touch(const QString& fileName);
 void writeToFile(const QString& fileName, const QString& contents);
-void rotateLog(const QString& fileName);
+void rotateFile(const QString& fileName);
 void unixSignalHandler(int sigNum);
 
 uint registerFreeTcpPort(uint specificPort = 0);

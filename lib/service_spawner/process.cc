@@ -15,7 +15,7 @@ void SvdProcess::init(const QString& name, uid_t uid) {
 
     if (QFile::exists(outputFile)) {
         logTrace() << "Rotating log file" << outputFile;
-        rotateLog(outputFile);
+        rotateFile(outputFile);
     }
     if (this->redirectOutput)
         setStandardOutputFile(outputFile, QIODevice::Truncate);
