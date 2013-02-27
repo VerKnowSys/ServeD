@@ -1,0 +1,12 @@
+{
+    "softwareName": "Elasticsearch",
+    "staticPort": 25,
+
+    "install": {
+        "commands": "sofin get elasticsearch",
+        "expectOutput": "All done"
+    },
+    "start": {
+        "commands": "SERVICE_ROOT/exports/elasticsearch -p SERVICE_PREFIX/service.pid"
+    }
+}
