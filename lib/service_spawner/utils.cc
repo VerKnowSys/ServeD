@@ -181,6 +181,7 @@ bool removeDir(const QString& dirName) {
 
 
 void writeToFile(const QString& fileName, const QString& contents) {
+    rotateFile(fileName);
     QFile file(fileName);
     if (file.open(QIODevice::ReadWrite)) {
         QTextStream stream(&file);
