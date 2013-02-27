@@ -48,6 +48,7 @@ bool pidIsAlive(uint pid);
 void performCleanupOfOldLogs();
 void touch(const QString& fileName);
 void writeToFile(const QString& fileName, const QString& contents);
+void writeToFile(const QString& fileName, const QString& contents, bool rotateFile);
 void rotateFile(const QString& fileName);
 void unixSignalHandler(int sigNum);
 
