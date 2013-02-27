@@ -259,7 +259,7 @@ uint registerFreeTcpPort(uint specificPort) {
         QHostInfo info = QHostInfo::fromName(list.at(j).toString());
         if (!info.addresses().isEmpty()) {
             auto address = info.addresses().first();
-            logDebug() << "Got address: " << address;
+            logTrace() << "Got address: " << address;
             auto tcpServer = new QTcpServer();
             tcpServer->listen(address, port);
             if (not tcpServer->isListening()) {

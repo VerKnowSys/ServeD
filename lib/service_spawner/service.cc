@@ -37,7 +37,6 @@ qint64 SvdService::getUptime() {
 
 /* baby sitting slot is used to watch service pid */
 void SvdService::babySitterSlot() {
-    logTrace() << "Babysitter invoked for:" << name;
     auto config = new SvdServiceConfig(name);
 
     /* look for three required files as indicators of already running services software */
@@ -46,7 +45,8 @@ void SvdService::babySitterSlot() {
         logDebug() << "Skipping babysitter spawn for service:" << name << ", because no service baby around.";
         delete config;
         return;
-    }
+    } else
+        logDebug() << "Babysitter invoked for:" << name;
     QString servicePidFile = config->prefixDir() + "/service.pid";
     validateSlot();
 
