@@ -19,7 +19,7 @@ SvdService::SvdService(const QString& name) {
     /* setup baby sitter */
     babySitter = new QTimer(this);
     connect(babySitter, SIGNAL(timeout()), this, SLOT(babySitterSlot()));
-    babySitter->start(10000); // XXX: hardcoded 10s
+    babySitter->start(BABYSITTER_TIMEOUT_INTERVAL / 1000); // miliseconds
 }
 
 
@@ -42,7 +42,7 @@ void SvdService::babySitterSlot() {
 
     /* look for three required files as indicators of already running services software */
     if (not (QFile::exists(config->prefixDir() + "/.domain") && QFile::exists(config->prefixDir() + "/.ports") && QFile::exists(config->prefixDir() + "/.running"))) {
-        logDebug() << "Skipping babysitter spawn, because no service baby around.";
+        logDebug() << "Skipping babysitter spawn for service:" << name << ", because no service baby around.";
         delete config;
         return;
     }

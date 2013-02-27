@@ -79,6 +79,7 @@
 
 
     #define DEFAULT_SERVICE_PAUSE_INTERVAL 5000000 // 5 seconds
+    #define BABYSITTER_TIMEOUT_INTERVAL 20000000 // 20 seconds
     #define DEFAULT_GATHERING_PAUSE_MICROSECONDS 500000 // half a second
     #define DEFAULT_COUNT_OF_ROUNDS_OF_GATHERING 7200 // waiting half a second, hence 7200 is 60 minutes of gathering
     #define DEFAULT_USER_GROUP 0
