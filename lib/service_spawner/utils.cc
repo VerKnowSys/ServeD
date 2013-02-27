@@ -21,7 +21,7 @@ void rotateFile(const QString& fileName) {
         const QString destinationFile = destLogsDir + "/" + fileStandaloneName + "." + now.toString(".yyyy-MM-dd--hh_mm_ss");
 
         logTrace() << "Log folder name appendix:" << parentCwdFolderName;
-        logDebug() << "Rotate file:" << fileName << ", Dest logs DIR:" << destLogsDir;
+        logDebug() << "Rotate file:" << fileName << ", Logs dir:" << destLogsDir;
         getOrCreateDir(destLogsDir);
 
         logTrace() << "Destination file:" << destinationFile;
@@ -37,7 +37,7 @@ void rotateFile(const QString& fileName) {
 void performCleanupOfOldLogs() {
     auto rootDirectory = getHomeDir() + LOGS_DIR;
     auto logDirs = QDir(rootDirectory).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
-    logTrace() << "Log dirs cleanup invoke in dir with:" << logDirs.length() << "elements, Root Logs DIR:" << rootDirectory;
+    logDebug() << "Log dirs cleanup invoke in dir with:" << logDirs.length() << "elements, Root Logs DIR:" << rootDirectory;
     Q_FOREACH(QString directory, logDirs) {
         auto cwdFiles = QDir(rootDirectory + "/" + directory).entryList(QDir::Files | QDir::Hidden, QDir::Name);
         auto fileAmount = cwdFiles.length();
@@ -49,7 +49,7 @@ void performCleanupOfOldLogs() {
             }
         }
 
-        logDebug() << "Cleanup of dir:" << rootDirectory + "/" + directory << ", with files:" << cwdFiles.length();
+        logTrace() << "Cleanup of dir:" << rootDirectory + "/" + directory << ", with files:" << cwdFiles.length();
     }
 }
 

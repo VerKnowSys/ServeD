@@ -46,7 +46,7 @@ void SvdProcess::spawnDefaultShell() {
 
 void SvdProcess::spawnProcess(const QString& command) {
     spawnDefaultShell();
-    logDebug() << "Spawning command:" << QString(command);
+    logTrace() << "Spawning command:" << QString(command);
     write(command.toUtf8());
     closeWriteChannel();
     // stop();

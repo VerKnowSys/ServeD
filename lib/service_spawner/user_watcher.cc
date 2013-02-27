@@ -121,7 +121,7 @@ void SvdUserWatcher::dirChangedSlot(const QString& dir) {
     logTrace() << "Directory changed:" << dir;
 
     if (dir == homeDir) {
-        logDebug() << "Invoked trigger in dir:" << dir;
+        logTrace() << "Invoked trigger in dir:" << dir;
         checkUserControlTriggers();
         return;
     }
