@@ -272,6 +272,19 @@ uint registerFreeTcpPort(uint specificPort) {
             delete tcpServer;
         }
     }
+
+    /* also perform additional check on 0.0.0.0 for services which are listening on multiple interfaces at once */
+    auto tcpServer = new QTcpServer();
+    tcpServer->listen(QHostAddress::Any, port);
+    if (not tcpServer->isListening()) {
+        logDebug() << "Taken port on 0.0.0.0:" << port;
+        delete tcpServer;
+        delete inter;
+        return registerFreeTcpPort(10000 + rand);
+    } else
+        tcpServer->close();
+    delete tcpServer;
+
     delete inter;
     return port;
 }
