@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
         }
     }
     logDebug() << "Lock name:" << lockName;
-    writeToFile(lockName, QString::number(getpid())); /* get process pid and record it to pid file */
+    writeToFile(lockName, QString::number(getpid()), false); /* get process pid and record it to pid file no logrotate */
 
     if (uid == 0) {
         logInfo("Root Mode Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
