@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ "$(uname)" == "Darwin" ]; then
+  cd $(pwd)/lib && bsdmake DEVEL=true DARWIN=true && cd ..
+else
+  cd $(pwd)/lib && make DEVEL=true && cd ..
+fi
