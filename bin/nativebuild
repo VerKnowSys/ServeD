@@ -4,7 +4,7 @@
 SYSTEM="$(uname)"
 ARCH="$(uname -p)"
 DEVEL="false"
-MAKE_OPTS="all strip clean"
+MAKE_OPTS="all clean"
 
 if [ "$1" = "devel" ]; then
     echo "Devel enabled"
