@@ -47,7 +47,7 @@ void SvdService::babySitterSlot() {
         return;
     } else
         logDebug() << "Babysitter invoked for:" << name;
-    QString servicePidFile = config->prefixDir() + "/service.pid";
+    QString servicePidFile = config->prefixDir() + DEFAULT_SERVICE_PID_FILE;
     validateSlot();
 
     if (config->alwaysOn) {
@@ -274,7 +274,7 @@ void SvdService::stopSlot() {
         logTrace() << "Loading service igniter" << name;
         proc->spawnProcess(config->stop->commands); // invoke igniter stop, and then try to look for service.pid in prefix directory:
 
-        QString servicePidFile = config->prefixDir() + "/service.pid";
+        QString servicePidFile = config->prefixDir() + DEFAULT_SERVICE_PID_FILE;
         if (QFile::exists(servicePidFile)) {
             uint pid = QString(readFileContents(servicePidFile).c_str()).toUInt();
             logDebug() << "Service pid found:" << QString::number(pid) << "in file:" << servicePidFile;
