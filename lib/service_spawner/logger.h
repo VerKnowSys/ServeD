@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef __SERVICE_CONFIG__
-#define __SERVICE_CONFIG__
+#ifndef __LOGGER_H__
+#define __LOGGER_H__
 
 #include <QtCore>
 #include "utils.h"
