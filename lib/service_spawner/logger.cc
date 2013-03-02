@@ -36,7 +36,7 @@ void LoggerTimer::invokeTrigger() {
 LoggerTimer::LoggerTimer(ConsoleAppender *appender) {
     this->logger = appender;
     QTimer *timer = new QTimer(this);
-    timer->setInterval(1000); // XXX : hardcoded
+    timer->setInterval(ONE_SECOND_OF_DELAY / 1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(invokeTrigger()));
     timer->start();
 }

@@ -77,7 +77,7 @@
     #define DEFAULT_SERVICE_VALIDATING_FILE "/.validating"
     #define DEFAULT_SS_SHUTDOWN_HOOK_FILE "/.shutdown"
 
-
+    #define ONE_SECOND_OF_DELAY 1000000 // 1 second
     #define DEFAULT_SERVICE_PAUSE_INTERVAL 5000000 // 5 seconds
     #define BABYSITTER_TIMEOUT_INTERVAL 20000000 // 20 seconds
     #define DEFAULT_GATHERING_PAUSE_MICROSECONDS 500000 // half a second
