@@ -76,10 +76,19 @@ int main(int argc, char *argv[]) {
     /* file lock setup */
     QString lockName = getHomeDir() + "/." + QString::number(uid) + ".pid";
     if (QFile::exists(lockName)) {
-        uint pid = QString(readFileContents(lockName).c_str()).trimmed().toUInt();
-        if (pidIsAlive(pid)) {
-            logError() << "Service Spawner is already running.";
-            exit(LOCK_FILE_OCCUPIED_ERROR); /* can not open */
+        bool ok;
+        QString aPid = QString(readFileContents(lockName).c_str()).trimmed();
+        uint pid = aPid.toInt(&ok, 10);
+        if (ok) {
+            if (pidIsAlive(pid)) {
+                logError() << "Service Spawner is already running.";
+                exit(LOCK_FILE_OCCUPIED_ERROR); /* can not open */
+            } else
+                logDebug() << "No alive Service Spawner pid found";
+
+        } else {
+            logWarn() << "Pid file is damaged or doesn't contains valid pid. File will be removed";
+            QFile::remove(lockName);
         }
     }
     logDebug() << "Lock name:" << lockName;
