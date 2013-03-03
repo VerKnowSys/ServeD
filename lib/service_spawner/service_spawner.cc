@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
             trace = true;
         }
         if (rxPrintVersion.indexIn(args.at(i)) != -1) {
-            cout << "Service Spawner v" << APP_VERSION << ". " << COPYRIGHT;
+            cout << "ServeD Service Spawner v" << APP_VERSION << ". " << COPYRIGHT;
             exit(EXIT_SUCCESS);
         }
     }

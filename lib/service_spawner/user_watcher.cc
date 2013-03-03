@@ -101,7 +101,7 @@ SvdUserWatcher::SvdUserWatcher(uid_t uid) {
 
 void SvdUserWatcher::shutdownSlot() {
     if (uid == 0) {
-        /* spawn ss for each of uids in /Users */
+        /* remove user pid files */
         Q_FOREACH(int userUid, gatherUserUids()) {
             QString lockName = QString(USERS_HOME_DIR) + "/" + QString::number(userUid) + "/." + QString::number(userUid) + ".pid";
             logDebug() << "Removing lock file:" << lockName;
