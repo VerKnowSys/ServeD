@@ -57,16 +57,23 @@ void SvdService::babySitterSlot() {
 
             /* checking status of pid of service */
             if (QFile::exists(servicePidFile)) {
+                bool ok;
                 logDebug() << "Babysitter has found service pid for" << name;
-                uint pid = QString(readFileContents(servicePidFile).c_str()).toUInt();
+                QString aPid = QString(readFileContents(servicePidFile).c_str()).trimmed();
+                uint pid = aPid.toInt(&ok, 10);
                 logDebug() << "Checking status of pid:" << QString::number(pid);
-
-                if (pidIsAlive(pid)) {
-                    logDebug() << "Service:" << name << "seems to be alive and kicking.";
+                if (ok) {
+                    if (pidIsAlive(pid)) {
+                        logDebug() << "Service:" << name << "seems to be alive and kicking.";
+                    } else {
+                        logError() << "Service:" << name << "seems to be down. Performing restart.";
+                        restartSlot();
+                    }
                 } else {
-                    logError() << "Service:" << name << "seems to be down. Performing restart.";
-                    restartSlot();
+                    logWarn() << "Pid file is damaged or doesn't contains valid pid. File will be removed:" << servicePidFile;
+                    QFile::remove(servicePidFile);
                 }
+
             } else {
                 logWarn() << "No service pid file found for service:" << name << "! Service Babysitter will try to respawn dead children immediately.";
                 restartSlot();
