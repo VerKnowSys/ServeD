@@ -221,6 +221,11 @@ const QString SvdServiceConfig::userIgniter() {
 }
 
 
+const QString SvdServiceConfig::standardUserIgniter() {
+    return QString(DEFAULTSOFTWARETEMPLATESDIR) + "/" + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
+}
+
+
 /* XXX: TODO: OPTIMIZE, define cache for values explictly read from files for each service hook for each service */
 const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
     QString ccont = content;
@@ -283,7 +288,7 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
             ccont = ccont.replace("SERVICE_PORT", portFilePath); /* replace with user port content */
         } else {
             uint freePort = registerFreeTcpPort();
-            logDebug() << "No port file for service " << name << " (software: " << softwareName << ")! Ports file will be created and filled with generated port:" << freePort;
+            logDebug() << "No port file for service:" << name << "(software:" << softwareName << ")! Ports file will be created and filled with generated port:" << freePort;
             ccont = ccont.replace("SERVICE_PORT", QString::number(freePort)); /* this happens when no service port file exists */
             writeToFile(portFilePath, QString::number(freePort));
         }
@@ -313,18 +318,27 @@ Json::Value* SvdServiceConfig::loadDefaultIgniter() {
  *  Load igniter data in Json.
  */
 Json::Value* SvdServiceConfig::loadIgniter() {
-
     // auto result = new Json::Value();
     QFile fileUser(userIgniter()); /* try loading user igniter as first */
-    QFile fileRoot(rootIgniter()); /* try loading root igniter as second */
+    QFile fileStandardUser(standardUserIgniter()); /* try loading standard igniter as second */
+    QFile fileRoot(rootIgniter()); /* try loading root igniter as third */
+
     if(!fileUser.open(QIODevice::ReadOnly)) { /* check file access */
         logDebug() << "No file: " << userIgniter();
     } else {
-        fileRoot.close();
         fileUser.close();
         return parseJSON(userIgniter());
     }
     fileUser.close();
+
+    /* also check standard location for igniters */
+    if(!fileStandardUser.open(QIODevice::ReadOnly)) { /* check file access */
+        logDebug() << "No file: " << standardUserIgniter();
+    } else {
+        fileStandardUser.close();
+        return parseJSON(standardUserIgniter());
+    }
+    fileStandardUser.close();
 
     if(!fileRoot.open(QIODevice::ReadOnly)) {
         logDebug() << "No file: " << rootIgniter();
