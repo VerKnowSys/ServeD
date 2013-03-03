@@ -42,22 +42,16 @@ http {
 }
 ' > SERVICE_PREFIX/service.conf
 
-SERVICE_ROOT/exports/nginx -t -c SERVICE_PREFIX/service.conf",
+SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -t",
         "expectOutput": "test is successful"
     },
     "reload": {
         "commands": "SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -s reload"
     },
     "babySitter": {
-        "commands": "SERVICE_ROOT/exports/nginx -t",
-        "expectOutput": "test is successful",
-        "expectOutputTimeout": 60
-    },
-    "babySitter": {
-        "commands": "SERVICE_ROOT/exports/nginx -t",
+        "commands": "SERVICE_ROOT/exports/nginx -c SERVICE_PREFIX/service.conf -t",
         "expectOutput": "test is successful",
         "expectOutputTimeout": 20
     }
-
 
 }
