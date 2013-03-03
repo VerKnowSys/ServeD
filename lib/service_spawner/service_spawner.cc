@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
         QString aPid = QString(readFileContents(lockName).c_str()).trimmed();
         uint pid = aPid.toInt(&ok, 10);
         if (ok) {
-            if (pidIsAlive(pid) or pid == 0) { /* NOTE: if pid == 0 it means that SS is runned from SS maintainer */
+            if (pidIsAlive(pid) or pid == 0) { /* NOTE: if pid == 0 it means that SS is runned from SS root maintainer */
                 logError() << "Service Spawner is already running.";
                 exit(LOCK_FILE_OCCUPIED_ERROR); /* can not open */
             } else
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 
     } else {
         logInfo("Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
-        logDebug() << "Spawning for uid:" << getuid();
+        logDebug() << "Spawning for uid:" << uid;
 
         logDebug() << "Checking user directory priviledges";
         setUserDirPriviledges(getHomeDir());
