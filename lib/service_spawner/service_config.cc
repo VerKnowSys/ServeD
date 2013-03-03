@@ -212,7 +212,7 @@ const QString SvdServiceConfig::defaultTemplateFile() {
 
 
 const QString SvdServiceConfig::rootIgniter() {
-    return QString(DEFAULTSOFTWARETEMPLATESDIR) + "/" + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
+    return QString(SYSTEM_USERS_DIR) + QString(DEFAULTUSERIGNITERSDIR) + "/" + name + QString(DEFAULTSOFTWARETEMPLATEEXT);
 }
 
 
