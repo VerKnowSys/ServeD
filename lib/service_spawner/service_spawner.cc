@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
     QStringList args = app.arguments();
     QRegExp rxEnableDebug("-d");
     QRegExp rxEnableTrace("-t");
+    QRegExp rxPrintVersion("-v");
     uint uid = getuid();
 
     bool debug = false, trace = false;
@@ -48,6 +49,10 @@ int main(int argc, char *argv[]) {
         if (rxEnableTrace.indexIn(args.at(i)) != -1 ) {
             debug = true;
             trace = true;
+        }
+        if (rxPrintVersion.indexIn(args.at(i)) != -1) {
+            cout << "Service Spawner v" << APP_VERSION << ". " << COPYRIGHT;
+            exit(0);
         }
     }
 
