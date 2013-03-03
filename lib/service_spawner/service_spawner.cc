@@ -108,12 +108,12 @@ int main(int argc, char *argv[]) {
         setUserDirPriviledges(getHomeDir());
 
         /* Setting up user watchers */
-        auto userWatcher = new SvdUserWatcher();
+        new SvdUserWatcher();
     }
 
     signal(SIGINT, unixSignalHandler);
 
-    auto loggerTimer = new LoggerTimer(consoleAppender);
+    new LoggerTimer(consoleAppender);
 
     return app.exec();
 }
