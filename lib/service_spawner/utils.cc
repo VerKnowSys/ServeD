@@ -9,6 +9,23 @@
 #include "utils.h"
 
 
+QList<int> gatherUserUids() {
+    auto userDirs = QDir(USERS_HOME_DIR).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    QList<int> dirs;
+
+    /* filter through invalid directories */
+    Q_FOREACH(QString directory, userDirs) {
+        bool ok;
+        int validUserDir = directory.toInt(&ok, 10); /* valid user directory must be number here */
+        if (ok)
+            dirs << validUserDir;
+        else
+            logTrace() << "Filtering out userDir:" << directory;
+    }
+    return dirs;
+}
+
+
 void rotateFile(const QString& fileName) {
     if (QFile::exists(fileName)) {
         logDebug() << "Rotating file:" << fileName;

@@ -17,24 +17,15 @@
 
 
 void spawnSSForEachUser() {
-    auto userDirs = QDir(USERS_HOME_DIR).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
-    QList<int> dirs;
-
-    /* filter through invalid directories */
-    Q_FOREACH(QString directory, userDirs) {
-        bool ok;
-        int validUserDir = directory.toInt(&ok, 10); /* valid user directory must be number here */
-        if (ok)
-            dirs << validUserDir;
-        else
-            logTrace() << "Filtering out userDir:" << directory;
-    }
-
     /* spawn ss for each of uids in /Users */
-    Q_FOREACH(int directory, dirs) {
-        logDebug() << "Spawning user SS for:" << QString::number(directory);
+    Q_FOREACH(int userUid, gatherUserUids()) {
+        logDebug() << "Spawning user SS for:" << QString::number(userUid);
 
-        auto proc = new SvdProcess("SS", directory, false); // don't redirect output
+        /* creating lock file for given user */
+        QString lockName = QString(USERS_HOME_DIR) + "/" + QString::number(userUid) + "/." + QString::number(userUid) + ".pid";
+        writeToFile(lockName, QString::number(0), false); /* NOTE: if pid == 0 it means that SS is runned from SS maintainer */
+
+        auto proc = new SvdProcess("SS", userUid, false); // don't redirect output
         proc->spawnProcess(DEFAULT_SS_COMMAND);
     }
 }
@@ -80,7 +71,7 @@ int main(int argc, char *argv[]) {
         QString aPid = QString(readFileContents(lockName).c_str()).trimmed();
         uint pid = aPid.toInt(&ok, 10);
         if (ok) {
-            if (pidIsAlive(pid)) {
+            if (pidIsAlive(pid) or pid == 0) { /* NOTE: if pid == 0 it means that SS is runned from SS maintainer */
                 logError() << "Service Spawner is already running.";
                 exit(LOCK_FILE_OCCUPIED_ERROR); /* can not open */
             } else
@@ -101,7 +92,7 @@ int main(int argc, char *argv[]) {
         spawnSSForEachUser();
 
         /* Setting up root watchers */
-        new SvdUserWatcher(uid);
+        new SvdUserWatcher();
 
     } else {
         logInfo("Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
