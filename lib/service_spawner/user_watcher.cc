@@ -107,16 +107,10 @@ void SvdUserWatcher::shutdownSlot() {
             logDebug() << "Removing lock file:" << lockName;
             QFile::remove(lockName);
         }
-
-        QString lockName = getHomeDir() + "/." + QString::number(uid) + ".pid";
-        logDebug() << "Removing lock file:" << lockName;
-        QFile::remove(lockName);
-
-    } else {
-        QString lockName = getHomeDir() + "/." + QString::number(uid) + ".pid";
-        logDebug() << "Removing lock file:" << lockName;
-        QFile::remove(lockName);
     }
+    QString lockName = getHomeDir() + "/." + QString::number(uid) + ".pid";
+    logDebug() << "Removing lock file:" << lockName;
+    QFile::remove(lockName);
     logInfo() << "Shutdown completed.";
 }
 
