@@ -52,7 +52,7 @@ void rotateFile(const QString& fileName) {
 
 
 void performCleanupOfOldLogs() {
-    auto rootDirectory = getHomeDir() + LOGS_DIR;
+    auto rootDirectory = getOrCreateDir(getHomeDir() + LOGS_DIR);
     auto logDirs = QDir(rootDirectory).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     logDebug() << "Log dirs cleanup invoke in dir with:" << logDirs.length() << "elements, Root Logs DIR:" << rootDirectory;
     Q_FOREACH(QString directory, logDirs) {
