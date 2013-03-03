@@ -116,10 +116,9 @@ void SvdUserWatcher::shutdownSlot() {
 
 
 void SvdUserWatcher::checkUserControlTriggers() {
-    QString dir = homeDir;
-    if (QFile::exists(dir + DEFAULT_SS_SHUTDOWN_HOOK_FILE)) {
+    if (QFile::exists(homeDir + DEFAULT_SS_SHUTDOWN_HOOK_FILE)) {
         logInfo() << "Invoked shutdown trigger. Sending SS down.";
-        QFile::remove(dir + DEFAULT_SS_SHUTDOWN_HOOK_FILE);
+        QFile::remove(homeDir + DEFAULT_SS_SHUTDOWN_HOOK_FILE);
         raise(SIGINT);
     }
 }
