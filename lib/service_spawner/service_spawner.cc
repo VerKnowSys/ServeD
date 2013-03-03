@@ -100,6 +100,9 @@ int main(int argc, char *argv[]) {
         // TODO: auto coreginxWatcher = …
         spawnSSForEachUser();
 
+        /* Setting up root watchers */
+        new SvdUserWatcher(uid);
+
     } else {
         logInfo("Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
         logDebug() << "Spawning for uid:" << getuid();

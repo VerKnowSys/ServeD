@@ -234,25 +234,15 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
     } else {
 
         /* Replace SERVICE_ROOT */
-        // if (QFile::exists(userServiceRoot())) {
-        logTrace() << "User service root should be located in:" << userServiceRoot();
-        ccont = ccont.replace("SERVICE_ROOT", userServiceRoot());
-        // } else {
-            // logDebug() << "Not found user service root of" << name << userServiceRoot();
-            // logDebug() << "Assumming it requires to be installed in service root directory";
-        // }
-
-        // if (!QFile::exists(userServiceRoot()) && QFile::exists(serviceRoot())) { // check it only if user service isn't installed
-        //     logTrace() << "Service root found in:" << serviceRoot();
-        //     ccont = ccont.replace("SERVICE_ROOT", serviceRoot());
-        // } else if (!QFile::exists(userServiceRoot()) && !QFile::exists(serviceRoot())) {
-        //      logWarn() << "Not found service root of" << name << serviceRoot();
-        //      // so by default..
-        //      return "";
-        // }
+        if (uid != 0) {
+            logDebug() << "Service root for uid:" << uid << "should be located in:" << userServiceRoot();
+            ccont = ccont.replace("SERVICE_ROOT", userServiceRoot());
+        } else {
+            logDebug() << "Service root for uid:" << uid << "should be located in:" << serviceRoot();
+            ccont = ccont.replace("SERVICE_ROOT", serviceRoot());
+        }
 
         /* Replace SERVICE_PREFIX */
-
         ccont = ccont.replace("SERVICE_PREFIX", prefixDir());
 
         /* Replace SERVICE_DOMAIN */
