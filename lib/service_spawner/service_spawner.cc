@@ -94,7 +94,9 @@ int main(int argc, char *argv[]) {
         logInfo("Root Mode Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
         setPublicDirPriviledges(getOrCreateDir(DEFAULT_PUBLIC_DIR));
         // TODO: auto coreginxWatcher = …
-        spawnSSForEachUser();
+
+        /* disabled cause completely no output from user ss, and cause of temporary unmagability */
+        // spawnSSForEachUser();
 
         /* Setting up root watchers */
         new SvdUserWatcher();
