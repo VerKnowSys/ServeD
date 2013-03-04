@@ -11,7 +11,7 @@
 
 
 SvdUserHookTriggerFiles::SvdUserHookTriggerFiles(const QString& path) {
-    shutdown = new SvdHookTriggerFile(path + "/.shutdown");
+    shutdown = new SvdHookTriggerFile(path + DEFAULT_SS_SHUTDOWN_HOOK_FILE);
 }
 
 
@@ -119,6 +119,8 @@ void SvdUserWatcher::checkUserControlTriggers() {
     if (QFile::exists(homeDir + DEFAULT_SS_SHUTDOWN_HOOK_FILE)) {
         logInfo() << "Invoked shutdown trigger. Sending SS down.";
         QFile::remove(homeDir + DEFAULT_SS_SHUTDOWN_HOOK_FILE);
+        /* and remove pid file */
+        QFile::remove(homeDir + "/." + QString::number(uid) + ".pid");
         raise(SIGINT);
     }
 }
