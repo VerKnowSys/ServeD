@@ -40,7 +40,7 @@ void SvdService::babySitterSlot() {
     auto config = new SvdServiceConfig(name);
 
     /* look for three required files as indicators of already running services software */
-    bool filesExistance = QFile::exists(config->prefixDir() + "/.domain") && QFile::exists(config->prefixDir() + "/.ports") && QFile::exists(config->prefixDir() + "/.running");
+    bool filesExistance = QFile::exists(config->prefixDir() + "/.domain") && QFile::exists(config->prefixDir() + "/.ports") && QFile::exists(config->prefixDir() + DEFAULT_SERVICE_RUNNING_FILE);
     if (not filesExistance) {
         logDebug() << "Skipping babysitter spawn for service:" << name << ", because no service baby around.";
         delete config;
@@ -297,6 +297,15 @@ void SvdService::stopSlot() {
         }
 
         QFile::remove(indicator);
+
+        /* remove any other states on stop in case of any kinds of failure /killed ss */
+        QFile::remove(config->prefixDir() + DEFAULT_SERVICE_INSTALLING_FILE);
+        QFile::remove(config->prefixDir() + DEFAULT_SERVICE_AFTERSTOPPING_FILE);
+        QFile::remove(config->prefixDir() + DEFAULT_SERVICE_AFTERSTARTING_FILE);
+        QFile::remove(config->prefixDir() + DEFAULT_SERVICE_CONFIGURING_FILE);
+        QFile::remove(config->prefixDir() + DEFAULT_SERVICE_RELOADING_FILE);
+        QFile::remove(config->prefixDir() + DEFAULT_SERVICE_VALIDATING_FILE);
+
         logTrace() << "After proc stop execution:" << name;
         delete proc;
     }
