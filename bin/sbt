@@ -28,6 +28,6 @@ exec java \
 -Djna.library.path=$(pwd)/lib \
 -Dfile.encoding=UTF-8 \
 -Djava.net.preferIPv4Stack=true \
--client \
+-server \
 -javaagent:/lib/jrebel/jrebel.jar \
 -jar $(dirname $0)/../vendor/sbt-launch.jar "$@"

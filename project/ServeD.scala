@@ -126,11 +126,11 @@ object Dependencies {
     val sshd = "org.apache.sshd" % "sshd-core" % "0.7.0"
     val jna = "net.java.dev.jna" % "jna" % "3.2.7"
     val jnaerator = "com.nativelibs4java" % "jnaerator-runtime" % "0.11-SNAPSHOT" % "compile"
-    val expect4j = "net.sourceforge.expectj" % "expectj" % "2.0.1"
+    // val expect4j = "net.sourceforge.expectj" % "expectj" % "2.0.1"
     val jgit = "org.eclipse.jgit" % "org.eclipse.jgit" % "2.1.0.201209190230-r" // "1.0.0.201106090707-r"
     val neodatis = "org.neodatis" % "neodatis-odb" % "1.9.24.679"
     val javaMail = "javax.mail" % "mail" % "1.4.5"
-    val quartz = "org.quartz-scheduler" % "quartz" % "2.1.6"
+    // val quartz = "org.quartz-scheduler" % "quartz" % "2.1.6"
     val slf4japi = "org.slf4j" % "slf4j-api" % "1.6.6"
     val webbit = "org.webbitserver" % "webbit" % "0.4.14"
     val tzip = "de.schlichtherle" % "truezip" % "6.8.4"
@@ -174,7 +174,7 @@ object ServeD extends Build {
     lazy val root = Project("root", file("svd.root"),
         settings = coreBuildSettings ++ Seq(
             parallelExecution in Test := false, // NOTE: This should be removed
-            libraryDependencies ++= Seq(jline, expect4j, sshd, webbit),
+            libraryDependencies ++= Seq(jline, sshd, webbit), // expect4j
             mainClass in assembly := Some("com.verknowsys.served.rootboot")
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, common, user, utils, web, testing % "test")
@@ -190,7 +190,7 @@ object ServeD extends Build {
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis, expect4j, bouncycastle, json, javaMail, jedis, smack, pircbot, commonsCodec, unfiltered)
+            libraryDependencies ++= Seq(neodatis, bouncycastle, json, javaMail, jedis, smack, pircbot, commonsCodec, unfiltered) // expect4j
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test") // unfiltered
 
@@ -212,7 +212,7 @@ object ServeD extends Build {
     lazy val utils = Project("utils", file("svd.utils"),
         settings = buildSettings ++ Seq(
             compileOrder        := CompileOrder.Mixed,
-            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd, slf4japi, quartz, json, actors, akkaActor, commonsCodec, commonsFileUpload) // liftUtil,
+            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd, slf4japi, json, actors, akkaActor, commonsCodec,  commonsFileUpload) // liftUtil, quartz
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, testing % "test")
 
