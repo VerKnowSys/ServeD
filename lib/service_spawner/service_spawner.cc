@@ -95,6 +95,8 @@ int main(int argc, char *argv[]) {
     if (uid == 0) {
         logInfo("Root Mode Service Spawner v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
         setPublicDirPriviledges(getOrCreateDir(DEFAULT_PUBLIC_DIR));
+        setupDefaultVPNNetwork();
+
         // TODO: auto coreginxWatcher = …
 
         /* disabled cause completely no output from user ss, and cause of temporary unmagability */

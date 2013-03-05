@@ -107,6 +107,7 @@ void SvdUserWatcher::shutdownSlot() {
             logDebug() << "Removing lock file:" << lockName;
             QFile::remove(lockName);
         }
+        shutdownDefaultVPNNetwork();
     }
     QString lockName = getHomeDir() + "/." + QString::number(uid) + ".pid";
     logDebug() << "Removing lock file:" << lockName;

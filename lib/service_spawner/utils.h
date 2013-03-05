@@ -13,6 +13,7 @@
 #include "../cutelogger/Logger.h"
 #include "../cutelogger/ConsoleAppender.h"
 #include "../cutelogger/FileAppender.h"
+#include "../service_spawner/process.h"
 
 #define logTrace LOG_TRACE
 #define logDebug LOG_DEBUG
@@ -47,6 +48,8 @@ bool setPublicDirPriviledges(const QString& path);
 bool setUserDirPriviledges(const QString& path);
 bool pidIsAlive(uint pid);
 
+void shutdownDefaultVPNNetwork();
+void setupDefaultVPNNetwork();
 void performCleanupOfOldLogs();
 void touch(const QString& fileName);
 void writeToFile(const QString& fileName, const QString& contents);

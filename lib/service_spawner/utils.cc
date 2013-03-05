@@ -9,6 +9,31 @@
 #include "utils.h"
 
 
+
+void setupDefaultVPNNetwork() {
+    #ifdef __FreeBSD__
+        logInfo() << "Launching VPN Network Setup";
+        auto proc = new SvdProcess("VPN-setup", 9, false); // don't redirect output
+        proc->spawnProcess(DEFAULT_VPN_INTERFACE_SETUP_COMMAND);
+        proc->waitForFinished(-1);
+        proc->close();
+        delete proc;
+    #endif
+}
+
+
+void shutdownDefaultVPNNetwork() {
+    #ifdef __FreeBSD__
+        logInfo() << "Shutting down VPN Network Setup";
+        auto proc = new SvdProcess("VPN-setup", 9, false); // don't redirect output
+        proc->spawnProcess(DEFAULT_VPN_INTERFACE_SHUTDOWN_COMMAND);
+        proc->waitForFinished(-1);
+        proc->close();
+        delete proc;
+    #endif
+}
+
+
 QList<int> gatherUserUids() {
     auto userDirs = QDir(USERS_HOME_DIR).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     QList<int> dirs;
