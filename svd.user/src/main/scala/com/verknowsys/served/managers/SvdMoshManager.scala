@@ -43,32 +43,32 @@ class SvdMoshManager(account: SvdAccount) extends Actor with Logging with SvdAct
 
         case User.MoshSession =>
             log.debug("Got MoshSession message in Mosh manager.")
-            log.info("Becoming aware of new Mosh Server")
-            val originSender = sender
-            val moshMatcher = """MOSH CONNECT (\d+?) ([\w*|\/|\+]+)"""
-            val moshUUID = newUuid
-            val moshServer = context.actorOf(Props(new SvdService("Mosh", account)), s"MoshSession-${moshUUID}")
-            context.watch(moshServer)
-            context.become(availableWith(moshServer :: activeSessions))
-            val future = (moshServer ? User.GetServiceStdOut(moshMatcher))
-            future onSuccess {
-                case ApiSuccess(msg, contentOption) =>
-                    val content = contentOption.get
-                    val splitMatch = new Regex(moshMatcher, "port", "key").findFirstMatchIn(content).get
-                    val key = splitMatch.group("key")
-                    val port = splitMatch.group("port")
-                    val moshClientCommand = s""" "MOSH_KEY=${key} mosh-client ${currentVPNHost} ${port}" """
-                    log.trace(s"COMMAND CONTENT for client: ${moshClientCommand}")
-                    originSender ! ApiSuccess("Mosh Session Created. Please note that Mosh server will automatically shut down after a minute without connection attempt.", Some(moshClientCommand))
-            }
-            future onFailure {
-                case x: AskTimeoutException =>
-                    log.trace(s"XXX: ${x}")
-                    originSender ! ApiError("Mosh timed out, probably cause not yet installed. Try again later.")
+            // log.info("Becoming aware of new Mosh Server")
+            // val originSender = sender
+            // val moshMatcher = """MOSH CONNECT (\d+?) ([\w*|\/|\+]+)"""
+            // val moshUUID = newUuid
+            // val moshServer = context.actorOf(Props(new SvdService("Mosh", account)), s"MoshSession-${moshUUID}")
+            // context.watch(moshServer)
+            // context.become(availableWith(moshServer :: activeSessions))
+            // val future = (moshServer ? User.GetServiceStdOut(moshMatcher))
+            // future onSuccess {
+            //     case ApiSuccess(msg, contentOption) =>
+            //         val content = contentOption.get
+            //         val splitMatch = new Regex(moshMatcher, "port", "key").findFirstMatchIn(content).get
+            //         val key = splitMatch.group("key")
+            //         val port = splitMatch.group("port")
+            //         val moshClientCommand = s""" "MOSH_KEY=${key} mosh-client ${currentVPNHost} ${port}" """
+            //         log.trace(s"COMMAND CONTENT for client: ${moshClientCommand}")
+            //         originSender ! ApiSuccess("Mosh Session Created. Please note that Mosh server will automatically shut down after a minute without connection attempt.", Some(moshClientCommand))
+            // }
+            // future onFailure {
+            //     case x: AskTimeoutException =>
+            //         log.trace(s"XXX: ${x}")
+            //         originSender ! ApiError("Mosh timed out, probably cause not yet installed. Try again later.")
 
-                case x =>
-                    originSender ! ApiError(s"Mosh Session Error: ${x.getMessage}.")
-            }
+            //     case x =>
+            //         originSender ! ApiError(s"Mosh Session Error: ${x.getMessage}.")
+            // }
 
 
         case Shutdown =>

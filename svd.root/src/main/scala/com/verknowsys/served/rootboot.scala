@@ -42,21 +42,24 @@ object rootboot extends Logging with SvdUtils with App {
         log.info(SvdConfig.servedFull)
         log.info(SvdConfig.copyright)
 
-        if (isBSD) {
-            log.info("Production system detected. Initializing VPN configuration before Akka")
-            val shell = new SvdShell(SvdAccount(uid = 0))
-            log.debug(s"Executing ${SvdConfig.vpnNetworkPreConfiguration}. Expecting setup complete output.")
-            shell.exec(SvdShellOperations(commands = SvdConfig.vpnNetworkPreConfiguration :: Nil, expectOutput = "setup complete" :: Nil))
-            log.debug("Done VPN setup")
 
-            addShutdownHook {
-                log.debug("Shutting down tap interface and internal shell")
-                shell.exec(SvdShellOperations(commands = SvdConfig.vpnNetworkPostConfiguration :: Nil, expectOutput = "post setup complete" :: Nil))
+        // TODO: move this code to SS
 
-                Thread.sleep(1000) // HACK: shell requires some additional time to finish his job properly
-                shell.close
-            }
-        }
+        // if (isBSD) {
+        //     log.info("Production system detected. Initializing VPN configuration before Akka")
+        //     val shell = new SvdShell(SvdAccount(uid = 0))
+        //     log.debug(s"Executing ${SvdConfig.vpnNetworkPreConfiguration}. Expecting setup complete output.")
+        //     shell.exec(SvdShellOperations(commands = SvdConfig.vpnNetworkPreConfiguration :: Nil, expectOutput = "setup complete" :: Nil))
+        //     log.debug("Done VPN setup")
+
+        //     addShutdownHook {
+        //         log.debug("Shutting down tap interface and internal shell")
+        //         shell.exec(SvdShellOperations(commands = SvdConfig.vpnNetworkPostConfiguration :: Nil, expectOutput = "post setup complete" :: Nil))
+
+        //         Thread.sleep(1000) // HACK: shell requires some additional time to finish his job properly
+        //         shell.close
+        //     }
+        // }
 
         // set runtime properties
         JSystem.setProperty("org.terracotta.quartz.skipUpdateCheck", "true")

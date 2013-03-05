@@ -62,28 +62,28 @@ class SvdRootBoot extends Logging with SvdActor {
     //     )
     // )
 
-    /**
-     *  Starts all predefined super services
-     *
-     * @author Daniel (dmilith) Dettlaff
-     */
-    def startSuperServices = systemServices.map {
-        service =>
-            val config = new SvdServiceConfigLoader(service).config
-            val prefix = SvdConfig.softwareRoot / config.softwareName
-            val internalService = system.actorOf(Props(new SvdService(
-                config,
-                account = root,
-                serviceRootPrefixPre = Some(prefix),
-                servicePrefixPre = Some(SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.name),
-                installIndicatorPre = Some(new java.io.File(
-                    prefix / config.softwareName.toLowerCase + "." + SvdConfig.installed))
+    // /**
+    //  *  Starts all predefined super services
+    //  *
+    //  * @author Daniel (dmilith) Dettlaff
+    //  */
+    // def startSuperServices = systemServices.map {
+    //     service =>
+    //         val config = new SvdServiceConfigLoader(service).config
+    //         val prefix = SvdConfig.softwareRoot / config.softwareName
+    //         val internalService = system.actorOf(Props(new SvdService(
+    //             config,
+    //             account = root,
+    //             serviceRootPrefixPre = Some(prefix),
+    //             servicePrefixPre = Some(SvdConfig.systemHomeDir / SvdConfig.softwareDataDir / config.name),
+    //             installIndicatorPre = Some(new java.io.File(
+    //                 prefix / config.softwareName.toLowerCase + "." + SvdConfig.installed))
 
-            )).withDispatcher("svd-single-dispatcher"), s"SuperService-${service}")
+    //         )).withDispatcher("svd-single-dispatcher"), s"SuperService-${service}")
 
-            context.watch(internalService)
-            log.info(s"Spawning SuperService: ${service}")
-    }
+    //         context.watch(internalService)
+    //         log.info(s"Spawning SuperService: ${service}")
+    // }
 
 
     /**
@@ -124,7 +124,7 @@ class SvdRootBoot extends Logging with SvdActor {
         context.watch(ssm)
         context.watch(sshd)
         context.watch(sam)
-        startSuperServices
+        // startSuperServices
 
         // (sam ? Admin.RegisterAccount(SvdConfig.defaultUserName)) onSuccess {
         //     case _ =>

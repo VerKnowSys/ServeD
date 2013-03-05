@@ -15,7 +15,7 @@ import com.verknowsys.served.utils.signals.SvdPOSIX._
 import com.verknowsys.served.systemmanager.managers._
 import com.verknowsys.served.api.pools._
 import com.verknowsys.served.services._
-import com.verknowsys.served.api.scheduler._
+// import com.verknowsys.served.api.scheduler._
 
 import akka.actor._
 import scala.io.Source
@@ -105,16 +105,16 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
             sender ! ApiSuccess
 
 
-        case SvdScheduler.StartJob(name, job, trigger) =>
-            log.debug("Starting schedule job named: %s for service: %s".format(name, sender))
-            scheduler.scheduleJob(job, trigger)
+        // case SvdScheduler.StartJob(name, job, trigger) =>
+        //     log.debug("Starting schedule job named: %s for service: %s".format(name, sender))
+        //     scheduler.scheduleJob(job, trigger)
 
 
-        case SvdScheduler.StopJob(name) =>
-            log.debug("Stopping scheduled jobs named: %s for service: %s".format(name, sender))
-            for (index <- 0 to SvdConfig.maxSchedulerDefinitions) { // XXX: hacky.. it's better to figure out how to get list of defined jobs from scheduler..
-                scheduler.deleteJob(jobKey("%s-%d".format(name, index)))
-            }
+        // case SvdScheduler.StopJob(name) =>
+        //     log.debug("Stopping scheduled jobs named: %s for service: %s".format(name, sender))
+        //     for (index <- 0 to SvdConfig.maxSchedulerDefinitions) { // XXX: hacky.. it's better to figure out how to get list of defined jobs from scheduler..
+        //         scheduler.deleteJob(jobKey("%s-%d".format(name, index)))
+        //     }
 
 
         case SvdFileEvent(path, flags) =>

@@ -7,7 +7,7 @@ package com.verknowsys.served.managers
 
 import com.verknowsys.served._
 import com.verknowsys.served.api._
-import com.verknowsys.served.api.scheduler._
+// import com.verknowsys.served.api.scheduler._
 import com.verknowsys.served.api.accountkeys._
 import com.verknowsys.served.api.git._
 import com.verknowsys.served.services._
@@ -302,27 +302,27 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
             }
 
 
-        case SvdScheduler.StartJob(name, job, trigger) =>
-            log.debug("Starting schedule job named: %s for service: %s".format(name, sender))
-            try {
-                scheduler.scheduleJob(job, trigger)
-            } catch {
-                case e: Exception =>
-                    log.warn(s"Tried to start job name: ${name} on dead service scheduler.")
-            }
+        // case SvdScheduler.StartJob(name, job, trigger) =>
+        //     log.debug("Starting schedule job named: %s for service: %s".format(name, sender))
+        //     try {
+        //         scheduler.scheduleJob(job, trigger)
+        //     } catch {
+        //         case e: Exception =>
+        //             log.warn(s"Tried to start job name: ${name} on dead service scheduler.")
+        //     }
 
 
 
-        case SvdScheduler.StopJob(name) =>
-            log.debug(s"Stopping scheduled jobs named: ${name} for service: ${sender}")
-            for (index <- 0 to SvdConfig.maxSchedulerDefinitions) { // XXX: hacky.. it's better to figure out how to get list of defined jobs from scheduler..
-                try {
-                    scheduler.deleteJob(jobKey(s"${name}-${index}"))
-                } catch {
-                    case e: Exception =>
-                        log.debug(s"Exception when deleting job from user scheduler: ${e}")
-                }
-            }
+        // case SvdScheduler.StopJob(name) =>
+        //     log.debug(s"Stopping scheduled jobs named: ${name} for service: ${sender}")
+        //     for (index <- 0 to SvdConfig.maxSchedulerDefinitions) { // XXX: hacky.. it's better to figure out how to get list of defined jobs from scheduler..
+        //         try {
+        //             scheduler.deleteJob(jobKey(s"${name}-${index}"))
+        //         } catch {
+        //             case e: Exception =>
+        //                 log.debug(s"Exception when deleting job from user scheduler: ${e}")
+        //         }
+        //     }
 
 
         case msg: Maintenance.Base =>
@@ -618,8 +618,8 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
                                 case Failure(ex) => // timeout probably?
                                     log.trace("CurrServ exception: %s", ex)
-                                    val service = system.actorOf(Props(new SvdService(binding.serviceName, account)), "Service-%s".format(binding.serviceName))
-                                    context.watch(service)
+                                    // val service = system.actorOf(Props(new SvdService(binding.serviceName, account)), "Service-%s".format(binding.serviceName))
+                                    // context.watch(service)
                             }
                         }
                 }
