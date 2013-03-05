@@ -9,7 +9,7 @@
     /* default BSD case: */
     #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh" // "/bin/svdshell" //
     #define DEFAULT_SS_COMMAND "/bin/svdss"
-    #define DEFAULT_JAVA_PATH "/Software/Openjdk/openjdk7/"
+    #define DEFAULT_JAVA_PATH "/Software/Openjdk7/openjdk7/"
 
     #ifdef __FreeBSD__
         #define DEFAULT_JAVA_BIN (DEFAULT_JAVA_PATH "bin/java")

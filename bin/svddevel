@@ -8,7 +8,7 @@ SYSTEM_NAME="$(uname -s)"
 userUID="$(id -u)"
 DEFAULT_COMMON_PATH="/Users/Common"
 DEFAULT_USER_UID="${userUID}"
-JAVA_PATH="/Software/Openjdk/openjdk7/bin/java"
+JAVA_PATH="/Software/Openjdk7/openjdk7/bin/java"
 
 # read sofin configuration
 . "/etc/profile_sofin"

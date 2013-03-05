@@ -16,7 +16,7 @@ JAR="${pwd}/svd.user/target/user-assembly-${VERSION}-b${BUILD}.jar"
 . "/Users/${userUID}/.profile"
 
 
-JAVA_PATH="/Software/Openjdk/openjdk7/bin/java"
+JAVA_PATH="/Software/Openjdk7/openjdk7/bin/java"
 
 
 if [ "$1" != "" ]; then
