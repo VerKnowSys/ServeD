@@ -24,10 +24,10 @@ import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
 import ExecutionContext.Implicits.global
-import org.quartz._
-import org.quartz.impl._
-import org.quartz.JobKey._
-import org.quartz.impl.matchers._
+// import org.quartz._
+// import org.quartz.impl._
+// import org.quartz.JobKey._
+// import org.quartz.impl.matchers._
 
 
 /**
@@ -47,15 +47,15 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
     //     case _: IllegalArgumentException => Stop
     //     case _: Exception                => Escalate
     // }
-    val scheduler = StdSchedulerFactory.getDefaultScheduler
+    // val scheduler = StdSchedulerFactory.getDefaultScheduler
 
 
 
 
     override def preStart = {
         super.preStart
-        log.info("Starting AccountsManager Quartz Scheduler")
-        scheduler.start
+        // log.info("Starting AccountsManager Quartz Scheduler")
+        // scheduler.start
 
         log.info(s"SvdAccountsManager (v${SvdConfig.version}) is loading")
         // launchSystemServices
@@ -160,8 +160,8 @@ class SvdAccountsManager extends SvdManager with SvdFileEventsReactor with Loggi
 
     override def postStop = {
         log.debug("Accounts Manager postStop.")
-        log.info("Shutting down AccountsManager Scheduler")
-        scheduler.shutdown
+        // log.info("Shutting down AccountsManager Scheduler")
+        // scheduler.shutdown
         // sendTerminationSignalForAllSuperServices
         super.postStop
     }

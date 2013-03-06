@@ -30,10 +30,10 @@ import ExecutionContext.Implicits.global
 
 import scala.math._
 import scala.util.Random
-import org.quartz._
-import org.quartz.impl._
-import org.quartz.JobKey._
-import org.quartz.impl.matchers._
+// import org.quartz._
+// import org.quartz.impl._
+// import org.quartz.JobKey._
+// import org.quartz.impl.matchers._
 import java.io.{File, FileNotFoundException}
 import java.lang.{System => JSystem}
 
@@ -73,7 +73,7 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
 
     import Events._
 
-    val scheduler = StdSchedulerFactory.getDefaultScheduler
+    // val scheduler = StdSchedulerFactory.getDefaultScheduler
     val userHomeDir = SvdConfig.userHomeDir / s"${bootAccount.uid}"
     val servicesLocationDir = SvdConfig.userHomeDir / s"${bootAccount.uid}" / SvdConfig.softwareDataDir
 
@@ -99,8 +99,8 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
     override def preStart = {
         super.preStart
 
-        log.info("Starting Quartz Scheduler")
-        scheduler.start
+        // log.info("Starting Quartz Scheduler")
+        // scheduler.start
 
         log.debug("Account Manager base folder checks in progress")
         checkOrCreateDir(userHomeDir / SvdConfig.softwareDataDir)
@@ -758,8 +758,8 @@ class SvdAccountManager(val bootAccount: SvdAccount, val userBoot: ActorRef, val
         log.info("Terminating Notification center")
         context.stop(notificationsManager)
 
-        log.info("Terminating Core Scheduler")
-        scheduler.shutdown
+        // log.info("Terminating Core Scheduler")
+        // scheduler.shutdown
 
         log.info("Terminating Account Manager")
         val shutdown = (self ? Shutdown)

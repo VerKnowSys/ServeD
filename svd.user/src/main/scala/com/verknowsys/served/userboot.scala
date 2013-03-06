@@ -45,7 +45,7 @@ object userboot extends SvdAkkaSupport with Logging {
                 log.info(SvdConfig.copyright)
 
                 // set runtime properties
-                JSystem.setProperty("org.terracotta.quartz.skipUpdateCheck", "true")
+                // JSystem.setProperty("org.terracotta.quartz.skipUpdateCheck", "true")
                 JSystem.setProperty("user.name", userUID) // required for ServeD
                 JSystem.setProperty("user.home", SvdConfig.userHomeDir / userUID) // required for ServeD
 
