@@ -3,10 +3,9 @@
 KERNEL_CONFIG_PATH="/usr/src/sys/amd64/conf/"
 PREFILES="$(${PWD_BIN})/prefiles/"
 
-CSUP_FILE="/etc/csup"
 MOTD_FILE="/etc/motd"
 PROFILE_FILE="/etc/profile"
-ZSHRC_FILE="/etc/zshenv"
+ZSHENV_FILE="/etc/zshenv"
 SRC_CONF_FILE="/etc/src.conf"
 MAKE_CONF_FILE="/etc/make.conf"
 
@@ -15,8 +14,8 @@ PWD_BIN="/bin/pwd"
 CP_BIN="/bin/cp"
 CAP_MKDB="/usr/bin/cap_mkdb"
 
-echo "Creating ${ZSHRC_FILE} if doesn't exists"
-if [ ! -e "${ZSHRC_FILE}" ]; then
+echo "Creating ${ZSHENV_FILE} if doesn't exists"
+if [ ! -e "${ZSHENV_FILE}" ]; then
 echo "
 autoload colors zsh/terminfo
 colors
@@ -119,7 +118,7 @@ else
     trap \"source \$HOME/.profile\" USR2
 fi
 export SHELL_PID=\"\$\$\"
-" > "${ZSHRC_FILE}"
+" > "${ZSHENV_FILE}"
 fi
 
 echo "Creating default ${PROFILE_FILE} if doesn't exists"
