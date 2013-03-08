@@ -1,8 +1,5 @@
 #!/bin/sh
 
-KERNEL_CONFIG_PATH="/usr/src/sys/amd64/conf/"
-PREFILES="$(${PWD_BIN})/prefiles/"
-
 MOTD_FILE="/etc/motd"
 PROFILE_FILE="/etc/profile"
 ZSHENV_FILE="/etc/zshenv"
@@ -13,6 +10,8 @@ READ_BIN="/usr/bin/read"
 PWD_BIN="/bin/pwd"
 CP_BIN="/bin/cp"
 CAP_MKDB="/usr/bin/cap_mkdb"
+
+PREFILES="$(${PWD_BIN})/prefiles/"
 
 echo "Creating ${ZSHENV_FILE} if doesn't exists"
 if [ ! -e "${ZSHENV_FILE}" ]; then
