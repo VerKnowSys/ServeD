@@ -6,7 +6,7 @@ PREFILES="$(${PWD_BIN})/prefiles/"
 CSUP_FILE="/etc/csup"
 MOTD_FILE="/etc/motd"
 PROFILE_FILE="/etc/profile"
-ZSHRC_FILE="/etc/zshrc"
+ZSHRC_FILE="/etc/zshenv"
 LOGIN_CONF_FILE="/etc/login.conf"
 SRC_CONF_FILE="/etc/src.conf"
 MAKE_CONF_FILE="/etc/make.conf"
@@ -144,14 +144,8 @@ setopt promptsubst
 autoload -U promptinit
 promptinit
 
-export LANGUAGE=\"en_US.UTF-8\"
 export LANG=\"en_US.UTF-8\"
-export LC_CTYPE=\"en_US.UTF-8\"
-export LC_NUMERIC=\"en_US.UTF-8\"
-export LC_TIME=\"en_US.UTF-8\"
-export LC_COLLATE=\"en_US.UTF-8\"
-export LC_MONETARY=\"en_US.UTF-8\"
-export LC_MESSAGES=\"en_US.UTF-8\"
+export LC_ALL=\"en_US.UTF-8\"
 export TERM=xterm-color
 export PAGER=less
 
@@ -163,10 +157,11 @@ alias pstree='pstree -g 3'
 
 unset TMUX
 ulimit -c 0
-. /etc/profile
-. /etc/profile_sofin
 
-if [ \"$(/usr/bin/id -u)\" = \"0\" ]; then
+if [ \"\$(/usr/bin/id -u)\" = \"0\" ]; then
+    if [ -e \"/etc/profile_sofin\" ]; then
+        . /etc/profile_sofin
+    fi
     trap \"source /etc/profile_sofin\" USR2
 else
     if [ -e \$HOME/.profile ]; then
