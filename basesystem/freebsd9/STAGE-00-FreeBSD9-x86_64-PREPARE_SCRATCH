@@ -107,17 +107,9 @@ ulimit -c 0
 " > "${ZSHENV_FILE}"
 fi
 
-echo "Creating default ${PROFILE_FILE} if doesn't exists"
-if [ ! -e "${PROFILE_FILE}" ]; then
-echo ". /etc/profile_sofin
-" > "${PROFILE_FILE}"
-fi
-
 echo "Creating ${MOTD_FILE}"
-if [ ! -e "${MOTD_FILE}" ]; then
 echo "Welcome on ServeD™ system
 " > "${MOTD_FILE}"
-fi
 
 echo "Creating ${SRC_CONF_FILE}"
 echo "
