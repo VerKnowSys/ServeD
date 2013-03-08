@@ -105,19 +105,6 @@ alias pstree='pstree -g 3'
 
 unset TMUX
 ulimit -c 0
-
-if [ \"\$(/usr/bin/id -u)\" = \"0\" ]; then
-    if [ -e \"/etc/profile_sofin\" ]; then
-        . /etc/profile_sofin
-    fi
-    trap \"source /etc/profile_sofin\" USR2
-else
-    if [ -e \$HOME/.profile ]; then
-        . \$HOME/.profile
-    fi
-    trap \"source \$HOME/.profile\" USR2
-fi
-export SHELL_PID=\"\$\$\"
 " > "${ZSHENV_FILE}"
 fi
 
