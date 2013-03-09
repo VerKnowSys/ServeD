@@ -1,9 +1,16 @@
 #!/bin/sh
+# author: Daniel (dmilith) Dettlaff
 
 . /etc/rc.subr
 
+SVDSS_BIN="/bin/svdss"
+RM_BIN="/bin/rm"
+CAT_BIN="/bin/cat"
+KILL_BIN="/bin/kill"
+
 name="served"
-pid_file="/SystemUsers/0.pid"
+pid_file="/SystemUsers/.0.pid"
+
 start_cmd="${name}_start"
 stop_cmd="${name}_stop"
 status_cmd="${name}_status"
@@ -12,64 +19,54 @@ extra_commands="status"
 
 
 served_status() {
-    if [ -e "$pid_file" ]; then
-        echo "* Service Spawner:"
-    else
-        echo "No workers around."
+    if [ -e "${pid_file}" ]; then
+        pid="$(${CAT_BIN} ${pid_file})"
+        ki="$(${KILL_BIN} -0 ${pid})"
+        if [ "$?" = "0" ]; then
+            echo "* Service Spawner is running."
+            return
+        else
+            ${RM_BIN} -f "$pid_file"
+        fi
     fi
+    echo "* Service Spawner is stopped."
 }
 
 
 served_start() {
-    echo "Starting ServeD KickStart"
-    core=$(jps | grep -v Jps |grep root\.core | wc -l)
-    if [ "${core}" -eq "1" ]; then
-        echo "Already started!"
-        return
-    else
-        svdkick > /dev/null 2>&1 &
-        echo "ServeD started."
-        return
+    if [ -e "${pid_file}" ]; then
+        pid="$(${CAT_BIN} ${pid_file})"
+        ki="$(${KILL_BIN} -0 ${pid})"
+        if [ "$?" = "0" ]; then
+            echo "* Service Spawner is already running."
+            return
+        else
+            ${RM_BIN} -f "$pid_file"
+        fi
     fi
+    echo "* Launching Service Spawner."
+    ${SVDSS_BIN} > /SystemUsers/ss.log 2>&1 &
 }
 
 
 served_restart() {
     served_stop
-    for i in $(jot 10); do
-        amount=$(ps -Au |grep java | grep -v grep | wc -l)
-        if [ "$amount" -gt "0" ]; then
-            echo "Some arrogant process found. Sending napalm."
-            killall -TERM java
-        fi
-        if [ "$amount" -eq "0" ]; then
-            break
-        fi
-        sleep 10
-    done
-    for i in $(jot 10); do
-        amount=$(ps -Au |grep java | grep -v grep | wc -l)
-        if [ "$amount" -gt "0" ]; then
-            echo "Some bastard is still alive! Sending anihilation."
-            killall -KILL java
-        fi
-        if [ "$amount" -eq "0" ]; then
-            break
-        fi
-        sleep 1
-    done
     served_start
 }
 
 
 served_stop() {
-    echo "Stopping ServeD KickStart"
-    if [ "$(jps | grep -v Jps |grep root\.core | wc -l)" -eq "1" ]; then
-        kill -INT "$(cat $pid_file)"
-        return
+    if [ -e "${pid_file}" ]; then
+        pid="$(${CAT_BIN} ${pid_file})"
+        ki="$(${KILL_BIN} -INT ${pid})"
+        if [ "$?" = "0" ]; then
+            echo "* Service Spawner has been stopped."
+            return
+        else
+            ${RM_BIN} -f "$pid_file"
+        fi
     else
-        echo "Already stopped!"
-        return
+        echo "* Service Spawner is already stopped."
     fi
 }
 
