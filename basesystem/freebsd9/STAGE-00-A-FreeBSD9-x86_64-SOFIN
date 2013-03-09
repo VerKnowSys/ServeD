@@ -1,0 +1,38 @@
+#!/bin/sh
+
+PWD_BIN="/bin/pwd"
+FETCH_BIN="/usr/bin/fetch"
+CHSH_BIN="/usr/bin/chsh"
+WHICH_BIN="/usr/bin/which"
+TAR_BIN="/usr/bin/tar"
+
+CWD="$(${PWD_BIN})"
+
+check_result () {
+  if [ "$1" != "0" ]; then
+    echo "FAILURE"
+    exit 666
+  fi
+}
+
+cd /var
+
+echo "Downloading Sofin's tarball and unpacking it to /var/sofin-master"
+${FETCH_BIN} -o - https://github.com/VerKnowSys/sofin/archive/master.tar.gz | ${TAR_BIN} xf - && cd ./sofin-master && ./sofin-install
+check_result $?
+
+echo "Checking for sofin binary..."
+SOFIN_BIN="$(${WHICH_BIN} sofin)"
+check_result $?
+
+echo "Installing base software"
+${SOFIN_BIN} install base
+check_result $?
+
+echo "Changing root shell to Zsh"
+${CHSH_BIN} -s "/Software/Zsh/exports/zsh"
+check_result $?
+
+echo "Done. Please relogin."
+
+cd "${CWD}"
