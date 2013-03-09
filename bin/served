@@ -51,6 +51,7 @@ served_start() {
 
 served_restart() {
     served_stop
+    sleep 10
     served_start
 }
 
