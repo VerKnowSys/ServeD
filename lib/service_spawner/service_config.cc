@@ -287,10 +287,16 @@ const QString SvdServiceConfig::replaceAllSpecialsIn(const QString content) {
             portFilePath = QString(readFileContents(portFilePath).c_str()).trimmed();
             ccont = ccont.replace("SERVICE_PORT", portFilePath); /* replace with user port content */
         } else {
-            uint freePort = registerFreeTcpPort();
-            logDebug() << "No port file for service:" << name << "(software:" << softwareName << ")! Ports file will be created and filled with generated port:" << freePort;
-            ccont = ccont.replace("SERVICE_PORT", QString::number(freePort)); /* this happens when no service port file exists */
-            writeToFile(portFilePath, QString::number(freePort));
+            if (staticPort != -1) { /* defined static port */
+                logDebug() << "Found static port:" << staticPort << "for service" << name;
+                ccont = ccont.replace("SERVICE_PORT", QString::number(staticPort));
+                writeToFile(portFilePath, QString::number(staticPort));
+            } else {
+                uint freePort = registerFreeTcpPort();
+                logDebug() << "No port file for service:" << name << "(software:" << softwareName << ")! Ports file will be created and filled with generated port:" << freePort;
+                ccont = ccont.replace("SERVICE_PORT", QString::number(freePort)); /* this happens when no service port file exists */
+                writeToFile(portFilePath, QString::number(freePort));
+            }
         }
 
         // logDebug() << "Given content: " << ccont.replace("\n", " ");
