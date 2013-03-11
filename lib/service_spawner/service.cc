@@ -224,6 +224,7 @@ void SvdService::startSlot() {
         proc->spawnProcess(config->start->commands);
 
         touch(indicator);
+        QFile::remove(config->prefixDir() + DEFAULT_SERVICE_ERRORS_FILE);
 
         proc->waitForFinished(-1);
         proc->kill();
