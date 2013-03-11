@@ -21,8 +21,10 @@
     },
     "validate": {
         "commands": "test ! -d /Vmail && mkdir /Vmail && chmod 700 /Vmail && chown daemon:daemon /Vmail
-test ! -L SERVICE_PREFIX/var && mv SERVICE_ROOT/var SERVICE_PREFIX/var && ln -s SERVICE_PREFIX/var SERVICE_ROOT/var
-test ! -L SERVICE_PREFIX/etc && mv SERVICE_ROOT/etc SERVICE_PREFIX/etc && ln -s SERVICE_PREFIX/etc SERVICE_ROOT/etc
+test -d SERVICE_PREFIX/var && mv SERVICE_ROOT/var SERVICE_PREFIX/var
+test -d SERVICE_PREFIX/etc && mv SERVICE_ROOT/etc SERVICE_PREFIX/etc
+test ! -L SERVICE_PREFIX/var && ln -s SERVICE_PREFIX/var SERVICE_ROOT/var
+test ! -L SERVICE_PREFIX/etc && ln -s SERVICE_PREFIX/etc SERVICE_ROOT/etc
 "
     }
 }
