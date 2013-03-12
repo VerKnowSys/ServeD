@@ -20,9 +20,6 @@
         "expectOutput": "success"
     },
     "validate": {
-        "commands": "test ! -d /Vmail && mkdir /Vmail && chmod 700 /Vmail && chown daemon:daemon /Vmail
-test ! -d SERVICE_PREFIX/var && mv SERVICE_ROOT/var SERVICE_PREFIX/var
-test ! -d SERVICE_PREFIX/etc && mv SERVICE_ROOT/etc SERVICE_PREFIX/etc
-"
+        "commands": "test ! -d /Vmail && mkdir /Vmail && chmod 700 /Vmail && chown daemon:daemon /Vmail"
     }
 }
