@@ -75,8 +75,8 @@ void SvdService::babySitterSlot() {
                 }
 
             } else {
-                logWarn() << "No service pid file found for service:" << name << "! Service Babysitter will try to respawn dead children immediately.";
-                restartSlot();
+                logDebug() << "No service pid file found for service:" << name << "Ignoring this problem (might be auto pid managment defined in software)";
+                // restartSlot();
             }
 
             /* perform additional port check if watchPort property is set to true */
