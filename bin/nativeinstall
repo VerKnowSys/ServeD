@@ -57,7 +57,9 @@ fi
 if [ "$system" = "FreeBSD" ]; then
     echo "* Installing ServeD rc script for FreeBSD"
     cp -fv bin/served /etc/rc.d
-    if [ "$(cat /etc/rc.conf | grep served | wc -l)" -gt "0" ]; then
+
+    grep -q "served_enable" "/etc/rc.conf"
+    if [ "$?" != "0" ]; then
         echo "Autostart entry already in rc.conf"
     else
         echo "served_enable=YES" >> /etc/rc.conf
