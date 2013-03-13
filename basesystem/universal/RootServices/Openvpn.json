@@ -1,6 +1,7 @@
 {
     "softwareName": "Openvpn",
     "staticPort": 1194,
+    "watchPort": false,
     "install": {
         "commands": "sofin get openvpn",
         "expectOutput": "All done"
