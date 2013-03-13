@@ -107,8 +107,8 @@ object SvdConfig {
     def defaultIRCGateNickname          = "tasks"
     def defaultIRCGateIdentify          = ",lpmkonji" // pass for identify to NickServ for registered nick "tasks"
     def defaultVPNNetworkPrefix         = "10.10.*"
-    def vpnNetworkPreConfiguration      = "kldunload if_tap ; kldload if_tap && ifconfig tap0 create && ifconfig tap0 10.10.0.1 netmask 255.255.255.0 && echo 'setup complete'"
-    def vpnNetworkPostConfiguration     = "ifconfig tap0 destroy && echo 'post setup complete'"
+    // def vpnNetworkPreConfiguration      = "kldunload if_tap ; kldload if_tap && ifconfig tap0 create && ifconfig tap0 10.10.0.1 netmask 255.255.255.0 && echo 'setup complete'"
+    // def vpnNetworkPostConfiguration     = "ifconfig tap0 destroy && echo 'post setup complete'"
     def defaultNtpHost                  = "ntp.task.gda.pl"
     def matcherFQDN                     = """(?=^.{1,254}$)(^(?:(?!\d+\.)[a-zA-Z0-9_\-]{1,63}\.?)+(?:[a-zA-Z]{2,})$)"""
 
