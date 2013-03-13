@@ -60,6 +60,6 @@ if [ "$system" = "FreeBSD" ]; then
     if [ "$(cat /etc/rc.conf | grep served | wc -l)" -gt "0" ]; then
         echo "Autostart entry already in rc.conf"
     else
-        echo "served_start=YES" >> /etc/rc.conf
+        echo "served_enabled=YES" >> /etc/rc.conf
     fi
 fi
