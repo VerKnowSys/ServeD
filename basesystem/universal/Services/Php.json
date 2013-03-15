@@ -31,8 +31,9 @@ test ! -f SERVICE_PREFIX/service.conf && printf '
     pm.max_spare_servers = 3
     ;pm.process_idle_timeout = 10s;
     ;pm.max_requests = 500
-' > SERVICE_PREFIX/service.conf",
-            "test ! -f SERVICE_PREFIX/service.ini && printf '
+' > SERVICE_PREFIX/service.conf
+
+test ! -f SERVICE_PREFIX/service.ini && printf '
 [PHP]
     engine = On
     short_open_tag = Off
