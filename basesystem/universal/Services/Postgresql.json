@@ -20,7 +20,7 @@ test ! -d SERVICE_PREFIX/database/base && SERVICE_ROOT/exports/initdb -D SERVICE
 test ! -f SERVICE_PREFIX/database/pg_hba.conf && printf '
 # Default Postgresql service configuration
 local all all trust
-host all all 127.0.0.1/32 password
+host all all 127.0.0.1/32 trust
 # host all all 0.0.0.0/0 ident
 host all all 0.0.0.0/0 password
 ' > SERVICE_PREFIX/database/pg_hba.conf
