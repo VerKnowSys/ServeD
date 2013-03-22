@@ -15,7 +15,7 @@ static struct termios saveTermios;
 static int interactive;
 
 
-string getUserHomeDirAndAskForName() {
+string getUserHomeDirAndAskForName(int uid) {
     stringstream ss;
     string in = "";
     cout << endl << "Enter your user name: ";
@@ -24,18 +24,18 @@ string getUserHomeDirAndAskForName() {
     // define allowed chars in user folder name entry:
     const char alphanum[] = "0123456789.-+ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzżźłóćęąń"; // XXX: only Polish characters and ASCII for now.
 
-    if (in.length() == 0) {
-        cerr << "Empty user name given!" << endl;
-        return getUserHomeDirAndAskForName();
+    if ((in == "") || (in == "\n") || (in == "\0")) {
+        cerr << "Empty user name given! Using uid as default user name" << endl;
+        ss << USERS_HOME_DIR << "/" << uid;
+        return ss.str();
     }
 
     for (int i = 0; i < in.length(); i++) {
         if (strchr(alphanum, in.at(i)) == NULL) {
             #ifdef DEVEL
                 cout << "Invalid characters given. You may only use these characters: '" << alphanum << "'" << endl;
-                in = "";
-                return getUserHomeDirAndAskForName();
             #endif
+            return getUserHomeDirAndAskForName(uid);
         }
     }
     ss << USERS_HOME_DIR << "/" << in;
@@ -334,7 +334,7 @@ int main(int argc, char *argv[]) {
         #endif
     } else {
         // no home directory, so let's ask a user for name, default domain and so on..
-        homeDir = getUserHomeDirAndAskForName();
+        homeDir = getUserHomeDirAndAskForName(uid);
 
         #ifdef DEVEL
             cerr << "User home given: " << homeDir << endl;
