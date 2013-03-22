@@ -25,9 +25,9 @@ class SvdRootBoot extends Logging with SvdActor {
 
 
     val root = new SvdAccount(uid = 0, userName = "SuperUser")
-    val defaultServices = "Openvpn" :: "Pptpd" :: "Redis" :: "Coreginx" :: Nil // "James" :: // XXX: hardcoded system services
-    val systemServices = if (isOSX) defaultServices.drop(2) else defaultServices
-    log.trace(s"Defined system services: ${systemServices}")
+    // val defaultServices = "Openvpn" :: "Pptpd" :: "Redis" :: "Coreginx" :: Nil // "James" :: // XXX: hardcoded system services
+    // val systemServices = if (isOSX) defaultServices.drop(2) else defaultServices
+    // log.trace(s"Defined system services: ${systemServices}")
 
     override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 25, withinTimeRange = 1 minute) {
         case _: ArithmeticException      => Resume
@@ -36,7 +36,14 @@ class SvdRootBoot extends Logging with SvdActor {
         case _: Exception                => Escalate
     }
 
-    val system = ActorSystem(SvdConfig.served, ConfigFactory.load.getConfig(SvdConfig.served))
+    val system = try {
+        ActorSystem(SvdConfig.served, ConfigFactory.load.getConfig(SvdConfig.served))
+        } catch {
+            case x: Throwable =>
+                log.debug(s"Exception: $x")
+                log.error("ServeD System Service must be running. No internal network accessible, hence cannot continue.")
+                sys.exit(1)
+        }
     // core svd actors:
     val sshd = system.actorOf(Props[SSHD].withDispatcher("svd-single-dispatcher"), "SvdSSHD") // .withDispatcher("svd-core-dispatcher")
     val ssm = system.actorOf(Props[SvdSystemManager].withDispatcher("svd-single-dispatcher"), "SvdSystemManager")
@@ -86,19 +93,19 @@ class SvdRootBoot extends Logging with SvdActor {
     // }
 
 
-    /**
-     *  Stops all predefined super services
-     *
-     * @author Daniel (dmilith) Dettlaff
-     */
-    def stopSuperServices = systemServices.map {
-        service =>
-            val internalService = system.actorFor(s"/user/SuperService-${service}")
-            context.unwatch(internalService)
-            context.stop(internalService)
-            log.info(s"Terminating SuperService: ${service}")
-            Thread.sleep(500)
-    }
+    // /**
+    //  *  Stops all predefined super services
+    //  *
+    //  * @author Daniel (dmilith) Dettlaff
+    //  */
+    // def stopSuperServices = systemServices.map {
+    //     service =>
+    //         val internalService = system.actorFor(s"/user/SuperService-${service}")
+    //         context.unwatch(internalService)
+    //         context.stop(internalService)
+    //         log.info(s"Terminating SuperService: ${service}")
+    //         Thread.sleep(500)
+    // }
 
 
     addShutdownHook {
@@ -109,7 +116,7 @@ class SvdRootBoot extends Logging with SvdActor {
 
     override def postStop = {
         log.info("Post Stopping SvdRootBoot")
-        stopSuperServices
+        // stopSuperServices
         context.stop(sshd)
         context.stop(fem)
         context.stop(ssm)
