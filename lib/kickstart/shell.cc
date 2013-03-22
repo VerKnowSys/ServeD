@@ -19,15 +19,21 @@ string getUserHomeDirAndAskForName(int uid) {
     stringstream ss;
     string in = "";
     cout << endl << "Enter your user name: ";
-    getline(cin, in);
+
+    if (!getline(cin, in)) {
+        cin.clear();
+        if (cin.eof())
+            exit(EXIT_SUCCESS);
+        else
+            exit(EXIT_FAILURE);
+    }
 
     // define allowed chars in user folder name entry:
     const char alphanum[] = "0123456789.-+ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzżźłóćęąń"; // XXX: only Polish characters and ASCII for now.
 
-    if ((in == "") || (in == "\n") || (in == "\0")) {
-        cerr << "Empty user name given! Using uid as default user name" << endl;
-        ss << USERS_HOME_DIR << "/" << uid;
-        return ss.str();
+    if (in.length() == 0) {
+        cerr << "Empty user name given!" << endl;
+        return getUserHomeDirAndAskForName(uid);
     }
 
     for (int i = 0; i < in.length(); i++) {
