@@ -21,10 +21,10 @@ string getUserHomeDirAndAskForName(int uid) {
     cout << endl << "Enter your user name: ";
 
     if (!getline(cin, in)) {
-        cin.clear();
-        if (cin.eof())
+        if (cin.eof()) {
+            cerr << "Terminated on EOF" << endl;
             exit(EXIT_SUCCESS);
-        else
+        } else
             exit(EXIT_FAILURE);
     }
 
