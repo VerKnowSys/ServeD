@@ -15,6 +15,42 @@ static struct termios saveTermios;
 static int interactive;
 
 
+const char* gatherUserNameFromDirEntry(int uid, const char* users_home_dir) {
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir(users_home_dir)) != NULL) {
+        /* print all the files and directories within directory */
+        while ((ent = readdir(dir)) != NULL) {
+            if ((strcmp(ent->d_name, ".") == 0) || (strcmp(ent->d_name, "..") == 0)) continue;
+            // only if owner of given directory is set to current runtime uid…
+            struct stat buffer;
+            int status;
+            char *fname = ent->d_name;
+            stringstream hd2;
+            hd2 << users_home_dir << "/" << fname;
+            status = stat(hd2.str().c_str(), &buffer);
+            if (buffer.st_uid == uid) {
+                #ifdef DEVEL
+                    cerr << "UID EQUALS current uid for " << fname << endl;
+                #endif
+                closedir (dir);
+                return hd2.str().c_str();
+            }
+            #ifdef DEVEL
+                cerr << "UID of file: " << fname << " is " << buffer.st_uid << endl;
+            #endif
+        }
+        closedir (dir);
+        return "";
+    } else {
+        /* could not open directory */
+        perror ("");
+        cerr << "Failed to find required home directory. Cannot continue" << endl;
+        exit(EXIT_FAILURE);
+    }
+}
+
+
 void ttySetRaw(void) {
     struct termios term;
 
@@ -134,7 +170,7 @@ void execute(char **argv, int uid) {
         if (uid == 0)
             hd << SYSTEMUSERS_HOME_DIR;
         else
-            hd << USERS_HOME_DIR << "/" << uid;
+            hd << gatherUserNameFromDirEntry(uid, USERS_HOME_DIR);
 
         usr << uid;
         chdir(hd.str().c_str());
@@ -153,6 +189,9 @@ void execute(char **argv, int uid) {
         unsetenv("SUDO_GID");
         unsetenv("SUDO_COMMAND");
         unsetenv("MAIL");
+        #ifdef DEVEL
+            cerr << "Defined user basic env. Home dir: " << hd.str().c_str() << endl;
+        #endif
         if (execvp(*argv, argv) < 0) {
             cerr << "Can't execute: " << *argv << endl;
             exit(EXEC_ERROR);
@@ -257,7 +296,7 @@ int main(int argc, char *argv[]) {
         homeDir = string(SYSTEMUSERS_HOME_DIR);
     else {
         stringstream ss;
-        ss << string(USERS_HOME_DIR) << "/" << uid;
+        ss << gatherUserNameFromDirEntry(uid, USERS_HOME_DIR);
         homeDir = ss.str(); /* NOTE: /Users/$UID homedir format used here */
     }
 

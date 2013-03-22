@@ -36,6 +36,7 @@
 #include <getopt.h>
 #include <termios.h>
 #include <signal.h>
+#include <dirent.h>
 
 #ifdef __FreeBSD__
     #include <kvm.h>
