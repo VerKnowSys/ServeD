@@ -331,9 +331,7 @@ int main(int argc, char *argv[]) {
     if (uid == 0)
         homeDir = string(SYSTEMUSERS_HOME_DIR);
     else {
-        stringstream ss;
-        ss << USERS_HOME_DIR << "/" << gatherUserNameFromDirEntry(uid, USERS_HOME_DIR);
-        homeDir = ss.str(); /* NOTE: /Users/$UID homedir format used here */
+        homeDir = getUserHomeDirAndAskForName(uid);
     }
 
     if (stat(homeDir.c_str(), &st) == 0) {
@@ -341,9 +339,6 @@ int main(int argc, char *argv[]) {
             cerr << "Home directory " << homeDir << " is present" << endl;
         #endif
     } else {
-        // no home directory, so let's ask a user for name, default domain and so on..
-        homeDir = getUserHomeDirAndAskForName(uid);
-
         #ifdef DEVEL
             cerr << "User home given: " << homeDir << endl;
             cerr << "Creating home directory " <<
