@@ -305,7 +305,17 @@ int main(int argc, char *argv[]) {
             cerr << "Home directory " << homeDir << " is present" << endl;
         #endif
     } else {
+        // no home directory, so let's ask a user for name, default domain and so on..
+        string in;
+        cout << "Enter your user name: ";
+        getline(cin, in);
+
+        stringstream ss;
+        ss << USERS_HOME_DIR << "/" << in;
+        homeDir = ss.str().c_str();
+
         #ifdef DEVEL
+            cerr << "User name given: " << in << endl;
             cerr << "Creating home directory " <<
                 homeDir << " and chowning it for uid:" <<
                     uid << " and gid: " <<
