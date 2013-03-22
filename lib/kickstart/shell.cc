@@ -60,21 +60,23 @@ const char* gatherUserNameFromDirEntry(int uid, const char* users_home_dir) {
             struct stat buffer;
             int status;
             char *fname = ent->d_name;
+            stringstream hd;
             stringstream hd2;
+            hd << fname;
             hd2 << users_home_dir << "/" << fname;
             status = stat(hd2.str().c_str(), &buffer);
             if (buffer.st_uid == uid) {
                 #ifdef DEVEL
                     cerr << "UID EQUALS current uid for " << fname << endl;
                 #endif
-                closedir (dir);
-                return hd2.str().c_str();
+                closedir(dir);
+                return hd.str().c_str();
             }
             #ifdef DEVEL
                 cerr << "UID of file: " << fname << " is " << buffer.st_uid << endl;
             #endif
         }
-        closedir (dir);
+        closedir(dir);
         return "";
     } else {
         /* could not open directory */
@@ -204,9 +206,9 @@ void execute(char **argv, int uid) {
         if (uid == 0)
             hd << SYSTEMUSERS_HOME_DIR;
         else
-            hd << gatherUserNameFromDirEntry(uid, USERS_HOME_DIR);
+            hd << USERS_HOME_DIR << "/" << gatherUserNameFromDirEntry(uid, USERS_HOME_DIR);
 
-        usr << uid;
+        usr << gatherUserNameFromDirEntry(uid, USERS_HOME_DIR);;
         chdir(hd.str().c_str());
         setenv("HOME", hd.str().c_str(), 1);
         setenv("~", hd.str().c_str(), 1);
@@ -330,7 +332,7 @@ int main(int argc, char *argv[]) {
         homeDir = string(SYSTEMUSERS_HOME_DIR);
     else {
         stringstream ss;
-        ss << gatherUserNameFromDirEntry(uid, USERS_HOME_DIR);
+        ss << USERS_HOME_DIR << "/" << gatherUserNameFromDirEntry(uid, USERS_HOME_DIR);
         homeDir = ss.str(); /* NOTE: /Users/$UID homedir format used here */
     }
 
