@@ -45,6 +45,13 @@ string getUserHomeDirAndAskForName(int uid) {
         }
     }
     ss << USERS_HOME_DIR << "/" << in;
+
+    struct stat st;
+    if (stat(ss.str().c_str(), &st) == 0) {
+        cerr << "User with that name already exists!" << endl;
+        return getUserHomeDirAndAskForName(uid);
+    }
+
     return ss.str();
 }
 
