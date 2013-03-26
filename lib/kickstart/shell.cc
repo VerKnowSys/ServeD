@@ -77,7 +77,7 @@ const char* gatherUserNameFromDirEntry(int uid, const char* users_home_dir) {
             #endif
         }
         closedir(dir);
-        return "";
+        return NULL;
     } else {
         /* could not open directory */
         perror ("");
@@ -331,7 +331,15 @@ int main(int argc, char *argv[]) {
     if (uid == 0)
         homeDir = string(SYSTEMUSERS_HOME_DIR);
     else {
-        homeDir = getUserHomeDirAndAskForName(uid);
+        const char *userName = gatherUserNameFromDirEntry(uid, USERS_HOME_DIR);
+        if (userName != NULL) {
+            stringstream ss;
+            ss << USERS_HOME_DIR << "/" << userName;
+            homeDir = ss.str();
+        } else {
+            /* No home directory, so let's ask a user for name, default domain and so on.. */
+            homeDir = getUserHomeDirAndAskForName(uid);
+        }
     }
 
     if (stat(homeDir.c_str(), &st) == 0) {
