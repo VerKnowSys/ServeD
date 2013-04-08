@@ -7,14 +7,14 @@ unset JAVA_OPTS
 # -Dcom.sun.management.jmxremote.ssl=false \
 # -Dcom.sun.management.jmxremote.authenticate=false \
 
+#-XX:+UseBiasedLocking \
 export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF8"
 if [ "$(uname)" = "Darwin" ]; then
   export JAVA_HOME="/usr/libexec/java_home --version 1.7"
 fi
 
-exec java \
--d64 \
--Xms3g \
+export SBT_OPTS="-d64 \
+-Xms1g \
 -Xmx3g \
 -XX:+DoEscapeAnalysis \
 -XX:+UseCompressedOops \
@@ -24,7 +24,24 @@ exec java \
 -XX:+UseFastAccessorMethods \
 -XX:+UseStringCache \
 -XX:+OptimizeStringConcat \
--XX:+UseBiasedLocking \
+-Djna.library.path=$(pwd)/lib \
+-Dfile.encoding=UTF-8 \
+-Djava.net.preferIPv4Stack=true \
+-server"
+
+
+exec java \
+-d64 \
+-Xms1g \
+-Xmx3g \
+-XX:+DoEscapeAnalysis \
+-XX:+UseCompressedOops \
+-XX:MaxPermSize=1200m \
+-XX:+CMSClassUnloadingEnabled \
+-XX:+AggressiveOpts \
+-XX:+UseFastAccessorMethods \
+-XX:+UseStringCache \
+-XX:+OptimizeStringConcat \
 -Djna.library.path=$(pwd)/lib \
 -Dfile.encoding=UTF-8 \
 -Djava.net.preferIPv4Stack=true \
