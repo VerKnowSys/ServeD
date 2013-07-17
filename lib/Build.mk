@@ -40,4 +40,4 @@ CXXFLAGS          = -Os -fPIC
 .endif
 
 
-MODULES           = cutelogger kickstart fann jsoncpp service_spawner test
+MODULES           = cutelogger kickstart fann
