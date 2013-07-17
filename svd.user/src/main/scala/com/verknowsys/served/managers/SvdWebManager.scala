@@ -127,7 +127,7 @@ class SvdWebManager(account: SvdAccount) extends SvdManager with SvdFileEventsRe
 
         accountManager forward Notify.Message(
             formatMessage("W:Your panel has been started for user: %s at: http://%s:%d".format(
-                account.userName, currentVPNHost, port))) // XXX : hardcoded host.
+                account.userName, currentVPNHost, port)))
 
         addShutdownHook {
             log.warn("Shutdown hook in Web Manager invoked")
