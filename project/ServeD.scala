@@ -73,7 +73,7 @@ object BuildSettings {
         test in assembly := false,
 
         mergeStrategy in assembly := {
-            case "reference.conf" | "application.conf" | "svd.logger.properties" | "META-INF/NOTICE.txt" | "META-INF/LICENSE" | "META-INF/LICENSE.txt" | "META-INF/NOTICE" | "plugin.properties" | "META-INF/eclipse.inf" =>
+            case "rootdoc.txt" | "reference.conf" | "application.conf" | "svd.logger.properties" | "META-INF/NOTICE.txt" | "META-INF/LICENSE" | "META-INF/LICENSE.txt" | "META-INF/NOTICE" | "plugin.properties" | "META-INF/eclipse.inf" =>
                 MergeStrategy.concat
 
             case some @ x if some.endsWith(".coffee") =>
