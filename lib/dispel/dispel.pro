@@ -15,5 +15,6 @@ SOURCES   += dispel_core.cc \
 
 
 # Zeromq should be installed with "base" list as superuser!
+INCLUDEPATH += /Software/Zeromq/include
 LIBS      += /Software/Zeromq/lib/libzmq.a ../../../TheSS/src/libquazip.a ../../../TheSS/src/libjsoncpp.a ../../../TheSS/src/liblogger.a ../../../TheSS/src/libnotifications.a -lz
 TARGET    = ../../bin/svddispel
