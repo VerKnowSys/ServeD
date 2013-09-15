@@ -103,8 +103,9 @@ object Resolvers {
     val jboss = "JBoss Repo" at "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases"
     val repoVks = "VerKnowSys Public Repository" at "http://maven.verknowsys.com/repository"
     val repo1 = "Repo1 Maven" at "http://repo1.maven.org/maven2"
+    val binReleases = "ScalaSbt" at "http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases"
 
-    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, repoVks, jboss, repo1)
+    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, repoVks, jboss, repo1, binReleases)
 }
 
 object Dependencies {
@@ -119,6 +120,7 @@ object Dependencies {
     val scalatest = "org.scalatest" % "scalatest_2.10" % "2.0.M5b"
     // val unfilteredSpec = "net.databinder" % "unfiltered-spec_2.10" % "0.6.4" % "test"
     val json = "org.json4s" %% "json4s-native" % "3.1.0"
+    val zeromq = "org.zeromq" % "zeromq-scala-binding_2.10.2" % "0.1.0"
 
     // Java
     val bouncycastle = "org.bouncycastle" % "bcprov-jdk16" % "1.46"
@@ -190,7 +192,7 @@ object ServeD extends Build {
 
     lazy val common = Project("common", file("svd.common"),
         settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis, bouncycastle, json, javaMail, jedis, smack, pircbot, commonsCodec, unfiltered) // expect4j
+            libraryDependencies ++= Seq(zeromq, neodatis, bouncycastle, json, javaMail, jedis, smack, pircbot, commonsCodec, unfiltered) // expect4j
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test") // unfiltered
 
@@ -212,7 +214,7 @@ object ServeD extends Build {
     lazy val utils = Project("utils", file("svd.utils"),
         settings = buildSettings ++ Seq(
             compileOrder        := CompileOrder.Mixed,
-            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd, slf4japi, json, actors, akkaActor, commonsCodec,  commonsFileUpload) // liftUtil, quartz
+            libraryDependencies ++= Seq(zeromq, messadmin, jna, tzip, bouncycastle, sshd, slf4japi, json, actors, akkaActor, commonsCodec,  commonsFileUpload) // liftUtil, quartz
         )
     ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, testing % "test")
 
