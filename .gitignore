@@ -1,4 +1,5 @@
 *.iml
+Makefile
 .DS_Store
 *.classpath
 *.class
@@ -122,7 +123,6 @@ ctrlcli
 /.idea/inspectionProfiles/
 /sftp-config.json
 /ss
-/lib/service_spawner/Makefile
 /lib/service_spawner/service_spawner.moc
 /lib/service_spawner/moc_service_config.cpp
 /lib/test/moc_config_loader.cpp
@@ -130,6 +130,9 @@ ctrlcli
 /lib/test/moc_TestJsonLibrary.cpp
 /test
 /lib/service_spawner/moc_config_loader.cpp
-/lib/test/Makefile
 moc_*.cpp
-/lib/cutelogger/Makefile
+/bin/svdshell
+/bin/svdrunner
+/bin/svdkick
+/bin/svddispel
+/bin/svddaemon
