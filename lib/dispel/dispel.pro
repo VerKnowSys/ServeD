@@ -6,11 +6,14 @@
 
 include(../Common.pro)
 
+QT += core network
 
 HEADERS   += *.h
-SOURCES   += dispel.cc
+SOURCES   += dispel_core.cc \
+            dispel_node.cc \
+            dispel.cc
 
 
-# Zeromq should be installed with "base" list as superuser.
-LIBS      += -L/Software/Zeromq/lib -lz -lzmq
+# Zeromq should be installed with "base" list as superuser!
+LIBS      += /Software/Zeromq/lib/libzmq.a ../../../TheSS/src/libquazip.a ../../../TheSS/src/libjsoncpp.a ../../../TheSS/src/liblogger.a ../../../TheSS/src/libnotifications.a -lz
 TARGET    = ../../bin/svddispel

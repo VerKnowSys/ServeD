@@ -7,4 +7,4 @@
 include(lib/Common.pro)
 
 TEMPLATE           = subdirs
-SUBDIRS            = lib/fann ../TheSS/src/cutelogger ../TheSS/src/hiredis ../TheSS/src/jsoncpp ../TheSS/src/notifications lib/dispel
+SUBDIRS            = lib/fann ../TheSS/src/cutelogger ../TheSS/src/quazip ../TheSS/src/hiredis ../TheSS/src/jsoncpp ../TheSS/src/notifications lib/dispel

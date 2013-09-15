@@ -11,7 +11,7 @@ QMAKE_CXX = clang++
 QMAKE_CC = clang
 QMAKE_CPP = clang++ -E
 
-QMAKE_CFLAGS += -fcolor-diagnostics -Wself-assign -fPIC -fPIE -O0
+QMAKE_CFLAGS += -fcolor-diagnostics -Wself-assign -fPIC -fPIE -O0 -w
 QMAKE_CXXFLAGS += -fcolor-diagnostics -Wself-assign -fPIC -fPIE -O0
 
 mac {
