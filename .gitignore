@@ -1,3 +1,4 @@
+*.iml
 .DS_Store
 *.classpath
 *.class
@@ -87,11 +88,11 @@ ctrlcli
 /kick
 /shell
 /sushell
-/svd.common/src/main/resources/FULLVERSION
+/svd.user/src/main/resources/FULLVERSION
 .project
 .history
 .ensime_port
-/svd.common/src/main/resources/BUILD
+/svd.user/src/main/resources/BUILD
 
 /lib/_digests
 /lib/*.cmi
