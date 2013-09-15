@@ -8,7 +8,7 @@
  */
 
 
-#include "core.h"
+#include "../kickstart/core.h"
 
 
 #include <fcntl.h>

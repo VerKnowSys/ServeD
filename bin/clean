@@ -31,26 +31,20 @@ fi
 # bin/sbt clean
 echo "Project source cleaned.."
 
-case "${SYSTEM}" in
+for project in $(find ./ -maxdepth 1 -name '*.pro' -type f); do
 
-    Darwin|Linux)
-        $(which bsdmake > /dev/null)
-        if [ ! "$?" = "0" ]; then
-            DEVEL= sofin get bsdmake
-        fi
-        if [ "${SYSTEM}" = "Darwin" ]; then
-            export MAKE_OPTS="DARWIN=true ${MAKE_OPTS}"
-        fi
-        cd lib
-        bsdmake ${DIST}clean ${MAKE_OPTS}
-        cd ..
-        ;;
+  printf "\nProcessing project definition: ${project}\n"
+  opts=""
+  if [ "$(uname)" = "Darwin" ]; then
+      export opts="-spec darwin-g++"
+  fi
+  qmake ${opts} "${project}"
+  make distclean
 
-    *)
-        cd lib
-        make ${DIST}clean
-        cd ..
-        ;;
+done
 
-esac
+
+rm -fv src/*.a
+rm -fv lib/*.a
+
 echo "Native code and libraries wiped out."

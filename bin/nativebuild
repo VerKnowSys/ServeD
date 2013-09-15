@@ -1,156 +1,59 @@
 #!/bin/sh
-# @author dmilith
-
-SYSTEM="$(uname)"
-ARCH="$(uname -p)"
-DEVEL="false"
-MAKE_OPTS="all clean"
-
-if [ "$1" = "devel" ]; then
-    echo "Devel enabled"
-    export DEVEL="true"
-    export MAKE_OPTS="all"
-fi
 
 
-case "${SYSTEM}" in
+sanity_checks() {
 
-    Darwin|Linux)
-        $(which bsdmake > /dev/null)
-        if [ ! "$?" = "0" ]; then
-            DEVEL= sofin get bsdmake
-        fi
-        if [ "${SYSTEM}" = "Darwin" ]; then
-            export MAKE_OPTS="DARWIN=true ${MAKE_OPTS}"
-        fi
-        cd lib
-        bsdmake DEVEL=${DEVEL} ${MAKE_OPTS}
-        cd ..
-        ;;
+    printf "Performing sanity checks..\n"
+    if [ "$(id -u)" = "0" ]; then
+        . /etc/profile_sofin
+    else
+        . ${HOME}/.profile
+    fi
 
-    *)
-        cd lib
-        make DEVEL=${DEVEL} ${MAKE_OPTS}
-        cd ..
-        ;;
-
-esac
-
-
-# check() {
-#     if [ "$1" = "0" ]; then
-#         echo "* $2 => Compiled Sucessfully"
-#         if [ "$DEVEL" != "true" ]; then
-#             if [ "$3" != "" ]; then
-#                 echo "  Stripping $3"
-#                 $STRIP $3
-#             fi
-#         fi
-#     else
-#         echo "* $2 => Failure"
-#         exit 1
-#     fi
-# }
+    if [ ! -x "/usr/bin/sofin" ]; then
+        printf "ERROR: Sofin is unavailable! Please install it first.\n"
+        exit 1
+    fi
+    if [ -f "/etc/sofin.conf.sh" ]; then
+        . "/etc/sofin.conf.sh"
+        note "Loaded Sofin config.."
+    else
+        printf "ERROR: Sofin configuration file is unavailable! Please install Sofin first.\n"
+        exit 1
+    fi
+    note "Checking availability of Zeromq library.."
+    if [ ! -f "/Software/Zeromq/include/zmq.h" ]; then
+        note "ERROR: Sofin base wasn't installed properly, or Zeromq was removed by super user. Please install it, by doing 'sofin get base' as super user!"
+        exit 1
+    fi
+    note "Checking availability of Qt4 library.."
+    tmp="$(which qmake 2> /dev/null)"
+    if [ ! -x "${tmp}" ]; then
+        note "ERROR: Sofin base wasn't installed properly, or Qt4 was removed by super user. Please install it, by doing 'sofin get base' as super user!"
+        exit 1
+    fi
+}
 
 
-# $CXX $FLAGS -c lib/kickstart/core.cc -o lib/core.o
-# check $? "Core"
+build () {
+    OPTS=""
+    case "${SYSTEM_NAME}" in
+        Darwin)
+            OPTS="-spec darwin-g++"
+            ;;
+    esac
 
-# $CXX $FLAGS -c lib/kickstart/utils.cc -o lib/utils.o
-# check $? "Utils"
+    for _project in $(find $(pwd) -maxdepth 1 -name '*.pro' -type f); do
+        project="$(${BASENAME_BIN} "${_project}")"
+        (qmake ${OPTS} ${project} 2> /dev/null 1>&2) || exit 1
+        (make && note "Project: ${project} built successfully!") || exit 1
+    done
 
-# $CXX $FLAGS lib/kickstart/shell.cc -o shell lib/utils.o -lutil
-# check $? "UserShell" "shell"
-
-# $CXX $FLAGS lib/kickstart/daemon.cc -o daemon lib/utils.o
-# check $? "UserDaemon" "daemon"
-
-# $CXX $FLAGS lib/kickstart/run.cc -o run lib/utils.o
-# check $? "UserRunner" "run"
-
-# $CXX $FLAGS lib/kickstart/kick.cc -o kick lib/core.o lib/utils.o
-# check $? "KickStart" "kick"
-
-# if [ "$SYSTEM" = "FreeBSD" ]; then
-#     fbsd_process () {
-#         postfix="${1}"
-#         $CXX $FLAGS -shared lib/kickstart/usage_sys.cc -o lib/libusagesys${postfix}.so lib/utils.o -lutil -lprocstat -lkvm
-#         check $? "UsageSysLib" "lib/libusagesys${postfix}.so"
-#         $CXX $FLAGS lib/kickstart/usage_gather.cc -o usage_gather lib/libusagesys${postfix}.so lib/utils.o -lutil -lprocstat -lkvm
-#         check $? "UsageGather" "usage_gather"
-#         $CXX $FLAGS -shared lib/kickstart/stat.cc -o lib/libstat${postfix}.so
-#         check $? "StatLib" "lib/libstat${postfix}.so"
-#         $CXX $FLAGS -shared lib/kickstart/system_time.cc -o lib/libsystemtime${postfix}.so -lrt
-#         check $? "SystemTimeLib" "lib/libsystemtime${postfix}.so"
-#     }
-#     fbsd_process
-# fi
-
-# if [ "$SYSTEM" = "Darwin" ]; then
-#     $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/usage_sys.cc -o lib/libusagesys.dylib lib/utils.o
-#     check $? "UsageSysLib"
-
-#     $CXX $FLAGS -arch i386 -arch x86_64 lib/kickstart/usage_gather.cc -o usage_gather lib/libusagesys.dylib lib/utils.o -lutil
-#     check $? "UsageGather" "usage_gather"
-
-#     $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/stat.cc -o lib/libstat.dylib
-#     check $? "StatLib"
-
-#     $CXX $FLAGS -arch i386 -arch x86_64 -shared lib/kickstart/system_time.cc -o lib/libsystemtime.dylib
-#     check $? "SystemTimeLib"
-
-# fi
-
-# if [ "$SYSTEM" = "Linux" ]; then
-#     $CXX $FLAGS -shared lib/kickstart/system_time.cc -o lib/libsystemtime.so -lrt
-#     check $? "SystemTimeLib" "lib/libsystemtime.so"
-# fi
+}
 
 
-# # FANN library build:
-# FANN_FLAGS="-pedantic"
-# $CC $FLAGS $FANN_FLAGS -c lib/fann/fann_cascade.c -o lib/fann_cascade.o
-# check $? "FANN cascade"
-# $CC $FLAGS $FANN_FLAGS -c lib/fann/doublefann.c -o lib/doublefann.o
-# check $? "FANN double"
-# $CC $FLAGS $FANN_FLAGS -c lib/fann/fann_error.c -o lib/fann_error.o
-# check $? "FANN error"
-# $CC $FLAGS $FANN_FLAGS -c lib/fann/fann_io.c -o lib/fann_io.o
-# check $? "FANN IO"
-# $CC $FLAGS $FANN_FLAGS -c lib/fann/fann_train.c -o lib/fann_train.o
-# check $? "FANN train"
-# $CC $FLAGS $FANN_FLAGS -c lib/fann/fann_train_data.c -o lib/fann_train_data.o
-# check $? "FANN train data"
-# $CC $FLAGS $FANN_FLAGS -c lib/fann/fixedfann.c -o lib/fixedfann.o
-# check $? "FANN fixed"
-# $CC $FLAGS $FANN_FLAGS -c lib/fann/floatfann.c -o lib/floatfann.o
-# check $? "FANN float"
-# $CC $FLAGS $FANN_FLAGS -c lib/fann/fann.c -o lib/fann.o
-# check $? "FANN main"
+# check all major software requirements:
+sanity_checks
 
-# if [ "$SYSTEM" = "Darwin" ]; then
-#     $CC $FLAGS $FANN_FLAGS -arch x86_64 -shared -o lib/libfann.dylib lib/fann.o lib/fann_train_data.o lib/fann_train.o lib/fann_io.o lib/fann_error.o lib/fann_cascade.o
-#     check $? "FANN library"
-
-#     $CC $FLAGS $FANN_FLAGS -arch x86_64 -shared -o lib/libfann-fixed.dylib lib/fixedfann.o
-#     check $? "FANN fixed library" "lib/libfann-fixed.dylib"
-
-#     $CC $FLAGS $FANN_FLAGS -arch x86_64 -shared -o lib/libfann-float.dylib lib/floatfann.o
-#     check $? "FANN float library" "lib/libfann-float.dylib"
-
-#     $CC $FLAGS $FANN_FLAGS -arch x86_64 -shared -o lib/libfann-double.dylib lib/doublefann.o
-#     check $? "FANN double library" "lib/libfann-double.dylib"
-# else
-#     $CC $FLAGS $FANN_FLAGS -shared -o lib/libfann.so lib/fann.o lib/fann_train_data.o lib/fann_train.o lib/fann_io.o lib/fann_error.o lib/fann_cascade.o
-#     check $? "FANN library" "lib/libfann.so"
-
-#     $CC $FLAGS $FANN_FLAGS -shared -o lib/libfann-fixed.so lib/fixedfann.o
-#     check $? "FANN fixed library" "lib/libfann-fixed.so"
-
-#     $CC $FLAGS $FANN_FLAGS -shared -o lib/libfann-float.so lib/floatfann.o
-#     check $? "FANN float library" "lib/libfann-float.so"
-
-#     $CC $FLAGS $FANN_FLAGS -shared -o lib/libfann-double.so lib/doublefann.o
-#     check $? "FANN double library" "lib/libfann-double.so"
-# fi
-
+note "Building ServeD Natives.."
+time build

@@ -7,7 +7,7 @@
  */
 
 
-#include "core.h"
+#include "../kickstart/core.h"
 
 #ifdef __FreeBSD__
 #include <sys/wait.h>
