@@ -6,8 +6,8 @@
 */
 
 
-#ifndef __DISPEL_NODE__
-#define __DISPEL_NODE__
+#ifndef __DISPEL_PUBLISHER__
+#define __DISPEL_PUBLISHER__
 
 
 #include "dispel_core.h"
@@ -26,15 +26,8 @@ class Publisher: public AbstractZmqBase {
 
 
     protected:
-        QThread* makeExecutionThread(AbstractZmqBase& base) const;
-
-        void startImpl() {
-            nodeUuid = readOrGenerateNodeUuid();
-            logInfo() << "Launching Publisher with id:" << nodeUuid;
-            launchPublisher();
-            assert(!nodeUuid.isEmpty());
-            QTimer::singleShot(1000, this, SLOT(sendPing()));
-        }
+        // QThread* makeExecutionThread(AbstractZmqBase& base) const;
+        void startImpl();
 
 
     signals:
@@ -42,17 +35,7 @@ class Publisher: public AbstractZmqBase {
 
 
     protected slots:
-        void sendPing() {
-            static quint64 counter = 0;
-            QList< QByteArray > msg;
-            msg += topic_.toLocal8Bit();
-            msg += QString("MSG[%1: %2]").arg(++counter).arg(QDateTime::currentDateTime().toLocalTime().toString(Qt::ISODate)).toLocal8Bit();
-            assert(socket_);
-            socket_->sendMessage(msg);
-            logDebug() << "Publisher> " << msg;
-            emit pingSent(msg);
-            QTimer::singleShot(1000, this, SLOT(sendPing()));
-        }
+        void sendPing();
 
 
     public:
@@ -63,10 +46,14 @@ class Publisher: public AbstractZmqBase {
                 socket_ = context.createSocket(ZMQSocket::TYP_PUB, this);
                 assert(socket_);
                 socket_->setObjectName("Publisher.Socket.socket(PUB)");
+                logDebug() << "Publisher created for topic:" << topic;
         }
 
-        QString id();
-        void launchPublisher();
+        inline QString id() {
+            return nodeUuid;
+        }
+
+        bool notify(QObject *obj, QEvent *event);
 
 };
 
