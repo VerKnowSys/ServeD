@@ -43,7 +43,7 @@ build () {
             ;;
     esac
 
-    for _project in $(find $(pwd) -maxdepth 1 -name '*.pro' -type f); do
+    for _project in $(find $(pwd)/ -maxdepth 1 -name '*.pro' -type f); do
         project="$(${BASENAME_BIN} "${_project}")"
         (qmake ${OPTS} ${project} 2> /dev/null 1>&2) || exit 1
         (make -j 8 && note "Project: ${project} built successfully!") || exit 1
