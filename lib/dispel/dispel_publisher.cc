@@ -11,13 +11,18 @@
 
 QThread* Publisher::makeExecutionThread(AbstractZmqBase& base) const {
     QThread* thread = new QThread;
+    assert(thread);
     base.moveToThread(thread);
 
     bool connected = false;
-    connected = connect(thread, SIGNAL(started()), &base, SLOT(start()));         Q_ASSERT(connected);
-    connected = connect(&base, SIGNAL(finished()), thread, SLOT(quit()));         Q_ASSERT(connected);
-    connected = connect(&base, SIGNAL(finished()), &base, SLOT(deleteLater())); Q_ASSERT(connected);
-    connected = connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));   Q_ASSERT(connected);
+    connected = connect(thread, SIGNAL(started()), &base, SLOT(start()));
+    assert(connected);
+    connected = connect(&base, SIGNAL(finished()), thread, SLOT(quit()));
+    assert(connected);
+    connected = connect(&base, SIGNAL(finished()), &base, SLOT(deleteLater()));
+    assert(connected);
+    connected = connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    assert(connected);
 
     return thread;
 }
@@ -25,6 +30,7 @@ QThread* Publisher::makeExecutionThread(AbstractZmqBase& base) const {
 
 void Publisher::launchPublisher() {
     nodeUuid = readOrGenerateNodeUuid();
+    assert(!nodeUuid.isEmpty());
     logInfo() << "Launching Node id:" << nodeUuid;
 }
 

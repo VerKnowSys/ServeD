@@ -47,6 +47,7 @@ class Publisher: public AbstractZmqBase {
             QList< QByteArray > msg;
             msg += topic_.toLocal8Bit();
             msg += QString("MSG[%1: %2]").arg(++counter).arg(QDateTime::currentDateTime().toLocalTime().toString(Qt::ISODate)).toLocal8Bit();
+            assert(socket_);
             socket_->sendMessage(msg);
             logDebug() << "Publisher> " << msg;
             emit pingSent(msg);
@@ -56,7 +57,9 @@ class Publisher: public AbstractZmqBase {
 
     public:
         explicit Publisher(ZMQContext& context, const QString& address, const QString& topic, QObject* parent = 0): super(parent), address_(address), topic_(topic), socket_(0) {
+                assert(context);
                 socket_ = context.createSocket(ZMQSocket::TYP_PUB, this);
+                assert(socket_);
                 socket_->setObjectName("Publisher.Socket.socket(PUB)");
         }
 

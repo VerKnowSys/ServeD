@@ -55,16 +55,16 @@ int main(int argc, char *argv[]) {
     logInfo("Using Zeromq v" + zmqVersion());
 
     QScopedPointer<ZMQContext> context(createDefaultContext());
+    assert(context);
 
     // XXX: 2013-09-16 14:25:02 - dmilith - subscriber should be launched first after node downtime!
 
 
-    const QString publisherAddress = "tcp://*:" + QString::number(DISPEL_NODE_SUBSCRIBE_PORT);
-
-    Publisher *publisher = new Publisher(*context, publisherAddress, "jakiś takiś topik?");
+    Publisher *publisher = new Publisher(*context, DISPEL_NODE_PUBLISHER_ADDRESS, "jakiś takiś topik?");
+    assert(publisher);
     publisher->start();
 
-    logInfo() << "Publishing new Node with ID:" << publisher->id() << "on address:" << publisherAddress;
+    logInfo() << "Publishing new Node with ID:" << publisher->id() << "on address:" << DISPEL_NODE_PUBLISHER_ADDRESS;
 
     return app.exec();
 }
