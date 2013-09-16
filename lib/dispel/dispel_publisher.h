@@ -21,32 +21,31 @@ class Publisher: public AbstractZmqBase {
     private:
         QString nodeUuid;
         QString address_;
-        QString topic_;
+        QString channel_;
         ZMQSocket* socket_;
 
 
     protected:
-        // QThread* makeExecutionThread(AbstractZmqBase& base) const;
         void startImpl();
 
 
     signals:
-        void pingSent(const QList<QByteArray>& message);
+        void sentJobMessage(const QList<QByteArray>& message);
 
 
     protected slots:
-        void sendPing();
+        void sendJobMessage();
 
 
     public:
-        explicit Publisher(ZMQContext& context, const QString& address, const QString& topic, QObject* parent = 0): super(parent), address_(address), topic_(topic), socket_(0) {
+        explicit Publisher(ZMQContext& context, const QString& address, const QString& channel, QObject* parent = 0): super(parent), address_(address), channel_(channel), socket_(0) {
                 assert(context);
                 assert(!address_.isEmpty());
-                assert(!topic_.isEmpty());
+                assert(!channel_.isEmpty());
                 socket_ = context.createSocket(ZMQSocket::TYP_PUB, this);
                 assert(socket_);
                 socket_->setObjectName("Publisher.Socket.socket(PUB)");
-                logDebug() << "Publisher created for topic:" << topic;
+                logDebug() << "Publisher created for channel:" << channel;
         }
 
         inline QString id() {

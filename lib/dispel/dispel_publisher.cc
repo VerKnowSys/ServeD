@@ -29,34 +29,14 @@ void Publisher::startImpl() {
 }
 
 
-void Publisher::sendPing() {
+void Publisher::sendJobMessage() {
     static quint64 counter = 0;
     QList< QByteArray > msg;
-    msg += topic_.toLocal8Bit();
+    msg += channel_.toLocal8Bit();
     msg += QString("MSG[%1: %2]").arg(++counter).arg(QDateTime::currentDateTime().toLocalTime().toString(Qt::ISODate)).toLocal8Bit();
     assert(socket_);
-    logDebug() << "Trying to publish message:" << msg;
+    logDebug() << "Publishing message:" << msg;
     socket_->sendMessage(msg);
-    logDebug() << "Publisher> " << msg;
-    emit pingSent(msg);
-    QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendPing()));
+    emit sentJobMessage(msg);
+    QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendJobMessage()));
 }
-
-
-// QThread* Publisher::makeExecutionThread(AbstractZmqBase& base) const {
-//     QThread* thread = new QThread;
-//     assert(thread);
-//     base.moveToThread(thread);
-
-//     bool connected = false;
-//     connected = connect(thread, SIGNAL(started()), &base, SLOT(start()));
-//     assert(connected);
-//     connected = connect(&base, SIGNAL(finished()), thread, SLOT(quit()));
-//     assert(connected);
-//     connected = connect(&base, SIGNAL(finished()), &base, SLOT(deleteLater()));
-//     assert(connected);
-//     connected = connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-//     assert(connected);
-
-//     return thread;
-// }

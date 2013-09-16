@@ -31,7 +31,7 @@ void Subscriber::startImpl() {
     logInfo() << "Launching Subscriber with id:" << nodeUuid << "trying address:" << address_;
     assert(!nodeUuid.isEmpty());
     socket_->connectTo(address_);
-    socket_->subscribeTo(topic_);
-    logDebug() << "Subscribing to:" << address_ << "@topic:" << topic_;
+    socket_->subscribeTo(channel_);
+    logDebug() << "Subscribing to:" << address_ << "@channel:" << channel_;
 }
 

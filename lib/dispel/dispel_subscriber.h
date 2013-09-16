@@ -21,7 +21,7 @@ class Subscriber: public AbstractZmqBase {
     private:
         QString nodeUuid;
         QString address_;
-        QString topic_;
+        QString channel_;
         ZMQSocket* socket_;
 
 
@@ -39,15 +39,15 @@ class Subscriber: public AbstractZmqBase {
 
 
     public:
-        explicit Subscriber(ZMQContext& context, const QString& address, const QString& topic, QObject* parent = 0): super(parent), address_(address), topic_(topic), socket_(0) {
+        explicit Subscriber(ZMQContext& context, const QString& address, const QString& channel, QObject* parent = 0): super(parent), address_(address), channel_(channel), socket_(0) {
                 assert(context);
                 assert(!address_.isEmpty());
-                assert(!topic_.isEmpty());
+                assert(!channel_.isEmpty());
                 socket_ = context.createSocket(ZMQSocket::TYP_SUB, this);
                 assert(socket_);
                 socket_->setObjectName("Subscriber.Socket.socket(SUB)");
                 connect(socket_, SIGNAL(messageReceived(const QList<QByteArray>&)), SLOT(messageReceived(const QList<QByteArray>&)));
-                logDebug() << "Subscriber created for topic:" << topic;
+                logDebug() << "Subscriber created for channel:" << channel;
         }
 
         inline QString id() {
