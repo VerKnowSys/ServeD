@@ -36,17 +36,17 @@ sanity_checks() {
 
 
 build () {
-    OPTS=""
+    QMAKE_OPTS=""
     case "${SYSTEM_NAME}" in
         Darwin)
-            OPTS="-spec darwin-g++"
+            QMAKE_OPTS="-spec darwin-g++"
             ;;
     esac
 
     for _project in $(find $(pwd)/ -maxdepth 1 -name '*.pro' -type f); do
         project="$(${BASENAME_BIN} "${_project}")"
-        (qmake ${OPTS} ${project} 2> /dev/null 1>&2) || exit 1
-        (make -j 8 && note "Project: ${project} built successfully!") || exit 1
+        (qmake ${QMAKE_OPTS} ${project} 2> /dev/null 1>&2) || exit 1
+        (make ${MAKE_OPTS} && note "Project: ${project} built successfully!") || exit 1
     done
 
 }
