@@ -5,6 +5,7 @@
 
 
 #include "dispel_publisher.h"
+#include "dispel_subscriber.h"
 
 
 int main(int argc, char *argv[]) {
@@ -34,6 +35,7 @@ int main(int argc, char *argv[]) {
 
     /* Logger setup */
     ConsoleAppender *consoleAppender = new ConsoleAppender();
+    assert(consoleAppender);
     Logger::registerAppender(consoleAppender);
     consoleAppender->setFormat("%t{dd-HH:mm:ss} [%-7l] <%c:(%F:%i)> %m\n");
     if (trace && debug)
@@ -54,17 +56,19 @@ int main(int argc, char *argv[]) {
     logInfo("The ServeD Dispel v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
     logInfo("Using Zeromq v" + zmqVersion());
 
+    /* will create context with polling enabled by default */
     QScopedPointer<ZMQContext> context(createDefaultContext());
     assert(context);
+    context->start();
 
-    // XXX: 2013-09-16 14:25:02 - dmilith - subscriber should be launched first after node downtime!
-
-
-    Publisher *publisher = new Publisher(*context, DISPEL_NODE_PUBLISHER_ADDRESS, "jakiś takiś topik?");
+    Publisher *publisher = new Publisher(*context, DISPEL_NODE_PUBLISHER_ADDRESS, "topiś jakiś!"); //
     assert(publisher);
     publisher->start();
 
-    logInfo() << "Publishing new Node with ID:" << publisher->id() << "on address:" << DISPEL_NODE_PUBLISHER_ADDRESS;
+    Subscriber *subscriber = new Subscriber(*context, DISPEL_NODE_SUBSCRIBER_ADDRESS, "topiś jakiś!");
+    assert(subscriber);
+    subscriber->start();
+
 
     return app.exec();
 }

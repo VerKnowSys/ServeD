@@ -47,7 +47,7 @@
 
 // Define default number of IO threads to be used by ZMQ.
 #ifndef NZMQT_DEFAULT_IOTHREADS
-    #define NZMQT_DEFAULT_IOTHREADS 4
+    #define NZMQT_DEFAULT_IOTHREADS 8
 #endif
 
 // Define default poll interval for polling-based implementation.

@@ -18,6 +18,7 @@ HEADERS   += *.h \
 SOURCES   += nzmqt/nzmqt.cpp \
             dispel_core.cc \
             dispel_publisher.cc \
+            dispel_subscriber.cc \
             dispel.cc
 
 
