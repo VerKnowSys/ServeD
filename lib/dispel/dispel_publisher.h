@@ -19,7 +19,7 @@ class Publisher: public AbstractZmqBase {
 
 
     private:
-        QString nodeUuid = "\0";
+        QString nodeUuid;
         QString address_;
         QString topic_;
         ZMQSocket* socket_;
@@ -58,6 +58,8 @@ class Publisher: public AbstractZmqBase {
     public:
         explicit Publisher(ZMQContext& context, const QString& address, const QString& topic, QObject* parent = 0): super(parent), address_(address), topic_(topic), socket_(0) {
                 assert(context);
+                assert(!address_.isEmpty());
+                assert(!topic_.isEmpty());
                 socket_ = context.createSocket(ZMQSocket::TYP_PUB, this);
                 assert(socket_);
                 socket_->setObjectName("Publisher.Socket.socket(PUB)");
