@@ -61,14 +61,17 @@ int main(int argc, char *argv[]) {
     assert(context);
     context->start();
 
-    Publisher *publisher = new Publisher(*context, DISPEL_NODE_PUBLISHER_ADDRESS, "topiś jakiś!"); //
+    Publisher *publisher = new Publisher(*context, DISPEL_NODE_PUBLISHER_ENDPOINT, "topiś jakiś!");
     assert(publisher);
     publisher->start();
 
-    Subscriber *subscriber = new Subscriber(*context, DISPEL_NODE_SUBSCRIBER_ADDRESS, "topiś jakiś!");
+    Subscriber *subscriber = new Subscriber(*context, DISPEL_NODE_SUBSCRIBER_ENDPOINT, "topiś jakiś!");
     assert(subscriber);
     subscriber->start();
 
+    Subscriber *subscriber2 = new Subscriber(*context, DISPEL_NODE_SUBSCRIBER_ENDPOINT, "topiś jakiś!");
+    assert(subscriber2);
+    subscriber2->start();
 
     return app.exec();
 }

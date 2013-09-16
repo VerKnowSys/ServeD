@@ -28,7 +28,7 @@ void Subscriber::messageReceived(const QList<QByteArray>& message) {
 
 void Subscriber::startImpl() {
     nodeUuid = readOrGenerateNodeUuid();
-    logInfo() << "Launching Subscriber with id:" << nodeUuid;
+    logInfo() << "Launching Subscriber with id:" << nodeUuid << "trying address:" << address_;
     assert(!nodeUuid.isEmpty());
     socket_->connectTo(address_);
     socket_->subscribeTo(topic_);

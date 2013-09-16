@@ -20,8 +20,9 @@
 // #define DISPEL_NODE_SUBSCRIBER_PORT "14"
 // #define DISPEL_NODE_FILE_SYNC_PORT "16"
 
-#define DISPEL_NODE_PUBLISHER_ADDRESS ("tcp://*:" DISPEL_NODE_PUBLISHER_PORT)
-#define DISPEL_NODE_SUBSCRIBER_ADDRESS ("tcp://0.0.0.0:" DISPEL_NODE_PUBLISHER_PORT)
+#define DISPEL_NODE_PUBLISHER_ENDPOINT ("tcp://*:" DISPEL_NODE_PUBLISHER_PORT)
+#define DISPEL_NODE_PUBLISHER_PAUSE 1000
+#define DISPEL_NODE_SUBSCRIBER_ENDPOINT ("tcp://0.0.0.0:" DISPEL_NODE_PUBLISHER_PORT)
 
 #define DISPEL_NODE_IDENTIFICATION_FILE (SYSTEMUSERS_HOME_DIR "/svd-node-id.uuid")
 #define DISPEL_NODE_KNOWN_NODES_DIR (SYSTEMUSERS_HOME_DIR "/svd-known-nodes/")
@@ -40,19 +41,8 @@ QString zmqVersion();
 #include "nzmqt/nzmqt.hpp"
 #include "nzmqt/AbstractZmqBase.hpp"
 
-
-// QThread* makeExecutionThread(AbstractZmqBase& base);
-
-
 #include "dispel_publisher.h"
 #include "dispel_subscriber.h"
-
-// #include "../nzmqt/include/nzmqt/pubsub/Subscriber.hpp"
-// #include "../nzmqt/include/nzmqt/reqrep/Requester.hpp"
-// #include "../nzmqt/include/nzmqt/reqrep/Replier.hpp"
-// #include "../nzmqt/include/nzmqt/pushpull/Ventilator.hpp"
-// #include "../nzmqt/include/nzmqt/pushpull/Worker.hpp"
-// #include "../nzmqt/include/nzmqt/pushpull/Sink.hpp"
 
 
 #endif

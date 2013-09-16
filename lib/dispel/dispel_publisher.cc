@@ -25,7 +25,7 @@ void Publisher::startImpl() {
     assert(!nodeUuid.isEmpty());
     logInfo() << "Launching Publisher with id:" << nodeUuid << "on address:" << address_;
     socket_->bindTo(address_);
-    QTimer::singleShot(1000, this, SLOT(sendPing()));
+    QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendPing()));
 }
 
 
@@ -39,7 +39,7 @@ void Publisher::sendPing() {
     socket_->sendMessage(msg);
     logDebug() << "Publisher> " << msg;
     emit pingSent(msg);
-    QTimer::singleShot(1000, this, SLOT(sendPing()));
+    QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendPing()));
 }
 
 
