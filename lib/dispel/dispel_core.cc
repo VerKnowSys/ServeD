@@ -16,8 +16,30 @@ QString zmqVersion() {
 
 
 QString readOrGenerateNodeUuid() {
+    /* permission check */
+    QString dirOnPath = QFileInfo(DISPEL_NODE_IDENTIFICATION_FILE).dir().absolutePath();
+    if (getuid() == 0) {
+        logDebug() << "Dir on path:" << dirOnPath;
+        if (not QFile::permissions(dirOnPath).testFlag(QFile::ExeOwner)) {
+            logFatal() << "Insufficient permissions to traverse through directory:" << dirOnPath << ":" << QFile::permissions(dirOnPath).testFlag(QFile::ExeOwner) << "," << QFile::permissions(dirOnPath).testFlag(QFile::ExeUser) << "," << QFile::permissions(dirOnPath).testFlag(QFile::ExeOther);
+        } else {
+            logDebug() << "Permissions granted to traverse through directory:" << dirOnPath;
+        }
+        if (not QFile::permissions(DISPEL_NODE_IDENTIFICATION_FILE).testFlag(QFile::ReadOwner)) {
+            logFatal() << "Can't read Node ID from file:" << DISPEL_NODE_IDENTIFICATION_FILE << "Check access rights to this file for current user and try again!";
+        } else {
+            logDebug() << "Permissions granted to read file:" << DISPEL_NODE_IDENTIFICATION_FILE;
+        }
+    } else {
+        logWarn() << "Launching Dispel as non root user. I assume it's just development build to test something out.";
+        QString develNodeName = "{devel-node-uuid}";
+        logWarn() << "Temporarely set Node ID to:" << develNodeName;
+        return develNodeName;
+    }
+
     QString content = "\0";
     if (QFile::exists(QString(DISPEL_NODE_IDENTIFICATION_FILE))) {
+        logDebug() << "Permissions to read file:" << DISPEL_NODE_IDENTIFICATION_FILE << ":" << QFile::permissions(DISPEL_NODE_IDENTIFICATION_FILE).testFlag(QFile::ReadOwner) << "," << QFile::permissions(DISPEL_NODE_IDENTIFICATION_FILE).testFlag(QFile::ReadUser) << "," << QFile::permissions(DISPEL_NODE_IDENTIFICATION_FILE).testFlag(QFile::ReadOther);
 
         uint tmpFileSize = QFile(DISPEL_NODE_IDENTIFICATION_FILE).size();
         if (tmpFileSize != UUID_CORRECT_LENGTH) {

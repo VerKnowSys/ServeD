@@ -47,10 +47,21 @@ int main(int argc, char *argv[]) {
         consoleAppender->setFormat("%t{dd-HH:mm:ss} [%-7l] %m\n");
     }
 
-    uint uid = getuid() + geteuid();
-    if (uid != 0) {
-        logError() << "This piece of software, requires super user to run!";
-        // logFatal() << "Aborted!";
+    uint uid = getuid();
+    switch (uid) {
+        case 0: {
+            logInfo() << "Checking existance and access priviledges of ServeD private directories";
+            readOrGenerateNodeUuid();
+            if (not QDir().exists(DISPEL_NODE_KNOWN_NODES_DIR))
+                QDir().mkpath(DISPEL_NODE_KNOWN_NODES_DIR);
+            chmod(DISPEL_NODE_IDENTIFICATION_FILE, 0600); /* rw------- */
+            chmod(DISPEL_NODE_KNOWN_NODES_DIR, 0600); /* rw------- */
+
+        } break;
+
+        default:
+            logError() << "Please note that this software requires super user priviledges to run!";
+            // logFatal()
     }
 
     logInfo("The ServeD Dispel v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
