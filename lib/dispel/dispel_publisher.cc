@@ -24,8 +24,13 @@ void Publisher::startImpl() {
     nodeUuid = readOrGenerateNodeUuid();
     assert(!nodeUuid.isEmpty());
     logInfo() << "Launching Publisher with id:" << nodeUuid << "on address:" << address_;
-    socket_->bindTo(address_);
     QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendPing()));
+    try {
+        socket_->bindTo(address_);
+    } catch (std::exception& ex) {
+        logError() << "Exception thrown in publisher: " << ex.what();
+        logFatal() << "Publisher requires free tcp address:" << address_ << " to work. Exitting!";
+    }
 }
 
 
