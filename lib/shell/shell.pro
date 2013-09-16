@@ -15,4 +15,7 @@ SOURCES   += ../kickstart/core.cc \
 
 QMAKE_CXXFLAGS += -w
 LIBS      += -lz
+unix:!mac {
+  LIBS += -lutil
+}
 TARGET    = ../../bin/svdshell
