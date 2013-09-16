@@ -8,6 +8,12 @@
 #include "dispel_core.h"
 
 
+QString zmqVersion() {
+    int major, minor, patch;
+    zmq_version(&major, &minor, &patch);
+    return QString::number(major) + "." + QString::number(minor) + "." + QString::number(patch);
+}
+
 
 QString readOrGenerateNodeUuid() {
     QString content = "\0";

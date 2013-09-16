@@ -4,7 +4,7 @@
 */
 
 
-#include "dispel_node.h"
+#include "dispel_publisher.h"
 
 
 int main(int argc, char *argv[]) {
@@ -52,9 +52,19 @@ int main(int argc, char *argv[]) {
     }
 
     logInfo("The ServeD Dispel v" + QString(APP_VERSION) + ". " + QString(COPYRIGHT));
+    logInfo("Using Zeromq v" + zmqVersion());
 
-    DispelNode *uniqueMachine = new DispelNode();
-    logWarn() << uniqueMachine->id();
+    QScopedPointer<ZMQContext> context(createDefaultContext());
+
+    // XXX: 2013-09-16 14:25:02 - dmilith - subscriber should be launched first after node downtime!
+
+
+    const QString publisherAddress = "tcp://*:" + QString::number(DISPEL_NODE_SUBSCRIBE_PORT);
+
+    Publisher *publisher = new Publisher(*context, publisherAddress, "jakiś takiś topik?");
+    publisher->start();
+
+    logInfo() << "Publishing new Node with ID:" << publisher->id() << "on address:" << publisherAddress;
 
     return app.exec();
 }
