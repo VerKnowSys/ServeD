@@ -84,7 +84,7 @@ class SvdArchiverTest extends DefaultTest with Logging with SvdUtils {
 
     it should "be able to recursively get svd directories" in {
         val dirs = SvdArchiver.gatherAllDirsRecursively(List(JSystem.getProperty("user.dir"))).map{_.getName} // ServeD source directories
-        List("svd.root", "svd.user", "svd.common", "svd.api", "svd.utils", "main", "test", "scala", "java", "lib", "target", "resources").foreach{ elem =>
+        List("svd.root", "svd.user", "svd.api", "svd.utils", "main", "test", "scala", "java", "lib", "target", "resources").foreach{ elem =>
                 dirs should contain (elem)
         }
 

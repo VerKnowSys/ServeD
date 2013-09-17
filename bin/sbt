@@ -15,36 +15,26 @@ fi
 
 export SBT_OPTS="-d64 \
 -Xms1g \
--Xmx3g \
--XX:+DoEscapeAnalysis \
+-Xmx4g \
 -XX:+UseCompressedOops \
--XX:MaxPermSize=1200m \
 -XX:+CMSClassUnloadingEnabled \
--XX:+AggressiveOpts \
--XX:+UseFastAccessorMethods \
--XX:+UseStringCache \
--XX:+OptimizeStringConcat \
 -Djna.library.path=$(pwd)/lib \
 -Dfile.encoding=UTF-8 \
--Djava.net.preferIPv4Stack=true \
--server"
+-XX:MaxPermSize=2000m \
+-Djava.net.preferIPv4Stack=true"
 
 
 exec java \
 -d64 \
 -Xms1g \
--Xmx3g \
--XX:+DoEscapeAnalysis \
+-Xmx4g \
+-XX:MaxPermSize=2000m \
 -XX:+UseCompressedOops \
--XX:MaxPermSize=1200m \
 -XX:+CMSClassUnloadingEnabled \
--XX:+AggressiveOpts \
--XX:+UseFastAccessorMethods \
--XX:+UseStringCache \
--XX:+OptimizeStringConcat \
 -Djna.library.path=$(pwd)/lib \
 -Dfile.encoding=UTF-8 \
 -Djava.net.preferIPv4Stack=true \
--server \
 -javaagent:/lib/jrebel/jrebel.jar \
 -jar $(dirname $0)/../vendor/sbt-launch.jar "$@"
+
+unset SBT_OPTS

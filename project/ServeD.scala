@@ -19,7 +19,7 @@ import less.Plugin._
 
 object BuildSettings {
 
-    val buildnFile = "svd.common/src/main/resources/BUILD"
+    val buildnFile = "svd.user/src/main/resources/BUILD"
     val buildNumber = if (new File(buildnFile).exists) {
         val value = Source.fromFile(buildnFile).mkString.trim.toInt + 1
         val outFile = new FileWriter(buildnFile)
@@ -45,10 +45,10 @@ object BuildSettings {
         parallelExecution := false,
 
         scalacOptions   += "-Xresident",
-        scalacOptions   += "-Yrepl-sync",
+        // scalacOptions   += "-Yrepl-sync",
         scalacOptions   += "-feature",
         scalacOptions   += "-language:postfixOps",
-        scalacOptions   += "-Xno-patmat-analysis",
+        // scalacOptions   += "-Xno-patmat-analysis",
         scalacOptions   += "-language:reflectiveCalls",
         scalacOptions   += "-language:implicitConversions",
         // scalacOptions   += "-Ywarn-dead-code", // throws warning for fake dead code for case objects
@@ -103,22 +103,24 @@ object Resolvers {
     val jboss = "JBoss Repo" at "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases"
     val repoVks = "VerKnowSys Public Repository" at "http://maven.verknowsys.com/repository"
     val repo1 = "Repo1 Maven" at "http://repo1.maven.org/maven2"
+    val binReleases = "ScalaSbt" at "http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases"
 
-    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, repoVks, jboss, repo1)
+    val all = Seq(akkaRepo, jlineRepo, javaNet, scalaTools, jgitRepo, sonatype, guiceyfruit, repoVks, jboss, repo1, binReleases)
 }
 
 object Dependencies {
-    val akkaVersion = "2.1.0"
+    val akkaVersion = "2.1.4"
 
     // Scala
     val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaVersion
     val akkaRemote = "com.typesafe.akka" %% "akka-remote" % akkaVersion
-    val actors = "org.scala-lang" % "scala-actors" % "2.10.0"
+    val actors = "org.scala-lang" % "scala-actors" % "2.10.2"
     val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test"
     val jline = "jline" % "jline" % "0.9.9"
     val scalatest = "org.scalatest" % "scalatest_2.10" % "2.0.M5b"
     // val unfilteredSpec = "net.databinder" % "unfiltered-spec_2.10" % "0.6.4" % "test"
     val json = "org.json4s" %% "json4s-native" % "3.1.0"
+    val zeromq = "org.zeromq" % "zeromq-scala-binding_2.10.2" % "0.1.0" // 2013-09-15 06:19:23 - dmilith - built by me and hosted in verknowsys maven repository.
 
     // Java
     val bouncycastle = "org.bouncycastle" % "bcprov-jdk16" % "1.46"
@@ -167,17 +169,23 @@ object ServeD extends Build {
             // commands ++= Seq(warmup)
         )).settings(graph.Plugin.graphSettings: _*) aggregate(
 
-        api, utils, testing, root, user, common, web // unfiltered, cli,
+        api, utils, testing, user, web // unfiltered, cli, root, common,
     )
 
 
-    lazy val root = Project("root", file("svd.root"),
-        settings = coreBuildSettings ++ Seq(
-            parallelExecution in Test := false, // NOTE: This should be removed
-            libraryDependencies ++= Seq(jline, sshd, webbit), // expect4j
-            mainClass in assembly := Some("com.verknowsys.served.rootboot")
+    lazy val api = Project("api", file("svd.api"),
+        settings = buildSettings ++ Seq(
+            libraryDependencies ++= Seq(jna, zeromq, json, actors, akkaActor, akkaRemote)
         )
-    ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, common, user, utils, web, testing % "test")
+    ).settings(graph.Plugin.graphSettings: _*)
+
+
+    lazy val utils = Project("utils", file("svd.utils"),
+        settings = buildSettings ++ Seq(
+            compileOrder        := CompileOrder.Mixed,
+            libraryDependencies ++= Seq(commonsio, messadmin, tzip, bouncycastle, sshd, slf4japi, commonsCodec, commonsFileUpload, neodatis, javaMail, jedis, smack, pircbot) // liftUtil, quartz
+        )
+    ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, testing % "test")
 
 
     lazy val user = Project("user", file("svd.user"),
@@ -185,43 +193,7 @@ object ServeD extends Build {
             parallelExecution in Test := false, // NOTE: This should be removed
             libraryDependencies ++= Seq(jline, jgit, webbit)
         )
-    ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, common, utils, web, testing % "test")
-
-
-    lazy val common = Project("common", file("svd.common"),
-        settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(neodatis, bouncycastle, json, javaMail, jedis, smack, pircbot, commonsCodec, unfiltered) // expect4j
-        )
-    ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test") // unfiltered
-
-
-    lazy val api = Project("api", file("svd.api"),
-        settings = buildSettings ++ Seq(
-            libraryDependencies ++= Seq(commonsio, actors, akkaActor, akkaRemote)
-        )
-    ).settings(graph.Plugin.graphSettings: _*)
-
-
-    // lazy val cli = Project("cli", file("svd.cli"),
-    //     settings = buildSettings ++ Seq(
-    //         libraryDependencies ++= Seq(jline)
-    //     )
-    // ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test")
-
-
-    lazy val utils = Project("utils", file("svd.utils"),
-        settings = buildSettings ++ Seq(
-            compileOrder        := CompileOrder.Mixed,
-            libraryDependencies ++= Seq(messadmin, jna, tzip, bouncycastle, sshd, slf4japi, json, actors, akkaActor, commonsCodec,  commonsFileUpload) // liftUtil, quartz
-        )
-    ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, testing % "test")
-
-
-    // lazy val unfiltered = Project("unfiltered", file("svd.unfiltered"),
-    //     settings = buildSettings ++ Seq(
-    //         libraryDependencies ++= Seq(jetty, jettyServer, jettyContinuations)
-    //     )
-    // ).settings(graph.Plugin.graphSettings: _*) dependsOn(utils, testing % "test")
+    ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, utils, web, testing % "test") // common,
 
 
     lazy val web = Project("web", file("svd.web"),
@@ -232,7 +204,7 @@ object ServeD extends Build {
                     json, jetty, jettyContinuations, unfiltered
                 )
             )
-        ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, common, utils, testing % "test") // unfiltered,
+        ).settings(graph.Plugin.graphSettings: _*) dependsOn(api, utils, testing % "test") // unfiltered, common,
 
 
     lazy val testing = Project("testkit", file("svd.testing"),

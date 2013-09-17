@@ -1,8 +1,22 @@
 #ifndef __GLOBALS__
 #define __GLOBALS__
 
+    /* logger constants */
+    #define logTrace LOG_TRACE
+    #define logDebug LOG_DEBUG
+    #define logInfo  LOG_INFO
+    #define logWarn  LOG_WARNING
+    #define logError LOG_ERROR
+    #define logFatal LOG_FATAL
+
+    /* notification definitions */
+    #define NOTIFICATIONS_LAST_SHOWN 7 /* amount of notification before moving to history */
+    #define NOTIFICATIONS_HISTORY_KEEP_UPTO 100 /* how many files to keep in history */
+    #define NOTIFICATIONS_DATA_DIR "/.notifications/"
+    #define NOTIFICATIONS_HISTORY_DATA_DIR "/.notifications-history/"
+
     /* global constants */
-    #define APP_VERSION "0.20.6"
+    #define APP_VERSION "0.24.1"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
