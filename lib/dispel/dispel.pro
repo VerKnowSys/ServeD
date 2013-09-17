@@ -6,23 +6,23 @@
 
 include(../Common.pro)
 
-QT += core network
+QT += core
 
 TARGET    = ../../bin/svddispel
 
 DEFINES += NZMQT_LIB
 
-HEADERS   += *.h \
-            nzmqt/*.hpp
+HEADERS   += nzmqt/*.hpp \
+            ../quazip/quazip.h \
+            ../cutelogger/AbstractAppender.h \
+            *.h
 
-SOURCES   += nzmqt/nzmqt.cpp \
+SOURCES   += nzmqt/*.cpp \
             dispel_core.cc \
             dispel_publisher.cc \
             dispel_subscriber.cc \
             dispel.cc
 
-
-# Zeromq should be installed with "base" list as superuser!
-INCLUDEPATH += /Software/Zeromq/include
-
-LIBS      += /Software/Zeromq/lib/libzmq.a ../../../TheSS/src/libquazip.a ../../../TheSS/src/libjsoncpp.a ../../../TheSS/src/liblogger.a ../../../TheSS/src/libnotifications.a -lz
+LIBS      += -lz -lzmq \
+            ../libnotifications.a \
+            ../liblogger.a
