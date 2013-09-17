@@ -52,8 +52,6 @@ class Publisher: public AbstractZmqBase {
             return nodeUuid;
         }
 
-        bool notify(QObject *obj, QEvent *event);
-
 };
 
 

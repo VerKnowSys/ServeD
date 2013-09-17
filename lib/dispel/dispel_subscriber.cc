@@ -9,17 +9,6 @@
 #include "dispel_subscriber.h"
 
 
-bool Subscriber::notify(QObject *obj, QEvent *event) {
-    try {
-        return notify(obj, event);
-    }
-    catch (std::exception& ex) {
-        logError() << "Exception thrown:" << ex.what();
-        return false;
-    }
-}
-
-
 void Subscriber::messageReceived(const QList<QByteArray>& message) {
     logDebug() << "Subscriber> " << message;
     emit pingReceived(message);

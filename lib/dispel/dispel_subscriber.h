@@ -26,7 +26,6 @@ class Subscriber: public AbstractZmqBase {
 
 
     protected:
-        // QThread* makeExecutionThread(AbstractZmqBase& base) const;
         void startImpl();
 
 
@@ -53,8 +52,6 @@ class Subscriber: public AbstractZmqBase {
         inline QString id() {
             return nodeUuid;
         }
-
-        bool notify(QObject *obj, QEvent *event);
 
 };
 

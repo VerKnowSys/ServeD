@@ -9,17 +9,6 @@
 #include "dispel_publisher.h"
 
 
-bool Publisher::notify(QObject *obj, QEvent *event) {
-    try {
-        return notify(obj, event);
-    }
-    catch (std::exception& ex) {
-        logError() << "Exception thrown:" << ex.what();
-        return false;
-    }
-}
-
-
 void Publisher::startImpl() {
     nodeUuid = readOrGenerateNodeUuid();
     assert(!nodeUuid.isEmpty());
