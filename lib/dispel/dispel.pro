@@ -8,21 +8,22 @@ include(../Common.pro)
 
 QT += core
 
-TARGET    = ../../bin/svddispel
+TARGET = ../../bin/svddispel
 
 DEFINES += NZMQT_LIB
 
-HEADERS   += nzmqt/*.hpp \
-            ../quazip/quazip.h \
-            ../cutelogger/AbstractAppender.h \
-            *.h
+HEADERS += nzmqt/*.hpp \
+      ../quazip/quazip.h \
+      ../cutelogger/AbstractAppender.h \
+      *.h
 
-SOURCES   += nzmqt/*.cpp \
-            dispel_core.cc \
-            dispel_publisher.cc \
-            dispel_subscriber.cc \
-            dispel.cc
+SOURCES += nzmqt/*.cpp \
+      dispel_core.cc \
+      dispel_publisher.cc \
+      dispel_subscriber.cc \
+      dispel.cc
 
-LIBS      += -lz -lzmq \
-            ../libnotifications.a \
-            ../liblogger.a
+LIBS += ../libzeromq.a \
+      ../libnotifications.a \
+      ../liblogger.a
+

@@ -9,11 +9,10 @@ QT -= gui core
 QMAKE_CXX = clang++
 QMAKE_CC = clang
 QMAKE_CPP = clang++ -E
+OBJECTS_DIR = .obj
+MOC_DIR = .moc
 
 mac {
-
-  CONFIG += link_pkgconfig
-  PKGCONFIG += libzmq
 
   # development opts:
   QMAKE_CFLAGS += -fcolor-diagnostics -Wself-assign -fPIC -O0 -w -gline-tables-only
@@ -23,7 +22,7 @@ mac {
 
   # production opts:
   CONFIG += link_pkgconfig
-  PKGCONFIG += QtCore libzmq
+  PKGCONFIG += QtCore
 
   DEFINES += NDEBUG
   QMAKE_CFLAGS += -fcolor-diagnostics -Wself-assign -fPIC -fPIE -Os -w

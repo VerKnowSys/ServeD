@@ -21,11 +21,12 @@ sanity_checks() {
         printf "ERROR: Sofin configuration file is unavailable! Please install Sofin first.\n"
         exit 1
     fi
-    note "Checking availability of Zeromq library.."
-    if [ ! -f "/Software/Zeromq/include/zmq.h" ]; then
-        note "ERROR: Sofin base wasn't installed properly, or Zeromq was removed by super user. Please install it, by doing 'sofin get base' as super user!"
-        exit 1
-    fi
+    # note "Checking availability of Pkg-config.."
+    # tmp="$(which pkgconf 2> /dev/null)"
+    # if [ ! -x "${tmp}" ]; then
+    #     note "ERROR: It seems that Pkg-config isn't installed. Please install it, by doing 'sofin get pkgconf'!"
+    #     exit 1
+    # fi
     note "Checking availability of Qt4 library.."
     tmp="$(which qmake 2> /dev/null)"
     if [ ! -x "${tmp}" ]; then

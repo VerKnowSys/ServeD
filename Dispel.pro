@@ -6,5 +6,8 @@
 
 include(lib/Common.pro)
 
-TEMPLATE           = subdirs
-SUBDIRS            = lib/fann lib/cutelogger lib/quazip lib/hiredis lib/jsoncpp lib/notifications lib/dispel
+TEMPLATE = subdirs
+CONFIG += ordered
+SUBDIRS = lib/fann lib/cutelogger lib/quazip lib/hiredis lib/jsoncpp lib/notifications lib/zeromq lib/dispel
+
+lib/dispel.depends = lib/zeromq
