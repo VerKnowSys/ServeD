@@ -24,7 +24,7 @@ void Publisher::startImpl() {
     nodeUuid = readOrGenerateNodeUuid();
     assert(!nodeUuid.isEmpty());
     logInfo() << "Launching Publisher with id:" << nodeUuid << "on address:" << address_;
-    QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendPing()));
+    QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendJobMessage()));
     try {
         socket_->bindTo(address_);
     } catch (std::exception& ex) {
