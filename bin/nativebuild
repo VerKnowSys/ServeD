@@ -56,4 +56,8 @@ build () {
 sanity_checks
 
 note "Building ServeD Natives.."
-time build
+if [ "${SYSTEM_NAME}" = "Darwin" ]; then
+    time build
+else
+    build
+fi

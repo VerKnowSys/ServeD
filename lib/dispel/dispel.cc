@@ -4,6 +4,17 @@
 */
 
 
+#ifdef __linux__
+    #include <sys/statfs.h>
+    #include <sys/types.h>
+#else
+    #include <sys/ucred.h>
+#endif
+
+#include <sys/param.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "dispel_publisher.h"
 #include "dispel_subscriber.h"
 
@@ -28,7 +39,7 @@ int main(int argc, char *argv[]) {
             trace = true;
         }
         if (rxPrintVersion.indexIn(args.at(i)) != -1) {
-            cout << "ServeD Dispel v" << APP_VERSION << ". " << COPYRIGHT << endl;
+            logInfo() << "ServeD Dispel v" << APP_VERSION << ". " << COPYRIGHT;
             return EXIT_SUCCESS;
         }
     }

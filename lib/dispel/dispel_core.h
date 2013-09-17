@@ -29,20 +29,16 @@
 #define UUID_CORRECT_LENGTH 39
 
 
+#include "nzmqt/AbstractZmqBase.hpp"
+#include "nzmqt/nzmqt.hpp"
+
+
 QString readOrGenerateNodeUuid();
 QString zmqVersion();
 
 
 #include "../globals/globals.h"
-#include "../../../TheSS/src/notifications/notifications.h"
-#include "../../../TheSS/src/service_spawner/logger.h"
-#include "../../../TheSS/src/service_spawner/utils.h"
-
-#include "nzmqt/nzmqt.hpp"
-#include "nzmqt/AbstractZmqBase.hpp"
-
-#include "dispel_publisher.h"
-#include "dispel_subscriber.h"
+#include "../notifications/notifications.h"
 
 
 #endif
