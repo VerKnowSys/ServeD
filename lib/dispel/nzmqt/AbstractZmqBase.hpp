@@ -75,7 +75,7 @@ inline void AbstractZmqBase::start() {
         startImpl();
     }
     catch (const ZMQException& ex) {
-        qWarning() << Q_FUNC_INFO << "Exception:" << ex.what();
+        qCritical() << Q_FUNC_INFO << "Exception:" << ex.what();
         emit failure(ex.what());
         emit finished();
     }
