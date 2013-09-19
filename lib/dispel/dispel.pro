@@ -15,6 +15,7 @@ DEFINES += NZMQT_LIB
 HEADERS += nzmqt/*.hpp \
       ../quazip/quazip.h \
       ../cutelogger/AbstractAppender.h \
+      ../jsoncpp/json/json.h \
       *.h
 
 SOURCES += nzmqt/*.cpp \
@@ -25,5 +26,6 @@ SOURCES += nzmqt/*.cpp \
 
 LIBS += ../libzeromq.a \
       ../libnotifications.a \
-      ../liblogger.a
+      ../liblogger.a \
+      ../libjsoncpp.a
 
