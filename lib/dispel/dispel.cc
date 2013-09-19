@@ -4,19 +4,18 @@
 */
 
 
-#ifdef __linux__
-    #include <sys/statfs.h>
-    #include <sys/types.h>
-#else
-    #include <sys/ucred.h>
-#endif
-
-#include <sys/param.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
+#include "dispel.h"
 #include "dispel_publisher.h"
 #include "dispel_subscriber.h"
+
+
+QMap<QString, QString> readNodesData() {
+    auto map = QMap<QString, QString>();
+    // XXX: 2013-09-19 13:17:04 - dmilith - should read "known nodes" file here:
+    map.insert("{devel-node-uuid}", "192.168.0.9"); // XXX: local box
+    map.insert("{devel-node-uuid}", "192.168.0.10"); // XXX: local vm
+    return map;
+}
 
 
 int main(int argc, char *argv[]) {
@@ -83,18 +82,29 @@ int main(int argc, char *argv[]) {
     assert(context);
     context->start();
 
-    Publisher *publisher = new Publisher(*context, DISPEL_NODE_PUBLISHER_ENDPOINT, "topiś jakiś!");
+    const QString nodeID = readOrGenerateNodeUuid();
+
+    /* launch local publisher */
+    Publisher *publisher = new Publisher(*context, DISPEL_NODE_PUBLISHER_ENDPOINT, nodeID); /* use node id, as channel name */
     assert(publisher);
     publisher->start();
 
-    Subscriber *subscriber = new Subscriber(*context, DISPEL_NODE_SUBSCRIBER_ENDPOINT, "topiś jakiś!");
-    assert(subscriber);
-    subscriber->start();
+    /* read remote nodes list */
+    auto subscribers = QList<Subscriber*>();
 
-    Subscriber *subscriber2 = new Subscriber(*context, DISPEL_NODE_SUBSCRIBER_ENDPOINT, "topiś jakiś!");
-    assert(subscriber2);
-    subscriber2->start();
+    const auto map = readNodesData();
+    Q_FOREACH(auto uuid, map.keys()) {
+        QString nodeAddress = "tcp://" + map.value(uuid) + ":" + DISPEL_NODE_PUBLISHER_PORT;
+        logInfo() << "Subscribing to Node ID:" << uuid << "->" << nodeAddress;
 
+        Subscriber *subscriber = new Subscriber(*context, nodeAddress, uuid); /* use uuid id, as channel name */
+        assert(subscriber);
+        subscriber->start();
+
+        subscribers << subscriber;
+    }
+
+    logDebug() << "Subscribed Nodes:" << subscribers;
     return app.exec();
 }
 
