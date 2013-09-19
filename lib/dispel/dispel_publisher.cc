@@ -13,21 +13,23 @@ void Publisher::startImpl() {
     nodeUuid = readOrGenerateNodeUuid();
     assert(!nodeUuid.isEmpty());
     logInfo() << "Launching Publisher with id:" << nodeUuid << "on address:" << address_;
-    QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendJobMessage()));
     try {
         socket_->bindTo(address_);
     } catch (std::exception& ex) {
         logError() << "Exception thrown in publisher: " << ex.what();
         logFatal() << "Publisher requires free tcp address:" << address_ << " to work. Exitting!";
     }
+    QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendJobMessage()));
 }
 
 
 void Publisher::sendJobMessage() {
     static quint64 counter = 0;
-    QList< QByteArray > msg;
+    QList<QByteArray> msg;
     msg += channel_.toLocal8Bit();
     msg += QString("MSG[%1: %2]").arg(++counter).arg(QDateTime::currentDateTime().toLocalTime().toString(Qt::ISODate)).toLocal8Bit();
+    msg += "Addresses: " + getCurrentNodeAddresses().join(", ").toUtf8();
+
     assert(socket_);
     logDebug() << "Publishing message:" << msg;
     socket_->sendMessage(msg);

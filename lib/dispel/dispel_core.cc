@@ -15,6 +15,18 @@ QString zmqVersion() {
 }
 
 
+QStringList getCurrentNodeAddresses() {
+    QStringList result;
+    QHostInfo info = QHostInfo::fromName(QHostInfo::localHostName());
+    if (!info.addresses().isEmpty()) {
+        QHostAddress address = info.addresses().first();
+        logDebug() << "Trying with address:" << address;
+        result << address.toString();
+    }
+    return result;
+}
+
+
 QString readOrGenerateNodeUuid() {
     /* permission check */
     QString dirOnPath = QFileInfo(DISPEL_NODE_IDENTIFICATION_FILE).dir().absolutePath();

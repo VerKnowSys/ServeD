@@ -14,6 +14,7 @@
 #include <QStringList>
 #include <QTextStream>
 #include <QTimer>
+#include <QtNetwork/QHostInfo>
 
 
 #define DISPEL_NODE_PUBLISHER_PORT "12000" // XXX: multiplied by 1k for testing purposes
@@ -21,7 +22,7 @@
 // #define DISPEL_NODE_FILE_SYNC_PORT "16"
 
 #define DISPEL_NODE_PUBLISHER_ENDPOINT ("tcp://*:" DISPEL_NODE_PUBLISHER_PORT)
-#define DISPEL_NODE_PUBLISHER_PAUSE 1000
+#define DISPEL_NODE_PUBLISHER_PAUSE 5000
 #define DISPEL_NODE_SUBSCRIBER_ENDPOINT ("tcp://0.0.0.0:" DISPEL_NODE_PUBLISHER_PORT)
 
 #define DISPEL_NODE_IDENTIFICATION_FILE (SYSTEMUSERS_HOME_DIR "/svd-node-id.uuid")
@@ -35,6 +36,7 @@
 
 QString readOrGenerateNodeUuid();
 QString zmqVersion();
+QStringList getCurrentNodeAddresses();
 
 
 #include "../globals/globals.h"

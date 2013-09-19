@@ -6,7 +6,7 @@
 
 include(../Common.pro)
 
-QT += core
+QT += core network
 
 TARGET = ../../bin/svddispel
 
