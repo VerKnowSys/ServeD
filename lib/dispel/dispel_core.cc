@@ -25,7 +25,8 @@ QString readOrGenerateNodeUuid() {
         } else {
             logDebug() << "Permissions granted to traverse through directory:" << dirOnPath;
         }
-        if (not QFile::permissions(DISPEL_NODE_IDENTIFICATION_FILE).testFlag(QFile::ReadOwner)) {
+        if ((not QFile::permissions(DISPEL_NODE_IDENTIFICATION_FILE).testFlag(QFile::ReadOwner)) and
+                 QFile::exists(DISPEL_NODE_IDENTIFICATION_FILE)) {
             logFatal() << "Can't read Node ID from file:" << DISPEL_NODE_IDENTIFICATION_FILE << "Check access rights to this file for current user and try again!";
         } else {
             logDebug() << "Permissions granted to read file:" << DISPEL_NODE_IDENTIFICATION_FILE;
