@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>ServeD by VerKnowSys</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>ServeD</h1>
+        <p>ServeD - You deserve to be ServeD!</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/VerKnowSys/ServeD" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/VerKnowSys/ServeD/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/VerKnowSys/ServeD/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h2>
+<a name="authors" class="anchor" href="#authors"><span class="octicon octicon-link"></span></a>Authors:</h2>
+
+<ul>
+<li>Daniel (dmilith) Dettlaff (dmilith [at] verknowsys.com). I'm also on #freebsd and #scala.pl @ freenode IRC.</li>
+</ul><h2>
+<a name="contributors" class="anchor" href="#contributors"><span class="octicon octicon-link"></span></a>Contributors:</h2>
+
+<ul>
+<li>Tymon (teamon) Tobolski - lead developer (active between: 2009-2012)</li>
+<li>Michał (tallica) Lipski.</li>
+</ul><h2>
+<a name="thanks-to" class="anchor" href="#thanks-to"><span class="octicon octicon-link"></span></a>Thanks to:</h2>
+
+<ul>
+<li>Michał (tallica) Lipski - tasks IRC, XMPP bot, svdshell, and more useful code.</li>
+<li>Marcin (lopex) Mielżyński - Scala and overall help.</li>
+<li>Iwo (db) ? - System, low level, technical help.</li>
+</ul><h2>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements:</h2>
+
+<ul>
+<li>Java - OpenJDK (recommended, but all Sun-Compatible JVMs should work). &gt;= Latest 1.6, 64-bit (yes, only 64 bits are supported)</li>
+<li>Simple Build Tool (xsbt: <a href="https://github.com/harrah/xsbt">https://github.com/harrah/xsbt</a>) &gt;= 0.12.2</li>
+<li>Scala (will be downloaded by sbt automatically) &gt;= 2.10.2</li>
+<li>ZSH Shell (it's just used by default) &gt;= 5.0.0</li>
+<li>Smack library (for XMPP Notifications) &gt;= 3.0.4 (downloaded by sbt automatically)</li>
+<li>pIRCbot library (for IRC Notifications) &gt;= 1.4.2 (will be downloaded by sbt automatically)</li>
+<li>
+<a href="http://zeroturnaround.com/software/jrebel/">JRebel</a> for Scala is required for development mode. It's not required in production.</li>
+</ul><h2>
+<a name="currently-supported-platforms" class="anchor" href="#currently-supported-platforms"><span class="octicon octicon-link"></span></a>Currently supported platforms:</h2>
+
+<ul>
+<li>Mac OSX (75% features, development),</li>
+<li>Free BSD (100% features, production)</li>
+<li>(upcoming) Linux (100% features, production)</li>
+</ul><h2>
+<a name="questions" class="anchor" href="#questions"><span class="octicon octicon-link"></span></a>Questions?</h2>
+
+<p>I'm as "dmilith" on:</p>
+
+<ul>
+<li>#scala.pl, #scala, #freebsd at irc.freenode.net</li>
+<li>
+<a href="mailto:dmilith@verknowsys.com">dmilith@verknowsys.com</a> on jabber/mail</li>
+<li>
+<a href="mailto:dmilith@me.com">dmilith@me.com</a> on imessage/mail</li>
+<li>dmilith on Skype</li>
+</ul><h2>
+<a name="rules" class="anchor" href="#rules"><span class="octicon octicon-link"></span></a>Rules?</h2>
+
+<p>Look for detailed rules in POLICIES file of this project.</p>
+
+<h2>
+<a name="used-3rd-party-software-and-licenses-info" class="anchor" href="#used-3rd-party-software-and-licenses-info"><span class="octicon octicon-link"></span></a>Used 3rd party software and licenses info:</h2>
+
+<ul>
+<li><a href="http://verknowsys.github.io/sofin">Sofin</a></li>
+<li>
+<a href="https://github.com/VerKnowSys/TheSS">TheSS</a> some code fragments are reused in ServeD from Software Spawner</li>
+<li>
+<a href="http://qt-project.org/downloads">Qt4 4.8.x</a> QtCore part</li>
+<li>
+<a href="https://github.com/redis/hiredis">Hiredis</a> client library by Salvatore Sanfilippo and Pieter Noordhuis (BSD licensed)</li>
+<li>
+<a href="http://jsoncpp.sourceforge.net">JSON CPP</a> implementation with JSON comments support by Baptiste Lepilleur (MIT licensed)</li>
+<li>
+<a href="http://quazip.sourceforge.net">QuaZIP</a> by Sergey A. Tachenov and contributors (LGPL licensed)</li>
+<li>
+<a href="https://github.com/zeromq/cppzmq">0mq-C++</a> - A C++ binding for 0mq, by 250bpm s.r.o., Botond Ballo, iMatix Corporation</li>
+<li>
+<a href="http://qt-apps.org/content/show.php/nzmqt?content=148558">nzmqt</a> - A lightweight C++ Qt binding for 0mq, by Johann Duscher (a.k.a. Jonny Dee)</li>
+<li>
+<a href="http://leenissen.dk/fann/wp/">fann</a> - Fast Artificial Neural Network Library, by Steffen Nissen and contributors.</li>
+<li>
+<a href="https://gitorious.org/cutelogger/cutelogger">CuteLogger</a> - MT logger implementation by Boris Moiseev (LGPL licensed)</li>
+</ul>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/VerKnowSys">VerKnowSys</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
