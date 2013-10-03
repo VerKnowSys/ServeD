@@ -216,7 +216,6 @@ void execute(char **argv, int uid) {
             hd << USERS_HOME_DIR << "/" << gatherUserNameFromDirEntry(uid, USERS_HOME_DIR);
 
         usr << gatherUserNameFromDirEntry(uid, USERS_HOME_DIR);;
-        chdir(hd.str().c_str());
         setenv("HOME", hd.str().c_str(), 1);
         setenv("~", hd.str().c_str(), 1);
         setenv("PWD", hd.str().c_str(), 1);
@@ -232,6 +231,12 @@ void execute(char **argv, int uid) {
         unsetenv("SUDO_GID");
         unsetenv("SUDO_COMMAND");
         unsetenv("MAIL");
+        char* dest = getenv("DESTPATH");
+        if (strlen(dest) == 0) {
+            chdir(hd.str().c_str());
+        } else
+            chdir(dest);
+
         #ifdef DEVEL
             cerr << "Defined user basic env. Home dir: " << hd.str().c_str() << endl;
         #endif
