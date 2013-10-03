@@ -8,33 +8,33 @@ fi
 SYSTEM="$(uname)"
 ARCH="$(uname -p)"
 
-if [ -e "kick" ]; then
+if [ -e "bin/svdkick" ]; then
     echo "* Installing svdkick to /sbin"
-    cp -f ./kick /sbin/svdkick
+    cp -f bin/svdkick /sbin/svdkick
 else
     echo "! Recompile to install svdkick"
 fi
 
-if [ -e "shell" ]; then
+if [ -e "bin/svdshell" ]; then
     echo "* Installing svdshell to /bin"
-    cp -f ./shell /bin/svdshell
+    cp -f bin/svdshell /bin/svdshell
 else
     echo "! Recompile to install svdshell"
 fi
 
-if [ -e "run" ]; then
+if [ -e "bin/svdrunner" ]; then
     echo "* Installing svdrun to /bin"
-    cp -f ./run /bin/svdrun
+    cp -f bin/svdrunner /bin/svdrun
 else
     echo "! Recompile to install svdrun"
 fi
 
-if [ -e "ss" ]; then
-    echo "* Installing svdss to /bin"
-    cp -f ./ss /bin/svdss
-else
-    echo "! Recompile to install svdss"
-fi
+# if [ -e "bin/svdss" ]; then
+#     echo "* Installing svdss to /bin"
+#     cp -f bin/svdss /bin/svdss
+# else
+#     echo "! Recompile to install svdss"
+# fi
 
 echo "* Installing native libraries"
 if [ ! -d "/lib" ]; then
@@ -47,10 +47,11 @@ fi
 # NOTE: TODO: maybe use case in case of support for more systems:
 if [ "$SYSTEM" = "FreeBSD" ]; then
     cp -fv lib/*.so /lib
+    chmod 0751 /lib
 fi
 if [ "$SYSTEM" = "Darwin" ]; then
     cp -fv lib/*.dylib /lib
-    chmod 0755 /lib
+    chmod 0751 /lib
     # chmod 0644 /lib/*
 fi
 
