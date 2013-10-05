@@ -8,6 +8,7 @@
 
 
 #include "../kickstart/core.h"
+#include "../shell/shellutils.h"
 
 #ifdef __FreeBSD__
 #include <sys/wait.h>
@@ -31,7 +32,7 @@ void execute(char **argv, int uid, const char* env) {
         fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
 
         stringstream hd, usr;
-        hd << USERS_HOME_DIR << "/" << uid;
+        hd << USERS_HOME_DIR << "/" << gatherUserNameFromDirEntry(uid, USERS_HOME_DIR);
         usr << uid;
         chdir(hd.str().c_str());
         setenv("HOME", hd.str().c_str(), 1);
