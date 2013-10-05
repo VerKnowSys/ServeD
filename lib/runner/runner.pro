@@ -7,9 +7,11 @@
 include(../Common.pro)
 
 
-HEADERS   += ../globals/*.h
+HEADERS   += ../globals/*.h \
+            ../shell/shellutils.h
 SOURCES   += ../kickstart/core.cc \
             ../kickstart/utils.cc \
+            ../shell/shellutils.cc \
             run.cc
 
 LIBS      += -lz

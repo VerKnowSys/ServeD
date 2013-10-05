@@ -8,10 +8,14 @@
 include(../Common.pro)
 
 
-HEADERS   += ../globals/*.h
+HEADERS   += ../globals/*.h \
+            shellutils.h
 SOURCES   += ../kickstart/core.cc \
             ../kickstart/utils.cc \
+            shellutils.cc \
             shell.cc
+
+DEFINES += DEVEL
 
 QMAKE_CXXFLAGS += -w
 LIBS      += -lz

@@ -7,5 +7,5 @@
 include(lib/Common.pro)
 
 TEMPLATE           = subdirs
-SUBDIRS            = lib/kickstart lib/runner
+SUBDIRS            = lib/kickstart lib/shell lib/runner
 
