@@ -38,8 +38,8 @@
 
     // Linux case:
     #ifdef __linux__
-        #undef DEFAULT_SHELL_COMMAND
-        #define DEFAULT_SHELL_COMMAND "/bin/zsh"
+        // #undef DEFAULT_SHELL_COMMAND
+        // #define DEFAULT_SHELL_COMMAND "/bin/zsh"
         #define DEFAULT_JAVA_BIN (DEFAULT_JAVA_PATH "bin/java")
     #endif
 
