@@ -10,6 +10,7 @@
 #define __DISPEL_PUBLISHER__
 
 
+#include <QCoreApplication>
 #include "dispel_core.h"
 
 
@@ -30,26 +31,46 @@ class Publisher: public AbstractZmqBase {
 
 
     signals:
-        void sentJobMessage(const QList<QByteArray>& message);
+        void sentJobMessage(const QByteArray message);
 
 
     protected slots:
-        void sendJobMessage();
+        void sendIDLEJobMessage();
 
 
     public:
         explicit Publisher(ZMQContext& context, const QString& address, const QString& channel, QObject* parent = 0): super(parent), address_(address), channel_(channel), socket_(0) {
                 assert(context);
                 assert(!address_.isEmpty());
+                assert(!address.isEmpty());
                 assert(!channel_.isEmpty());
-                socket_ = context.createSocket(ZMQSocket::TYP_PUB, this);
+                assert(!channel.isEmpty());
+                socket_ = context.createSocket(ZMQSocket::TYP_XPUB, this); // TYP_PUB
                 assert(socket_);
-                socket_->setObjectName("Publisher.Socket.socket(PUB)");
-                logDebug() << "Publisher created for channel:" << channel;
+                socket_->setObjectName("Publisher.Socket.socket(PUB) -> " + channel);
+                logDebug() << "Publisher created for channel:" << channel << "address:" << address << "parent:" << parent;
+                this->thread()->moveToThread(QCoreApplication::instance()->thread());
+                setParent(QCoreApplication::instance());
         }
+
+
+        inline ZMQSocket* socket() {
+            return socket_;
+        }
+
 
         inline QString id() {
             return nodeUuid;
+        }
+
+
+        inline QString channelName() {
+            return channel_;
+        }
+
+
+        inline QString address() {
+            return address_;
         }
 
 };

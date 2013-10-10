@@ -10,29 +10,30 @@
 
 
 void Publisher::startImpl() {
-    nodeUuid = readOrGenerateNodeUuid();
-    assert(!nodeUuid.isEmpty());
-    logInfo() << "Launching Publisher with id:" << nodeUuid << "on address:" << address_;
+    nodeUuid = currentNodeUUID();
+    logInfo() << "Launching Publisher with id:" << nodeUuid << "on address:" << address();
     try {
-        socket_->bindTo(address_);
+        socket()->bindTo(address());
     } catch (std::exception& ex) {
         logError() << "Exception thrown in publisher: " << ex.what();
-        logFatal() << "Publisher requires free tcp address:" << address_ << " to work. Exitting!";
+        logFatal() << "Publisher requires free tcp address:" << address() << " to work. Exitting!";
     }
-    QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendJobMessage()));
+    QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendIDLEJobMessage()));
 }
 
 
-void Publisher::sendJobMessage() {
+void Publisher::sendIDLEJobMessage() {
     static quint64 counter = 0;
-    QList<QByteArray> msg;
-    msg += channel_.toLocal8Bit();
-    msg += QString("MSG[%1: %2]").arg(++counter).arg(QDateTime::currentDateTime().toLocalTime().toString(Qt::ISODate)).toLocal8Bit();
-    msg += "Addresses: " + getCurrentNodeAddresses().join(", ").toUtf8();
+    auto noOp = "{}";
+    QByteArray *msg = new QByteArray();
+    msg->append(channelName());
+    msg->append(noOp);
+    assert(socket());
+    logDebug() << "Publishing IDLE:" << msg->data() << "no:" << (counter++);
+    socket()->setIdentity(channelName());
+    socket()->sendMessage(msg->data());
+    emit sentJobMessage(*msg);
+    delete msg;
 
-    assert(socket_);
-    logDebug() << "Publishing message:" << msg;
-    socket_->sendMessage(msg);
-    emit sentJobMessage(msg);
-    QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendJobMessage()));
+    QTimer::singleShot(DISPEL_NODE_PUBLISHER_PAUSE, this, SLOT(sendIDLEJobMessage()));
 }
