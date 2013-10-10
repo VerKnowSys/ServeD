@@ -18,19 +18,37 @@
 
 
 #
+# 2013-10-10 03:34:49 - dmilith:
+#
+#     SvdAPI low level details:
+#
+#      # Idle message weight:
+#          idleSize = 44 # 39 for uuid + 5 bytes for 0mq file format "bloat".
+#      # For hipotetical amount of 100 nodes:
+#          nodes = 100
+#      # Amount of possible connections made by 0mq while publishing jobs under critical load:
+#          nodesChannels = nodes * nodes # max ~100.000 connections per second
+#      # 100.000 * 44   = 4.400.000 bytes/s of network load for idle messages.
+#      # 100.000 * 2KiB = 204.800.000 bytes/s of network load for big messages
+#      # 100.000 * 4KiB = 409.600.000 bytes/s of network load for huge messages
+#      # 100.000 * 8KiB = 819.200.000 bytes/s of network load for mosterous messages (possibly size limit)
+#
+#
+
+
+#
 # 2013-10-10 03:26:45 - dmilith:
 #
 #    ServeD design roadmap:
 #
-#            a. SvdDispel
-#                I. SvdAPI and SvdProto (JSON API, Distributed Communication Protocol)
-#               II. ServeD Network (communication between distributed nodes)
-#              III. ServeD Web Panel (web interface for application deployment)
-#               IV. SvdAI with SvdSemanthic (learning network, semanthic knowledge base, and automated user support)
-#
-#            b. SvdServiceSpawner
-#                I. DNS server (load ballancing, round-robin)
-#               II. Coreginx (load ballancing, round-robin)
+#      a. SvdDispel
+#          I. SvdAPI and SvdProto (JSON API, Distributed Communication Protocol)
+#         II. ServeD Network (communication between distributed nodes)
+#        III. ServeD Web Panel (web interface for application deployment)
+#         IV. SvdAI with SvdSemanthic (learning network, semanthic knowledge base, and automated user support)
+#      b. SvdServiceSpawner
+#          I. DNS server (load ballancing, round-robin)
+#         II. Coreginx (load ballancing, round-robin)
 #
 
 
