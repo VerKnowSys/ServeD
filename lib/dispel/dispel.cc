@@ -5,15 +5,36 @@
 
 
 #include "dispel.h"
+#include "dispel_core.h"
 #include "dispel_publisher.h"
 #include "dispel_subscriber.h"
 
 
+/*
+    example value for knownNodes file:
+
+    {
+      "knownNodes": [
+          ["127.0.0.1", "{40a8e817-57de-4e5e-9806-2c1338a5079b}"],
+          ["192.168.0.9", "{40a8e817-57de-4e5e-9806-2c1338a5079b}"]
+      ]
+    }
+
+*/
+
+
 QMap<QString, QString> readNodesData() {
     auto map = QMap<QString, QString>();
-    // XXX: 2013-09-19 13:17:04 - dmilith - should read "known nodes" file here:
-    map.insert("{devel-node-uuid}", "192.168.0.9"); // XXX: local box
-    map.insert("{devel-node-uuid}", "192.168.0.10"); // XXX: local vm
+    if (getuid() == 0) {
+        QMap<QString,QString> nodes = allKnownNodeUUIDs();
+        logInfo() << "Known nodes:" << nodes.values();
+        Q_FOREACH(QString node, nodes) {
+            map.insert(DEFAULT_SYSTEM_ADDRESS, node);
+        }
+    } else {
+        map.insert("192.168.0.9", "{devel-node-uuid}"); // XXX: local box
+        map.insert("192.168.0.10", "{devel-node-uuid}"); // XXX: local vm
+    }
     return map;
 }
 
@@ -61,7 +82,7 @@ int main(int argc, char *argv[]) {
     switch (uid) {
         case 0: {
             logInfo() << "Checking existance and access priviledges of ServeD private directories";
-            readOrGenerateNodeUuid();
+            // readOrGenerateNodeUuid();
             if (not QDir().exists(DISPEL_NODE_KNOWN_NODES_DIR))
                 QDir().mkpath(DISPEL_NODE_KNOWN_NODES_DIR);
             chmod(DISPEL_NODE_IDENTIFICATION_FILE, 0600); /* rw------- */
@@ -82,7 +103,7 @@ int main(int argc, char *argv[]) {
     assert(context);
     context->start();
 
-    const QString nodeID = readOrGenerateNodeUuid();
+    const QString nodeID = currentNodeUUID();
 
     /* launch local publisher */
     Publisher *publisher = new Publisher(*context, DISPEL_NODE_PUBLISHER_ENDPOINT, nodeID); /* use node id, as channel name */
@@ -93,11 +114,11 @@ int main(int argc, char *argv[]) {
     auto subscribers = QList<Subscriber*>();
 
     const auto map = readNodesData();
-    Q_FOREACH(auto uuid, map.keys()) {
-        QString nodeAddress = "tcp://" + map.value(uuid) + ":" + DISPEL_NODE_PUBLISHER_PORT;
-        logInfo() << "Subscribing to Node ID:" << uuid << "->" << nodeAddress;
+    Q_FOREACH(auto ip, map.keys()) {
+        QString nodeAddress = "tcp://" + ip + ":" + DISPEL_NODE_PUBLISHER_PORT;
+        logInfo() << "Subscribing to Node ID:" << map.value(ip) << "->" << nodeAddress;
 
-        Subscriber *subscriber = new Subscriber(*context, nodeAddress, uuid); /* use uuid id, as channel name */
+        Subscriber *subscriber = new Subscriber(*context, nodeAddress, map.value(ip)); /* use uuid, as channel name */
         assert(subscriber);
         subscriber->start();
 

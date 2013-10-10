@@ -23,6 +23,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "../jsoncpp/json/json.h"
+
 
 QMap<QString, QString> readNodesData();
 

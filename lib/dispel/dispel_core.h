@@ -8,6 +8,8 @@
 #define __DISPEL_CORE__
 
 
+#include "../jsoncpp/json/json.h"
+
 #include <QtCore>
 #include <QUuid>
 #include <stdexcept>
@@ -27,16 +29,19 @@
 
 #define DISPEL_NODE_IDENTIFICATION_FILE (SYSTEMUSERS_HOME_DIR "/svd-node-id.uuid")
 #define DISPEL_NODE_KNOWN_NODES_DIR (SYSTEMUSERS_HOME_DIR "/svd-known-nodes/")
-#define UUID_CORRECT_LENGTH 39
+#define DISPEL_API_HEADER_LENGTH 39
 
 
 #include "nzmqt/AbstractZmqBase.hpp"
 #include "nzmqt/nzmqt.hpp"
 
 
-QString readOrGenerateNodeUuid();
+// QString readOrGenerateNodeUuid();
 QString zmqVersion();
+QString currentNodeUUID(); /* uuid -> localhost */
+QMap<QString,QString> allKnownNodeUUIDs(); /* uuid -> ip */
 QStringList getCurrentNodeAddresses();
+QMap<QString,QString> parseJSON(const QString& contents);
 
 
 #include "../globals/globals.h"
