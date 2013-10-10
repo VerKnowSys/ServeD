@@ -18,6 +18,23 @@
 
 
 #
+# 2013-10-10 03:26:45 - dmilith:
+#
+#    ServeD design roadmap:
+#
+#            a. SvdDispel
+#                I. SvdAPI and SvdProto (JSON API, Distributed Communication Protocol)
+#               II. ServeD Network (communication between distributed nodes)
+#              III. ServeD Web Panel (web interface for application deployment)
+#               IV. SvdAI with SvdSemanthic (learning network, semanthic knowledge base, and automated user support)
+#
+#            b. SvdServiceSpawner
+#                I. DNS server (load ballancing, round-robin)
+#               II. Coreginx (load ballancing, round-robin)
+#
+
+
+#
 # A) [Change DNS domain for rails app scenario]
 #   1. I log in to panel.mydomain.com and pick my "application name" from the list.
 #   2. I just deployed my new dynamic web application on 4 of 8, of my production Nodes five minutes ago.
