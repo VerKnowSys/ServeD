@@ -16,7 +16,7 @@
     #define NOTIFICATIONS_HISTORY_DATA_DIR "/.notifications-history/"
 
     /* global constants */
-    #define APP_VERSION "0.26.0"
+    #define APP_VERSION "0.28.0"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
@@ -78,7 +78,7 @@
     #define DEFAULTSOFTWARETEMPLATE (USERS_HOME_DIR "/Common/Igniters/Default")
     #define DEFAULTSOFTWARETEMPLATESDIR (USERS_HOME_DIR "/Common/Igniters/Services")
     #define DEFAULTUSERIGNITERSDIR "/Igniters/Services"
-    #define DEFAULT_SYSTEM_ADDRESS "127.0.0.1"
+    #define DEFAULT_SYSTEM_ADDRESS "127.0.0.1" /* NOTE: most secure default, for tcp services */
     #define DEFAULT_SERVICE_PID_FILE "/service.pid"
     #define DEFAULT_SERVICE_DOMAIN_FILE "/.domain"
     #define DEFAULT_SERVICE_PORTS_FILE "/.ports"

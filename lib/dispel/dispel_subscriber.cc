@@ -10,13 +10,13 @@
 
 
 void Subscriber::messageReceived(const QList<QByteArray>& message) {
-    logDebug() << "Subscriber> " << message;
+    // logDebug() << "Subscriber> " << message;
     emit pingReceived(message);
 }
 
 
 void Subscriber::startImpl() {
-    nodeUuid = readOrGenerateNodeUuid();
+    nodeUuid = currentNodeUUID();
     logInfo() << "Launching Subscriber with id:" << nodeUuid << "trying address:" << address_ << "on channel" << channel_;
     assert(!nodeUuid.isEmpty());
     socket_->connectTo(address_);
