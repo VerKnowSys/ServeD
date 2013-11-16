@@ -2,14 +2,9 @@
 # author: Daniel (dmilith) Dettlaff
 
 . /etc/rc.subr
-
-SVDSS_BIN="/bin/svdss"
-RM_BIN="/bin/rm"
-CAT_BIN="/bin/cat"
-KILL_BIN="/bin/kill"
+. /etc/profile_sofin
 
 name="served"
-pid_file="/SystemUsers/.0.pid"
 
 start_cmd="${name}_start"
 stop_cmd="${name}_stop"
@@ -18,57 +13,29 @@ restart_cmd="${name}_restart"
 extra_commands="status"
 
 
-served_status() {
-    if [ -e "${pid_file}" ]; then
-        pid="$(${CAT_BIN} ${pid_file})"
-        ki="$(${KILL_BIN} -0 ${pid})"
-        if [ "$?" = "0" ]; then
-            echo "* Service Spawner is running."
-            return
-        else
-            ${RM_BIN} -f "$pid_file"
-        fi
-    fi
-    echo "* Service Spawner is stopped."
-}
-
-
 served_start() {
-    if [ -e "${pid_file}" ]; then
-        pid="$(${CAT_BIN} ${pid_file})"
-        ki="$(${KILL_BIN} -0 ${pid})"
-        if [ "$?" = "0" ]; then
-            echo "* Service Spawner is already running."
-            return
-        else
-            ${RM_BIN} -f "$pid_file"
-        fi
-    fi
     echo "* Launching Service Spawner."
-    ${SVDSS_BIN} > /SystemUsers/ss.log 2>&1 &
+    nohup svdss &
+
+    # cd /Users
+    # for user in *; do
+    #     uid="$(find /Users -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
+    #     echo "* Launching Service Spawner for user: ${user}"
+    #     svdshell -u sdfdsfdsfd ${user} -c "svdss >/dev/null 2>&1 &"
+    # done
 }
 
 
 served_restart() {
     served_stop
-    sleep 10
+    sleep 1
     served_start
 }
 
 
 served_stop() {
-    if [ -e "${pid_file}" ]; then
-        pid="$(${CAT_BIN} ${pid_file})"
-        ki="$(${KILL_BIN} -INT ${pid})"
-        if [ "$?" = "0" ]; then
-            echo "* Service Spawner has been stopped."
-            return
-        else
-            ${RM_BIN} -f "$pid_file"
-        fi
-    else
-        echo "* Service Spawner is already stopped."
-    fi
+    echo "* Terminating Service Spawner."
+    killall svdss
 }
 
 
