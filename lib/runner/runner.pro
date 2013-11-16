@@ -6,6 +6,8 @@
 
 include(../Common.pro)
 
+# For debug use:
+# DEFINES = DEVEL
 
 HEADERS   += ../globals/*.h \
             ../shell/shellutils.h
