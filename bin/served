@@ -14,15 +14,18 @@ extra_commands="status"
 
 
 served_start() {
-    echo "* Launching Service Spawner."
-    nohup svdss &
+    echo "* Launching SuperUser Service Spawner"
+    daemon svdss
 
-    # cd /Users
-    # for user in *; do
-    #     uid="$(find /Users -maxdepth 1 -uid "${CURRENT_USER_UID}" 2> /dev/null)" # get user dir by uid and ignore access errors
-    #     echo "* Launching Service Spawner for user: ${user}"
-    #     svdshell -u sdfdsfdsfd ${user} -c "svdss >/dev/null 2>&1 &"
-    # done
+    cd /Users
+    for user in *; do
+        if [ -f "/Users/${user}/.autostart" ]; then
+            echo "* Launching Service Spawner for user ${user}"
+            uid="$(stat -f%u "/Users/${user}")"
+            svdshell -u${uid} -- daemon svdss
+        fi
+    done
+
 }
 
 
