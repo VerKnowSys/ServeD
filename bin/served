@@ -15,7 +15,9 @@ extra_commands="status"
 
 served_start() {
     echo "* Launching SuperUser Service Spawner"
-    daemon svdss
+    daemon -p /SystemUsers/.root-daemon.pid svdss
+    # XXX: not briliant solution for double locked pid file:
+    cat /SystemUsers/.root-daemon.pid > /SystemUsers/.root.pid
 
     cd /Users
     for user in *; do
