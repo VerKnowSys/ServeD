@@ -16,13 +16,12 @@
     #define NOTIFICATIONS_HISTORY_DATA_DIR "/.notifications-history/"
 
     /* global constants */
-    #define APP_VERSION "0.28.0"
+    #define APP_VERSION "0.28.2"
     #define COPYRIGHT "Copyright © 2oo9-2o13 VerKnowSys.com - All Rights Reserved."
     #define MOTD_FILE "/etc/motd"
 
     /* default BSD case: */
     #define DEFAULT_SHELL_COMMAND "/Software/Zsh/exports/zsh" // "/bin/svdshell" //
-    #define DEFAULT_SS_COMMAND "/bin/svdss"
     #define DEFAULT_JAVA_PATH "/Software/Openjdk7/openjdk7/"
 
     #ifdef __FreeBSD__

@@ -136,3 +136,4 @@ moc_*.cpp
 /bin/svdkick
 /bin/svddispel
 /bin/svddaemon
+/releases/

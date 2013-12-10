@@ -1,0 +1,39 @@
+#!/bin/sh
+# @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
+
+# load configuration from sofin.conf
+CONF_FILE="/etc/sofin.conf.sh"
+if [ -e "${CONF_FILE}" ]; then
+    . "${CONF_FILE}"
+    note "Validating environment"
+    validate_env
+else
+    echo "FATAL: No configuration file found: ${CONF_FILE}"
+    exit 1
+fi
+
+
+bin/clean
+${MKDIR_BIN} -p releases
+version="$(grep 'APP_VERSION' lib/globals/globals.h | awk '{ gsub(/\"/, "", $3); gsub(/APP_VERSION/, "", $3); print $3; }')"
+base_name="served-${version}"
+archive_name="${base_name}.tar.bz2"
+note "Preparing package: ${archive_name} with version: ${version}"
+
+tar --disable-copyfile --exclude='.obj' --exclude='tmp' --exclude='build.sbt' --exclude='.git' --exclude='vendor' --exclude='ui_layout' --exclude='docs' --exclude='target' --exclude='project' --exclude='svd.*' --exclude='.gitignore' --exclude='releases' -cjf releases/${archive_name} ./
+
+mkdir -p releases/${base_name}
+mv releases/${archive_name} releases/${base_name}/
+cd releases/${base_name}
+tar xf ${archive_name}
+rm -f ${archive_name}
+cd ..
+tar -cjf ${archive_name} ./${base_name}
+rm -rf ${base_name}
+cd ..
+
+if [ "${USER}" = "dmilith" ]; then
+    note "Pushing package to remote server"
+    scp releases/served-${version}.tar.bz2 v:/home/dmilith/Web/Public/Sofin-releases > /dev/null 2>&1
+    ssh sofin@v "source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/served-${version}.tar.bz2"
+fi

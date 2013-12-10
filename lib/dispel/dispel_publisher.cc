@@ -29,7 +29,7 @@ void Publisher::sendIDLEJobMessage() {
     msg->append(channelName());
     msg->append(noOp);
     assert(socket());
-    logDebug() << "Publishing IDLE:" << msg->data() << "no:" << (counter++);
+    logTrace() << "Publishing IDLE:" << msg->data() << "no:" << (counter++);
     socket()->setIdentity(channelName());
     socket()->sendMessage(msg->data());
     emit sentJobMessage(*msg);

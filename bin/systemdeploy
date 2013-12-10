@@ -29,7 +29,7 @@ requirementscheck
 
 # bin/clean
 bin/current
-bin/sbt compile
+#bin/sbt compile
 if [ "$?" = "0" ]; then
     bin/sbt assembly
     if [ "$?" = "0" ]; then

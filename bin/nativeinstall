@@ -8,26 +8,26 @@ fi
 SYSTEM="$(uname)"
 ARCH="$(uname -p)"
 
-if [ -e "bin/svdkick" ]; then
-    echo "* Installing svdkick to /sbin"
-    cp -f bin/svdkick /sbin/svdkick
-else
-    echo "! Recompile to install svdkick"
-fi
+# if [ -e "bin/svdkick" ]; then
+#     echo "* Installing svdkick to /sbin"
+#     cp -f bin/svdkick /sbin/svdkick
+# else
+#     echo "! Recompile to install svdkick"
+# fi
 
-if [ -e "bin/svdshell" ]; then
-    echo "* Installing svdshell to /bin"
-    cp -f bin/svdshell /bin/svdshell
-else
-    echo "! Recompile to install svdshell"
-fi
+# if [ -e "bin/svdshell" ]; then
+#     echo "* Installing svdshell to /bin"
+#     cp -f bin/svdshell /bin/svdshell
+# else
+#     echo "! Recompile to install svdshell"
+# fi
 
-if [ -e "bin/svdrunner" ]; then
-    echo "* Installing svdrun to /bin"
-    cp -f bin/svdrunner /bin/svdrun
-else
-    echo "! Recompile to install svdrun"
-fi
+# if [ -e "bin/svdrunner" ]; then
+#     echo "* Installing svdrun to /bin"
+#     cp -f bin/svdrunner /bin/svdrun
+# else
+#     echo "! Recompile to install svdrun"
+# fi
 
 # if [ -e "bin/svdss" ]; then
 #     echo "* Installing svdss to /bin"
@@ -36,24 +36,24 @@ fi
 #     echo "! Recompile to install svdss"
 # fi
 
-echo "* Installing native libraries"
-if [ ! -d "/lib" ]; then
-    mkdir /lib
-    if [ "$SYSTEM" = "Darwin" ]; then
-        echo "Making /lib hidden"
-        chflags hidden /lib
-    fi
-fi
-# NOTE: TODO: maybe use case in case of support for more systems:
-if [ "$SYSTEM" = "FreeBSD" ]; then
-    cp -fv lib/*.so /lib
-    chmod 0751 /lib
-fi
-if [ "$SYSTEM" = "Darwin" ]; then
-    cp -fv lib/*.dylib /lib
-    chmod 0751 /lib
-    # chmod 0644 /lib/*
-fi
+# echo "* Installing native libraries"
+# if [ ! -d "/lib" ]; then
+#     mkdir /lib
+#     if [ "$SYSTEM" = "Darwin" ]; then
+#         echo "Making /lib hidden"
+#         chflags hidden /lib
+#     fi
+# fi
+# # NOTE: TODO: maybe use case in case of support for more systems:
+# if [ "$SYSTEM" = "FreeBSD" ]; then
+#     cp -fv lib/*.so /lib
+#     chmod 0751 /lib
+# fi
+# if [ "$SYSTEM" = "Darwin" ]; then
+#     cp -fv lib/*.dylib /lib
+#     chmod 0751 /lib
+#     # chmod 0644 /lib/*
+# fi
 
 if [ "$system" = "FreeBSD" ]; then
     echo "* Installing ServeD rc script for FreeBSD"
@@ -63,6 +63,7 @@ if [ "$system" = "FreeBSD" ]; then
     if [ "$?" != "0" ]; then
         echo "Autostart entry already in rc.conf"
     else
-        echo "served_enable=YES" >> /etc/rc.conf
+        echo "served_enable=\"YES\"" >> /etc/rc.conf
     fi
+    service served restart
 fi
