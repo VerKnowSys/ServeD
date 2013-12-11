@@ -12,8 +12,12 @@ else
     exit 1
 fi
 
+if [ "${OUT}" = "" ]; then
+    export OUT="/dev/null" # be quiet by default
+fi
 
-bin/clean
+
+bin/clean > ${OUT} 2>&1
 ${MKDIR_BIN} -p releases
 version="$(grep 'APP_VERSION' lib/globals/globals.h | awk '{ gsub(/\"/, "", $3); gsub(/APP_VERSION/, "", $3); print $3; }')"
 base_name="served-${version}"
@@ -24,16 +28,26 @@ tar --disable-copyfile --exclude='.obj' --exclude='tmp' --exclude='build.sbt' --
 
 mkdir -p releases/${base_name}
 mv releases/${archive_name} releases/${base_name}/
-cd releases/${base_name}
+cd releases/${base_name} > ${OUT} 2>&1
 tar xf ${archive_name}
 rm -f ${archive_name}
-cd ..
+cd .. > ${OUT} 2>&1
 tar -cjf ${archive_name} ./${base_name}
 rm -rf ${base_name}
-cd ..
+cd .. > ${OUT} 2>&1
 
 if [ "${USER}" = "dmilith" ]; then
     note "Pushing package to remote server"
-    scp releases/served-${version}.tar.bz2 v:/home/dmilith/Web/Public/Sofin-releases > /dev/null 2>&1
-    ssh sofin@v "source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/served-${version}.tar.bz2"
+    definit="served"
+    name="${definit}-${version}.tar.bz2"
+    scp releases/${name} v:/home/dmilith/Web/Public/Sofin-releases > ${OUT} 2>&1
+    ssh sofin@v "source ~/.functions.sh && gather-source http://dmilith.verknowsys.com/Public/Sofin-releases/${name}" > ${OUT} 2>&1
+    asha1=$(shasum releases/${name} | awk '{print $1;}')
+    note "${name}: publish is now complete. File sha1 checksum is: ${asha1}"
+    if [ -f ~/Projects/Sofin-definitions/definitions/${definit}.def ]; then
+        note "Appending new sha1 to definition: ${definit}.def"
+        sed -ie "s/^APP_SHA=.*/APP_SHA=\"${asha1}\"/" ~/Projects/Sofin-definitions/definitions/${definit}.def
+        sed -ie "s/^APP_VERSION=.*/APP_VERSION=\"${version}\"/" ~/Projects/Sofin-definitions/definitions/${definit}.def
+    fi
+
 fi
