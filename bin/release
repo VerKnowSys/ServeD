@@ -1,5 +1,5 @@
 #!/bin/sh
-# @author: Daniel (dmilith) Dettlaff (dmilith@verknowsys.com)
+# @author: Daniel (dmilith) Dettlaff (dmilith at verknowsys.com)
 
 # load configuration from sofin.conf
 CONF_FILE="/etc/sofin.conf.sh"
@@ -46,8 +46,8 @@ if [ "${USER}" = "dmilith" ]; then
     note "${name}: publish is now complete. File sha1 checksum is: ${asha1}"
     if [ -f ~/Projects/Sofin-definitions/definitions/${definit}.def ]; then
         note "Appending new sha1 to definition: ${definit}.def"
-        sed -ie "s/^APP_SHA=.*/APP_SHA=\"${asha1}\"/" ~/Projects/Sofin-definitions/definitions/${definit}.def
-        sed -ie "s/^APP_VERSION=.*/APP_VERSION=\"${version}\"/" ~/Projects/Sofin-definitions/definitions/${definit}.def
+        sed -i -e "s/^APP_SHA=.*/APP_SHA=\"${asha1}\"/" ~/Projects/Sofin-definitions/definitions/${definit}.def
+        sed -i -e "s/^APP_VERSION=.*/APP_VERSION=\"${version}\"/" ~/Projects/Sofin-definitions/definitions/${definit}.def
     fi
 
 fi
