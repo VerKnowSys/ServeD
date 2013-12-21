@@ -1,0 +1,21 @@
+#!/bin/sh
+# author: Daniel (dmilith) Dettlaff
+# this script reloads configuration for user ttys assigned to user side svdss
+
+. /etc/sofin.conf.sh
+
+
+TTYS="/etc/ttys"
+SVD_SHELL="/bin/svdshell"
+
+cd /Users
+for user in *; do
+    if [ -f "/Users/${user}/.autostart" ]; then
+        note "Autostarting enabled for user: ${user}"
+        uid="$(stat -f%u "/Users/${user}")"
+        grep -q "${uid}" ${TTYS} || printf "\n# user: ${user}($uid):\nttyv${uid} \"${SVD_SHELL} -u${uid} -- svdss\" xterm on secure\n" >> ${TTYS}
+    fi
+done
+
+note "Reloading ${TTYS}"
+kill -HUP 1
