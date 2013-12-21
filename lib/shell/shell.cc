@@ -170,7 +170,7 @@ void execute(char **argv, int uid) {
     if (pid < 0) {
         cerr << "Error forking PTY master process!" << endl;
         exit(PTY_FORK_ERROR);
-    } else if (pid == 0) {
+    } else {
         stringstream hd, usr;
 
         if (uid == 0)
@@ -195,10 +195,10 @@ void execute(char **argv, int uid) {
         unsetenv("SUDO_COMMAND");
         unsetenv("MAIL");
         char* dest = getenv("DESTPATH");
-        if (strlen(dest) == 0) {
-            chdir(hd.str().c_str());
-        } else
+        if ((NULL != dest) && (strlen(dest) > 0)) {
             chdir(dest);
+        } else
+            chdir(hd.str().c_str());
 
         #ifdef DEVEL
             cerr << "Defined user basic env. Home dir: " << hd.str().c_str() << endl;
