@@ -4,6 +4,7 @@
 
 . /etc/sofin.conf.sh
 
+test "$(id -u)" = "0" || error "Updater must be run as root"
 
 TTYS="/etc/ttys"
 SVD_SHELL="/bin/svdshell"
